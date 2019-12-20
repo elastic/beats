@@ -21,9 +21,10 @@ import (
 	"fmt"
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
@@ -42,16 +43,16 @@ func TestPodIndexer(t *testing.T) {
 	ns := "testns"
 	nodeName := "testnode"
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Uid:       &uid,
-			Namespace: &ns,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			UID:       types.UID(uid),
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: &v1.PodSpec{
-			NodeName: &nodeName,
+		Spec: v1.PodSpec{
+			NodeName: nodeName,
 		},
 	}
 
@@ -94,16 +95,16 @@ func TestPodUIDIndexer(t *testing.T) {
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	nodeName := "testnode"
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
-			Uid:       &uid,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
+			UID:       types.UID(uid),
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: &v1.PodSpec{
-			NodeName: &nodeName,
+		Spec: v1.PodSpec{
+			NodeName: nodeName,
 		},
 	}
 
@@ -142,23 +143,25 @@ func TestContainerIndexer(t *testing.T) {
 	ns := "testns"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
+	containerImage := "containerimage"
+	initContainerImage := "initcontainerimage"
 	initContainer := "initcontainer"
 	nodeName := "testnode"
 
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Uid:       &uid,
-			Namespace: &ns,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			UID:       types.UID(uid),
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: &v1.PodStatus{
-			ContainerStatuses:     make([]*kubernetes.PodContainerStatus, 0),
-			InitContainerStatuses: make([]*kubernetes.PodContainerStatus, 0),
+		Status: v1.PodStatus{
+			ContainerStatuses:     make([]kubernetes.PodContainerStatus, 0),
+			InitContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
 		},
-		Spec: &v1.PodSpec{},
+		Spec: v1.PodSpec{},
 	}
 
 	indexers := conIndexer.GetMetadata(&pod)
@@ -179,18 +182,20 @@ func TestContainerIndexer(t *testing.T) {
 		},
 	}
 	container1 := "docker://abcde"
-	pod.Spec.NodeName = &nodeName
-	pod.Status.ContainerStatuses = []*kubernetes.PodContainerStatus{
+	pod.Spec.NodeName = nodeName
+	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
 		{
-			Name:        &container,
-			ContainerID: &container1,
+			Name:        container,
+			Image:       containerImage,
+			ContainerID: container1,
 		},
 	}
 	container2 := "docker://fghij"
-	pod.Status.InitContainerStatuses = []*kubernetes.PodContainerStatus{
+	pod.Status.InitContainerStatuses = []kubernetes.PodContainerStatus{
 		{
-			Name:        &initContainer,
-			ContainerID: &container2,
+			Name:        initContainer,
+			Image:       initContainerImage,
+			ContainerID: container2,
 		},
 	}
 
@@ -205,12 +210,14 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 
 	expected["container"] = common.MapStr{
-		"name": container,
+		"name":  container,
+		"image": containerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	expected["container"] = common.MapStr{
-		"name": initContainer,
+		"name":  initContainer,
+		"image": initContainerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
@@ -224,9 +231,9 @@ func TestFilteredGenMeta(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"foo": "bar",
 				"x":   "y",
@@ -236,7 +243,7 @@ func TestFilteredGenMeta(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: &v1.PodSpec{},
+		Spec: v1.PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -305,9 +312,9 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"foo": "bar",
 				"x":   "y",
@@ -317,7 +324,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: &v1.PodSpec{},
+		Spec: v1.PodSpec{},
 	}
 
 	assert.Nil(t, err)
@@ -349,23 +356,24 @@ func TestIpPortIndexer(t *testing.T) {
 	ns := "testns"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
+	containerImage := "containerimage"
 	ip := "1.2.3.4"
 	port := int32(80)
 	pod := kubernetes.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Uid:       &uid,
-			Namespace: &ns,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      podName,
+			UID:       types.UID(uid),
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: &v1.PodSpec{
-			Containers: make([]*kubernetes.Container, 0),
+		Spec: v1.PodSpec{
+			Containers: make([]kubernetes.Container, 0),
 		},
 
-		Status: &v1.PodStatus{
-			PodIP: &ip,
+		Status: v1.PodStatus{
+			PodIP: ip,
 		},
 	}
 
@@ -395,20 +403,21 @@ func TestIpPortIndexer(t *testing.T) {
 		},
 	}
 
-	pod.Spec.Containers = []*v1.Container{
+	pod.Spec.Containers = []v1.Container{
 		{
-			Name: &container,
-			Ports: []*v1.ContainerPort{
+			Name:  container,
+			Image: containerImage,
+			Ports: []v1.ContainerPort{
 				{
-					Name:          &container,
-					ContainerPort: &port,
+					Name:          container,
+					ContainerPort: port,
 				},
 			},
 		},
 	}
 
 	nodeName := "testnode"
-	pod.Spec.NodeName = &nodeName
+	pod.Spec.NodeName = nodeName
 
 	indexers = ipIndexer.GetMetadata(&pod)
 	assert.Equal(t, 2, len(indexers))
@@ -421,6 +430,6 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
-	expected["container"] = common.MapStr{"name": container}
+	expected["container"] = common.MapStr{"name": container, "image": containerImage}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }

@@ -7,6 +7,8 @@
 <titleabbrev>Docker</titleabbrev>
 ++++
 
+deprecated:[7.2.0, Use `container` input instead.]
+
 Use the `docker` input to read logs from Docker containers.
 
 This input searches for container logs under its path, and parse them into

@@ -24,12 +24,17 @@ import (
 
 type redisConfig struct {
 	config.ProtocolCommon `config:",inline"`
+	QueueLimits           MessageQueueConfig `config:",inline"`
 }
 
 var (
 	defaultConfig = redisConfig{
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
+		},
+		QueueLimits: MessageQueueConfig{
+			MaxBytes:    1024 * 1024,
+			MaxMessages: 20000,
 		},
 	}
 )

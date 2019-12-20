@@ -26,6 +26,8 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 var (
@@ -35,9 +37,6 @@ var (
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
 	GoImportsLocalPrefix = "github.com/elastic"
-
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
 )
 
 // Format adds license headers, formats .go files with goimports, and formats
@@ -45,7 +44,9 @@ var (
 func Format() {
 	// Don't run AddLicenseHeaders and GoImports concurrently because they
 	// both can modify the same files.
-	mg.Deps(AddLicenseHeaders)
+	if BeatProjectType != CommunityProject {
+		mg.Deps(AddLicenseHeaders)
+	}
 	mg.Deps(GoImports, PythonAutopep8)
 }
 
@@ -110,13 +111,15 @@ func PythonAutopep8() error {
 }
 
 // AddLicenseHeaders adds license headers to .go files. It applies the
-// appropriate license header based on the value of mage.BeatLicense.
+// appropriate license header based on the value of devtools.BeatLicense.
 func AddLicenseHeaders() error {
+	if os.Getenv("CHECK_HEADERS_DISABLED") != "" {
+		return nil
+	}
+
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", GoLicenserImportPath); err != nil {
-		return err
-	}
+	mg.Deps(InstallGoLicenser)
 
 	var license string
 	switch BeatLicense {
@@ -128,5 +131,6 @@ func AddLicenseHeaders() error {
 		return errors.Errorf("unknown license type %v", BeatLicense)
 	}
 
-	return sh.RunV("go-licenser", "-license", license)
+	licenser := gotool.Licenser
+	return licenser(licenser.License(license))
 }

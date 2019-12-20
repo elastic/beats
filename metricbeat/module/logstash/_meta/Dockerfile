@@ -1,4 +1,5 @@
-FROM docker.elastic.co/logstash/logstash:6.6.0
+ARG LOGSTASH_VERSION
+FROM docker.elastic.co/logstash/logstash:${LOGSTASH_VERSION}
 
 COPY healthcheck.sh /
 ENV XPACK_MONITORING_ENABLED=FALSE

@@ -1,0 +1,3302 @@
+[
+    {
+        "@timestamp": "2018-10-17T11:50:16.332Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Host-Info :- Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit) Installation :- C:\\Program Files\\IBM\\MQ (Installation1) Version :- 9.1.0.0 (p910-L180709.TRIAL) AKTION: Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6287I",
+        "ibmmq.errorlog.commentinsert": [
+            "Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit)",
+            "C:\\\\Program Files\\\\IBM\\\\MQ (Installation1)",
+            "9.1.0.0 (p910-L180709.TRIAL)"
+        ],
+        "ibmmq.errorlog.explanation": "Systeminformationen zu IBM",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 0,
+        "message": "IBM MQ V9.1.0.0 (p910-L180709.TRIAL).",
+        "process.pid": "39452.3",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.330Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "LOGGER-IO",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'LOGGER-IO' wurde vom Task-Manager f\ufffdr kritische Dienstprogramme gestartet. Diese Task wurde jetzt 1 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 857,
+        "message": "Die WS-Manager-Task 'LOGGER-IO' wurde gestartet.",
+        "process.pid": "39452.3",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.377Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "LOGGER-IO",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'LOGGER-IO' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 1499,
+        "message": "Die WS-Manager-Task 'LOGGER-IO' wurde beendet.",
+        "process.pid": "39452.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.700Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "LOGGER-IO",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'LOGGER-IO' wurde vom Task-Manager f\ufffdr kritische Dienstprogramme gestartet. Diese Task wurde jetzt 1 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 2023,
+        "message": "Die WS-Manager-Task 'LOGGER-IO' wurde gestartet.",
+        "process.pid": "3452.3",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.713Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "4",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7229I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "4 Protokolls\ufffdtze wurden bisher auf WS-Manager QM2 w\ufffdhrend der Protokollwiederholungsphase aufgerufen, um den WS-Manager in einen zuvor bekannten Status zur\ufffdckzuversetzen.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 2664,
+        "message": "4 Protokolls\ufffdtze wurden auf WS-Manager 'QM2' w\ufffdhrend der Protokollwiederholungsphase aufgerufen.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.716Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "4",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7230I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Protokollwiederholungsphase des Neustartprozesses wurde f\ufffdr WS-Manager QM2 beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 3394,
+        "message": "Die Protokollwiederholung f\ufffdr WS-Manager 'QM2' ist beendet.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.727Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7231I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "W\ufffdhrend der Wiederherstellungsphase des Transaktionsmanagerstatus wurden bisher 0 Protokolls\ufffdtze auf WS-Manager QM2 aufgerufen.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 4004,
+        "message": "0 Protokolls\ufffdtze wurden auf WS-Manager 'QM2' w\ufffdhrend der Wiederherstellungsphase aufgerufen.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.730Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7232I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Der Status der Transaktionen zu dem Zeitpunkt, als der WS-Manager beendet wurde, wurde f\ufffdr WS-Manager QM2 wiederhergestellt.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 4649,
+        "message": "Der Transaktionsmanagerstatus wurde f\ufffdr WS-Manager 'QM2' wiederhergestellt.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.740Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7233I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "0 von 0 Transaktionen, die zum Zeitpunkt der Beendigung des WS-Managers QM2 unvollst\ufffdndig waren, wurden aufgel\ufffdst.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 5274,
+        "message": "0 von 0 unvollst\ufffdndigen Transaktionen wurden f\ufffdr WS-Manager 'QM2' aufgel\ufffdst.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.746Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHECKPOINT",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'CHECKPOINT' wurde vom Task-Manager f\ufffdr kritische Dienstprogramme gestartet. Diese Task wurde jetzt 1 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 5890,
+        "message": "Die WS-Manager-Task 'CHECKPOINT' wurde gestartet.",
+        "process.pid": "3452.8",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.810Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "ERROR-LOG",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'ERROR-LOG' wurde vom Task-Manager f\ufffdr wieder anlauff\ufffdhige Dienstprogramme gestartet. Diese Task wurde jetzt 1 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 6534,
+        "message": "Die WS-Manager-Task 'ERROR-LOG' wurde gestartet.",
+        "process.pid": "23324.3",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.811Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'APP-SIGNAL' wurde vom Task-Manager f\ufffdr wieder anlauff\ufffdhige Dienstprogramme gestartet. Diese Task wurde jetzt 1 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 7186,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde gestartet.",
+        "process.pid": "23324.7",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.812Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "2"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'APP-SIGNAL' wurde vom Task-Manager f\ufffdr wieder anlauff\ufffdhige Dienstprogramme gestartet. Diese Task wurde jetzt 2 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 7841,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde gestartet.",
+        "process.pid": "23324.4",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.812Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "3"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'APP-SIGNAL' wurde vom Task-Manager f\ufffdr wieder anlauff\ufffdhige Dienstprogramme gestartet. Diese Task wurde jetzt 3 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 8496,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde gestartet.",
+        "process.pid": "23324.5",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:16.812Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "4"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die Task 'APP-SIGNAL' wurde vom Task-Manager f\ufffdr wieder anlauff\ufffdhige Dienstprogramme gestartet. Diese Task wurde jetzt 4 Mal gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 9151,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde gestartet.",
+        "process.pid": "23324.6",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.019Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "87",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8048I",
+        "ibmmq.errorlog.commentinsert": [
+            "0",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Dies sind Informationen zur Anzahl der erfolgreich erstellten oder ersetzten Objekte sowie zu den Fehlschl\ufffdgen beim Erstellen der Standardobjekte.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 9806,
+        "message": "Standardobjektstatistik: 87 erstellt. 0 ersetzt. 0 fehlgeschlagen.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.040Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8003I",
+        "ibmmq.errorlog.commentinsert": [
+            "9.1.0.0",
+            "",
+            "QM2"
+        ],
+        "ibmmq.errorlog.explanation": "IBM MQ-WS-Manager 'QM2' wurde mit V9.1.0.0 gestartet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 10481,
+        "message": "IBM MQ-WS-Manager 'QM2' wurde mit V9.1.0.0 gestartet.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.100Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'APP-SIGNAL' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 11059,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde beendet.",
+        "process.pid": "23324.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.130Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'APP-SIGNAL' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 11586,
+        "message": "Die WS-Manager-Task 'APP-SIGNAL' wurde beendet.",
+        "process.pid": "23324.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.135Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "ERROR-LOG",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'ERROR-LOG' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 12113,
+        "message": "Die WS-Manager-Task 'ERROR-LOG' wurde beendet.",
+        "process.pid": "23324.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.202Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHECKPOINT",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'CHECKPOINT' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 12637,
+        "message": "Die WS-Manager-Task 'CHECKPOINT' wurde beendet.",
+        "process.pid": "3452.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.214Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "LOGGER-IO",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Die WS-Manager-Task 'LOGGER-IO' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 13163,
+        "message": "Die WS-Manager-Task 'LOGGER-IO' wurde beendet.",
+        "process.pid": "3452.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.228Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8004I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            "QM2"
+        ],
+        "ibmmq.errorlog.explanation": "Der IBM MQ-Warteschlangenmanager 'QM2' wurde beendet.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 13686,
+        "message": "IBM MQ-Warteschlangenmanager 'QM2' wurde beendet.",
+        "process.pid": "25240.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "LOGGER-IO",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the LOGGER-IO task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 14214,
+        "message": "The queue manager task 'LOGGER-IO' has started.",
+        "process.pid": "7220.3",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "5",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7229I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "5 log records have been accessed so far on queue manager QM2 during the log replay phase in order to bring the queue manager back to a previously known state.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 14838,
+        "message": "5 log records accessed on queue manager 'QM2' during the log replay phase.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "5",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7230I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The log replay phase of the queue manager restart process has been completed for queue manager QM2.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 15541,
+        "message": "Log replay for queue manager 'QM2' complete.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7231I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "0 log records have been accessed so far on queue manager QM2 during the recovery phase of the transactions manager state.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 16155,
+        "message": "0 log records accessed on queue manager 'QM2' during the recovery phase.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7232I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The state of transactions at the time the queue manager ended has been recovered for queue manager QM2.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 16781,
+        "message": "Transaction manager state recovered for queue manager 'QM2'.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ7233I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "0 transactions out of 0 in-flight at the time queue manager QM2 ended have been resolved.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 17377,
+        "message": "0 out of 0 in-flight transactions resolved for queue manager 'QM2'.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHECKPOINT",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the CHECKPOINT task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 17966,
+        "message": "The queue manager task 'CHECKPOINT' has started.",
+        "process.pid": "7220.8",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "ERROR-LOG",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the ERROR-LOG task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 18593,
+        "message": "The queue manager task 'ERROR-LOG' has started.",
+        "process.pid": "31504.3",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 19221,
+        "message": "The queue manager task 'APP-SIGNAL' has started.",
+        "process.pid": "31504.4",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "2"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 2 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 19852,
+        "message": "The queue manager task 'APP-SIGNAL' has started.",
+        "process.pid": "31504.5",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "3"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 3 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 20483,
+        "message": "The queue manager task 'APP-SIGNAL' has started.",
+        "process.pid": "31504.6",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:18.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "4"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 4 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 21114,
+        "message": "The queue manager task 'APP-SIGNAL' has started.",
+        "process.pid": "31504.7",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8003I",
+        "ibmmq.errorlog.commentinsert": [
+            "9.1.0.0",
+            "",
+            "QM2"
+        ],
+        "ibmmq.errorlog.explanation": "IBM MQ queue manager 'QM2' started using V9.1.0.0.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 21745,
+        "message": "IBM MQ queue manager 'QM2' started using V9.1.0.0.",
+        "process.pid": "6008.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "DEFERRED_DELIVERY",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the DEFERRED_DELIVERY task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 22324,
+        "message": "The queue manager task 'DEFERRED_DELIVERY' has started.",
+        "process.pid": "31504.9",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "ACTVTRC",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the ACTVTRC task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 22976,
+        "message": "The queue manager task 'ACTVTRC' has started.",
+        "process.pid": "7220.19",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "DEFERRED-MSG",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the DEFERRED-MSG task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 23595,
+        "message": "The queue manager task 'DEFERRED-MSG' has started.",
+        "process.pid": "31504.10",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "ASYNCQ",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the ASYNCQ task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 24233,
+        "message": "The queue manager task 'ASYNCQ' has started.",
+        "process.pid": "7220.20",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "STATISTICS",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the STATISTICS task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 24849,
+        "message": "The queue manager task 'STATISTICS' has started.",
+        "process.pid": "31504.11",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "EXPIRER",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the EXPIRER task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 25481,
+        "message": "The queue manager task 'EXPIRER' has started.",
+        "process.pid": "7220.21",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "DUR-SUBS-MGR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the DUR-SUBS-MGR task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 26100,
+        "message": "The queue manager task 'DUR-SUBS-MGR' has started.",
+        "process.pid": "7220.22",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9410I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The repository manager started successfully.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 26734,
+        "message": "Repository manager started.",
+        "process.pid": "9848.1",
+        "process.title": "amqrrmfa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "TOPIC-TREE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the TOPIC-TREE task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 27196,
+        "message": "The queue manager task 'TOPIC-TREE' has started.",
+        "process.pid": "7220.23",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5052I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-CTRLR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-CTRLR task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 27824,
+        "message": "The queue manager task 'QPUBSUB-CTRLR' has started.",
+        "process.pid": "33244.3",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5037I",
+        "ibmmq.errorlog.commentinsert": [
+            "MARKINTSCAN",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The restartable utility task manager has started the MARKINTSCAN task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 28470,
+        "message": "The queue manager task 'MARKINTSCAN' has started.",
+        "process.pid": "31504.12",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "RESOURCE_MONITOR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the RESOURCE_MONITOR task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 29105,
+        "message": "The queue manager task 'RESOURCE_MONITOR' has started.",
+        "process.pid": "7220.24",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "PRESERVED-Q",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the PRESERVED-Q task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 29751,
+        "message": "The queue manager task 'PRESERVED-Q' has started.",
+        "process.pid": "7220.26",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "Q-DELETION",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the Q-DELETION task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 30382,
+        "message": "The queue manager task 'Q-DELETION' has started.",
+        "process.pid": "7220.25",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5052I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-SUBPT-NLCACHE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-SUBPT-NLCACHE task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 31010,
+        "message": "The queue manager task 'QPUBSUB-SUBPT-NLCACHE' has started.",
+        "process.pid": "33244.5",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5052I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-QUEUE-NLCACHE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-QUEUE-NLCACHE task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 31680,
+        "message": "The queue manager task 'QPUBSUB-QUEUE-NLCACHE' has started.",
+        "process.pid": "33244.4",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5051I",
+        "ibmmq.errorlog.commentinsert": [
+            "MULTICAST",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The critical utility task manager has started the MULTICAST task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 32350,
+        "message": "The queue manager task 'MULTICAST' has started.",
+        "process.pid": "7220.27",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            "1"
+        ],
+        "ibmmq.errorlog.code": "AMQ5052I",
+        "ibmmq.errorlog.commentinsert": [
+            "PUBSUB-DAEMON",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the PUBSUB-DAEMON task. This task has now started 1 times.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 32975,
+        "message": "The queue manager task 'PUBSUB-DAEMON' has started.",
+        "process.pid": "33244.6",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5975I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Controller",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Controller' has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 33621,
+        "message": "'IBM MQ Distributed Pub/Sub Controller' has started.",
+        "process.pid": "33244.6",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5975I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Publish Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Publish Task' has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 34193,
+        "message": "'IBM MQ Distributed Pub/Sub Publish Task' has started.",
+        "process.pid": "33244.9",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5975I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Fan Out Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Fan Out Task' has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 34771,
+        "message": "'IBM MQ Distributed Pub/Sub Fan Out Task' has started.",
+        "process.pid": "33244.7",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5975I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Command Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Command Task' has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 35349,
+        "message": "'IBM MQ Distributed Pub/Sub Command Task' has started.",
+        "process.pid": "33244.8",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "9264",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5022I",
+        "ibmmq.errorlog.commentinsert": [
+            "SYSTEM.CHANNEL.INITQ",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The channel initiator process has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 35927,
+        "message": "The channel initiator has started. ProcessId(9264).",
+        "process.pid": "27056.1",
+        "process.title": "amqzmgr0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "19060",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5024I",
+        "ibmmq.errorlog.commentinsert": [
+            "SYSTEM.CMDSERVER.1",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The command server process has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 36512,
+        "message": "The command server has started. ProcessId(19060).",
+        "process.pid": "27056.1",
+        "process.title": "amqzmgr0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5806I",
+        "ibmmq.errorlog.commentinsert": [
+            "QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Queued Publish/Subscribe Daemon started for queue manager QM2.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 37091,
+        "message": "Queued Publish/Subscribe Daemon started for queue manager QM2.",
+        "process.pid": "21220.1",
+        "process.title": "amqfqpub.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8024I",
+        "ibmmq.errorlog.commentinsert": [
+            "SYSTEM.CHANNEL.INITQ",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The channel initiator for queue SYSTEM.CHANNEL.INITQ has been started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 37649,
+        "message": "IBM MQ channel initiator started.",
+        "process.pid": "9264.1",
+        "process.title": "runmqchi.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-17T13:50:19.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "37632",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5026I",
+        "ibmmq.errorlog.commentinsert": [
+            "LISTENER.TCP",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The listener process has started.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 38202,
+        "message": "The listener 'LISTENER.TCP' has started. ProcessId(37632).",
+        "process.pid": "27056.1",
+        "process.title": "amqzmgr0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T15:18:48.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9002I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHL.QM1.QM2",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Channel 'CHL.QM1.QM2' is starting.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 38778,
+        "message": "Channel 'CHL.QM1.QM2' is starting.",
+        "process.pid": "44852.3",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T15:19:11.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9002I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHL.QM2.QM1",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Channel 'CHL.QM2.QM1' is starting.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 39288,
+        "message": "Channel 'CHL.QM2.QM1' is starting.",
+        "process.pid": "37368.1",
+        "process.title": "runmqchl.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:06.000Z",
+        "destination.address": "127.0.0.1",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Contact the systems administrator, who should examine the channel authentication records to ensure that the correct settings have been configured. The ALTER QMGR CHLAUTH switch is used to control whether channel authentication records are used. The command DISPLAY CHLAUTH can be used to query the channel authentication records.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9776E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "127.0.0.1",
+            "MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)"
+        ],
+        "ibmmq.errorlog.explanation": "The inbound channel 'CLI.LOGSTASH' was blocked from address '127.0.0.1' because the active values of the channel were mapped to a userid which should be blocked. The active values of the channel were 'MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 39798,
+        "message": "Channel was blocked by userid",
+        "process.pid": "44852.4",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:06.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9999E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "44852(28928)",
+            "127.0.0.1"
+        ],
+        "ibmmq.errorlog.explanation": "The channel program running under process ID 44852(28928) for channel 'CLI.LOGSTASH' ended abnormally. The host name is '127.0.0.1'; in some cases the host name cannot be determined and so is shown as '????'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 41028,
+        "message": "Channel 'CLI.LOGSTASH' to host '127.0.0.1' ended abnormally.",
+        "process.pid": "44852.4",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:12.000Z",
+        "destination.address": "127.0.0.1",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Contact the systems administrator, who should examine the channel authentication records to ensure that the correct settings have been configured. The ALTER QMGR CHLAUTH switch is used to control whether channel authentication records are used. The command DISPLAY CHLAUTH can be used to query the channel authentication records.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9776E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "127.0.0.1",
+            "MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)"
+        ],
+        "ibmmq.errorlog.explanation": "The inbound channel 'CLI.LOGSTASH' was blocked from address '127.0.0.1' because the active values of the channel were mapped to a userid which should be blocked. The active values of the channel were 'MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 42182,
+        "message": "Channel was blocked by userid",
+        "process.pid": "44852.5",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:12.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9999E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "44852(22352)",
+            "127.0.0.1"
+        ],
+        "ibmmq.errorlog.explanation": "The channel program running under process ID 44852(22352) for channel 'CLI.LOGSTASH' ended abnormally. The host name is '127.0.0.1'; in some cases the host name cannot be determined and so is shown as '????'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 43412,
+        "message": "Channel 'CLI.LOGSTASH' to host '127.0.0.1' ended abnormally.",
+        "process.pid": "44852.5",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:28.000Z",
+        "destination.address": "127.0.0.1",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Contact the systems administrator, who should examine the channel authentication records to ensure that the correct settings have been configured. The ALTER QMGR CHLAUTH switch is used to control whether channel authentication records are used. The command DISPLAY CHLAUTH can be used to query the channel authentication records.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9776E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "127.0.0.1",
+            "MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)"
+        ],
+        "ibmmq.errorlog.explanation": "The inbound channel 'CLI.LOGSTASH' was blocked from address '127.0.0.1' because the active values of the channel were mapped to a userid which should be blocked. The active values of the channel were 'MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 44566,
+        "message": "Channel was blocked by userid",
+        "process.pid": "44852.6",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:10:28.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9999E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "44852(4436)",
+            "127.0.0.1"
+        ],
+        "ibmmq.errorlog.explanation": "The channel program running under process ID 44852(4436) for channel 'CLI.LOGSTASH' ended abnormally. The host name is '127.0.0.1'; in some cases the host name cannot be determined and so is shown as '????'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 45796,
+        "message": "Channel 'CLI.LOGSTASH' to host '127.0.0.1' ended abnormally.",
+        "process.pid": "44852.6",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:20.000Z",
+        "destination.address": "127.0.0.1",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Contact the systems administrator, who should examine the channel authentication records to ensure that the correct settings have been configured. The ALTER QMGR CHLAUTH switch is used to control whether channel authentication records are used. The command DISPLAY CHLAUTH can be used to query the channel authentication records.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9776E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "127.0.0.1",
+            "MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)"
+        ],
+        "ibmmq.errorlog.explanation": "The inbound channel 'CLI.LOGSTASH' was blocked from address '127.0.0.1' because the active values of the channel were mapped to a userid which should be blocked. The active values of the channel were 'MCAUSER(felix) CLNTUSER(felix) ADDRESS(picmention)'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 46948,
+        "message": "Channel was blocked by userid",
+        "process.pid": "44852.7",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:20.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9999E",
+        "ibmmq.errorlog.commentinsert": [
+            "CLI.LOGSTASH",
+            "44852(34856)",
+            "127.0.0.1"
+        ],
+        "ibmmq.errorlog.explanation": "The channel program running under process ID 44852(34856) for channel 'CLI.LOGSTASH' ended abnormally. The host name is '127.0.0.1'; in some cases the host name cannot be determined and so is shown as '????'.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 48178,
+        "message": "Channel 'CLI.LOGSTASH' to host '127.0.0.1' ended abnormally.",
+        "process.pid": "44852.7",
+        "process.title": "amqrmppa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9411I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The repository manager ended normally.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 49332,
+        "message": "Repository manager ended normally.",
+        "process.pid": "9848.1",
+        "process.title": "amqrrmfa.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9542W",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The program will end because the queue manager is quiescing.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 49795,
+        "message": "Queue manager is ending.",
+        "process.pid": "9264.1",
+        "process.title": "runmqchi.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "2162",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "DEFERRED_DELIVERY",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task DEFERRED_DELIVERY has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 50270,
+        "message": "The queue manager task 'DEFERRED_DELIVERY' has ended.",
+        "process.pid": "31504.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9542W",
+        "ibmmq.errorlog.commentinsert": [
+            "CHL.QM2.QM1",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The program will end because the queue manager is quiescing.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 50863,
+        "message": "Queue manager is ending.",
+        "process.pid": "37368.1",
+        "process.title": "runmqchl.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "ACTVTRC",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task ACTVTRC has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 51389,
+        "message": "The queue manager task 'ACTVTRC' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "ASYNCQ",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task ASYNCQ has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 51910,
+        "message": "The queue manager task 'ASYNCQ' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "EXPIRER",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task EXPIRER has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 52428,
+        "message": "The queue manager task 'EXPIRER' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "DUR-SUBS-MGR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task DUR-SUBS-MGR has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 52949,
+        "message": "The queue manager task 'DUR-SUBS-MGR' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "TOPIC-TREE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task TOPIC-TREE has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 53485,
+        "message": "The queue manager task 'TOPIC-TREE' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "RESOURCE_MONITOR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task RESOURCE_MONITOR has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 54015,
+        "message": "The queue manager task 'RESOURCE_MONITOR' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "Q-DELETION",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task Q-DELETION has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 54563,
+        "message": "The queue manager task 'Q-DELETION' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "PRESERVED-Q",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task PRESERVED-Q has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 55093,
+        "message": "The queue manager task 'PRESERVED-Q' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "MULTICAST",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task MULTICAST has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 55626,
+        "message": "The queue manager task 'MULTICAST' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ9001I",
+        "ibmmq.errorlog.commentinsert": [
+            "CHL.QM2.QM1",
+            "37368(31284)",
+            "127.0.0.1(1414)"
+        ],
+        "ibmmq.errorlog.explanation": "Channel 'CHL.QM2.QM1' to host '127.0.0.1(1414)' ended normally.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 56153,
+        "message": "Channel 'CHL.QM2.QM1' ended normally.",
+        "process.pid": "37368.1",
+        "process.title": "runmqchl.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "APP-SIGNAL",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task APP-SIGNAL has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 56800,
+        "message": "The queue manager task 'APP-SIGNAL' has ended.",
+        "process.pid": "31504.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "ACTVTRC",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task ACTVTRC has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 57331,
+        "message": "The queue manager task 'ACTVTRC' has ended.",
+        "process.pid": "7220.1",
+        "process.title": "amqzmuc0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "DEFERRED-MSG",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task DEFERRED-MSG has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 57852,
+        "message": "The queue manager task 'DEFERRED-MSG' has ended.",
+        "process.pid": "31504.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-CTRLR",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-CTRLR has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 58389,
+        "message": "The queue manager task 'QPUBSUB-CTRLR' has ended.",
+        "process.pid": "33244.1",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-QUEUE-NLCACHE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-QUEUE-NLCACHE has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 58929,
+        "message": "The queue manager task 'QPUBSUB-QUEUE-NLCACHE' has ended.",
+        "process.pid": "33244.1",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "STATISTICS",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task STATISTICS has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 59493,
+        "message": "The queue manager task 'STATISTICS' has ended.",
+        "process.pid": "31504.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "QPUBSUB-SUBPT-NLCACHE",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-SUBPT-NLCACHE has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 60024,
+        "message": "The queue manager task 'QPUBSUB-SUBPT-NLCACHE' has ended.",
+        "process.pid": "33244.1",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "MARKINTSCAN",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task MARKINTSCAN has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 60588,
+        "message": "The queue manager task 'MARKINTSCAN' has ended.",
+        "process.pid": "31504.1",
+        "process.title": "amqzmur0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5041I",
+        "ibmmq.errorlog.commentinsert": [
+            "PUBSUB-DAEMON",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "The queue manager task PUBSUB-DAEMON has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 61122,
+        "message": "The queue manager task 'PUBSUB-DAEMON' has ended.",
+        "process.pid": "33244.1",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5976I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Publish Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Publish Task' has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 61662,
+        "message": "'IBM MQ Distributed Pub/Sub Publish Task' has ended.",
+        "process.pid": "33244.9",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5976I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Command Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Command Task' has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 62231,
+        "message": "'IBM MQ Distributed Pub/Sub Command Task' has ended.",
+        "process.pid": "33244.8",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5976I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Fan Out Task",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Fan Out Task' has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 62800,
+        "message": "'IBM MQ Distributed Pub/Sub Fan Out Task' has ended.",
+        "process.pid": "33244.7",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    },
+    {
+        "@timestamp": "2018-10-18T16:13:46.000Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ5976I",
+        "ibmmq.errorlog.commentinsert": [
+            "IBM MQ Distributed Pub/Sub Controller",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "'IBM MQ Distributed Pub/Sub Controller' has ended.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "ibmmq.errorlog.qmgr": "QM2",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 63369,
+        "message": "'IBM MQ Distributed Pub/Sub Controller' has ended.",
+        "process.pid": "33244.6",
+        "process.title": "amqzmuf0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
+    }
+]

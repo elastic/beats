@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Node represents a node object
 type Node struct {
 	ID       int64   `json:"id"`
 	Name     string  `json:"name"`
@@ -42,10 +43,12 @@ type Node struct {
 	DeviceClass     string  `json:"device_class"`
 }
 
+// Output contains a node list from the df response
 type Output struct {
 	Nodes []Node `json:"nodes"`
 }
 
+// OsdTreeRequest is a OSD response object
 type OsdTreeRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`

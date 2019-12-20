@@ -19,13 +19,14 @@ package dashboards
 
 import (
 	"io/ioutil"
+	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/filebeat/generator"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
 )
@@ -64,6 +65,9 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, L
 	if err != nil {
 		return nil, ListYML{}, errors.Wrap(err, "error reading the list of dashboards")
 	}
+	if len(list.Dashboards) == 0 {
+		return nil, ListYML{}, errors.Errorf("dashboards list is empty in file %v", ymlPath)
+	}
 
 	results, err := ExportAll(client, list)
 
@@ -85,8 +89,8 @@ func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
 
 // SaveToFile creates the required directories if needed and saves dashboard.
 func SaveToFile(dashboard common.MapStr, filename, root string, version common.Version) error {
-	dashboardsPath := "_meta/kibana/" + strconv.Itoa(version.Major) + "/dashboard"
-	err := generator.CreateDirectories(root, dashboardsPath)
+	dashboardsPath := path.Join("_meta", "kibana", strconv.Itoa(version.Major), "dashboard")
+	err := os.MkdirAll(path.Join(root, dashboardsPath), 0750)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,9 @@
 [
     {
-        "@timestamp": "2016-12-09T13:08:33.000Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2016-12-09T13:08:33.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 0,
@@ -12,9 +12,9 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.335Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -25,9 +25,9 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.335Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -38,9 +38,9 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.336Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -51,9 +51,9 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.345Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -64,9 +64,9 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -77,32 +77,25 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.784Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 832,
-        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.",
+        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.\nVersion: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew",
         "mysql.thread_id": 0,
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 935,
-        "message": "Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew",
-        "service.type": "mysql"
-    },
-    {
         "@timestamp": "2016-12-09T22:21:02.443Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -112,10 +105,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -124,10 +117,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -136,10 +129,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1422,

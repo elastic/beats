@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/libbeat/paths"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -69,6 +70,14 @@ func WithModuleOptions(options ...module.Option) Option {
 	}
 }
 
+// WithLightModules enables light modules support
+func WithLightModules() Option {
+	return func(*Metricbeat) {
+		path := paths.Resolve(paths.Home, "module")
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+	}
+}
+
 // Creator returns a beat.Creator for instantiating a new instance of the
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
@@ -90,6 +99,7 @@ func Creator(options ...Option) beat.Creator {
 //     )
 func DefaultCreator() beat.Creator {
 	return Creator(
+		WithLightModules(),
 		WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithServiceName(),
@@ -97,11 +107,32 @@ func DefaultCreator() beat.Creator {
 	)
 }
 
+// DefaultTestModulesCreator returns a customized instance of Metricbeat
+// where startup delay has been disabled to workaround the fact that
+// Modules() will return the static modules (not the dynamic ones)
+// with a start delay.
+//
+// This is equivalent to calling
+//
+//  beater.Creator(
+//		beater.WithLightModules(),
+//		beater.WithModuleOptions(
+//			module.WithMetricSetInfo(),
+//			module.WithMaxStartDelay(0),
+//		),
+//	)
+func DefaultTestModulesCreator() beat.Creator {
+	return Creator(
+		WithLightModules(),
+		WithModuleOptions(
+			module.WithMetricSetInfo(),
+			module.WithMaxStartDelay(0),
+		),
+	)
+}
+
 // newMetricbeat creates and returns a new Metricbeat instance.
 func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
-	// List all registered modules and metricsets.
-	logp.Debug("modules", "%s", mb.Registry.String())
-
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
@@ -120,6 +151,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		applyOption(metricbeat)
 	}
 
+	// List all registered modules and metricsets.
+	logp.Debug("modules", "Available modules and metricsets: %s", mb.Registry.String())
+
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
 		return metricbeat, nil
@@ -136,7 +170,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 		failed := false
 
-		connector, err := module.NewConnector(b.Publisher, moduleCfg, nil)
+		connector, err := module.NewConnector(b.Info, b.Publisher, moduleCfg, nil)
 		if err != nil {
 			errs = append(errs, err)
 			failed = true
@@ -167,7 +201,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 	if config.Autodiscover != nil {
 		var err error
-		factory := module.NewFactory(metricbeat.moduleOptions...)
+		factory := module.NewFactory(b.Info, metricbeat.moduleOptions...)
 		adapter := autodiscover.NewFactoryAdapter(factory)
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
@@ -204,7 +238,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(bt.moduleOptions...)
+	factory := module.NewFactory(b.Info, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
 	wg.Add(1)

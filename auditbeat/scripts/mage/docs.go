@@ -25,20 +25,20 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // ModuleDocs collects documentation from modules (both OSS and X-Pack).
 func ModuleDocs() error {
 	dirsWithModules := []string{
-		mage.OSSBeatDir(),
-		mage.XPackBeatDir(),
+		devtools.OSSBeatDir(),
+		devtools.XPackBeatDir(),
 	}
 
 	// Generate config.yml files for each module.
 	var configFiles []string
 	for _, path := range dirsWithModules {
-		files, err := mage.FindFiles(filepath.Join(path, configTemplateGlob))
+		files, err := devtools.FindFiles(filepath.Join(path, configTemplateGlob))
 		if err != nil {
 			return errors.Wrap(err, "failed to find config templates")
 		}
@@ -56,9 +56,9 @@ func ModuleDocs() error {
 	for _, src := range configFiles {
 		dst := strings.TrimSuffix(src, ".tmpl")
 		configs = append(configs, dst)
-		mage.MustExpandFile(src, dst, params)
+		devtools.MustExpandFile(src, dst, params)
 	}
-	defer mage.Clean(configs)
+	defer devtools.Clean(configs)
 
 	// Remove old.
 	for _, path := range dirsWithModules {
@@ -71,18 +71,18 @@ func ModuleDocs() error {
 	}
 
 	// Run the docs_collector.py script.
-	ve, err := mage.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv()
 	if err != nil {
 		return err
 	}
 
-	python, err := mage.LookVirtualenvPath(ve, "python")
+	python, err := devtools.LookVirtualenvPath(ve, "python")
 	if err != nil {
 		return err
 	}
 
 	// TODO: Port this script to Go.
-	args := []string{mage.OSSBeatDir("scripts/docs_collector.py"), "--base-paths"}
+	args := []string{devtools.OSSBeatDir("scripts/docs_collector.py"), "--base-paths"}
 	args = append(args, dirsWithModules...)
 
 	return sh.Run(python, args...)
@@ -92,12 +92,12 @@ func ModuleDocs() error {
 // (including x-pack).
 func FieldDocs() error {
 	inputs := []string{
-		mage.OSSBeatDir("module"),
-		mage.XPackBeatDir("module"),
+		devtools.OSSBeatDir("module"),
+		devtools.XPackBeatDir("module"),
 	}
-	output := mage.CreateDir("build/fields/fields.all.yml")
-	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
 		return err
 	}
-	return mage.Docs.FieldDocs(output)
+	return devtools.Docs.FieldDocs(output)
 }

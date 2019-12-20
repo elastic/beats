@@ -32,7 +32,7 @@ type Config struct {
 	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
 	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
 	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
-	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotation"`
+	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys

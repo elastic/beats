@@ -62,13 +62,25 @@
             },
             {
                 "date": {
+                    "if": "ctx.event.timezone == null",
                     "field": "iptables.raw_date",
-                    "ignore_failure": true,
-                    {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                     "formats": [
                         "MMM  d HH:mm:ss",
                         "MMM dd HH:mm:ss"
-                    ]
+                    ],
+                    "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+                }
+            },
+            {
+                "date": {
+                    "if": "ctx.event.timezone != null",
+                    "field": "iptables.raw_date",
+                    "formats": [
+                        "MMM  d HH:mm:ss",
+                        "MMM dd HH:mm:ss"
+                    ],
+                    "timezone": "{{ event.timezone }}",
+                    "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
                 }
             },
             {
@@ -95,6 +107,58 @@
                 "geoip": {
                     "field": "destination.ip",
                     "target_field": "destination.geo",
+                    "ignore_missing": true
+                }
+            },
+            {
+                "geoip": {
+                    "database_file": "GeoLite2-ASN.mmdb",
+                    "field": "source.ip",
+                    "target_field": "source.as",
+                    "properties": [
+                        "asn",
+                        "organization_name"
+                    ],
+                    "ignore_missing": true
+                }
+            },
+            {
+                "geoip": {
+                    "database_file": "GeoLite2-ASN.mmdb",
+                    "field": "destination.ip",
+                    "target_field": "destination.as",
+                    "properties": [
+                        "asn",
+                        "organization_name"
+                    ],
+                    "ignore_missing": true
+                }
+            },
+            {
+                "rename": {
+                    "field": "source.as.asn",
+                    "target_field": "source.as.number",
+                    "ignore_missing": true
+                }
+            },
+            {
+                "rename": {
+                    "field": "source.as.organization_name",
+                    "target_field": "source.as.organization.name",
+                    "ignore_missing": true
+                }
+            },
+            {
+                "rename": {
+                    "field": "destination.as.asn",
+                    "target_field": "destination.as.number",
+                    "ignore_missing": true
+                }
+            },
+            {
+                "rename": {
+                    "field": "destination.as.organization_name",
+                    "target_field": "destination.as.organization.name",
                     "ignore_missing": true
                 }
             },

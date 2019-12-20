@@ -20,24 +20,15 @@ package channel
 import (
 	"sync"
 
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
 )
 
 type subOutlet struct {
 	done      chan struct{}
-	ch        chan *util.Data
+	ch        chan beat.Event
 	res       chan bool
 	mutex     sync.Mutex
 	closeOnce sync.Once
-}
-
-// ConnectTo creates a new Connector, combining a beat.Pipeline with an outlet Factory.
-func ConnectTo(pipeline beat.Pipeline, factory Factory) Connector {
-	return func(cfg *common.Config, m *common.MapStrPointer) (Outleter, error) {
-		return factory(pipeline, cfg, m)
-	}
 }
 
 // SubOutlet create a sub-outlet, which can be closed individually, without closing the
@@ -45,7 +36,7 @@ func ConnectTo(pipeline beat.Pipeline, factory Factory) Connector {
 func SubOutlet(out Outleter) Outleter {
 	s := &subOutlet{
 		done: make(chan struct{}),
-		ch:   make(chan *util.Data),
+		ch:   make(chan beat.Event),
 		res:  make(chan bool, 1),
 	}
 
@@ -75,7 +66,7 @@ func (o *subOutlet) Done() <-chan struct{} {
 	return o.done
 }
 
-func (o *subOutlet) OnEvent(d *util.Data) bool {
+func (o *subOutlet) OnEvent(event beat.Event) bool {
 
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
@@ -89,7 +80,7 @@ func (o *subOutlet) OnEvent(d *util.Data) bool {
 	case <-o.done:
 		return false
 
-	case o.ch <- d:
+	case o.ch <- event:
 		select {
 		case <-o.done:
 

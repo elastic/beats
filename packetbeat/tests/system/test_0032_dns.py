@@ -254,6 +254,6 @@ class Test(BaseTest):
         assert o["dns.opt.do"] == True
         assert o["dns.opt.version"] == "0"
         assert o["dns.opt.udp_size"] == 4000
-        assert o["dns.opt.ext_rcode"] == "Unknown 15"
+        assert o["dns.opt.ext_rcode"] == "NOERROR"
         assert len(o["dns.answers"]) == 3
         assert all("ietf.org" in x["name"] for x in o["dns.answers"])

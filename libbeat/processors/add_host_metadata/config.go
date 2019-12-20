@@ -19,25 +19,16 @@ package add_host_metadata
 
 import (
 	"time"
+
+	"github.com/elastic/beats/libbeat/processors/util"
 )
 
 // Config for add_host_metadata processor.
 type Config struct {
-	NetInfoEnabled bool          `config:"netinfo.enabled"` // Add IP and MAC to event
-	CacheTTL       time.Duration `config:"cache.ttl"`
-	Geo            *GeoConfig    `config:"geo"`
-	Name           string        `config:"name"`
-}
-
-// GeoConfig contains geo configuration data.
-type GeoConfig struct {
-	Name           string `config:"name"`
-	Location       string `config:"location"`
-	ContinentName  string `config:"continent_name"`
-	CountryISOCode string `config:"country_iso_code"`
-	RegionName     string `config:"region_name"`
-	RegionISOCode  string `config:"region_iso_code"`
-	CityName       string `config:"city_name"`
+	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
+	CacheTTL       time.Duration   `config:"cache.ttl"`
+	Geo            *util.GeoConfig `config:"geo"`
+	Name           string          `config:"name"`
 }
 
 func defaultConfig() Config {

@@ -38,6 +38,7 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
 			"default_region":    defaultRegion,
+			"regions":           []string{"us-east-1"},
 		}
 
 		if okSessionToken && sessionToken != "" {

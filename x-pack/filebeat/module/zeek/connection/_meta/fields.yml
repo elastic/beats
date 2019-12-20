@@ -1,0 +1,59 @@
+- name: connection
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek Connection log
+  fields:
+    - name: local_orig
+      type: boolean
+      description: >
+        Indicates whether the session is originated locally.
+
+    - name: local_resp
+      type: boolean
+      description: >
+        Indicates whether the session is responded locally.
+
+    - name: missed_bytes
+      type: long
+      description: >
+        Missed bytes for the session.
+
+    - name: state
+      type: keyword
+      description: >
+        Code indicating the state of the session.
+
+    - name: state_message
+      type: keyword
+      description: >
+        The state of the session.
+
+    - name: icmp
+      type: group
+      fields:
+        - name: type
+          type: integer
+          description: >
+            ICMP message type.
+
+        - name: code
+          type: integer
+          description: >
+            ICMP message code.
+
+    - name: history
+      type: keyword
+      description: >
+        Flags indicating the history of the session.
+
+    - name: vlan
+      type: integer
+      description: >
+        VLAN identifier.
+
+    - name: inner_vlan
+      type: integer
+      description: >
+        VLAN identifier.
+

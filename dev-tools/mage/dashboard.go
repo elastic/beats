@@ -19,8 +19,11 @@ package mage
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"strconv"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
@@ -33,27 +36,58 @@ func ExportDashboard() error {
 
 	id := EnvOr("ID", "")
 	if id == "" {
-		return fmt.Errorf("Dashboad ID must be specified")
+		return fmt.Errorf("Dashboard ID must be specified")
 	}
-
-	kibanaURL := EnvOr("KIBANA_URL", "")
 
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
 	}
 
+	dashboardCmd := sh.RunCmd("go", "run", filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"))
+
 	// TODO: This is currently hardcoded for KB 7, we need to figure out what we do for KB 8 if applicable
 	file := CWD("module", module, "_meta/kibana/7/dashboard", id+".json")
 
-	dashboardCmd := sh.RunCmd("go", "run",
-		filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"),
-		"-output", file, "-dashboard", id,
-	)
-
-	if kibanaURL != "" {
-		return dashboardCmd("-kibana", kibanaURL)
-	} else {
-		return dashboardCmd()
+	args := []string{
+		"-output", file,
+		"-dashboard", id,
 	}
+	if kibanaURL := EnvOr("KIBANA_URL", ""); kibanaURL != "" {
+		args = append(args, "-kibana", kibanaURL)
+	}
+
+	return dashboardCmd(args...)
+}
+
+// ImportDashboards imports dashboards to Kibana using the Beat setup command.
+//
+// Depends on: build, dashboard
+//
+// Optional environment variables:
+// - KIBANA_URL: URL of Kibana
+// - KIBANA_ALWAYS: Connect to Kibana without checking ES version. Default true.
+// - ES_URL: URL of Elasticsearch (only used with KIBANA_ALWAYS=false).
+func ImportDashboards(buildDep, dashboardDep interface{}) error {
+	mg.Deps(buildDep, dashboardDep)
+
+	setupDashboards := sh.RunCmd(CWD(BeatName+binaryExtension(GOOS)),
+		"setup", "--dashboards",
+		"-E", "setup.dashboards.directory="+kibanaBuildDir)
+
+	kibanaAlways := true
+	if b, err := strconv.ParseBool(os.Getenv("KIBANA_ALWAYS")); err == nil {
+		kibanaAlways = b
+	}
+
+	var args []string
+	if kibanaURL := EnvOr("KIBANA_URL", ""); kibanaURL != "" {
+		args = append(args, "-E", "setup.kibana.host="+kibanaURL)
+	}
+	if esURL := EnvOr("ES_URL", ""); !kibanaAlways && esURL != "" {
+		args = append(args, "-E", "setup.elasticsearch.host="+esURL)
+	}
+	args = append(args, "-E", "setup.dashboards.always_kibana="+strconv.FormatBool(kibanaAlways))
+
+	return setupDashboards(args...)
 }

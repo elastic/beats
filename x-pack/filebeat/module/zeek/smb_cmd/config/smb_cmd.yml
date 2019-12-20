@@ -1,0 +1,87 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: smb
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.smb_cmd"
+
+  - drop_fields:
+      fields:
+        - "zeek.smb_cmd.referenced_file.ts"
+        - "zeek.smb_cmd.referenced_file.id.orig_p"
+        - "zeek.smb_cmd.referenced_file.id.resp_p"
+        - "zeek.smb_cmd.referenced_file.size"
+        - "zeek.smb_cmd.referenced_file.times.modified"
+        - "zeek.smb_cmd.referenced_file.times.accessed"
+        - "zeek.smb_cmd.referenced_file.times.created"
+        - "zeek.smb_cmd.referenced_file.times.changed"
+      ignore_missing: true
+
+  - drop_fields:
+      when:
+        not:
+          has_fields: ["zeek.smb_cmd.referenced_file.action"]
+      fields:
+        - "zeek.smb_cmd.referenced_file.uid"
+        - "zeek.smb_cmd.referenced_file.id.orig_h"
+        - "zeek.smb_cmd.referenced_file.id.resp_h"
+      ignore_missing: true
+
+  - rename:
+      fields:
+        - from: "zeek.smb_cmd.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.smb_cmd.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.smb_cmd.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.smb_cmd.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.smb_cmd.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.smb_cmd.referenced_file.uid"
+          to: "zeek.smb_cmd.file.uid"
+
+        - from: "zeek.smb_cmd.referenced_file.id.orig_h"
+          to: "zeek.smb_cmd.file.host.tx"
+
+        - from: "zeek.smb_cmd.referenced_file.id.resp_h"
+          to: "zeek.smb_cmd.file.host.rx"
+
+        - from: "zeek.smb_cmd.referenced_file.name"
+          to: "zeek.smb_cmd.file.name"
+
+        - from: "zeek.smb_cmd.referenced_file.path"
+          to: "zeek.smb_cmd.file.path"
+
+        - from: "zeek.smb_cmd.referenced_file.action"
+          to: "zeek.smb_cmd.file.action"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

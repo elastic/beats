@@ -46,22 +46,16 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Nats routes API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Nats routes API response")
 	}
 	event.MetricSetFields, err = routesSchema.Apply(inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying routes schema")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure applying routes schema")
 	}
 
 	event.ModuleFields, err = moduleSchema.Apply(inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying module schema")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure applying module schema")
 	}
 	r.Event(event)
 	return nil

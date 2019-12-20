@@ -44,6 +44,9 @@ type Event struct {
 	Host      string        // Host from which the data was collected.
 	Service   string        // Service type
 	Took      time.Duration // Amount of time it took to collect the event data.
+	Period    time.Duration // Period that is set to retrieve the events
+
+	DisableTimeSeries bool // true if the event doesn't contain timeseries data
 }
 
 // BeatEvent returns a new beat.Event containing the data this Event. It does
@@ -58,8 +61,9 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 	}
 
 	b := beat.Event{
-		Timestamp: e.Timestamp,
-		Fields:    e.RootFields,
+		Timestamp:  e.Timestamp,
+		Fields:     e.RootFields,
+		TimeSeries: !e.DisableTimeSeries,
 	}
 
 	if len(e.ModuleFields) > 0 {
@@ -107,17 +111,26 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 
 // AddMetricSetInfo is an EventModifier that adds information about the
 // MetricSet that generated the event. It will always add the metricset and
-// module names. And it will add the host, namespace, and rtt (round-trip time
-// in microseconds) values if they are non-zero values.
+// module names. And it will add the host, period (in milliseconds), and
+// duration (round-trip time in nanoseconds) values if they are non-zero
+// values.
 //
+//   {
+//     "event": {
+//       "dataset": "apache.status",
+//       "duration": 115,
+//       "module": "apache"
+//     },
+//     "service": {
+//       "address": "127.0.0.1",
+//     },
 //     "metricset": {
-//       "host": "apache",
-//       "module": "apache",
 //       "name": "status",
-//       "rtt": 115
+//       "period": 10000
 //     }
+//   }
+//
 func AddMetricSetInfo(module, metricset string, event *Event) {
-
 	if event.Namespace == "" {
 		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
 	}
@@ -137,6 +150,9 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 	}
 	if event.Took > 0 {
 		e.Put("event.duration", event.Took/time.Nanosecond)
+	}
+	if event.Period > 0 {
+		e.Put("metricset.period", event.Period/time.Millisecond)
 	}
 
 	if event.RootFields == nil {

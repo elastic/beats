@@ -18,6 +18,10 @@
 package state_container
 
 import (
+	"strings"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -105,14 +109,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error getting event")
 	}
 
 	m.enricher.Enrich(events)
@@ -131,6 +133,22 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			}
 		}
 
+		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
+		var rootFields common.MapStr
+		if containerID, ok := event["id"]; ok {
+			// we don't expect errors here, but if any we would obtain an
+			// empty string
+			cID := (containerID).(string)
+			split := strings.Index(cID, "://")
+			if split != -1 {
+				rootFields = common.MapStr{
+					"container": common.MapStr{
+						"runtime": cID[:split],
+						"id":      cID[split+3:],
+					}}
+			}
+		}
+
 		var moduleFieldsMapStr common.MapStr
 		moduleFields, ok := event[mb.ModuleDataKey]
 		if ok {
@@ -142,14 +160,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		delete(event, mb.ModuleDataKey)
 
 		if reported := reporter.Event(mb.Event{
+			RootFields:      rootFields,
 			MetricSetFields: event,
 			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.container",
 		}); !reported {
-			m.Logger().Debug("error trying to emit event")
-			return
+			return nil
 		}
 	}
+
+	return nil
 }
 
 // Close stops this metricset

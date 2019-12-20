@@ -207,7 +207,9 @@ func (b *builder) monthOfYearShortText() {
 	b.appendShortText(ftMonthOfYear)
 }
 
-// TODO: add timezone support
+func (b *builder) timeZoneOffsetText() {
+	b.appendText(ftTimeZoneOffset)
+}
 
 func (b *builder) appendRune(r rune) {
 	b.add(runeLiteral{r})

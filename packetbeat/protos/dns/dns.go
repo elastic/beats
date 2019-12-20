@@ -385,6 +385,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Event.Start = t.request.ts
 		pbf.Event.End = t.response.ts
 
+		dnsEvent["type"] = "answer"
 		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
@@ -407,6 +408,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Source.Bytes = int64(t.request.length)
 		pbf.Event.Start = t.request.ts
 
+		dnsEvent["type"] = "query"
 		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
@@ -422,6 +424,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Destination.Bytes = int64(t.response.length)
 		pbf.Event.End = t.response.ts
 
+		dnsEvent["type"] = "answer"
 		fields["method"] = dnsOpCodeToString(t.response.data.Opcode)
 		if len(t.response.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
@@ -459,6 +462,31 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 	}
 	m["response_code"] = dnsResponseCodeToString(dns.Rcode)
 
+	// Add a list of header flags.
+	var hf []string
+	if dns.Authoritative {
+		hf = append(hf, "AA")
+	}
+	if dns.Truncated {
+		hf = append(hf, "TC")
+	}
+	if dns.RecursionDesired {
+		hf = append(hf, "RD")
+	}
+	if dns.RecursionAvailable {
+		hf = append(hf, "RA")
+	}
+	if dns.AuthenticatedData {
+		hf = append(hf, "AD")
+	}
+	if dns.CheckingDisabled {
+		hf = append(hf, "CD")
+	}
+	if opt := dns.IsEdns0(); opt != nil && opt.Do() {
+		hf = append(hf, "DO")
+	}
+	m["header_flags"] = hf
+
 	if len(dns.Question) > 0 {
 		q := dns.Question[0]
 		qMapStr := common.MapStr{
@@ -469,8 +497,28 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		m["question"] = qMapStr
 
 		eTLDPlusOne, err := publicsuffix.EffectiveTLDPlusOne(q.Name)
-		if err == nil {
+		if err == nil && eTLDPlusOne != "" {
+			eTLDPlusOne = strings.TrimRight(eTLDPlusOne, ".")
+
+			// etld_plus_one should be removed for 8.0.0.
 			qMapStr["etld_plus_one"] = eTLDPlusOne
+			qMapStr["registered_domain"] = eTLDPlusOne
+
+			if idx := strings.IndexByte(eTLDPlusOne, '.'); idx != -1 {
+				qMapStr["top_level_domain"] = eTLDPlusOne[idx+1:]
+			}
+
+			subdomain := strings.TrimRight(strings.TrimSuffix(q.Name, eTLDPlusOne), ".")
+			if subdomain != "" {
+				qMapStr["subdomain"] = subdomain
+			}
+		} else if strings.Count(q.Name, ".") == 1 {
+			// Handle publicsuffix.EffectiveTLDPlusOne eTLD+1 error with 1 dot in the domain.
+			s := strings.Split(q.Name, ".")
+			if len(s) == 2 && s[1] != "" {
+				qMapStr["top_level_domain"] = s[1]
+			}
+			qMapStr["registered_domain"] = q.Name
 		}
 	}
 
@@ -481,12 +529,16 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
-		m["answers"] = rrsToMapStrs(dns.Answer)
+		var resolvedIPs []string
+		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true)
+		if len(resolvedIPs) > 0 {
+			m["resolved_ip"] = resolvedIPs
+		}
 	}
 
 	m["authorities_count"] = len(dns.Ns)
 	if authority && len(dns.Ns) > 0 {
-		m["authorities"] = rrsToMapStrs(dns.Ns)
+		m["authorities"], _ = rrsToMapStrs(dns.Ns, false)
 	}
 
 	if rrOPT != nil {
@@ -495,7 +547,7 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		m["additionals_count"] = len(dns.Extra)
 	}
 	if additional && len(dns.Extra) > 0 {
-		rrsMapStrs := rrsToMapStrs(dns.Extra)
+		rrsMapStrs, _ := rrsToMapStrs(dns.Extra, false)
 		// We do not want OPT RR to appear in the 'additional' section,
 		// that's why rrsMapStrs could be empty even though len(dns.Extra) > 0
 		if len(rrsMapStrs) > 0 {
@@ -538,23 +590,27 @@ func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
 	return optMapStr
 }
 
-// rrsToMapStr converts an slice of RR's to an slice of MapStr's.
-func rrsToMapStrs(records []mkdns.RR) []common.MapStr {
+// rrsToMapStr converts an slice of RR's to an slice of MapStr's and optionally
+// returns a list of the IP addresses found in the resource records.
+func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]common.MapStr, []string) {
+	var allIPs []string
 	mapStrSlice := make([]common.MapStr, 0, len(records))
 	for _, rr := range records {
 		rrHeader := rr.Header()
 
-		mapStr := rrToMapStr(rr)
+		mapStr, ips := rrToMapStr(rr, ipList)
 		if len(mapStr) == 0 { // OPT pseudo-RR returns an empty MapStr
 			continue
 		}
+		allIPs = append(allIPs, ips...)
+
 		mapStr["name"] = trimRightDot(rrHeader.Name)
 		mapStr["type"] = dnsTypeToString(rrHeader.Rrtype)
 		mapStr["class"] = dnsClassToString(rrHeader.Class)
 		mapStr["ttl"] = strconv.FormatInt(int64(rrHeader.Ttl), 10)
 		mapStrSlice = append(mapStrSlice, mapStr)
 	}
-	return mapStrSlice
+	return mapStrSlice, allIPs
 }
 
 // Convert all RDATA fields of a RR to a single string
@@ -566,7 +622,7 @@ func rrToString(rr mkdns.RR) string {
 	var st string
 	var keys []string
 
-	mapStr := rrToMapStr(rr)
+	mapStr, _ := rrToMapStr(rr, false)
 	data, ok := mapStr["data"]
 	delete(mapStr, "data")
 
@@ -599,9 +655,17 @@ func rrToString(rr mkdns.RR) string {
 	return b.String()
 }
 
-func rrToMapStr(rr mkdns.RR) common.MapStr {
+func rrToMapStr(rr mkdns.RR, ipList bool) (common.MapStr, []string) {
 	mapStr := common.MapStr{}
 	rrType := rr.Header().Rrtype
+
+	var ips []string
+	appendIP := func(ip string) string {
+		if ipList {
+			ips = append(ips, ip)
+		}
+		return ip
+	}
 
 	switch x := rr.(type) {
 	default:
@@ -619,9 +683,9 @@ func rrToMapStr(rr mkdns.RR) common.MapStr {
 			debugf("Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
 		}
 	case *mkdns.A:
-		mapStr["data"] = x.A.String()
+		mapStr["data"] = appendIP(x.A.String())
 	case *mkdns.AAAA:
-		mapStr["data"] = x.AAAA.String()
+		mapStr["data"] = appendIP(x.AAAA.String())
 	case *mkdns.CNAME:
 		mapStr["data"] = trimRightDot(x.Target)
 	case *mkdns.DNSKEY:
@@ -656,7 +720,7 @@ func rrToMapStr(rr mkdns.RR) common.MapStr {
 		mapStr["data"] = dnsSaltToString(x.Salt)
 	case *mkdns.OPT: // EDNS [RFC6891]
 		// OPT pseudo-RR is managed in addDnsToMapStr function
-		return nil
+		return nil, nil
 	case *mkdns.PTR:
 		mapStr["data"] = trimRightDot(x.Ptr)
 	case *mkdns.RFC3597:
@@ -694,7 +758,7 @@ func rrToMapStr(rr mkdns.RR) common.MapStr {
 		mapStr["data"] = strings.Join(x.Txt, " ")
 	}
 
-	return mapStr
+	return mapStr, ips
 }
 
 // dnsQuestionToString converts a Question to a string.

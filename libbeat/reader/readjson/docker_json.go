@@ -21,11 +21,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/reader"
 )
 
@@ -38,31 +40,39 @@ type DockerJSONReader struct {
 	// join partial lines
 	partial bool
 
-	// Force log format: json-file | cri
-	forceCRI bool
-
 	// parse CRI flags
 	criflags bool
+
+	parseLine func(message *reader.Message, msg *logLine) error
 
 	stripNewLine func(msg *reader.Message)
 }
 
 type logLine struct {
-	Partial   bool      `json:"-"`
-	Timestamp time.Time `json:"-"`
-	Time      string    `json:"time"`
-	Stream    string    `json:"stream"`
-	Log       string    `json:"log"`
+	Partial   bool              `json:"-"`
+	Timestamp time.Time         `json:"-"`
+	Time      string            `json:"time"`
+	Stream    string            `json:"stream"`
+	Log       string            `json:"log"`
+	Attrs     map[string]string `json:"attrs"`
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
-		forceCRI: forceCRI,
 		criflags: CRIFlags,
+	}
+
+	switch strings.ToLower(format) {
+	case "docker", "json-file":
+		reader.parseLine = reader.parseDockerJSONLog
+	case "cri":
+		reader.parseLine = reader.parseCRILog
+	default:
+		reader.parseLine = reader.parseAuto
 	}
 
 	if runtime.GOOS == "windows" {
@@ -92,7 +102,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	if len(log) < split {
 		return errors.New("invalid CRI log format")
 	}
-	ts, err := time.Parse(time.RFC3339, string(log[i]))
+	ts, err := time.Parse(time.RFC3339Nano, string(log[i]))
 	if err != nil {
 		return errors.Wrap(err, "parsing CRI timestamp")
 	}
@@ -144,23 +154,26 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	if err != nil {
 		return errors.Wrap(err, "parsing docker timestamp")
 	}
+	message.Ts = ts
 
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
-	message.Content = []byte(msg.Log)
-	message.Ts = ts
-	msg.Partial = message.Content[len(message.Content)-1] != byte('\n')
 
+	if len(msg.Attrs) > 0 {
+		message.AddFields(common.MapStr{
+			"docker": common.MapStr{
+				"attrs": msg.Attrs,
+			},
+		})
+	}
+
+	message.Content = []byte(msg.Log)
+	msg.Partial = (len(message.Content) == 0) || (message.Content[len(message.Content)-1] != byte('\n'))
 	return nil
 }
 
-func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) error {
-	if p.forceCRI {
-		return p.parseCRILog(message, msg)
-	}
-
-	// If froceCRI isn't set, autodetect file type
+func (p *DockerJSONReader) parseAuto(message *reader.Message, msg *logLine) error {
 	if len(message.Content) > 0 && message.Content[0] == '{' {
 		return p.parseDockerJSONLog(message, msg)
 	}
@@ -185,7 +198,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
-			return message, err
+			logp.Err("Parse line error: %v", err)
+			return message, reader.ErrLineUnparsable
 		}
 
 		// Handle multiline messages, join partial lines
@@ -201,7 +215,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
-				return message, err
+				logp.Err("Parse line error: %v", err)
+				return message, reader.ErrLineUnparsable
 			}
 			message.Content = append(message.Content, next.Content...)
 		}

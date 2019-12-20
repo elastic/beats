@@ -47,12 +47,6 @@ func create(
 		return nil, 0, err
 	}
 
-	// TODO: check icmp is support by OS + check we've
-	// got required credentials (implementation uses RAW socket, requires root +
-	// not supported on all OSes)
-	// TODO: replace icmp package base reader/sender using raw sockets with
-	//       OS specific solution
-
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
@@ -61,13 +55,14 @@ func create(
 
 	var loopErr error
 	loopInit.Do(func() {
-		debugf("initialize icmp handler")
+		debugf("initializing ICMP loop")
 		loop, loopErr = newICMPLoop()
 	})
 	if loopErr != nil {
-		debugf("Failed to initialize ICMP loop %v", loopErr)
+		logp.Warn("Failed to initialize ICMP loop %v", loopErr)
 		return nil, 0, loopErr
 	}
+	debugf("ICMP loop successfully initialized")
 
 	if err := loop.checkNetworkMode(ipVersion); err != nil {
 		return nil, 0, err

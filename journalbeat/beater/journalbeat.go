@@ -32,6 +32,9 @@ import (
 
 	"github.com/elastic/beats/journalbeat/config"
 	_ "github.com/elastic/beats/journalbeat/include"
+
+	// Add dedicated processors
+	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 
 // Journalbeat instance
@@ -64,7 +67,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {
-		i, err := input.New(c, b.Publisher, done, cp.States())
+		i, err := input.New(c, b, done, cp.States())
 		if err != nil {
 			return nil, err
 		}

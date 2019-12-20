@@ -22,11 +22,8 @@ kibana:
 
 # Collects all module docs
 .PHONY: collect-docs
-collect-docs: python-env
-	@rm -rf docs/modules
-	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
-	mage FieldsDocs
+collect-docs:
+	mage CollectAll
 
 # Collects all module configs
 .PHONY: configs
@@ -37,16 +34,16 @@ configs: python-env
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@rm -rf modules.d
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/script/modules_collector.py --beat ${BEAT_NAME} --docs_branch=$(DOCS_BRANCH)
+	mage config
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
-imports: python-env
+imports:
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+	mage imports
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
@@ -72,7 +69,7 @@ run-module:
 test-module: ## @testing Tests the given module. Needs $MODULE as param an run-module must be started first.
 test-module: python-env update metricbeat.test
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
-	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
+	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests module/${MODULE}
 
 .PHONY: assets
 assets:

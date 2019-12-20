@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/tests/resources"
 )
 
 type mockRunner struct {
@@ -135,6 +136,9 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
@@ -255,6 +259,9 @@ func TestAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscoverHash(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 
@@ -319,6 +326,9 @@ func TestAutodiscoverHash(t *testing.T) {
 }
 
 func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()

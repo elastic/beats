@@ -2,21 +2,17 @@
 [role="xpack"]
 = {beats} central management
 
-++++
-<titleabbrev>Central management</titleabbrev>
-++++
-
 [partintro]
 --
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 [WARNING]
 =======================================
 When you use central management, configurations are stored centrally in {es}. To
 prevent an attacker from leveraging the configurations to attack your
-infrastructure, you must {stack-ov}/elasticsearch-security.html[secure {es} and
-{kib}] before using central management.
+infrastructure, you must secure {es} and {kib} before using central management.
+See {ref}/secure-cluster.html[Secure a cluster].
 =======================================
 
 {beats} central management provides a way to define and manage configurations in
@@ -42,7 +38,7 @@ include::shared-license-statement.asciidoc[]
 [role="xpack"]
 == How central management works
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 {beats} central management uses a mechanism called configuration tags to group
 related configurations. You define configuration tags in the {cm-ui} UI in {kib}
@@ -109,7 +105,7 @@ the Beat to troubleshoot the problem.
 [role="xpack"]
 == Enroll {beats} in central management
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 You need to enroll {beats} to register them in
 <<configuration-central-management,central management>> and establish
@@ -146,7 +142,7 @@ ifndef::no_dashboards[]
 <<load-kibana-dashboards,load the dashboards>> before enrolling the
 Beat.
 endif::[]
-ifeval::[("{beatname_lc}"=="filebeat")]
+ifeval::["{beatname_lc}"=="filebeat"]
 * If you plan to define module configurations in central management, set up the
 ingest pipelines before enrolling the Beat. For more information, see
 <<load-ingest-pipelines>>.

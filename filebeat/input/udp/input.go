@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -54,7 +53,11 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +69,7 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	callback := func(data []byte, metadata inputsource.NetworkMetadata) {
-		e := util.NewData()
-		e.Event = beat.Event{
+		forwarder.Send(beat.Event{
 			Timestamp: time.Now(),
 			Meta: common.MapStr{
 				"truncated": metadata.Truncated,
@@ -80,8 +82,7 @@ func NewInput(
 					},
 				},
 			},
-		}
-		forwarder.Send(e)
+		})
 	}
 
 	udp := udp.New(&config.Config, callback)

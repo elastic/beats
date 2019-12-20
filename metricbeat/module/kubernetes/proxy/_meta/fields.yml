@@ -1,0 +1,110 @@
+- name: proxy
+  type: group
+  description: >
+    Kubernetes proxy server metrics
+  release: ga
+  fields:
+  - name: handler
+    type: keyword
+    description: >
+      Request handler
+  - name: code
+    type: keyword
+    description: >
+      HTTP code
+  - name: method
+    type: keyword
+    description: >
+      HTTP method
+  - name: host
+    type: keyword
+    description: >
+      Request host
+  - name: process
+    type: group
+    fields:
+      - name: cpu.sec
+        type: double
+        description: CPU seconds
+      - name: memory.resident.bytes
+        type: long
+        format: bytes
+        description: Bytes in resident memory
+      - name: memory.virtual.bytes
+        type: long
+        format: bytes
+        description: Bytes in virtual memory
+      - name: fds.open.count
+        type: long
+        description: Number of open file descriptors
+      - name: started.sec
+        type: double
+        description: Seconds since the process started
+  - name: http
+    type: group
+    fields:
+      - name: request.duration.us.percentile.*
+        type: object
+        object_type: double
+        description: Request duration microseconds percentiles
+      - name: request.duration.us.sum
+        type: double
+        description: Request duration microseconds cumulative sum
+      - name: request.duration.us.count
+        type: long
+        description: Request count for duration
+      - name: request.size.bytes.percentile.*
+        type: object
+        object_type: long
+        description: Request size percentiles
+      - name: request.size.bytes.sum
+        type: long
+        format: bytes
+        description: Request size cumulative sum
+      - name: request.size.bytes.count
+        type: long
+        description: Request count for size
+      - name: response.size.bytes.percentile.*
+        type: object
+        object_type: long
+        description: Response size percentiles
+      - name: response.size.bytes.sum
+        type: long
+        format: bytes
+        description: Response size cumulative sum
+      - name: response.size.bytes.count
+        type: long
+        description: Response count
+      - name: request.count
+        type: long
+        description: Request count
+  - name: client.request.count
+    type: long
+    description: >
+      Number of requests as client
+  - name: sync
+    type: group
+    description: >
+      kubeproxy proxy sync metrics
+    fields:
+      - name: rules.duration.us.sum
+        type: long
+        description: SyncProxyRules duration, sum of durations in microseconds
+      - name: rules.duration.us.count
+        type: long
+        description: SyncProxyRules duration, number of operations
+      - name: rules.duration.us.bucket.*
+        type: object
+        object_type: long
+        description: SyncProxyRules duration, histogram buckets
+      - name: networkprogramming.duration.us.sum
+        type: long
+        description: Network programming duration, sum in microseconds
+      - name: networkprogramming.duration.us.count
+        type: long
+        description: Network programming duration, number of operations
+      - name: networkprogramming.duration.us.bucket.*
+        type: object
+        object_type: long
+        description: Network programming duration, histogram buckets
+

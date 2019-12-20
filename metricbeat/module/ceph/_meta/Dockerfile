@@ -1,4 +1,5 @@
-FROM ceph/daemon:master-6373c6a-jewel-centos-7-x86_64
+ARG CEPH_VERSION
+FROM ceph/daemon:${CEPH_VERSION}
 
 RUN yum -q install -y jq && yum clean all && rm -fr /var/cache/yum
 

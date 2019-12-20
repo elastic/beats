@@ -1,0 +1,95 @@
+- name: stats
+  type: group
+  description: >
+    Beat stats
+  release: ga
+  fields:
+    - name: uptime.ms
+      type: long
+      description: >
+        Beat uptime
+    - name: runtime.goroutines
+      type: long
+      description: >
+        Number of goroutines running in Beat
+    - name: libbeat
+      type: group
+      description: >
+        Fields common to all Beats
+      fields:
+        - name: output
+          type: group
+          description: >
+            Output stats
+          fields:
+            - name: type
+              type: keyword
+              description: >
+                Type of output
+            - name: events
+              type: group
+              description: >
+                Event counters
+              fields:
+                - name: acked
+                  type: long
+                  description: >
+                    Number of events acknowledged
+                - name: active
+                  type: long
+                  description: >
+                    Number of active events
+                - name: batches
+                  type: long
+                  description: >
+                    Number of event batches
+                - name: dropped
+                  type: long
+                  description: >
+                    Number of events dropped
+                - name: duplicates
+                  type: long
+                  description: >
+                    Number of events duplicated
+                - name: failed
+                  type: long
+                  description: >
+                    Number of events failed
+                - name: toomany
+                  type: long
+                  description: >
+                    Number of too many events
+                - name: total
+                  type: long
+                  description: >
+                    Total number of events
+            - name: read
+              type: group
+              description: >
+                Read stats
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Number of bytes read
+                - name: errors
+                  type: long
+                  description: >
+                    Number of read errors
+            - name: write
+              type: group
+              description: >
+                Write stats
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Number of bytes written
+                - name: errors
+                  type: long
+                  description: >
+                    Number of write errors
+
+
+
+

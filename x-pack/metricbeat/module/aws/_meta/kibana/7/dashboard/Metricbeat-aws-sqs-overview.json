@@ -23,8 +23,8 @@
             "gridData": {
               "h": 8,
               "i": "1",
-              "w": 20,
-              "x": 10,
+              "w": 12,
+              "x": 12,
               "y": 0
             },
             "panelIndex": "1",
@@ -36,8 +36,8 @@
             "gridData": {
               "h": 8,
               "i": "2",
-              "w": 18,
-              "x": 30,
+              "w": 12,
+              "x": 36,
               "y": 0
             },
             "panelIndex": "2",
@@ -101,13 +101,26 @@
             "gridData": {
               "h": 8,
               "i": "9",
-              "w": 10,
+              "w": 12,
               "x": 0,
               "y": 0
             },
             "panelIndex": "9",
             "panelRefName": "panel_6",
             "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "10",
+              "w": 12,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "10",
+            "panelRefName": "panel_7",
+            "version": "7.0.0"
           }
         ],
         "timeRestore": false,
@@ -153,11 +166,16 @@
           "id": "b0afd3e0-43b7-11e9-8697-530f39afc6eb",
           "name": "panel_6",
           "type": "visualization"
+        },
+        {
+          "id": "bb82c4d0-6c25-11e9-81bc-7f4cd8b3d892",
+          "name": "panel_7",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-03-15T05:03:32.298Z",
-      "version": "WzQ1OCw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4NywxXQ=="
     },
     {
       "attributes": {
@@ -171,7 +189,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Visible",
+        "title": "SQS Messages Visible [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -190,6 +208,7 @@
                 "id": "d2d14920-41e8-11e9-9e94-11d4d21d3f4b"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
             "gauge_color_rules": [
               {
                 "id": "d2163680-41e8-11e9-9e94-11d4d21d3f4b"
@@ -199,7 +218,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -222,7 +241,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -238,12 +257,12 @@
       },
       "id": "f74eb760-41e8-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-14T21:45:13.172Z",
-      "version": "WzI0Myw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4OCwxXQ=="
     },
     {
       "attributes": {
@@ -257,7 +276,7 @@
             }
           }
         },
-        "title": "AWS SQS Oldest Message Age in Seconds",
+        "title": "SQS Oldest Message Age in Seconds [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -271,8 +290,9 @@
                 "id": "3e3d3610-437e-11e9-a35d-972620e4f790"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -295,7 +315,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -311,12 +331,12 @@
       },
       "id": "53730d20-437e-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-14T21:45:13.172Z",
-      "version": "WzI0NCw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4OSwxXQ=="
     },
     {
       "attributes": {
@@ -330,7 +350,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Received",
+        "title": "SQS Messages Received [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -349,8 +369,10 @@
                 "id": "57cc0200-43b5-11e9-84e9-a97a63579915"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -374,7 +396,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -390,12 +412,12 @@
       },
       "id": "1235fe50-41e7-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T04:47:42.929Z",
-      "version": "WzQ1Miw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MCwxXQ=="
     },
     {
       "attributes": {
@@ -409,7 +431,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Deleted",
+        "title": "SQS Messages Deleted [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -418,8 +440,10 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -442,7 +466,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -458,12 +482,12 @@
       },
       "id": "be6c4180-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T04:58:33.318Z",
-      "version": "WzQ1Niw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MSwxXQ=="
     },
     {
       "attributes": {
@@ -477,7 +501,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Delayed",
+        "title": "SQS Messages Delayed [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -486,8 +510,10 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -510,7 +536,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -526,12 +552,12 @@
       },
       "id": "dcd31cd0-41e5-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-14T21:45:13.172Z",
-      "version": "WzI0Nyw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MiwxXQ=="
     },
     {
       "attributes": {
@@ -545,7 +571,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Not Visible",
+        "title": "SQS Messages Sent [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -554,8 +580,15 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -568,7 +601,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.sqs.messages.not_visible",
+                    "field": "aws.sqs.messages.sent",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -578,7 +611,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.sqs.queue.name",
+                "terms_field": "aws.sqs.queue.name.keyword",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -588,18 +621,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS SQS Messages Not Visible",
+          "title": "AWS SQS Messages Sent",
           "type": "metrics"
         }
       },
       "id": "dd2f2a10-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-14T21:45:13.172Z",
-      "version": "WzI0OCw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MywxXQ=="
     },
     {
       "attributes": {
@@ -613,7 +646,7 @@
             }
           }
         },
-        "title": "AWS SQS Filters",
+        "title": "SQS Filters [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -623,7 +656,7 @@
               {
                 "fieldName": "cloud.region",
                 "id": "1549397251041",
-                "indexPattern": "2c424110-43b2-11e9-8697-530f39afc6eb",
+                "indexPatternRefName": "control_0_index_pattern",
                 "label": "region",
                 "options": {
                   "dynamicOptions": true,
@@ -638,7 +671,7 @@
               {
                 "fieldName": "aws.sqs.queue.name",
                 "id": "1549512142947",
-                "indexPattern": "2c424110-43b2-11e9-8697-530f39afc6eb",
+                "indexPatternRefName": "control_1_index_pattern",
                 "label": "queue name",
                 "options": {
                   "dynamicOptions": true,
@@ -661,13 +694,120 @@
       },
       "id": "b0afd3e0-43b7-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-05-29T14:13:49.585Z",
+      "version": "WzQ5NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SQS Empty Receives [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "a7e8c370-6c25-11e9-9cd1-3bdb0c7db024"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "gauge_color_rules": [
+              {
+                "id": "a778eaa0-6c25-11e9-9cd1-3bdb0c7db024"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.empty_receives",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "numerator": "",
+                    "percentiles": [
+                      {
+                        "id": "74323cf0-6c25-11e9-9cd1-3bdb0c7db024",
+                        "mode": "line",
+                        "shade": 0.2,
+                        "value": 50
+                      }
+                    ],
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "top_n"
+          },
+          "title": "AWS SQS Empty Receives",
+          "type": "metrics"
+        }
+      },
+      "id": "bb82c4d0-6c25-11e9-81bc-7f4cd8b3d892",
+      "migrationVersion": {
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-14T21:45:13.172Z",
-      "version": "WzI0OSw1XQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5NSwxXQ=="
     }
   ],
-  "version": "7.0.0-beta1"
+  "version": "7.2.0"
 }

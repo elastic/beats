@@ -23,6 +23,55 @@ import (
 	"unsafe"
 )
 
+func lookupUserPrimitiveConstructor(t reflect.Type) func(reflect.Value) ptrUnfolder {
+	switch t.Kind() {
+	case reflect.Bool:
+		return newUserUnfolderBool
+
+	case reflect.String:
+		return newUserUnfolderString
+
+	case reflect.Uint:
+		return newUserUnfolderUint
+
+	case reflect.Uint8:
+		return newUserUnfolderUint8
+
+	case reflect.Uint16:
+		return newUserUnfolderUint16
+
+	case reflect.Uint32:
+		return newUserUnfolderUint32
+
+	case reflect.Uint64:
+		return newUserUnfolderUint64
+
+	case reflect.Int:
+		return newUserUnfolderInt
+
+	case reflect.Int8:
+		return newUserUnfolderInt8
+
+	case reflect.Int16:
+		return newUserUnfolderInt16
+
+	case reflect.Int32:
+		return newUserUnfolderInt32
+
+	case reflect.Int64:
+		return newUserUnfolderInt64
+
+	case reflect.Float32:
+		return newUserUnfolderFloat32
+
+	case reflect.Float64:
+		return newUserUnfolderFloat64
+
+	default:
+		return nil
+	}
+}
+
 func lookupGoTypeUnfolder(to interface{}) (unsafe.Pointer, ptrUnfolder) {
 	switch ptr := to.(type) {
 	case *interface{}:
@@ -291,8 +340,18 @@ func lookupGoPtrUnfolder(t reflect.Type) ptrUnfolder {
 	return nil
 }
 
-func lookupReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
-	if f := unfoldRegistry.find(t); f != nil {
+func lookupReflUnfolder(ctx *unfoldCtx, t reflect.Type, withUser bool) (reflUnfolder, error) {
+	if withUser {
+		if f := lookupReflUser(ctx, t); f != nil {
+			return f, nil
+		}
+	}
+
+	if t.Implements(tExpander) {
+		return newExpanderInit(), nil
+	}
+
+	if f := ctx.reg.find(t); f != nil {
 		return f, nil
 	}
 
@@ -301,8 +360,15 @@ func lookupReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 		return nil, err
 	}
 
-	unfoldRegistry.set(t, f)
+	ctx.reg.set(t, f)
 	return f, nil
+}
+
+func lookupReflUser(ctx *unfoldCtx, t reflect.Type) reflUnfolder {
+	if ctx.userReg != nil {
+		return ctx.userReg[t]
+	}
+	return nil
 }
 
 func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
@@ -359,7 +425,7 @@ func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 		return nil, errTODO()
 
 	case reflect.Ptr:
-		unfolderElem, err := lookupReflUnfolder(ctx, bt)
+		unfolderElem, err := lookupReflUnfolder(ctx, bt, true)
 		if err != nil {
 			return nil, err
 		}
@@ -367,6 +433,15 @@ func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 
 	case reflect.Slice:
 		et := bt.Elem()
+
+		if unfolderElem := lookupReflUser(ctx, et); unfolderElem != nil {
+			return newUnfolderReflSlice(unfolderElem), nil
+		}
+
+		if reflect.PtrTo(et).Implements(tExpander) {
+			return newUnfolderReflSlice(newExpanderInit()), nil
+		}
+
 		switch et.Kind() {
 		case reflect.Interface:
 			return unfolderReflArrIfc, nil
@@ -415,7 +490,7 @@ func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 
 		}
 
-		unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et))
+		unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et), false)
 		if err != nil {
 			return nil, err
 		}
@@ -423,6 +498,15 @@ func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 
 	case reflect.Map:
 		et := bt.Elem()
+
+		if unfolderElem := lookupReflUser(ctx, et); unfolderElem != nil {
+			return newUnfolderReflMap(unfolderElem), nil
+		}
+
+		if reflect.PtrTo(et).Implements(tExpander) {
+			return newUnfolderReflMap(newExpanderInit()), nil
+		}
+
 		switch et.Kind() {
 		case reflect.Interface:
 			return unfolderReflMapIfc, nil
@@ -471,7 +555,7 @@ func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
 
 		}
 
-		unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et))
+		unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et), false)
 		if err != nil {
 			return nil, err
 		}

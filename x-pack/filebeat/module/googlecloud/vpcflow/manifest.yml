@@ -1,0 +1,21 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: google-pubsub
+  - name: project_id
+    default: SET_PROJECT_NAME
+  - name: topic
+    default: stackdriver-vpcflow
+  - name: subscription_name
+    default: filebeat-googlecloud-vpcflow
+  - name: credentials_file
+    default: googlecloud-vpcflow-reader-service-identity.json
+  - name: keep_original_message
+    default: false
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

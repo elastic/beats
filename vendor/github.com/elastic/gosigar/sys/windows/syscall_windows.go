@@ -23,6 +23,10 @@ const (
 	PROCESS_VM_READ                   uint32 = 0x0010
 )
 
+// SizeOfRtlUserProcessParameters gives the size
+// of the RtlUserProcessParameters struct.
+const SizeOfRtlUserProcessParameters = unsafe.Sizeof(RtlUserProcessParameters{})
+
 // MAX_PATH is the maximum length for a path in Windows.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
 const MAX_PATH = 260
@@ -42,6 +46,26 @@ const (
 	DRIVE_CDROM
 	DRIVE_RAMDISK
 )
+
+// UnicodeString is Go's equivalent for the _UNICODE_STRING struct.
+type UnicodeString struct {
+	Size          uint16
+	MaximumLength uint16
+	Buffer        uintptr
+}
+
+// RtlUserProcessParameters is Go's equivalent for the
+// _RTL_USER_PROCESS_PARAMETERS struct.
+// A few undocumented fields are exposed.
+type RtlUserProcessParameters struct {
+	Reserved1              [16]byte
+	Reserved2              [5]uintptr
+	CurrentDirectoryPath   UnicodeString
+	CurrentDirectoryHandle uintptr
+	DllPath                UnicodeString
+	ImagePathName          UnicodeString
+	CommandLine            UnicodeString
+}
 
 func (dt DriveType) String() string {
 	names := map[DriveType]string{
@@ -441,10 +465,120 @@ func UTF16SliceToStringSlice(buffer []uint16) []string {
 	return result
 }
 
-// Use "GOOS=windows go generate -v -x ." to generate the source.
+func GetUserProcessParams(handle syscall.Handle, pbi ProcessBasicInformation) (params RtlUserProcessParameters, err error) {
+	const is32bitProc = unsafe.Sizeof(uintptr(0)) == 4
 
-// Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go syscall_windows.go
+	// Offset of params field within PEB structure.
+	// This structure is different in 32 and 64 bit.
+	paramsOffset := 0x20
+	if is32bitProc {
+		paramsOffset = 0x10
+	}
+
+	// Read the PEB from the target process memory
+	pebSize := paramsOffset + 8
+	peb := make([]byte, pebSize)
+	nRead, err := ReadProcessMemory(handle, pbi.PebBaseAddress, peb)
+	if err != nil {
+		return params, err
+	}
+	if nRead != uintptr(pebSize) {
+		return params, errors.Errorf("PEB: short read (%d/%d)", nRead, pebSize)
+	}
+
+	// Get the RTL_USER_PROCESS_PARAMETERS struct pointer from the PEB
+	paramsAddr := *(*uintptr)(unsafe.Pointer(&peb[paramsOffset]))
+
+	// Read the RTL_USER_PROCESS_PARAMETERS from the target process memory
+	paramsBuf := make([]byte, SizeOfRtlUserProcessParameters)
+	nRead, err = ReadProcessMemory(handle, paramsAddr, paramsBuf)
+	if err != nil {
+		return params, err
+	}
+	if nRead != uintptr(SizeOfRtlUserProcessParameters) {
+		return params, errors.Errorf("RTL_USER_PROCESS_PARAMETERS: short read (%d/%d)", nRead, SizeOfRtlUserProcessParameters)
+	}
+
+	params = *(*RtlUserProcessParameters)(unsafe.Pointer(&paramsBuf[0]))
+	return params, nil
+}
+
+// ReadProcessUnicodeString returns a zero-terminated UTF-16 string from another
+// process's memory.
+func ReadProcessUnicodeString(handle syscall.Handle, s *UnicodeString) ([]byte, error) {
+	// Allocate an extra UTF-16 null character at the end in case the read string
+	// is not terminated.
+	extra := 2
+	if s.Size&1 != 0 {
+		extra = 3 // If size is odd, need 3 nulls to terminate.
+	}
+	buf := make([]byte, int(s.Size)+extra)
+	nRead, err := ReadProcessMemory(handle, s.Buffer, buf[:s.Size])
+	if err != nil {
+		return nil, err
+	}
+	if nRead != uintptr(s.Size) {
+		return nil, errors.Errorf("unicode string: short read: (%d/%d)", nRead, s.Size)
+	}
+	return buf, nil
+}
+
+// ByteSliceToStringSlice uses CommandLineToArgv API to split an UTF-16 command
+// line string into a list of parameters.
+func ByteSliceToStringSlice(utf16 []byte) ([]string, error) {
+	n := len(utf16)
+	// Discard odd byte
+	if n&1 != 0 {
+		n--
+		utf16 = utf16[:n]
+	}
+	if n == 0 {
+		return nil, nil
+	}
+	terminated := false
+	for i := 0; i < n && !terminated; i += 2 {
+		terminated = utf16[i] == 0 && utf16[i+1] == 0
+	}
+	if !terminated {
+		// Append a null uint16 at the end if terminator is missing
+		utf16 = append(utf16, 0, 0)
+	}
+	var numArgs int32
+	argsWide, err := syscall.CommandLineToArgv((*uint16)(unsafe.Pointer(&utf16[0])), &numArgs)
+	if err != nil {
+		return nil, err
+	}
+
+	// Free memory allocated for CommandLineToArgvW arguments.
+	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(argsWide)))
+
+	args := make([]string, numArgs)
+	for idx := range args {
+		args[idx] = syscall.UTF16ToString(argsWide[idx][:])
+	}
+	return args, nil
+}
+
+// ReadProcessMemory reads from another process memory. The Handle needs to have
+// the PROCESS_VM_READ right.
+// A zero-byte read is a no-op, no error is returned.
+func ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, dest []byte) (numRead uintptr, err error) {
+	n := len(dest)
+	if n == 0 {
+		return 0, nil
+	}
+	if err = _ReadProcessMemory(handle, baseAddress, uintptr(unsafe.Pointer(&dest[0])), uintptr(n), &numRead); err != nil {
+		return 0, err
+	}
+	return numRead, nil
+}
+
+func GetTickCount64() (uptime uint64, err error) {
+	if uptime, err = _GetTickCount64(); err != nil {
+		return 0, err
+	}
+	return uptime, nil
+}
 
 // Windows API calls
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
@@ -467,3 +601,5 @@ func UTF16SliceToStringSlice(buffer []uint16) []string {
 //sys  _FindNextVolume(handle syscall.Handle, volumeName *uint16, size uint32) (err error) = kernel32.FindNextVolumeW
 //sys  _FindVolumeClose(handle syscall.Handle) (err error) = kernel32.FindVolumeClose
 //sys  _GetVolumePathNamesForVolumeName(volumeName string, buffer *uint16, bufferSize uint32, length *uint32) (err error) = kernel32.GetVolumePathNamesForVolumeNameW
+//sys  _ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, buffer uintptr, size uintptr, numRead *uintptr) (err error) = kernel32.ReadProcessMemory
+//sys  _GetTickCount64() (uptime uint64, err error) = kernel32.GetTickCount64

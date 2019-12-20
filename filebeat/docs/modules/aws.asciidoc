@@ -1,0 +1,60 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-aws]]
+[role="xpack"]
+
+:modulename: aws
+:has-dashboards: true
+
+== AWS module
+
+beta[]
+
+This is a module for aws logs. It uses filebeat s3 input to get log files from
+AWS S3 buckets with SQS notification. This module supports reading s3 server
+access logs with `s3access` fileset, ELB access logs with `elb` fileset and VPC
+flow logs with `vpc` fileset.
+
+Access logs contain detailed information about the requests made to these
+services. VPC flow logs captures information about the IP traffic going to and
+from network interfaces in AWS VPC.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for `s3access` fileset:
+
+[role="screenshot"]
+image::./images/filebeat-aws-s3access-overview.png[]
+
+[float]
+==== `s3access` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: aws
+  s3access:
+    enabled: true
+    var.queue_url: https://sqs.us-west-1.amazonaws.com/123/queue-name
+    var.credential_profile_name: fb-aws
+----
+
+*`var.queue_url`*::
+
+AWS SQS queue url.
+
+*`var.credential_profile_name`*::
+
+AWS credential profile name.
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-aws,exported fields>> section.
+

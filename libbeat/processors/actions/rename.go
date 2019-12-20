@@ -26,6 +26,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type renameFields struct {
@@ -45,8 +47,10 @@ type fromTo struct {
 
 func init() {
 	processors.RegisterPlugin("rename",
-		configChecked(NewRenameFields,
-			requireFields("fields")))
+		checks.ConfigChecked(NewRenameFields,
+			checks.RequireFields("fields")))
+
+	jsprocessor.RegisterPlugin("Rename", NewRenameFields)
 }
 
 // NewRenameFields returns a new rename processor.
@@ -75,12 +79,14 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.config.Fields {
 		err := f.renameField(field.From, field.To, event.Fields)
-		if err != nil && f.config.FailOnError {
+		if err != nil {
 			errMsg := fmt.Errorf("Failed to rename fields in processor: %s", err)
 			logp.Debug("rename", errMsg.Error())
-			event.Fields = backup
-			event.PutValue("error.message", errMsg.Error())
-			return event, err
+			if f.config.FailOnError {
+				event.Fields = backup
+				event.PutValue("error.message", errMsg.Error())
+				return event, err
+			}
 		}
 	}
 

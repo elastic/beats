@@ -6,18 +6,26 @@ package aws
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/stretchr/testify/assert"
 )
 
 // MockCloudwatchClient struct is used for unit tests.
 type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
+	cloudwatchiface.ClientAPI
+}
+
+// MockResourceGroupsTaggingClient is used for unit tests.
+type MockResourceGroupsTaggingClient struct {
+	resourcegroupstaggingapiiface.ClientAPI
 }
 
 var (
@@ -48,6 +56,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 		Name:  &dimName,
 		Value: &instanceID,
 	}
+	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudwatch.ListMetricsRequest{
 		Request: &awssdk.Request{
 			Data: &cloudwatch.ListMetricsOutput{
@@ -59,6 +68,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -68,6 +78,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	value2 := 0.0
 	value3 := 0.0
 	value4 := 0.0
+	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
 		Request: &awssdk.Request{
@@ -95,6 +106,47 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 					},
 				},
 			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return resourcegroupstaggingapi.GetResourcesRequest{
+		Request: &awssdk.Request{
+			Data: &resourcegroupstaggingapi.GetResourcesOutput{
+				PaginationToken: awssdk.String(""),
+				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
+					{
+						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
+						Tags: []resourcegroupstaggingapi.Tag{
+							{
+								Key:   awssdk.String("organization"),
+								Value: awssdk.String("engineering"),
+							},
+							{
+								Key:   awssdk.String("owner"),
+								Value: awssdk.String("foo"),
+							},
+						},
+					},
+					{
+						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-2"),
+						Tags: []resourcegroupstaggingapi.Tag{
+							{
+								Key:   awssdk.String("organization"),
+								Value: awssdk.String("finance"),
+							},
+							{
+								Key:   awssdk.String("owner"),
+								Value: awssdk.String("boo"),
+							},
+						},
+					},
+				},
+			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -111,12 +163,23 @@ func TestGetListMetricsOutput(t *testing.T) {
 	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
 }
 
-func TestGetMetricDataPerRegion(t *testing.T) {
-	startTime, endTime, err := GetStartTimeEndTime("-10m")
+func TestGetListMetricsOutputWithWildcard(t *testing.T) {
+	svcCloudwatch := &MockCloudWatchClient{}
+	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", svcCloudwatch)
 	assert.NoError(t, err)
+	assert.Equal(t, 1, len(listMetricsOutput))
+	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
+	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+}
+
+func TestGetMetricDataPerRegion(t *testing.T) {
+	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
 
 	mockSvc := &MockCloudWatchClient{}
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, nil, mockSvc, startTime, endTime)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
@@ -142,11 +205,21 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestGetMetricDataResults(t *testing.T) {
-	startTime, endTime, err := GetStartTimeEndTime("-10m")
-	assert.NoError(t, err)
+	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
 
 	mockSvc := &MockCloudWatchClient{}
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	metricInfo := cloudwatch.Metric{
+		MetricName: &metricName,
+		Namespace:  &namespace,
+	}
+	metricStat := cloudwatch.MetricStat{Metric: &metricInfo}
+	metricDataQueries := []cloudwatch.MetricDataQuery{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			MetricStat: &metricStat,
+		},
+	}
 	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
@@ -274,4 +347,69 @@ func TestFindTimestamp(t *testing.T) {
 		outputTimestamp := FindTimestamp(c.getMetricDataResults)
 		assert.Equal(t, c.expectedTimestamp, outputTimestamp)
 	}
+}
+
+func TestFindIdentifierFromARN(t *testing.T) {
+	cases := []struct {
+		resourceARN        string
+		expectedIdentifier string
+	}{
+		{
+			"arn:aws:rds:eu-west-1:123456789012:db:mysql-db",
+			"mysql-db",
+		},
+		{
+			"arn:aws:ec2:us-east-1:123456789012:instance/i-123",
+			"i-123",
+		},
+		{
+			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
+			"notification-topic-1",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/app/ece-ui/b195d6cf21493989",
+			"app/ece-ui/b195d6cf21493989",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+		},
+	}
+
+	for _, c := range cases {
+		identifier, err := findIdentifierFromARN(c.resourceARN)
+		assert.NoError(t, err)
+		assert.Equal(t, c.expectedIdentifier, identifier)
+	}
+
+}
+
+func TestGetResourcesTags(t *testing.T) {
+	mockSvc := &MockResourceGroupsTaggingClient{}
+	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(resourceTagMap))
+
+	expectedResourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
+	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("engineering"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("foo"),
+		},
+	}
+	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("finance"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("boo"),
+		},
+	}
+	assert.Equal(t, expectedResourceTagMap, resourceTagMap)
 }

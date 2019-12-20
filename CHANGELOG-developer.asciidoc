@@ -12,6 +12,25 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+=== Beats version 7.1.1
+https://github.com/elastic/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
+
+=== Beats version 7.1.0
+https://github.com/elastic/beats/compare/v7.0.0..v7.1.0[Check the HEAD diff]
+
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0..v7.0.1[Check the HEAD diff]
+
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2..v7.0.0[Check the HEAD diff]
+
+The list below covers the major changes between 7.0.0-rc2 and 7.0 only.
+
+==== Added
+
+- Added support for using PYTHON_EXE to control what Python interpreter is used
+  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
+
 === Beats version 7.0.0-rc2
 https://github.com/elastic/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
 

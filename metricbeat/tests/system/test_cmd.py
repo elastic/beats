@@ -138,7 +138,7 @@ class TestCommands(metricbeat.BaseTest):
         assert exit_code == 0
         try:
             assert any((
-                self.log_contains("ERROR error making http request"),
+                self.log_contains("ERROR error fetching status"),
                 self.log_contains("ERROR timeout waiting for an event"),
             ))
         except:

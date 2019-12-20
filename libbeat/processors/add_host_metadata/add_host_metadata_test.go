@@ -23,9 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -169,77 +168,31 @@ func TestConfigGeoEnabled(t *testing.T) {
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	for configKey, configValue := range config {
-		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
-			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
-			assert.NoError(t, err)
-			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
-		})
-	}
+	eventGeoField, err := newEvent.GetValue("host.geo")
+	require.NoError(t, err)
+
+	assert.Len(t, eventGeoField, len(config))
 }
 
-func TestPartialGeo(t *testing.T) {
+func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{
-		"geo.name":      "yerevan-am",
-		"geo.city_name": "  ",
-	}
+	config := map[string]interface{}{}
 
 	testConfig, err := common.NewConfigFrom(config)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
-	assert.NoError(t, err)
 
-	v, err := newEvent.Fields.GetValue("host.geo.name")
-	assert.NoError(t, err)
-	assert.Equal(t, "yerevan-am", v)
+	require.NoError(t, err)
 
-	missing := []string{"continent_name", "country_name", "country_iso_code", "region_name", "region_iso_code", "city_name"}
-
-	for _, k := range missing {
-		path := "host.geo." + k
-		v, err = newEvent.Fields.GetValue(path)
-
-		assert.Equal(t, common.ErrKeyNotFound, err, "din expect to find %v", path)
-	}
-}
-
-func TestGeoLocationValidation(t *testing.T) {
-	locations := []struct {
-		str   string
-		valid bool
-	}{
-		{"40.177200, 44.503490", true},
-		{"-40.177200, -44.503490", true},
-		{"garbage", false},
-		{"9999999999", false},
-	}
-
-	for _, location := range locations {
-		t.Run(fmt.Sprintf("Location %s validation should be %t", location.str, location.valid), func(t *testing.T) {
-
-			conf, err := common.NewConfigFrom(map[string]interface{}{
-				"geo": map[string]interface{}{
-					"location": location.str,
-				},
-			})
-			require.NoError(t, err)
-
-			_, err = New(conf)
-
-			if location.valid {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
-		})
-	}
+	eventGeoField, err := newEvent.GetValue("host.geo")
+	assert.Error(t, err)
+	assert.Equal(t, nil, eventGeoField)
 }

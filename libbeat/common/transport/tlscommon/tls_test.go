@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -131,12 +132,13 @@ func TestApplyEmptyConfig(t *testing.T) {
 
 	cfg := tmp.BuildModuleConfig("")
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
 	assert.Equal(t, false, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 0)
 	assert.Len(t, cfg.CurvePreferences, 0)
+	assert.Equal(t, tls.RenegotiateNever, cfg.Renegotiation)
 }
 
 func TestApplyWithConfig(t *testing.T) {
@@ -149,6 +151,7 @@ func TestApplyWithConfig(t *testing.T) {
       - "ECDHE-ECDSA-AES-256-CBC-SHA"
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
     curve_types: [P-384]
+    renegotiation: once
   `))
 	if err != nil {
 		t.Fatal(err)
@@ -161,8 +164,60 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
+	assert.Equal(t, tls.RenegotiateOnceAsClient, cfg.Renegotiation)
+}
+
+func TestServerConfigDefaults(t *testing.T) {
+	t.Run("when CA is not explicitly set", func(t *testing.T) {
+		var c ServerConfig
+		config := common.MustNewConfigFrom([]byte(``))
+		err := config.Unpack(&c)
+		require.NoError(t, err)
+		tmp, err := LoadTLSServerConfig(&c)
+		require.NoError(t, err)
+
+		cfg := tmp.BuildModuleConfig("")
+
+		assert.NotNil(t, cfg)
+		// values not set by default
+		assert.Len(t, cfg.Certificates, 0)
+		assert.Nil(t, cfg.ClientCAs)
+		assert.Len(t, cfg.CipherSuites, 0)
+		assert.Len(t, cfg.CurvePreferences, 0)
+		// values set by default
+		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
+		assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
+		assert.Equal(t, tls.NoClientCert, cfg.ClientAuth)
+	})
+	t.Run("when CA is explicitly set", func(t *testing.T) {
+
+		yamlStr := `
+    certificate_authorities: [ca_test.pem]
+`
+		var c ServerConfig
+		config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+		err = config.Unpack(&c)
+		require.NoError(t, err)
+		tmp, err := LoadTLSServerConfig(&c)
+		require.NoError(t, err)
+
+		cfg := tmp.BuildModuleConfig("")
+
+		assert.NotNil(t, cfg)
+		// values not set by default
+		assert.Len(t, cfg.Certificates, 0)
+		assert.NotNil(t, cfg.ClientCAs)
+		assert.Len(t, cfg.CipherSuites, 0)
+		assert.Len(t, cfg.CurvePreferences, 0)
+		// values set by default
+		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
+		assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
+		assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
+	})
 }
 
 func TestApplyWithServerConfig(t *testing.T) {
@@ -172,7 +227,7 @@ func TestApplyWithServerConfig(t *testing.T) {
     certificate_authorities: [ca_test.pem]
     verification_mode: none
     client_authentication: optional
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
     cipher_suites:
       - "ECDHE-ECDSA-AES-256-CBC-SHA"
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
@@ -200,7 +255,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
 	assert.Equal(t, tls.VerifyClientCertIfGiven, cfg.ClientAuth)
 }

@@ -35,6 +35,8 @@ type Win32Service struct {
 	ProcessId   uint32
 	DisplayName string
 	State       string
+	StartName   string
+	PathName    string
 }
 
 func TestData(t *testing.T) {
@@ -58,7 +60,8 @@ func TestReadService(t *testing.T) {
 
 	var wmiSrc []Win32Service
 
-	// Get services from WMI.
+	// Get services from WMI, set NonePtrZero so nil fields are turned to empty strings
+	wmi.DefaultClient.NonePtrZero = true
 	err = wmi.Query("SELECT * FROM Win32_Service ", &wmiSrc)
 	if err != nil {
 		t.Fatal(err)
@@ -86,6 +89,15 @@ func TestReadService(t *testing.T) {
 				if w.DisplayName != w.Name {
 					assert.Equal(t, w.DisplayName, s["display_name"],
 						"Display name of service %v does not match", w.Name)
+				}
+				// some services come back without PathName or StartName from WMI, just skip them
+				if s["path_name"] != nil && w.PathName != "" {
+					assert.Equal(t, w.PathName, s["path_name"],
+						"Path name of service %v does not match", w.Name)
+				}
+				if s["start_name"] != nil && w.StartName != "" {
+					assert.Equal(t, w.StartName, s["start_name"],
+						"Start name of service %v does not match", w.Name)
 				}
 				// Some services have changed state before the second retrieval.
 				if w.State != s["state"] {

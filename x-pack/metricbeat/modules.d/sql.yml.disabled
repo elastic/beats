@@ -1,0 +1,13 @@
+# Module: sql
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-sql.html
+
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["localhost"]
+
+  driver: "postgres"
+  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
+  sql_query: "select now()"
+

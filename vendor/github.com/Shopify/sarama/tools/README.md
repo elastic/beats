@@ -6,5 +6,6 @@ Some of these tools mirror tools that ship with Kafka, but these tools won't req
 - [kafka-console-producer](./kafka-console-producer): a command line tool to produce a single message to your Kafka custer.
 - [kafka-console-partitionconsumer](./kafka-console-partitionconsumer): (deprecated) a command line tool to consume a single partition of a topic on your Kafka cluster.
 - [kafka-console-consumer](./kafka-console-consumer): a command line tool to consume arbitrary partitions of a topic on your Kafka cluster.
+- [kafka-producer-performance](./kafka-producer-performance): a command line tool to performance test producers (sync and async) on your Kafka cluster.
 
 To install all tools, run `go get github.com/Shopify/sarama/tools/...`

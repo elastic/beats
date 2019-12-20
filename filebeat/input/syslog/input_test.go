@@ -110,11 +110,8 @@ func TestPid(t *testing.T) {
 		m := dummyMetadata()
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
-		v, err := event.GetValue("process")
-		if !assert.NoError(t, err) {
-			return
-		}
-		assert.Equal(t, common.MapStr{}, v)
+		_, err := event.GetValue("process")
+		assert.Equal(t, common.ErrKeyNotFound, err)
 	})
 }
 
@@ -165,12 +162,8 @@ func TestProgram(t *testing.T) {
 		m := dummyMetadata()
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
-		v, err := event.GetValue("process")
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		assert.Equal(t, common.MapStr{}, v)
+		_, err := event.GetValue("process")
+		assert.Equal(t, common.ErrKeyNotFound, err)
 	})
 }
 

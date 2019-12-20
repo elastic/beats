@@ -12,7 +12,6 @@ multiline:
   match: after
 {{ end }}
 
-{{ if .convert_timezone }}
 processors:
-- add_locale: ~
-{{ end }}
+# Locale for timezone is only needed in non-json logs
+- add_locale.when.not.regexp.message: "^{"

@@ -8,14 +8,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -27,9 +24,7 @@ var metricsetName = "s3_daily_storage"
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -38,23 +33,14 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The aws s3_daily_storage metricset is beta.")
-	s3Logger := logp.NewLogger(aws.ModuleName)
-
 	moduleConfig := aws.Config{}
 	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
 		return nil, err
-	}
-
-	if moduleConfig.Period == "" {
-		err := errors.New("period is not set in AWS module config")
-		s3Logger.Error(err)
 	}
 
 	metricSet, err := aws.NewMetricSet(base)
@@ -63,42 +49,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 86400s
-	remainder := metricSet.PeriodInSec % 86400
+	remainder := int(metricSet.Period.Seconds()) % 86400
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 86400s (or a multiple of 86400s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly " +
 			"in config.yml")
-		s3Logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    s3Logger,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		err = errors.Wrap(err, "Error ParseDuration")
-		m.logger.Error(err.Error())
-		report.Error(err)
-		return
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			err = errors.Wrap(err, "GetListMetricsOutput failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -107,12 +87,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.PeriodInSec)
+		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.Period)
 		// Use metricDataQueries to make GetMetricData API calls
 		metricDataOutputs, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err)
+			m.Logger().Error(err)
 			report.Error(err)
 			continue
 		}
@@ -120,24 +100,30 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		// Create Cloudwatch Events for s3_daily_storage
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
-			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
+			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName, m.AccountName, m.AccountID)
 			if err != nil {
 				err = errors.Wrap(err, "createCloudWatchEvents failed")
-				m.logger.Error(err)
+				m.Logger().Error(err)
 				event.Error = err
 				report.Event(event)
 				continue
 			}
-			report.Event(event)
+
+			if reported := report.Event(event); !reported {
+				m.Logger().Debug("Fetch interrupted, failed to emit event")
+				return nil
+			}
 		}
 	}
+
+	return nil
 }
 
 func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []string) {
 	for _, output := range listMetricsOutputs {
 		for _, dim := range output.Dimensions {
 			if *dim.Name == "BucketName" {
-				if aws.StringInSlice(*dim.Value, bucketNames) {
+				if exists, _ := aws.StringInSlice(*dim.Value, bucketNames); exists {
 					continue
 				}
 				bucketNames = append(bucketNames, *dim.Value)
@@ -147,16 +133,16 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	return
 }
 
-func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {
-		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
+		if exists, _ := aws.StringInSlice(*listMetric.MetricName, metricNames); !exists {
 			continue
 		}
 
-		metricDataQuery := createMetricDataQuery(listMetric, periodInSec, i)
+		metricDataQuery := createMetricDataQuery(listMetric, period, i)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -165,9 +151,9 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec 
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
-	period := int64(periodInSec)
+	periodInSec := int64(period.Seconds())
 	id := "s3d" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	bucketName := ""
@@ -185,7 +171,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int)
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &period,
+			Period: &periodInSec,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
@@ -194,13 +180,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int)
 	return
 }
 
-func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
+func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
+	event = aws.InitEvent(regionName, accountName, accountID)
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -228,7 +209,7 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 		return
 	}
 
-	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return
 }

@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-CoreDNS-Dashboard
+      file: Metricbeat-coredns-overview.json

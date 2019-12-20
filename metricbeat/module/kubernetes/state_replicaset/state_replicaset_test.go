@@ -30,6 +30,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 const testFile = "../_meta/test/kube-state-metrics"
@@ -124,4 +126,8 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   1,
 		},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_replicaset")
 }

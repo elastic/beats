@@ -12,7 +12,7 @@ Before deploying {beatname_uc}, you need to configure one or more functions and
 specify details about the services that will trigger the functions.
 
 You configure the functions in the the +{beatname_lc}.yml+ configuration file.
-When you're done, you can <<{beatname_lc}-deploying,deploy the functions>>
+When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
 to your serverless environment.
 
 The following example configures two functions: `cloudwatch` and `sqs`. The
@@ -22,6 +22,7 @@ the events to {es}.
 
 ["source","sh",subs="attributes"]
 ----
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 {beatname_lc}.provider.aws.functions:
   - name: cloudwatch
@@ -46,7 +47,6 @@ processors:
   - add_cloud_metadata: ~
 ----
 
-
 [id="{beatname_lc}-options"]
 [float]
 === Configuration options
@@ -55,6 +55,12 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
+
+[float]
+[id="{beatname_lc}-endpoint"]
+==== `provider.aws.endpoint`
+
+AWS endpoint to use in the URL template to load functions.
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
@@ -76,6 +82,7 @@ will appear in the Lambda console on AWS.
 The type of service to monitor. For this release, the supported types
 are:
 
+[horizontal]
 `cloudwatch_logs`:: Collects events from CloudWatch logs.
 `sqs`:: Collects data from Amazon Simple Queue Service (SQS).
 `kinesis`:: Collects data from a Kinesis stream.
@@ -92,9 +99,13 @@ multiple functions and need more context about how each function is used.
 ==== `triggers`
 
 A list of triggers that will cause the function to execute. The list of valid
-triggers depends on the `type`. If `type` is `cloudwatch_logs` logs, specify a
-list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
-(ARNs).
+triggers depends on the `type`:
+
+* For `cloudwatch_logs`, specify a list of log groups. Because the AWS limit is
+one subscription filter per CloudWatch log group, the log groups specified here
+must have no other subscription filters, or deployment will fail.
+For more information, see <<unable-to-deploy-resource-limit>>.
+* For `sqs` or `kinesis`, specify a list of Amazon Resource Names (ARNs).
 
 [float]
 [id="{beatname_lc}-filter_pattern"]
@@ -121,6 +132,40 @@ is a factor of 64. There is a hard limit of 3008 MiB for each function. The
 default is 128 MiB.
 
 [float]
+[id="{beatname_lc}-role"]
+==== `role`
+
+The custom execution role to use for the deployed function. For example:
+
+[source,yaml]
+----
+    role: arn:aws:iam::123456789012:role/MyFunction
+----
+
+Make sure the custom role has the permissions required to run the function. For
+more information, see <<iam-permissions>>.
+
+If `role` is not specified, the function uses the default role and policy
+created during deployment.
+
+[float]
+[id="{beatname_lc}-virtual_private_cloud"]
+==== `virtual_private_cloud`
+
+Specifies additional settings required to connect to private resources in an
+Amazon Virtual Private Cloud (VPC). For example:
+
+[source,yaml]
+----
+    virtual_private_cloud:
+      security_group_ids:
+        - mySecurityGroup
+        - anotherSecurityGroup
+      subnet_ids:
+        - myUniqueID
+----
+
+[float]
 [id="{beatname_lc}-dead-letter-config"]
 ==== `dead_letter_config.target_arn`
 
@@ -140,3 +185,23 @@ The number of events to read from a Kinesis stream, the minimal values is 100 an
 
 The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
 The default is trim_horizon.
+
+[float]
+[id="{beatname_lc}-keep-null"]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
+[id="{beatname_lc}-index"]
+==== `index`
+
+If present, this formatted string overrides the index for events from this function
+(for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"functionbeat-myindex-2019.12.13"`.

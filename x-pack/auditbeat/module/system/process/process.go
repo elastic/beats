@@ -13,11 +13,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"
+	"github.com/elastic/beats/auditbeat/helper/hasher"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -80,6 +81,7 @@ type MetricSet struct {
 	log       *logp.Logger
 	bucket    datastore.Bucket
 	lastState time.Time
+	hasher    *hasher.FileHasher
 
 	suppressPermissionWarnings bool
 }
@@ -90,12 +92,13 @@ type Process struct {
 	UserInfo *types.UserInfo
 	User     *user.User
 	Group    *user.Group
+	Hashes   map[hasher.HashType]hasher.Digest
 	Error    error
 }
 
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(strconv.Itoa(p.Info.PID))
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
@@ -137,12 +140,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
+	hasher, err := hasher.NewFileHasher(config.HasherConfig, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
 		log:             logp.NewLogger(metricsetName),
 		cache:           cache.New(),
 		bucket:          bucket,
+		hasher:          hasher,
 	}
 
 	// Load from disk: Time when state was last sent
@@ -161,7 +170,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found")
 	}
 
-	if os.Geteuid() != 0 {
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
 		ms.log.Warn("Running as non-root user, will likely not report all processes.")
 	}
 
@@ -215,6 +224,8 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 	for _, p := range processes {
+		ms.enrichProcess(p)
+
 		if p.Error == nil {
 			event := ms.processEvent(p, eventTypeState, eventActionExistingProcess)
 			event.RootFields.Put("event.id", stateID.String())
@@ -255,6 +266,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 	for _, cacheValue := range started {
 		p := cacheValue.(*Process)
+		ms.enrichProcess(p)
 
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStarted))
@@ -273,6 +285,34 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// enrichProcess enriches a process with user lookup information
+// and executable file hash.
+func (ms *MetricSet) enrichProcess(process *Process) {
+	if process.UserInfo != nil {
+		goUser, err := user.LookupId(process.UserInfo.UID)
+		if err == nil {
+			process.User = goUser
+		}
+
+		group, err := user.LookupGroupId(process.UserInfo.GID)
+		if err == nil {
+			process.Group = group
+		}
+	}
+
+	if process.Info.Exe != "" {
+		hashes, err := ms.hasher.HashFile(process.Info.Exe)
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
+					process.Info.PID)
+			}
+		} else {
+			process.Hashes = hashes
+		}
+	}
 }
 
 func (ms *MetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
@@ -310,11 +350,20 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("user.group.name", process.Group.Name)
 	}
 
+	if process.Hashes != nil {
+		for hashType, digest := range process.Hashes {
+			fieldName := "process.hash." + string(hashType)
+			event.RootFields.Put(fieldName, digest)
+		}
+	}
+
 	if process.Error != nil {
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
 
-	event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	}
 
 	return event
 }
@@ -411,16 +460,6 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			}
 		} else {
 			process.UserInfo = &userInfo
-
-			goUser, err := user.LookupId(userInfo.UID)
-			if err == nil {
-				process.User = goUser
-			}
-
-			group, err := user.LookupGroupId(userInfo.GID)
-			if err == nil {
-				process.Group = group
-			}
 		}
 
 		// Exclude Linux kernel processes, they are not very interesting.

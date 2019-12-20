@@ -1,8 +1,8 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",
@@ -13,9 +13,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",

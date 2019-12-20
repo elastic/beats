@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-12-28T14:40:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "osquery.result",
         "event.module": "osquery",
         "fileset.name": "result",

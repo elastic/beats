@@ -376,7 +376,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Path", 
-                                "field": "file.path.raw", 
+                                "field": "file.path", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 10
@@ -541,7 +541,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "File", 
-                                "field": "file.path.raw", 
+                                "field": "file.path", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 1
@@ -816,7 +816,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Path", 
-                                "field": "file.path.raw", 
+                                "field": "file.path", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 10
@@ -872,7 +872,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Path", 
-                                "field": "file.path.raw", 
+                                "field": "file.path", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 10

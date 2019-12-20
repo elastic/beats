@@ -27,7 +27,8 @@ import (
 	"github.com/elastic/beats/libbeat/cmd"
 )
 
-func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
+// BuildModulesManager adds support for modules management to a beat
+func BuildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 	config := beat.BeatConfig
 
 	glob, err := config.String("config.modules.path", -1)

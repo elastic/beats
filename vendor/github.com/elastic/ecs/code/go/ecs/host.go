@@ -53,6 +53,9 @@ type Host struct {
 	// meaningful in your environment.
 	Type string `ecs:"type"`
 
+	// Seconds the host has been up.
+	Uptime int64 `ecs:"uptime"`
+
 	// Operating system architecture.
 	Architecture string `ecs:"architecture"`
 }

@@ -36,13 +36,8 @@ import (
 )
 
 func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
-	b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
-
+	b, err := instance.NewInitializedBeat(settings)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing beat: %s", err)
-	}
-
-	if err = b.InitWithSettings(settings); err != nil {
 		return nil, fmt.Errorf("error initializing beat: %s", err)
 	}
 

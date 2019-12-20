@@ -75,8 +75,8 @@
       fields:
         - name: used.value
           type: long
-          description: >
           format: bytes
+          description: >
             Total number of bytes allocated by Redis.
         - name: used.rss
           type: long

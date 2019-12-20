@@ -8,7 +8,11 @@ package login
 
 import (
 	"encoding/binary"
+	"io"
+	"io/ioutil"
 	"net"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -28,7 +32,7 @@ func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
 	config := getBaseConfig()
-	config["login.wtmp_file_pattern"] = "../../../tests/files/wtmp"
+	config["login.wtmp_file_pattern"] = "./testdata/wtmp"
 	config["login.btmp_file_pattern"] = ""
 	f := mbtest.NewReportingMetricSetV2(t, config)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
@@ -56,8 +60,13 @@ func TestWtmp(t *testing.T) {
 
 	defer abtest.SetupDataDir(t)()
 
+	dir := setupTestDir(t)
+	defer os.RemoveAll(dir)
+
+	wtmpFilepath := filepath.Join(dir, "wtmp")
+
 	config := getBaseConfig()
-	config["login.wtmp_file_pattern"] = "../../../tests/files/wtmp"
+	config["login.wtmp_file_pattern"] = wtmpFilepath
 	config["login.btmp_file_pattern"] = ""
 	f := mbtest.NewReportingMetricSetV2(t, config)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
@@ -85,6 +94,40 @@ func TestWtmp(t *testing.T) {
 	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
 	assert.True(t, events[0].Timestamp.Equal(time.Date(2019, 1, 24, 9, 51, 51, 367964000, time.UTC)),
 		"Timestamp is not equal: %+v", events[0].Timestamp)
+
+	// Append logout event to wtmp file and check that it's read
+	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
+	}
+
+	loginUtmp := utmpC{
+		Type: DEAD_PROCESS,
+	}
+	copy(loginUtmp.Device[:], "pts/2")
+
+	err = binary.Write(wtmpFile, byteOrder, loginUtmp)
+	if err != nil {
+		t.Fatalf("error writing to %v: %v", wtmpFilepath, err)
+	}
+
+	events, errs = mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
+	}
+
+	if len(events) == 0 {
+		t.Fatal("no events were generated")
+	} else if len(events) != 1 {
+		t.Fatalf("only one event expected, got %d: %v", len(events), events)
+	}
+
+	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
+	checkFieldValue(t, events[0].RootFields, "event.action", "user_logout")
+	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
+	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
+	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
+	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
 }
 
 func TestBtmp(t *testing.T) {
@@ -96,7 +139,7 @@ func TestBtmp(t *testing.T) {
 
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""
-	config["login.btmp_file_pattern"] = "../../../tests/files/btmp_ubuntu1804"
+	config["login.btmp_file_pattern"] = "./testdata/btmp*"
 	f := mbtest.NewReportingMetricSetV2(t, config)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
@@ -188,5 +231,50 @@ func getBaseConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":   "system",
 		"datasets": []string{"login"},
+	}
+}
+
+// setupTestDir creates a temporary directory, copies the test files into it,
+// and returns the path.
+func setupTestDir(t *testing.T) string {
+	tmp, err := ioutil.TempDir("", "auditbeat-login-test-dir")
+	if err != nil {
+		t.Fatal("failed to create temp dir")
+	}
+
+	copyDir(t, "./testdata", tmp)
+
+	return tmp
+}
+
+func copyDir(t *testing.T, src, dst string) {
+	files, err := ioutil.ReadDir(src)
+	if err != nil {
+		t.Fatalf("failed to read %v", src)
+	}
+
+	for _, file := range files {
+		srcFile := filepath.Join(src, file.Name())
+		dstFile := filepath.Join(dst, file.Name())
+		copyFile(t, srcFile, dstFile)
+	}
+}
+
+func copyFile(t *testing.T, src, dst string) {
+	in, err := os.Open(src)
+	if err != nil {
+		t.Fatalf("failed to open %v", src)
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		t.Fatalf("failed to open %v", dst)
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		t.Fatalf("failed to copy %v to %v", src, dst)
 	}
 }

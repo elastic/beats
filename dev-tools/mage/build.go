@@ -33,6 +33,7 @@ import (
 // "go build" is invoked.
 type BuildArgs struct {
 	Name       string // Name of binary. (On Windows '.exe' is appended.)
+	InputFiles []string
 	OutputDir  string
 	CGO        bool
 	Static     bool
@@ -47,6 +48,9 @@ func DefaultBuildArgs() BuildArgs {
 	args := BuildArgs{
 		Name: BeatName,
 		CGO:  build.Default.CgoEnabled,
+		LDFlags: []string{
+			"-s", // Strip all debug symbols from binary (does not affect Go stack traces).
+		},
 		Vars: map[string]string{
 			"github.com/elastic/beats/libbeat/version.buildTime": "{{ date }}",
 			"github.com/elastic/beats/libbeat/version.commit":    "{{ commit }}",
@@ -141,6 +145,10 @@ func Build(params BuildArgs) error {
 	if len(ldflags) > 0 {
 		args = append(args, "-ldflags")
 		args = append(args, MustExpand(strings.Join(ldflags, " ")))
+	}
+
+	if len(params.InputFiles) > 0 {
+		args = append(args, params.InputFiles...)
 	}
 
 	log.Println("Adding build environment vars:", env)

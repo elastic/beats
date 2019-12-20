@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{TIMESTAMP_ISO8601:mongodb.log.timestamp} %{WORD:log.level} %{WORD:mongodb.log.component} \\s*\\[%{WORD:mongodb.log.context}\\] %{GREEDYDATA:message}"
+          "%{TIMESTAMP_ISO8601:mongodb.log.timestamp}%{SPACE}%{MONGO3_SEVERITY:log.level}%{SPACE}%{MONGO3_COMPONENT:mongodb.log.component}%{SPACE}(?:\\[%{DATA:mongodb.log.context}\\])?%{SPACE}%{GREEDYDATA:message}"
       ],
       "ignore_missing": true
     }

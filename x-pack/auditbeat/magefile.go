@@ -16,13 +16,20 @@ import (
 	"github.com/pkg/errors"
 
 	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
 )
 
 func init() {
-	mage.BeatDescription = "Audit the activities of users and processes on your system."
-	mage.BeatLicense = "Elastic License"
-	mage.Platforms = mage.Platforms.Filter("!linux/ppc64 !linux/mips64")
+	common.RegisterCheckDeps(Update)
+
+	devtools.BeatDescription = "Audit the activities of users and processes on your system."
+	devtools.BeatLicense = "Elastic License"
+	devtools.Platforms = devtools.Platforms.Filter("!linux/ppc64 !linux/mips64")
 }
 
 // Aliases provides compatibility with CI while we transition all Beats
@@ -33,36 +40,31 @@ var Aliases = map[string]interface{}{
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if d, ok := deps[mage.Platform.Name]; ok {
+	if d, ok := deps[devtools.Platform.Name]; ok {
 		mg.Deps(d)
 	}
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
@@ -73,28 +75,28 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatXPackPackaging()
-	mage.PackageKibanaDashboardsFromBuildDir()
+	devtools.UseElasticBeatXPackPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
-	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return devtools.TestPackages(devtools.WithRootUserContainer())
 }
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
 }
 
 // Config generates both the short and reference configs.
 func Config() error {
-	return mage.Config(mage.AllConfigTypes, auditbeat.XPackConfigFileParams(), ".")
+	return devtools.Config(devtools.AllConfigTypes, auditbeat.XPackConfigFileParams(), ".")
 }
 
 // Fields generates a fields.yml and include/fields.go.
@@ -103,12 +105,12 @@ func Fields() {
 }
 
 func moduleFieldsGo() error {
-	return mage.GenerateModuleFieldsGo("module")
+	return devtools.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates the fields.yml file containing all fields.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
+	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module")
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory.
@@ -117,29 +119,12 @@ func fieldsYML() error {
 // - MODULE: Name of the module
 // - ID:     Dashboard id
 func ExportDashboard() error {
-	return mage.ExportDashboard()
+	return devtools.ExportDashboard()
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
-	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(mage.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(mage.Format, Update, mage.Check)
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	mage.AddIntegTestUsage()
-	defer mage.StopIntegTestEnv()
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
 }
 
 // UnitTest executes the unit tests.
@@ -151,33 +136,13 @@ func UnitTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
-}
-
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoIntegTest(ctx context.Context) error {
-	return mage.RunIntegTest("goIntegTest", func() error {
-		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
-	})
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.SerialDeps(Fields, mage.BuildSystemTestBinary)
-	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
-}
-
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
-func PythonIntegTest(ctx context.Context) error {
-	if !mage.IsInIntegTestEnv() {
-		mg.Deps(Fields)
-	}
-	return mage.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(mage.BuildSystemTestBinary)
-		return mage.PythonNoseTest(mage.DefaultPythonTestIntegrationArgs())
-	})
+	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
+	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------

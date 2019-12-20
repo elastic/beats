@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-05-09T10:57:55.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.duration": 26000000,
         "event.module": "kibana",
@@ -36,7 +35,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:12.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -57,7 +55,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:12.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",

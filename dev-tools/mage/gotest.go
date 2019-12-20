@@ -53,12 +53,34 @@ type GoTestArgs struct {
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 }
 
+// TestBinaryArgs are the arguments used when building binary for testing.
+type TestBinaryArgs struct {
+	Name       string // Name of the binary to build
+	InputFiles []string
+}
+
 func makeGoTestArgs(name string) GoTestArgs {
 	fileName := fmt.Sprintf("build/TEST-go-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
 	params := GoTestArgs{
 		TestName:        name,
 		Race:            RaceDetector,
 		Packages:        []string{"./..."},
+		OutputFile:      fileName + ".out",
+		JUnitReportFile: fileName + ".xml",
+	}
+	if TestCoverage {
+		params.CoverageProfileFile = fileName + ".cov"
+	}
+	return params
+}
+
+func makeGoTestArgsForModule(name, module string) GoTestArgs {
+	fileName := fmt.Sprintf("build/TEST-go-%s-%s", strings.Replace(strings.ToLower(name), " ", "_", -1),
+		strings.Replace(strings.ToLower(module), " ", "_", -1))
+	params := GoTestArgs{
+		TestName:        fmt.Sprintf("%s-%s", name, module),
+		Race:            RaceDetector,
+		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 	}
@@ -80,6 +102,55 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	return args
 }
 
+// GoTestIntegrationArgsForModule returns a default set of arguments for running
+// module integration tests. We tag integration test files with 'integration'.
+func GoTestIntegrationArgsForModule(module string) GoTestArgs {
+	args := makeGoTestArgsForModule("Integration", module)
+	args.Tags = append(args.Tags, "integration")
+	return args
+}
+
+// DefaultTestBinaryArgs returns the default arguments for building
+// a binary for testing.
+func DefaultTestBinaryArgs() TestBinaryArgs {
+	return TestBinaryArgs{
+		Name: BeatName,
+	}
+}
+
+// GoTestIntegrationForModule executes the Go integration tests sequentially.
+// Currently all test cases must be present under "./module" directory.
+//
+// Motivation: previous implementation executed all integration tests at once,
+// causing high CPU load, high memory usage and resulted in timeouts.
+//
+// This method executes integration tests for a single module at a time.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestIntegrationForModule(ctx context.Context) error {
+	return RunIntegTest("goIntegTest", func() error {
+		modulesFileInfo, err := ioutil.ReadDir("./module")
+		if err != nil {
+			return err
+		}
+
+		var failed bool
+		for _, fi := range modulesFileInfo {
+			if !fi.IsDir() {
+				continue
+			}
+			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			if err != nil {
+				failed = true
+			}
+		}
+		if failed {
+			return errors.New("integration tests failed")
+		}
+		return nil
+	})
+}
+
 // GoTest invokes "go test" and reports the results to stdout. It returns an
 // error if there was any failure executing the tests or if there were any
 // test failures.
@@ -87,7 +158,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
 	// Build args list to Go.
-	args := []string{"test", "-v"}
+	args := []string{"test"}
+	args = append(args, "-v")
+
 	if params.Race {
 		args = append(args, "-race")
 	}
@@ -109,9 +182,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	// Wire up the outputs.
 	bufferOutput := new(bytes.Buffer)
 	outputs := []io.Writer{bufferOutput}
-	if mg.Verbose() {
-		outputs = append(outputs, os.Stdout)
-	}
+
 	if params.OutputFile != "" {
 		fileOutput, err := os.Create(createDir(params.OutputFile))
 		if err != nil {
@@ -121,8 +192,8 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = output
-	goTest.Stderr = output
+	goTest.Stdout = io.MultiWriter(output, os.Stdout)
+	goTest.Stderr = io.MultiWriter(output, os.Stderr)
 
 	// Execute 'go test' and measure duration.
 	start := time.Now()
@@ -329,15 +400,24 @@ func (s *GoTestSummary) String() string {
 	return strings.TrimRight(b.String(), "\n")
 }
 
-// BuildSystemTestBinary build a binary for testing that is instrumented for
+// BuildSystemTestBinary runs BuildSystemTestGoBinary with default values.
+func BuildSystemTestBinary() error {
+	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
+}
+
+// BuildSystemTestGoBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
-func BuildSystemTestBinary() error {
+func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	args := []string{
 		"test", "-c",
+		"-o", binArgs.Name + ".test",
 	}
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
+	}
+	if len(binArgs.InputFiles) > 0 {
+		args = append(args, binArgs.InputFiles...)
 	}
 	return sh.RunV("go", args...)
 }
