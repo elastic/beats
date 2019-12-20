@@ -2393,12 +2393,11 @@
 			"revisionTime": "2014-10-17T20:07:13Z"
 		},
 		{
-			"checksumSHA1": "91BeeUBHx1qOMIymuVX6R3UPP+A=",
+			"checksumSHA1": "aqxhpCT2VwDYHuf2FX6JLmN+GX4=",
 			"path": "github.com/influxdata/go-syslog",
 			"revision": "1193720dd65bc4bab8d9ec1e0c3b5e2496f4d08f",
 			"revisionTime": "2019-11-01T17:40:56Z",
-			"version": "v2.0.1",
-			"versionExact": "v2.0.1"
+			"tree": true
 		},
 		{
 			"checksumSHA1": "5qaMTb8eLAwaTeCqSHYMVyb4BSM=",
