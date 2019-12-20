@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
 - Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
 - NFSv4: Always use opname `ILLEGAL` when failed to match request to a valid nfs operation. {pull}11503[11503]
 
@@ -552,6 +553,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable script processor. {pull}14711[14711]
 - Enable wildcard for cloudwatch metricset namespace. {pull}14971[14971] {issue}14965[14965]
 - Add `kube-state-metrics` `state_service` metrics for kubernetes module. {pull}14794[14794]
+- Add `kube-state-metrics` `state_persistentvolume` metrics for kubernetes module. {pull}14859[14859]
 - Add `kube-state-metrics` `state_persistentvolumeclaim` metrics for kubernetes module. {pull}15066[15066]
 - Add usage metricset in aws modules. {pull}14925[14925] {issue}14935[14935]
 - Add billing metricset in aws modules. {pull}14801[14801] {issue}14934[14934]
