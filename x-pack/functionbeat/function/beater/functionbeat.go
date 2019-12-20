@@ -29,6 +29,7 @@ var (
 	supportedOutputs = []string{
 		"elasticsearch",
 		"logstash",
+		"console", // for local debugging
 	}
 )
 
