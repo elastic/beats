@@ -3707,10 +3707,10 @@
 			"revisionTime": "2019-11-15T12:05:43Z"
 		},
 		{
-			"checksumSHA1": "vGfePfr0+weQUeTM/71mu+LCFuE=",
+			"checksumSHA1": "MpBvKi+rNRB9eV6zc1MJyeK87ew=",
 			"path": "golang.org/x/time/rate",
-			"revision": "26559e0f760e39c24d730d3224364aef164ee23f",
-			"revisionTime": "2018-03-14T17:21:34Z"
+			"revision": "555d28b269f0569763d25dbe1a237ae74c6bcc82",
+			"revisionTime": "2019-10-23T19:31:36Z"
 		},
 		{
 			"checksumSHA1": "V4M/6A62nVBzPFxPbN+EAatCrVs=",
