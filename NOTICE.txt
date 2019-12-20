@@ -11,7 +11,7 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------
 Dependency: 4d63.com/tz
-Revision: acbe7ac603850b02c7bc4329a2354e389857bf18
+Revision: 6d37baae851b6f07225308b199322f70907aa3dd
 License type (autodetected): MIT
 ./vendor/4d63.com/tz/LICENSE:
 --------------------------------------------------------------------
@@ -6023,7 +6023,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/genproto
-Revision: a7e196e89fd3a3c4d103ca540bd5dac3a736e375
+Revision: fa694d86fc64c7654a660f8908de4e879866748d
 License type (autodetected): Apache-2.0
 ./vendor/google.golang.org/genproto/LICENSE:
 --------------------------------------------------------------------
