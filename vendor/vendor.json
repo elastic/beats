@@ -1579,8 +1579,8 @@
 		{
 			"checksumSHA1": "8cCK0nrEedpDsGzQf2hAOjTWfZs=",
 			"path": "github.com/elastic/go-perf",
-			"revision": "9bc9b58a3de9e63a1a8e27241ae3c61d3449782b",
-			"revisionTime": "2019-08-22T17:42:12Z"
+			"revision": "9c656876f595360525261b7db5bbbcd3c40b7dbb",
+			"revisionTime": "2019-12-12T13:55:12Z"
 		},
 		{
 			"checksumSHA1": "3e1eGhr4UUQOQffSHkoycT18inA=",
