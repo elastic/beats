@@ -202,8 +202,8 @@ jobs:
     #  stage: test
 
 before_install:
-  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -y update; end
-  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends install python-virtualenv libpcap-dev xsltproc libxml2-utils libsystemd-dev librpm-dev; end
+  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -y update; fi
+  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends install python-virtualenv libpcap-dev xsltproc libxml2-utils libsystemd-dev librpm-dev; fi
   - python --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
