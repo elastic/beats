@@ -67,7 +67,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {
-		i, err := input.New(c, b.Publisher, done, cp.States())
+		i, err := input.New(c, b, done, cp.States())
 		if err != nil {
 			return nil, err
 		}

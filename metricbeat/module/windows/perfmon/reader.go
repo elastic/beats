@@ -59,7 +59,7 @@ func NewReader(config Config) (*Reader, error) {
 		config:        config,
 	}
 	for _, counter := range config.CounterConfig {
-		childQueries, err := query.ExpandWildCardPath(counter.Query)
+		childQueries, err := query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
@@ -76,6 +76,12 @@ func NewReader(config Config) (*Reader, error) {
 		}
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
 		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
+			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
+			if config.IgnoreNECounters {
+				r.log.Infow("Ignoring non existent counter", "initial query", counter.Query,
+					logp.Namespace("perfmon"), "expanded query", childQueries)
+				continue
+			}
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
 		}
 		for _, v := range childQueries {
@@ -94,7 +100,7 @@ func NewReader(config Config) (*Reader, error) {
 func (r *Reader) RefreshCounterPaths() error {
 	var newCounters []string
 	for _, counter := range r.config.CounterConfig {
-		childQueries, err := r.query.ExpandWildCardPath(counter.Query)
+		childQueries, err := r.query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if r.config.IgnoreNECounters {
 				switch err {

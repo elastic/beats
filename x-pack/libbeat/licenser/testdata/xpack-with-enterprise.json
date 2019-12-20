@@ -6,38 +6,12 @@
   "license": {
     "uid": "936183d8-f48c-4a3f-959a-a52aa2563279",
     "type": "enterprise",
-    "mode": "enterprise",
-    "status": "active",
-    "expiry_date_in_millis": 1588291199999
-  },
-  "features": {
-    "graph": {
-      "available": false,
-      "enabled": true
-    },
-    "logstash": {
-      "available": false,
-      "enabled": true
-    },
-    "ml": {
-      "available": false,
-      "enabled": true
-    },
-    "monitoring": {
-      "available": true,
-      "enabled": true
-    },
-    "rollup": {
-      "available": true,
-      "enabled": true
-    },
-    "security": {
-      "available": false,
-      "enabled": true
-    },
-    "watcher": {
-      "available": false,
-      "enabled": true
-    }
+    "issue_date_in_millis": 1576000000000,
+    "start_date_in_millis": 1576000000000,
+    "expiry_date_in_millis": 1588291199999,
+    "max_resource_units": 100,
+    "issued_to": "Elastic - INTERNAL",
+    "issuer": "Fabio Busatto",
+    "type": "enterprise"
   }
 }
