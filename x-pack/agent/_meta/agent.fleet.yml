@@ -2,22 +2,7 @@
 # Beats is configured under Fleet, you can define most settings
 # from the Kibana UI. You can update this file to configure the settings that
 # are not supported by Fleet.
-outputs:
-  default:
-    type: elasticsearch
-    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
-    username: elastic
-    password: changeme
-
-streams:
-  - type: event/file
-    enabled: true
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
-
 management:
-  #
   mode: "fleet"
 
 # reattach collection path is a way of tracking started processes by agent.
@@ -27,7 +12,7 @@ download:
   # operating system [linux, windows, darwin]
   operating_system: "linux"
   # target architecture [32, 64]
-  arch: "32"
+  arch: "64"
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip
   sourceURI: "https://artifacts.elastic.co/downloads/beats/"

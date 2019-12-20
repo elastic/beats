@@ -76,6 +76,18 @@ func TestAST(t *testing.T) {
 				},
 			},
 		},
+		"support null (nil) values": {
+			hashmap: map[string]interface{}{
+				"nil_v": nil,
+			},
+			ast: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{name: "nil_v"},
+					},
+				},
+			},
+		},
 		"support bool": {
 			hashmap: map[string]interface{}{
 				"true_v":  true,

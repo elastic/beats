@@ -23,37 +23,10 @@ management:
   # Default is local.
   mode: "local"
 
-  fleet:
-    access_token: ""
-    kibana:
-      # kibana minimal configuration
-      host: "localhost:5601"
-      ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-      # optional values
-      #protocol: "https"
-      #username: "elastic"
-      #password: "changeme"
-      #path: ""
-      #ssl.verification_mode: full
-      #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-      #ssl.cipher_suites: []
-      #ssl.curve_types: []
-
   reporting:
     log:
       # format in which logs will be written, options are json or default.
       format: "default"
-    fleet:
-      # enables fleet reporter. fleet reporting can be enabled only in fleet management.mode.
-      enabled: false
-
-      # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
-      reporting_threshold: 10000
-
-      # Frequency used to check the queue of events to be sent out to fleet.
-      reporting_check_frequency_sec: 30
-
 
   # Allow the agent to reload his configuration locally on disk.
   # Notes: Only specific process configuration will be reloaded.
@@ -73,7 +46,7 @@ download:
   # operating system [linux, windows, darwin]
   operating_system: "linux"
   # target architecture [32, 64]
-  arch: "32"
+  arch: "64"
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip
   sourceURI: "https://artifacts.elastic.co/downloads/beats/"

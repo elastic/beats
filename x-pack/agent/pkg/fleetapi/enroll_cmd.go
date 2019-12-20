@@ -70,7 +70,7 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 // 	"type": "PERMANENT",
 //   "metadata": {
 // 	  "local": { "os": "macos"},
-// 	  "userProvided": { "region": "us-east"}
+// 	  "user_provided": { "region": "us-east"}
 //   }
 // }
 type EnrollRequest struct {
@@ -83,7 +83,7 @@ type EnrollRequest struct {
 // Metadata is a all the metadata send or received from the agent.
 type Metadata struct {
 	Local        map[string]interface{} `json:"local"`
-	UserProvided map[string]interface{} `json:"userProvided"`
+	UserProvided map[string]interface{} `json:"user_provided"`
 }
 
 // Validate validates the enrollment request before sending it to the API.
