@@ -3659,10 +3659,14 @@
 		{
 			"checksumSHA1": "V4M/6A62nVBzPFxPbN+EAatCrVs=",
 			"path": "golang.org/x/tools/cmd/goimports",
-			"revision": "156d532d4f67148ceab07c3b59ed7fa13bdbf00c",
-			"revisionTime": "2018-08-25T23:28:30Z",
+			"revision": "e7e52e73e2735bea994c85b62483cc6376dd8d74",
+			"revisionTime": "2019-01-02T18:22:47Z",
 			"version": "release-branch.go1.10",
 			"versionExact": "release-branch.go1.10"
+		},
+		{
+			"path": "golang.org/x/tools/cmd/imports",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "AsL/fTkY1p1HNVSikhVZJd++Nrk=",
@@ -3673,38 +3677,28 @@
 			"versionExact": "release-branch.go1.10"
 		},
 		{
-			"checksumSHA1": "AnXFEvmaJ7w2Q7hWPcLUmCbPgq0=",
+			"checksumSHA1": "GHup0BNpNT3tou3vSVk8tZjz0s8=",
 			"path": "golang.org/x/tools/go/buildutil",
-			"revision": "5d2fd3ccab986d52112bf301d47a819783339d0e",
-			"revisionTime": "2017-08-07T23:04:23Z",
-			"version": "release-branch.go1.9",
-			"versionExact": "release-branch.go1.9"
+			"revision": "5e752206af050099b86f8738f3b6b5f69a08561b",
+			"revisionTime": "2019-12-19T22:50:08Z"
 		},
 		{
-			"checksumSHA1": "ZpAR2KupZto/mWf9zu5e6IKDWt0=",
+			"checksumSHA1": "VQ0sTJYKkzzAvWA6zvaKD5lar0o=",
+			"path": "golang.org/x/tools/go/internal/cgo",
+			"revision": "5e752206af050099b86f8738f3b6b5f69a08561b",
+			"revisionTime": "2019-12-19T22:50:08Z"
+		},
+		{
+			"checksumSHA1": "R4e+WZeYIHsulXVgQcoyHdidlJw=",
 			"path": "golang.org/x/tools/go/loader",
-			"revision": "5d2fd3ccab986d52112bf301d47a819783339d0e",
-			"revisionTime": "2017-08-07T23:04:23Z",
-			"version": "release-branch.go1.9",
-			"versionExact": "release-branch.go1.9"
+			"revision": "5e752206af050099b86f8738f3b6b5f69a08561b",
+			"revisionTime": "2019-12-19T22:50:08Z"
 		},
 		{
 			"checksumSHA1": "A4PTlJrxT0eSlnVGhlWcs/3bUjc=",
 			"path": "golang.org/x/tools/imports",
 			"revision": "156d532d4f67148ceab07c3b59ed7fa13bdbf00c",
 			"revisionTime": "2018-08-25T23:28:30Z",
-			"version": "release-branch.go1.10",
-			"versionExact": "release-branch.go1.10"
-		},
-		{
-			"path": "golang.org/x/tools/internal/fastwalk",
-			"revision": "release-branch.go1.10",
-			"version": "release-branch.go1.10",
-			"versionExact": "release-branch.go1.10"
-		},
-		{
-			"path": "golang.org/x/tools/internal/gopathwalk",
-			"revision": "release-branch.go1.10",
 			"version": "release-branch.go1.10",
 			"versionExact": "release-branch.go1.10"
 		},
