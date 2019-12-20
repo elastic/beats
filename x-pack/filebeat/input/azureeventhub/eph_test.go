@@ -23,6 +23,6 @@ var (
 func TestRunWithEPH(t *testing.T) {
 	input := azureInput{config: invalidConfig}
 	// decoding error when key is invalid
-	error := input.runWithEPH()
-	assert.Error(t, error, '7')
+	err := input.runWithEPH()
+	assert.Error(t, err, '7')
 }

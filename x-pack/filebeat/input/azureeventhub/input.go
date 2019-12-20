@@ -200,12 +200,12 @@ func (a *azureInput) Wait() {
 	a.Stop()
 }
 
-func (a *azureInput) processEvents(event *eventhub.Event, partitionId string) error {
+func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) error {
 	// timestamp temp disabled as the event date is applied for now, will be replaced
 	//timestamp := time.Now()
 	var events []beat.Event
 	azure := common.MapStr{
-		"partition_id":   partitionId,
+		"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
@@ -243,7 +243,6 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []map[time.Time]stri
 		return []map[time.Time]string{}
 	}
 	var messages []map[time.Time]string
-	//var messages []string
 	if len(obj[expandEventListFromField]) > 0 {
 		for _, ms := range obj[expandEventListFromField] {
 			js, err := json.Marshal(ms)
