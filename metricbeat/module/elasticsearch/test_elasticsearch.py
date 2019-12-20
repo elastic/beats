@@ -153,6 +153,7 @@ class Test(metricbeat.BaseTest):
             self.assertIsNot(type(issue_date), float)
 
             self.assertNotIn("expiry_date_in_millis", license)
+            self.assertNotIn("max_resource_units", license)
 
     def create_ml_job(self):
         # Check if an ml job already exists
