@@ -203,7 +203,8 @@ jobs:
 
 before_install:
   - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -y update; fi
-  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends install python-virtualenv libpcap-dev xsltproc libxml2-utils libsystemd-journal-dev librpm-dev; fi
+  - if [[ -x /usr/bin/apt-get ]]; then travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends install python-virtualenv libpcap-dev xsltproc libxml2-utils librpm-dev; fi
+  - if [[ "${TARGETS}" != "-C deploy/kubernetes test" ]]; then travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends install libsystemd-journal-dev; fi
   - python --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
