@@ -4,9 +4,18 @@
 
 package application
 
+import (
+	"io"
+)
+
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
 	agentID string
+}
+
+type ioStore interface {
+	store
+	Load() (io.ReadCloser, error)
 }
 
 // NewAgentInfo creates a new agent information.

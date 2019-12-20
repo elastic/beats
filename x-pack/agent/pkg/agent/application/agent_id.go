@@ -7,14 +7,64 @@ package application
 import (
 	"fmt"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
+const agentInfoKey = "agent-info"
+
+type persistentAgentInfo struct {
+	ID string `json:"ID" yaml:"ID"`
+}
+
 func generateAgentID() (string, error) {
-	id, err := uuid.NewV4()
+	s := storage.NewEncryptedDiskStore(agentInfoKey, []byte(""))
+
+	id := loadAgentID(s)
+	if id != "" {
+		return id, nil
+	}
+
+	uid, err := uuid.NewV4()
 	if err != nil {
 		return "", fmt.Errorf("error while generating UUID for agent: %v", err)
 	}
 
-	return id.String(), nil
+	id = uid.String()
+
+	if err := storeAgentID(s, id); err != nil {
+		return "", errors.Wrap(err, "storing generated agent id")
+	}
+
+	return id, nil
+}
+
+func loadAgentID(s ioStore) string {
+	r, err := s.Load()
+	if err != nil {
+		return ""
+	}
+	d := yaml.NewDecoder(r)
+
+	id := &persistentAgentInfo{}
+	if err := d.Decode(&id); err != nil {
+		return ""
+	}
+
+	return id.ID
+}
+
+func storeAgentID(s ioStore, id string) error {
+	ids := &persistentAgentInfo{
+		ID: id,
+	}
+
+	r, err := yamlToReader(ids)
+	if err != nil {
+		return err
+	}
+
+	return s.Save(r)
 }
