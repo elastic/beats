@@ -1302,7 +1302,7 @@ var security = (function () {
                 {from: "winlog.event_data.TargetDomainName", to: "user.domain"},
             ],
             ignore_missing: true,
-        }) 
+        })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             addRelatedUser(evt,user);
@@ -1348,7 +1348,7 @@ var security = (function () {
                 {from: "winlog.event_data.SubjectDomainName", to: "user.domain"},
             ],
             ignore_missing: true,
-        })        
+        })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
             addRelatedUser(evt,user);
@@ -1593,7 +1593,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addActionDesc)
         .Build();
-        
+
     var computerMgmtEvts = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
@@ -1710,43 +1710,43 @@ var security = (function () {
 
         // 4741 - A computer account was created.
         4741: computerMgmtEvts.Run,
-    
+
         // 4742 -  A computer account was changed.
         4742: computerMgmtEvts.Run,
-        
+
         // 4743 -  A computer account was deleted.
         4743: computerMgmtEvts.Run,
-    
+
         // 4744 -  A security-disabled local group was created.
         4744: groupMgmtEvts.Run,
-    
+
         // 4745 -  A security-disabled local group was changed.
         4745: groupMgmtEvts.Run,
-    
+
         // 4746 -  A member was added to a security-disabled local group.
         4746: groupMgmtEvts.Run,
-    
+
         // 4747 -  A member was removed from a security-disabled local group.
         4747: groupMgmtEvts.Run,
-    
+
         // 4748 -  A security-disabled local group was deleted.
         4748: groupMgmtEvts.Run,
-    
+
         // 4749 - A security-disabled global group was created.
         4749: groupMgmtEvts.Run,
-    
+
         // 4750 - A security-disabled global group was changed.
         4750: groupMgmtEvts.Run,
-    
+
        // 4751 - A member was added to a security-disabled global group.
         4751: groupMgmtEvts.Run,
-    
+
         // 4752 - A member was removed from a security-disabled global group.
         4752: groupMgmtEvts.Run,
-    
+
         // 4753 - A security-disabled global group was deleted.
         4753: groupMgmtEvts.Run,
-    
+
         // 4754 -  A security-enabled universal group was created.
         4754: groupMgmtEvts.Run,
 
@@ -1767,13 +1767,13 @@ var security = (function () {
 
         // 4760 - A security-disabled universal group was changed.
         4760: groupMgmtEvts.Run,
-    
+
        // 4761 - A member was added to a security-disabled universal group.
         4761: groupMgmtEvts.Run,
-    
+
         // 4762 - A member was removed from a security-disabled universal group.
         4762: groupMgmtEvts.Run,
-    
+
         // 4763 - A security-disabled global group was deleted.
         4763: groupMgmtEvts.Run,
 
