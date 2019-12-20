@@ -5914,7 +5914,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/time
-Revision: 26559e0f760e39c24d730d3224364aef164ee23f
+Revision: 555d28b269f0569763d25dbe1a237ae74c6bcc82
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/time/LICENSE:
 --------------------------------------------------------------------
