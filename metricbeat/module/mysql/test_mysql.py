@@ -38,7 +38,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(MYSQL_FIELDS), evt.keys(), evt)
 
         status = evt["mysql"]["status"]
         assert status["connections"] > 0

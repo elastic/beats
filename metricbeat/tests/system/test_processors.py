@@ -33,13 +33,13 @@ class Test(metricbeat.BaseTest):
 
         print(evt)
         print(list(evt.keys()))
-        self.assertItemsEqual(self.de_dot([
+        self.assertCountEqual(self.de_dot([
             'agent', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(list(cpu.keys()))
-        self.assertItemsEqual(self.de_dot([
+        self.assertCountEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
             "idle", "irq", "steal", "nice", "total"
         ]), cpu.keys())

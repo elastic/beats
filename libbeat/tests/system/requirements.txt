@@ -4,11 +4,11 @@ cached-property==1.4.2
 certifi==2018.1.18
 chardet==3.0.4
 docker==3.7.0
-docker-compose==1.24.1
+docker-compose==1.25.0
 docker-pycreds==0.4.0
 dockerpty==0.4.1
 docopt==0.6.2
-elasticsearch==6.3.1
+elasticsearch==7.1.0
 enum34==1.1.6
 future==0.18.2
 idna==2.6
