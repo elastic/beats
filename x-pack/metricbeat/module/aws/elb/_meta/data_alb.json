@@ -1,19 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
-        "cloudwatch": {
-            "dimensions": {
-                "LoadBalancer": "app/filebeat-aws-elb-test-lb/aaa75bb026cc4c54"
-            },
-            "namespace": "AWS/ApplicationELB"
-        },
-        "metrics": {
-            "ConsumedLCUs": {
-                "avg": 0
-            },
+        "applicationelb": {
             "RequestCount": {
                 "sum": 0
             }
+        },
+        "cloudwatch": {
+            "namespace": "AWS/ApplicationELB"
+        },
+        "dimensions": {
+            "AvailabilityZone": "eu-central-1b",
+            "LoadBalancer": "app/filebeat-aws-elb-test-lb/03c8c88f757d2d38"
         }
     },
     "cloud": {
@@ -22,7 +20,7 @@
             "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "ap-southeast-1"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.elb",

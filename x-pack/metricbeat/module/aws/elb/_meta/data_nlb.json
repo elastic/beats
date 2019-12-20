@@ -5,37 +5,34 @@
             "namespace": "AWS/NetworkELB"
         },
         "dimensions": {
-            "LoadBalancer": "net/asdfe/3b2c2530f0b34305"
+            "AvailabilityZone": "eu-central-1b",
+            "LoadBalancer": "net/ece-es-clusters-nlb/0c5bdb3b96cf1552"
         },
         "networkelb": {
-            "metrics": {
-                "ConsumedLCUs": {
-                    "avg": 0
-                },
-                "NewFlowCount": {
-                    "sum": 0
-                },
-                "ProcessedBytes": {
-                    "sum": 0
-                },
-                "TCP_Client_Reset_Count": {
-                    "sum": 0
-                },
-                "TCP_ELB_Reset_Count": {
-                    "sum": 0
-                },
-                "TCP_Target_Reset_Count": {
-                    "sum": 0
-                }
+            "NewFlowCount": {
+                "sum": 0
+            },
+            "ProcessedBytes": {
+                "sum": 0
+            },
+            "TCP_Client_Reset_Count": {
+                "sum": 0
+            },
+            "TCP_ELB_Reset_Count": {
+                "sum": 0
+            },
+            "TCP_Target_Reset_Count": {
+                "sum": 0
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "856482450085"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-west-2"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.elb",

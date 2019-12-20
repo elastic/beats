@@ -5,31 +5,33 @@
             "namespace": "AWS/ELB"
         },
         "dimensions": {
-            "LoadBalancerName": "asdff"
+            "AvailabilityZone": "eu-central-1a"
         },
         "elb": {
-            "metrics": {
-                "EstimatedALBActiveConnectionCount": {
-                    "avg": 3
-                },
-                "EstimatedALBConsumedLCUs": {
-                    "avg": 0.0002375
-                },
-                "EstimatedALBNewConnectionCount": {
-                    "avg": 21.25
-                },
-                "EstimatedProcessedBytes": {
-                    "avg": 192.5
-                }
+            "HealthyHostCount": {
+                "max": 2
+            },
+            "Latency": {
+                "avg": 0.00001025199890136719
+            },
+            "RequestCount": {
+                "sum": 1
+            },
+            "SurgeQueueLength": {
+                "max": 1
+            },
+            "UnHealthyHostCount": {
+                "max": 0
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "856482450085"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-west-2"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.elb",
