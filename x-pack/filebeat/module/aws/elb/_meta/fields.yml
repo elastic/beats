@@ -1,5 +1,6 @@
 - name: elb
   type: group
+  release: beta
   description: >
     Fields for AWS ELB logs.
   fields:
