@@ -212,20 +212,9 @@ jobs:
     #    - TRAVIS_K8S_VERSION=v1.11.0
     #  stage: test
 
-addons:
-  apt:
-    config:
-      retries: true
-    update: true
-    packages:
-      - python-virtualenv
-      - libpcap-dev
-      - xsltproc
-      - libxml2-utils
-      - libsystemd-journal-dev
-      - librpm-dev
-
 before_install:
+  - travis_retry sudo -E apt-get -y update
+  - travis_retry sudo -E apt-get -yq --no-install-suggests --no-install-recommends $(travis_apt_get_options) install python-virtualenv libpcap-dev xsltproc libxml2-utils libsystemd-journal-dev librpm-dev
   - python --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
