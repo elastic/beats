@@ -2,17 +2,19 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
-            "dimensions": {
-                "Class": "Standard/OnDemand",
-                "Resource": "vCPU",
-                "Service": "EC2",
-                "Type": "Resource"
-            },
             "namespace": "AWS/Usage"
         },
-        "metrics": {
-            "ResourceCount": {
-                "sum": 10
+        "dimensions": {
+            "Class": "None",
+            "Resource": "ListMetrics",
+            "Service": "CloudWatch",
+            "Type": "API"
+        },
+        "usage": {
+            "metrics": {
+                "CallCount": {
+                    "sum": 2
+                }
             }
         }
     },
@@ -22,7 +24,7 @@
             "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "eu-north-1"
     },
     "event": {
         "dataset": "aws.usage",

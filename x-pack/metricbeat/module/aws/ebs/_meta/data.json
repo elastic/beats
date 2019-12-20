@@ -5,29 +5,31 @@
             "namespace": "AWS/EBS"
         },
         "dimensions": {
-            "VolumeId": "vol-07d4d68f5ebc6c80e"
+            "VolumeId": "vol-0dc8166dc085b2b89"
         },
         "ebs": {
-            "BurstBalance": {
-                "avg": 100
-            },
-            "VolumeIdleTime": {
-                "sum": 299.82
-            },
-            "VolumeQueueLength": {
-                "avg": 0.0006
-            },
-            "VolumeReadOps": {
-                "avg": 0
-            },
-            "VolumeTotalWriteTime": {
-                "sum": 0.18
-            },
-            "VolumeWriteBytes": {
-                "avg": 9736.041884816754
-            },
-            "VolumeWriteOps": {
-                "avg": 191
+            "metrics": {
+                "BurstBalance": {
+                    "avg": 100
+                },
+                "VolumeIdleTime": {
+                    "sum": 299.99
+                },
+                "VolumeQueueLength": {
+                    "avg": 0.0000333333333333333
+                },
+                "VolumeReadOps": {
+                    "avg": 0
+                },
+                "VolumeTotalWriteTime": {
+                    "sum": 0.01
+                },
+                "VolumeWriteBytes": {
+                    "avg": 5376
+                },
+                "VolumeWriteOps": {
+                    "avg": 16
+                }
             }
         }
     },
@@ -37,7 +39,7 @@
             "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "ap-northeast-1"
     },
     "event": {
         "dataset": "aws.ebs",
