@@ -79,22 +79,22 @@
 			"revisionTime": "2019-07-18T21:44:46Z"
 		},
 		{
-			"checksumSHA1": "ngNSB6sT1BYbWf0U6wuld3pIRXM=",
+			"checksumSHA1": "VVSYyqGiaulGwpTexZMl06Ik9Fw=",
 			"path": "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights",
-			"revision": "7a9d2769e4a581b0b1bc609c71b59af043e05c98",
-			"revisionTime": "2019-07-30T02:56:09Z"
+			"revision": "a629ae7873bf2a86184a8bc1b65e65e1ab532f57",
+			"revisionTime": "2019-08-05T17:15:50Z"
 		},
 		{
-			"checksumSHA1": "OCsjojjUiG5pLjpeCxHpekcq7ZA=",
+			"checksumSHA1": "5XfymcYhuBdR2lTF400PnnCv5Fo=",
 			"path": "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources",
 			"revision": "a629ae7873bf2a86184a8bc1b65e65e1ab532f57",
 			"revisionTime": "2019-08-05T17:15:50Z"
 		},
 		{
-			"checksumSHA1": "jgptrp19Ok9B8BS04S8Xb3Y8Yl8=",
+			"checksumSHA1": "dDdVWPEWDRc5Uxo9WPA9nRA1A0o=",
 			"path": "github.com/Azure/azure-sdk-for-go/version",
-			"revision": "7a9d2769e4a581b0b1bc609c71b59af043e05c98",
-			"revisionTime": "2019-07-30T02:56:09Z"
+			"revision": "a629ae7873bf2a86184a8bc1b65e65e1ab532f57",
+			"revisionTime": "2019-08-05T17:15:50Z"
 		},
 		{
 			"checksumSHA1": "dl0zIyJAk/XSTO7F7g8AKh0quCo=",
