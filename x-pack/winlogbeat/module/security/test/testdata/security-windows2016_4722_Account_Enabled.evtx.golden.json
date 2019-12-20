@@ -14,7 +14,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was enabled.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1000\n\tAccount Name:\t\taudittest\n\tAccount Domain:\t\tWIN-41OB2LO92CR",
     "process": {
       "name": "null"
     },
@@ -71,7 +70,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was enabled.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR",
     "process": {
       "name": "null"
     },
