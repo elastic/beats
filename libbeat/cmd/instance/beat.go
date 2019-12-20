@@ -466,7 +466,6 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 //SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
 	Dashboard       bool
-	MachineLearning bool
 	Pipeline        bool
 	IndexManagement bool
 	//Deprecated: use IndexManagementKey instead
@@ -507,7 +506,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadTemplate = idxmgmt.LoadModeOverwrite
 			}
 			if setup.IndexManagement || setup.ILMPolicy {
-				loadILM = idxmgmt.LoadModeOverwrite
+				loadILM = idxmgmt.LoadModeEnabled
 			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
@@ -533,14 +532,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			} else {
 				fmt.Println("Loaded dashboards")
 			}
-		}
-
-		if setup.MachineLearning && b.SetupMLCallback != nil {
-			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
-			if err != nil {
-				return err
-			}
-			fmt.Println("Loaded machine learning job configurations")
 		}
 
 		if setup.Pipeline && b.OverwritePipelinesCallback != nil {

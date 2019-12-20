@@ -16,15 +16,18 @@ class TestRunILM(BaseTest):
     def setUp(self):
         super(TestRunILM, self).setUp()
 
-        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.alias_name = self.index_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.custom_alias = self.beat_name + "_foo"
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -160,18 +163,21 @@ class TestCommandSetupILMPolicy(BaseTest):
 
         self.setupCmd = "--ilm-policy"
 
-        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.alias_name = self.index_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.custom_alias = self.beat_name + "_foo"
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -277,7 +283,7 @@ class TestCommandExportILMPolicy(BaseTest):
         self.config = "libbeat.yml"
         self.output = os.path.join(self.working_dir, self.config)
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
-        self.policy_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.cmd = "ilm-policy"
 
     def assert_log_contains_policy(self):

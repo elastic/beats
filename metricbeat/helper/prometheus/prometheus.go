@@ -119,9 +119,8 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
-
-			// Ignore unknown metrics
-			if !ok {
+			if m == nil || !ok {
+				// Ignore unknown metrics
 				continue
 			}
 
@@ -131,6 +130,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Ignore retrieval errors (bad conf)
 			if value == nil {
 				continue
+			}
+
+			storeAllLabels := false
+			labelsLocation := ""
+			var extraFields common.MapStr
+			if m != nil {
+				c := m.GetConfiguration()
+				storeAllLabels = c.StoreNonMappedLabels
+				labelsLocation = c.NonMappedLabelsPlacement
+				extraFields = c.ExtraFields
 			}
 
 			// Apply extra options
@@ -149,7 +158,21 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 					} else {
 						labels.Put(l.GetField(), v)
 					}
+				} else if storeAllLabels {
+					// if label for this metric is not found at the label mappings but
+					// it is configured to store any labels found, make it so
+					// TODO dedot
+					labels.Put(labelsLocation+"."+k, v)
 				}
+			}
+
+			// if extra fields have been added through metric configuration
+			// add them to labels.
+			//
+			// not considering these extra fields to be keylabels as that case
+			// have not appeared yet
+			for k, v := range extraFields {
+				labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
@@ -182,7 +205,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			event[k] = v
 		}
 		events = append(events, event)
-
 	}
 
 	// fill info from infoMetrics
@@ -205,7 +227,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
-
 }
 
 // infoMetricData keeps data about an infoMetric
@@ -230,7 +251,7 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
-	hash := LabelHash(labels.Flatten())
+	hash := labels.String()
 	res, ok := m[hash]
 	if !ok {
 		res = labels

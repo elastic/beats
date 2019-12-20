@@ -72,7 +72,13 @@ func Package() error {
 					"PackageType": pkgType.String(),
 					"BinaryExt":   binaryExtension(target.GOOS()),
 				}
-				spec.packageDir = packageStagingDir + "/" + pkgType.AddFileExtension(spec.Name+"-"+target.GOOS()+"-"+target.Arch())
+
+				spec.packageDir, err = pkgType.PackagingDir(packageStagingDir, target, spec)
+				if err != nil {
+					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
+					continue
+				}
+
 				spec = spec.Evaluate()
 
 				tasks = append(tasks, packageBuilder{target, spec, pkgType}.Build)

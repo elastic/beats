@@ -21,19 +21,16 @@ package kubernetes
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -41,17 +38,23 @@ func init() {
 	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
 }
 
+// Eventer allows defining ways in which kubernetes resource events are observed and processed
+type Eventer interface {
+	kubernetes.ResourceEventHandler
+	GenerateHints(event bus.Event) bus.Event
+	Start() error
+	Stop()
+}
+
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
 	config    *Config
 	bus       bus.Bus
-	uuid      uuid.UUID
-	watcher   kubernetes.Watcher
-	metagen   kubernetes.MetaGenerator
 	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 	logger    *logp.Logger
+	eventer   Eventer
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -74,24 +77,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	metagen, err := kubernetes.NewMetaGenerator(c)
-	if err != nil {
-		return nil, errWrap(err)
-	}
-
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
-
-	logger.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
-
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Host,
-		Namespace:   config.Namespace,
-	})
-	if err != nil {
-		return nil, errWrap(fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err))
-	}
-
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, errWrap(err)
@@ -110,164 +95,45 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	p := &Provider{
 		config:    config,
 		bus:       bus,
-		uuid:      uuid,
 		templates: mapper,
 		builders:  builders,
 		appenders: appenders,
-		metagen:   metagen,
-		watcher:   watcher,
 		logger:    logger,
 	}
 
-	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc:    p.handleAdd,
-		UpdateFunc: p.handleUpdate,
-		DeleteFunc: p.handleDelete,
-	})
+	switch config.Resource {
+	case "pod":
+		p.eventer, err = NewPodEventer(uuid, c, client, p.publish)
+	case "node":
+		p.eventer, err = NewNodeEventer(uuid, c, client, p.publish)
+	case "service":
+		p.eventer, err = NewServiceEventer(uuid, c, client, p.publish)
+	default:
+		return nil, fmt.Errorf("unsupported autodiscover resource %s", config.Resource)
+	}
+
+	if err != nil {
+		return nil, errWrap(err)
+	}
 
 	return p, nil
 }
 
-// handleAdd emits a start event for the given pod
-func (p *Provider) handleAdd(obj interface{}) {
-	p.logger.Debugf("Watcher Pod add: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "start")
-}
-
-// handleUpdate emits events for a given pod depending on the state of the pod,
-// if it is terminating, a stop event is scheduled, if not, a stop and a start
-// events are sent sequentially to recreate the resources assotiated to the pod.
-func (p *Provider) handleUpdate(obj interface{}) {
-	pod := obj.(*kubernetes.Pod)
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
-		// Pod is terminating, don't reload its configuration and ignore the event
-		// if some pod is still running, we will receive more events when containers
-		// terminate.
-		for _, container := range pod.Status.ContainerStatuses {
-			if container.State.Running != nil {
-				return
-			}
-		}
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-	} else {
-		p.logger.Debugf("Watcher Pod update: %+v", obj)
-		p.emit(pod, "stop")
-		p.emit(pod, "start")
-	}
-}
-
-// handleDelete emits a stop event for the given pod
-func (p *Provider) handleDelete(obj interface{}) {
-	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
-}
-
 // Start for Runner interface.
 func (p *Provider) Start() {
-	if err := p.watcher.Start(); err != nil {
+	if err := p.eventer.Start(); err != nil {
 		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
 }
 
-func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
-	// Emit events for all containers
-	p.emitEvents(pod, flag, pod.Spec.Containers, pod.Status.ContainerStatuses)
-
-	// Emit events for all initContainers
-	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+// Stop signals the stop channel to force the watch loop routine to stop.
+func (p *Provider) Stop() {
+	p.eventer.Stop()
 }
 
-func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
-	host := pod.Status.PodIP
-
-	// If the container doesn't exist in the runtime or its network
-	// is not configured, it won't have an IP. Skip it as we cannot
-	// generate configs without host, and an update will arrive when
-	// the container is ready.
-	// If stopping, emit the event in any case to ensure cleanup.
-	if host == "" && flag != "stop" {
-		return
-	}
-
-	// Collect all runtimes from status information.
-	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
-	for _, c := range containerstatuses {
-		// If the container is not being stopped then add the container only if it is in running state.
-		// This makes sure that we dont keep tailing init container logs after they have stopped.
-		// Emit the event in case that the pod is being stopped.
-		if flag == "stop" || c.State.Running != nil {
-			cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-			containerIDs[c.Name] = cid
-			runtimes[c.Name] = runtime
-		}
-	}
-
-	// Emit container and port information
-	for _, c := range containers {
-		// If it doesn't have an ID, container doesn't exist in
-		// the runtime, emit only an event if we are stopping, so
-		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.Name]
-		if cid == "" && flag != "stop" {
-			continue
-		}
-
-		// This must be an id that doesn't depend on the state of the container
-		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
-
-		cmeta := common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
-		}
-		meta := p.metagen.ContainerMetadata(pod, c.Name, c.Image)
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
-
-		// Pass annotations to all events so that it can be used in templating and by annotation builders.
-		annotations := common.MapStr{}
-		for k, v := range pod.GetObjectMeta().GetAnnotations() {
-			safemapstr.Put(annotations, k, v)
-		}
-		kubemeta["annotations"] = annotations
-
-		// Without this check there would be overlapping configurations with and without ports.
-		if len(c.Ports) == 0 {
-			event := bus.Event{
-				"provider":   p.uuid,
-				"id":         eventID,
-				flag:         true,
-				"host":       host,
-				"kubernetes": kubemeta,
-				"meta": common.MapStr{
-					"kubernetes": meta,
-				},
-			}
-			p.publish(event)
-		}
-
-		for _, port := range c.Ports {
-			event := bus.Event{
-				"provider":   p.uuid,
-				"id":         eventID,
-				flag:         true,
-				"host":       host,
-				"port":       port.ContainerPort,
-				"kubernetes": kubemeta,
-				"meta": common.MapStr{
-					"kubernetes": meta,
-				},
-			}
-			p.publish(event)
-		}
-	}
+// String returns a description of kubernetes autodiscover provider.
+func (p *Provider) String() string {
+	return "kubernetes"
 }
 
 func (p *Provider) publish(event bus.Event) {
@@ -276,7 +142,7 @@ func (p *Provider) publish(event bus.Event) {
 		event["config"] = config
 	} else {
 		// If there isn't a default template then attempt to use builders
-		if config := p.builders.GetConfig(p.generateHints(event)); config != nil {
+		if config := p.builders.GetConfig(p.eventer.GenerateHints(event)); config != nil {
 			event["config"] = config
 		}
 	}
@@ -284,56 +150,4 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 	p.bus.Publish(event)
-}
-
-func (p *Provider) generateHints(event bus.Event) bus.Event {
-	// Try to build a config with enabled builders. Send a provider agnostic payload.
-	// Builders are Beat specific.
-	e := bus.Event{}
-	var annotations common.MapStr
-	var kubeMeta, container common.MapStr
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(common.MapStr)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
-		}
-	}
-	if host, ok := event["host"]; ok {
-		e["host"] = host
-	}
-	if port, ok := event["port"]; ok {
-		e["port"] = port
-	}
-
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(common.MapStr)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
-	}
-
-	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
-	p.logger.Debugf("Generated hints %+v", hints)
-	if len(hints) != 0 {
-		e["hints"] = hints
-	}
-
-	p.logger.Debugf("Generated builder event %+v", e)
-
-	return e
-}
-
-// Stop signals the stop channel to force the watch loop routine to stop.
-func (p *Provider) Stop() {
-	p.watcher.Stop()
-}
-
-// String returns a description of kubernetes autodiscover provider.
-func (p *Provider) String() string {
-	return "kubernetes"
 }

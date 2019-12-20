@@ -38,6 +38,7 @@ import (
 // Select Docker API version
 const dockerAPIVersion = "1.22"
 
+// HostParser is a TCP host parser function for docker tcp host addresses
 var HostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 func init() {
@@ -47,6 +48,7 @@ func init() {
 	}
 }
 
+// NewModule creates a new module after performing validation.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
@@ -59,6 +61,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
+// Stat contains container and statistics information
 type Stat struct {
 	Container *types.Container
 	Stats     types.StatsJSON

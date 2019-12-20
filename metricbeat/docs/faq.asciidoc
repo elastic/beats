@@ -22,6 +22,6 @@ sudo mount -t linprocfs /dev/null /compat/linux/proc
 
 include::faq-unexpected-metrics.asciidoc[]
 
-include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
+include::{libbeat-dir}/faq-limit-bandwidth.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]
