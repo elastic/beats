@@ -19,6 +19,34 @@ var security = (function () {
         "11": "CachedInteractive",
     };
 
+    // User Account Control Attributes Table
+    // https://support.microsoft.com/es-us/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties
+    var uac_flags = [
+        [0x0001, 'SCRIPT'],
+        [0x0002, 'ACCOUNTDISABLE'],
+        [0x0008, 'HOMEDIR_REQUIRED'],
+        [0x0010, 'LOCKOUT'],
+        [0x0020, 'PASSWD_NOTREQD'],
+        [0x0040, 'PASSWD_CANT_CHANGE'],
+        [0x0080, 'ENCRYPTED_TEXT_PWD_ALLOWED'],
+        [0x0100, 'TEMP_DUPLICATE_ACCOUNT'],
+        [0x0200, 'NORMAL_ACCOUNT'],
+        [0x0800, 'INTERDOMAIN_TRUST_ACCOUNT'],
+        [0x1000, 'WORKSTATION_TRUST_ACCOUNT'],
+        [0x2000, 'SERVER_TRUST_ACCOUNT'],
+        [0x10000, 'DONT_EXPIRE_PASSWORD'],
+        [0x20000, 'MNS_LOGON_ACCOUNT'],
+        [0x40000, 'SMARTCARD_REQUIRED'],
+        [0x80000, 'TRUSTED_FOR_DELEGATION'],
+        [0x100000, 'NOT_DELEGATED'],
+        [0x200000, 'USE_DES_KEY_ONLY'],
+        [0x400000, 'DONT_REQ_PREAUTH'],
+        [0x800000, 'PASSWORD_EXPIRED'],
+        [0x1000000, 'TRUSTED_TO_AUTH_FOR_DELEGATION'],
+        [0x04000000, 'PARTIAL_SECRETS_ACCOUNT'],
+    ];
+
+    // event.action Description Table
     var eventActionTypes = {
         "4624": "logged-in",
         "4625": "logon-failed",
@@ -32,10 +60,28 @@ var security = (function () {
         "4724": "reset-password",
         "4725": "disabled-user-account",
         "4726": "deleted-user-account",
+        "4727": "added-group-account",
+        "4728": "added-group-account-to",
+        "4729": "deleted-group-account-from",
+        "4730": "deleted-group-account",
+        "4731": "added-group-account",
+        "4732": "added-group-account-to",
+        "4733": "deleted-group-account-from",
+        "4734": "deleted-group-account",
+        "4735": "modified-group-account",
+        "4737": "modified-group-account",
         "4738": "modified-user-account",
         "4740": "locked-out-user-account",
+        "4754": "added-group-account",
+        "4755": "modified-group-account",
+        "4756": "added-group-account-to",
+        "4757": "deleted-group-account-from",
+        "4758": "deleted-group-account",
+        "4764": "type-changed-group-account",
         "4767": "unlocked-user-account",
         "4781": "renamed-user-account",
+        "4798": "group-membership-enumerated",
+        "4799": "user-member-enumerated",
     };
 
     // Descriptions of failure status codes.
@@ -1104,12 +1150,45 @@ var security = (function () {
         evt.Put("winlog.logon.failure.sub_status", descriptiveFailureStatus);
     };
 
+    var addUACDescription = function(evt) {
+        var code = evt.Get("winlog.event_data.NewUacValue");
+        if (!code) {
+            return;
+        }
+        var uac_code=parseInt(code);
+        var uac_result = [];
+        for (var i=0; i<uac_flags.length; i++) {
+            if ((uac_code | uac_flags[i][0]) === uac_code) {
+                uac_result.push(uac_flags[i][1]);
+            }
+        }
+        if (uac_result) {
+            evt.Put("winlog.event_data.NewUACList",uac_result);
+        }
+        var uac_list=evt.Get("winlog.event_data.UserAccountControl").replace(/\s/g,'').split("%%").filter(String);
+        if (! uac_list) {
+            return;
+        }
+        evt.Put("winlog.event_data.UserAccountControl",uac_list);
+      };
+
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
                 {from: "winlog.event_data.TargetUserSid", to: "user.id"},
                 {from: "winlog.event_data.TargetUserName", to: "user.name"},
                 {from: "winlog.event_data.TargetDomainName", to: "user.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Build();
+
+    var copyTargetUserToGroup = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetUserSid", to: "group.id"},
+                {from: "winlog.event_data.TargetUserName", to: "group.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "group.domain"},
             ],
             ignore_missing: true,
         })
@@ -1304,12 +1383,21 @@ var security = (function () {
         .Add(copyTargetUser)
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
+        .Add(addUACDescription)
         .Add(addActionDesc)
         .Build();
 
     var userRenamed = new processor.Chain()
         .Add(copyOldTargetUser)
         .Add(copySubjectUserLogonId)
+        .Add(addActionDesc)
+        .Build();
+
+    var groupMgmtEvts = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(copyTargetUserToGroup)
+        .Add(renameCommonAuthFields)
         .Add(addActionDesc)
         .Build();
 
@@ -1356,17 +1444,71 @@ var security = (function () {
         // 4726 - An user account was deleted.
         4726: userMgmtEvts.Run,
 
+        // 4727 - A security-enabled global group was created.
+        4727: groupMgmtEvts.Run,
+
+        // 4728 - A member was added to a security-enabled global group.
+        4728: groupMgmtEvts.Run,
+
+        // 4729 - A member was removed from a security-enabled global group.
+        4729: groupMgmtEvts.Run,
+
+        // 4730 - A security-enabled global group was deleted.
+        4730: groupMgmtEvts.Run,
+
+        // 4731 - A security-enabled local group was created.
+        4731: groupMgmtEvts.Run,
+
+        // 4732 - A member was added to a security-enabled local group.
+        4732: groupMgmtEvts.Run,
+
+        // 4733 - A member was removed from a security-enabled local group.
+        4733: groupMgmtEvts.Run,
+
+        // 4734 - A security-enabled local group was deleted.
+        4734: groupMgmtEvts.Run,
+
+        // 4735 - A security-enabled local group was changed.
+        4735: groupMgmtEvts.Run,
+
+        // 4737 - A security-enabled global group was changed.
+        4737: groupMgmtEvts.Run,
+
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
 
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
 
+        // 4754 -  A security-enabled universal group was created.
+        4754: groupMgmtEvts.Run,
+
+        // 4755 - A security-enabled universal group was changed.
+        4755: groupMgmtEvts.Run,
+
+        // 4756 - A member was added to a security-enabled universal group.
+        4756: groupMgmtEvts.Run,
+
+        // 4757 - A member was removed from a security-enabled universal group.
+        4757: groupMgmtEvts.Run,
+
+        // 4758 - A security-enabled universal group was deleted.
+        4758: groupMgmtEvts.Run,
+
+        // 4764 - A group\'s type was changed.
+        4764: groupMgmtEvts.Run,
+
         // 4767 - A user account was unlocked.
         4767: userMgmtEvts.Run,
 
         // 4781 - The name of an account was changed.
         4781: userRenamed.Run,
+
+        // 4798 - A user's local group membership was enumerated.
+        4798: userMgmtEvts.Run,
+
+        // 4799 - A security-enabled local group membership was enumerated.
+        4799: groupMgmtEvts.Run,
 
         process: function(evt) {
             var event_id = evt.Get("winlog.event_id");

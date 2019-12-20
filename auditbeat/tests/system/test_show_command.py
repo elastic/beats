@@ -82,7 +82,7 @@ class Test(BaseTest):
             assert expected == got.decode("utf-8"), \
                 "rule {0} doesn't match. expected='{1}' got='{2}'".format(
                     i, expected, got.decode("utf-8")
-                )
+            )
 
     @unittest.skipUnless(is_root(), "Requires root")
     def test_show_auditd_status(self):

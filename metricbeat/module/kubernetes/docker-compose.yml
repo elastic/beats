@@ -1,0 +1,24 @@
+version: '2.3'
+
+services:
+  #kubernetes:
+  #  build: ./module/kubernetes/_meta
+  #  network_mode: host
+  #  pid: host
+  #  privileged: true
+  #  volumes:
+  #    - /:/rootfs:ro
+  #    - /sys:/sys
+  #    - /var/lib/docker:/var/lib/docker
+  #    - /var/run:/var/run
+  #  ports:
+  #    - 10255
+
+  #kubestate:
+  #  build:
+  #    context: ./_meta
+  #    dockerfile: Dockerfile.kube-state
+  #  depends_on:
+  #    - kubernetes
+  #  ports:
+  #    - 18080

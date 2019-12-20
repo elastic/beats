@@ -925,10 +925,14 @@ details.
 Sets the path for log files. See the <<directory-layout>> section for details.
 
 *`--strict.perms`*::
-Sets strict permission checking on configuration files. The default is
-`-strict.perms=true`. See
-{beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
+Sets strict permission checking on configuration files. The default is `-strict.perms=true`.
+ifndef::apm-server[]
+See {beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
 the _Beats Platform Reference_ for more information.
+endif::[]
+ifdef::apm-server[]
+See <<config-file-ownership>> for more information.
+endif::[]
 
 *`-v, --v`*::
 Logs INFO-level messages.

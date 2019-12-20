@@ -161,7 +161,13 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
+
         tls.connect((config.get('host'), config.get('port')))
+        # In TLS 1.3 authentication failures are not detected by the initial
+        # connection and handshake. For the client to detect that authentication
+        # has failed (at least in python) it must wait for a server response
+        # so that the failure can be reported as an exception when it arrives.
+        tls.recv(1)
 
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
