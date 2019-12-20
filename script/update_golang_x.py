@@ -24,16 +24,16 @@ def update(pkg_name):
 def get_parser():
     """Creates parser to parse script params
     """
-    parser=argparse.ArgumentParser(description = "Update golang.org/x/<name> in vendor folder")
-    parser.add_argument('-q', '--quiet', dest = 'verbose', action = 'store_false', help = 'work quietly')
-    parser.add_argument('--revision', help = 'update deps to this revision', default = '')
-    parser.add_argument('name', help = 'name of the golang.org/x/ package. Can be empty', default = '', nargs = '?')
+    parser = argparse.ArgumentParser(description="Update golang.org/x/<name> in vendor folder")
+    parser.add_argument('-q', '--quiet', dest='verbose', action='store_false', help='work quietly')
+    parser.add_argument('--revision', help='update deps to this revision', default='')
+    parser.add_argument('name', help='name of the golang.org/x/ package. Can be empty', default='', nargs='?')
     return parser
 
 
 if __name__ == "__main__":
 
-    parser=get_parser()
-    args=parser.parse_args()
+    parser = get_parser()
+    args = parser.parse_args()
 
     update(args.name)
