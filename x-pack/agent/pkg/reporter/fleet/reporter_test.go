@@ -5,7 +5,6 @@
 package fleet
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -17,8 +16,7 @@ import (
 func TestReporting(t *testing.T) {
 	// setup client
 	threshold := 10
-	c := newTestClient()
-	r := newTestReporter(1*time.Second, threshold, c)
+	r := newTestReporter(1*time.Second, threshold)
 
 	// report events
 	firstBatchSize := 5
@@ -28,14 +26,13 @@ func TestReporting(t *testing.T) {
 	}
 
 	// check after delay for output
-	<-time.After(2 * time.Second)
-	reportedEvents := c.events()
+	reportedEvents, ack := r.Events()
 	if reportedCount := len(reportedEvents); reportedCount != firstBatchSize {
 		t.Fatalf("expected %v events got %v", firstBatchSize, reportedCount)
 	}
 
 	// reset reported events
-	c.reset()
+	ack()
 
 	// report events > threshold
 	secondBatchSize := threshold + 1
@@ -45,8 +42,7 @@ func TestReporting(t *testing.T) {
 	}
 
 	// check events are dropped
-	<-time.After(2 * time.Second)
-	reportedEvents = c.events()
+	reportedEvents, _ = r.Events()
 	if reportedCount := len(reportedEvents); reportedCount != threshold {
 		t.Fatalf("expected %v events got %v", secondBatchSize, reportedCount)
 	}
@@ -55,8 +51,7 @@ func TestReporting(t *testing.T) {
 func TestInfoDrop(t *testing.T) {
 	// setup client
 	threshold := 2
-	c := newTestClient()
-	r := newTestReporter(2*time.Second, threshold, c)
+	r := newTestReporter(2*time.Second, threshold)
 
 	// report 1 info and 1 error
 	ee := []reporter.Event{testStateEvent{}, testErrorEvent{}, testErrorEvent{}}
@@ -66,8 +61,7 @@ func TestInfoDrop(t *testing.T) {
 	}
 
 	// check after delay for output
-	<-time.After(3 * time.Second)
-	reportedEvents := c.events()
+	reportedEvents, _ := r.Events()
 	if reportedCount := len(reportedEvents); reportedCount != 2 {
 		t.Fatalf("expected %v events got %v", 2, reportedCount)
 	}
@@ -78,36 +72,98 @@ func TestInfoDrop(t *testing.T) {
 	}
 }
 
-type testClient struct {
-	reportedEvents []fleetapi.SerializableEvent
-	lock           sync.Mutex
-}
+func TestOutOfOrderAck(t *testing.T) {
+	// setup client
+	threshold := 100
+	r := newTestReporter(1*time.Second, threshold)
 
-func newTestClient() *testClient {
-	return &testClient{
-		reportedEvents: make([]fleetapi.SerializableEvent, 0),
+	// report events
+	firstBatchSize := 5
+	ee := getEvents(firstBatchSize)
+	for _, e := range ee {
+		r.Report(e)
+	}
+
+	// check after delay for output
+	reportedEvents1, ack1 := r.Events()
+	if reportedCount := len(reportedEvents1); reportedCount != firstBatchSize {
+		t.Fatalf("expected %v events got %v", firstBatchSize, reportedCount)
+	}
+
+	// report events > threshold
+	secondBatchSize := threshold + 1
+	ee = getEvents(secondBatchSize)
+	for _, e := range ee {
+		r.Report(e)
+	}
+
+	// check all events are returned
+	reportedEvents2, ack2 := r.Events()
+	if reportedCount := len(reportedEvents2); reportedCount == firstBatchSize+secondBatchSize {
+		t.Fatalf("expected %v events got %v", secondBatchSize, reportedCount)
+	}
+
+	// ack second batch
+	ack2()
+
+	reportedEvents, _ := r.Events()
+	if reportedCount := len(reportedEvents); reportedCount != 0 {
+		t.Fatalf("expected all events are removed after second batch ack, got %v events", reportedCount)
+	}
+
+	defer func() {
+		r := recover()
+		if r != nil {
+			t.Fatalf("expected ack is ignored but it paniced: %v", r)
+		}
+	}()
+
+	ack1()
+	reportedEvents, _ = r.Events()
+	if reportedCount := len(reportedEvents); reportedCount != 0 {
+		t.Fatalf("expected all events are still removed after first batch ack, got %v events", reportedCount)
 	}
 }
 
-func (tc *testClient) Execute(r *fleetapi.CheckinRequest) (*fleetapi.CheckinResponse, error) {
-	tc.lock.Lock()
-	defer tc.lock.Unlock()
+func TestAfterDrop(t *testing.T) {
+	// setup client
+	threshold := 7
+	r := newTestReporter(1*time.Second, threshold)
 
-	tc.reportedEvents = append(tc.reportedEvents, r.Events...)
-	return nil, nil
-}
+	// report events
+	firstBatchSize := 5
+	ee := getEvents(firstBatchSize)
+	for _, e := range ee {
+		r.Report(e)
+	}
 
-func (tc *testClient) reset() {
-	tc.lock.Lock()
-	defer tc.lock.Unlock()
-	tc.reportedEvents = make([]fleetapi.SerializableEvent, 0)
-}
+	// check after delay for output
+	reportedEvents1, ack1 := r.Events()
+	if reportedCount := len(reportedEvents1); reportedCount != firstBatchSize {
+		t.Fatalf("expected %v events got %v", firstBatchSize, reportedCount)
+	}
 
-func (tc *testClient) events() []fleetapi.SerializableEvent {
-	tc.lock.Lock()
-	defer tc.lock.Unlock()
+	// report events > threshold
+	secondBatchSize := 5
+	ee = getEvents(secondBatchSize)
+	for _, e := range ee {
+		r.Report(e)
+	}
 
-	return tc.reportedEvents
+	// check all events are returned
+	reportedEvents2, _ := r.Events()
+	if reportedCount := len(reportedEvents2); reportedCount != threshold {
+		t.Fatalf("expected %v events got %v", secondBatchSize, reportedCount)
+	}
+
+	// remove first batch from queue
+	ack1()
+
+	reportedEvents, _ := r.Events()
+	if reportedCount := len(reportedEvents); reportedCount != secondBatchSize {
+		t.Fatalf("expected all events from first batch are removed, got %v events", reportedCount)
+	}
+
 }
 
 func getEvents(count int) []reporter.Event {
@@ -119,18 +175,14 @@ func getEvents(count int) []reporter.Event {
 	return ee
 }
 
-func newTestReporter(frequency time.Duration, threshold int, client checkinExecutor) *Reporter {
+func newTestReporter(frequency time.Duration, threshold int) *Reporter {
 	log, _ := logger.New()
 	r := &Reporter{
-		queue:       make([]reporter.Event, 0),
-		ticker:      time.NewTicker(frequency),
-		logger:      log,
-		checkingCmd: client,
-		threshold:   threshold,
-		closeChan:   make(chan struct{}),
+		queue:     make([]fleetapi.SerializableEvent, 0),
+		logger:    log,
+		threshold: threshold,
 	}
 
-	go r.reportLoop()
 	return r
 }
 

@@ -85,12 +85,15 @@ func newManaged(
 		agentInfo: agentInfo,
 	}
 
-	reporter, err := createFleetReporters(log, cfg, managedApplication.agentInfo, client)
+	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
+	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
 
-	router, err := newRouter(log, streamFactory(rawConfig, client, reporter))
+	combinedReporter := reporting.NewReporter(log, agentInfo, logR, fleetR)
+
+	router, err := newRouter(log, streamFactory(rawConfig, client, combinedReporter))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
@@ -118,6 +121,7 @@ func newManaged(
 		agentInfo,
 		client,
 		actionDispatcher,
+		fleetR,
 	)
 	if err != nil {
 		return nil, err
@@ -144,21 +148,4 @@ func (m *Managed) Stop() error {
 // AgentInfo retrieves agent information.
 func (m *Managed) AgentInfo() *AgentInfo {
 	return m.agentInfo
-}
-
-func createFleetReporters(
-	log *logger.Logger,
-	cfg *FleetAgentConfig,
-	agentInfo *AgentInfo,
-	client apiClient,
-) (reporter, error) {
-
-	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
-
-	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet, client)
-	if err != nil {
-		return nil, err
-	}
-
-	return reporting.NewReporter(log, agentInfo, logR, fleetR), nil
 }
