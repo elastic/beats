@@ -86,6 +86,8 @@ func (r *Reporter) Report(e reporter.Event) error {
 	return nil
 }
 
+// Events returns a list of event from a queue and a ack function
+// which clears those events once caller is done with processing.
 func (r *Reporter) Events() ([]fleetapi.SerializableEvent, func()) {
 	r.qlock.Lock()
 	defer r.qlock.Unlock()
