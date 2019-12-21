@@ -15,7 +15,10 @@ https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries
   hosts: ["node:9100"]
   paths:
   - name: 'http_request'
-    path: '/api/v1/query'
+    path: '/api/v1/query_range'
     fields:
-      'query': sum(rate(prometheus_http_requests_total[1m]))
+      'query': 'up{node="master01"}'
+      'start': '2019-12-20T23:30:00.000Z'
+      'end': '2019-12-21T00:00:00.000Z'
+      'step': 1h
 -------------------------------------------------------------------------------------

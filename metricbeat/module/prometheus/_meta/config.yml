@@ -1,7 +1,7 @@
 - module: prometheus
   period: 10s
   hosts: ["localhost:9090"]
-  metricsets: ["collect"]
+  metricsets: ["collector"]
   metrics_path: /metrics
   #username: "user"
   #password: "secret"
@@ -16,7 +16,18 @@
   hosts: ["localhost:9090"]
   metricsets: ["query"]
   paths:
-  - name: 'http_request'
+  - name: 'instant_vector'
     path: '/api/v1/query'
     fields:
       'query': sum(rate(prometheus_http_requests_total[1m]))
+  - name: 'range_vector'
+    path: '/api/v1/query_range'
+    fields:
+      'query': 'up'
+      'start': '2019-12-20T00:00:00.000Z'
+      'end':  '2019-12-21T00:00:00.000Z'
+      'step': 1h
+  - name: 'scalar'
+    path: '/api/v1/query'
+    fields:
+      'query': '100'

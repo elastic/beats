@@ -80,10 +80,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return err
 		}
 
-		event := m.parseResponse(body, pathConfig)
-
-		if reported := reporter.Event(event); !reported {
-			m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+		events, parseErr := m.parseResponse(body, pathConfig)
+		if parseErr != nil {
+			return err
+		}
+		for _, e := range events {
+			if reported := reporter.Event(e); !reported {
+				m.Logger().Debug(errors.Errorf("error reporting event: %#v", e))
+			}
 		}
 	}
 	return nil
