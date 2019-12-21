@@ -10,18 +10,18 @@
             "period": 10000
         },
         "prometheus": {
-            "status": "success",
-            "data": {
-                "resultType": "vector",
-                "result": [
-                {
-                    "metric": {},
-                    "value": [
-                    1576217053.147,
-                    "55293501.76000571"
-                    ]
-                }
-                ]
+            "query": {
+                "labels": {
+                    "job": "kubelet",
+                    "namespace": "kube-system",
+                    "node": "master01",
+                    "service": "prometheus-prometheus-oper-kubelet",
+                    "__name__": "up",
+                    "endpoint": "https-metrics",
+                    "instance": "192.168.48.204:10250"
+                },
+                "dataType": "matrix",
+                "matrix_test": "1"
             }
         },
         "service": {

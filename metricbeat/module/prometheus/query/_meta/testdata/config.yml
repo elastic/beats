@@ -1,4 +1,4 @@
 type: http
-url: "/api/v1/query?query="
+url: "/api/v1/query_range?query="
 module:
   namespace: test

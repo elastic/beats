@@ -19,55 +19,103 @@ package query
 
 import (
 	"encoding/json"
+	"time"
 
+	"github.com/pkg/errors"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// PromResponseBody for Prometheus Query API Request
-type PromResponseBody struct {
-	Status string         `json:"status"`
-	Data   prometheusData `json:"data"`
+// ArrayResponse is for "scalar", "string" type.
+type ArrayResponse struct {
+	Status string       `json:"status"`
+	Data   arrayData	`json:"data"`
 }
-type prometheusData struct {
-	ResultType string   `json:"resultType"`
-	Results    []result `json:"result"`
+type arrayData struct {
+	ResultType string   		`json:"resultType"`
+	Results    []interface{} 	`json:"result"`
 }
-type result struct {
-	Metric          interface{}            `json:"metric"`
-	Vectors         []interface{}          `json:"value,omitempty"`
-	ReconciledValue map[string]interface{} `json:"reconciledValue"`
+// MapResponse is for "vector", "matrix" type from Prometheus Query API Request
+type MapResponse struct {
+	Status string  	`json:"status"`
+	Data   mapData 	`json:"data"`
+}
+type mapData struct {
+	ResultType string   		`json:"resultType"`
+	Results    []mapResult 	`json:"result"`
+}
+type mapResult struct {
+	Metric	map[string]string	`json:"metric"`
+	Vector	[]interface{}		`json:"value"`
+	Vectors [][]interface{}		`json:"values"`
 }
 
-func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) mb.Event {
-	var event common.MapStr
-	var res PromResponseBody
-	if err := json.Unmarshal(body, &res); err != nil {
-		m.Logger().Error("Failed to parsing api response ", err)
+func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
+	var events []mb.Event
+	converted, resultType, err := convertJSONToStruct(body)
+	if err != nil {
+		return events, err
 	}
-
-	// Check if there is vector array.
-	// Vector [ <unix_timestamp>, "<query_result>" ] is not acceptable for Elasticsearch.
-	// Because there are two types in one array.
-	// So change Vector to Object { unixtimestamp: "<unix_timestamp", value: "query_result" }
-	if res.Data.ResultType == "vector" {
-		for idx := range res.Data.Results {
-			if len(res.Data.Results[idx].Vectors) != 0 {
-				res.Data.Results[idx].ReconciledValue = map[string]interface{}{
-					"unixtimestamp": res.Data.Results[idx].Vectors[0],
-					"value":         res.Data.Results[idx].Vectors[1],
-				}
-				res.Data.Results[idx].Vectors = nil
+	switch resultType {
+	case "scalar", "string":
+		res := converted.(ArrayResponse)
+		events = append(events, mb.Event{
+			Timestamp: getTimestamp(res.Data.Results[0].(float64)),
+			MetricSetFields: common.MapStr{
+				"dataType": resultType,
+				pathConfig.Name: res.Data.Results[1], 
+			},
+		})
+	case "vector":
+		res := converted.(MapResponse)
+		for _, result := range res.Data.Results {
+			events = append(events, mb.Event{
+				Timestamp: getTimestamp(result.Vector[0].(float64)),
+				MetricSetFields: common.MapStr{
+					"labels": result.Metric,
+					"dataType": resultType,
+					pathConfig.Name: result.Vector[1],
+				},
+			})
+		}
+	case "matrix":
+		res := converted.(MapResponse)
+		for _, result := range res.Data.Results {
+			for _, vector := range result.Vectors {
+				events = append(events, mb.Event{
+					Timestamp: getTimestamp(vector[0].(float64)),
+					MetricSetFields: common.MapStr{
+						"labels": result.Metric,
+						"dataType": resultType,
+						pathConfig.Name: vector[1],
+					},
+				})
 			}
 		}
+	default:
+		return events, errors.New("Unknown resultType " + resultType)
+	}
+	return events, nil
+}
+
+func convertJSONToStruct(body []byte) (interface{}, string, error) {
+	arrayBody := ArrayResponse{}
+	if err := json.Unmarshal(body, &arrayBody); err != nil {
+		return nil, "", errors.Wrap(err, "Failed to parse api response")
 	}
 
-	event = common.MapStr{
-		pathConfig.Name: res,
+	if arrayBody.Data.ResultType == "vector" ||  arrayBody.Data.ResultType == "matrix" {
+		mapBody := MapResponse{}
+		if err := json.Unmarshal(body, &mapBody); err != nil {
+			return nil, arrayBody.Data.ResultType, errors.Wrap(err, "Failed to parse api response")
+		}
+		return mapBody, mapBody.Data.ResultType, nil
 	}
+	return arrayBody, arrayBody.Data.ResultType, nil
+}
 
-	return mb.Event{
-		MetricSetFields: event,
-		Namespace:       "prometheus.query",
-	}
+func getTimestamp(num float64) time.Time {
+	sec := int64(num)
+	ns := int64((num - float64(sec))*1000)
+	return time.Unix(sec, ns)
 }
