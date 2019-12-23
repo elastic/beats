@@ -833,8 +833,10 @@
 			"revisionTime": "2019-08-08T01:16:37Z"
 		},
 		{
+			"checksumSHA1": "ru5eKWdLzXfpNRL+Mi1bxbmY8DU=",
 			"path": "github.com/containerd/containerd/errdefs",
-			"revision": ""
+			"revision": "36cf5b690dcc00ff0f34ff7799209050c3d0c59a",
+			"revisionTime": "2019-09-27T01:04:35Z"
 		},
 		{
 			"checksumSHA1": "6aGvzibOCGGTbCFKOHRWIASC+Us=",
