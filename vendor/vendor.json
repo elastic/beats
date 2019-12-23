@@ -845,6 +845,12 @@
 			"revisionTime": "2019-08-27T14:05:05Z"
 		},
 		{
+			"checksumSHA1": "ARPWcCZaH5T/+LVCWHgAc2e3uwQ=",
+			"path": "github.com/containerd/fifo",
+			"revision": "bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13",
+			"revisionTime": "2019-08-16T18:02:39Z"
+		},
+		{
 			"checksumSHA1": "qFaKrhSla38BRAyaGz2UaZvH/Dk=",
 			"path": "github.com/coreos/bbolt",
 			"revision": "af9db2027c98c61ecd8e17caa5bd265792b9b9a2",

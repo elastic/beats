@@ -478,6 +478,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/containerd/fifo
+Revision: bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13
+License type (autodetected): Apache-2.0
+./vendor/github.com/containerd/fifo/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/coreos/bbolt
 Revision: af9db2027c98c61ecd8e17caa5bd265792b9b9a2
 License type (autodetected): MIT
