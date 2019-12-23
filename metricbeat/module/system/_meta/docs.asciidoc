@@ -19,3 +19,44 @@ directly.
 The System module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_system_dashboard.png[]
+
+[float]
+=== Required permissions
+
+The System metricsets collect different kinds of metric data, which may require dedicated permissions
+to be fetched. For security reasons it's advised to grant the lowest possible permissions. This section
+justifies which permissions must be present for particular metricsets.
+
+Please notice that modern Linux implementations divide the privileges traditionally associated with superuser
+into distinct units, known as capabilities, which can be independently enabled and disabled.
+Capabilities are a per-thread attribute.
+
+==== cpu
+
+CPU statistics (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+escalated permissions.
+
+==== load
+
+CPU load data (1 min, 5 min, 15 min, cores) should be available without escalated permissions.
+
+==== memory
+
+Memory statistics (swap, total, used, free, actual) should be available without escalated permissions.
+
+==== network
+
+Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without escalated
+permissions.
+
+==== process
+
+Process execution data (state, memory, cpu, cmdline) should be available for the authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+```
+2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
+5
+```
