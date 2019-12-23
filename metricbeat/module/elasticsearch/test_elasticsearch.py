@@ -83,6 +83,8 @@ class Test(metricbeat.BaseTest):
 
         docs = self.read_output_json()
         for doc in docs:
+            if not "type" in doc:
+                continue
             t = doc["type"]
             if t != "cluster_stats":
                 continue
