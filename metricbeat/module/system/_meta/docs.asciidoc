@@ -98,4 +98,17 @@ TODO
 
 ==== filesystem
 
-Fil
+Filesystem metrics data (total, available, type, mount point, files, free, used) should be available without elevated
+permissions.
+
+==== fsstat
+
+Fsstat metrics data (total size, free, total, used count) should be available without elevated permissions.
+
+==== uptime
+
+Uptime metrics data (duration) should be available without elevated permissions.
+
+==== raid
+
+TODO
