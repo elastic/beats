@@ -530,7 +530,8 @@ This product includes software developed at CoreOS, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Revision: 2d78030078ef61b3cae27f42ad6d0e46db51b339
+Version: v20
+Revision: e64a0ec8b42a61e2a9801dc1d0abe539dea79197
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -5507,7 +5508,8 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: 9756ffdc24725223350eb3266ffb92590d28f278
+Version: release-branch.go1.13
+Revision: 60c769a6c58655dab1b9adac0d58967dd517cfba
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -5714,6 +5716,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/time
+Version: release-branch.go1.13
 Revision: 555d28b269f0569763d25dbe1a237ae74c6bcc82
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/time/LICENSE:
