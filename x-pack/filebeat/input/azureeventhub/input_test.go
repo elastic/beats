@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go/v2"
+	"github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/channel"

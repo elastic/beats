@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go/v2/persist"
+	"github.com/Azure/azure-event-hubs-go/v3/persist"
 
 	"github.com/elastic/beats/libbeat/paths"
 
@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/Azure/azure-event-hubs-go/v2"
-	"github.com/Azure/azure-event-hubs-go/v2/eph"
+	"github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
 var eventHubConnector = ";EntityPath="
@@ -55,7 +55,7 @@ func init() {
 	}
 }
 
-// NewInput creates a new kafka input
+// NewInput creates a new azure-eventhub input
 func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
@@ -131,14 +131,10 @@ func (a *azureInput) run() error {
 	if err != nil {
 		return err
 	}
-	hubs, err := eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName), eventhub.HubWithOffsetPersistence(persister))
-	//ctx, cancel := context.WithCancel(a.workerCtx)
-	//defer cancel()
+	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName), eventhub.HubWithOffsetPersistence(persister))
 	if err != nil {
 		return err
 	}
-	a.hub = hubs
-
 	// listen to each partition of the Event Hub
 	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
 	if err != nil {

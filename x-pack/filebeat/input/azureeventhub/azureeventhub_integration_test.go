@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
+//// +build integration
 
 package azureeventhub
 
@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go/v2"
+	"github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/channel"
