@@ -1007,9 +1007,13 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "JBP//JPgago6rB8bmnJxI8b0+0s=",
+			"origin": "github.com/docker/engine/api/types/backend",
 			"path": "github.com/docker/docker/api/types/backend",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "/jF0HVFiLzUUuywSjp4F/piM7BM=",
@@ -1075,9 +1079,13 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "VS7M8nyoXQOGpin7ojH9C/ZwSNk=",
+			"origin": "github.com/docker/engine/api/types/plugins/logdriver",
 			"path": "github.com/docker/docker/api/types/plugins/logdriver",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "m4Jg5WnW75I65nvkEno8PElSXik=",
@@ -1161,9 +1169,13 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "wBdKOknRfc7kGUeSprWpAmzvaP0=",
+			"origin": "github.com/docker/engine/daemon/logger",
 			"path": "github.com/docker/docker/daemon/logger",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "kkxaFQKzk0Lqq1PdWsf5f87LMcA=",
