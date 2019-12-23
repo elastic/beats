@@ -52,6 +52,10 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch-xpack module test for type:cluster_stats
         """
+
+        es = Elasticsearch(self.get_hosts())
+        self.start_basic(es)
+
         self.render_config_template(modules=[{
             "name": "elasticsearch",
             "metricsets": [
@@ -79,12 +83,16 @@ class Test(metricbeat.BaseTest):
 
         docs = self.read_output_json()
         for doc in docs:
+            if not "type" in doc:
+                continue
             t = doc["type"]
             if t != "cluster_stats":
                 continue
             license = doc["license"]
             issue_date = license["issue_date_in_millis"]
             self.assertIsNot(type(issue_date), float)
+
+            self.assertNotIn("expiry_date_in_millis", license)
 
     def get_hosts(self):
         return [os.getenv('ES_HOST', 'localhost') + ':' +
@@ -154,6 +162,18 @@ class Test(metricbeat.BaseTest):
         except:
             e = sys.exc_info()[0]
             print "Trial already enabled. Error: {}".format(e)
+
+    def start_basic(self, es):
+        # Check if basic license is already enabled
+        response = es.transport.perform_request('GET', "/_xpack/license")
+        if response["license"]["type"] == "basic":
+            return
+
+        try:
+            es.transport.perform_request('POST', "/_xpack/license/start_basic?acknowledge=true")
+        except:
+            e = sys.exc_info()[0]
+            print "Basic license already enabled. Error: {}".format(e)
 
     def check_skip(self, metricset, es):
         if metricset != "ccr":

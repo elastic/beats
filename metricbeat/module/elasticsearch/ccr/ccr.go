@@ -87,9 +87,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
-			err := fmt.Errorf(ccrUnavailableMessage)
-			elastic.ReportAndLogError(err, r, m.Log)
 			m.lastCCRLicenseMessageTimestamp = time.Now()
+			err := fmt.Errorf(ccrUnavailableMessage)
+			r.Error(err)
+			m.Log.Debug(ccrUnavailableMessage)
 		}
 		return
 	}
