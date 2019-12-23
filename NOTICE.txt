@@ -239,7 +239,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/awslabs/goformation
-Revision: c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3
+Version: v4.1.0
+Revision: 18ccd0e58e5df10d9f82f875d54b087d3058cfc1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/awslabs/goformation/LICENSE:
 --------------------------------------------------------------------
@@ -5115,6 +5116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
+Version: v2.19.11
 Revision: fc7e5e7af6052e36e83e5539148015ed2c09d8f9
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
@@ -5743,7 +5745,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/net
-Revision: d28f0bde5980168871434b95cfc858db9f2a7a99
+Version: release-branch.go1.13
+Revision: 13f9640d40b9cc418fb53703dfbd177679788ceb
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
@@ -5845,7 +5848,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: fae7ac547cb717d141c433a2a173315e216b64c4
+Version: release-branch.go1.13
+Revision: fde4db37ae7ad8191b03d30d27f258b5291ae4e3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -5879,7 +5883,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
-Revision: cbf43d21aaebfdfeb81d91a5f444d13a3046e686
+Version: release-branch.go1.13
+Revision: 342b2e1fbaa52c93f31447ad2c6abc048c63e475
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
@@ -5947,8 +5952,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Version: release-branch.go1.10
-Revision: e7e52e73e2735bea994c85b62483cc6376dd8d74
+Version: release-branch.go1.13
+Revision: 65e3620a7ae7ac25e8494a60f0e5ef4e4fba03b3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
