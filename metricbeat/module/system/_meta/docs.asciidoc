@@ -34,15 +34,15 @@ Capabilities are a per-thread attribute.
 ==== cpu
 
 CPU statistics (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
-escalated permissions.
+elevated permissions.
 
 ==== load
 
-CPU load data (1 min, 5 min, 15 min, cores) should be available without escalated permissions.
+CPU load data (1 min, 5 min, 15 min, cores) should be available without elevated permissions.
 
 ==== memory
 
-Memory statistics (swap, total, used, free, actual) should be available without escalated permissions.
+Memory statistics (swap, total, used, free, actual) should be available without elevated permissions.
 
 ==== network
 
@@ -51,7 +51,7 @@ permissions.
 
 ==== process
 
-Process execution data (state, memory, cpu, cmdline) should be available for the authorized user.
+Process execution data (state, memory, cpu, cmdline) should be available for an authorized user.
 
 If the beats process is running as less privileged user, it may not be able to read process data belonging to
 other users. The issue should be reported in application logs:
@@ -60,3 +60,42 @@ other users. The issue should be reported in application logs:
 2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
 5
 ```
+
+==== process_summary
+
+General process summary (unknown, dead, total, sleeping, running, idle, stopped, zombie) should be available without
+elevated permissions. Please notice that if the process data belongs to the other users, it will be counted as unknown
+value (no error will be reported in application logs).
+
+==== socket_summary
+
+Used sockets summary (TCP, UDP, count, listening, established, wait, etc.) should be available without elevated
+permissions.
+
+==== entropy
+
+TODO
+
+==== core
+
+Usage statistics for each CPU core (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+elevated permissions.
+
+==== diskio
+
+Disk IO metrics (io, read, write) should be available without elevated permissions.
+
+==== socket
+
+Events for each new TCP socket should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to view socket data belonging to
+other users.
+
+==== service
+
+TODO
+
+==== filesystem
+
+Fil
