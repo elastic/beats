@@ -19,9 +19,10 @@ package readjson
 
 import (
 	"bytes"
-	gojson "encoding/json"
 	"fmt"
 	"time"
+
+	gojson "github.com/json-iterator/go"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -83,7 +84,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
 // to int64 where possible, instead of using always float64.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
-	dec := gojson.NewDecoder(bytes.NewReader(text))
+	dec := gojson.ConfigCompatibleWithStandardLibrary.NewDecoder(bytes.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(fields)
 	if err != nil {

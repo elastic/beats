@@ -19,13 +19,13 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
@@ -338,7 +338,7 @@ func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sara
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
+	err := jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(bMessage, &obj)
 	if err != nil {
 		h.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", h.expandEventListFromField), "error", err)
 		return []string{}
@@ -346,7 +346,7 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	var messages []string
 	if len(obj[h.expandEventListFromField]) > 0 {
 		for _, ms := range obj[h.expandEventListFromField] {
-			js, err := json.Marshal(ms)
+			js, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))
 			} else {
