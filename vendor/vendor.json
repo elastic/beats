@@ -857,6 +857,12 @@
 			"revisionTime": "2019-08-29T19:00:40Z"
 		},
 		{
+			"checksumSHA1": "zx3XLDZzMknp9rkqfUXKGYUHcgA=",
+			"path": "github.com/coreos/go-systemd/activation",
+			"revision": "2d78030078ef61b3cae27f42ad6d0e46db51b339",
+			"revisionTime": "2019-11-11T15:26:58Z"
+		},
+		{
 			"checksumSHA1": "WF6GR2/MTAreZskxw9rvh+HCQc4=",
 			"path": "github.com/coreos/go-systemd/dbus",
 			"revision": "e64a0ec8b42a61e2a9801dc1d0abe539dea79197",
@@ -1347,6 +1353,12 @@
 			"path": "github.com/docker/go-metrics",
 			"revision": "b619b3592b65de4f087d9f16863a7e6ff905973c",
 			"revisionTime": "2019-08-28T14:40:21Z"
+		},
+		{
+			"checksumSHA1": "e/cSY11dRBYpw1MpxpKLDG0NO28=",
+			"path": "github.com/docker/go-plugins-helpers/sdk",
+			"revision": "1e6269c305b8c75cfda1c8aa91349c38d7335814",
+			"revisionTime": "2018-10-25T12:07:12Z"
 		},
 		{
 			"checksumSHA1": "UmXGieuTJQOzJPspPJTVKKKMiUA=",

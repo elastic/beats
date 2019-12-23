@@ -521,8 +521,7 @@ This product includes software developed at CoreOS, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v20
-Revision: e64a0ec8b42a61e2a9801dc1d0abe539dea79197
+Revision: 2d78030078ef61b3cae27f42ad6d0e46db51b339
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -758,6 +757,35 @@ Docker
 Copyright 2012-2015 Docker, Inc.
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
+Dependency: github.com/docker/go-plugins-helpers
+Revision: 1e6269c305b8c75cfda1c8aa91349c38d7335814
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/go-plugins-helpers/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+This product contains software (https://github.com/kr/pty) developed
+by Keith Rarick, licensed under the MIT License.
 
 The following is courtesy of our legal counsel:
 
