@@ -116,39 +116,6 @@ var security = (function () {
         "8451": "Failure Added",
     };
 
-    var group_types = {
-        "4727": ["Security-Enabled","Global"],
-        "4728": ["Security-Enabled","Global"],
-        "4729": ["Security-Enabled","Global"],
-        "4730": ["Security-Enabled","Global"],
-        "4731": ["Security-Enabled","Local"],
-        "4732": ["Security-Enabled","Local"],
-        "4733": ["Security-Enabled","Local"],
-        "4734": ["Security-Enabled","Local"],
-        "4735": ["Security-Enabled","Local"],
-        "4737": ["Security-Enabled","Global"],
-        "4744": ["Security-Disabled","Local"],
-        "4745": ["Security-Disabled","Local"],
-        "4746": ["Security-Disabled","Local"],
-        "4747": ["Security-Disabled","Local"],
-        "4748": ["Security-Disabled","Local"],
-        "4749": ["Security-Disabled","Global"],
-        "4750": ["Security-Disabled","Global"],
-        "4751": ["Security-Disabled","Global"],
-        "4752": ["Security-Disabled","Global"],
-        "4753": ["Security-Disabled","Global"],
-        "4754": ["Security-Enabled","Universal"],
-        "4755": ["Security-Enabled","Universal"],
-        "4756": ["Security-Enabled","Universal"],
-        "4757": ["Security-Enabled","Universal"],
-        "4758": ["Security-Enabled","Universal"],
-        "4759": ["Security-Disabled","Universal"],
-        "4760": ["Security-Disabled","Universal"],
-        "4761": ["Security-Disabled","Universal"],
-        "4762": ["Security-Disabled","Universal"],
-        "4763": ["Security-Disabled","Universal"],
-    };
-
     var audit_description = {
         "0CCE9210-69AE-11D9-BED3-505054503030":["Security State Change", "System"],
         "0CCE9211-69AE-11D9-BED3-505054503030":["Security System Extension", "System"],
@@ -1504,15 +1471,6 @@ var security = (function () {
         })
         .Build();
 
-    var addGroupType = function(evt) {
-        var code = evt.Get("event.code");
-        if (!code) {
-         return;
-        }
-        evt.Put("winlog.group.type", group_types[code][0]);
-        evt.Put("winlog.group.scope", group_types[code][1]);
-    };
-
     var addComputerData = function(evt) {
         var computer = evt.Get("winlog.computer_name");
         if (!computer) {
@@ -1618,7 +1576,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(copyTargetUserToGroup)
         .Add(renameCommonAuthFields)
-        .Add(addGroupType)
         .Add(addActionDesc)
         .Build();
 
