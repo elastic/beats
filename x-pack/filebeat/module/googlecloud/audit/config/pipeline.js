@@ -35,15 +35,6 @@ function Audit(keep_original_message) {
         evt.Delete("message");
     };
 
-    var categorizeEvent = new processor.AddFields({
-        target: "event",
-        fields: {
-            category: "audit",
-            type: "audit-log",
-        },
-    });
-
-
     var saveMetadata = new processor.Convert({
         fields: [
             {from: "json.logName", to: "log.logger"},
@@ -142,7 +133,6 @@ function Audit(keep_original_message) {
         .Add(parseTimestamp)
         .Add(saveOriginalMessage)
         .Add(dropPubSubFields)
-        .Add(categorizeEvent)
         .Add(saveMetadata)
         .Add(setCloudMetadata)
         .Add(convertLogEntry)
