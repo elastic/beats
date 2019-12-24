@@ -27,8 +27,10 @@ import (
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
-var eventHubConnector = ";EntityPath="
-var expandEventListFromField = "records"
+const (
+	eventHubConnector        = ";EntityPath="
+	expandEventListFromField = "records"
+)
 
 // azureInput struct for the azure-eventhub input
 type azureInput struct {
@@ -163,13 +165,6 @@ func (a *azureInput) run() error {
 		}
 	}
 
-	// Wait for a signal to quit:
-
-	//err = hub.Close(context.Background())
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-
 	return nil
 }
 
@@ -198,7 +193,7 @@ func (a *azureInput) Wait() {
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) error {
 	// timestamp temp disabled as the event date is applied for now, will be replaced
-	//timestamp := time.Now()
+	// timestamp := time.Now()
 	var events []beat.Event
 	azure := common.MapStr{
 		"partition_id":   partitionID,
@@ -224,7 +219,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) er
 	for _, event := range events {
 		ok := a.outlet.OnEvent(event)
 		if !ok {
-			return errors.New("function OnEvent returned false - ")
+			return errors.New("event has not been sent - ")
 		}
 	}
 	return nil

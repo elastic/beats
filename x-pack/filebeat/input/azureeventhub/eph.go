@@ -16,7 +16,7 @@ import (
 )
 
 // runWithEPH will consume ingested events using the Event Processor Host (EPH) https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host
-func (a azureInput) runWithEPH() error {
+func (a *azureInput) runWithEPH() error {
 	// create a new Azure Storage Leaser / Checkpointer
 	cred, err := azblob.NewSharedKeyCredential(a.config.SAName, a.config.SAKey)
 	if err != nil {
@@ -49,11 +49,11 @@ func (a azureInput) runWithEPH() error {
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
 			return a.processEvents(e, "")
+
 		})
 	if err != nil {
 		return err
 	}
-
 	a.log.Infof("handler id: %q is running\n", handlerID)
 
 	// unregister a handler to stop that handler from receiving events
@@ -64,15 +64,5 @@ func (a azureInput) runWithEPH() error {
 	if err != nil {
 		return err
 	}
-
-	// Wait for a signal to quit:
-	//signalChan := make(chan os.Signal, 1)
-	//signal.Notify(signalChan, os.Interrupt, os.Kill)
-	//<-signalChan
-
-	//err = processor.Close(ctx)
-	//if err != nil {
-	//	return err
-	//}
 	return nil
 }
