@@ -60,14 +60,14 @@ func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 		return ErrCloudCfg{err}
 	}
 
+	if config.Cloud.Auth != "" && config.Cloud.ID == "" {
+		return ErrCloudCfgIncomplete
+	}
+
 	// We remove monitoring.cloud.* so that "cloud" is not treated as a type of
 	// monitoring reporter later.
 	if _, err := monitoringCfg.Remove("cloud", -1); err != nil {
 		return ErrCloudCfg{err}
-	}
-
-	if config.Cloud.Auth != "" && config.Cloud.ID == "" {
-		return ErrCloudCfgIncomplete
 	}
 
 	if err := overwriteWithCloudID(config, monitoringCfg); err != nil {

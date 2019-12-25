@@ -17,14 +17,86 @@
 
 package monitoring
 
-// TODO: test if monitoring.cloud.id is set but no monitoring.elasticsearch.* is set
-// - test that monitoring.elasticsearch.hosts is set
-// - test that monitoring.cloud is removed
+import (
+	"testing"
 
-// TODO: test if monitoring.cloud.id is set and monitoring.elasticsearch.* is set
-// - test that monitoring.elasticsearch.hosts is overridden
-// - test that monitoring.cloud is removed
+	"github.com/stretchr/testify/assert"
 
-// TODO: test if monitoring.cloud.auth is set but no monitoring.cloud.id is set
-// - test that error is returned
-// - test that monitoring.cloud is removed
+	"github.com/elastic/beats/libbeat/common"
+)
+
+func TestOverrideWithCloudSettings(t *testing.T) {
+	tests := map[string]struct {
+		in               common.MapStr
+		out              common.MapStr
+		errAssertionFunc assert.ErrorAssertionFunc
+	}{
+		"cloud_id_no_es_hosts": {
+			common.MapStr{
+				"cloud.id": "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
+			},
+			common.MapStr{
+				"elasticsearch.hosts": []string{"https://escluster.localhost:443"},
+			},
+			assert.NoError,
+		},
+		"cloud_id_with_es_hosts": {
+			common.MapStr{
+				"cloud.id":            "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
+				"elasticsearch.hosts": []string{"foo", "bar"},
+			},
+			common.MapStr{
+				"elasticsearch.hosts": []string{"https://escluster.localhost:443"},
+			},
+			assert.NoError,
+		},
+		"cloud_auth_no_es_auth": {
+			common.MapStr{
+				"cloud.id":   "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
+				"cloud.auth": "elastic:changeme",
+			},
+			common.MapStr{
+				"elasticsearch.hosts":    []string{"https://escluster.localhost:443"},
+				"elasticsearch.username": "elastic",
+				"elasticsearch.password": "changeme",
+			},
+			assert.NoError,
+		},
+		"cloud_auth_with_es_auth": {
+			common.MapStr{
+				"cloud.id":               "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
+				"cloud.auth":             "elastic:changeme",
+				"elasticsearch.username": "foo",
+				"elasticsearch.password": "bar",
+			},
+			common.MapStr{
+				"elasticsearch.hosts":    []string{"https://escluster.localhost:443"},
+				"elasticsearch.username": "elastic",
+				"elasticsearch.password": "changeme",
+			},
+			assert.NoError,
+		},
+		"cloud_auth_no_id": {
+			common.MapStr{
+				"cloud.auth": "elastic:changeme",
+			},
+			common.MapStr{
+				"cloud.auth": "elastic:changeme",
+			},
+			func(t assert.TestingT, err error, _ ...interface{}) bool {
+				return assert.EqualError(t, ErrCloudCfgIncomplete, err.Error())
+			},
+		}}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg := common.MustNewConfigFrom(test.in)
+			expected := common.MustNewConfigFrom(test.out)
+
+			err := OverrideWithCloudSettings(cfg)
+
+			test.errAssertionFunc(t, err)
+			assert.EqualValues(t, expected, cfg)
+		})
+	}
+}
