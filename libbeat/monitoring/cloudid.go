@@ -38,12 +38,12 @@ type ErrCloudCfg struct {
 	cause error
 }
 
-// (ErrCloudCfg).Error returns the error as a string.
+// Error returns the error as a string.
 func (e ErrCloudCfg) Error() string {
 	return fmt.Sprintf("error using monitoring.cloud.* settings: %v", e.cause)
 }
 
-// (ErrCloudCfg).Unwrap returns the underlying cause of the error.
+// Unwrap returns the underlying cause of the error.
 func (e ErrCloudCfg) Unwrap() error {
 	return e.cause
 }
