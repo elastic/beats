@@ -33,8 +33,7 @@ type cloudConfig struct {
 	} `config:"cloud"`
 }
 
-// ErrCloudConfig represents an error when trying to use monitoring.cloud.*
-// settings.
+// ErrCloudCfg represents an error when trying to use monitoring.cloud.* settings.
 type ErrCloudCfg struct {
 	cause error
 }
