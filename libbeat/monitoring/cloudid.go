@@ -33,18 +33,28 @@ type cloudConfig struct {
 	} `config:"cloud"`
 }
 
-type ErrCloudCfg struct{ cause error }
+// ErrCloudConfig represents an error when trying to use monitoring.cloud.*
+// settings.
+type ErrCloudCfg struct {
+	cause error
+}
 
+// (ErrCloudCfg).Error returns the error as a string.
 func (e ErrCloudCfg) Error() string {
 	return fmt.Sprintf("error using monitoring.cloud.* settings: %v", e.cause)
 }
 
+// (ErrCloudCfg).Unwrap returns the underlying cause of the error.
 func (e ErrCloudCfg) Unwrap() error {
 	return e.cause
 }
 
-var ErrCloudCfgIncomplete = ErrCloudCfg{errors.New("monitoring.cloud.auth specified but monitoring.cloud.id is empty. Please specify both.")}
+// ErrCloudCfgIncomplete is an error indicating that monitoring.cloud.auth has
+// been specified but monitoring.cloud.id has not.
+var ErrCloudCfgIncomplete = ErrCloudCfg{errors.New("monitoring.cloud.auth specified but monitoring.cloud.id is empty. Please specify both")}
 
+// OverrideWithCloudSettings overrides monitoring.elasticsearch.* with
+// monitoring.cloud.* if the latter are set.
 func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 	var config cloudConfig
 	if err := monitoringCfg.Unpack(&config); err != nil {
