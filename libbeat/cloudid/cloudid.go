@@ -53,7 +53,7 @@ func OverwriteSettings(cfg *common.Config) error {
 	}
 
 	// cloudID overwrites
-	esURL, kibanaURL, err := decodeCloudID(cloudID)
+	esURL, kibanaURL, err := DecodeCloudID(cloudID)
 	if err != nil {
 		return errors.Errorf("Error decoding cloud.id: %v", err)
 	}
@@ -88,7 +88,7 @@ func OverwriteSettings(cfg *common.Config) error {
 
 	if cloudAuth != "" {
 		// cloudAuth overwrites
-		username, password, err := decodeCloudAuth(cloudAuth)
+		username, password, err := DecodeCloudAuth(cloudAuth)
 		if err != nil {
 			return err
 		}
@@ -117,8 +117,8 @@ func extractPortFromName(word string, defaultPort string) (id, port string) {
 	return word, defaultPort
 }
 
-// decodeCloudID decodes the cloud.id into elasticsearch-URL and kibana-URL
-func decodeCloudID(cloudID string) (string, string, error) {
+// DecodeCloudID decodes the cloud.id into elasticsearch-URL and kibana-URL
+func DecodeCloudID(cloudID string) (string, string, error) {
 
 	// 1. Ignore anything before `:`.
 	idx := strings.LastIndex(cloudID, ":")
@@ -150,8 +150,8 @@ func decodeCloudID(cloudID string) (string, string, error) {
 	return esURL.String(), kibanaURL.String(), nil
 }
 
-// decodeCloudAuth splits the cloud.auth into username and password.
-func decodeCloudAuth(cloudAuth string) (string, string, error) {
+// DecodeCloudAuth splits the cloud.auth into username and password.
+func DecodeCloudAuth(cloudAuth string) (string, string, error) {
 
 	idx := strings.Index(cloudAuth, ":")
 	if idx < 0 {

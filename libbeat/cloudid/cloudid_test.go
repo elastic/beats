@@ -79,7 +79,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		esURL, kbURL, err := decodeCloudID(test.cloudID)
+		esURL, kbURL, err := DecodeCloudID(test.cloudID)
 		assert.NoError(t, err, test.cloudID)
 
 		assert.Equal(t, esURL, test.expectedEsURL, test.cloudID)
@@ -103,7 +103,7 @@ func TestDecodeError(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, _, err := decodeCloudID(test.cloudID)
+		_, _, err := DecodeCloudID(test.cloudID)
 		assert.Error(t, err, test.cloudID)
 		assert.Contains(t, err.Error(), test.errorMsg, test.cloudID)
 	}
