@@ -60,7 +60,12 @@ func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 		return ErrCloudCfg{err}
 	}
 
-	if config.Cloud.Auth != "" && config.Cloud.ID == "" {
+	if config.Cloud.ID == "" && config.Cloud.Auth == "" {
+		// Nothing to do
+		return nil
+	}
+
+	if config.Cloud.ID == "" && config.Cloud.Auth != "" {
 		return ErrCloudCfgIncomplete
 	}
 
@@ -70,29 +75,26 @@ func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 		return ErrCloudCfg{err}
 	}
 
-	if err := overwriteWithCloudID(config, monitoringCfg); err != nil {
+	cid, err := cloudid.NewCloudID(config.Cloud.ID, config.Cloud.Auth)
+	if err != nil {
 		return ErrCloudCfg{err}
 	}
 
-	if err := overwriteWithCloudAuth(config, monitoringCfg); err != nil {
+	if err := overwriteWithCloudID(monitoringCfg, cid); err != nil {
 		return ErrCloudCfg{err}
+	}
+
+	if config.Cloud.Auth != "" {
+		if err := overwriteWithCloudAuth(monitoringCfg, cid); err != nil {
+			return ErrCloudCfg{err}
+		}
 	}
 
 	return nil
 }
 
-func overwriteWithCloudID(config cloudConfig, monitoringCfg *common.Config) error {
-	if config.Cloud.ID == "" {
-		// Nothing to do
-		return nil
-	}
-
-	esURL, _, err := cloudid.DecodeCloudID(config.Cloud.ID)
-	if err != nil {
-		return err
-	}
-
-	esURLConfig, err := common.NewConfigFrom([]string{esURL})
+func overwriteWithCloudID(monitoringCfg *common.Config, cid *cloudid.CloudID) error {
+	esURLConfig, err := common.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {
 		return err
 	}
@@ -101,27 +103,17 @@ func overwriteWithCloudID(config cloudConfig, monitoringCfg *common.Config) erro
 		return err
 	}
 
-	return err
+	return nil
 }
 
-func overwriteWithCloudAuth(config cloudConfig, monitoringCfg *common.Config) error {
-	if config.Cloud.Auth == "" {
-		// Nothing to do
-		return nil
-	}
-
-	username, password, err := cloudid.DecodeCloudAuth(config.Cloud.Auth)
-	if err != nil {
+func overwriteWithCloudAuth(monitoringCfg *common.Config, cid *cloudid.CloudID) error {
+	if err := monitoringCfg.SetString("elasticsearch.username", -1, cid.Username()); err != nil {
 		return err
 	}
 
-	if err := monitoringCfg.SetString("elasticsearch.username", -1, username); err != nil {
+	if err := monitoringCfg.SetString("elasticsearch.password", -1, cid.Password()); err != nil {
 		return err
 	}
 
-	if err := monitoringCfg.SetString("elasticsearch.password", -1, password); err != nil {
-		return err
-	}
-
-	return err
+	return nil
 }
