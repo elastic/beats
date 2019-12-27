@@ -33,6 +33,7 @@ import (
 
 const defaultCloudPort = "443"
 
+// CloudID encapsulates the encoded (i.e. raw) and decoded parts of Elastic Cloud ID.
 type CloudID struct {
 	id     string
 	esURL  string
@@ -43,6 +44,7 @@ type CloudID struct {
 	password string
 }
 
+// NewCloudID constructs a new CloudID object by decoding the given cloud ID and cloud auth.
 func NewCloudID(cloudID string, cloudAuth string) (*CloudID, error) {
 	cid := CloudID{
 		id:   cloudID,
@@ -56,18 +58,22 @@ func NewCloudID(cloudID string, cloudAuth string) (*CloudID, error) {
 	return &cid, nil
 }
 
+// ElasticsearchURL returns the Elasticsearch URL decoded from the cloud ID.
 func (c *CloudID) ElasticsearchURL() string {
 	return c.esURL
 }
 
+// KibanaURL returns the Kibana URL decoded from the cloud ID.
 func (c *CloudID) KibanaURL() string {
 	return c.kibURL
 }
 
+// Username returns the username decoded from the cloud auth.
 func (c *CloudID) Username() string {
 	return c.username
 }
 
+// Password returns the password decoded from the cloud auth.
 func (c *CloudID) Password() string {
 	return c.password
 }
