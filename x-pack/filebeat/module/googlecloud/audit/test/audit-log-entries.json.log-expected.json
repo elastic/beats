@@ -2,10 +2,8 @@
     {
         "@timestamp": "2019-12-19T00:49:36.086Z",
         "cloud.project.id": "elastic-beats",
-        "event.category": "audit",
         "event.dataset": "googlecloud.audit",
         "event.module": "googlecloud",
-        "event.type": "audit-log",
         "fileset.name": "audit",
         "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
         "googlecloud.audit.authorization_info": [
@@ -32,10 +30,8 @@
     {
         "@timestamp": "2019-12-19T00:45:51.228Z",
         "cloud.project.id": "elastic-beats",
-        "event.category": "audit",
         "event.dataset": "googlecloud.audit",
         "event.module": "googlecloud",
-        "event.type": "audit-log",
         "fileset.name": "audit",
         "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
         "googlecloud.audit.authorization_info": [
@@ -70,10 +66,8 @@
     {
         "@timestamp": "2019-12-19T00:44:25.051Z",
         "cloud.project.id": "elastic-beats",
-        "event.category": "audit",
         "event.dataset": "googlecloud.audit",
         "event.module": "googlecloud",
-        "event.type": "audit-log",
         "fileset.name": "audit",
         "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
         "googlecloud.audit.authorization_info": [
