@@ -26,6 +26,7 @@
     - sns
     - sqs
     - rds
+    - lambda
 - module: aws
   period: 12h
   metricsets:

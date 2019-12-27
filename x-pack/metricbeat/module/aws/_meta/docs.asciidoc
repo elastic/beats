@@ -105,7 +105,7 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 | CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per namespace per collection period
 | CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per namespace per collection period
 |===
-`billing`, `ebs`, `elb`, `sns` and `usage` are the same as `cloudwatch` metricset.
+`billing`, `ebs`, `elb`, `sns`, `usage` and `lambda` are the same as `cloudwatch` metricset.
 
 [float]
 === `ec2`
