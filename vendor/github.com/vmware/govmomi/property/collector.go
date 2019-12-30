@@ -111,12 +111,6 @@ func (p *Collector) WaitForUpdates(ctx context.Context, v string) (*types.Update
 	return res.Returnval, nil
 }
 
-func (p *Collector) CancelWaitForUpdates(ctx context.Context) error {
-	req := &types.CancelWaitForUpdates{This: p.Reference()}
-	_, err := methods.CancelWaitForUpdates(ctx, p.roundTripper, req)
-	return err
-}
-
 func (p *Collector) RetrieveProperties(ctx context.Context, req types.RetrieveProperties) (*types.RetrievePropertiesResponse, error) {
 	req.This = p.Reference()
 	return methods.RetrieveProperties(ctx, p.roundTripper, &req)
@@ -126,30 +120,26 @@ func (p *Collector) RetrieveProperties(ctx context.Context, req types.RetrievePr
 // must be a pointer to a []interface{}, which is populated with the instances
 // of the specified managed objects, with the relevant properties filled in. If
 // the properties slice is nil, all properties are loaded.
-// Note that pointer types are optional fields that may be left as a nil value.
-// The caller should check such fields for a nil value before dereferencing.
 func (p *Collector) Retrieve(ctx context.Context, objs []types.ManagedObjectReference, ps []string, dst interface{}) error {
-	if len(objs) == 0 {
-		return errors.New("object references is empty")
-	}
-
-	kinds := make(map[string]bool)
-
-	var propSet []types.PropertySpec
+	var propSpec *types.PropertySpec
 	var objectSet []types.ObjectSpec
 
 	for _, obj := range objs {
-		if _, ok := kinds[obj.Type]; !ok {
-			spec := types.PropertySpec{
+		// Ensure that all object reference types are the same
+		if propSpec == nil {
+			propSpec = &types.PropertySpec{
 				Type: obj.Type,
 			}
+
 			if ps == nil {
-				spec.All = types.NewBool(true)
+				propSpec.All = types.NewBool(true)
 			} else {
-				spec.PathSet = ps
+				propSpec.PathSet = ps
 			}
-			propSet = append(propSet, spec)
-			kinds[obj.Type] = true
+		} else {
+			if obj.Type != propSpec.Type {
+				return errors.New("object references must have the same type")
+			}
 		}
 
 		objectSpec := types.ObjectSpec{
@@ -164,7 +154,7 @@ func (p *Collector) Retrieve(ctx context.Context, objs []types.ManagedObjectRefe
 		SpecSet: []types.PropertyFilterSpec{
 			{
 				ObjectSet: objectSet,
-				PropSet:   propSet,
+				PropSet:   []types.PropertySpec{*propSpec},
 			},
 		},
 	}
@@ -204,7 +194,7 @@ func (p *Collector) RetrieveWithFilter(ctx context.Context, objs []types.Managed
 	return p.Retrieve(ctx, objs, ps, dst)
 }
 
-// RetrieveOne calls Retrieve with a single managed object reference via Collector.Retrieve().
+// RetrieveOne calls Retrieve with a single managed object reference.
 func (p *Collector) RetrieveOne(ctx context.Context, obj types.ManagedObjectReference, ps []string, dst interface{}) error {
 	var objs = []types.ManagedObjectReference{obj}
 	return p.Retrieve(ctx, objs, ps, dst)

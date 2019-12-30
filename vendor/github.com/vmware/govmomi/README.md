@@ -5,19 +5,14 @@
 
 A Go library for interacting with VMware vSphere APIs (ESXi and/or vCenter).
 
-In addition to the vSphere API client, this repository includes:
-
-* [govc](./govc) - vSphere CLI
-
-* [vcsim](./vcsim) - vSphere API mock framework
-
-* [toolbox](./toolbox) - VM guest tools framework
+For `govc`, a CLI built on top of govmomi, check out the [govc](./govc) directory and [USAGE](./govc/USAGE.md) document.
 
 ## Compatibility
 
-This library is built for and tested against ESXi and vCenter 6.0, 6.5 and 6.7.
+This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
-It may work with versions 5.5 and 5.1, but neither are officially supported.
+If you're able to use it against older versions of ESXi and/or vCenter, please
+leave a note and we'll include it in this compatibility list.
 
 ## Documentation
 
@@ -30,12 +25,17 @@ See [godoc.org][godoc] for documentation.
 
 [apiref]:http://pubs.vmware.com/vsphere-6-5/index.jsp#com.vmware.wssdk.apiref.doc/right-pane.html
 [godoc]:http://godoc.org/github.com/vmware/govmomi
+[drone]:https://drone.io
+[dronesrc]:https://github.com/drone/drone
+[dronecli]:http://readme.drone.io/devs/cli/
 
-## Installation
+#### Building with CI
+Merges to this repository will trigger builds in both Travis and [Drone][drone].
 
-```sh
-go get -u github.com/vmware/govmomi
-```
+To build locally with Drone:
+- Ensure that you have Docker 1.6 or higher installed.
+- Install the [Drone command line tools][dronecli].
+- Run `drone exec` from within the root directory of the govmomi repository.
 
 ## Discussion
 
@@ -53,21 +53,9 @@ Refer to the [CHANGELOG](CHANGELOG.md) for version to version changes.
 
 * [Docker Machine](https://github.com/docker/machine/tree/master/drivers/vmwarevsphere)
 
-* [Docker InfraKit](https://github.com/docker/infrakit/tree/master/pkg/provider/vsphere)
-
-* [Docker LinuxKit](https://github.com/linuxkit/linuxkit/tree/master/src/cmd/linuxkit)
-
 * [Kubernetes](https://github.com/kubernetes/kubernetes/tree/master/pkg/cloudprovider/providers/vsphere)
 
-* [Kubernetes Cloud Provider](https://github.com/kubernetes/cloud-provider-vsphere)
-
-* [Kubernetes Cluster API](https://github.com/kubernetes-sigs/cluster-api-provider-vsphere)
-
-* [Kubernetes kops](https://github.com/kubernetes/kops/tree/master/upup/pkg/fi/cloudup/vsphere)
-
-* [Terraform](https://github.com/terraform-providers/terraform-provider-vsphere)
-
-* [Packer](https://github.com/jetbrains-infra/packer-builder-vsphere)
+* [Terraform](https://github.com/hashicorp/terraform/tree/master/builtin/providers/vsphere)
 
 * [VMware VIC Engine](https://github.com/vmware/vic)
 
@@ -79,12 +67,6 @@ Refer to the [CHANGELOG](CHANGELOG.md) for version to version changes.
 
 * [Libretto](https://github.com/apcera/libretto/tree/master/virtualmachine/vsphere)
 
-* [Telegraf](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere)
-
-* [Open Storage](https://github.com/libopenstorage/openstorage/tree/master/pkg/storageops/vsphere)
-
-* [Juju](https://github.com/juju/juju)
-
 ## Related projects
 
 * [rbvmomi](https://github.com/vmware/rbvmomi)
@@ -93,4 +75,4 @@ Refer to the [CHANGELOG](CHANGELOG.md) for version to version changes.
 
 ## License
 
-govmomi is available under the [Apache 2 license](LICENSE.txt).
+govmomi is available under the [Apache 2 license](LICENSE).

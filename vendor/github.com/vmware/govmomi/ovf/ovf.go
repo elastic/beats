@@ -17,9 +17,8 @@ limitations under the License.
 package ovf
 
 import (
+	"encoding/xml"
 	"io"
-
-	"github.com/vmware/govmomi/vim25/xml"
 )
 
 func Unmarshal(r io.Reader) (*Envelope, error) {

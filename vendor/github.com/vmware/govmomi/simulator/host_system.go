@@ -17,18 +17,12 @@ limitations under the License.
 package simulator
 
 import (
-	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/vmware/govmomi/simulator/esx"
-	"github.com/vmware/govmomi/vim25/methods"
 	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/soap"
 	"github.com/vmware/govmomi/vim25/types"
-)
-
-var (
-	hostPortUnique = os.Getenv("VCSIM_HOST_PORT_UNIQUE") == "true"
 )
 
 type HostSystem struct {
@@ -36,27 +30,23 @@ type HostSystem struct {
 }
 
 func NewHostSystem(host mo.HostSystem) *HostSystem {
-	if hostPortUnique { // configure unique port for each host
-		port := &esx.HostSystem.Summary.Config.Port
-		*port++
-		host.Summary.Config.Port = *port
-	}
-
 	now := time.Now()
+
+	host.Name = host.Summary.Config.Name
+	host.Summary.Runtime = &host.Runtime
+	host.Summary.Runtime.BootTime = &now
+
+	hw := *host.Summary.Hardware // shallow copy
+	hw.Uuid = uuid.New().String()
+	host.Summary.Hardware = &hw
+
+	info := *esx.HostHardwareInfo
+	info.SystemInfo.Uuid = hw.Uuid
+	host.Hardware = &info
 
 	hs := &HostSystem{
 		HostSystem: host,
 	}
-
-	hs.Name = hs.Summary.Config.Name
-	hs.Summary.Runtime = &hs.Runtime
-	hs.Summary.Runtime.BootTime = &now
-
-	hardware := *host.Summary.Hardware
-	hs.Summary.Hardware = &hardware
-
-	info := *esx.HostHardwareInfo
-	hs.Hardware = &info
 
 	config := []struct {
 		ref **types.ManagedObjectReference
@@ -77,45 +67,6 @@ func NewHostSystem(host mo.HostSystem) *HostSystem {
 	return hs
 }
 
-func (h *HostSystem) configure(spec types.HostConnectSpec, connected bool) {
-	h.Runtime.ConnectionState = types.HostSystemConnectionStateDisconnected
-	if connected {
-		h.Runtime.ConnectionState = types.HostSystemConnectionStateConnected
-	}
-
-	h.Summary.Config.Name = spec.HostName
-	h.Name = h.Summary.Config.Name
-	id := newUUID(h.Name)
-	h.Summary.Hardware.Uuid = id
-	h.Hardware.SystemInfo.Uuid = id
-}
-
-func (h *HostSystem) event() types.HostEvent {
-	return types.HostEvent{
-		Event: types.Event{
-			Datacenter:      datacenterEventArgument(h),
-			ComputeResource: h.eventArgumentParent(),
-			Host:            h.eventArgument(),
-		},
-	}
-}
-
-func (h *HostSystem) eventArgument() *types.HostEventArgument {
-	return &types.HostEventArgument{
-		Host:                h.Self,
-		EntityEventArgument: types.EntityEventArgument{Name: h.Name},
-	}
-}
-
-func (h *HostSystem) eventArgumentParent() *types.ComputeResourceEventArgument {
-	parent := hostParent(&h.HostSystem)
-
-	return &types.ComputeResourceEventArgument{
-		ComputeResource:     parent.Self,
-		EntityEventArgument: types.EntityEventArgument{Name: parent.Name},
-	}
-}
-
 func hostParent(host *mo.HostSystem) *mo.ComputeResource {
 	switch parent := Map.Get(*host.Parent).(type) {
 	case *mo.ComputeResource:
@@ -127,37 +78,19 @@ func hostParent(host *mo.HostSystem) *mo.ComputeResource {
 	}
 }
 
-func addComputeResource(s *types.ComputeResourceSummary, h *HostSystem) {
-	s.TotalCpu += h.Summary.Hardware.CpuMhz
-	s.TotalMemory += h.Summary.Hardware.MemorySize
-	s.NumCpuCores += h.Summary.Hardware.NumCpuCores
-	s.NumCpuThreads += h.Summary.Hardware.NumCpuThreads
-	s.EffectiveCpu += h.Summary.Hardware.CpuMhz
-	s.EffectiveMemory += h.Summary.Hardware.MemorySize
-	s.NumHosts++
-	s.NumEffectiveHosts++
-	s.OverallStatus = types.ManagedEntityStatusGreen
-}
-
 // CreateDefaultESX creates a standalone ESX
 // Adds objects of type: Datacenter, Network, ComputeResource, ResourcePool and HostSystem
 func CreateDefaultESX(f *Folder) {
-	dc := NewDatacenter(f)
+	dc := &esx.Datacenter
+	f.putChild(dc)
+	createDatacenterFolders(dc, false)
 
 	host := NewHostSystem(esx.HostSystem)
 
-	summary := new(types.ComputeResourceSummary)
-	addComputeResource(summary, host)
-
-	cr := &mo.ComputeResource{
-		Summary: summary,
-		Network: esx.Datacenter.Network,
-	}
-	cr.EnvironmentBrowser = newEnvironmentBrowser()
+	cr := &mo.ComputeResource{}
 	cr.Self = *host.Parent
 	cr.Name = host.Name
 	cr.Host = append(cr.Host, host.Reference())
-	host.Network = cr.Network
 	Map.PutEntity(cr, host)
 
 	pool := NewResourcePool()
@@ -177,79 +110,23 @@ func CreateStandaloneHost(f *Folder, spec types.HostConnectSpec) (*HostSystem, t
 
 	pool := NewResourcePool()
 	host := NewHostSystem(esx.HostSystem)
-	host.configure(spec, false)
 
-	summary := new(types.ComputeResourceSummary)
-	addComputeResource(summary, host)
+	host.Summary.Config.Name = spec.HostName
+	host.Name = host.Summary.Config.Name
+	host.Runtime.ConnectionState = types.HostSystemConnectionStateDisconnected
 
-	cr := &mo.ComputeResource{
-		ConfigurationEx: &types.ComputeResourceConfigInfo{
-			VmSwapPlacement: string(types.VirtualMachineConfigInfoSwapPlacementTypeVmDirectory),
-		},
-		Summary:            summary,
-		EnvironmentBrowser: newEnvironmentBrowser(),
-	}
+	cr := &mo.ComputeResource{}
 
 	Map.PutEntity(cr, Map.NewEntity(host))
-	host.Summary.Host = &host.Self
 
 	Map.PutEntity(cr, Map.NewEntity(pool))
 
 	cr.Name = host.Name
-	cr.Network = Map.getEntityDatacenter(f).defaultNetwork()
 	cr.Host = append(cr.Host, host.Reference())
 	cr.ResourcePool = &pool.Self
 
 	f.putChild(cr)
 	pool.Owner = cr.Self
-	host.Network = cr.Network
 
 	return host, nil
-}
-
-func (h *HostSystem) DestroyTask(ctx *Context, req *types.Destroy_Task) soap.HasFault {
-	task := CreateTask(h, "destroy", func(t *Task) (types.AnyType, types.BaseMethodFault) {
-		if len(h.Vm) > 0 {
-			return nil, &types.ResourceInUse{}
-		}
-
-		ctx.postEvent(&types.HostRemovedEvent{HostEvent: h.event()})
-
-		f := Map.getEntityParent(h, "Folder").(*Folder)
-		f.removeChild(h.Reference())
-
-		return nil, nil
-	})
-
-	return &methods.Destroy_TaskBody{
-		Res: &types.Destroy_TaskResponse{
-			Returnval: task.Run(),
-		},
-	}
-}
-
-func (h *HostSystem) EnterMaintenanceModeTask(spec *types.EnterMaintenanceMode_Task) soap.HasFault {
-	task := CreateTask(h, "enterMaintenanceMode", func(t *Task) (types.AnyType, types.BaseMethodFault) {
-		h.Runtime.InMaintenanceMode = true
-		return nil, nil
-	})
-
-	return &methods.EnterMaintenanceMode_TaskBody{
-		Res: &types.EnterMaintenanceMode_TaskResponse{
-			Returnval: task.Run(),
-		},
-	}
-}
-
-func (h *HostSystem) ExitMaintenanceModeTask(spec *types.ExitMaintenanceMode_Task) soap.HasFault {
-	task := CreateTask(h, "exitMaintenanceMode", func(t *Task) (types.AnyType, types.BaseMethodFault) {
-		h.Runtime.InMaintenanceMode = false
-		return nil, nil
-	})
-
-	return &methods.ExitMaintenanceMode_TaskBody{
-		Res: &types.ExitMaintenanceMode_TaskResponse{
-			Returnval: task.Run(),
-		},
-	}
 }

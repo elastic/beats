@@ -18,7 +18,6 @@ package progress
 
 import (
 	"container/list"
-	"context"
 	"fmt"
 	"io"
 	"sync/atomic"
@@ -26,11 +25,11 @@ import (
 )
 
 type readerReport struct {
-	pos  int64   // Keep first to ensure 64-bit alignment
-	size int64   // Keep first to ensure 64-bit alignment
-	bps  *uint64 // Keep first to ensure 64-bit alignment
-
 	t time.Time
+
+	pos  int64
+	size int64
+	bps  *uint64
 
 	err error
 }
@@ -76,16 +75,16 @@ type reader struct {
 
 	pos  int64
 	size int64
-	bps  uint64
 
-	ch  chan<- Report
-	ctx context.Context
+	bps uint64
+
+	ch chan<- Report
 }
 
-func NewReader(ctx context.Context, s Sinker, r io.Reader, size int64) *reader {
+func NewReader(s Sinker, r io.Reader, size int64) *reader {
 	pr := reader{
-		r:    r,
-		ctx:  ctx,
+		r: r,
+
 		size: size,
 	}
 
@@ -100,12 +99,11 @@ func NewReader(ctx context.Context, s Sinker, r io.Reader, size int64) *reader {
 // underlying channel.
 func (r *reader) Read(b []byte) (int, error) {
 	n, err := r.r.Read(b)
-	r.pos += int64(n)
-
-	if err != nil && err != io.EOF {
+	if err != nil {
 		return n, err
 	}
 
+	r.pos += int64(n)
 	q := readerReport{
 		t:    time.Now(),
 		pos:  r.pos,
@@ -113,10 +111,7 @@ func (r *reader) Read(b []byte) (int, error) {
 		bps:  &r.bps,
 	}
 
-	select {
-	case r.ch <- q:
-	case <-r.ctx.Done():
-	}
+	r.ch <- q
 
 	return n, err
 }
@@ -132,11 +127,8 @@ func (r *reader) Done(err error) {
 		err:  err,
 	}
 
-	select {
-	case r.ch <- q:
-		close(r.ch)
-	case <-r.ctx.Done():
-	}
+	r.ch <- q
+	close(r.ch)
 }
 
 // newBpsLoop returns a sink that monitors and stores throughput.
@@ -158,7 +150,7 @@ func bpsLoop(ch <-chan Report, dst *uint64) {
 
 		// Setup timer for front of list to become stale.
 		if e := l.Front(); e != nil {
-			dt := time.Second - time.Since(e.Value.(readerReport).t)
+			dt := time.Second - time.Now().Sub(e.Value.(readerReport).t)
 			tch = time.After(dt)
 		}
 

@@ -40,8 +40,8 @@ type keepAlive struct {
 }
 
 func defaultKeepAlive(roundTripper soap.RoundTripper) error {
-	_, err := methods.GetCurrentTime(context.Background(), roundTripper)
-	return err
+	_, _ = methods.GetCurrentTime(context.Background(), roundTripper)
+	return nil
 }
 
 // KeepAlive wraps the specified soap.RoundTripper and executes a meaningless
@@ -114,9 +114,10 @@ func (k *keepAlive) RoundTrip(ctx context.Context, req, res soap.HasFault) error
 	if err != nil {
 		return err
 	}
+
 	// Start ticker on login, stop ticker on logout.
 	switch req.(type) {
-	case *methods.LoginBody, *methods.LoginExtensionByCertificateBody, *methods.LoginByTokenBody:
+	case *methods.LoginBody, *methods.LoginExtensionByCertificateBody:
 		k.start()
 	case *methods.LogoutBody:
 		k.stop()

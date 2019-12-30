@@ -22,9 +22,6 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-// HostHardwareInfo is the default template for the HostSystem hardware property.
-// Capture method:
-//   govc object.collect -s -dump HostSystem:ha-host hardware
 var HostHardwareInfo = &types.HostHardwareInfo{
 	SystemInfo: types.HostSystemInfo{
 		Vendor: "VMware, Inc.",

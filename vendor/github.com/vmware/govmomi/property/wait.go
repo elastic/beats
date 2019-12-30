@@ -19,14 +19,12 @@ package property
 import (
 	"context"
 
-	"github.com/vmware/govmomi/vim25/methods"
 	"github.com/vmware/govmomi/vim25/types"
 )
 
 // WaitFilter provides helpers to construct a types.CreateFilter for use with property.Wait
 type WaitFilter struct {
 	types.CreateFilter
-	Options *types.WaitOptions
 }
 
 // Add a new ObjectSpec and PropertySpec to the WaitFilter
@@ -77,7 +75,6 @@ func Wait(ctx context.Context, c *Collector, obj types.ManagedObjectReference, p
 // creates a new property collector and calls CreateFilter. A new property
 // collector is required because filters can only be added, not removed.
 //
-// If the Context is canceled, a call to CancelWaitForUpdates() is made and its error value is returned.
 // The newly created collector is destroyed before this function returns (both
 // in case of success or error).
 //
@@ -88,43 +85,28 @@ func WaitForUpdates(ctx context.Context, c *Collector, filter *WaitFilter, f fun
 	}
 
 	// Attempt to destroy the collector using the background context, as the
-	// specified context may have timed out or have been canceled.
-	defer func() {
-		_ = p.Destroy(context.Background())
-	}()
+	// specified context may have timed out or have been cancelled.
+	defer p.Destroy(context.Background())
 
 	err = p.CreateFilter(ctx, filter.CreateFilter)
 	if err != nil {
 		return err
 	}
 
-	req := types.WaitForUpdatesEx{
-		This:    p.Reference(),
-		Options: filter.Options,
-	}
-
-	for {
-		res, err := methods.WaitForUpdatesEx(ctx, p.roundTripper, &req)
+	for version := ""; ; {
+		res, err := p.WaitForUpdates(ctx, version)
 		if err != nil {
-			if ctx.Err() == context.Canceled {
-				werr := p.CancelWaitForUpdates(context.Background())
-				return werr
-			}
 			return err
 		}
 
-		set := res.Returnval
-		if set == nil {
-			if req.Options != nil && req.Options.MaxWaitSeconds != nil {
-				return nil // WaitOptions.MaxWaitSeconds exceeded
-			}
-			// Retry if the result came back empty
+		// Retry if the result came back empty
+		if res == nil {
 			continue
 		}
 
-		req.Version = set.Version
+		version = res.Version
 
-		for _, fs := range set.FilterSet {
+		for _, fs := range res.FilterSet {
 			if f(fs.ObjectSet) {
 				return nil
 			}

@@ -21,43 +21,22 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 
-	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/simulator/esx"
 	"github.com/vmware/govmomi/simulator/vpx"
-	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 )
-
-type DelayConfig struct {
-	// Delay specifies the number of milliseconds to delay serving a SOAP call. 0 means no delay.
-	// This can be used to simulate a poorly performing vCenter or network lag.
-	Delay int
-
-	// Delay specifies the number of milliseconds to delay serving a specific method.
-	// Each entry in the map represents the name of a method and its associated delay in milliseconds,
-	// This can be used to simulate a poorly performing vCenter or network lag.
-	MethodDelay map[string]int
-
-	// DelayJitter defines the delay jitter as a coefficient of variation (stddev/mean).
-	// This can be used to simulate unpredictable delay. 0 means no jitter, i.e. all invocations get the same delay.
-	DelayJitter float64
-}
 
 // Model is used to populate a Model with an initial set of managed entities.
 // This is a simple helper for tests running against a simulator, to populate an inventory
 // with commonly used models.
 type Model struct {
-	Service *Service `json:"-"`
+	Service *Service
 
-	ServiceContent types.ServiceContent `json:"-"`
-	RootFolder     mo.Folder            `json:"-"`
-
-	// Autostart will power on Model created VMs when true
-	Autostart bool `json:"-"`
+	ServiceContent types.ServiceContent
+	RootFolder     mo.Folder
 
 	// Datacenter specifies the number of Datacenter entities to create
 	Datacenter int
@@ -66,13 +45,13 @@ type Model struct {
 	Portgroup int
 
 	// Host specifies the number of standalone HostSystems entities to create per Datacenter
-	Host int `json:",omitempty"`
+	Host int
 
 	// Cluster specifies the number of ClusterComputeResource entities to create per Datacenter
 	Cluster int
 
 	// ClusterHost specifies the number of HostSystems entities to create within a Cluster
-	ClusterHost int `json:",omitempty"`
+	ClusterHost int
 
 	// Pool specifies the number of ResourcePool entities to create per Cluster
 	Pool int
@@ -96,9 +75,6 @@ type Model struct {
 	// Pod specifies the number of StoragePod to create per Cluster
 	Pod int
 
-	// Delay configurations
-	DelayConfig DelayConfig
-
 	// total number of inventory objects, set by Count()
 	total int
 
@@ -110,14 +86,8 @@ func ESX() *Model {
 	return &Model{
 		ServiceContent: esx.ServiceContent,
 		RootFolder:     esx.RootFolder,
-		Autostart:      true,
 		Datastore:      1,
 		Machine:        2,
-		DelayConfig: DelayConfig{
-			Delay:       0,
-			DelayJitter: 0,
-			MethodDelay: nil,
-		},
 	}
 }
 
@@ -126,7 +96,6 @@ func VPX() *Model {
 	return &Model{
 		ServiceContent: vpx.ServiceContent,
 		RootFolder:     vpx.RootFolder,
-		Autostart:      true,
 		Datacenter:     1,
 		Portgroup:      1,
 		Host:           1,
@@ -134,11 +103,6 @@ func VPX() *Model {
 		ClusterHost:    3,
 		Datastore:      1,
 		Machine:        2,
-		DelayConfig: DelayConfig{
-			Delay:       0,
-			DelayJitter: 0,
-			MethodDelay: nil,
-		},
 	}
 }
 
@@ -194,8 +158,6 @@ func (m *Model) Create() error {
 
 	// After all hosts are created, this var is used to mount the host datastores.
 	var hosts []*object.HostSystem
-	hostMap := make(map[string][]*object.HostSystem)
-
 	// We need to defer VM creation until after the datastores are created.
 	var vms []func() error
 	// 1 DVS per DC, added to all hosts
@@ -240,7 +202,6 @@ func (m *Model) Create() error {
 	addMachine := func(prefix string, host *object.HostSystem, pool *object.ResourcePool, folders *object.DatacenterFolders) {
 		nic := esx.EthernetCard
 		nic.Backing = vmnet
-		ds := types.ManagedObjectReference{}
 
 		f := func() error {
 			for i := 0; i < m.Machine; i++ {
@@ -263,11 +224,8 @@ func (m *Model) Create() error {
 				scsi, _ := devices.CreateSCSIController("pvscsi")
 				ide, _ := devices.CreateIDEController()
 				cdrom, _ := devices.CreateCdrom(ide.(*types.VirtualIDEController))
-				disk := devices.CreateDisk(scsi.(types.BaseVirtualController), ds,
-					config.Files.VmPathName+" "+path.Join(name, "disk1.vmdk"))
-				disk.CapacityInKB = 1024
 
-				devices = append(devices, scsi, cdrom, disk, &nic)
+				devices = append(devices, scsi, cdrom, &nic)
 
 				config.DeviceChange, _ = devices.ConfigSpec(types.VirtualDeviceConfigSpecOperationAdd)
 
@@ -276,15 +234,9 @@ func (m *Model) Create() error {
 					return err
 				}
 
-				info, err := task.WaitForResult(ctx, nil)
+				err = task.Wait(ctx)
 				if err != nil {
 					return err
-				}
-
-				vm := object.NewVirtualMachine(client, info.Result.(types.ManagedObjectReference))
-
-				if m.Autostart {
-					_, _ = vm.PowerOn(ctx)
 				}
 			}
 
@@ -425,7 +377,7 @@ func (m *Model) Create() error {
 			addMachine(prefix+"0", nil, pool, folders)
 
 			for npool := 1; npool <= m.Pool; npool++ {
-				spec := types.DefaultResourceConfigSpec()
+				spec := NewResourceConfigSpec()
 
 				_, err = pool.Create(ctx, m.fmtName(prefix, npool), spec)
 				if err != nil {
@@ -436,7 +388,7 @@ func (m *Model) Create() error {
 			prefix = clusterName + "_APP"
 
 			for napp := 0; napp < m.App; napp++ {
-				rspec := types.DefaultResourceConfigSpec()
+				rspec := NewResourceConfigSpec()
 				vspec := NewVAppConfigSpec()
 				name := m.fmtName(prefix, napp)
 
@@ -448,14 +400,12 @@ func (m *Model) Create() error {
 				addMachine(name, nil, vapp.ResourcePool, folders)
 			}
 		}
-
-		hostMap[dcName] = hosts
-		hosts = nil
 	}
 
 	if m.ServiceContent.RootFolder == esx.RootFolder.Reference() {
 		// ESX model
 		host := object.NewHostSystem(client, esx.HostSystem.Reference())
+		hosts = append(hosts, host)
 
 		dc := object.NewDatacenter(client, esx.Datacenter.Reference())
 		folders, err := dc.Folders(ctx)
@@ -463,17 +413,13 @@ func (m *Model) Create() error {
 			return err
 		}
 
-		hostMap[dc.Reference().Value] = append(hosts, host)
-
 		addMachine(host.Reference().Value, host, nil, folders)
 	}
 
-	for dc, dchosts := range hostMap {
-		for i := 0; i < m.Datastore; i++ {
-			err := m.createLocalDatastore(dc, m.fmtName("LocalDS_", i), dchosts)
-			if err != nil {
-				return err
-			}
+	for i := 0; i < m.Datastore; i++ {
+		err := m.createLocalDatastore(m.fmtName("LocalDS_", i), hosts)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -484,15 +430,16 @@ func (m *Model) Create() error {
 		}
 	}
 
-	// Turn on delay AFTER we're done building the service content
-	m.Service.delay = &m.DelayConfig
-
 	return nil
 }
 
-func (m *Model) createLocalDatastore(dc string, name string, hosts []*object.HostSystem) error {
+var tempDir = func() (string, error) {
+	return ioutil.TempDir("", "govcsim-")
+}
+
+func (m *Model) createLocalDatastore(name string, hosts []*object.HostSystem) error {
 	ctx := context.Background()
-	dir, err := ioutil.TempDir("", fmt.Sprintf("govcsim-%s-%s-", dc, name))
+	dir, err := tempDir()
 	if err != nil {
 		return err
 	}
@@ -518,44 +465,5 @@ func (m *Model) createLocalDatastore(dc string, name string, hosts []*object.Hos
 func (m *Model) Remove() {
 	for _, dir := range m.dirs {
 		_ = os.RemoveAll(dir)
-	}
-}
-
-// Run calls f with a Client connected to a simulator server instance, which is stopped after f returns.
-func (m *Model) Run(f func(context.Context, *vim25.Client) error) error {
-	ctx := context.Background()
-
-	defer m.Remove()
-	err := m.Create()
-	if err != nil {
-		return err
-	}
-
-	s := m.Service.NewServer()
-	defer s.Close()
-
-	c, err := govmomi.NewClient(ctx, s.URL, true)
-	if err != nil {
-		return err
-	}
-
-	defer c.Logout(ctx)
-
-	return f(ctx, c.Client)
-}
-
-// Example calls Model.Run for each model and will panic if f returns an error.
-// If no model is specified, the VPX Model is used by default.
-func Example(f func(context.Context, *vim25.Client) error, model ...*Model) {
-	m := model
-	if len(m) == 0 {
-		m = []*Model{VPX()}
-	}
-
-	for i := range m {
-		err := m[i].Run(f)
-		if err != nil {
-			panic(err)
-		}
 	}
 }

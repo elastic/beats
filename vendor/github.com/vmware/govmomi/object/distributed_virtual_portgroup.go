@@ -18,7 +18,6 @@ package object
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/methods"
@@ -39,16 +38,10 @@ func NewDistributedVirtualPortgroup(c *vim25.Client, ref types.ManagedObjectRefe
 // EthernetCardBackingInfo returns the VirtualDeviceBackingInfo for this DistributedVirtualPortgroup
 func (p DistributedVirtualPortgroup) EthernetCardBackingInfo(ctx context.Context) (types.BaseVirtualDeviceBackingInfo, error) {
 	var dvp mo.DistributedVirtualPortgroup
-	var dvs mo.DistributedVirtualSwitch
-	prop := "config.distributedVirtualSwitch"
+	var dvs mo.VmwareDistributedVirtualSwitch // TODO: should be mo.BaseDistributedVirtualSwitch
 
-	if err := p.Properties(ctx, p.Reference(), []string{"key", prop}, &dvp); err != nil {
+	if err := p.Properties(ctx, p.Reference(), []string{"key", "config.distributedVirtualSwitch"}, &dvp); err != nil {
 		return nil, err
-	}
-
-	// "This property should always be set unless the user's setting does not have System.Read privilege on the object referred to by this property."
-	if dvp.Config.DistributedVirtualSwitch == nil {
-		return nil, fmt.Errorf("no System.Read privilege on: %s.%s", p.Reference(), prop)
 	}
 
 	if err := p.Properties(ctx, *dvp.Config.DistributedVirtualSwitch, []string{"uuid"}, &dvs); err != nil {

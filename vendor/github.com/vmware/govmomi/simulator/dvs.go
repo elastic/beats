@@ -23,19 +23,16 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-type DistributedVirtualSwitch struct {
-	mo.DistributedVirtualSwitch
+type VmwareDistributedVirtualSwitch struct {
+	mo.VmwareDistributedVirtualSwitch
 }
 
-func (s *DistributedVirtualSwitch) AddDVPortgroupTask(c *types.AddDVPortgroup_Task) soap.HasFault {
+func (s *VmwareDistributedVirtualSwitch) AddDVPortgroupTask(c *types.AddDVPortgroup_Task) soap.HasFault {
 	task := CreateTask(s, "addDVPortgroup", func(t *Task) (types.AnyType, types.BaseMethodFault) {
 		f := Map.getEntityParent(s, "Folder").(*Folder)
 
-		portgroups := s.Portgroup
-		portgroupNames := s.Summary.PortgroupName
-
 		for _, spec := range c.Spec {
-			pg := &DistributedVirtualPortgroup{}
+			pg := &mo.DistributedVirtualPortgroup{}
 			pg.Name = spec.Name
 			pg.Entity().Name = pg.Name
 
@@ -49,100 +46,33 @@ func (s *DistributedVirtualSwitch) AddDVPortgroupTask(c *types.AddDVPortgroup_Ta
 			f.putChild(pg)
 
 			pg.Key = pg.Self.Value
-			pg.Config = types.DVPortgroupConfigInfo{
-				Key:                          pg.Key,
-				Name:                         pg.Name,
-				NumPorts:                     spec.NumPorts,
-				DistributedVirtualSwitch:     &s.Self,
-				DefaultPortConfig:            spec.DefaultPortConfig,
-				Description:                  spec.Description,
-				Type:                         spec.Type,
-				Policy:                       spec.Policy,
-				PortNameFormat:               spec.PortNameFormat,
-				Scope:                        spec.Scope,
-				VendorSpecificConfig:         spec.VendorSpecificConfig,
-				ConfigVersion:                spec.ConfigVersion,
-				AutoExpand:                   spec.AutoExpand,
-				VmVnicNetworkResourcePoolKey: spec.VmVnicNetworkResourcePoolKey,
-			}
+			pg.Config.DistributedVirtualSwitch = &s.Self
 
-			if pg.Config.DefaultPortConfig == nil {
-				pg.Config.DefaultPortConfig = &types.VMwareDVSPortSetting{
-					Vlan: new(types.VmwareDistributedVirtualSwitchVlanIdSpec),
-					UplinkTeamingPolicy: &types.VmwareUplinkPortTeamingPolicy{
-						Policy: &types.StringPolicy{
-							Value: "loadbalance_srcid",
-						},
-						ReversePolicy: &types.BoolPolicy{
-							Value: types.NewBool(true),
-						},
-						NotifySwitches: &types.BoolPolicy{
-							Value: types.NewBool(true),
-						},
-						RollingOrder: &types.BoolPolicy{
-							Value: types.NewBool(true),
-						},
-					},
-				}
-			}
-
-			if pg.Config.Policy == nil {
-				pg.Config.Policy = &types.VMwareDVSPortgroupPolicy{
-					DVPortgroupPolicy: types.DVPortgroupPolicy{
-						BlockOverrideAllowed:               true,
-						ShapingOverrideAllowed:             false,
-						VendorConfigOverrideAllowed:        false,
-						LivePortMovingAllowed:              false,
-						PortConfigResetAtDisconnect:        true,
-						NetworkResourcePoolOverrideAllowed: types.NewBool(false),
-						TrafficFilterOverrideAllowed:       types.NewBool(false),
-					},
-					VlanOverrideAllowed:           false,
-					UplinkTeamingOverrideAllowed:  false,
-					SecurityPolicyOverrideAllowed: false,
-					IpfixOverrideAllowed:          types.NewBool(false),
-				}
-			}
-
-			pg.PortKeys = []string{}
-
-			portgroups = append(portgroups, pg.Self)
-			portgroupNames = append(portgroupNames, pg.Name)
+			s.Portgroup = append(s.Portgroup, pg.Self)
+			s.Summary.PortgroupName = append(s.Summary.PortgroupName, pg.Name)
 
 			for _, h := range s.Summary.HostMember {
-				pg.Host = append(pg.Host, h)
-
+				pg.Host = AddReference(h, pg.Host)
 				host := Map.Get(h).(*HostSystem)
-				Map.AppendReference(host, &host.Network, pg.Reference())
-
-				parent := Map.Get(*host.HostSystem.Parent)
-				computeNetworks := append(hostParent(&host.HostSystem).Network, pg.Reference())
-				Map.Update(parent, []types.PropertyChange{
-					{Name: "network", Val: computeNetworks},
-				})
+				host.Network = append(host.Network, pg.Reference())
 			}
 		}
-
-		Map.Update(s, []types.PropertyChange{
-			{Name: "portgroup", Val: portgroups},
-			{Name: "summary.portgroupName", Val: portgroupNames},
-		})
 
 		return nil, nil
 	})
 
+	task.Run()
+
 	return &methods.AddDVPortgroup_TaskBody{
 		Res: &types.AddDVPortgroup_TaskResponse{
-			Returnval: task.Run(),
+			Returnval: task.Self,
 		},
 	}
 }
 
-func (s *DistributedVirtualSwitch) ReconfigureDvsTask(req *types.ReconfigureDvs_Task) soap.HasFault {
+func (s *VmwareDistributedVirtualSwitch) ReconfigureDvsTask(req *types.ReconfigureDvs_Task) soap.HasFault {
 	task := CreateTask(s, "reconfigureDvs", func(t *Task) (types.AnyType, types.BaseMethodFault) {
 		spec := req.Spec.GetDVSConfigSpec()
-
-		members := s.Summary.HostMember
 
 		for _, member := range spec.Host {
 			h := Map.Get(member.Host)
@@ -154,111 +84,41 @@ func (s *DistributedVirtualSwitch) ReconfigureDvsTask(req *types.ReconfigureDvs_
 
 			switch types.ConfigSpecOperation(member.Operation) {
 			case types.ConfigSpecOperationAdd:
-				if FindReference(s.Summary.HostMember, member.Host) != nil {
+				if FindReference(host.Network, s.Self) != nil {
 					return nil, &types.AlreadyExists{Name: host.Name}
 				}
 
-				hostNetworks := append(host.Network, s.Portgroup...)
-				Map.Update(host, []types.PropertyChange{
-					{Name: "network", Val: hostNetworks},
-				})
-				members = append(members, member.Host)
-				parent := Map.Get(*host.HostSystem.Parent)
+				host.Network = append(host.Network, s.Self)
+				host.Network = append(host.Network, s.Portgroup...)
+				s.Summary.HostMember = append(s.Summary.HostMember, member.Host)
 
-				var pgs []types.ManagedObjectReference
 				for _, ref := range s.Portgroup {
-					pg := Map.Get(ref).(*DistributedVirtualPortgroup)
-					pgs = append(pgs, ref)
-
-					pgHosts := append(pg.Host, member.Host)
-					Map.Update(pg, []types.PropertyChange{
-						{Name: "host", Val: pgHosts},
-					})
-
-					cr := hostParent(&host.HostSystem)
-					if FindReference(cr.Network, ref) == nil {
-						computeNetworks := append(cr.Network, ref)
-						Map.Update(parent, []types.PropertyChange{
-							{Name: "network", Val: computeNetworks},
-						})
-					}
+					pg := Map.Get(ref).(*mo.DistributedVirtualPortgroup)
+					pg.Host = AddReference(member.Host, pg.Host)
 				}
-
 			case types.ConfigSpecOperationRemove:
-				for _, ref := range host.Vm {
-					vm := Map.Get(ref).(*VirtualMachine)
-					if pg := FindReference(vm.Network, s.Portgroup...); pg != nil {
-						return nil, &types.ResourceInUse{
-							Type: pg.Type,
-							Name: pg.Value,
-						}
+				if pg := FindReference(host.Network, s.Portgroup...); pg != nil {
+					return nil, &types.ResourceInUse{
+						Type: pg.Type,
+						Name: pg.Value,
 					}
 				}
 
-				RemoveReference(&members, member.Host)
+				host.Network = RemoveReference(s.Self, host.Network)
+				s.Summary.HostMember = RemoveReference(s.Self, s.Summary.HostMember)
 			case types.ConfigSpecOperationEdit:
 				return nil, &types.NotSupported{}
 			}
 		}
 
-		Map.Update(s, []types.PropertyChange{
-			{Name: "summary.hostMember", Val: members},
-		})
-
 		return nil, nil
 	})
+
+	task.Run()
 
 	return &methods.ReconfigureDvs_TaskBody{
 		Res: &types.ReconfigureDvs_TaskResponse{
-			Returnval: task.Run(),
+			Returnval: task.Self,
 		},
 	}
-}
-
-func (s *DistributedVirtualSwitch) FetchDVPorts(req *types.FetchDVPorts) soap.HasFault {
-	body := &methods.FetchDVPortsBody{}
-	body.Res = &types.FetchDVPortsResponse{
-		Returnval: s.dvPortgroups(req.Criteria),
-	}
-	return body
-}
-
-func (s *DistributedVirtualSwitch) DestroyTask(req *types.Destroy_Task) soap.HasFault {
-	task := CreateTask(s, "destroy", func(t *Task) (types.AnyType, types.BaseMethodFault) {
-		f := Map.getEntityParent(s, "Folder").(*Folder)
-		f.removeChild(s.Reference())
-		return nil, nil
-	})
-
-	return &methods.Destroy_TaskBody{
-		Res: &types.Destroy_TaskResponse{
-			Returnval: task.Run(),
-		},
-	}
-}
-
-func (s *DistributedVirtualSwitch) dvPortgroups(_ *types.DistributedVirtualSwitchPortCriteria) []types.DistributedVirtualPort {
-	// TODO(agui): Filter is not implemented yet
-	var res []types.DistributedVirtualPort
-	for _, ref := range s.Portgroup {
-		pg := Map.Get(ref).(*DistributedVirtualPortgroup)
-		res = append(res, types.DistributedVirtualPort{
-			DvsUuid: s.Uuid,
-			Key:     pg.Key,
-			Config: types.DVPortConfigInfo{
-				Setting: pg.Config.DefaultPortConfig,
-			},
-		})
-
-		for _, key := range pg.PortKeys {
-			res = append(res, types.DistributedVirtualPort{
-				DvsUuid: s.Uuid,
-				Key:     key,
-				Config: types.DVPortConfigInfo{
-					Setting: pg.Config.DefaultPortConfig,
-				},
-			})
-		}
-	}
-	return res
 }

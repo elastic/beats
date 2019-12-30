@@ -18,9 +18,8 @@ package ovf
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
-
-	"github.com/vmware/govmomi/vim25/xml"
 )
 
 const (
@@ -87,13 +86,13 @@ func (e Env) MarshalManual() string {
 	buffer.WriteString(fmt.Sprintf(ovfEnvHeader, e.EsxID))
 	buffer.WriteString(fmt.Sprintf(ovfEnvPlatformSection, e.Platform.Kind, e.Platform.Version, e.Platform.Vendor, e.Platform.Locale))
 
-	buffer.WriteString(fmt.Sprint(ovfEnvPropertyHeader))
+	buffer.WriteString(fmt.Sprintf(ovfEnvPropertyHeader))
 	for _, p := range e.Property.Properties {
 		buffer.WriteString(fmt.Sprintf(ovfEnvPropertyEntry, p.Key, p.Value))
 	}
-	buffer.WriteString(fmt.Sprint(ovfEnvPropertyFooter))
+	buffer.WriteString(fmt.Sprintf(ovfEnvPropertyFooter))
 
-	buffer.WriteString(fmt.Sprint(ovfEnvFooter))
+	buffer.WriteString(fmt.Sprintf(ovfEnvFooter))
 
 	return buffer.String()
 }

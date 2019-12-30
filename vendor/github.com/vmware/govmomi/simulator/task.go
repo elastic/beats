@@ -55,18 +55,17 @@ func CreateTask(e mo.Reference, name string, run func(*Task) (types.AnyType, typ
 		Execute: run,
 	}
 
-	task.Self = Map.newReference(task)
+	Map.Put(task)
+
 	task.Info.Key = task.Self.Value
 	task.Info.Task = task.Self
 	task.Info.Name = ucFirst(name)
 	task.Info.DescriptionId = fmt.Sprintf("%s.%s", ref.Type, id)
 	task.Info.Entity = &ref
 	task.Info.EntityName = ref.Value
-	task.Info.Reason = &types.TaskReasonUser{UserName: "vcsim"} // TODO: Context.Session.User
+
 	task.Info.QueueTime = time.Now()
 	task.Info.State = types.TaskInfoStateQueued
-
-	Map.Put(task)
 
 	return task
 }
@@ -77,33 +76,25 @@ type TaskRunner interface {
 	Run(*Task) (types.AnyType, types.BaseMethodFault)
 }
 
-func (t *Task) Run() types.ManagedObjectReference {
+func (t *Task) Run() {
 	now := time.Now()
+	t.Info.StartTime = &now
 
-	Map.Update(t, []types.PropertyChange{
-		{Name: "info.startTime", Val: now},
-		{Name: "info.state", Val: types.TaskInfoStateRunning},
-	})
+	t.Info.State = types.TaskInfoStateRunning
 
 	res, err := t.Execute(t)
-	state := types.TaskInfoStateSuccess
-	var fault interface{}
+
+	now = time.Now()
+	t.Info.CompleteTime = &now
+
 	if err != nil {
-		state = types.TaskInfoStateError
-		fault = types.LocalizedMethodFault{
+		t.Info.State = types.TaskInfoStateError
+		t.Info.Error = &types.LocalizedMethodFault{
 			Fault:            err,
 			LocalizedMessage: fmt.Sprintf("%T", err),
 		}
+	} else {
+		t.Info.Result = res
+		t.Info.State = types.TaskInfoStateSuccess
 	}
-
-	now = time.Now()
-
-	Map.Update(t, []types.PropertyChange{
-		{Name: "info.completeTime", Val: now},
-		{Name: "info.state", Val: state},
-		{Name: "info.result", Val: res},
-		{Name: "info.error", Val: fault},
-	})
-
-	return t.Self
 }

@@ -5268,8 +5268,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi
-Version: v0.21.0
-Revision: a0fef816799db3e430bb7a5ac951e7835fe4d56b
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): Apache-2.0
 ./vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
@@ -5278,8 +5277,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi/vim25/xml
-Version: v0.21.0
-Revision: a0fef816799db3e430bb7a5ac951e7835fe4d56b
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------

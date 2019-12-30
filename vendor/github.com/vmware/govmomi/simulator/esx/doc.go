@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 /*
-Package esx contains SOAP responses from an ESX server, captured using `govc ... -dump`.
+Package esx contains SOAP responses from an ESX server, captured using `govc ... -debug`.
 */
 package esx
