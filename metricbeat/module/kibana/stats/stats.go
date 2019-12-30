@@ -78,6 +78,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err := m.init()
 	if err != nil {
+		if m.XPackEnabled {
+			m.Logger().Error(err)
+			return nil
+		}
 		return err
 	}
 
