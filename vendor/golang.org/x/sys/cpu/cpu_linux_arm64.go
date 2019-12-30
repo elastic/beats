@@ -4,11 +4,8 @@
 
 package cpu
 
-<<<<<<< HEAD
 const cacheLineSize = 64
 
-=======
->>>>>>> update golang.org/x/sys
 // HWCAP/HWCAP2 bits. These are exposed by Linux.
 const (
 	hwcap_FP       = 1 << 0
@@ -38,15 +35,6 @@ const (
 )
 
 func doinit() {
-<<<<<<< HEAD
-=======
-	if err := readHWCAP(); err != nil {
-		// failed to read /proc/self/auxv, try reading registers directly
-		readARM64Registers()
-		return
-	}
-
->>>>>>> update golang.org/x/sys
 	// HWCAP feature bits
 	ARM64.HasFP = isSet(hwCap, hwcap_FP)
 	ARM64.HasASIMD = isSet(hwCap, hwcap_ASIMD)

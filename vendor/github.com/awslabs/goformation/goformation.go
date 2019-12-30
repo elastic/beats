@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/awslabs/goformation/cloudformation"
-	"github.com/awslabs/goformation/intrinsics"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/intrinsics"
 )
 
 //go:generate generate/generate.sh
@@ -27,12 +27,12 @@ func OpenWithOptions(filename string, options *intrinsics.ProcessorOptions) (*cl
 		return nil, err
 	}
 
-	if strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml") {
-		return ParseYAMLWithOptions(data, options)
+	if strings.HasSuffix(filename, ".json") {
+		// This is definitely JSON
+		return ParseJSONWithOptions(data, options)
 	}
 
-	return ParseJSONWithOptions(data, options)
-
+	return ParseYAMLWithOptions(data, options)
 }
 
 // ParseYAML an AWS CloudFormation template (expects a []byte of valid YAML)
