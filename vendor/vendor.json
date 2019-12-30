@@ -971,12 +971,6 @@
 			"revisionTime": "2017-10-09T02:06:23Z"
 		},
 		{
-			"checksumSHA1": "LhwL/rHFg+5rl91akYOrSqeF/mc=",
-			"path": "github.com/docker/distribution",
-			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
-			"revisionTime": "2019-09-03T18:54:37Z"
-		},
-		{
 			"checksumSHA1": "Gj+xR1VgFKKmFXYOJMnAczC3Znk=",
 			"path": "github.com/docker/distribution/digestset",
 			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
