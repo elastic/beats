@@ -353,8 +353,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		},
 		ProcessConfig: &process.Config{},
 		DownloadConfig: &artifact.Config{
-			InstallPath:     installPath,
-			OperatingSystem: "darwin",
+			InstallPath: installPath,
 		},
 		MonitoringConfig: &monitoring.Config{
 			MonitorMetrics: false,
@@ -380,6 +379,9 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	operator.config.DownloadConfig.OperatingSystem = "darwin"
+	operator.config.DownloadConfig.Architecture = "32"
 
 	return operator, operatorConfig
 }
