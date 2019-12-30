@@ -683,7 +683,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/distribution
-Revision: 1e2f10eb65743fed02f573d31a4587de09afb20e
+Version: v2.7.1
+Revision: 2461543d988979529609e8cb6fca9ca190dc48da
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/distribution/LICENSE:
 --------------------------------------------------------------------
