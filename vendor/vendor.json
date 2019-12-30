@@ -971,36 +971,28 @@
 			"revisionTime": "2017-10-09T02:06:23Z"
 		},
 		{
-			"checksumSHA1": "psKi0a/rSOz06B9gl1BtfJrkEFE=",
+			"checksumSHA1": "LhwL/rHFg+5rl91akYOrSqeF/mc=",
 			"path": "github.com/docker/distribution",
-			"revision": "2461543d988979529609e8cb6fca9ca190dc48da",
-			"revisionTime": "2019-01-17T23:19:26Z",
-			"version": "v2.7.1",
-			"versionExact": "v2.7.1"
+			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
+			"revisionTime": "2019-09-03T18:54:37Z"
 		},
 		{
 			"checksumSHA1": "Gj+xR1VgFKKmFXYOJMnAczC3Znk=",
 			"path": "github.com/docker/distribution/digestset",
-			"revision": "2461543d988979529609e8cb6fca9ca190dc48da",
-			"revisionTime": "2019-01-17T23:19:26Z",
-			"version": "v2.7.1",
-			"versionExact": "v2.7.1"
+			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
+			"revisionTime": "2019-09-03T18:54:37Z"
 		},
 		{
-			"checksumSHA1": "2Fe4D6PGaVE2he4fUeenLmhC1lE=",
+			"checksumSHA1": "QRxPMM7EjKnrZvhpRwPQ2s/iqSo=",
 			"path": "github.com/docker/distribution/reference",
-			"revision": "2461543d988979529609e8cb6fca9ca190dc48da",
-			"revisionTime": "2019-01-17T23:19:26Z",
-			"version": "v2.7.1",
-			"versionExact": "v2.7.1"
+			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
+			"revisionTime": "2019-09-03T18:54:37Z"
 		},
 		{
-			"checksumSHA1": "oFgg0LXTCZuYeI0/eEatdTyLexg=",
+			"checksumSHA1": "OvbnMCvUWjeV6iKz843oHyZMQHY=",
 			"path": "github.com/docker/distribution/registry/api/errcode",
-			"revision": "2461543d988979529609e8cb6fca9ca190dc48da",
-			"revisionTime": "2019-01-17T23:19:26Z",
-			"version": "v2.7.1",
-			"versionExact": "v2.7.1"
+			"revision": "aeaeb844071362767ad497eb0911fcf60e47fa11",
+			"revisionTime": "2019-09-03T18:54:37Z"
 		},
 		{
 			"checksumSHA1": "NgQljhOV4hWsnskKteojGyUQHd4=",
