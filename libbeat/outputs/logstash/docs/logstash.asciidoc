@@ -24,7 +24,7 @@ the {stack} getting started tutorial. Also see the documentation for the
 If you want to use {ls} to perform additional processing on the data collected by
 {beatname_uc}, you need to configure {beatname_uc} to use {ls}.
 
-To do this, you edit the {beatname_uc} configuration file to disable the {es}
+To do this, edit the {beatname_uc} configuration file to disable the {es}
 output by commenting it out and enable the {ls} output by uncommenting the
 logstash section:
 
@@ -224,7 +224,12 @@ You can specify the following options in the `logstash` section of the
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
+ifndef::apm-server[]
 The default value is `true`.
+endif::[]
+ifdef::apm-server[]
+The default value is `false`.
+endif::[]
 
 [[hosts]]
 ===== `hosts`

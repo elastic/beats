@@ -11,6 +11,9 @@ The Redis output inserts the events into a Redis list or a Redis channel.
 This output plugin is compatible with
 the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash.
 
+To use this output, edit the {beatname_uc} configuration file to disable the {es}
+output by commenting it out, and enable the Redis output by adding `output.redis`.
+
 Example configuration:
 
 ["source","yaml",subs="attributes"]
@@ -29,14 +32,14 @@ This output works with Redis 3.2.4.
 
 ==== Configuration options
 
-You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
+You can specify the following `output.redis` options in the +{beatname_lc}.yml+ config file:
 
 ===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
-The default value is true.
+The default value is `true`.
 
 ===== `hosts`
 
@@ -142,24 +145,6 @@ The default value is `list`.
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
-
-===== `host_topology`
-
-deprecated:[5.0.0]
-
-The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
-
-===== `password_topology`
-
-deprecated:[5.0.0]
-
-The password to use for authenticating with the Redis topology server. The default is no authentication.
-
-===== `db_topology`
-
-deprecated:[5.0.0]
-
-The Redis database number where the topology information is stored. The default is 1.
 
 ===== `worker`
 
