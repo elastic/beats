@@ -23,21 +23,17 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"sync"
+	"reflect"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	timestamppb "github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/google/go-cmp/cmp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer"
 	lbpb "google.golang.org/grpc/balancer/grpclb/grpc_lb_v1"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/internal"
-	"google.golang.org/grpc/internal/backoff"
 	"google.golang.org/grpc/internal/channelz"
-	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/resolver"
 )
@@ -56,7 +52,7 @@ func (lb *lbBalancer) processServerList(l *lbpb.ServerList) {
 	lb.serverListReceived = true
 
 	// If the new server list == old server list, do nothing.
-	if cmp.Equal(lb.fullServerList, l.Servers, cmp.Comparer(proto.Equal)) {
+	if reflect.DeepEqual(lb.fullServerList, l.Servers) {
 		if grpclog.V(2) {
 			grpclog.Infof("lbBalancer: new serverlist same as the previous one, ignoring")
 		}
@@ -70,7 +66,7 @@ func (lb *lbBalancer) processServerList(l *lbpb.ServerList) {
 			continue
 		}
 
-		md := metadata.Pairs(lbTokenKey, s.LoadBalanceToken)
+		md := metadata.Pairs(lbTokeyKey, s.LoadBalanceToken)
 		ip := net.IP(s.IpAddress)
 		ipStr := ip.String()
 		if ip.To4() == nil {
@@ -99,6 +95,16 @@ func (lb *lbBalancer) processServerList(l *lbpb.ServerList) {
 //
 // Caller must hold lb.mu.
 func (lb *lbBalancer) refreshSubConns(backendAddrs []resolver.Address, fallback bool, pickFirst bool) {
+	defer func() {
+		// Regenerate and update picker after refreshing subconns because with
+		// cache, even if SubConn was newed/removed, there might be no state
+		// changes (the subconn will be kept in cache, not actually
+		// newed/removed).
+		lb.updateStateAndPicker(true, true)
+	}()
+
+	lb.inFallback = fallback
+
 	opts := balancer.NewSubConnOptions{}
 	if !fallback {
 		opts.CredsBundle = lb.grpclbBackendCreds
@@ -107,35 +113,17 @@ func (lb *lbBalancer) refreshSubConns(backendAddrs []resolver.Address, fallback 
 	lb.backendAddrs = backendAddrs
 	lb.backendAddrsWithoutMetadata = nil
 
-	fallbackModeChanged := lb.inFallback != fallback
-	lb.inFallback = fallback
-	if fallbackModeChanged && lb.inFallback {
-		// Clear previous received list when entering fallback, so if the server
-		// comes back and sends the same list again, the new addresses will be
-		// used.
-		lb.fullServerList = nil
-	}
-
-	balancingPolicyChanged := lb.usePickFirst != pickFirst
-	oldUsePickFirst := lb.usePickFirst
-	lb.usePickFirst = pickFirst
-
-	if fallbackModeChanged || balancingPolicyChanged {
-		// Remove all SubConns when switching balancing policy or switching
-		// fallback mode.
-		//
-		// For fallback mode switching with pickfirst, we want to recreate the
-		// SubConn because the creds could be different.
+	if lb.usePickFirst != pickFirst {
+		// Remove all SubConns when switching modes.
 		for a, sc := range lb.subConns {
-			if oldUsePickFirst {
-				// If old SubConn were created for pickfirst, bypass cache and
-				// remove directly.
+			if lb.usePickFirst {
 				lb.cc.cc.RemoveSubConn(sc)
 			} else {
 				lb.cc.RemoveSubConn(sc)
 			}
 			delete(lb.subConns, a)
 		}
+		lb.usePickFirst = pickFirst
 	}
 
 	if lb.usePickFirst {
@@ -196,79 +184,9 @@ func (lb *lbBalancer) refreshSubConns(backendAddrs []resolver.Address, fallback 
 			// The entry will be deleted in HandleSubConnStateChange.
 		}
 	}
-
-	// Regenerate and update picker after refreshing subconns because with
-	// cache, even if SubConn was newed/removed, there might be no state
-	// changes (the subconn will be kept in cache, not actually
-	// newed/removed).
-	lb.updateStateAndPicker(true, true)
 }
 
-type remoteBalancerCCWrapper struct {
-	cc      *grpc.ClientConn
-	lb      *lbBalancer
-	backoff backoff.Strategy
-	done    chan struct{}
-
-	// waitgroup to wait for all goroutines to exit.
-	wg sync.WaitGroup
-}
-
-func (lb *lbBalancer) newRemoteBalancerCCWrapper() {
-	var dopts []grpc.DialOption
-	if creds := lb.opt.DialCreds; creds != nil {
-		dopts = append(dopts, grpc.WithTransportCredentials(creds))
-	} else if bundle := lb.grpclbClientConnCreds; bundle != nil {
-		dopts = append(dopts, grpc.WithCredentialsBundle(bundle))
-	} else {
-		dopts = append(dopts, grpc.WithInsecure())
-	}
-	if lb.opt.Dialer != nil {
-		dopts = append(dopts, grpc.WithContextDialer(lb.opt.Dialer))
-	}
-	// Explicitly set pickfirst as the balancer.
-	dopts = append(dopts, grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"pick_first"}`))
-	wrb := internal.WithResolverBuilder.(func(resolver.Builder) grpc.DialOption)
-	dopts = append(dopts, wrb(lb.manualResolver))
-	if channelz.IsOn() {
-		dopts = append(dopts, grpc.WithChannelzParentID(lb.opt.ChannelzParentID))
-	}
-
-	// Enable Keepalive for grpclb client.
-	dopts = append(dopts, grpc.WithKeepaliveParams(keepalive.ClientParameters{
-		Time:                20 * time.Second,
-		Timeout:             10 * time.Second,
-		PermitWithoutStream: true,
-	}))
-
-	// The dial target is not important.
-	//
-	// The grpclb server addresses will set field ServerName, and creds will
-	// receive ServerName as authority.
-	cc, err := grpc.DialContext(context.Background(), "grpclb.subClientConn", dopts...)
-	if err != nil {
-		grpclog.Fatalf("failed to dial: %v", err)
-	}
-	ccw := &remoteBalancerCCWrapper{
-		cc:      cc,
-		lb:      lb,
-		backoff: lb.backoff,
-		done:    make(chan struct{}),
-	}
-	lb.ccRemoteLB = ccw
-	ccw.wg.Add(1)
-	go ccw.watchRemoteBalancer()
-}
-
-// close closed the ClientConn to remote balancer, and waits until all
-// goroutines to finish.
-func (ccw *remoteBalancerCCWrapper) close() {
-	close(ccw.done)
-	ccw.cc.Close()
-	ccw.wg.Wait()
-}
-
-func (ccw *remoteBalancerCCWrapper) readServerList(s *balanceLoadClientStream) error {
+func (lb *lbBalancer) readServerList(s *balanceLoadClientStream) error {
 	for {
 		reply, err := s.Recv()
 		if err != nil {
@@ -278,12 +196,12 @@ func (ccw *remoteBalancerCCWrapper) readServerList(s *balanceLoadClientStream) e
 			return fmt.Errorf("grpclb: failed to recv server list: %v", err)
 		}
 		if serverList := reply.GetServerList(); serverList != nil {
-			ccw.lb.processServerList(serverList)
+			lb.processServerList(serverList)
 		}
 	}
 }
 
-func (ccw *remoteBalancerCCWrapper) sendLoadReport(s *balanceLoadClientStream, interval time.Duration) {
+func (lb *lbBalancer) sendLoadReport(s *balanceLoadClientStream, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
@@ -292,7 +210,7 @@ func (ccw *remoteBalancerCCWrapper) sendLoadReport(s *balanceLoadClientStream, i
 		case <-s.Context().Done():
 			return
 		}
-		stats := ccw.lb.clientStats.toClientStats()
+		stats := lb.clientStats.toClientStats()
 		t := time.Now()
 		stats.Timestamp = &timestamppb.Timestamp{
 			Seconds: t.Unix(),
@@ -308,23 +226,23 @@ func (ccw *remoteBalancerCCWrapper) sendLoadReport(s *balanceLoadClientStream, i
 	}
 }
 
-func (ccw *remoteBalancerCCWrapper) callRemoteBalancer() (backoff bool, _ error) {
-	lbClient := &loadBalancerClient{cc: ccw.cc}
+func (lb *lbBalancer) callRemoteBalancer() (backoff bool, _ error) {
+	lbClient := &loadBalancerClient{cc: lb.ccRemoteLB}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	stream, err := lbClient.BalanceLoad(ctx, grpc.WaitForReady(true))
 	if err != nil {
 		return true, fmt.Errorf("grpclb: failed to perform RPC to the remote balancer %v", err)
 	}
-	ccw.lb.mu.Lock()
-	ccw.lb.remoteBalancerConnected = true
-	ccw.lb.mu.Unlock()
+	lb.mu.Lock()
+	lb.remoteBalancerConnected = true
+	lb.mu.Unlock()
 
 	// grpclb handshake on the stream.
 	initReq := &lbpb.LoadBalanceRequest{
 		LoadBalanceRequestType: &lbpb.LoadBalanceRequest_InitialRequest{
 			InitialRequest: &lbpb.InitialLoadBalanceRequest{
-				Name: ccw.lb.target,
+				Name: lb.target,
 			},
 		},
 	}
@@ -343,24 +261,21 @@ func (ccw *remoteBalancerCCWrapper) callRemoteBalancer() (backoff bool, _ error)
 		return true, fmt.Errorf("grpclb: Delegation is not supported")
 	}
 
-	ccw.wg.Add(1)
 	go func() {
-		defer ccw.wg.Done()
 		if d := convertDuration(initResp.ClientStatsReportInterval); d > 0 {
-			ccw.sendLoadReport(stream, d)
+			lb.sendLoadReport(stream, d)
 		}
 	}()
 	// No backoff if init req/resp handshake was successful.
-	return false, ccw.readServerList(stream)
+	return false, lb.readServerList(stream)
 }
 
-func (ccw *remoteBalancerCCWrapper) watchRemoteBalancer() {
-	defer ccw.wg.Done()
+func (lb *lbBalancer) watchRemoteBalancer() {
 	var retryCount int
 	for {
-		doBackoff, err := ccw.callRemoteBalancer()
+		doBackoff, err := lb.callRemoteBalancer()
 		select {
-		case <-ccw.done:
+		case <-lb.doneCh:
 			return
 		default:
 			if err != nil {
@@ -372,31 +287,69 @@ func (ccw *remoteBalancerCCWrapper) watchRemoteBalancer() {
 			}
 		}
 		// Trigger a re-resolve when the stream errors.
-		ccw.lb.cc.cc.ResolveNow(resolver.ResolveNowOption{})
+		lb.cc.cc.ResolveNow(resolver.ResolveNowOption{})
 
-		ccw.lb.mu.Lock()
-		ccw.lb.remoteBalancerConnected = false
-		ccw.lb.fullServerList = nil
+		lb.mu.Lock()
+		lb.remoteBalancerConnected = false
+		lb.fullServerList = nil
 		// Enter fallback when connection to remote balancer is lost, and the
 		// aggregated state is not Ready.
-		if !ccw.lb.inFallback && ccw.lb.state != connectivity.Ready {
+		if !lb.inFallback && lb.state != connectivity.Ready {
 			// Entering fallback.
-			ccw.lb.refreshSubConns(ccw.lb.resolvedBackendAddrs, true, ccw.lb.usePickFirst)
+			lb.refreshSubConns(lb.resolvedBackendAddrs, true, lb.usePickFirst)
 		}
-		ccw.lb.mu.Unlock()
+		lb.mu.Unlock()
 
 		if !doBackoff {
 			retryCount = 0
 			continue
 		}
 
-		timer := time.NewTimer(ccw.backoff.Backoff(retryCount)) // Copy backoff
+		timer := time.NewTimer(lb.backoff.Backoff(retryCount))
 		select {
 		case <-timer.C:
-		case <-ccw.done:
+		case <-lb.doneCh:
 			timer.Stop()
 			return
 		}
 		retryCount++
 	}
+}
+
+func (lb *lbBalancer) dialRemoteLB(remoteLBName string) {
+	var dopts []grpc.DialOption
+	if creds := lb.opt.DialCreds; creds != nil {
+		if err := creds.OverrideServerName(remoteLBName); err == nil {
+			dopts = append(dopts, grpc.WithTransportCredentials(creds))
+		} else {
+			grpclog.Warningf("grpclb: failed to override the server name in the credentials: %v, using Insecure", err)
+			dopts = append(dopts, grpc.WithInsecure())
+		}
+	} else if bundle := lb.grpclbClientConnCreds; bundle != nil {
+		dopts = append(dopts, grpc.WithCredentialsBundle(bundle))
+	} else {
+		dopts = append(dopts, grpc.WithInsecure())
+	}
+	if lb.opt.Dialer != nil {
+		dopts = append(dopts, grpc.WithContextDialer(lb.opt.Dialer))
+	}
+	// Explicitly set pickfirst as the balancer.
+	dopts = append(dopts, grpc.WithBalancerName(grpc.PickFirstBalancerName))
+	wrb := internal.WithResolverBuilder.(func(resolver.Builder) grpc.DialOption)
+	dopts = append(dopts, wrb(lb.manualResolver))
+	if channelz.IsOn() {
+		dopts = append(dopts, grpc.WithChannelzParentID(lb.opt.ChannelzParentID))
+	}
+
+	// DialContext using manualResolver.Scheme, which is a random scheme
+	// generated when init grpclb. The target scheme here is not important.
+	//
+	// The grpc dial target will be used by the creds (ALTS) as the authority,
+	// so it has to be set to remoteLBName that comes from resolver.
+	cc, err := grpc.DialContext(context.Background(), remoteLBName, dopts...)
+	if err != nil {
+		grpclog.Fatalf("failed to dial: %v", err)
+	}
+	lb.ccRemoteLB = cc
+	go lb.watchRemoteBalancer()
 }

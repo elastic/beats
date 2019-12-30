@@ -38,7 +38,6 @@ const (
 type JumpTest uint16
 
 // Supported operators for conditional jumps.
-// K can be RegX for JumpIfX
 const (
 	// K == A
 	JumpEqual JumpTest = iota
@@ -135,9 +134,12 @@ const (
 	opMaskLoadDest  = 0x01
 	opMaskLoadWidth = 0x18
 	opMaskLoadMode  = 0xe0
-	// opClsALU & opClsJump
-	opMaskOperand  = 0x08
-	opMaskOperator = 0xf0
+	// opClsALU
+	opMaskOperandSrc = 0x08
+	opMaskOperator   = 0xf0
+	// opClsJump
+	opMaskJumpConst = 0x0f
+	opMaskJumpCond  = 0xf0
 )
 
 const (
@@ -190,21 +192,15 @@ const (
 	opLoadWidth1
 )
 
-// Operand for ALU and Jump instructions
-type opOperand uint16
+// Operator defined by ALUOp*
 
-// Supported operand sources.
 const (
-	opOperandConstant opOperand = iota << 3
-	opOperandX
+	opALUSrcConstant uint16 = iota << 3
+	opALUSrcX
 )
 
-// An jumpOp is a conditional jump condition.
-type jumpOp uint16
-
-// Supported jump conditions.
 const (
-	opJumpAlways jumpOp = iota << 4
+	opJumpAlways = iota << 4
 	opJumpEqual
 	opJumpGT
 	opJumpGE

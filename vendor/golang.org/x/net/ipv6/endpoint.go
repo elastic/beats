@@ -6,6 +6,7 @@ package ipv6
 
 import (
 	"net"
+	"syscall"
 	"time"
 
 	"golang.org/x/net/internal/socket"
@@ -33,11 +34,11 @@ func (c *genericOpt) ok() bool { return c != nil && c.Conn != nil }
 // with the endpoint.
 func (c *Conn) PathMTU() (int, error) {
 	if !c.ok() {
-		return 0, errInvalidConn
+		return 0, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoPathMTU]
 	if !ok {
-		return 0, errNotImplemented
+		return 0, errOpNoSupport
 	}
 	_, mtu, err := so.getMTUInfo(c.Conn)
 	if err != nil {
@@ -75,7 +76,7 @@ func (c *dgramOpt) ok() bool { return c != nil && c.Conn != nil }
 // socket options.
 func (c *PacketConn) SetControlMessage(cf ControlFlags, on bool) error {
 	if !c.payloadHandler.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return setControlMessage(c.dgramOpt.Conn, &c.payloadHandler.rawOpt, cf, on)
 }
@@ -84,7 +85,7 @@ func (c *PacketConn) SetControlMessage(cf ControlFlags, on bool) error {
 // endpoint.
 func (c *PacketConn) SetDeadline(t time.Time) error {
 	if !c.payloadHandler.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.payloadHandler.SetDeadline(t)
 }
@@ -93,7 +94,7 @@ func (c *PacketConn) SetDeadline(t time.Time) error {
 // endpoint.
 func (c *PacketConn) SetReadDeadline(t time.Time) error {
 	if !c.payloadHandler.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.payloadHandler.SetReadDeadline(t)
 }
@@ -102,7 +103,7 @@ func (c *PacketConn) SetReadDeadline(t time.Time) error {
 // endpoint.
 func (c *PacketConn) SetWriteDeadline(t time.Time) error {
 	if !c.payloadHandler.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.payloadHandler.SetWriteDeadline(t)
 }
@@ -110,7 +111,7 @@ func (c *PacketConn) SetWriteDeadline(t time.Time) error {
 // Close closes the endpoint.
 func (c *PacketConn) Close() error {
 	if !c.payloadHandler.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.payloadHandler.Close()
 }

@@ -15,8 +15,8 @@ package procfs
 
 import (
 	"fmt"
-
-	"github.com/prometheus/procfs/internal/util"
+	"io/ioutil"
+	"os"
 )
 
 // ProcIO models the content of /proc/<pid>/io.
@@ -39,11 +39,17 @@ type ProcIO struct {
 	CancelledWriteBytes int64
 }
 
-// IO creates a new ProcIO instance from a given Proc instance.
-func (p Proc) IO() (ProcIO, error) {
+// NewIO creates a new ProcIO instance from a given Proc instance.
+func (p Proc) NewIO() (ProcIO, error) {
 	pio := ProcIO{}
 
-	data, err := util.ReadFileNoStat(p.path("io"))
+	f, err := os.Open(p.path("io"))
+	if err != nil {
+		return pio, err
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
 	if err != nil {
 		return pio, err
 	}

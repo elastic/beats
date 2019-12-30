@@ -808,7 +808,6 @@ type Ustat_t struct {
 
 type EpollEvent struct {
 	Events uint32
-	_      int32
 	Fd     int32
 	Pad    int32
 }

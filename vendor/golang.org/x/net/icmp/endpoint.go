@@ -7,6 +7,7 @@ package icmp
 import (
 	"net"
 	"runtime"
+	"syscall"
 	"time"
 
 	"golang.org/x/net/ipv4"
@@ -46,7 +47,7 @@ func (c *PacketConn) IPv6PacketConn() *ipv6.PacketConn {
 // ReadFrom reads an ICMP message from the connection.
 func (c *PacketConn) ReadFrom(b []byte) (int, net.Addr, error) {
 	if !c.ok() {
-		return 0, nil, errInvalidConn
+		return 0, nil, syscall.EINVAL
 	}
 	// Please be informed that ipv4.NewPacketConn enables
 	// IP_STRIPHDR option by default on Darwin.
@@ -59,12 +60,11 @@ func (c *PacketConn) ReadFrom(b []byte) (int, net.Addr, error) {
 }
 
 // WriteTo writes the ICMP message b to dst.
-// The provided dst must be net.UDPAddr when c is a non-privileged
-// datagram-oriented ICMP endpoint.
-// Otherwise it must be net.IPAddr.
+// Dst must be net.UDPAddr when c is a non-privileged
+// datagram-oriented ICMP endpoint. Otherwise it must be net.IPAddr.
 func (c *PacketConn) WriteTo(b []byte, dst net.Addr) (int, error) {
 	if !c.ok() {
-		return 0, errInvalidConn
+		return 0, syscall.EINVAL
 	}
 	return c.c.WriteTo(b, dst)
 }
@@ -72,7 +72,7 @@ func (c *PacketConn) WriteTo(b []byte, dst net.Addr) (int, error) {
 // Close closes the endpoint.
 func (c *PacketConn) Close() error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.c.Close()
 }
@@ -89,7 +89,7 @@ func (c *PacketConn) LocalAddr() net.Addr {
 // endpoint.
 func (c *PacketConn) SetDeadline(t time.Time) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.c.SetDeadline(t)
 }
@@ -98,7 +98,7 @@ func (c *PacketConn) SetDeadline(t time.Time) error {
 // endpoint.
 func (c *PacketConn) SetReadDeadline(t time.Time) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.c.SetReadDeadline(t)
 }
@@ -107,7 +107,7 @@ func (c *PacketConn) SetReadDeadline(t time.Time) error {
 // endpoint.
 func (c *PacketConn) SetWriteDeadline(t time.Time) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	return c.c.SetWriteDeadline(t)
 }

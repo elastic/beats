@@ -2,11 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !aix,!darwin,!dragonfly,!freebsd,!linux,!netbsd,!openbsd,!solaris
+// +build nacl plan9 windows
 
 package ipv4
 
-import "net"
+import (
+	"net"
+	"syscall"
+)
 
 // ReadFrom reads a payload of the received IPv4 datagram, from the
 // endpoint c, copying the payload into b. It returns the number of
@@ -14,7 +17,7 @@ import "net"
 // src of the received datagram.
 func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) {
 	if !c.ok() {
-		return 0, nil, nil, errInvalidConn
+		return 0, nil, nil, syscall.EINVAL
 	}
 	if n, src, err = c.PacketConn.ReadFrom(b); err != nil {
 		return 0, nil, nil, err
@@ -30,7 +33,7 @@ func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.
 // control of the outgoing datagram is not required.
 func (c *payloadHandler) WriteTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) {
 	if !c.ok() {
-		return 0, errInvalidConn
+		return 0, syscall.EINVAL
 	}
 	if dst == nil {
 		return 0, errMissingAddress

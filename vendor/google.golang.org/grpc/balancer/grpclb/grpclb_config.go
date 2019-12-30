@@ -23,32 +23,53 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer/roundrobin"
-	"google.golang.org/grpc/serviceconfig"
 )
+
+type serviceConfig struct {
+	LoadBalancingConfig *[]map[string]*grpclbServiceConfig
+}
+
+type grpclbServiceConfig struct {
+	ChildPolicy *[]map[string]json.RawMessage
+}
+
+func parseFullServiceConfig(s string) *serviceConfig {
+	var ret serviceConfig
+	err := json.Unmarshal([]byte(s), &ret)
+	if err != nil {
+		return nil
+	}
+	return &ret
+}
+
+func parseServiceConfig(s string) *grpclbServiceConfig {
+	parsedSC := parseFullServiceConfig(s)
+	if parsedSC == nil {
+		return nil
+	}
+	lbConfigs := parsedSC.LoadBalancingConfig
+	if lbConfigs == nil {
+		return nil
+	}
+	for _, lbC := range *lbConfigs {
+		if v, ok := lbC[grpclbName]; ok {
+			return v
+		}
+	}
+	return nil
+}
 
 const (
 	roundRobinName = roundrobin.Name
 	pickFirstName  = grpc.PickFirstBalancerName
 )
 
-type grpclbServiceConfig struct {
-	serviceconfig.LoadBalancingConfig
-	ChildPolicy *[]map[string]json.RawMessage
-}
-
-func (b *lbBuilder) ParseConfig(lbConfig json.RawMessage) (serviceconfig.LoadBalancingConfig, error) {
-	ret := &grpclbServiceConfig{}
-	if err := json.Unmarshal(lbConfig, ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
-func childIsPickFirst(sc *grpclbServiceConfig) bool {
-	if sc == nil {
+func childIsPickFirst(s string) bool {
+	parsedSC := parseServiceConfig(s)
+	if parsedSC == nil {
 		return false
 	}
-	childConfigs := sc.ChildPolicy
+	childConfigs := parsedSC.ChildPolicy
 	if childConfigs == nil {
 		return false
 	}

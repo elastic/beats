@@ -102,13 +102,13 @@ func Mounted(mountpoint string) (bool, error) {
 // specified like the mount or fstab unix commands: "opt1=val1,opt2=val2". See
 // flags.go for supported option flags.
 func Mount(device, target, mType, options string) error {
-	flag, data := parseOptions(options)
+	flag, _ := parseOptions(options)
 	if flag&REMOUNT != REMOUNT {
 		if mounted, err := Mounted(target); err != nil || mounted {
 			return err
 		}
 	}
-	return mount(device, target, mType, uintptr(flag), data)
+	return ForceMount(device, target, mType, options)
 }
 
 // ForceMount will mount a filesystem according to the specified configuration,

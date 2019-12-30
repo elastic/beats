@@ -15,14 +15,11 @@ package procfs
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
-
-	"github.com/prometheus/procfs/internal/fs"
-	"github.com/prometheus/procfs/internal/util"
 )
 
 // CPUStat shows how much time the cpu spend in various stages.
@@ -79,6 +76,16 @@ type Stat struct {
 	SoftIRQTotal uint64
 	// Detailed softirq statistics.
 	SoftIRQ SoftIRQStat
+}
+
+// NewStat returns kernel/system statistics read from /proc/stat.
+func NewStat() (Stat, error) {
+	fs, err := NewFS(DefaultMountPoint)
+	if err != nil {
+		return Stat{}, err
+	}
+
+	return fs.NewStat()
 }
 
 // Parse a cpu statistics line and returns the CPUStat struct plus the cpu id (or -1 for the overall sum).
@@ -142,38 +149,19 @@ func parseSoftIRQStat(line string) (SoftIRQStat, uint64, error) {
 	return softIRQStat, total, nil
 }
 
-// NewStat returns information about current cpu/process statistics.
-// See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
-//
-// Deprecated: use fs.Stat() instead
-func NewStat() (Stat, error) {
-	fs, err := NewFS(fs.DefaultProcMountPoint)
-	if err != nil {
-		return Stat{}, err
-	}
-	return fs.Stat()
-}
-
-// NewStat returns information about current cpu/process statistics.
-// See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
-//
-// Deprecated: use fs.Stat() instead
+// NewStat returns an information about current kernel/system statistics.
 func (fs FS) NewStat() (Stat, error) {
-	return fs.Stat()
-}
+	// See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
 
-// Stat returns information about current cpu/process statistics.
-// See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
-func (fs FS) Stat() (Stat, error) {
-	fileName := fs.proc.Path("stat")
-	data, err := util.ReadFileNoStat(fileName)
+	f, err := os.Open(fs.Path("stat"))
 	if err != nil {
 		return Stat{}, err
 	}
+	defer f.Close()
 
 	stat := Stat{}
 
-	scanner := bufio.NewScanner(bytes.NewReader(data))
+	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Fields(scanner.Text())
@@ -237,7 +225,7 @@ func (fs FS) Stat() (Stat, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return Stat{}, fmt.Errorf("couldn't parse %s: %s", fileName, err)
+		return Stat{}, fmt.Errorf("couldn't parse %s: %s", f.Name(), err)
 	}
 
 	return stat, nil

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net"
 	"runtime"
+	"syscall"
 
 	"golang.org/x/net/internal/socket"
 )
@@ -51,13 +52,9 @@ func (h *Header) String() string {
 }
 
 // Marshal returns the binary encoding of h.
-//
-// The returned slice is in the format used by a raw IP socket on the
-// local system.
-// This may differ from the wire format, depending on the system.
 func (h *Header) Marshal() ([]byte, error) {
 	if h == nil {
-		return nil, errNilHeader
+		return nil, syscall.EINVAL
 	}
 	if h.Len < HeaderLen {
 		return nil, errHeaderTooShort
@@ -101,21 +98,14 @@ func (h *Header) Marshal() ([]byte, error) {
 	return b, nil
 }
 
-// Parse parses b as an IPv4 header and stores the result in h.
-//
-// The provided b must be in the format used by a raw IP socket on the
-// local system.
-// This may differ from the wire format, depending on the system.
+// Parse parses b as an IPv4 header and sotres the result in h.
 func (h *Header) Parse(b []byte) error {
-	if h == nil || b == nil {
-		return errNilHeader
-	}
-	if len(b) < HeaderLen {
+	if h == nil || len(b) < HeaderLen {
 		return errHeaderTooShort
 	}
 	hdrlen := int(b[0]&0x0f) << 2
-	if len(b) < hdrlen {
-		return errExtHeaderTooShort
+	if hdrlen > len(b) {
+		return errBufferTooShort
 	}
 	h.Version = int(b[0] >> 4)
 	h.Len = hdrlen
@@ -160,10 +150,6 @@ func (h *Header) Parse(b []byte) error {
 }
 
 // ParseHeader parses b as an IPv4 header.
-//
-// The provided b must be in the format used by a raw IP socket on the
-// local system.
-// This may differ from the wire format, depending on the system.
 func ParseHeader(b []byte) (*Header, error) {
 	h := new(Header)
 	if err := h.Parse(b); err != nil {

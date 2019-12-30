@@ -4,12 +4,6 @@
 
 package icmp
 
-import (
-	"golang.org/x/net/internal/iana"
-	"golang.org/x/net/ipv4"
-	"golang.org/x/net/ipv6"
-)
-
 // A TimeExceeded represents an ICMP time exceeded message body.
 type TimeExceeded struct {
 	Data       []byte      // data, known as original datagram field
@@ -21,35 +15,23 @@ func (p *TimeExceeded) Len(proto int) int {
 	if p == nil {
 		return 0
 	}
-	l, _ := multipartMessageBodyDataLen(proto, true, p.Data, p.Extensions)
-	return l
+	l, _ := multipartMessageBodyDataLen(proto, p.Data, p.Extensions)
+	return 4 + l
 }
 
 // Marshal implements the Marshal method of MessageBody interface.
 func (p *TimeExceeded) Marshal(proto int) ([]byte, error) {
-	var typ Type
-	switch proto {
-	case iana.ProtocolICMP:
-		typ = ipv4.ICMPTypeTimeExceeded
-	case iana.ProtocolIPv6ICMP:
-		typ = ipv6.ICMPTypeTimeExceeded
-	default:
-		return nil, errInvalidProtocol
-	}
-	if !validExtensions(typ, p.Extensions) {
-		return nil, errInvalidExtension
-	}
-	return marshalMultipartMessageBody(proto, true, p.Data, p.Extensions)
+	return marshalMultipartMessageBody(proto, p.Data, p.Extensions)
 }
 
 // parseTimeExceeded parses b as an ICMP time exceeded message body.
-func parseTimeExceeded(proto int, typ Type, b []byte) (MessageBody, error) {
+func parseTimeExceeded(proto int, b []byte) (MessageBody, error) {
 	if len(b) < 4 {
 		return nil, errMessageTooShort
 	}
 	p := &TimeExceeded{}
 	var err error
-	p.Data, p.Extensions, err = parseMultipartMessageBody(proto, typ, b)
+	p.Data, p.Extensions, err = parseMultipartMessageBody(proto, b)
 	if err != nil {
 		return nil, err
 	}

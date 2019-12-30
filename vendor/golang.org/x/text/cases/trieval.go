@@ -15,7 +15,8 @@ package cases
 // The per-rune values have the following format:
 //
 //   if (exception) {
-//     15..4  unsigned exception index
+//     15..5  unsigned exception index
+//         4  unused
 //   } else {
 //     15..8  XOR pattern or index to XOR pattern for case mapping
 //            Only 13..8 are used for XOR patterns.
@@ -47,8 +48,8 @@ const (
 	isMidBit       = 1 << 6
 
 	exceptionBit     = 1 << 3
-	exceptionShift   = 4
-	numExceptionBits = 12
+	exceptionShift   = 5
+	numExceptionBits = 11
 
 	xorIndexBit = 1 << 6
 	xorShift    = 8

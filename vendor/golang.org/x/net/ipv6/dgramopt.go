@@ -6,6 +6,7 @@ package ipv6
 
 import (
 	"net"
+	"syscall"
 
 	"golang.org/x/net/bpf"
 )
@@ -14,11 +15,11 @@ import (
 // multicast packets.
 func (c *dgramOpt) MulticastHopLimit() (int, error) {
 	if !c.ok() {
-		return 0, errInvalidConn
+		return 0, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastHopLimit]
 	if !ok {
-		return 0, errNotImplemented
+		return 0, errOpNoSupport
 	}
 	return so.GetInt(c.Conn)
 }
@@ -27,11 +28,11 @@ func (c *dgramOpt) MulticastHopLimit() (int, error) {
 // outgoing multicast packets.
 func (c *dgramOpt) SetMulticastHopLimit(hoplim int) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastHopLimit]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	return so.SetInt(c.Conn, hoplim)
 }
@@ -40,11 +41,11 @@ func (c *dgramOpt) SetMulticastHopLimit(hoplim int) error {
 // packet transmissions.
 func (c *dgramOpt) MulticastInterface() (*net.Interface, error) {
 	if !c.ok() {
-		return nil, errInvalidConn
+		return nil, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastInterface]
 	if !ok {
-		return nil, errNotImplemented
+		return nil, errOpNoSupport
 	}
 	return so.getMulticastInterface(c.Conn)
 }
@@ -53,11 +54,11 @@ func (c *dgramOpt) MulticastInterface() (*net.Interface, error) {
 // multicast packet transmissions.
 func (c *dgramOpt) SetMulticastInterface(ifi *net.Interface) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastInterface]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	return so.setMulticastInterface(c.Conn, ifi)
 }
@@ -66,11 +67,11 @@ func (c *dgramOpt) SetMulticastInterface(ifi *net.Interface) error {
 // should be copied and send back to the originator.
 func (c *dgramOpt) MulticastLoopback() (bool, error) {
 	if !c.ok() {
-		return false, errInvalidConn
+		return false, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastLoopback]
 	if !ok {
-		return false, errNotImplemented
+		return false, errOpNoSupport
 	}
 	on, err := so.GetInt(c.Conn)
 	if err != nil {
@@ -83,11 +84,11 @@ func (c *dgramOpt) MulticastLoopback() (bool, error) {
 // should be copied and send back to the originator.
 func (c *dgramOpt) SetMulticastLoopback(on bool) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoMulticastLoopback]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	return so.SetInt(c.Conn, boolint(on))
 }
@@ -103,11 +104,11 @@ func (c *dgramOpt) SetMulticastLoopback(on bool) error {
 // configuration.
 func (c *dgramOpt) JoinGroup(ifi *net.Interface, group net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoJoinGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -121,11 +122,11 @@ func (c *dgramOpt) JoinGroup(ifi *net.Interface, group net.Addr) error {
 // source-specific group.
 func (c *dgramOpt) LeaveGroup(ifi *net.Interface, group net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoLeaveGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -142,11 +143,11 @@ func (c *dgramOpt) LeaveGroup(ifi *net.Interface, group net.Addr) error {
 // routing configuration.
 func (c *dgramOpt) JoinSourceSpecificGroup(ifi *net.Interface, group, source net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoJoinSourceGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -163,11 +164,11 @@ func (c *dgramOpt) JoinSourceSpecificGroup(ifi *net.Interface, group, source net
 // interface ifi.
 func (c *dgramOpt) LeaveSourceSpecificGroup(ifi *net.Interface, group, source net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoLeaveSourceGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -185,11 +186,11 @@ func (c *dgramOpt) LeaveSourceSpecificGroup(ifi *net.Interface, group, source ne
 // ifi.
 func (c *dgramOpt) ExcludeSourceSpecificGroup(ifi *net.Interface, group, source net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoBlockSourceGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -206,11 +207,11 @@ func (c *dgramOpt) ExcludeSourceSpecificGroup(ifi *net.Interface, group, source 
 // group by ExcludeSourceSpecificGroup again on the interface ifi.
 func (c *dgramOpt) IncludeSourceSpecificGroup(ifi *net.Interface, group, source net.Addr) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoUnblockSourceGroup]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	grp := netAddrToIP16(group)
 	if grp == nil {
@@ -229,11 +230,11 @@ func (c *dgramOpt) IncludeSourceSpecificGroup(ifi *net.Interface, group, source 
 // field is located.
 func (c *dgramOpt) Checksum() (on bool, offset int, err error) {
 	if !c.ok() {
-		return false, 0, errInvalidConn
+		return false, 0, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoChecksum]
 	if !ok {
-		return false, 0, errNotImplemented
+		return false, 0, errOpNoSupport
 	}
 	offset, err = so.GetInt(c.Conn)
 	if err != nil {
@@ -250,11 +251,11 @@ func (c *dgramOpt) Checksum() (on bool, offset int, err error) {
 // checksum field is located.
 func (c *dgramOpt) SetChecksum(on bool, offset int) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoChecksum]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	if !on {
 		offset = -1
@@ -265,11 +266,11 @@ func (c *dgramOpt) SetChecksum(on bool, offset int) error {
 // ICMPFilter returns an ICMP filter.
 func (c *dgramOpt) ICMPFilter() (*ICMPFilter, error) {
 	if !c.ok() {
-		return nil, errInvalidConn
+		return nil, syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoICMPFilter]
 	if !ok {
-		return nil, errNotImplemented
+		return nil, errOpNoSupport
 	}
 	return so.getICMPFilter(c.Conn)
 }
@@ -277,11 +278,11 @@ func (c *dgramOpt) ICMPFilter() (*ICMPFilter, error) {
 // SetICMPFilter deploys the ICMP filter.
 func (c *dgramOpt) SetICMPFilter(f *ICMPFilter) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoICMPFilter]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	return so.setICMPFilter(c.Conn, f)
 }
@@ -291,11 +292,11 @@ func (c *dgramOpt) SetICMPFilter(f *ICMPFilter) error {
 // Only supported on Linux.
 func (c *dgramOpt) SetBPF(filter []bpf.RawInstruction) error {
 	if !c.ok() {
-		return errInvalidConn
+		return syscall.EINVAL
 	}
 	so, ok := sockOpts[ssoAttachFilter]
 	if !ok {
-		return errNotImplemented
+		return errOpNoSupport
 	}
 	return so.setBPF(c.Conn, filter)
 }

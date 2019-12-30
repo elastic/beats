@@ -89,14 +89,10 @@ func (ri RawInstruction) Disassemble() Instruction {
 	case opClsALU:
 		switch op := ALUOp(ri.Op & opMaskOperator); op {
 		case ALUOpAdd, ALUOpSub, ALUOpMul, ALUOpDiv, ALUOpOr, ALUOpAnd, ALUOpShiftLeft, ALUOpShiftRight, ALUOpMod, ALUOpXor:
-			switch operand := opOperand(ri.Op & opMaskOperand); operand {
-			case opOperandX:
+			if ri.Op&opMaskOperandSrc != 0 {
 				return ALUOpX{Op: op}
-			case opOperandConstant:
-				return ALUOpConstant{Op: op, Val: ri.K}
-			default:
-				return ri
 			}
+			return ALUOpConstant{Op: op, Val: ri.K}
 		case aluOpNeg:
 			return NegateA{}
 		default:
@@ -104,18 +100,63 @@ func (ri RawInstruction) Disassemble() Instruction {
 		}
 
 	case opClsJump:
-		switch op := jumpOp(ri.Op & opMaskOperator); op {
+		if ri.Op&opMaskJumpConst != opClsJump {
+			return ri
+		}
+		switch ri.Op & opMaskJumpCond {
 		case opJumpAlways:
 			return Jump{Skip: ri.K}
-		case opJumpEqual, opJumpGT, opJumpGE, opJumpSet:
-			cond, skipTrue, skipFalse := jumpOpToTest(op, ri.Jt, ri.Jf)
-			switch operand := opOperand(ri.Op & opMaskOperand); operand {
-			case opOperandX:
-				return JumpIfX{Cond: cond, SkipTrue: skipTrue, SkipFalse: skipFalse}
-			case opOperandConstant:
-				return JumpIf{Cond: cond, Val: ri.K, SkipTrue: skipTrue, SkipFalse: skipFalse}
-			default:
-				return ri
+		case opJumpEqual:
+			if ri.Jt == 0 {
+				return JumpIf{
+					Cond:      JumpNotEqual,
+					Val:       ri.K,
+					SkipTrue:  ri.Jf,
+					SkipFalse: 0,
+				}
+			}
+			return JumpIf{
+				Cond:      JumpEqual,
+				Val:       ri.K,
+				SkipTrue:  ri.Jt,
+				SkipFalse: ri.Jf,
+			}
+		case opJumpGT:
+			if ri.Jt == 0 {
+				return JumpIf{
+					Cond:      JumpLessOrEqual,
+					Val:       ri.K,
+					SkipTrue:  ri.Jf,
+					SkipFalse: 0,
+				}
+			}
+			return JumpIf{
+				Cond:      JumpGreaterThan,
+				Val:       ri.K,
+				SkipTrue:  ri.Jt,
+				SkipFalse: ri.Jf,
+			}
+		case opJumpGE:
+			if ri.Jt == 0 {
+				return JumpIf{
+					Cond:      JumpLessThan,
+					Val:       ri.K,
+					SkipTrue:  ri.Jf,
+					SkipFalse: 0,
+				}
+			}
+			return JumpIf{
+				Cond:      JumpGreaterOrEqual,
+				Val:       ri.K,
+				SkipTrue:  ri.Jt,
+				SkipFalse: ri.Jf,
+			}
+		case opJumpSet:
+			return JumpIf{
+				Cond:      JumpBitsSet,
+				Val:       ri.K,
+				SkipTrue:  ri.Jt,
+				SkipFalse: ri.Jf,
 			}
 		default:
 			return ri
@@ -146,41 +187,6 @@ func (ri RawInstruction) Disassemble() Instruction {
 	}
 }
 
-func jumpOpToTest(op jumpOp, skipTrue uint8, skipFalse uint8) (JumpTest, uint8, uint8) {
-	var test JumpTest
-
-	// Decode "fake" jump conditions that don't appear in machine code
-	// Ensures the Assemble -> Disassemble stage recreates the same instructions
-	// See https://github.com/golang/go/issues/18470
-	if skipTrue == 0 {
-		switch op {
-		case opJumpEqual:
-			test = JumpNotEqual
-		case opJumpGT:
-			test = JumpLessOrEqual
-		case opJumpGE:
-			test = JumpLessThan
-		case opJumpSet:
-			test = JumpBitsNotSet
-		}
-
-		return test, skipFalse, 0
-	}
-
-	switch op {
-	case opJumpEqual:
-		test = JumpEqual
-	case opJumpGT:
-		test = JumpGreaterThan
-	case opJumpGE:
-		test = JumpGreaterOrEqual
-	case opJumpSet:
-		test = JumpBitsSet
-	}
-
-	return test, skipTrue, skipFalse
-}
-
 // LoadConstant loads Val into register Dst.
 type LoadConstant struct {
 	Dst Register
@@ -192,7 +198,7 @@ func (a LoadConstant) Assemble() (RawInstruction, error) {
 	return assembleLoad(a.Dst, 4, opAddrModeImmediate, a.Val)
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadConstant) String() string {
 	switch a.Dst {
 	case RegA:
@@ -218,7 +224,7 @@ func (a LoadScratch) Assemble() (RawInstruction, error) {
 	return assembleLoad(a.Dst, 4, opAddrModeScratch, uint32(a.N))
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadScratch) String() string {
 	switch a.Dst {
 	case RegA:
@@ -242,7 +248,7 @@ func (a LoadAbsolute) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegA, a.Size, opAddrModeAbsolute, a.Off)
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadAbsolute) String() string {
 	switch a.Size {
 	case 1: // byte
@@ -271,7 +277,7 @@ func (a LoadIndirect) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegA, a.Size, opAddrModeIndirect, a.Off)
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadIndirect) String() string {
 	switch a.Size {
 	case 1: // byte
@@ -300,7 +306,7 @@ func (a LoadMemShift) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegX, 1, opAddrModeMemShift, a.Off)
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadMemShift) String() string {
 	return fmt.Sprintf("ldx 4*([%d]&0xf)", a.Off)
 }
@@ -319,7 +325,7 @@ func (a LoadExtension) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegA, 4, opAddrModeAbsolute, uint32(extOffset+a.Num))
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a LoadExtension) String() string {
 	switch a.Num {
 	case ExtLen:
@@ -386,7 +392,7 @@ func (a StoreScratch) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a StoreScratch) String() string {
 	switch a.Src {
 	case RegA:
@@ -407,12 +413,12 @@ type ALUOpConstant struct {
 // Assemble implements the Instruction Assemble method.
 func (a ALUOpConstant) Assemble() (RawInstruction, error) {
 	return RawInstruction{
-		Op: opClsALU | uint16(opOperandConstant) | uint16(a.Op),
+		Op: opClsALU | opALUSrcConstant | uint16(a.Op),
 		K:  a.Val,
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a ALUOpConstant) String() string {
 	switch a.Op {
 	case ALUOpAdd:
@@ -448,11 +454,11 @@ type ALUOpX struct {
 // Assemble implements the Instruction Assemble method.
 func (a ALUOpX) Assemble() (RawInstruction, error) {
 	return RawInstruction{
-		Op: opClsALU | uint16(opOperandX) | uint16(a.Op),
+		Op: opClsALU | opALUSrcX | uint16(a.Op),
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a ALUOpX) String() string {
 	switch a.Op {
 	case ALUOpAdd:
@@ -490,7 +496,7 @@ func (a NegateA) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a NegateA) String() string {
 	return fmt.Sprintf("neg")
 }
@@ -503,12 +509,12 @@ type Jump struct {
 // Assemble implements the Instruction Assemble method.
 func (a Jump) Assemble() (RawInstruction, error) {
 	return RawInstruction{
-		Op: opClsJump | uint16(opJumpAlways),
+		Op: opClsJump | opJumpAlways,
 		K:  a.Skip,
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a Jump) String() string {
 	return fmt.Sprintf("ja %d", a.Skip)
 }
@@ -524,39 +530,11 @@ type JumpIf struct {
 
 // Assemble implements the Instruction Assemble method.
 func (a JumpIf) Assemble() (RawInstruction, error) {
-	return jumpToRaw(a.Cond, opOperandConstant, a.Val, a.SkipTrue, a.SkipFalse)
-}
-
-// String returns the instruction in assembler notation.
-func (a JumpIf) String() string {
-	return jumpToString(a.Cond, fmt.Sprintf("#%d", a.Val), a.SkipTrue, a.SkipFalse)
-}
-
-// JumpIfX skips the following Skip instructions in the program if A
-// <Cond> X is true.
-type JumpIfX struct {
-	Cond      JumpTest
-	SkipTrue  uint8
-	SkipFalse uint8
-}
-
-// Assemble implements the Instruction Assemble method.
-func (a JumpIfX) Assemble() (RawInstruction, error) {
-	return jumpToRaw(a.Cond, opOperandX, 0, a.SkipTrue, a.SkipFalse)
-}
-
-// String returns the instruction in assembler notation.
-func (a JumpIfX) String() string {
-	return jumpToString(a.Cond, "x", a.SkipTrue, a.SkipFalse)
-}
-
-// jumpToRaw assembles a jump instruction into a RawInstruction
-func jumpToRaw(test JumpTest, operand opOperand, k uint32, skipTrue, skipFalse uint8) (RawInstruction, error) {
 	var (
-		cond jumpOp
+		cond uint16
 		flip bool
 	)
-	switch test {
+	switch a.Cond {
 	case JumpEqual:
 		cond = opJumpEqual
 	case JumpNotEqual:
@@ -574,63 +552,63 @@ func jumpToRaw(test JumpTest, operand opOperand, k uint32, skipTrue, skipFalse u
 	case JumpBitsNotSet:
 		cond, flip = opJumpSet, true
 	default:
-		return RawInstruction{}, fmt.Errorf("unknown JumpTest %v", test)
+		return RawInstruction{}, fmt.Errorf("unknown JumpTest %v", a.Cond)
 	}
-	jt, jf := skipTrue, skipFalse
+	jt, jf := a.SkipTrue, a.SkipFalse
 	if flip {
 		jt, jf = jf, jt
 	}
 	return RawInstruction{
-		Op: opClsJump | uint16(cond) | uint16(operand),
+		Op: opClsJump | cond,
 		Jt: jt,
 		Jf: jf,
-		K:  k,
+		K:  a.Val,
 	}, nil
 }
 
-// jumpToString converts a jump instruction to assembler notation
-func jumpToString(cond JumpTest, operand string, skipTrue, skipFalse uint8) string {
-	switch cond {
+// String returns the the instruction in assembler notation.
+func (a JumpIf) String() string {
+	switch a.Cond {
 	// K == A
 	case JumpEqual:
-		return conditionalJump(operand, skipTrue, skipFalse, "jeq", "jneq")
+		return conditionalJump(a, "jeq", "jneq")
 	// K != A
 	case JumpNotEqual:
-		return fmt.Sprintf("jneq %s,%d", operand, skipTrue)
+		return fmt.Sprintf("jneq #%d,%d", a.Val, a.SkipTrue)
 	// K > A
 	case JumpGreaterThan:
-		return conditionalJump(operand, skipTrue, skipFalse, "jgt", "jle")
+		return conditionalJump(a, "jgt", "jle")
 	// K < A
 	case JumpLessThan:
-		return fmt.Sprintf("jlt %s,%d", operand, skipTrue)
+		return fmt.Sprintf("jlt #%d,%d", a.Val, a.SkipTrue)
 	// K >= A
 	case JumpGreaterOrEqual:
-		return conditionalJump(operand, skipTrue, skipFalse, "jge", "jlt")
+		return conditionalJump(a, "jge", "jlt")
 	// K <= A
 	case JumpLessOrEqual:
-		return fmt.Sprintf("jle %s,%d", operand, skipTrue)
+		return fmt.Sprintf("jle #%d,%d", a.Val, a.SkipTrue)
 	// K & A != 0
 	case JumpBitsSet:
-		if skipFalse > 0 {
-			return fmt.Sprintf("jset %s,%d,%d", operand, skipTrue, skipFalse)
+		if a.SkipFalse > 0 {
+			return fmt.Sprintf("jset #%d,%d,%d", a.Val, a.SkipTrue, a.SkipFalse)
 		}
-		return fmt.Sprintf("jset %s,%d", operand, skipTrue)
+		return fmt.Sprintf("jset #%d,%d", a.Val, a.SkipTrue)
 	// K & A == 0, there is no assembler instruction for JumpBitNotSet, use JumpBitSet and invert skips
 	case JumpBitsNotSet:
-		return jumpToString(JumpBitsSet, operand, skipFalse, skipTrue)
+		return JumpIf{Cond: JumpBitsSet, SkipTrue: a.SkipFalse, SkipFalse: a.SkipTrue, Val: a.Val}.String()
 	default:
-		return fmt.Sprintf("unknown JumpTest %#v", cond)
+		return fmt.Sprintf("unknown instruction: %#v", a)
 	}
 }
 
-func conditionalJump(operand string, skipTrue, skipFalse uint8, positiveJump, negativeJump string) string {
-	if skipTrue > 0 {
-		if skipFalse > 0 {
-			return fmt.Sprintf("%s %s,%d,%d", positiveJump, operand, skipTrue, skipFalse)
+func conditionalJump(inst JumpIf, positiveJump, negativeJump string) string {
+	if inst.SkipTrue > 0 {
+		if inst.SkipFalse > 0 {
+			return fmt.Sprintf("%s #%d,%d,%d", positiveJump, inst.Val, inst.SkipTrue, inst.SkipFalse)
 		}
-		return fmt.Sprintf("%s %s,%d", positiveJump, operand, skipTrue)
+		return fmt.Sprintf("%s #%d,%d", positiveJump, inst.Val, inst.SkipTrue)
 	}
-	return fmt.Sprintf("%s %s,%d", negativeJump, operand, skipFalse)
+	return fmt.Sprintf("%s #%d,%d", negativeJump, inst.Val, inst.SkipFalse)
 }
 
 // RetA exits the BPF program, returning the value of register A.
@@ -643,7 +621,7 @@ func (a RetA) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a RetA) String() string {
 	return fmt.Sprintf("ret a")
 }
@@ -661,7 +639,7 @@ func (a RetConstant) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a RetConstant) String() string {
 	return fmt.Sprintf("ret #%d", a.Val)
 }
@@ -676,7 +654,7 @@ func (a TXA) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a TXA) String() string {
 	return fmt.Sprintf("txa")
 }
@@ -691,7 +669,7 @@ func (a TAX) Assemble() (RawInstruction, error) {
 	}, nil
 }
 
-// String returns the instruction in assembler notation.
+// String returns the the instruction in assembler notation.
 func (a TAX) String() string {
 	return fmt.Sprintf("tax")
 }

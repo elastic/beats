@@ -7,8 +7,7 @@
 // of dependencies.  The ASTs and the derived facts are retained for
 // later use.
 //
-// Deprecated: This is an older API and does not have support
-// for modules. Use golang.org/x/tools/go/packages instead.
+// THIS INTERFACE IS EXPERIMENTAL AND IS LIKELY TO CHANGE.
 //
 // The package defines two primary types: Config, which specifies a
 // set of initial packages to load and various other options; and
@@ -202,3 +201,5 @@ package loader
 // the error.
 //
 // The result of using concurrency is about a 2.5x speedup for stdlib_test.
+
+// TODO(adonovan): overhaul the package documentation.
