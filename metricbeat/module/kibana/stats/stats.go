@@ -146,7 +146,6 @@ func (m *MetricSet) init() error {
 	m.statsHTTP = statsHTTP
 	m.settingsHTTP = settingsHTTP
 	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
-	m.usageLastCollectedOn = time.Time{}
 
 	return nil
 }
