@@ -5400,15 +5400,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/zmap/zcrypto
-Revision: 9051775e6a2e3a89ec27977077b09f4496febecf
-License type (autodetected): Apache-2.0
-./vendor/github.com/zmap/zcrypto/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/zmap/zlint
 Revision: 5dcecad773158b82b5e52064ee2782d1b8a79314
 License type (autodetected): Apache-2.0

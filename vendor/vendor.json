@@ -3451,36 +3451,6 @@
 			"revisionTime": "2017-04-03T16:00:31Z"
 		},
 		{
-			"checksumSHA1": "viPwhW5uANNuXPrOHALgjOOROO8=",
-			"path": "github.com/zmap/zcrypto/json",
-			"revision": "9051775e6a2e3a89ec27977077b09f4496febecf",
-			"revisionTime": "2019-07-29T16:58:52Z"
-		},
-		{
-			"checksumSHA1": "sGkYL7ASCRfs5vliFHrxveDrtt0=",
-			"path": "github.com/zmap/zcrypto/util",
-			"revision": "9051775e6a2e3a89ec27977077b09f4496febecf",
-			"revisionTime": "2019-07-29T16:58:52Z"
-		},
-		{
-			"checksumSHA1": "mc4HEQL6oLKd0qmRtS+CKP5DXfc=",
-			"path": "github.com/zmap/zcrypto/x509",
-			"revision": "9051775e6a2e3a89ec27977077b09f4496febecf",
-			"revisionTime": "2019-07-29T16:58:52Z"
-		},
-		{
-			"checksumSHA1": "jAkT78QZ/SZve96q8DtAkh56r0c=",
-			"path": "github.com/zmap/zcrypto/x509/ct",
-			"revision": "9051775e6a2e3a89ec27977077b09f4496febecf",
-			"revisionTime": "2019-07-29T16:58:52Z"
-		},
-		{
-			"checksumSHA1": "pnjkbNdKfOolkE9XbgZ1MMoh5Cg=",
-			"path": "github.com/zmap/zcrypto/x509/pkix",
-			"revision": "9051775e6a2e3a89ec27977077b09f4496febecf",
-			"revisionTime": "2019-07-29T16:58:52Z"
-		},
-		{
 			"checksumSHA1": "abWfwUQtSGlE5OBR6+6RDODTwpk=",
 			"path": "github.com/zmap/zlint",
 			"revision": "5dcecad773158b82b5e52064ee2782d1b8a79314",
