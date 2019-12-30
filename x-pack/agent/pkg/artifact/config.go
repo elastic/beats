@@ -13,10 +13,10 @@ import (
 // Config is a configuration used for verifier and downloader
 type Config struct {
 	// OperatingSystem: operating system [linux, windows, darwin]
-	OperatingSystem string `json:"-"`
+	OperatingSystem string `json:"-" config:",ignore"`
 
 	// Architecture: target architecture [32, 64]
-	Architecture string `json:"-"`
+	Architecture string `json:"-" config:",ignore"`
 
 	// BeatsSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/beats/
 	BeatsSourceURI string `json:"sourceURI" config:"sourceURI"`
