@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 )
@@ -173,7 +173,7 @@ func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 		return nil, err
 	}
 
-	_, err := application.NewAgentInfo()
+	_, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
 	}

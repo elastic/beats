@@ -2,9 +2,10 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package info
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 
@@ -21,7 +22,7 @@ type persistentAgentInfo struct {
 }
 
 type ioStore interface {
-	store
+	Save(io.Reader) error
 	Load() (io.ReadCloser, error)
 }
 
@@ -73,4 +74,12 @@ func storeAgentID(s ioStore, id string) error {
 	}
 
 	return s.Save(r)
+}
+
+func yamlToReader(in interface{}) (io.Reader, error) {
+	data, err := yaml.Marshal(in)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not marshal to YAML")
+	}
+	return bytes.NewReader(data), nil
 }

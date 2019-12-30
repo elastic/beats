@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package info
 
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {

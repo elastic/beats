@@ -7,6 +7,7 @@ package application
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -32,7 +33,7 @@ var ErrNoConfiguration = errors.New("no configuration found")
 type Local struct {
 	log       *logger.Logger
 	source    source
-	agentInfo *AgentInfo
+	agentInfo *info.AgentInfo
 }
 
 type source interface {
@@ -54,7 +55,7 @@ func newLocal(
 		}
 	}
 
-	agentInfo, err := NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +114,7 @@ func (l *Local) Stop() error {
 }
 
 // AgentInfo retrieves agent information.
-func (l *Local) AgentInfo() *AgentInfo {
+func (l *Local) AgentInfo() *info.AgentInfo {
 	return l.agentInfo
 }
 
