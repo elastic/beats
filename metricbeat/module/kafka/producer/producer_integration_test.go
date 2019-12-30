@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/jolokia"
 	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
