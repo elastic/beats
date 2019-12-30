@@ -11,9 +11,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 )
 
 // EnrollType is the type of enrollment to do with the agent.

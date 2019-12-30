@@ -9,10 +9,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 )
 
 const agentInfoKey = "agent-info"
