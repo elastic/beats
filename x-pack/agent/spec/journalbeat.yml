@@ -17,5 +17,8 @@ rules:
     - journalbeat
     - output
     - keystore
+- rename:
+    from: output.elasticsearch.url
+    to: hosts
 when: HasItems(%{[journalbeat.inputs]}) && HasNamespace('output', 'elasticsearch',
   'redis', 'kafka', 'logstash')

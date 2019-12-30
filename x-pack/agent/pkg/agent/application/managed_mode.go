@@ -51,7 +51,7 @@ func newManaged(
 ) (*Managed, error) {
 
 	agentInfo, err := info.NewAgentInfo()
-	if agentInfo != nil {
+	if err != nil {
 		return nil, err
 	}
 

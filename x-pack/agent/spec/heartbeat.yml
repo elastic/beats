@@ -18,6 +18,9 @@ rules:
 - rename:
     from: heartbeat.streams
     to: monitors
+- rename:
+    from: output.elasticsearch.url
+    to: hosts
 - filter:
     selectors:
     - heartbeat

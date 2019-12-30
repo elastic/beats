@@ -120,7 +120,11 @@ func (k *Key) String() string {
 	var sb strings.Builder
 	sb.WriteString(k.name)
 	sb.WriteString(":")
-	sb.WriteString(k.value.String())
+	if k.value == nil {
+		sb.WriteString("nil")
+	} else {
+		sb.WriteString(k.value.String())
+	}
 	return sb.String()
 }
 
@@ -143,14 +147,20 @@ func (k *Key) Value() interface{} {
 
 // Clone returns a clone of the current key and his embedded values.
 func (k *Key) Clone() Node {
-	return &Key{name: k.name, value: k.value.Clone()}
+	if k.value != nil {
+		return &Key{name: k.name, value: k.value.Clone()}
+	}
+
+	return &Key{name: k.name, value: nil}
 }
 
 // Hash compute a sha256 hash of the current node and recursively call any children.
 func (k *Key) Hash() []byte {
 	h := sha256.New()
 	h.Write([]byte(k.name))
-	h.Write(k.value.Hash())
+	if k.value != nil {
+		h.Write(k.value.Hash())
+	}
 	return h.Sum(nil)
 }
 
@@ -388,6 +398,7 @@ func MustNewAST(m map[string]interface{}) *AST {
 
 func load(val reflect.Value) (Node, error) {
 	val = lookupVal(val)
+
 	switch val.Kind() {
 	case reflect.Map:
 		return loadMap(val)
@@ -408,6 +419,9 @@ func load(val reflect.Value) (Node, error) {
 	case reflect.Bool:
 		return &BoolVal{value: val.Interface().(bool)}, nil
 	default:
+		if val.IsNil() {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("unknown type %T for %+v", val.Interface(), val)
 	}
 }
