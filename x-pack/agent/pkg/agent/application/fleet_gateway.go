@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-	repo "github.com/elastic/beats/x-pack/agent/pkg/reporter"
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
 )
 
@@ -22,7 +21,6 @@ type agentInfo interface {
 }
 
 type fleetReporter interface {
-	repo.Backend
 	Events() ([]fleetapi.SerializableEvent, func())
 }
 

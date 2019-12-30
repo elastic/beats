@@ -164,6 +164,12 @@ func (r *Reporter) tryDropInfo() bool {
 }
 
 func (r *Reporter) dropFirst() {
+	if len(r.queue) == 0 {
+		return
+	}
+
+	first := r.queue[0]
+	r.logger.Infof("fleet reporter dropped event because threshold[%d] was reached: %v", r.threshold, first)
 	r.queue = r.queue[1:]
 }
 

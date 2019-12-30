@@ -83,7 +83,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{})}
 }
 
-type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, fleetReporter)
+type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -145,7 +145,7 @@ func TestFleetGateway(t *testing.T) {
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
-		rep fleetReporter,
+		rep repo.Backend,
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
@@ -170,31 +170,31 @@ func TestFleetGateway(t *testing.T) {
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
-		rep fleetReporter,
+		rep repo.Backend,
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `
-	{
-	    "actions": [
-	        {
-	            "type": "POLICY_CHANGE",
-	            "id": "id1",
-	            "data": {
-	                "policy": {
-	                    "id": "policy-id"
-	                }
-	            }
-	        },
-	        {
-	            "type": "ANOTHER_ACTION",
-	            "id": "id2"
-	        }
-	    ],
-	    "success": true
-	}
-	`)
+{
+	"actions": [
+		{
+			"type": "POLICY_CHANGE",
+			"id": "id1",
+			"data": {
+				"policy": {
+					"id": "policy-id"
+				}
+			}
+		},
+		{
+			"type": "ANOTHER_ACTION",
+			"id": "id2"
+		}
+	],
+	"success": true
+}
+`)
 				return resp, nil
 			}),
 			dispatcher.Answer(func(actions ...action) error {
@@ -257,7 +257,7 @@ func TestFleetGateway(t *testing.T) {
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
-		rep fleetReporter,
+		rep repo.Backend,
 	) {
 		rep.Report(&testStateEvent{})
 		received := ackSeq(
@@ -295,7 +295,7 @@ func skip(t *testing.T) {
 	t.SkipNow()
 }
 
-func getReporter(info agentInfo, log *logger.Logger, t *testing.T) fleetReporter {
+func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
 	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultFleetManagementConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
