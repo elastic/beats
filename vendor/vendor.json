@@ -1241,9 +1241,13 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "xX1+9qXSGHg3P/SllPGeAAhlBcE=",
+			"origin": "github.com/docker/engine/pkg/jsonmessage",
 			"path": "github.com/docker/docker/pkg/jsonmessage",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "EXiIm2xIL7Ds+YsQUx8Z3eUYPtI=",
@@ -1273,24 +1277,40 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "JWH9Uzhof7ZrdmGDsVGZkYWOEbo=",
+			"origin": "github.com/docker/engine/pkg/plugingetter",
 			"path": "github.com/docker/docker/pkg/plugingetter",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "EJlFDaTWREewnv3SMOQv/5c8qyg=",
+			"origin": "github.com/docker/engine/pkg/plugins",
 			"path": "github.com/docker/docker/pkg/plugins",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "uJagSmJVfXoAt1ZsC0dJwU6l0yk=",
+			"origin": "github.com/docker/engine/pkg/plugins/transport",
 			"path": "github.com/docker/docker/pkg/plugins/transport",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "TzcP4JKm2Sylo6qFay+UJ4YlwPU=",
+			"origin": "github.com/docker/engine/pkg/progress",
 			"path": "github.com/docker/docker/pkg/progress",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "w0waeTRJ1sFygI0dZXH6l9E1c60=",
@@ -1302,14 +1322,22 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "BcvRzr5GtRDG0/t8tjNtXXh1qQM=",
+			"origin": "github.com/docker/engine/pkg/streamformatter",
 			"path": "github.com/docker/docker/pkg/streamformatter",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "THVhMDu12TT7TpGJkazOSxQhmRs=",
+			"origin": "github.com/docker/engine/pkg/stringid",
 			"path": "github.com/docker/docker/pkg/stringid",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "TYqofbgbw+QR0g/rAIhZ2cQGlAM=",
@@ -1321,22 +1349,31 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "GFsDxJkQz407/2nUBmWuafG+uF8=",
+			"origin": "github.com/docker/engine/pkg/term",
 			"path": "github.com/docker/docker/pkg/term",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "TeOtxuBbbZtp6wDK/t4DdaGGSC0=",
+			"origin": "github.com/docker/engine/pkg/term/windows",
 			"path": "github.com/docker/docker/pkg/term/windows",
-			"revision": "v19.03.5",
-			"version": "v19.03.5"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "ZLK19eBuLoOIEE92Dwxx6qHHxDI=",
+			"origin": "github.com/docker/engine/pkg/tlsconfig",
 			"path": "github.com/docker/docker/pkg/tlsconfig",
 			"revision": "8af4db6f002ac907b6ef8610b237879dfcaa5b7a",
 			"revisionTime": "2017-08-02T01:53:33Z",
 			"version": "v19.03.5",
-			"versionExact": "v19.03.2"
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "JbiWTzH699Sqz25XmDlsARpMN9w=",
