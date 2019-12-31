@@ -233,7 +233,6 @@ func TestFleetGateway(t *testing.T) {
 		for {
 			received := ackSeq(
 				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-					// TODO: assert no events
 					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 					return resp, nil
 				}),
