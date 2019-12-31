@@ -14,9 +14,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
+	"github.com/elastic/beats/x-pack/agent/pkg/config"
 )
 
-const agentInfoKey = "agent-info"
+const AgentConfigFile = "fleet.yml"
 
 type persistentAgentInfo struct {
 	ID string `json:"ID" yaml:"ID"`
@@ -28,48 +29,80 @@ type ioStore interface {
 }
 
 func generateAgentID() (string, error) {
-	s := storage.NewEncryptedDiskStore(agentInfoKey, []byte(""))
-
-	id := loadAgentID(s)
-	if id != "" {
-		return id, nil
-	}
-
 	uid, err := uuid.NewV4()
 	if err != nil {
 		return "", fmt.Errorf("error while generating UUID for agent: %v", err)
 	}
 
-	id = uid.String()
+	return uid.String(), nil
+}
 
-	if err := storeAgentID(s, id); err != nil {
-		return "", errors.Wrap(err, "storing generated agent id")
+func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
+	s := storage.NewEncryptedDiskStore(AgentConfigFile, []byte(""))
+
+	agentinfo, err := loadAgentID(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if !forceUpdate && agentinfo.ID != "" {
+		return agentinfo, nil
+	}
+
+	agentinfo.ID, err = generateAgentID()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := updateAgentInfo(s, agentinfo); err != nil {
+		return nil, errors.Wrap(err, "storing generated agent id")
+	}
+
+	return agentinfo, nil
+}
+
+func loadAgentID(s ioStore) (*persistentAgentInfo, error) {
+	reader, err := s.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	id := &persistentAgentInfo{}
+
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
+	}
+
+	if err := config.Unpack(&id); err != nil {
+		return nil, errors.Wrap(err, "unpacking existing config")
 	}
 
 	return id, nil
 }
 
-func loadAgentID(s ioStore) string {
-	r, err := s.Load()
+func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
+	reader, err := s.Load()
 	if err != nil {
-		return ""
-	}
-	d := yaml.NewDecoder(r)
-
-	id := &persistentAgentInfo{}
-	if err := d.Decode(&id); err != nil {
-		return ""
+		return err
 	}
 
-	return id.ID
-}
-
-func storeAgentID(s ioStore, id string) error {
-	ids := &persistentAgentInfo{
-		ID: id,
+	cfg, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
 	}
 
-	r, err := yamlToReader(ids)
+	infoCfg, err := config.NewConfigFrom(agentInfo)
+	if err != nil {
+		return errors.Wrap(err, "fail to get configuration for the agent info")
+	}
+
+	err = infoCfg.Merge(cfg)
+	if err != nil {
+		return errors.Wrap(err, "fail to merge configuration for the agent info")
+	}
+
+	r, err := yamlToReader(infoCfg)
 	if err != nil {
 		return err
 	}

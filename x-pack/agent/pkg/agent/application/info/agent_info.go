@@ -10,15 +10,31 @@ type AgentInfo struct {
 }
 
 // NewAgentInfo creates a new agent information.
-// Generates new unique identifier for agent.
+// In case when agent ID was already created it returns,
+// this created ID otherwise it generates
+// new unique identifier for agent.
 func NewAgentInfo() (*AgentInfo, error) {
-	agentID, err := generateAgentID()
+	agentInfo, err := loadAgentInfo(false)
 	if err != nil {
 		return nil, err
 	}
 
 	return &AgentInfo{
-		agentID: agentID,
+		agentID: agentInfo.ID,
+	}, nil
+}
+
+// ForceNewAgentInfo creates a new agent information.
+// Generates new unique identifier for agent regardless
+// of any existing ID.
+func ForceNewAgentInfo() (*AgentInfo, error) {
+	agentInfo, err := loadAgentInfo(true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AgentInfo{
+		agentID: agentInfo.ID,
 	}, nil
 }
 
