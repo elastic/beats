@@ -6,13 +6,11 @@ package stackdriver
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/option"
-	httpGoogle "google.golang.org/api/transport/http"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -79,13 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	httpClient, err := createHTTPClient(ctx, m.config.opt...)
-	if err != nil {
-		return errors.Wrapf(err, "could not create HTTP client to connect to Google Services")
-	}
-
-	httpClientOption := option.WithHTTPClient(httpClient)
-	m.config.opt = []option.ClientOption{m.config.credentialsOption, httpClientOption}
+	m.config.opt = []option.ClientOption{m.config.credentialsOption}
 
 	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
@@ -107,18 +99,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	}
 
 	return nil
-}
-
-//createHTTPClient to use with share around every request to GCP services. It's recreated in every Fetch call.
-func createHTTPClient(ctx context.Context, opts ...option.ClientOption) (*http.Client, error) {
-	transport, err := httpGoogle.NewTransport(ctx, http.DefaultTransport, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &http.Client{
-		Transport: transport,
-		Timeout:   30 * time.Second,
-	}, nil
 }
 
 func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSeries) ([]mb.Event, error) {
@@ -147,6 +127,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 			ModuleFields: common.MapStr{
 				"labels": groupedEvents[0].Labels,
 			},
+			MetricSetFields: common.MapStr{},
 		}
 
 		for _, singleEvent := range groupedEvents {

@@ -6,6 +6,7 @@ package compute
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
@@ -23,7 +24,7 @@ func NewMetadataService(projectID, zone string, opt ...option.ClientOption) (goo
 		projectID:     projectID,
 		zone:          zone,
 		opt:           opt,
-		instanceCache: common.Cache{},
+		instanceCache: common.NewCache(30 * time.Second, 13),
 	}, nil
 }
 
@@ -48,7 +49,7 @@ type metadataCollector struct {
 
 	computeMetadata *computeMetadata
 
-	instanceCache common.Cache
+	instanceCache *common.Cache
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
