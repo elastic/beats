@@ -71,10 +71,6 @@ management:
     period: 10s
 
 download:
-  # operating system [linux, windows, darwin]
-  operating_system: "linux"
-  # target architecture [32, 64]
-  arch: "32"
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip
   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
@@ -84,9 +80,10 @@ download:
   timeout: 30s
   # file path to a public key used for verifying downloaded artifacts
   # if not file is present agent will try to load public key from elastic.co website.
-  pgpfile: "/home/elastic/elastic.pgp"# install describes the location of installed packages/programs. It is also used
+  pgpfile: "/home/elastic/elastic.pgp"
+  # install_path describes the location of installed packages/programs. It is also used
   # for reading program specifications.
-  install_path: "/"
+  install_path: "/home/elastic/install"
 
 process:
   # minimal port number for spawned processes

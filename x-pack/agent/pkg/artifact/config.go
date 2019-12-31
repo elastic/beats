@@ -6,16 +6,17 @@ package artifact
 
 import (
 	"runtime"
+	"strings"
 	"time"
 )
 
 // Config is a configuration used for verifier and downloader
 type Config struct {
 	// OperatingSystem: operating system [linux, windows, darwin]
-	OperatingSystem string `json:"operatingSystem" config:"operating_system"`
+	OperatingSystem string `json:"-" config:",ignore"`
 
 	// Architecture: target architecture [32, 64]
-	Architecture string `json:"arch" config:"arch"`
+	Architecture string `json:"-" config:",ignore"`
 
 	// BeatsSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/beats/
 	BeatsSourceURI string `json:"sourceURI" config:"sourceURI"`
@@ -47,16 +48,16 @@ func (c *Config) OS() string {
 		return c.OperatingSystem
 	}
 
-	osFromEnv := "linux"
 	switch runtime.GOOS {
 	case "windows":
-		osFromEnv = "windows"
+		c.OperatingSystem = "windows"
 	case "darwin":
-		osFromEnv = "darwin"
+		c.OperatingSystem = "darwin"
+	default:
+		c.OperatingSystem = "linux"
 	}
 
-	c.OperatingSystem = osFromEnv
-	return osFromEnv
+	return c.OperatingSystem
 }
 
 // Arch return configured architecture or falls back to 32bit
@@ -65,6 +66,11 @@ func (c *Config) Arch() string {
 		return c.Architecture
 	}
 
-	c.Architecture = "32"
+	arch := "32"
+	if strings.Contains(runtime.GOARCH, "64") {
+		arch = "64"
+	}
+
+	c.Architecture = arch
 	return c.Architecture
 }
