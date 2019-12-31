@@ -35,8 +35,8 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
-* <<exported-fields-gcp>>
 * <<exported-fields-golang>>
+* <<exported-fields-googlecloud>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -13615,20 +13615,6 @@ type: integer
 
 --
 
-[[exported-fields-gcp]]
-== Google Cloud Platform fields
-
-GCP module
-
-
-
-*`googlecloud.labels`*::
-+
---
-type: object
-
---
-
 [[exported-fields-golang]]
 == Golang fields
 
@@ -13937,6 +13923,20 @@ Bytes in non-idle span.
 type: long
 
 format: bytes
+
+--
+
+[[exported-fields-googlecloud]]
+== Google Cloud Platform fields
+
+GCP module
+
+
+
+*`googlecloud.labels`*::
++
+--
+type: object
 
 --
 
