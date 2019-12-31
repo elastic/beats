@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -42,7 +43,7 @@ func generateAgentID() (string, error) {
 func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 	s := storage.NewEncryptedDiskStore(AgentConfigFile, []byte(""))
 
-	agentinfo, err := loadAgentID(s)
+	agentinfo, err := getInfoFromStore(s)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 	return agentinfo, nil
 }
 
-func loadAgentID(s ioStore) (*persistentAgentInfo, error) {
+func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 	reader, err := s.Load()
 	if err != nil {
 		return nil, err
@@ -129,4 +130,18 @@ func yamlToReader(in interface{}) (io.Reader, error) {
 		return nil, errors.Wrap(err, "could not marshal to YAML")
 	}
 	return bytes.NewReader(data), nil
+}
+
+func touchSource() error {
+	_, err := os.Stat(AgentConfigFile)
+	if err == nil {
+		return nil
+	}
+
+	f, err := os.OpenFile(AgentConfigFile, os.O_CREATE, 0640)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create config file '%s'", AgentConfigFile)
+	}
+
+	return f.Close()
 }

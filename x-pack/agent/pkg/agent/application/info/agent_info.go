@@ -13,7 +13,12 @@ type AgentInfo struct {
 // In case when agent ID was already created it returns,
 // this created ID otherwise it generates
 // new unique identifier for agent.
+// If agent config file does not exist it gets created.
 func NewAgentInfo() (*AgentInfo, error) {
+	if err := touchSource(); err != nil {
+		return nil, err
+	}
+
 	agentInfo, err := loadAgentInfo(false)
 	if err != nil {
 		return nil, err
@@ -27,7 +32,12 @@ func NewAgentInfo() (*AgentInfo, error) {
 // ForceNewAgentInfo creates a new agent information.
 // Generates new unique identifier for agent regardless
 // of any existing ID.
+// If agent config file does not exist it gets created.
 func ForceNewAgentInfo() (*AgentInfo, error) {
+	if err := touchSource(); err != nil {
+		return nil, err
+	}
+
 	agentInfo, err := loadAgentInfo(true)
 	if err != nil {
 		return nil, err
