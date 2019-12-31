@@ -7,15 +7,17 @@ package tokenbucket
 import (
 	"fmt"
 	"time"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
 )
 
 // Bucket is a Token Bucket for rate limiting
 type Bucket struct {
 	size       int
 	dropAmount int
-	dropRate   time.Duration
 	rateChan   chan struct{}
 	closeChan  chan struct{}
+	scheduler  scheduler.Scheduler
 }
 
 // NewTokenBucket creates a bucket and starts it.
@@ -23,16 +25,27 @@ type Bucket struct {
 // dropAmount: amount which is dropped per every specified interval
 // dropRate: specified interval when drop will happen
 func NewTokenBucket(size, dropAmount int, dropRate time.Duration) (*Bucket, error) {
+	s := scheduler.NewPeriodic(dropRate)
+	return newTokenBucketWithScheduler(size, dropAmount, s)
+}
+
+func newTokenBucketWithScheduler(
+	size, dropAmount int,
+	s scheduler.Scheduler,
+) (*Bucket, error) {
 	if dropAmount > size {
-		return nil, fmt.Errorf("TokenBucket: invalid configuration, size '%d' is lower than drop amount '%d'", size, dropAmount)
+		return nil, fmt.Errorf(
+			"TokenBucket: invalid configuration, size '%d' is lower than drop amount '%d'",
+			size,
+			dropAmount,
+		)
 	}
 
 	b := &Bucket{
-		size:       size,
 		dropAmount: dropAmount,
-		dropRate:   dropRate,
 		rateChan:   make(chan struct{}, size),
 		closeChan:  make(chan struct{}),
+		scheduler:  s,
 	}
 	go b.run()
 
@@ -48,14 +61,14 @@ func (b *Bucket) Add() {
 func (b *Bucket) Close() {
 	close(b.closeChan)
 	close(b.rateChan)
+	b.scheduler.Stop()
 }
 
 // run runs basic loop and consumes configured tokens per every configured period.
 func (b *Bucket) run() {
-	tick := time.NewTicker(b.dropRate)
 	for {
 		select {
-		case <-tick.C:
+		case <-b.scheduler.WaitTick():
 			for i := 0; i < b.dropAmount; i++ {
 				select {
 				case <-b.rateChan:
