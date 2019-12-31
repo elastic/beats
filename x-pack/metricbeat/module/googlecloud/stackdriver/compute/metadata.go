@@ -24,7 +24,7 @@ func NewMetadataService(projectID, zone string, opt ...option.ClientOption) (goo
 		projectID:     projectID,
 		zone:          zone,
 		opt:           opt,
-		instanceCache: common.NewCache(30 * time.Second, 13),
+		instanceCache: common.NewCache(30*time.Second, 13),
 	}, nil
 }
 
