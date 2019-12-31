@@ -91,13 +91,5 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
-* <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
-
-* <<metricbeat-metricset-googlecloud-storage,storage>>
-
 include::googlecloud/compute.asciidoc[]
-
-include::googlecloud/stackdriver.asciidoc[]
-
-include::googlecloud/storage.asciidoc[]
 
