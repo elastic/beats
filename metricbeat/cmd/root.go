@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/cmd/test"
+
 	// import modules
 	_ "github.com/elastic/beats/metricbeat/include"
 	_ "github.com/elastic/beats/metricbeat/include/fields"
