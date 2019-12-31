@@ -68,60 +68,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	statsHTTP, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
-	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
-	if err != nil {
-		return nil, err
-	}
-
-	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
-	if err != nil {
-		return nil, err
-	}
-
-	if !isStatsAPIAvailable {
-		const errorMsg = "The %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
-	}
-
-	if ms.XPackEnabled {
-		// Use legacy API response so we can passthru usage as-is
-		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
-	}
-
-	var settingsHTTP *helper.HTTP
-	if ms.XPackEnabled {
-		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
-		if err != nil {
-			return nil, err
-		}
-
-		if !isSettingsAPIAvailable {
-			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
-		}
-
-		settingsHTTP, err = helper.NewHTTP(base)
-		if err != nil {
-			return nil, err
-		}
-
-		// HACK! We need to do this because there might be a basepath involved, so we
-		// only search/replace the actual API paths
-		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
-		settingsHTTP.SetURI(settingsURI)
-	}
-
 	return &MetricSet{
-		ms,
-		statsHTTP,
-		settingsHTTP,
-		time.Time{},
-		kibana.IsUsageExcludable(kibanaVersion),
+		MetricSet: ms,
 	}, nil
 }
 
@@ -129,16 +77,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	now := time.Now()
-
-	err := m.fetchStats(r, now)
+	err := m.init()
 	if err != nil {
 		if m.XPackEnabled {
 			m.Log.Error(err)
 		} else {
 			elastic.ReportAndLogError(err, r, m.Log)
 		}
-		return
+	}
+
+	now := time.Now()
+
+	err = m.fetchStats(r, now)
+	if err != nil {
+		if m.XPackEnabled {
+			m.Log.Error(err)
+		} else {
+			elastic.ReportAndLogError(err, r, m.Log)
+		}
 	}
 
 	if m.XPackEnabled {
@@ -147,6 +103,53 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			m.Log.Error(err)
 		}
 	}
+}
+
+func (m *MetricSet) init() error {
+	statsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
+	}
+
+	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
+	if err != nil {
+		return err
+	}
+
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
+	if !isStatsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
+	}
+	if m.XPackEnabled {
+		// Use legacy API response so we can passthru usage as-is
+		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
+	}
+
+	var settingsHTTP *helper.HTTP
+	if m.XPackEnabled {
+		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+		if !isSettingsAPIAvailable {
+			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
+			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
+		}
+
+		settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
+		if err != nil {
+			return err
+		}
+
+		// HACK! We need to do this because there might be a basepath involved, so we
+		// only search/replace the actual API paths
+		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
+		settingsHTTP.SetURI(settingsURI)
+	}
+
+	m.statsHTTP = statsHTTP
+	m.settingsHTTP = settingsHTTP
+	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
+
+	return nil
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
