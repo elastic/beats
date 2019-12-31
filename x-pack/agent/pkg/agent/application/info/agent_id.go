@@ -17,11 +17,12 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 )
 
+// AgentConfigFile is a name of file used to store agent information
 const AgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent_info"
 
 type persistentAgentInfo struct {
-	ID string `json:"ID" config:"ID"`
+	ID string `json:"ID" yaml:"ID" config:"ID"`
 }
 
 type ioStore interface {
