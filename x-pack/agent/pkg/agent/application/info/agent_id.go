@@ -18,9 +18,10 @@ import (
 )
 
 const AgentConfigFile = "fleet.yml"
+const agentInfoKey = "agent_info"
 
 type persistentAgentInfo struct {
-	ID string `json:"ID" yaml:"ID"`
+	ID string `json:"ID" config:"ID"`
 }
 
 type ioStore interface {
@@ -45,7 +46,7 @@ func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 		return nil, err
 	}
 
-	if !forceUpdate && agentinfo.ID != "" {
+	if agentinfo != nil && !forceUpdate && agentinfo.ID != "" {
 		return agentinfo, nil
 	}
 
@@ -67,18 +68,32 @@ func loadAgentID(s ioStore) (*persistentAgentInfo, error) {
 		return nil, err
 	}
 
-	id := &persistentAgentInfo{}
-
-	config, err := config.NewConfigFrom(reader)
+	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
 	}
 
-	if err := config.Unpack(&id); err != nil {
-		return nil, errors.Wrap(err, "unpacking existing config")
+	configMap, err := cfg.ToMapStr()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unpack stored config to map")
 	}
 
-	return id, nil
+	agentInfoSubMap, found := configMap[agentInfoKey]
+	if !found {
+		return &persistentAgentInfo{}, nil
+	}
+
+	cc, err := config.NewConfigFrom(agentInfoSubMap)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create config from agent info submap")
+	}
+
+	pid := &persistentAgentInfo{}
+	if err := cc.Unpack(&pid); err != nil {
+		return nil, errors.Wrap(err, "failed to unpack stored config to map")
+	}
+
+	return pid, nil
 }
 
 func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
@@ -92,17 +107,14 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 		return errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
 	}
 
-	infoCfg, err := config.NewConfigFrom(agentInfo)
-	if err != nil {
-		return errors.Wrap(err, "fail to get configuration for the agent info")
+	configMap := make(map[string]interface{})
+	if err := cfg.Unpack(&configMap); err != nil {
+		return errors.Wrap(err, "failed to unpack stored config to map")
 	}
 
-	err = infoCfg.Merge(cfg)
-	if err != nil {
-		return errors.Wrap(err, "fail to merge configuration for the agent info")
-	}
+	configMap[agentInfoKey] = agentInfo
 
-	r, err := yamlToReader(infoCfg)
+	r, err := yamlToReader(configMap)
 	if err != nil {
 		return err
 	}

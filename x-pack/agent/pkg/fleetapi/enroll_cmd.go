@@ -13,8 +13,6 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 )
 
 // EnrollType is the type of enrollment to do with the agent.
@@ -171,11 +169,6 @@ func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 	const prefix = "ApiKey "
 
 	if err := r.Validate(); err != nil {
-		return nil, err
-	}
-
-	_, err := info.NewAgentInfo()
-	if err != nil {
 		return nil, err
 	}
 
