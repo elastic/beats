@@ -11,9 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package nfsd implements parsing of /proc/net/rpc/nfsd.
+// Package nfs implements parsing of /proc/net/rpc/nfsd.
 // Fields are documented in https://www.svennd.be/nfsd-stats-explained-procnetrpcnfsd/
 package nfs
+
+import (
+	"os"
+	"strings"
+
+	"github.com/prometheus/procfs/internal/fs"
+)
 
 // ReplyCache models the "rc" line.
 type ReplyCache struct {
@@ -136,8 +143,8 @@ type ClientV4Stats struct {
 	Setattr            uint64
 	FsInfo             uint64
 	Renew              uint64
-	SetClientId        uint64
-	SetClientIdConfirm uint64
+	SetClientID        uint64
+	SetClientIDConfirm uint64
 	Lock               uint64
 	Lockt              uint64
 	Locku              uint64
@@ -156,13 +163,13 @@ type ClientV4Stats struct {
 	ReadDir            uint64
 	ServerCaps         uint64
 	DelegReturn        uint64
-	GetAcl             uint64
-	SetAcl             uint64
+	GetACL             uint64
+	SetACL             uint64
 	FsLocations        uint64
 	ReleaseLockowner   uint64
 	Secinfo            uint64
 	FsidPresent        uint64
-	ExchangeId         uint64
+	ExchangeID         uint64
 	CreateSession      uint64
 	DestroySession     uint64
 	Sequence           uint64
@@ -173,11 +180,11 @@ type ClientV4Stats struct {
 	LayoutCommit       uint64
 	LayoutReturn       uint64
 	SecinfoNoName      uint64
-	TestStateId        uint64
-	FreeStateId        uint64
+	TestStateID        uint64
+	FreeStateID        uint64
 	GetDeviceList      uint64
 	BindConnToSession  uint64
-	DestroyClientId    uint64
+	DestroyClientID    uint64
 	Seek               uint64
 	Allocate           uint64
 	DeAllocate         uint64
@@ -238,7 +245,7 @@ type V4Ops struct {
 	RelLockOwner uint64
 }
 
-// RPCStats models all stats from /proc/net/rpc/nfs.
+// ClientRPCStats models all stats from /proc/net/rpc/nfs.
 type ClientRPCStats struct {
 	Network       Network
 	ClientRPC     ClientRPC
@@ -260,4 +267,53 @@ type ServerRPCStats struct {
 	V3Stats        V3Stats
 	ServerV4Stats  ServerV4Stats
 	V4Ops          V4Ops
+}
+
+// FS represents the pseudo-filesystem proc, which provides an interface to
+// kernel data structures.
+type FS struct {
+	proc *fs.FS
+}
+
+// NewDefaultFS returns a new FS mounted under the default mountPoint. It will error
+// if the mount point can't be read.
+func NewDefaultFS() (FS, error) {
+	return NewFS(fs.DefaultProcMountPoint)
+}
+
+// NewFS returns a new FS mounted under the given mountPoint. It will error
+// if the mount point can't be read.
+func NewFS(mountPoint string) (FS, error) {
+	if strings.TrimSpace(mountPoint) == "" {
+		mountPoint = fs.DefaultProcMountPoint
+	}
+	fs, err := fs.NewFS(mountPoint)
+	if err != nil {
+		return FS{}, err
+	}
+	return FS{&fs}, nil
+}
+
+// ClientRPCStats retrieves NFS client RPC statistics
+// from proc/net/rpc/nfs.
+func (fs FS) ClientRPCStats() (*ClientRPCStats, error) {
+	f, err := os.Open(fs.proc.Path("net/rpc/nfs"))
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return ParseClientRPCStats(f)
+}
+
+// ServerRPCStats retrieves NFS daemon RPC statistics
+// from proc/net/rpc/nfsd.
+func (fs FS) ServerRPCStats() (*ServerRPCStats, error) {
+	f, err := os.Open(fs.proc.Path("net/rpc/nfsd"))
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return ParseServerRPCStats(f)
 }
