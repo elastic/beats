@@ -10,11 +10,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/awslabs/goformation/cloudformation"
-	"github.com/awslabs/goformation/cloudformation/iam"
-	"github.com/awslabs/goformation/cloudformation/lambda"
-	"github.com/awslabs/goformation/cloudformation/logs"
-	"github.com/awslabs/goformation/cloudformation/tags"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation/logs"
+	"github.com/awslabs/goformation/v4/cloudformation/tags"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -280,9 +280,6 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 		}
 		return nil
 	}
-	mergeResources := func(r1, r2 cloudformation.Resources) error {
-		return nil
-	}
 
 	err := merge(to.Parameters, from.Parameters)
 	if err != nil {
@@ -300,7 +297,7 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 	}
 
 	for k, v := range from.Resources {
-		if _, ok := r1[k]; ok {
+		if _, ok := to.Resources[k]; ok {
 			return fmt.Errorf("key %s already exist in the template map", k)
 		}
 		to.Resources[k] = v
