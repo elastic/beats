@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -130,18 +129,4 @@ func yamlToReader(in interface{}) (io.Reader, error) {
 		return nil, errors.Wrap(err, "could not marshal to YAML")
 	}
 	return bytes.NewReader(data), nil
-}
-
-func touchSource() error {
-	_, err := os.Stat(AgentConfigFile)
-	if err == nil {
-		return nil
-	}
-
-	f, err := os.OpenFile(AgentConfigFile, os.O_CREATE, 0640)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create config file '%s'", AgentConfigFile)
-	}
-
-	return f.Close()
 }
