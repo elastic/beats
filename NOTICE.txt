@@ -246,6 +246,16 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/awslabs/goformation/v4
+Version: v4.1.0
+Revision: 18ccd0e58e5df10d9f82f875d54b087d3058cfc1
+License type (autodetected): Apache-2.0
+./vendor/github.com/awslabs/goformation/v4/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 -------NOTICE-----
 GoFormation
 Copyright 2011-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
