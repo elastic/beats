@@ -14,13 +14,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type info struct{}
+type agentinfo struct{}
 
-func (*info) AgentID() string { return "id" }
+func (*agentinfo) AgentID() string { return "id" }
 
 func TestCheckin(t *testing.T) {
 	const withAPIKey = "secret"
-	agentInfo := &info{}
+	agentInfo := &agentinfo{}
 
 	t.Run("Send back status of actions", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
@@ -76,7 +76,7 @@ func TestCheckin(t *testing.T) {
 				},
 			}
 
-			cmd := NewCheckinCmd(&info{}, client)
+			cmd := NewCheckinCmd(&agentinfo{}, client)
 
 			request := CheckinRequest{
 				Events: []SerializableEvent{

@@ -209,7 +209,7 @@ func (d *EncryptedDiskStore) Save(in io.Reader) error {
 
 // Load return a io.ReadCloser that will take care on unencrypting the data.
 func (d *EncryptedDiskStore) Load() (io.ReadCloser, error) {
-	fd, err := os.OpenFile(d.target, os.O_RDONLY, perms)
+	fd, err := os.OpenFile(d.target, os.O_RDONLY|os.O_CREATE, perms)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not open %s", d.target)
 	}

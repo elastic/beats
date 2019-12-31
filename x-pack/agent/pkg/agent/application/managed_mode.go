@@ -13,6 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -40,7 +41,7 @@ type Managed struct {
 	log       *logger.Logger
 	Config    FleetAgentConfig
 	api       apiClient
-	agentInfo *AgentInfo
+	agentInfo *info.AgentInfo
 	gateway   *fleetGateway
 }
 
@@ -49,7 +50,7 @@ func newManaged(
 	rawConfig *config.Config,
 ) (*Managed, error) {
 
-	agentInfo, err := NewAgentInfo()
+	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -142,14 +143,14 @@ func (m *Managed) Stop() error {
 }
 
 // AgentInfo retrieves agent information.
-func (m *Managed) AgentInfo() *AgentInfo {
+func (m *Managed) AgentInfo() *info.AgentInfo {
 	return m.agentInfo
 }
 
 func createFleetReporters(
 	log *logger.Logger,
 	cfg *FleetAgentConfig,
-	agentInfo *AgentInfo,
+	agentInfo *info.AgentInfo,
 	client apiClient,
 ) (reporter, error) {
 

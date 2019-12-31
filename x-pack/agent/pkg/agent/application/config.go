@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/agent/kibana"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
@@ -18,7 +19,7 @@ import (
 
 // TODO(ph) correctly setup global path.
 func fleetAgentConfigPath() string {
-	return "fleet.yml"
+	return info.AgentConfigFile
 }
 
 // Config define the configuration of the Agent.

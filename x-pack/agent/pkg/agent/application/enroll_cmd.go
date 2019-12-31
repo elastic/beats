@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
@@ -87,7 +88,6 @@ func NewEnrollCmdWithStore(
 	configPath string,
 	store store,
 ) (*EnrollCmd, error) {
-
 	cfg, err := kibana.NewConfigFromURL(url, CAs)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid Kibana URL")
@@ -146,6 +146,10 @@ func (c *EnrollCmd) Execute() error {
 
 	if err := c.configStore.Save(reader); err != nil {
 		return errors.Wrap(err, "could not save enroll credentials")
+	}
+
+	if _, err := info.NewAgentInfo(); err != nil {
+		return err
 	}
 
 	return nil

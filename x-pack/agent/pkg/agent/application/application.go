@@ -7,6 +7,7 @@ package application
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
@@ -15,7 +16,7 @@ import (
 type Application interface {
 	Start() error
 	Stop() error
-	AgentInfo() *AgentInfo
+	AgentInfo() *info.AgentInfo
 }
 
 // New creates a new Agent and bootstrap the required subsystem.
