@@ -76,14 +76,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	err := m.init()
 	if err != nil {
 		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
+			m.Log.Error(err)
+		} else {
+			elastic.ReportAndLogError(err, r, m.Log)
 		}
-		return err
 	}
 
 	now := time.Now()
@@ -91,17 +91,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err = m.fetchStats(r, now)
 	if err != nil {
 		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
+			m.Log.Error(err)
+		} else {
+			elastic.ReportAndLogError(err, r, m.Log)
 		}
-		return err
 	}
 
 	if m.XPackEnabled {
-		m.fetchSettings(r, now)
+		err = m.fetchSettings(r, now)
+		if err != nil {
+			m.Log.Error(err)
+		}
 	}
-
-	return nil
 }
 
 func (m *MetricSet) init() error {
