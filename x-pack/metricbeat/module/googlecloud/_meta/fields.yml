@@ -9,13 +9,17 @@
       fields:
         - name: user.*
           type: object
-          object_type: keyword
+          object_type: object
+          object_type_mapping_type: "*"
         - name: metadata.*
           type: object
-          object_type: keyword
+          object_type: object
+          object_type_mapping_type: "*"
         - name: metrics.*
           type: object
-          object_type: keyword
+          object_type: object
+          object_type_mapping_type: "*"
         - name: system.*
           type: object
-          object_type: keyword
+          object_type: object
+          object_type_mapping_type: "*"
