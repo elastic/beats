@@ -62,12 +62,7 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	if !devtools.IsInIntegTestEnv() {
-		mg.SerialDeps(goTestDeps...)
-	}
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	}, whitelistedEnvVars...)
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).

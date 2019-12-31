@@ -14,6 +14,13 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
+// Ignore these fields because they can be different on different versions
+// of windows.
+var ignoreFields = []string{
+	"message",
+}
+
 func TestSecurity(t *testing.T) {
-	module.TestPipeline(t, "testdata/*.evtx", "../config/winlogbeat-security.js")
+	module.TestPipeline(t, "testdata/*.evtx", "../config/winlogbeat-security.js",
+		module.WithFieldFilter(ignoreFields))
 }
