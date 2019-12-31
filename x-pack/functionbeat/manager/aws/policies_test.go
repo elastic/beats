@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/awslabs/goformation/cloudformation"
+	"github.com/awslabs/goformation/cloudformation/iam"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -49,7 +50,7 @@ func testPolicies(t *testing.T) {
 	}
 
 	// ensure permissions on specified resources
-	expected := cloudformation.AWSIAMRole_Policy{
+	expected := iam.Role_Policy{
 		PolicyName: cloudformation.Join("-", []string{"fnb", "kinesis", "myfunction"}),
 		PolicyDocument: map[string]interface{}{
 			"Statement": []map[string]interface{}{

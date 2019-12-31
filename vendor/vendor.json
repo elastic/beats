@@ -655,29 +655,699 @@
 			"versionExact": "v4.1.0"
 		},
 		{
-			"checksumSHA1": "9UUSrXIJWHfYH9kQH1fYFnpOMPo=",
+			"checksumSHA1": "kFeFyp450p6PBjON3ttgnkx7VDE=",
 			"path": "github.com/awslabs/goformation/cloudformation",
-			"revision": "c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3",
-			"revisionTime": "2018-10-29T15:41:58Z"
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
 		},
 		{
-			"checksumSHA1": "iAlvZoyOROLal7D0Zh8K32bQJwE=",
-			"origin": "github.com/ph/goformation/intrinsics",
+			"checksumSHA1": "wGM1C3qPmsJmmmA2pdLe6w/5rzo=",
+			"path": "github.com/awslabs/goformation/cloudformation/iam",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"checksumSHA1": "SMcN6fmbi5oRkvP8dGpCbD3hqkc=",
+			"path": "github.com/awslabs/goformation/cloudformation/lambda",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"checksumSHA1": "D3KTA5omtqaWEDreHKzVddWDXBc=",
+			"path": "github.com/awslabs/goformation/cloudformation/logs",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"checksumSHA1": "7h/Uh4ogUAUsELuMDkffKlOIQp0=",
+			"path": "github.com/awslabs/goformation/cloudformation/policies",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"checksumSHA1": "SGSRgoNYci6L13blR3mVkxXAEhE=",
+			"path": "github.com/awslabs/goformation/cloudformation/tags",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"checksumSHA1": "02A/FIvn3LV0PYKg4zlZZwo1aAE=",
 			"path": "github.com/awslabs/goformation/intrinsics",
-			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
-			"revisionTime": "2018-09-16T20:29:49Z",
-			"version": "1.2.2",
-			"versionExact": "1.2.2"
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"revisionTime": "2019-12-09T03:51:39Z",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
 		},
 		{
-			"checksumSHA1": "bHeG9a9KF3MjiU6ZAdz91geL1DA=",
-			"origin": "github.com/ph/goformation/intrinsics",
-			"path": "github.com/awslabs/goformation/intrinsics/",
-			"revision": "c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3",
-			"revisionTime": "2018-10-29T15:41:58Z"
+			"path": "github.com/awslabs/goformation/v4/cloudformation/accessanalyzer",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
 		},
 		{
-			"path": "github.com/awslabs/goformation/v4/cloudformation",
+			"path": "github.com/awslabs/goformation/v4/cloudformation/amazonmq",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/amplify",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/apigateway",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/apigatewayv2",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/applicationautoscaling",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/appmesh",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/appstream",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/appsync",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ask",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/athena",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/autoscaling",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/autoscalingplans",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/backup",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/batch",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/budgets",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/certificatemanager",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cloud9",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cloudformation",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cloudfront",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cloudtrail",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cloudwatch",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codebuild",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codecommit",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codedeploy",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codepipeline",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codestar",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/codestarnotifications",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/cognito",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/config",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/datapipeline",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/dax",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/directoryservice",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/dlm",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/dms",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/docdb",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/dynamodb",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ec2",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ecr",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ecs",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/efs",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/eks",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/elasticache",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/elasticbeanstalk",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/elasticloadbalancing",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/elasticloadbalancingv2",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/elasticsearch",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/emr",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/events",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/eventschemas",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/fsx",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/gamelift",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/glue",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/greengrass",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/guardduty",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iam",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/inspector",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iot",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iot1click",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iotanalytics",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iotevents",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/iotthingsgraph",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/kinesis",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/kinesisanalytics",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/kinesisanalyticsv2",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/kinesisfirehose",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/kms",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/lakeformation",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/lambda",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/logs",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/managedblockchain",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/mediaconvert",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/medialive",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/mediastore",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/msk",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/neptune",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/opsworks",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/opsworkscm",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/pinpoint",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/pinpointemail",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/policies",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/qldb",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ram",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/rds",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/redshift",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/robomaker",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/route53",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/route53resolver",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/s3",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/sagemaker",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/sdb",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/secretsmanager",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/securityhub",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/serverless",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/servicecatalog",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/servicediscovery",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ses",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/sns",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/sqs",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/ssm",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/stepfunctions",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/tags",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/transfer",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/waf",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/wafregional",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/wafv2",
+			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
+			"version": "v4.1.0",
+			"versionExact": "v4.1.0"
+		},
+		{
+			"path": "github.com/awslabs/goformation/v4/cloudformation/workspaces",
 			"revision": "18ccd0e58e5df10d9f82f875d54b087d3058cfc1",
 			"version": "v4.1.0",
 			"versionExact": "v4.1.0"
