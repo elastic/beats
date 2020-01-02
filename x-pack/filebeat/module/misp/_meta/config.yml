@@ -7,5 +7,5 @@
     # Array object in MISP response
     #var.json_objects_array
 
-    # URI of the MISP REST API
+    # URL of the MISP REST API
     #var.url
