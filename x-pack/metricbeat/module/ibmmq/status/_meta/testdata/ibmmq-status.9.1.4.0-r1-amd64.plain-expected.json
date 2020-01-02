@@ -1,0 +1,407 @@
+[
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "handler": "prometheus",
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.9"
+            },
+            "metrics": {
+                "http_request_duration_microseconds": 11240.8,
+                "http_request_size_bytes": 541,
+                "http_response_size_bytes": 17385
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.25"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.0002584
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq"
+            },
+            "metrics": {
+                "go_gc_duration_seconds_count": 4,
+                "go_gc_duration_seconds_sum": 0.0015406,
+                "go_goroutines": 17,
+                "go_memstats_alloc_bytes": 3310936,
+                "go_memstats_alloc_bytes_total": 15629504,
+                "go_memstats_buck_hash_sys_bytes": 1444532,
+                "go_memstats_frees_total": 70586,
+                "go_memstats_gc_sys_bytes": 2381824,
+                "go_memstats_heap_alloc_bytes": 3310936,
+                "go_memstats_heap_idle_bytes": 62185472,
+                "go_memstats_heap_inuse_bytes": 4333568,
+                "go_memstats_heap_objects": 14862,
+                "go_memstats_heap_released_bytes_total": 0,
+                "go_memstats_heap_sys_bytes": 66519040,
+                "go_memstats_last_gc_time_seconds": 1577985263.6227708,
+                "go_memstats_lookups_total": 0,
+                "go_memstats_mallocs_total": 85448,
+                "go_memstats_mcache_inuse_bytes": 3472,
+                "go_memstats_mcache_sys_bytes": 16384,
+                "go_memstats_mspan_inuse_bytes": 39024,
+                "go_memstats_mspan_sys_bytes": 65536,
+                "go_memstats_next_gc_bytes": 4194304,
+                "go_memstats_other_sys_bytes": 745028,
+                "go_memstats_stack_inuse_bytes": 589824,
+                "go_memstats_stack_sys_bytes": 589824,
+                "go_memstats_sys_bytes": 71762168,
+                "process_cpu_seconds_total": 0.48,
+                "process_max_fds": 1048576,
+                "process_open_fds": 10,
+                "process_resident_memory_bytes": 25088000,
+                "process_start_time_seconds": 1577985248.64,
+                "process_virtual_memory_bytes": 971141120
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "qmgr": "QM1"
+            },
+            "metrics": {
+                "ibmmq_qmgr_commit_total": 0,
+                "ibmmq_qmgr_destructive_get_bytes_total": 7812,
+                "ibmmq_qmgr_destructive_get_total": 23,
+                "ibmmq_qmgr_durable_subscription_alter_total": 0,
+                "ibmmq_qmgr_durable_subscription_create_total": 0,
+                "ibmmq_qmgr_durable_subscription_delete_total": 0,
+                "ibmmq_qmgr_durable_subscription_resume_total": 0,
+                "ibmmq_qmgr_expired_message_total": 0,
+                "ibmmq_qmgr_failed_browse_total": 0,
+                "ibmmq_qmgr_failed_mqcb_total": 0,
+                "ibmmq_qmgr_failed_mqclose_total": 0,
+                "ibmmq_qmgr_failed_mqconn_mqconnx_total": 0,
+                "ibmmq_qmgr_failed_mqget_total": 16,
+                "ibmmq_qmgr_failed_mqinq_total": 0,
+                "ibmmq_qmgr_failed_mqopen_total": 0,
+                "ibmmq_qmgr_failed_mqput1_total": 0,
+                "ibmmq_qmgr_failed_mqput_total": 0,
+                "ibmmq_qmgr_failed_mqset_total": 0,
+                "ibmmq_qmgr_failed_mqsubrq_total": 0,
+                "ibmmq_qmgr_failed_subscription_create_alter_resume_total": 0,
+                "ibmmq_qmgr_failed_subscription_delete_total": 0,
+                "ibmmq_qmgr_failed_topic_mqput_mqput1_total": 0,
+                "ibmmq_qmgr_log_logical_written_bytes_total": 0,
+                "ibmmq_qmgr_log_physical_written_bytes_total": 0,
+                "ibmmq_qmgr_mqcb_total": 0,
+                "ibmmq_qmgr_mqclose_total": 0,
+                "ibmmq_qmgr_mqconn_mqconnx_total": 0,
+                "ibmmq_qmgr_mqctl_total": 0,
+                "ibmmq_qmgr_mqdisc_total": 0,
+                "ibmmq_qmgr_mqinq_total": 4,
+                "ibmmq_qmgr_mqopen_total": 0,
+                "ibmmq_qmgr_mqput_mqput1_bytes_total": 1860,
+                "ibmmq_qmgr_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_mqset_total": 0,
+                "ibmmq_qmgr_mqstat_total": 0,
+                "ibmmq_qmgr_mqsubrq_total": 0,
+                "ibmmq_qmgr_non_durable_subscription_create_total": 0,
+                "ibmmq_qmgr_non_durable_subscription_delete_total": 0,
+                "ibmmq_qmgr_non_persistent_message_browse_bytes_total": 0,
+                "ibmmq_qmgr_non_persistent_message_browse_total": 0,
+                "ibmmq_qmgr_non_persistent_message_destructive_get_total": 23,
+                "ibmmq_qmgr_non_persistent_message_get_bytes_total": 7812,
+                "ibmmq_qmgr_non_persistent_message_mqput1_total": 0,
+                "ibmmq_qmgr_non_persistent_message_mqput_total": 6,
+                "ibmmq_qmgr_non_persistent_message_put_bytes_total": 1860,
+                "ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_persistent_message_browse_bytes_total": 0,
+                "ibmmq_qmgr_persistent_message_browse_total": 0,
+                "ibmmq_qmgr_persistent_message_destructive_get_total": 0,
+                "ibmmq_qmgr_persistent_message_get_bytes_total": 0,
+                "ibmmq_qmgr_persistent_message_mqput1_total": 0,
+                "ibmmq_qmgr_persistent_message_mqput_total": 0,
+                "ibmmq_qmgr_persistent_message_put_bytes_total": 0,
+                "ibmmq_qmgr_persistent_topic_mqput_mqput1_total": 0,
+                "ibmmq_qmgr_published_to_subscribers_bytes_total": 1224,
+                "ibmmq_qmgr_published_to_subscribers_message_total": 6,
+                "ibmmq_qmgr_purged_queue_total": 0,
+                "ibmmq_qmgr_rollback_total": 0,
+                "ibmmq_qmgr_topic_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_topic_put_bytes_total": 1224
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "handler": "prometheus",
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq"
+            },
+            "metrics": {
+                "http_request_duration_microseconds_count": 20,
+                "http_request_duration_microseconds_sum": 119184,
+                "http_request_size_bytes_count": 20,
+                "http_request_size_bytes_sum": 5540,
+                "http_response_size_bytes_count": 20,
+                "http_response_size_bytes_sum": 120494
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.5"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.000299
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "handler": "prometheus",
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.5"
+            },
+            "metrics": {
+                "http_request_duration_microseconds": 3322.4,
+                "http_request_size_bytes": 63,
+                "http_response_size_bytes": 6428
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.75"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.0008576
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "1"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.0008576
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "handler": "prometheus",
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0.99"
+            },
+            "metrics": {
+                "http_request_duration_microseconds": 22438.3,
+                "http_request_size_bytes": 541,
+                "http_response_size_bytes": 17387
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "code": "200",
+                "handler": "prometheus",
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "method": "get"
+            },
+            "metrics": {
+                "http_requests_total": 20
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.status",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60576",
+                "job": "ibmmq",
+                "quantile": "0"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.0001256
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    }
+]
