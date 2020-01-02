@@ -113,7 +113,7 @@ func (o *Operator) State() map[string]state.State {
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
-	_, steps, err := o.stateResolver.Resolve(cfg)
+	_, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
@@ -128,6 +128,9 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 			return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err))
 		}
 	}
+
+	// Ack the resolver should state for next call.
+	ack()
 
 	return nil
 }
