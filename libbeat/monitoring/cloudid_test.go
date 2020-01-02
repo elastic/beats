@@ -20,6 +20,8 @@ package monitoring
 import (
 	"testing"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -84,7 +86,7 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 				"cloud.auth": "elastic:changeme",
 			},
 			func(t assert.TestingT, err error, _ ...interface{}) bool {
-				return assert.EqualError(t, ErrCloudCfgIncomplete, err.Error())
+				return assert.EqualError(t, errCloudCfgIncomplete, errw.Cause(err).Error())
 			},
 		}}
 

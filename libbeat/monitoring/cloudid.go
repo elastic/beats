@@ -19,9 +19,9 @@ package monitoring
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/cloudid"
+	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -33,31 +33,18 @@ type cloudConfig struct {
 	} `config:"cloud"`
 }
 
-// ErrCloudCfg represents an error when trying to use monitoring.cloud.* settings.
-type ErrCloudCfg struct {
-	cause error
+func cfgError(cause error) error {
+	return errw.Wrap(cause, "error using monitoring.cloud.* settings")
 }
 
-// Error returns the error as a string.
-func (e ErrCloudCfg) Error() string {
-	return fmt.Sprintf("error using monitoring.cloud.* settings: %v", e.cause)
-}
-
-// Unwrap returns the underlying cause of the error.
-func (e ErrCloudCfg) Unwrap() error {
-	return e.cause
-}
-
-// ErrCloudCfgIncomplete is an error indicating that monitoring.cloud.auth has
-// been specified but monitoring.cloud.id has not.
-var ErrCloudCfgIncomplete = ErrCloudCfg{errors.New("monitoring.cloud.auth specified but monitoring.cloud.id is empty. Please specify both")}
+var errCloudCfgIncomplete = errors.New("monitoring.cloud.auth specified but monitoring.cloud.id is empty. Please specify both")
 
 // OverrideWithCloudSettings overrides monitoring.elasticsearch.* with
 // monitoring.cloud.* if the latter are set.
 func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 	var config cloudConfig
 	if err := monitoringCfg.Unpack(&config); err != nil {
-		return ErrCloudCfg{err}
+		return cfgError(err)
 	}
 
 	if config.Cloud.ID == "" && config.Cloud.Auth == "" {
@@ -66,27 +53,27 @@ func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 	}
 
 	if config.Cloud.ID == "" && config.Cloud.Auth != "" {
-		return ErrCloudCfgIncomplete
+		return cfgError(errCloudCfgIncomplete)
 	}
 
 	// We remove monitoring.cloud.* so that "cloud" is not treated as a type of
 	// monitoring reporter later.
 	if _, err := monitoringCfg.Remove("cloud", -1); err != nil {
-		return ErrCloudCfg{err}
+		return cfgError(err)
 	}
 
 	cid, err := cloudid.NewCloudID(config.Cloud.ID, config.Cloud.Auth)
 	if err != nil {
-		return ErrCloudCfg{err}
+		return cfgError(err)
 	}
 
 	if err := overwriteWithCloudID(monitoringCfg, cid); err != nil {
-		return ErrCloudCfg{err}
+		return cfgError(err)
 	}
 
 	if config.Cloud.Auth != "" {
 		if err := overwriteWithCloudAuth(monitoringCfg, cid); err != nil {
-			return ErrCloudCfg{err}
+			return cfgError(err)
 		}
 	}
 
