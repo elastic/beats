@@ -22,9 +22,10 @@ import (
 	"os"
 	"path/filepath"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // RunSetup runs any remaining setup commands after the vendor directory has been setup

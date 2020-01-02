@@ -22,7 +22,7 @@ import (
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	extv1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -66,6 +66,9 @@ type ReplicaSet = extv1.ReplicaSet
 
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
+
+// Service data
+type Service = v1.Service
 
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {

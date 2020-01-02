@@ -1,7 +1,11 @@
+[role="xpack"]
+
 :modulename: activemq
-:has-dashboards: false
+:has-dashboards: true
 
 == ActiveMQ module
+
+beta[]
 
 This module parses Apache ActiveMQ logs. It supports application and audit logs.
 
@@ -43,11 +47,26 @@ To specify the same settings at the command line, you use:
 -----
 
 [float]
+==== `audit` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
 ==== `log` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Dashboards
+
+The ActiveMQ module comes with several predefined dashboards for application and audit logs. For example:
+
+image::./images/filebeat-activemq-application-events.png[]
+
+image::./images/filebeat-activemq-audit-events.png[]
+
 
 :has-dashboards!:
 

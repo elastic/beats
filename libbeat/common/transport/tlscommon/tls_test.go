@@ -132,7 +132,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 
 	cfg := tmp.BuildModuleConfig("")
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
 	assert.Equal(t, false, cfg.InsecureSkipVerify)
@@ -164,7 +164,7 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
 	assert.Equal(t, tls.RenegotiateOnceAsClient, cfg.Renegotiation)
 }
@@ -189,7 +189,7 @@ func TestServerConfigDefaults(t *testing.T) {
 		// values set by default
 		assert.Equal(t, false, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-		assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+		assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 		assert.Equal(t, tls.NoClientCert, cfg.ClientAuth)
 	})
 	t.Run("when CA is explicitly set", func(t *testing.T) {
@@ -215,7 +215,7 @@ func TestServerConfigDefaults(t *testing.T) {
 		// values set by default
 		assert.Equal(t, false, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-		assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+		assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 		assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
 	})
 }
@@ -227,7 +227,7 @@ func TestApplyWithServerConfig(t *testing.T) {
     certificate_authorities: [ca_test.pem]
     verification_mode: none
     client_authentication: optional
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
     cipher_suites:
       - "ECDHE-ECDSA-AES-256-CBC-SHA"
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
@@ -255,7 +255,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
-	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Equal(t, int(tls.VersionTLS13), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
 	assert.Equal(t, tls.VerifyClientCertIfGiven, cfg.ClientAuth)
 }
