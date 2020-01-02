@@ -20,9 +20,9 @@ package monitoring
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/cloudid"
 	errw "github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 )
 
