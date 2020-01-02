@@ -6,6 +6,7 @@ package application
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -15,9 +16,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	repo "github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
 )
 
@@ -79,7 +83,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{})}
 }
 
-type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper)
+type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -88,6 +92,7 @@ func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 		dispatcher := newTestingDispatcher()
 
 		log, _ := logger.New()
+		rep := getReporter(agentInfo, log, t)
 
 		gateway, err := newFleetGatewayWithScheduler(
 			log,
@@ -96,6 +101,7 @@ func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 			client,
 			dispatcher,
 			scheduler,
+			rep,
 		)
 
 		go gateway.Start()
@@ -103,7 +109,7 @@ func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 
 		require.NoError(t, err)
 
-		fn(t, gateway, client, dispatcher, scheduler)
+		fn(t, gateway, client, dispatcher, scheduler, rep)
 	}
 }
 
@@ -139,6 +145,7 @@ func TestFleetGateway(t *testing.T) {
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
+		rep repo.Backend,
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
@@ -163,28 +170,29 @@ func TestFleetGateway(t *testing.T) {
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
+		rep repo.Backend,
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `
 {
-    "actions": [
-        {
-            "type": "POLICY_CHANGE",
-            "id": "id1",
-            "data": {
-                "policy": {
-                    "id": "policy-id"
-                }
-            }
-        },
-        {
-            "type": "ANOTHER_ACTION",
-            "id": "id2"
-        }
-    ],
-    "success": true
+	"actions": [
+		{
+			"type": "POLICY_CHANGE",
+			"id": "id1",
+			"data": {
+				"policy": {
+					"id": "policy-id"
+				}
+			}
+		},
+		{
+			"type": "ANOTHER_ACTION",
+			"id": "id2"
+		}
+	],
+	"success": true
 }
 `)
 				return resp, nil
@@ -213,6 +221,7 @@ func TestFleetGateway(t *testing.T) {
 			client,
 			dispatcher,
 			scheduler,
+			getReporter(agentInfo, log, t),
 		)
 
 		go gateway.Start()
@@ -224,7 +233,6 @@ func TestFleetGateway(t *testing.T) {
 		for {
 			received := ackSeq(
 				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-					// TODO: assert no events
 					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 					return resp, nil
 				}),
@@ -242,6 +250,43 @@ func TestFleetGateway(t *testing.T) {
 		}
 	})
 
+	t.Run("send event and receive no action", withGateway(agentInfo, func(
+		t *testing.T,
+		gateway *fleetGateway,
+		client *testingClient,
+		dispatcher *testingDispatcher,
+		scheduler *scheduler.Stepper,
+		rep repo.Backend,
+	) {
+		rep.Report(&testStateEvent{})
+		received := ackSeq(
+			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+				cr := &request{}
+				content, err := ioutil.ReadAll(body)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = json.Unmarshal(content, &cr)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				require.Equal(t, 1, len(cr.Events))
+
+				// TODO: assert no events
+				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+				return resp, nil
+			}),
+			dispatcher.Answer(func(actions ...action) error {
+				require.Equal(t, 0, len(actions))
+				return nil
+			}),
+		)
+
+		// Synchronize scheduler and acking of calls from the worker go routine.
+		scheduler.Next()
+		<-received
+	}))
 	t.Run("Successfully connects and sends events back to fleet", skip)
 }
 
@@ -249,6 +294,28 @@ func skip(t *testing.T) {
 	t.SkipNow()
 }
 
+func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultFleetManagementConfig())
+	if err != nil {
+		t.Fatal(errors.Wrap(err, "fail to create reporters"))
+	}
+
+	return fleetR
+}
+
 type testAgentInfo struct{}
 
 func (testAgentInfo) AgentID() string { return "agent-secret" }
+
+type testStateEvent struct{}
+
+func (testStateEvent) Type() string                    { return repo.EventTypeState }
+func (testStateEvent) SubType() string                 { return repo.EventSubTypeInProgress }
+func (testStateEvent) Time() time.Time                 { return time.Unix(0, 1) }
+func (testStateEvent) Message() string                 { return "hello" }
+func (testStateEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
+func (testStateEvent) Data() string                    { return "" }
+
+type request struct {
+	Events []interface{} `json:"events"`
+}

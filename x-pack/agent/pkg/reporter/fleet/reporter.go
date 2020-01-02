@@ -5,9 +5,6 @@
 package fleet
 
 import (
-	"io"
-	"net/http"
-	"net/url"
 	"sync"
 	"time"
 
@@ -19,6 +16,8 @@ import (
 const (
 	defaultThreshold = 1000
 )
+
+type ackFn func()
 
 type event struct {
 	EventType string                 `json:"type"`
@@ -41,31 +40,13 @@ func (e *event) Message() string {
 	return e.Msg
 }
 
-type checkinExecutor interface {
-	Execute(r *fleetapi.CheckinRequest) (*fleetapi.CheckinResponse, error)
-}
-
-type remoteClient interface {
-	Send(
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
-}
-
 // Reporter is a reporter without any effects, serves just as a showcase for further implementations.
 type Reporter struct {
-	logger         *logger.Logger
-	queue          []reporter.Event
-	qlock          sync.Mutex
-	ticker         *time.Ticker
-	threshold      int
-	droppedCounter int
-	checkingCmd    checkinExecutor
-	closeChan      chan struct{}
-	closeOnce      sync.Once
+	logger    *logger.Logger
+	queue     []fleetapi.SerializableEvent
+	qlock     sync.Mutex
+	threshold int
+	lastAck   time.Time
 }
 
 type agentInfo interface {
@@ -73,104 +54,97 @@ type agentInfo interface {
 }
 
 // NewReporter creates a new fleet reporter.
-func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig, client remoteClient) (*Reporter, error) {
-	checkinClient := fleetapi.NewCheckinCmd(agentInfo, client)
-
-	frequency := time.Duration(c.ReportingCheckFrequency) * time.Second
+func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig) (*Reporter, error) {
 	r := &Reporter{
-		queue:       make([]reporter.Event, 0),
-		ticker:      time.NewTicker(frequency),
-		logger:      l,
-		checkingCmd: checkinClient,
-		threshold:   c.Threshold,
-		closeChan:   make(chan struct{}),
+		queue:     make([]fleetapi.SerializableEvent, 0),
+		logger:    l,
+		threshold: c.Threshold,
 	}
 
-	go r.reportLoop()
 	return r, nil
 }
 
-// Report in noop reporter does nothing.
+// Report enqueue event into reporter queue.
 func (r *Reporter) Report(e reporter.Event) error {
 	r.qlock.Lock()
 	defer r.qlock.Unlock()
 
-	r.queue = append(r.queue, e)
+	r.queue = append(r.queue, &event{
+		EventType: e.Type(),
+		Ts:        fleetapi.Time(e.Time()),
+		SubType:   e.SubType(),
+		Msg:       e.Message(),
+		Payload:   e.Payload(),
+		Data:      e.Data(),
+	})
+
 	if r.threshold > 0 && len(r.queue) > r.threshold {
+		// drop some low importance event if needed
 		r.dropEvent()
 	}
+
 	return nil
+}
+
+// Events returns a list of event from a queue and a ack function
+// which clears those events once caller is done with processing.
+func (r *Reporter) Events() ([]fleetapi.SerializableEvent, func()) {
+	r.qlock.Lock()
+	defer r.qlock.Unlock()
+
+	cp := r.queueCopy()
+
+	ackFn := func() {
+		// as time is monotonic and this is on single machine this should be ok.
+		r.clear(cp, time.Now())
+	}
+
+	return cp, ackFn
+}
+
+func (r *Reporter) clear(items []fleetapi.SerializableEvent, ackTime time.Time) {
+	r.qlock.Lock()
+	defer r.qlock.Unlock()
+
+	if ackTime.Sub(r.lastAck) <= 0 ||
+		len(r.queue) == 0 ||
+		items == nil ||
+		len(items) == 0 {
+		return
+	}
+
+	var dropIdx int
+	r.lastAck = ackTime
+	itemsLen := len(items)
+
+OUTER:
+	for idx := itemsLen - 1; idx >= 0; idx-- {
+		for i, v := range r.queue {
+			if v == items[idx] {
+				dropIdx = i
+				break OUTER
+			}
+		}
+	}
+
+	r.queue = r.queue[dropIdx+1:]
 }
 
 // Close stops all the background jobs reporter is running.
 // Guards agains panic of closing channel multiple times.
 func (r *Reporter) Close() error {
-	r.closeOnce.Do(func() { close(r.closeChan) })
 	return nil
 }
 
-func (r *Reporter) reportLoop() {
-	for {
-		select {
-		case <-r.ticker.C:
-		case <-r.closeChan:
-			r.logger.Info("stop received, cancelling the fleet report loop")
-			return
-		}
-
-		// report all events up to this point
-		r.qlock.Lock()
-		batch := r.queueCopy()
-		r.droppedCounter = 0
-		r.qlock.Unlock()
-
-		if err := r.reportBatch(batch); err != nil {
-			r.logger.Errorf("failed to report event batch: %v", err)
-			continue
-		}
-
-		// shrink
-		r.qlock.Lock()
-
-		// in case some event are dropped decrease size to avoid event-loss
-		if size := len(batch) - r.droppedCounter; size > 0 {
-			r.queue = r.queue[size:]
-		}
-		r.qlock.Unlock()
-	}
-}
-
-func (r *Reporter) queueCopy() []reporter.Event {
+func (r *Reporter) queueCopy() []fleetapi.SerializableEvent {
 	size := len(r.queue)
-	batch := make([]reporter.Event, size)
+	batch := make([]fleetapi.SerializableEvent, size)
 
 	copy(batch, r.queue)
 	return batch
 }
 
-func (r *Reporter) reportBatch(ee []reporter.Event) error {
-	req := &fleetapi.CheckinRequest{
-		Events: make([]fleetapi.SerializableEvent, 0, len(ee)),
-	}
-
-	for _, e := range ee {
-		req.Events = append(req.Events,
-			&event{
-				EventType: e.Type(),
-				Ts:        fleetapi.Time(e.Time()),
-				SubType:   e.SubType(),
-				Msg:       e.Message(),
-				Payload:   e.Payload(),
-				Data:      e.Data(),
-			})
-	}
-
-	_, err := r.checkingCmd.Execute(req)
-	return err
-}
-
 func (r *Reporter) dropEvent() {
-	r.droppedCounter++
 	if dropped := r.tryDropInfo(); !dropped {
 		r.dropFirst()
 	}
@@ -190,6 +164,12 @@ func (r *Reporter) tryDropInfo() bool {
 }
 
 func (r *Reporter) dropFirst() {
+	if len(r.queue) == 0 {
+		return
+	}
+
+	first := r.queue[0]
+	r.logger.Infof("fleet reporter dropped event because threshold[%d] was reached: %v", r.threshold, first)
 	r.queue = r.queue[1:]
 }
 

@@ -20,6 +20,10 @@ type agentInfo interface {
 	AgentID() string
 }
 
+type fleetReporter interface {
+	Events() ([]fleetapi.SerializableEvent, func())
+}
+
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
 // bidirectional communication requirements. The gateway aggregates events and will periodically
 // call the API to send the events and will receive actions to be executed locally.
@@ -30,6 +34,7 @@ type fleetGateway struct {
 	client     clienter
 	scheduler  scheduler.Scheduler
 	agentInfo  agentInfo
+	reporter   fleetReporter
 	done       chan struct{}
 }
 
@@ -43,6 +48,7 @@ func newFleetGateway(
 	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
+	r fleetReporter,
 ) (*fleetGateway, error) {
 	scheduler := scheduler.NewPeriodic(settings.Duration)
 	return newFleetGatewayWithScheduler(
@@ -52,6 +58,7 @@ func newFleetGateway(
 		client,
 		d,
 		scheduler,
+		r,
 	)
 }
 
@@ -62,6 +69,7 @@ func newFleetGatewayWithScheduler(
 	client clienter,
 	d dispatcher,
 	scheduler scheduler.Scheduler,
+	r fleetReporter,
 ) (*fleetGateway, error) {
 	return &fleetGateway{
 		log:        log,
@@ -70,6 +78,7 @@ func newFleetGatewayWithScheduler(
 		agentInfo:  agentInfo, //TODO(ph): this need to be a struct.
 		scheduler:  scheduler,
 		done:       make(chan struct{}),
+		reporter:   r,
 	}, nil
 }
 
@@ -101,17 +110,22 @@ func (f *fleetGateway) worker() {
 }
 
 func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
-	// TODO(ph): Aggregates and send events.
-	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
+	// get events
+	ee, ack := f.reporter.Events()
 
+	// checkin
+	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
-		Events: make([]fleetapi.SerializableEvent, 0),
+		Events: ee,
 	}
+
 	resp, err := cmd.Execute(req)
 	if err != nil {
 		return nil, err
 	}
 
+	// ack events so they are dropped from queue
+	ack()
 	return resp, nil
 }
 
