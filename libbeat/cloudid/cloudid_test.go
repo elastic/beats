@@ -82,8 +82,8 @@ func TestDecode(t *testing.T) {
 		cid, err := NewCloudID(test.cloudID, "")
 		assert.NoError(t, err, test.cloudID)
 
-		assert.Equal(t, cid.esURL, test.expectedEsURL, test.cloudID)
-		assert.Equal(t, cid.kibURL, test.expectedKibanaURL, test.cloudID)
+		assert.Equal(t, cid.ElasticsearchURL(), test.expectedEsURL, test.cloudID)
+		assert.Equal(t, cid.KibanaURL(), test.expectedKibanaURL, test.cloudID)
 	}
 }
 
