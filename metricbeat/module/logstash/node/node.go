@@ -18,8 +18,6 @@
 package node
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -92,17 +90,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 func (m *MetricSet) init() error {
 	if m.XPack {
-		logstashVersion, err := logstash.GetVersion(m.MetricSet)
-		if err != nil {
-			return err
-		}
-
-		arePipelineGraphAPIsAvailable := logstash.ArePipelineGraphAPIsAvailable(logstashVersion)
-
-		if !arePipelineGraphAPIsAvailable {
-			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
-			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), logstash.PipelineGraphAPIsAvailableVersion, logstashVersion)
-		}
+		return m.CheckPipelineGraphAPIsAvailable()
 	}
 
 	return nil
