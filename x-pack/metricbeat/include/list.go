@@ -28,6 +28,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/coredns/stats"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/googlecloud/stackdriver"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/ibmmq"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/performance"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/transaction_log"

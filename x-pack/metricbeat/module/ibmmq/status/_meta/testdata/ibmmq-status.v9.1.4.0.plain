@@ -1,0 +1,375 @@
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0.0001497
+go_gc_duration_seconds{quantile="0.25"} 0.0002576
+go_gc_duration_seconds{quantile="0.5"} 0.00031
+go_gc_duration_seconds{quantile="0.75"} 0.0003503
+go_gc_duration_seconds{quantile="1"} 0.0005474
+go_gc_duration_seconds_sum 0.0018763
+go_gc_duration_seconds_count 6
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 14
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 2.08604e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 1.900984e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.444398e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 80976
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 442368
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 2.08604e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 3.85024e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 2.8672e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 14827
+# HELP go_memstats_heap_released_bytes_total Total number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes_total counter
+go_memstats_heap_released_bytes_total 0
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 6.71744e+06
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.5763457442673564e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 217
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 95803
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 3472
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 16384
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 48336
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 81920
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 4.194304e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 741066
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 622592
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 622592
+# HELP go_memstats_sys_bytes Number of bytes obtained by system. Sum of all system allocations.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 1.0066168e+07
+# HELP http_request_duration_microseconds The HTTP request latencies in microseconds.
+# TYPE http_request_duration_microseconds summary
+http_request_duration_microseconds{handler="prometheus",quantile="0.5"} 5838
+http_request_duration_microseconds{handler="prometheus",quantile="0.9"} 18555.9
+http_request_duration_microseconds{handler="prometheus",quantile="0.99"} 18555.9
+http_request_duration_microseconds_sum{handler="prometheus"} 67148.70000000001
+http_request_duration_microseconds_count{handler="prometheus"} 8
+# HELP http_request_size_bytes The HTTP request sizes in bytes.
+# TYPE http_request_size_bytes summary
+http_request_size_bytes{handler="prometheus",quantile="0.5"} 536
+http_request_size_bytes{handler="prometheus",quantile="0.9"} 536
+http_request_size_bytes{handler="prometheus",quantile="0.99"} 536
+http_request_size_bytes_sum{handler="prometheus"} 4288
+http_request_size_bytes_count{handler="prometheus"} 8
+# HELP http_requests_total Total number of HTTP requests made.
+# TYPE http_requests_total counter
+http_requests_total{code="200",handler="prometheus",method="get"} 8
+# HELP http_response_size_bytes The HTTP response sizes in bytes.
+# TYPE http_response_size_bytes summary
+http_response_size_bytes{handler="prometheus",quantile="0.5"} 2592
+http_response_size_bytes{handler="prometheus",quantile="0.9"} 3290
+http_response_size_bytes{handler="prometheus",quantile="0.99"} 3290
+http_response_size_bytes_sum{handler="prometheus"} 19568
+http_response_size_bytes_count{handler="prometheus"} 8
+# HELP ibmmq_qmgr_commit_total Commit count
+# TYPE ibmmq_qmgr_commit_total counter
+ibmmq_qmgr_commit_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_cpu_load_fifteen_minute_average_percentage CPU load - fifteen minute average
+# TYPE ibmmq_qmgr_cpu_load_fifteen_minute_average_percentage gauge
+ibmmq_qmgr_cpu_load_fifteen_minute_average_percentage{qmgr="QM1"} 0.2
+# HELP ibmmq_qmgr_cpu_load_five_minute_average_percentage CPU load - five minute average
+# TYPE ibmmq_qmgr_cpu_load_five_minute_average_percentage gauge
+ibmmq_qmgr_cpu_load_five_minute_average_percentage{qmgr="QM1"} 0.23
+# HELP ibmmq_qmgr_cpu_load_one_minute_average_percentage CPU load - one minute average
+# TYPE ibmmq_qmgr_cpu_load_one_minute_average_percentage gauge
+ibmmq_qmgr_cpu_load_one_minute_average_percentage{qmgr="QM1"} 0.08
+# HELP ibmmq_qmgr_destructive_get_bytes_total Interval total destructive get - byte count
+# TYPE ibmmq_qmgr_destructive_get_bytes_total counter
+ibmmq_qmgr_destructive_get_bytes_total{qmgr="QM1"} 90424
+# HELP ibmmq_qmgr_destructive_get_total Interval total destructive get- count
+# TYPE ibmmq_qmgr_destructive_get_total counter
+ibmmq_qmgr_destructive_get_total{qmgr="QM1"} 218
+# HELP ibmmq_qmgr_durable_subscription_alter_total Alter durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_alter_total counter
+ibmmq_qmgr_durable_subscription_alter_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_create_total Create durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_create_total counter
+ibmmq_qmgr_durable_subscription_create_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_delete_total Delete durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_delete_total counter
+ibmmq_qmgr_durable_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_resume_total Resume durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_resume_total counter
+ibmmq_qmgr_durable_subscription_resume_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_errors_file_system_free_space_percentage MQ errors file system - free space
+# TYPE ibmmq_qmgr_errors_file_system_free_space_percentage gauge
+ibmmq_qmgr_errors_file_system_free_space_percentage{qmgr="QM1"} 76.31
+# HELP ibmmq_qmgr_errors_file_system_in_use_bytes MQ errors file system - bytes in use
+# TYPE ibmmq_qmgr_errors_file_system_in_use_bytes gauge
+ibmmq_qmgr_errors_file_system_in_use_bytes{qmgr="QM1"} 1.485832192e+10
+# HELP ibmmq_qmgr_expired_message_total Expired message count
+# TYPE ibmmq_qmgr_expired_message_total counter
+ibmmq_qmgr_expired_message_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_browse_total Failed browse count
+# TYPE ibmmq_qmgr_failed_browse_total counter
+ibmmq_qmgr_failed_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqcb_total Failed MQCB count
+# TYPE ibmmq_qmgr_failed_mqcb_total counter
+ibmmq_qmgr_failed_mqcb_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqclose_total Failed MQCLOSE count
+# TYPE ibmmq_qmgr_failed_mqclose_total counter
+ibmmq_qmgr_failed_mqclose_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqconn_mqconnx_total Failed MQCONN/MQCONNX count
+# TYPE ibmmq_qmgr_failed_mqconn_mqconnx_total counter
+ibmmq_qmgr_failed_mqconn_mqconnx_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqget_total Failed MQGET - count
+# TYPE ibmmq_qmgr_failed_mqget_total counter
+ibmmq_qmgr_failed_mqget_total{qmgr="QM1"} 54
+# HELP ibmmq_qmgr_failed_mqinq_total Failed MQINQ count
+# TYPE ibmmq_qmgr_failed_mqinq_total counter
+ibmmq_qmgr_failed_mqinq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqopen_total Failed MQOPEN count
+# TYPE ibmmq_qmgr_failed_mqopen_total counter
+ibmmq_qmgr_failed_mqopen_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqput1_total Failed MQPUT1 count
+# TYPE ibmmq_qmgr_failed_mqput1_total counter
+ibmmq_qmgr_failed_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqput_total Failed MQPUT count
+# TYPE ibmmq_qmgr_failed_mqput_total counter
+ibmmq_qmgr_failed_mqput_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqset_total Failed MQSET count
+# TYPE ibmmq_qmgr_failed_mqset_total counter
+ibmmq_qmgr_failed_mqset_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqsubrq_total Failed MQSUBRQ count
+# TYPE ibmmq_qmgr_failed_mqsubrq_total counter
+ibmmq_qmgr_failed_mqsubrq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_subscription_create_alter_resume_total Failed create/alter/resume subscription count
+# TYPE ibmmq_qmgr_failed_subscription_create_alter_resume_total counter
+ibmmq_qmgr_failed_subscription_create_alter_resume_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_subscription_delete_total Subscription delete failure count
+# TYPE ibmmq_qmgr_failed_subscription_delete_total counter
+ibmmq_qmgr_failed_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_topic_mqput_mqput1_total Failed topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_failed_topic_mqput_mqput1_total counter
+ibmmq_qmgr_failed_topic_mqput_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_fdc_files MQ FDC file count
+# TYPE ibmmq_qmgr_fdc_files gauge
+ibmmq_qmgr_fdc_files{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_log_file_system_in_use_bytes Log file system - bytes in use
+# TYPE ibmmq_qmgr_log_file_system_in_use_bytes gauge
+ibmmq_qmgr_log_file_system_in_use_bytes{qmgr="QM1"} 1.4858715136e+10
+# HELP ibmmq_qmgr_log_file_system_max_bytes Log file system - bytes max
+# TYPE ibmmq_qmgr_log_file_system_max_bytes gauge
+ibmmq_qmgr_log_file_system_max_bytes{qmgr="QM1"} 6.272247808e+10
+# HELP ibmmq_qmgr_log_in_use_bytes Log - bytes in use
+# TYPE ibmmq_qmgr_log_in_use_bytes gauge
+ibmmq_qmgr_log_in_use_bytes{qmgr="QM1"} 5.0331648e+07
+# HELP ibmmq_qmgr_log_logical_written_bytes_total Log - logical bytes written
+# TYPE ibmmq_qmgr_log_logical_written_bytes_total counter
+ibmmq_qmgr_log_logical_written_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_log_max_bytes Log - bytes max
+# TYPE ibmmq_qmgr_log_max_bytes gauge
+ibmmq_qmgr_log_max_bytes{qmgr="QM1"} 8.388608e+07
+# HELP ibmmq_qmgr_log_physical_written_bytes_total Log - physical bytes written
+# TYPE ibmmq_qmgr_log_physical_written_bytes_total counter
+ibmmq_qmgr_log_physical_written_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_log_primary_space_in_use_percentage Log - current primary space in use
+# TYPE ibmmq_qmgr_log_primary_space_in_use_percentage gauge
+ibmmq_qmgr_log_primary_space_in_use_percentage{qmgr="QM1"} 2.36
+# HELP ibmmq_qmgr_log_workload_primary_space_utilization_percentage Log - workload primary space utilization
+# TYPE ibmmq_qmgr_log_workload_primary_space_utilization_percentage gauge
+ibmmq_qmgr_log_workload_primary_space_utilization_percentage{qmgr="QM1"} 2.36
+# HELP ibmmq_qmgr_log_write_latency_seconds Log - write latency
+# TYPE ibmmq_qmgr_log_write_latency_seconds gauge
+ibmmq_qmgr_log_write_latency_seconds{qmgr="QM1"} 0.000586
+# HELP ibmmq_qmgr_log_write_size_bytes Log - write size
+# TYPE ibmmq_qmgr_log_write_size_bytes gauge
+ibmmq_qmgr_log_write_size_bytes{qmgr="QM1"} 5921
+# HELP ibmmq_qmgr_mqcb_total MQCB count
+# TYPE ibmmq_qmgr_mqcb_total counter
+ibmmq_qmgr_mqcb_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqclose_total MQCLOSE count
+# TYPE ibmmq_qmgr_mqclose_total counter
+ibmmq_qmgr_mqclose_total{qmgr="QM1"} 2
+# HELP ibmmq_qmgr_mqconn_mqconnx_total MQCONN/MQCONNX count
+# TYPE ibmmq_qmgr_mqconn_mqconnx_total counter
+ibmmq_qmgr_mqconn_mqconnx_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqctl_total MQCTL count
+# TYPE ibmmq_qmgr_mqctl_total counter
+ibmmq_qmgr_mqctl_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqdisc_total MQDISC count
+# TYPE ibmmq_qmgr_mqdisc_total counter
+ibmmq_qmgr_mqdisc_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqinq_total MQINQ count
+# TYPE ibmmq_qmgr_mqinq_total counter
+ibmmq_qmgr_mqinq_total{qmgr="QM1"} 74
+# HELP ibmmq_qmgr_mqopen_total MQOPEN count
+# TYPE ibmmq_qmgr_mqopen_total counter
+ibmmq_qmgr_mqopen_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqput_mqput1_bytes_total Interval total MQPUT/MQPUT1 byte count
+# TYPE ibmmq_qmgr_mqput_mqput1_bytes_total counter
+ibmmq_qmgr_mqput_mqput1_bytes_total{qmgr="QM1"} 83772
+# HELP ibmmq_qmgr_mqput_mqput1_total Interval total MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_mqput_mqput1_total counter
+ibmmq_qmgr_mqput_mqput1_total{qmgr="QM1"} 201
+# HELP ibmmq_qmgr_mqset_total MQSET count
+# TYPE ibmmq_qmgr_mqset_total counter
+ibmmq_qmgr_mqset_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqstat_total MQSTAT count
+# TYPE ibmmq_qmgr_mqstat_total counter
+ibmmq_qmgr_mqstat_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqsubrq_total MQSUBRQ count
+# TYPE ibmmq_qmgr_mqsubrq_total counter
+ibmmq_qmgr_mqsubrq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_durable_subscription_create_total Create non-durable subscription count
+# TYPE ibmmq_qmgr_non_durable_subscription_create_total counter
+ibmmq_qmgr_non_durable_subscription_create_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_durable_subscription_delete_total Delete non-durable subscription count
+# TYPE ibmmq_qmgr_non_durable_subscription_delete_total counter
+ibmmq_qmgr_non_durable_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_browse_bytes_total Non-persistent message browse - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_browse_bytes_total counter
+ibmmq_qmgr_non_persistent_message_browse_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_browse_total Non-persistent message browse - count
+# TYPE ibmmq_qmgr_non_persistent_message_browse_total counter
+ibmmq_qmgr_non_persistent_message_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_destructive_get_total Non-persistent message destructive get - count
+# TYPE ibmmq_qmgr_non_persistent_message_destructive_get_total counter
+ibmmq_qmgr_non_persistent_message_destructive_get_total{qmgr="QM1"} 218
+# HELP ibmmq_qmgr_non_persistent_message_get_bytes_total Got non-persistent messages - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_get_bytes_total counter
+ibmmq_qmgr_non_persistent_message_get_bytes_total{qmgr="QM1"} 90424
+# HELP ibmmq_qmgr_non_persistent_message_mqput1_total Non-persistent message MQPUT1 count
+# TYPE ibmmq_qmgr_non_persistent_message_mqput1_total counter
+ibmmq_qmgr_non_persistent_message_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_mqput_total Non-persistent message MQPUT count
+# TYPE ibmmq_qmgr_non_persistent_message_mqput_total counter
+ibmmq_qmgr_non_persistent_message_mqput_total{qmgr="QM1"} 201
+# HELP ibmmq_qmgr_non_persistent_message_put_bytes_total Put non-persistent messages - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_put_bytes_total counter
+ibmmq_qmgr_non_persistent_message_put_bytes_total{qmgr="QM1"} 83772
+# HELP ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total Non-persistent - topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total counter
+ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total{qmgr="QM1"} 201
+# HELP ibmmq_qmgr_persistent_message_browse_bytes_total Persistent message browse - byte count
+# TYPE ibmmq_qmgr_persistent_message_browse_bytes_total counter
+ibmmq_qmgr_persistent_message_browse_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_browse_total Persistent message browse - count
+# TYPE ibmmq_qmgr_persistent_message_browse_total counter
+ibmmq_qmgr_persistent_message_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_destructive_get_total Persistent message destructive get - count
+# TYPE ibmmq_qmgr_persistent_message_destructive_get_total counter
+ibmmq_qmgr_persistent_message_destructive_get_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_get_bytes_total Got persistent messages - byte count
+# TYPE ibmmq_qmgr_persistent_message_get_bytes_total counter
+ibmmq_qmgr_persistent_message_get_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_mqput1_total Persistent message MQPUT1 count
+# TYPE ibmmq_qmgr_persistent_message_mqput1_total counter
+ibmmq_qmgr_persistent_message_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_mqput_total Persistent message MQPUT count
+# TYPE ibmmq_qmgr_persistent_message_mqput_total counter
+ibmmq_qmgr_persistent_message_mqput_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_put_bytes_total Put persistent messages - byte count
+# TYPE ibmmq_qmgr_persistent_message_put_bytes_total counter
+ibmmq_qmgr_persistent_message_put_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_topic_mqput_mqput1_total Persistent - topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_persistent_topic_mqput_mqput1_total counter
+ibmmq_qmgr_persistent_topic_mqput_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_published_to_subscribers_bytes_total Published to subscribers - byte count
+# TYPE ibmmq_qmgr_published_to_subscribers_bytes_total counter
+ibmmq_qmgr_published_to_subscribers_bytes_total{qmgr="QM1"} 62616
+# HELP ibmmq_qmgr_published_to_subscribers_message_total Published to subscribers - message count
+# TYPE ibmmq_qmgr_published_to_subscribers_message_total counter
+ibmmq_qmgr_published_to_subscribers_message_total{qmgr="QM1"} 201
+# HELP ibmmq_qmgr_purged_queue_total Purged queue count
+# TYPE ibmmq_qmgr_purged_queue_total counter
+ibmmq_qmgr_purged_queue_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_queue_manager_file_system_free_space_percentage Queue Manager file system - free space
+# TYPE ibmmq_qmgr_queue_manager_file_system_free_space_percentage gauge
+ibmmq_qmgr_queue_manager_file_system_free_space_percentage{qmgr="QM1"} 76.31
+# HELP ibmmq_qmgr_queue_manager_file_system_in_use_bytes Queue Manager file system - bytes in use
+# TYPE ibmmq_qmgr_queue_manager_file_system_in_use_bytes gauge
+ibmmq_qmgr_queue_manager_file_system_in_use_bytes{qmgr="QM1"} 1.485832192e+10
+# HELP ibmmq_qmgr_ram_free_percentage RAM free percentage
+# TYPE ibmmq_qmgr_ram_free_percentage gauge
+ibmmq_qmgr_ram_free_percentage{qmgr="QM1"} 65.67
+# HELP ibmmq_qmgr_ram_usage_estimate_for_queue_manager_bytes RAM total bytes - estimate for queue manager
+# TYPE ibmmq_qmgr_ram_usage_estimate_for_queue_manager_bytes gauge
+ibmmq_qmgr_ram_usage_estimate_for_queue_manager_bytes{qmgr="QM1"} 1.43654912e+08
+# HELP ibmmq_qmgr_rollback_total Rollback count
+# TYPE ibmmq_qmgr_rollback_total counter
+ibmmq_qmgr_rollback_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_system_cpu_time_estimate_for_queue_manager_percentage System CPU time - percentage estimate for queue manager
+# TYPE ibmmq_qmgr_system_cpu_time_estimate_for_queue_manager_percentage gauge
+ibmmq_qmgr_system_cpu_time_estimate_for_queue_manager_percentage{qmgr="QM1"} 0.04
+# HELP ibmmq_qmgr_system_cpu_time_percentage System CPU time percentage
+# TYPE ibmmq_qmgr_system_cpu_time_percentage gauge
+ibmmq_qmgr_system_cpu_time_percentage{qmgr="QM1"} 0.76
+# HELP ibmmq_qmgr_topic_mqput_mqput1_total Topic MQPUT/MQPUT1 interval total
+# TYPE ibmmq_qmgr_topic_mqput_mqput1_total counter
+ibmmq_qmgr_topic_mqput_mqput1_total{qmgr="QM1"} 201
+# HELP ibmmq_qmgr_topic_put_bytes_total Interval total topic bytes put
+# TYPE ibmmq_qmgr_topic_put_bytes_total counter
+ibmmq_qmgr_topic_put_bytes_total{qmgr="QM1"} 62616
+# HELP ibmmq_qmgr_trace_file_system_free_space_percentage MQ trace file system - free space
+# TYPE ibmmq_qmgr_trace_file_system_free_space_percentage gauge
+ibmmq_qmgr_trace_file_system_free_space_percentage{qmgr="QM1"} 76.31
+# HELP ibmmq_qmgr_trace_file_system_in_use_bytes MQ trace file system - bytes in use
+# TYPE ibmmq_qmgr_trace_file_system_in_use_bytes gauge
+ibmmq_qmgr_trace_file_system_in_use_bytes{qmgr="QM1"} 1.485832192e+10
+# HELP ibmmq_qmgr_user_cpu_time_estimate_for_queue_manager_percentage User CPU time - percentage estimate for queue manager
+# TYPE ibmmq_qmgr_user_cpu_time_estimate_for_queue_manager_percentage gauge
+ibmmq_qmgr_user_cpu_time_estimate_for_queue_manager_percentage{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_user_cpu_time_percentage User CPU time percentage
+# TYPE ibmmq_qmgr_user_cpu_time_percentage gauge
+ibmmq_qmgr_user_cpu_time_percentage{qmgr="QM1"} 0.35
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 0.79
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 10
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 2.2614016e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.57634561972e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 7.45988096e+08
