@@ -1,1 +1,11 @@
-TODO
+This module periodically fetches metrics from IBM MQ.
+
+[float]
+=== Compatibility
+
+The ibmmq `status` metricset is compatible with any IBM MQ version exposing metrics in Prometheus format.
+
+The official Docker container provides an option to easily enable metrics exporter using a dedicated environment
+variable:
+
+`MQ_ENABLE_METRICS` - Set this to `true` to generate Prometheus metrics for the Queue Manager.
