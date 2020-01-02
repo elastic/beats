@@ -58,7 +58,6 @@ other users. The issue should be reported in application logs:
 
 ```
 2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
-5
 ```
 
 ==== process_summary
@@ -74,7 +73,8 @@ permissions.
 
 ==== entropy
 
-TODO
+Entropy data (available, pool size) requires access to the `/proc/sys/kernel/random` path.
+Otherwise an error will be reported.
 
 ==== core
 
@@ -94,7 +94,14 @@ other users.
 
 ==== service
 
-TODO
+Systemd service data (memory, tasks, states) should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+```
+2020-01-02T08:19:50.635Z	INFO	module/wrapper.go:252	Error fetching data for metricset system.service: error getting list of running units: Rejected send message, 2 matched rules; type="method_call", sender=":1.35" (uid=1000 pid=4429 comm="./metricbeat -d * -e ") interface="org.freedesktop.systemd1.Manager" member="ListUnitsByPatterns" error name="(unset)" requested_reply="0" destination="org.freedesktop.systemd1" (uid=0 pid=1 comm="/usr/lib/systemd/systemd --switched-root --system ")
+```
 
 ==== filesystem
 
@@ -111,4 +118,5 @@ Uptime metrics data (duration) should be available without elevated permissions.
 
 ==== raid
 
-TODO
+RAID metrics data (block, disks) requires access to the `/sys/block` mount point and all referenced devices.
+Otherwise an error will be reported.
