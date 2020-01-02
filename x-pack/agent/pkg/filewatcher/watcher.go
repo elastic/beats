@@ -12,8 +12,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -202,7 +201,10 @@ type record struct {
 func ContentComparer(file string, r interface{}) (bool, interface{}, error) {
 	stat, err := os.Stat(file)
 	if err != nil {
-		return false, nil, errors.Wrap(err, "could not get information about the file")
+		return false, nil, errors.New(err,
+			"could not get information about the file",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, file))
 	}
 
 	// We never saw the file before.
@@ -239,14 +241,20 @@ func checksum(file string) ([]byte, error) {
 	// Mod time was changed on on the file, now lets looks at the content of the file.
 	f, err := os.Open(file)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not open file")
+		return nil, errors.New(err,
+			"could not open file",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, file))
 	}
 
 	defer f.Close()
 
 	h := sha256.New()
 	if _, err := io.Copy(h, f); err != nil {
-		return nil, errors.Wrap(err, "could not generate checksum")
+		return nil, errors.New(err,
+			"could not generate checksum",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, file))
 	}
 	return h.Sum(nil), nil
 }

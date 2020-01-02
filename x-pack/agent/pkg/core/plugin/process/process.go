@@ -16,9 +16,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -66,7 +66,7 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, cre
 	// inject env
 	grpcAddress, err := getGrpcAddress(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to acquire grpc address")
+		return nil, errors.New(err, "failed to acquire grpc address")
 	}
 
 	logger.Infof("address assigned to the process '%s': '%s'", path, grpcAddress)
@@ -84,7 +84,7 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, cre
 
 	// start process
 	if err := cmd.Start(); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to start '%s'", path))
+		return nil, errors.New(err, fmt.Sprintf("failed to start '%s'", path))
 	}
 
 	// push credentials
