@@ -58,23 +58,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if ms.XPack {
-		logstashVersion, err := logstash.GetVersion(ms)
-		if err != nil {
-			return nil, err
-		}
-
-		arePipelineGraphAPIsAvailable := logstash.ArePipelineGraphAPIsAvailable(logstashVersion)
-		if err != nil {
-			return nil, err
-		}
-
-		if !arePipelineGraphAPIsAvailable {
-			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
-			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), logstash.PipelineGraphAPIsAvailableVersion, logstashVersion)
-		}
-	}
-
 	return &MetricSet{
 		ms,
 	}, nil
@@ -102,6 +85,24 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err = eventMappingXPack(r, m, pipelinesContent)
 	if err != nil {
 		m.Logger().Error(err)
+	}
+
+	return nil
+}
+
+func (m *MetricSet) init() error {
+	if m.XPack {
+		logstashVersion, err := logstash.GetVersion(m.MetricSet)
+		if err != nil {
+			return err
+		}
+
+		arePipelineGraphAPIsAvailable := logstash.ArePipelineGraphAPIsAvailable(logstashVersion)
+
+		if !arePipelineGraphAPIsAvailable {
+			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), logstash.PipelineGraphAPIsAvailableVersion, logstashVersion)
+		}
 	}
 
 	return nil
