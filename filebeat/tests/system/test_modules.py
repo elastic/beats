@@ -225,7 +225,7 @@ def clean_keys(obj):
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
     remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
-                        "system.auth", "system.syslog", "cef.log", "activemq.audit"}
+                        "system.auth", "system.syslog", "cef.log", "activemq.audit", "iptables.log"}
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),
