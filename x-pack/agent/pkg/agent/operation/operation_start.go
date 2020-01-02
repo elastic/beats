@@ -5,20 +5,11 @@
 package operation
 
 import (
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
-)
-
-var (
-	// ErrUpdateClientFailed happens when call to a client vault returns an error.
-	ErrUpdateClientFailed = errors.New("updating clientvault failed")
-	// ErrStoringReattachInfoFailed happens when call to reattach collection fails
-	// might be related to filesystem. Check logs for more information.
-	ErrStoringReattachInfoFailed = errors.New("backing up reattach information failed")
 )
 
 // operationStart start installed process
@@ -69,7 +60,10 @@ func (o *operationStart) Run(application Application) (err error) {
 	defer func() {
 		if err != nil {
 			// kill the process if something failed
-			err = errors.Wrap(err, o.Name())
+			err = errors.New(err,
+				o.Name(),
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, application.Name()))
 			o.eventProcessor.OnFailing(application.Name(), err)
 		} else {
 			o.eventProcessor.OnRunning(application.Name())

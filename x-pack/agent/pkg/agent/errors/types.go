@@ -42,6 +42,7 @@ var readableTypes = map[ErrorType]string{
 	TypeConfig:           "CONFIG",
 	TypePath:             "PATH",
 	TypeApplicationCrash: "CRASH",
+	TypeApplication:      "APPLICATION",
 	TypeNetwork:          "NETWORK",
 	TypeFilesystem:       "FILESYSTEM",
 	TypeSecurity:         "SECURITY",

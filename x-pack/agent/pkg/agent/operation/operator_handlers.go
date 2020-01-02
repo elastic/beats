@@ -7,9 +7,8 @@ package operation
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
 )
 
@@ -31,7 +30,10 @@ func (o *Operator) handleRun(step configrequest.Step) error {
 
 	p, cfg, err := getProgramFromStep(step)
 	if err != nil {
-		return errors.Wrap(err, "operator.handleStart failed to create program")
+		return errors.New(err,
+			"operator.handleStart failed to create program",
+			errors.TypeApplication,
+			errors.M(errors.MetaKeyAppName, step.Process))
 	}
 
 	return o.start(p, cfg)
@@ -44,7 +46,10 @@ func (o *Operator) handleRemove(step configrequest.Step) error {
 
 	p, _, err := getProgramFromStep(step)
 	if err != nil {
-		return errors.Wrap(err, "operator.handleRemove failed to stop program")
+		return errors.New(err,
+			"operator.handleRemove failed to stop program",
+			errors.TypeApplication,
+			errors.M(errors.MetaKeyAppName, step.Process))
 	}
 
 	return o.stop(p)
@@ -76,7 +81,8 @@ func getConfigFromStep(step configrequest.Step) (map[string]interface{}, error) 
 		var ok bool
 		config, ok = metConfig.(map[string]interface{})
 		if !ok {
-			return nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+			return nil, errors.New(errors.TypeConfig,
+				fmt.Sprintf("step: %s, program config is in invalid format", step.ID))
 		}
 	}
 
