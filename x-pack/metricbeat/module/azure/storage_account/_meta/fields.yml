@@ -1,7 +1,7 @@
-- name: storage_accounts.*.*
+- name: storage_account.*.*
   release: beta
   type: object
   object_type: float
   object_type_mapping_type: "*"
   description: >
-    compute_vm
+    storage account
