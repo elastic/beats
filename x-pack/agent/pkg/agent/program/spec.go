@@ -7,13 +7,13 @@
 package program
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
 )
 
@@ -38,18 +38,18 @@ func ReadSpecs(path string) ([]Spec, error) {
 	var specs []Spec
 	files, err := filepath.Glob(path)
 	if err != nil {
-		return []Spec{}, errors.Wrap(err, "could not include spec")
+		return []Spec{}, errors.New(err, "could not include spec", errors.TypeConfig)
 	}
 
 	for _, f := range files {
 		b, err := ioutil.ReadFile(f)
 		if err != nil {
-			return []Spec{}, errors.Wrapf(err, "could not read spec %s", f)
+			return []Spec{}, errors.New(err, fmt.Sprintf("could not read spec %s", f), errors.TypeConfig)
 		}
 
 		spec := Spec{}
 		if err := yaml.Unmarshal(b, &spec); err != nil {
-			return []Spec{}, errors.Wrapf(err, "cound unmarshal YAML for file %s", f)
+			return []Spec{}, errors.New(err, fmt.Sprintf("cound unmarshal YAML for file %s", f), errors.TypeConfig)
 		}
 		specs = append(specs, spec)
 	}
@@ -61,7 +61,7 @@ func ReadSpecs(path string) ([]Spec, error) {
 func NewSpecFromBytes(b []byte) (Spec, error) {
 	spec := Spec{}
 	if err := yaml.Unmarshal(b, &spec); err != nil {
-		return Spec{}, errors.Wrap(err, "cound unmarshal YAML")
+		return Spec{}, errors.New(err, "cound unmarshal YAML", errors.TypeConfig)
 	}
 	return spec, nil
 }
