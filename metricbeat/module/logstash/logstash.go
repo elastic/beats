@@ -159,8 +159,25 @@ func GetPipelines(m *MetricSet) ([]PipelineState, error) {
 	return pipelines, nil
 }
 
-// GetVersion returns the version of the Logstash node
-func (m *MetricSet) GetVersion() (*common.Version, error) {
+// CheckPipelineGraphAPIsAvailable returns an error if pipeline graph APIs are not
+// available in the version of the Logstash node.
+func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
+	logstashVersion, err := m.getVersion()
+	if err != nil {
+		return err
+	}
+
+	arePipelineGraphAPIsAvailable := elastic.IsFeatureAvailable(logstashVersion, PipelineGraphAPIsAvailableVersion)
+
+	if !arePipelineGraphAPIsAvailable {
+		const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), PipelineGraphAPIsAvailableVersion, logstashVersion)
+	}
+
+	return nil
+}
+
+func (m *MetricSet) getVersion() (*common.Version, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
@@ -177,24 +194,6 @@ func (m *MetricSet) GetVersion() (*common.Version, error) {
 	}
 
 	return response.Version, nil
-}
-
-// CheckPipelineGraphAPIs returns an error if pipeline graph APIs are not available
-// in the version of the Logstash node.
-func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
-	logstashVersion, err := m.GetVersion()
-	if err != nil {
-		return err
-	}
-
-	arePipelineGraphAPIsAvailable := elastic.IsFeatureAvailable(logstashVersion, PipelineGraphAPIsAvailableVersion)
-
-	if !arePipelineGraphAPIsAvailable {
-		const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), PipelineGraphAPIsAvailableVersion, logstashVersion)
-	}
-
-	return nil
 }
 
 func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {
