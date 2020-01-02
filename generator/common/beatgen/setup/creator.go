@@ -25,8 +25,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // CfgPrefix specifies the env variable prefix used to configure the beat

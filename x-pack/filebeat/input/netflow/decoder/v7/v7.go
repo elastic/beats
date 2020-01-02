@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v1"
+	v1 "github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v1"
 )
 
 const (
