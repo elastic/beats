@@ -81,12 +81,12 @@ func (c *CloudID) Password() string {
 func (c *CloudID) decode() error {
 	var err error
 	if err = c.decodeCloudID(); err != nil {
-		return err
+		return errors.Wrapf(err, "invalid cloud id '%v'", c.id)
 	}
 
 	if c.auth != "" {
 		if err = c.decodeCloudAuth(); err != nil {
-			return err
+			return errors.Wrap(err, "invalid cloud auth")
 		}
 	}
 
