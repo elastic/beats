@@ -413,7 +413,10 @@ func parseSID(record eventLogRecord, buffer []byte) (*sys.SID, error) {
 	}
 
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[record.userSidOffset]))
-	identifier = sid.String()
+	identifier, err := sid.String()
+	if err != nil {
+		return nil, err
+	}
 
 	return &sys.SID{Identifier: identifier}, nil
 }
