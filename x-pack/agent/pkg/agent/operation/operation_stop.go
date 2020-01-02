@@ -5,8 +5,7 @@
 package operation
 
 import (
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
@@ -48,7 +47,10 @@ func (o *operationStop) Run(application Application) (err error) {
 	o.eventProcessor.OnStopping(application.Name())
 	defer func() {
 		if err != nil {
-			err = errors.Wrap(err, o.Name())
+			err = errors.New(err,
+				o.Name(),
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, application.Name()))
 			o.eventProcessor.OnFailing(application.Name(), err)
 		} else {
 			o.eventProcessor.OnStopped(application.Name())

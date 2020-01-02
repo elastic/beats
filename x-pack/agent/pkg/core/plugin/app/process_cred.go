@@ -11,7 +11,7 @@ import (
 	"os/user"
 	"strconv"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 func getUserGroup(spec ProcessSpec) (int, int, error) {
@@ -51,12 +51,12 @@ func getUserGroup(spec ProcessSpec) (int, int, error) {
 
 	uid, err := strconv.Atoi(usedUID)
 	if err != nil {
-		return 0, 0, errors.Wrap(err, "invalid user")
+		return 0, 0, errors.New(err, "invalid user")
 	}
 
 	gid, _ := strconv.Atoi(usedGID)
 	if err != nil {
-		return 0, 0, errors.Wrap(err, "invalid group")
+		return 0, 0, errors.New(err, "invalid group")
 	}
 
 	return uid, gid, nil

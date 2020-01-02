@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -115,7 +115,7 @@ func (r *Reporter) report(e event) {
 	}
 
 	if err != nil {
-		r.l.Error(errors.Wrap(err, "failed reporting event"))
+		r.l.Error(errors.New(err, "failed reporting event"))
 	}
 }
 

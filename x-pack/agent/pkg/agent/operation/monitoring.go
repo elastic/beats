@@ -6,9 +6,9 @@ package operation
 
 import (
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
@@ -24,7 +24,9 @@ const (
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	cfg, err := getConfigFromStep(s)
 	if err != nil {
-		return errors.Wrap(err, "operator.handleStartSidecar failed to retrieve config from step")
+		return errors.New(err,
+			errors.TypeConfig,
+			"operator.handleStartSidecar failed to retrieve config from step")
 	}
 
 	// if monitoring is disabled and running stop it
@@ -43,7 +45,10 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	for _, step := range o.getMonitoringSteps(s) {
 		p, cfg, err := getProgramFromStepWithTags(step, monitoringTags())
 		if err != nil {
-			return errors.Wrap(err, "operator.handleStartSidecar failed to create program")
+			return errors.New(err,
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, step.Process),
+				"operator.handleStartSidecar failed to create program")
 		}
 
 		// best effort on starting monitoring, if no hosts provided stop and spare resources
@@ -65,7 +70,10 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 	for _, step := range o.getMonitoringSteps(s) {
 		p, _, err := getProgramFromStepWithTags(step, monitoringTags())
 		if err != nil {
-			return errors.Wrap(err, "operator.handleStopSidecar failed to create program")
+			return errors.New(err,
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, step.Process),
+				"operator.handleStopSidecar failed to create program")
 		}
 
 		if err := o.stop(p); err != nil {

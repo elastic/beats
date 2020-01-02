@@ -13,10 +13,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
@@ -49,7 +48,7 @@ func init() {
 
 			l, err := logger.New()
 			if err != nil {
-				return nil, errors.Wrap(err, "could not create the logger for debugging HTTP request")
+				return nil, errors.New(err, "could not create the logger for debugging HTTP request")
 			}
 
 			return kibana.NewDebugRoundTripper(rt, l), nil
@@ -98,7 +97,7 @@ func extract(resp io.Reader) error {
 
 	data, err := ioutil.ReadAll(resp)
 	if err != nil {
-		return errors.New("fail to read original error")
+		return errors.New(err, "fail to read original error")
 	}
 
 	err = json.Unmarshal(data, e)

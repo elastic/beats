@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -96,7 +96,9 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 	var responses []r
 
 	if err := json.Unmarshal(data, &responses); err != nil {
-		return errors.Wrap(err, "fail to decode actions")
+		return errors.New(err,
+			"fail to decode actions",
+			errors.TypeConfig)
 	}
 
 	actions := make([]Action, 0, len(responses))
@@ -112,7 +114,9 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				},
 			}
 			if err := json.Unmarshal(response.Data, action); err != nil {
-				return errors.Wrap(err, "fail to decode POLICY_CHANGE action")
+				return errors.New(err,
+					"fail to decode POLICY_CHANGE action",
+					errors.TypeConfig)
 			}
 		default:
 			action = &ActionUnknown{

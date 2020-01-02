@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 // PackMap represents multiples files packed, the key represent the path of the file and raw bytes of
@@ -30,17 +30,17 @@ func Pack(patterns ...string) (string, []string, error) {
 	for _, p := range patterns {
 		files, err := filepath.Glob(p)
 		if err != nil {
-			return "", []string{}, errors.Wrapf(err, "error while reading pattern %s", p)
+			return "", []string{}, errors.New(err, fmt.Sprintf("error while reading pattern %s", p))
 		}
 		for _, f := range files {
 			b, err := ioutil.ReadFile(f)
 			if err != nil {
-				return "", []string{}, errors.Wrapf(err, "cannot read file %s", f)
+				return "", []string{}, errors.New(err, fmt.Sprintf("cannot read file %s", f))
 			}
 
 			_, ok := pack[f]
 			if ok {
-				return "", []string{}, fmt.Errorf("file %s already pack", f)
+				return "", []string{}, errors.New(fmt.Sprintf("file %s already packed", f))
 			}
 
 			encodedFiles = append(encodedFiles, f)
@@ -56,7 +56,7 @@ func Pack(patterns ...string) (string, []string, error) {
 	w := zlib.NewWriter(&buf)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(pack); err != nil {
-		return "", []string{}, errors.Wrap(err, "could not encode files")
+		return "", []string{}, errors.New(err, "could not encode files")
 	}
 	// flush any buffers.
 	w.Close()
@@ -68,20 +68,20 @@ func Pack(patterns ...string) (string, []string, error) {
 func Unpack(pack string) (PackMap, error) {
 	d, err := base64.StdEncoding.DecodeString(pack)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while decoding")
+		return nil, errors.New(err, "error while decoding")
 	}
 
 	b := bytes.NewReader(d)
 	r, err := zlib.NewReader(b)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while uncompressing")
+		return nil, errors.New(err, "error while uncompressing")
 	}
 	defer r.Close()
 
 	var uncompressed PackMap
 	dec := json.NewDecoder(r)
 	if err := dec.Decode(&uncompressed); err != nil {
-		return nil, errors.Wrap(err, "could no read the pack data")
+		return nil, errors.New(err, "could no read the pack data")
 	}
 
 	return uncompressed, nil

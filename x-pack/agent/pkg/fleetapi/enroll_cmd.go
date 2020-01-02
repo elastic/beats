@@ -12,7 +12,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 // EnrollType is the type of enrollment to do with the agent.
@@ -178,7 +179,7 @@ func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 
 	b, err := json.Marshal(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to encode the enrollment request")
+		return nil, errors.New(err, "fail to encode the enrollment request")
 	}
 
 	resp, err := e.client.Send("POST", p, nil, headers, bytes.NewBuffer(b))
@@ -194,7 +195,7 @@ func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 	enrollResponse := &EnrollResponse{}
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(enrollResponse); err != nil {
-		return nil, errors.Wrap(err, "fail to decode enrollment response")
+		return nil, errors.New(err, "fail to decode enrollment response")
 	}
 
 	if err := enrollResponse.Validate(); err != nil {

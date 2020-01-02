@@ -9,9 +9,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
@@ -116,17 +115,17 @@ func (o *Operator) State() map[string]state.State {
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, steps, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		return errors.Wrapf(err, "operator: failed to resolve configuration %s, error: %v", cfg, err)
+		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
 
 	for _, step := range steps {
 		handler, found := o.handlers[step.ID]
 		if !found {
-			return fmt.Errorf("operator: received unexpected event '%s'", step.ID)
+			return errors.New(fmt.Sprintf("operator: received unexpected event '%s'", step.ID), errors.TypeConfig)
 		}
 
 		if err := handler(step); err != nil {
-			return errors.Wrapf(err, "operator: failed to execute step %s, error: %v", step.ID, err)
+			return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err))
 		}
 	}
 

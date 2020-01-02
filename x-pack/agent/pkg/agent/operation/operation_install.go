@@ -7,8 +7,7 @@ package operation
 import (
 	"os"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact/install"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -59,7 +58,10 @@ func (o *operationInstall) Check() (bool, error) {
 func (o *operationInstall) Run(application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Wrap(err, o.Name())
+			err = errors.New(err,
+				o.Name(),
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, application.Name()))
 			o.eventProcessor.OnFailing(application.Name(), err)
 		}
 	}()

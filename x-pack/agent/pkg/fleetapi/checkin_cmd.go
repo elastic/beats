@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 const checkingPath = "/api/fleet/agents/%s/checkin"
@@ -80,13 +80,18 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 
 	b, err := json.Marshal(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to encode the checkin request")
+		return nil, errors.New(err,
+			"fail to encode the checkin request",
+			errors.TypeUnexpected)
 	}
 
 	cp := fmt.Sprintf(checkingPath, e.info.AgentID())
 	resp, err := e.client.Send("POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to checkin to fleet")
+		return nil, errors.New(err,
+			"fail to checkin to fleet",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, cp))
 	}
 	defer resp.Body.Close()
 
@@ -97,7 +102,10 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 	checkinResponse := &CheckinResponse{}
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(checkinResponse); err != nil {
-		return nil, errors.Wrap(err, "fail to decode checkin response")
+		return nil, errors.New(err,
+			"fail to decode checkin response",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, cp))
 	}
 
 	if err := checkinResponse.Validate(); err != nil {

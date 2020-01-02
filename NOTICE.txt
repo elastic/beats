@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2019 Elasticsearch BV
+Copyright 2014-2020 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).

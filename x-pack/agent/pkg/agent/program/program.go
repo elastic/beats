@@ -8,8 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/x-pack/agent/pkg/boolexp"
 )
@@ -20,7 +19,7 @@ type Program struct {
 	Config *transpiler.AST
 }
 
-// Cmd return the exection command to run.
+// Cmd return the execution command to run.
 func (p *Program) Cmd() string {
 	return p.Spec.Cmd
 }
@@ -51,14 +50,14 @@ func (p *Program) Configuration() map[string]interface{} {
 func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
 	grouped, err := groupByOutputs(singleConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to extract program configuration")
+		return nil, errors.New(err, errors.TypeConfig, "fail to extract program configuration")
 	}
 
 	groupedPrograms := make(map[string][]Program)
 	for k, config := range grouped {
 		programs, err := detectPrograms(config)
 		if err != nil {
-			return nil, errors.Wrap(err, "fail to generate program configuration")
+			return nil, errors.New(err, errors.TypeConfig, "fail to generate program configuration")
 		}
 		groupedPrograms[k] = programs
 	}
@@ -127,7 +126,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 	// Normalize using an intermediate map.
 	normMap, err := single.Map()
 	if err != nil {
-		return nil, errors.Wrap(err, "could not read configuration")
+		return nil, errors.New(err, "could not read configuration")
 	}
 
 	// Recreates multiple configuration grouped by the name of the outputs.
@@ -141,10 +140,10 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 	out, ok := m.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf(
+		return nil, errors.New(fmt.Errorf(
 			"invalid outputs configuration received, expecting a map not a %T",
 			m,
-		)
+		))
 	}
 
 	for k, v := range out {
@@ -216,7 +215,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 		ast, err := transpiler.NewAST(group)
 		if err != nil {
-			return nil, errors.Wrapf(err, "fail to generate configuration for output name %s", name)
+			return nil, errors.New(err, "fail to generate configuration for output name %s", name)
 		}
 
 		transpiled[name] = ast
