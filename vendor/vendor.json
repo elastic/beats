@@ -2835,12 +2835,12 @@
 			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "rfr1yBSyYTHNU3p1NKftIyzr/eQ=",
+			"checksumSHA1": "rQiXI5O9NmODCPE2GZllkZMZPn8=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "bd0a84193268134cbe6cdd21b0a5618aee1f5791",
+			"revisionTime": "2019-12-09T20:02:09Z",
+			"version": "v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "GiZCjX17K265TtamGZZw4R2Jwbk=",
