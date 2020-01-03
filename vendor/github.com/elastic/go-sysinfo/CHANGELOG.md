@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [unreleased]
 
 ### Added
 
@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+## [1.2.1] - 2020-1-3
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- create a sidToString function to deal with API changes in various versions of golang.org/x/sys/windows [#74](https://github.com/elastic/go-sysinfo/pull/74)
 
 ## [1.2.0] - 2019-12-09
 
@@ -69,7 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.1
 [1.2.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.0
 [1.1.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
 [1.1.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
