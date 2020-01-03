@@ -10,7 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/awslabs/goformation/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 	merrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -29,12 +31,12 @@ const (
 // AWSLambdaFunction add 'dependsOn' as a serializable parameters,  goformation doesn't currently
 // serialize this field.
 type AWSLambdaFunction struct {
-	*cloudformation.AWSLambdaFunction
+	*lambda.Function
 	DependsOn []string
 }
 
 type installer interface {
-	Policies() []cloudformation.AWSIAMRole_Policy
+	Policies() []iam.Role_Policy
 	Template() *cloudformation.Template
 	LambdaConfig() *fnaws.LambdaConfig
 }
