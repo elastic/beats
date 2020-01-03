@@ -40,6 +40,7 @@ type fleetGateway struct {
 
 type fleetGatewaySettings struct {
 	Duration time.Duration
+	Jitter   time.Duration
 }
 
 func newFleetGateway(
@@ -50,7 +51,7 @@ func newFleetGateway(
 	d dispatcher,
 	r fleetReporter,
 ) (*fleetGateway, error) {
-	scheduler := scheduler.NewPeriodic(settings.Duration)
+	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
 	return newFleetGatewayWithScheduler(
 		log,
 		settings,
@@ -135,4 +136,5 @@ func (f *fleetGateway) Start() {
 
 func (f *fleetGateway) Stop() {
 	close(f.done)
+	f.scheduler.Stop()
 }
