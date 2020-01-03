@@ -18,7 +18,7 @@ The configuration in the config.yml file uses the following format:
 
  * var.api_key: specifies the API key to access MISP.
  * var.json_objects_array: specifies the array object in MISP response, e.g., "response.Attribute".
- * var.url: URI of the MISP REST API, e.g., "http://x.x.x.x/attributes/restSearch"
+ * var.url: URL of the MISP REST API, e.g., "http://x.x.x.x/attributes/restSearch"
 
 [float]
 === Example dashboard
