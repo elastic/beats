@@ -6,7 +6,9 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -17,6 +19,8 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
+
+var defaultDelay = 1 * time.Second
 
 func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
@@ -67,6 +71,8 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
 
+	delay(defaultDelay)
+
 	c, err := application.NewEnrollCmd(
 		logger,
 		url,
@@ -87,4 +93,8 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	fmt.Fprintln(streams.Out, "Successfully enrolled the Agent.")
 	return nil
+}
+
+func delay(t time.Duration) {
+	<-time.After(time.Duration(rand.Int63n(int64(t))))
 }
