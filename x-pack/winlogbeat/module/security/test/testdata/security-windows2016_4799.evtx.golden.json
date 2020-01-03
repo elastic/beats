@@ -12,10 +12,12 @@
       "domain": "Builtin",
       "name": "Administrators"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A security-enabled local group membership was enumerated.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nGroup:\n\tSecurity ID:\t\tS-1-5-32-544\n\tGroup Name:\t\tAdministrators\n\tGroup Domain:\t\tBuiltin\n\nProcess Information:\n\tProcess ID:\t\t0x494\n\tProcess Name:\t\tC:\\Windows\\System32\\svchost.exe",
     "process": {
       "name": "null"
     },
