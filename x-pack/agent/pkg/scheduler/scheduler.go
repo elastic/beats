@@ -86,6 +86,7 @@ type PeriodicJitter struct {
 	done     chan struct{}
 }
 
+// NewPeriodicJitter creates a new PeriodicJitter.
 func NewPeriodicJitter(d, variance time.Duration) *PeriodicJitter {
 	return &PeriodicJitter{
 		C:        make(chan time.Time, 1),
@@ -95,6 +96,8 @@ func NewPeriodicJitter(d, variance time.Duration) *PeriodicJitter {
 	}
 }
 
+// WaitTick wait on the duration plus some jitter to unblock the channel.
+// Note: you should not keep a reference to the channel.
 func (p *PeriodicJitter) WaitTick() <-chan time.Time {
 	if !p.ran {
 		// Sleep for only the variance, this will smooth the initial bootstrap of all the agents.
@@ -119,6 +122,7 @@ func (p *PeriodicJitter) WaitTick() <-chan time.Time {
 	return p.C
 }
 
+// Stop stops the PeriodicJitter scheduler.
 func (p *PeriodicJitter) Stop() {
 	close(p.done)
 }
