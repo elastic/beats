@@ -134,6 +134,12 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
+    # Docker Log Driver
+    - os: linux
+      env: TARGETS="-C x-pack/dockerlogbeat testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     # Journalbeat
     - os: linux
       env: TARGETS="-C journalbeat testsuite"
@@ -198,6 +204,8 @@ jobs:
       stage: test
       addons:
         apt:
+          config:
+            retries: true
           update: true
           packages:
             - python-virtualenv
@@ -216,6 +224,8 @@ jobs:
 
 addons:
   apt:
+    config:
+      retries: true
     update: true
     packages:
       - python-virtualenv

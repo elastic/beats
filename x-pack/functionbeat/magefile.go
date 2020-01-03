@@ -20,9 +20,9 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"

@@ -14,7 +14,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1005\n\tAccount Name:\t\telastictest1\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nChanged Attributes:\n\tSAM Account Name:\telastictest1\n\tDisplay Name:\t\telastictest1\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t6/9/2019 10:30:28\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowedToDelegateTo:\t-\n\tOld UAC Value:\t\t0x210\n\tNew UAC Value:\t\t0x210\n\tUser Account Control:\t-\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "process": {
       "name": "null"
     },
@@ -35,6 +34,10 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
+        "NewUACList": [
+          "LOCKOUT",
+          "NORMAL_ACCOUNT"
+        ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x210",
         "PasswordLastSet": "6/9/2019 10:30:28",
@@ -51,7 +54,9 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1",
-        "UserAccountControl": "-",
+        "UserAccountControl": [
+          "-"
+        ],
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -91,7 +96,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nChanged Attributes:\n\tSAM Account Name:\taudittest0609\n\tDisplay Name:\t\taudittest0609s\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t6/9/2019 10:25:21\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowedToDelegateTo:\t-\n\tOld UAC Value:\t\t0x10\n\tNew UAC Value:\t\t0x210\n\tUser Account Control:\t\n\t\t'Don't Expire Password' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "process": {
       "name": "null"
     },
@@ -112,6 +116,10 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
+        "NewUACList": [
+          "LOCKOUT",
+          "NORMAL_ACCOUNT"
+        ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x10",
         "PasswordLastSet": "6/9/2019 10:25:21",
@@ -128,7 +136,9 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609",
-        "UserAccountControl": "\n\t\t%%2089",
+        "UserAccountControl": [
+          "2089"
+        ],
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"

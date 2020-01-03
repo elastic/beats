@@ -128,9 +128,6 @@ func (p *messagePartitioner) Partition(
 
 	msg.partition = partition
 
-	if logp.IsDebug(debugSelector) {
-		debugf("setting event.Meta[\"partition\"] = %v", partition)
-	}
 	if _, err := msg.data.Cache.Put("partition", partition); err != nil {
 		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %v", err)
 	}

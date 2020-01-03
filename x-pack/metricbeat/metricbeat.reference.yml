@@ -616,6 +616,8 @@ metricbeat.modules:
     - state_cronjob
     - state_resourcequota
     - state_service
+    - state_persistentvolume
+    - state_persistentvolumeclaim
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -734,7 +736,9 @@ metricbeat.modules:
   metricsets:
     - "transaction_log"
     - "performance"
-  hosts: ["sqlserver://sa@localhost"]
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
   period: 10s
 
 
@@ -905,6 +909,27 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#--------------------------------- Sql Module ---------------------------------
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["localhost"]
+
+  driver: "postgres"
+  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
+  sql_query: "select now()"
+
+
+#--------------------------------- Stan Module ---------------------------------
+- module: stan
+  metricsets: ["stats", "channels", "subscriptions"]
+  period: 60s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/streaming/serverz"
+  #channels.metrics_path: "/streaming/channelsz"
+  #subscriptions.metrics_path: "/streaming/channelsz" # we retrieve streaming subscriptions with a detailed query param to the channelsz endpoint
 
 #-------------------------------- Statsd Module --------------------------------
 - module: statsd

@@ -100,7 +100,20 @@ type cpuUsage struct {
 // be updated/initialized with the corresponding value retrieved from Docker API.
 func (u *cpuUsage) CPUs() uint32 {
 	if u.cpus == 0 {
-		u.cpus = u.Stats.CPUStats.OnlineCPUs
+		if u.Stats.CPUStats.OnlineCPUs != 0 {
+			u.cpus = u.Stats.CPUStats.OnlineCPUs
+		} else {
+			//Certain versions of docker don't have `online_cpus`
+			//In addition to this, certain kernel versions will report spurious zeros from the cgroups usage_percpu
+			var realCPUCount uint32
+			for _, rCPUUsage := range u.Stats.CPUStats.CPUUsage.PercpuUsage {
+				if rCPUUsage != 0 {
+					realCPUCount++
+				}
+			}
+			u.cpus = realCPUCount
+		}
+
 	}
 	return u.cpus
 }
