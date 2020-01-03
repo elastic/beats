@@ -16,9 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-<<<<<<< HEAD
-### Security
-=======
 ## [1.2.1] - 2020-1-3
 
 ### Added
@@ -45,7 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an issue determining the Linux distribution for Fedora 30. [#69](https://github.com/elastic/go-sysinfo/pull/69)
->>>>>>> 5a45be9aa... Update go-sysinfo to v1.2.1 (#15329)
 
 ## [1.1.0] - 2019-08-22
 
@@ -86,14 +82,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-<<<<<<< HEAD
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.1.0...HEAD
-=======
 [Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.2.1...HEAD
 [1.2.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.1
 [1.2.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.0
 [1.1.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
->>>>>>> 5a45be9aa... Update go-sysinfo to v1.2.1 (#15329)
 [1.1.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
 [1.0.2]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.2
 [1.0.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.1
