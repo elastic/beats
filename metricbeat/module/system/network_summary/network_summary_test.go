@@ -28,7 +28,6 @@ import (
 )
 
 func TestMapping(t *testing.T) {
-
 	example := &types.NetworkCountersInfo{
 		SNMP: types.SNMP{
 			IP:      map[string]int64{"DefaultTTL": 64},
@@ -52,7 +51,6 @@ func TestMapping(t *testing.T) {
 
 	out := eventMapping(example)
 	assert.Equal(t, exampleOut, out)
-
 }
 
 func TestData(t *testing.T) {

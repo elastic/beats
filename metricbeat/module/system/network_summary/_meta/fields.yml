@@ -7,20 +7,20 @@
     - name: ip.*
       type: object
       description: >
-        IP protocol counters
+        IP counters
     - name: tcp.*
       type: object
       description: >
-        TCP protocol counters
+        TCP  counters
     - name: udp.*
       type: object
       description: >
-        UDP protocol counters
+        UDP  counters
     - name: udpLite.*
       type: object
       description: >
-        UDP Lite protocol counters
+        UDP Lite  counters
     - name: icmp.*
       type: object
       description: >
-        ICMP protocol counters
+        ICMP  counters
