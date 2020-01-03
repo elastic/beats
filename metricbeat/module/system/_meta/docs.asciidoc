@@ -46,7 +46,7 @@ Memory statistics (swap, total, used, free, actual) should be available without 
 
 ==== network
 
-Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without escalated
+Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without elevated
 permissions.
 
 ==== process
