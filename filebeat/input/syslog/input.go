@@ -32,9 +32,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/influxdata/go-syslog/rfc5424"
 )
 
-// Parser is generated from a ragel state machine using the following command:
+// RFC 3164 parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G2 parser.rl -o parser.go
 //go:generate go fmt parser.go
 
@@ -126,8 +128,33 @@ func NewInput(
 		return nil, err
 	}
 
+	var cb inputsource.NetworkFunc
 	forwarder := harvester.NewForwarder(out)
-	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
+	switch config.Format {
+	case syslogFormatRFC3164:
+		cb = networkFuncFor3164(log, forwarder)
+	case syslogFormatRFC5424:
+		cb = networkFuncFor5424(log, forwarder)
+	}
+
+	server, err := factory(cb, config.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Input{
+		outlet:  out,
+		started: false,
+		server:  server,
+		config:  &config,
+		log:     log,
+	}, nil
+}
+
+func networkFuncFor3164(
+	log *logp.Logger, forwarder *harvester.Forwarder,
+) inputsource.NetworkFunc {
+	return (func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := newEvent()
 		Parse(data, ev)
 		if !ev.IsValid() {
@@ -146,21 +173,36 @@ func NewInput(
 		} else {
 			forwarder.Send(createEvent(ev, metadata, time.Local, log))
 		}
-	}
-
-	server, err := factory(cb, config.Protocol)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Input{
-		outlet:  out,
-		started: false,
-		server:  server,
-		config:  &config,
-		log:     log,
-	}, nil
+	})
 }
+
+func networkFuncFor5424(
+	log *logp.Logger, forwarder *harvester.Forwarder,
+) inputsource.NetworkFunc {
+	parser := rfc5424.NewParser()
+	return (func(data []byte, metadata inputsource.NetworkMetadata) {
+		message, err := parser.Parse(data)
+		if err != nil {
+			log.Errorw("can't parse event as syslog rfc5424",
+				"message", string(data), "error", err)
+			// On error revert to the raw bytes content, we need a better way to communicate this kind of
+			// error upstream this should be a global effort.
+			forwarder.Send(beat.Event{
+				Timestamp: time.Now(),
+				Meta: common.MapStr{
+					"truncated": metadata.Truncated,
+				},
+				Fields: common.MapStr{
+					"message": string(data),
+				},
+			})
+		} else {
+			//forwarder.Send(createEvent5424(message))
+		}
+	})
+}
+
+//func createEvent5424(message)
 
 // Run starts listening for Syslog events over the network.
 func (p *Input) Run() {

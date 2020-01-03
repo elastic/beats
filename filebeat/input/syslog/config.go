@@ -33,12 +33,28 @@ import (
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
+	Format                    syslogFormat           `config:"format"`
 }
+
+type syslogFormat int
+
+const (
+	syslogFormatRFC3164 = iota
+	syslogFormatRFC5424
+)
+
+var (
+	syslogFormats = map[string]syslogFormat{
+		"rfc3164": syslogFormatRFC3164,
+		"rfc5424": syslogFormatRFC5424,
+	}
+)
 
 var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "syslog",
 	},
+	Format: syslogFormatRFC3164,
 }
 
 type syslogTCP struct {
@@ -89,4 +105,14 @@ func factory(
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}
+}
+
+// Unpack validates and unpack the "format" config option
+func (f *syslogFormat) Unpack(value string) error {
+	format, ok := syslogFormats[value]
+	if !ok {
+		return fmt.Errorf("invalid format '%s'", value)
+	}
+	*f = format
+	return nil
 }
