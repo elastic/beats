@@ -14,7 +14,6 @@
     "log": {
       "level": "information"
     },
-    "message": "The name of an account was changed:\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tOld Account Name:\taudittest0609\n\tNew Account Name:\taudittest06\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "user": {
       "name": "audittest0609"
     },
@@ -69,7 +68,6 @@
     "log": {
       "level": "information"
     },
-    "message": "The name of an account was changed:\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tOld Account Name:\taudittest06\n\tNew Account Name:\taudittest0609\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "user": {
       "name": "audittest06"
     },
