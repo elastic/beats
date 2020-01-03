@@ -1657,10 +1657,34 @@
 			"revisionTime": "2019-07-31T12:00:54Z"
 		},
 		{
+			"checksumSHA1": "Hc4yYaBrUJXrXge+C5PecOIFX84=",
+			"path": "github.com/blakesmith/ar",
+			"revision": "8bd4349a67f2533b078dbc524689d15dba0f4659",
+			"revisionTime": "2015-03-11T14:59:44Z"
+		},
+		{
 			"checksumSHA1": "al43W4TWRdznwfxOWp4egKcL39c=",
 			"path": "github.com/bsm/sarama-cluster",
 			"revision": "7e67d87a6b3f83fe08c096fd084691bd9dca112f",
 			"revisionTime": "2018-06-25T08:32:03Z"
+		},
+		{
+			"checksumSHA1": "oqq6XncFUhs7TnBccRh8O4kr0UQ=",
+			"path": "github.com/cavaliercoder/badio",
+			"revision": "ce5280129e9e9d80def35bfe203b845a4eebc9db",
+			"revisionTime": "2016-02-13T15:00:51Z"
+		},
+		{
+			"checksumSHA1": "JtuNZxVxkhG/dwmOBOj4i25kaA4=",
+			"path": "github.com/cavaliercoder/go-rpm",
+			"revision": "7a9c54e3d83e935c2f070a97273c99be6a3ac2e9",
+			"revisionTime": "2019-01-31T05:56:24Z"
+		},
+		{
+			"checksumSHA1": "YOGrTfw2qs9xWa+dQEKtE4Bw8m0=",
+			"path": "github.com/cavaliercoder/go-rpm/version",
+			"revision": "7a9c54e3d83e935c2f070a97273c99be6a3ac2e9",
+			"revisionTime": "2019-01-31T05:56:24Z"
 		},
 		{
 			"checksumSHA1": "tQ+EywYQyMDanePvvgMc6hCd1so=",
@@ -4123,6 +4147,12 @@
 			"versionExact": "v0.4.0"
 		},
 		{
+			"checksumSHA1": "nlhGP9VLnwbYrykVzBdJMppDrFs=",
+			"path": "github.com/tsg/go-daemon",
+			"revision": "c6e0d1a849861166320520e9bae9bbda5f2ecb03",
+			"revisionTime": "2016-04-14T21:23:35Z"
+		},
+		{
 			"checksumSHA1": "M0S9278lG9Fztu+ZUsLUi40GDJU=",
 			"path": "github.com/tsg/gopacket",
 			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
@@ -4577,6 +4607,14 @@
 			"versionExact": "release-branch.go1.13"
 		},
 		{
+			"checksumSHA1": "zJybXQZcPAht+soLp/ozc9q5teE=",
+			"path": "golang.org/x/crypto/cast5",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
 			"checksumSHA1": "1ezNasqd516o9HG59beqc5s+2Ro=",
 			"path": "golang.org/x/crypto/cryptobyte",
 			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
@@ -4619,6 +4657,54 @@
 		{
 			"checksumSHA1": "PGEmqKttvy7NzqOkwNKI5E5xtOs=",
 			"path": "golang.org/x/crypto/ocsp",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "dQG5zjp8kTNBcgGUkNsrXdacRjg=",
+			"path": "golang.org/x/crypto/openpgp",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "olOKkhrdkYQHZ0lf1orrFQPQrv4=",
+			"path": "golang.org/x/crypto/openpgp/armor",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "eo/KtdjieJQXH7Qy+faXFcF70ME=",
+			"path": "golang.org/x/crypto/openpgp/elgamal",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "rlxVSaGgqdAgwblsErxTxIfuGfg=",
+			"path": "golang.org/x/crypto/openpgp/errors",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "lGbjBcUoV7OfI7FZ5/DCXhCMoIM=",
+			"path": "golang.org/x/crypto/openpgp/packet",
+			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
+			"revisionTime": "2019-08-20T16:16:47Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "s2qT4UwvzBSkzXuiuMkowif1Olw=",
+			"path": "golang.org/x/crypto/openpgp/s2k",
 			"revision": "60c769a6c58655dab1b9adac0d58967dd517cfba",
 			"revisionTime": "2019-08-20T16:16:47Z",
 			"version": "release-branch.go1.13",
@@ -5202,6 +5288,14 @@
 		{
 			"checksumSHA1": "3JryHiLUg2BoGvcHW0F07Ruj6v8=",
 			"path": "golang.org/x/tools/go/packages",
+			"revision": "65e3620a7ae7ac25e8494a60f0e5ef4e4fba03b3",
+			"revisionTime": "2019-08-19T14:41:38Z",
+			"version": "release-branch.go1.13",
+			"versionExact": "release-branch.go1.13"
+		},
+		{
+			"checksumSHA1": "3MMloGEeOp5DSWVD80vbdIekTSo=",
+			"path": "golang.org/x/tools/go/vcs",
 			"revision": "65e3620a7ae7ac25e8494a60f0e5ef4e4fba03b3",
 			"revisionTime": "2019-08-19T14:41:38Z",
 			"version": "release-branch.go1.13",
