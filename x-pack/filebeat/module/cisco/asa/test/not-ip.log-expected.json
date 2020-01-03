@@ -18,6 +18,7 @@
         "event.timezone": "-02:00",
         "fileset.name": "asa",
         "input.type": "log",
+        "log.file.path": "not-ip.log",
         "log.level": "notification",
         "log.offset": 0,
         "network.iana_number": 6,

@@ -16,6 +16,7 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
 	// mage:import
