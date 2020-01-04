@@ -464,6 +464,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ActiveMQ. {pull}14840[14840]
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
 - Add STAN Metricbeat module. {pull}14839[14839]
+- Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
