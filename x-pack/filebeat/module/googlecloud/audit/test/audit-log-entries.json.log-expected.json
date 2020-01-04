@@ -24,8 +24,10 @@
         "input.type": "log",
         "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
         "log.offset": 0,
+        "service.name": "cloudbilling.googleapis.com",
         "service.type": "googlecloud",
-        "source.ip": "192.168.1.1"
+        "source.ip": "192.168.1.1",
+        "user.email": "xxx@xxx.xxx"
     },
     {
         "@timestamp": "2019-12-19T00:45:51.228Z",
@@ -59,9 +61,17 @@
         "input.type": "log",
         "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
         "log.offset": 945,
+        "service.name": "compute.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
-        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)"
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "user_agent.os.full": "Mac OS X 10.15",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15",
+        "user_agent.version": "71.0."
     },
     {
         "@timestamp": "2019-12-19T00:44:25.051Z",
@@ -95,8 +105,16 @@
         "input.type": "log",
         "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
         "log.offset": 2251,
+        "service.name": "compute.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
-        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)"
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "user_agent.os.full": "Mac OS X 10.15",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15",
+        "user_agent.version": "71.0."
     }
 ]

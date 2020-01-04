@@ -96,17 +96,12 @@ function Audit(keep_original_message) {
         ignore_missing: true,
     });
 
-    // Copy the caller.ip  to source.ip.
-    var copyAddressFields = new processor.Convert({
+    // Copy some fields
+    var copyFields = new processor.Convert({
         fields: [
-            {from: "googlecloud.audit.request_metadata.caller_ip", to: "source.ip"},
-        ],
-        fail_on_error: false,
-    });
-
-    // Copy caller_supplied_user_agent to user_agent.original.
-    var copyCallerUserAgent = new processor.Convert({
-        fields: [
+            {from: "googlecloud.audit.request_metadata.caller_ip", to: "source.ip", type: "ip"},
+            {from: "googlecloud.audit.authentication_info.principal_email", to: "user.email"},
+            {from: "googlecloud.audit.service_name", to: "service.name"},
             {from: "googlecloud.audit.request_metadata.caller_supplied_user_agent", to: "user_agent.original"},
         ],
         fail_on_error: false,
@@ -137,8 +132,7 @@ function Audit(keep_original_message) {
         .Add(setCloudMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
-        .Add(copyAddressFields)
-        .Add(copyCallerUserAgent)
+        .Add(copyFields)
         .Add(dropExtraFields)
         .Add(RenameNestedFields)
         .Build();
