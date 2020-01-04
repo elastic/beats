@@ -79,7 +79,7 @@ function Audit(keep_original_message) {
             {from: "json.request.name", to: "json.request.name"},
             {from: "json.request.resourceName", to: "json.request.resource_name"},
 
-            {from: "json.requestMetadata.callerIp", to: "json.requestMetadata.caller_ip"},
+            {from: "json.requestMetadata.callerIp", to: "json.requestMetadata.caller_ip", type: "ip"},
             {from: "json.requestMetadata.callerSuppliedUserAgent", to: "json.requestMetadata.caller_supplied_user_agent"},
             {from: "json.requestMetadata", to: "json.request_metadata"},
 
@@ -99,7 +99,7 @@ function Audit(keep_original_message) {
     // Copy some fields
     var copyFields = new processor.Convert({
         fields: [
-            {from: "googlecloud.audit.request_metadata.caller_ip", to: "source.ip", type: "ip"},
+            {from: "googlecloud.audit.request_metadata.caller_ip", to: "source.ip"},
             {from: "googlecloud.audit.authentication_info.principal_email", to: "user.email"},
             {from: "googlecloud.audit.service_name", to: "service.name"},
             {from: "googlecloud.audit.request_metadata.caller_supplied_user_agent", to: "user_agent.original"},
