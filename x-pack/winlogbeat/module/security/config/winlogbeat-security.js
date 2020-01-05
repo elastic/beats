@@ -1181,7 +1181,7 @@ var security = (function () {
         return this.filter(function (value, index, self) { 
            return self.indexOf(value) === index;
         });
-    }
+    };
 
     // lookupMessageCode returns the string associated with the code. key should
     // be the name of the field in evt containing the code (e.g. %%2313).
@@ -1293,7 +1293,7 @@ var security = (function () {
     var addRelatedUser= function(evt,user) {
         var related_user = evt.Get("related.user");
         if (!related_user) {
-            var related_user=[];
+            related_user=[];
         }
         var all_users=related_user.slice(0);
         var i=all_users.lenght;
