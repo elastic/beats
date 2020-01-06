@@ -46,6 +46,10 @@ func (t *testingClient) Send(
 	return t.callback(headers, body)
 }
 
+func (t *testingClient) URI() string {
+	return "http://localhost"
+}
+
 func (t *testingClient) Answer(fn clientCallbackFunc) <-chan struct{} {
 	t.Lock()
 	defer t.Unlock()

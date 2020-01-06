@@ -141,7 +141,11 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 		if err != nil {
 			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
 			if !f.backoff.Wait() {
-				return nil, errors.M(errors.TypeNetwork, "execute retry loop was stopped")
+				return nil, errors.New(
+					"execute retry loop was stopped",
+					errors.TypeNetwork,
+					errors.M(errors.MetaKeyPath, f.client.URI()),
+				)
 			}
 			continue
 		}
