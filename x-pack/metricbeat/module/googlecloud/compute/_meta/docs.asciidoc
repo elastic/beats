@@ -1,4 +1,4 @@
-Compute Metricset to fetch metrics from instances in Google Cloud Platform.
+Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine] Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this Metricset.
 
 The `compute` Metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names have been left untouched for people already familiar with them.
 

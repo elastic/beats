@@ -28,6 +28,8 @@ func NewMetadataService(projectID, zone string, opt ...option.ClientOption) (goo
 	}, nil
 }
 
+// computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
+// reading and writing in the same method)
 type computeMetadata struct {
 	projectID   string
 	zone        string
