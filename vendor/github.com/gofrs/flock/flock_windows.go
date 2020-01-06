@@ -23,7 +23,7 @@ func (f *Flock) Lock() error {
 	return f.lock(&f.l, winLockfileExclusiveLock)
 }
 
-// RLock is a blocking call to try and take a sahred file lock. It will wait
+// RLock is a blocking call to try and take a shared file lock. It will wait
 // until it is able to obtain the shared file lock. It's recommended that
 // TryRLock() be used over this function. This function may block the ability to
 // query the current Locked() or RLocked() status due to a RW-mutex lock.
@@ -86,7 +86,7 @@ func (f *Flock) Unlock() error {
 	return nil
 }
 
-// TryLock is the preferred function for taking an exlusive file lock. This
+// TryLock is the preferred function for taking an exclusive file lock. This
 // function does take a RW-mutex lock before it tries to lock the file, so there
 // is the possibility that this function may block for a short time if another
 // goroutine is trying to take any action.
