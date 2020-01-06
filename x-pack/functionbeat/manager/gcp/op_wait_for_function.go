@@ -66,6 +66,4 @@ func (o *opWaitForFunction) Execute(ctx executor.Context) error {
 		timer := time.NewTimer(periodicCheck)
 		<-timer.C
 	}
-
-	return nil
 }
