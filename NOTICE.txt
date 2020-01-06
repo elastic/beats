@@ -1233,13 +1233,19 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Version: v1.1.0
-Revision: 51d9d1362d77a4792dfb39a7a19f056cdf1b9840
+Version: v1.2.1
+Revision: cee67141de1bdfb666367301f44e559e58b16734
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
+-------NOTICE.txt-----
+Elastic go-sysinfo
+Copyright 2017-2020 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile

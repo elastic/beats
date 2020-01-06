@@ -2864,60 +2864,60 @@
 			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "rfr1yBSyYTHNU3p1NKftIyzr/eQ=",
+			"checksumSHA1": "s37l3najJFu22RNPP9udnam+YnU=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
 			"checksumSHA1": "GiZCjX17K265TtamGZZw4R2Jwbk=",
 			"path": "github.com/elastic/go-sysinfo/internal/registry",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
 			"checksumSHA1": "dVSTUnZHCLNd0tYIENqdj05RyI8=",
 			"path": "github.com/elastic/go-sysinfo/providers/darwin",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
-			"checksumSHA1": "7Spkw81dzevqmPbUGZO1UM3K3oc=",
+			"checksumSHA1": "Kc5GlAf7iwLd/d1X68JFM8b12GM=",
 			"path": "github.com/elastic/go-sysinfo/providers/linux",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
 			"checksumSHA1": "RWLvcP1w9ynKbuCqiW6prwd+EDU=",
 			"path": "github.com/elastic/go-sysinfo/providers/shared",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
-			"checksumSHA1": "E+yrwS/aZemnWUvwTvEhiczYuD8=",
+			"checksumSHA1": "SI4WoiEzBJFS73GRQV6EsfA90RI=",
 			"path": "github.com/elastic/go-sysinfo/providers/windows",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
-			"checksumSHA1": "u2RbbYcB7B4uhi/eJ01qiiBa41E=",
+			"checksumSHA1": "dtxTdCkTAMgGmJS7Bn5jDXsQ8nA=",
 			"path": "github.com/elastic/go-sysinfo/types",
-			"revision": "51d9d1362d77a4792dfb39a7a19f056cdf1b9840",
-			"revisionTime": "2019-08-22T16:44:40Z",
-			"version": "v1.1.0",
-			"versionExact": "v1.1.0"
+			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
+			"revisionTime": "2020-01-03T17:30:45Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
 		},
 		{
 			"checksumSHA1": "bNf3GDGhZh86bfCIMM5c5AYfo3g=",
