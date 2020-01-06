@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"runtime"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/agent/release"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
@@ -90,12 +90,18 @@ func NewEnrollCmdWithStore(
 ) (*EnrollCmd, error) {
 	cfg, err := kibana.NewConfigFromURL(url, CAs)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid Kibana URL")
+		return nil, errors.New(err,
+			"invalid Kibana URL",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, url))
 	}
 
 	client, err := fleetapi.NewWithConfig(log, cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to create the API client")
+		return nil, errors.New(err,
+			"fail to create the API client",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, url))
 	}
 
 	if userProvidedMetadata == nil {
@@ -131,7 +137,9 @@ func (c *EnrollCmd) Execute() error {
 
 	resp, err := cmd.Execute(r)
 	if err != nil {
-		return errors.Wrap(err, "fail to execute request to Kibana")
+		return errors.New(err,
+			"fail to execute request to Kibana",
+			errors.TypeNetwork)
 	}
 
 	fleetConfig, err := createFleetConfigFromEnroll(&APIAccess{
@@ -145,7 +153,7 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	if err := c.configStore.Save(reader); err != nil {
-		return errors.Wrap(err, "could not save enroll credentials")
+		return errors.New(err, "could not save enroll credentials", errors.TypeFilesystem)
 	}
 
 	if _, err := info.NewAgentInfo(); err != nil {
@@ -165,7 +173,7 @@ func metadata() map[string]interface{} {
 func yamlToReader(in interface{}) (io.Reader, error) {
 	data, err := yaml.Marshal(in)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not marshal to YAML")
+		return nil, errors.New(err, "could not marshal to YAML")
 	}
 	return bytes.NewReader(data), nil
 }

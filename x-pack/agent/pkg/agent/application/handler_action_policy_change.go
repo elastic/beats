@@ -7,8 +7,7 @@ package application
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
@@ -28,7 +27,7 @@ func (h *handlerPolicyChange) Handle(a action) error {
 
 	c, err := config.NewConfigFrom(action.Policy)
 	if err != nil {
-		return errors.Wrap(err, "could not parse the configuration from the policy")
+		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}
 
 	h.log.Debug("HandlerPolicyChange: emit configuration")

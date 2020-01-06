@@ -9,8 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation"
 	operatorCfg "github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/stateresolver"
@@ -77,7 +76,7 @@ func newOperator(log *logger.Logger, id routingKey, config *config.Config, r rep
 	fetcher := downloader.NewDownloader(operatorConfig.DownloadConfig)
 	installer, err := install.NewInstaller(operatorConfig.DownloadConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "initiating installer")
+		return nil, errors.New(err, "initiating installer")
 	}
 
 	stateResolver, err := stateresolver.NewStateResolver(log)

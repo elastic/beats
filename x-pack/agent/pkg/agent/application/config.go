@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
@@ -126,11 +125,11 @@ type LogReporting struct {
 // Validate validates the required fields for accessing the API.
 func (e *APIAccess) Validate() error {
 	if len(e.AccessAPIKey) == 0 {
-		return errors.New("empty access token")
+		return errors.New("empty access token", errors.TypeConfig)
 	}
 
 	if e.Kibana == nil || len(e.Kibana.Host) == 0 {
-		return errors.New("missing Kibana host configuration")
+		return errors.New("missing Kibana host configuration", errors.TypeConfig)
 	}
 
 	return nil
@@ -147,7 +146,7 @@ func defaultFleetAgentConfig() *FleetAgentConfig {
 
 func createFleetConfigFromEnroll(access *APIAccess) (*FleetAgentConfig, error) {
 	if err := access.Validate(); err != nil {
-		return nil, errors.Wrap(err, "invalid enrollment options")
+		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
 
 	cfg := defaultFleetAgentConfig()

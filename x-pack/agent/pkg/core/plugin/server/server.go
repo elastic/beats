@@ -13,11 +13,11 @@ import (
 	"net"
 	"os"
 
-	"github.com/pkg/errors"
 	rpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
@@ -34,12 +34,12 @@ func NewGrpcServer(secretsReader io.Reader, configServer grpc.ConfiguratorServer
 	var cred *process.Creds
 	secrets, err := ioutil.ReadAll(secretsReader)
 	if err != nil {
-		return errors.Wrap(err, "failed to retrieve secrets from provided input")
+		return errors.New(err, "failed to retrieve secrets from provided input")
 	}
 
 	err = yaml.Unmarshal(secrets, &cred)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse secrets from provided input")
+		return errors.New(err, "failed to parse secrets from provided input")
 	}
 
 	// setup grpc server
@@ -50,7 +50,7 @@ func NewGrpcServer(secretsReader io.Reader, configServer grpc.ConfiguratorServer
 
 	pair, err := tls.X509KeyPair(cred.Cert, cred.PK)
 	if err != nil {
-		return errors.Wrap(err, "failed to load x509 key-pair %v")
+		return errors.New(err, "failed to load x509 key-pair")
 	}
 
 	// Create CA cert pool
@@ -62,7 +62,10 @@ func NewGrpcServer(secretsReader io.Reader, configServer grpc.ConfiguratorServer
 	fmt.Printf("Listening at %s\n", serverAddress)
 	lis, err := net.Listen("tcp", serverAddress)
 	if err != nil {
-		return errors.Wrap(err, "failed to start server: %v")
+		return errors.New(err,
+			fmt.Sprintf("failed to start server: %v", serverAddress),
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, serverAddress))
 	}
 
 	// Create the TLS credentials
@@ -80,7 +83,10 @@ func NewGrpcServer(secretsReader io.Reader, configServer grpc.ConfiguratorServer
 
 	// Serve and Listen
 	if err := srv.Serve(lis); err != nil {
-		return errors.Wrap(err, "grpc serve error: %s")
+		return errors.New(err,
+			fmt.Sprintf("grpc serve error: %s", serverAddress),
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, serverAddress))
 	}
 
 	return nil

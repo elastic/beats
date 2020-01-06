@@ -5,15 +5,15 @@
 package application
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -64,24 +64,35 @@ func newManaged(
 	store := storage.NewEncryptedDiskStore(path, []byte(""))
 	reader, err := store.Load()
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize config store")
+		return nil, errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
 	}
 
 	config, err := config.NewConfigFrom(reader)
 	if err != nil {
-		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", path)
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
 	}
 
 	rawConfig.Merge(config)
 
 	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack configuration from %s", path)
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to unpack configuration from %s", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
 	}
 
 	client, err := fleetapi.NewAuthWithConfig(log, cfg.API.AccessAPIKey, cfg.API.Kibana)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to create API client")
+		return nil, errors.New(err,
+			"fail to create API client",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, cfg.API.Kibana.Host))
 	}
 
 	managedApplication := &Managed{
@@ -92,14 +103,14 @@ func newManaged(
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
 	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to create reporters")
+		return nil, errors.New(err, "fail to create reporters")
 	}
 
 	combinedReporter := reporting.NewReporter(log, agentInfo, logR, fleetR)
 
 	router, err := newRouter(log, streamFactory(rawConfig, client, combinedReporter))
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to initialize pipeline router")
+		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
 	emit := emitter(log, router)
