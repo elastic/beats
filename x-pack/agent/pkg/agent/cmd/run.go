@@ -10,10 +10,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/cli"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -35,7 +35,10 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 func run(flags *globalFlags, streams *cli.IOStreams) error {
 	config, err := config.LoadYAML(flags.PathConfigFile)
 	if err != nil {
-		return errors.Wrapf(err, "could not read configuration file %s", flags.PathConfigFile)
+		return errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", flags.PathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, flags.PathConfigFile))
 	}
 
 	logger, err := logger.NewFromConfig(config)

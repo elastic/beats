@@ -9,8 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -81,7 +80,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}
-		ad.log.Debugf("Succesfully dispatched action: '%+v'", action)
+		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 	return nil
 }

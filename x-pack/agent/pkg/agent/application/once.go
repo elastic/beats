@@ -5,8 +5,7 @@
 package application
 
 import (
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -23,7 +22,7 @@ func newOnce(log *logger.Logger, discover discoverFunc, emitter emitterFunc) *on
 func (o *once) Start() error {
 	files, err := o.discover()
 	if err != nil {
-		return errors.Wrap(err, "could not discover configuration files")
+		return errors.New(err, "could not discover configuration files", errors.TypeConfig)
 	}
 
 	if len(files) == 0 {

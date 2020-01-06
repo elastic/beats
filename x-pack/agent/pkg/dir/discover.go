@@ -7,7 +7,7 @@ package dir
 import (
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 // DiscoverFiles takes a slices of wildcards patterns and try to discover all the matching files
@@ -17,7 +17,10 @@ func DiscoverFiles(patterns ...string) ([]string, error) {
 	for _, pattern := range patterns {
 		f, err := filepath.Glob(pattern)
 		if err != nil {
-			return files, errors.Wrap(err, "error while reading the glob pattern")
+			return files, errors.New(err,
+				"error while reading the glob pattern",
+				errors.TypeFilesystem,
+				errors.M(errors.MetaKeyPath, pattern))
 		}
 
 		if len(f) > 0 {

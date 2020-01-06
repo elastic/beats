@@ -11,9 +11,9 @@ import (
 
 	"google.golang.org/grpc/credentials"
 
-	"github.com/pkg/errors"
 	rpc "google.golang.org/grpc"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig"
 )
 
@@ -54,7 +54,7 @@ func (c *connectionFactory) NewConnection(provider remoteconfig.ConnectionProvid
 	// Load client certificate
 	pair, err := tls.X509KeyPair(grpcProvider.Cert(), grpcProvider.PK())
 	if err != nil {
-		return nil, errors.Wrap(err, "creating client certificate pair")
+		return nil, errors.New(err, "creating client certificate pair")
 	}
 
 	// Load Cert Auth

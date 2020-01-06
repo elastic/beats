@@ -10,9 +10,9 @@ import (
 	"io"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 )
@@ -57,7 +57,7 @@ func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 	}
 
 	if err := updateAgentInfo(s, agentinfo); err != nil {
-		return nil, errors.Wrap(err, "storing generated agent id")
+		return nil, errors.New(err, "storing generated agent id", errors.TypeFilesystem)
 	}
 
 	return agentinfo, nil
@@ -71,12 +71,17 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
-		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the agent", AgentConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, AgentConfigFile))
 	}
 
 	configMap, err := cfg.ToMapStr()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unpack stored config to map")
+		return nil, errors.New(err,
+			"failed to unpack stored config to map",
+			errors.TypeFilesystem)
 	}
 
 	agentInfoSubMap, found := configMap[agentInfoKey]
@@ -86,12 +91,12 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 
 	cc, err := config.NewConfigFrom(agentInfoSubMap)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create config from agent info submap")
+		return nil, errors.New(err, "failed to create config from agent info submap")
 	}
 
 	pid := &persistentAgentInfo{}
 	if err := cc.Unpack(&pid); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack stored config to map")
+		return nil, errors.New(err, "failed to unpack stored config to map")
 	}
 
 	return pid, nil
@@ -105,12 +110,14 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
-		return errors.Wrapf(err, "fail to read configuration %s for the agent", AgentConfigFile)
+		return errors.New(err, fmt.Sprintf("fail to read configuration %s for the agent", AgentConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, AgentConfigFile))
 	}
 
 	configMap := make(map[string]interface{})
 	if err := cfg.Unpack(&configMap); err != nil {
-		return errors.Wrap(err, "failed to unpack stored config to map")
+		return errors.New(err, "failed to unpack stored config to map")
 	}
 
 	configMap[agentInfoKey] = agentInfo
@@ -126,7 +133,7 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 func yamlToReader(in interface{}) (io.Reader, error) {
 	data, err := yaml.Marshal(in)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not marshal to YAML")
+		return nil, errors.New(err, "could not marshal to YAML")
 	}
 	return bytes.NewReader(data), nil
 }
