@@ -1176,13 +1176,6 @@ var security = (function () {
         "16903": "Publish",
     };
 
-    // General Purpose Functions
-    Array.prototype.unique = function() {
-        return this.filter(function (value, index, self) { 
-           return self.indexOf(value) === index;
-        });
-    };
-
     // lookupMessageCode returns the string associated with the code. key should
     // be the name of the field in evt containing the code (e.g. %%2313).
     var lookupMessageCode = function (evt, key) {
@@ -1294,11 +1287,11 @@ var security = (function () {
         var related_user = evt.Get("related.user");
         if (!related_user) {
             related_user=[];
+            related_user.push(user);
+            evt.Put("related.user", related_user);
+        } else {
+            evt.AppendTo('related.user',user);
         }
-        var all_users=related_user.slice(0);
-        var i=all_users.lenght;
-        all_users.push(user);
-        evt.Put("related.user", all_users.unique());
     };
 
     var copyTargetUser = new processor.Chain()
