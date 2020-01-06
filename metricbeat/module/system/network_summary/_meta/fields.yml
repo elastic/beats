@@ -11,16 +11,16 @@
     - name: tcp.*
       type: object
       description: >
-        TCP  counters
+        TCP counters
     - name: udp.*
       type: object
       description: >
-        UDP  counters
+        UDP counters
     - name: udp_lite.*
       type: object
       description: >
-        UDP Lite  counters
+        UDP Lite counters
     - name: icmp.*
       type: object
       description: >
-        ICMP  counters
+        ICMP counters
