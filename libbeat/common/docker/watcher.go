@@ -309,7 +309,7 @@ func (w *watcher) watch() {
 			case err := <-errors:
 				// Restart watch call
 				if err == context.DeadlineExceeded {
-					logp.Info("Context deadline exceeded for docker request, restarting watch call", dockerWatchRequestTimeout)
+					logp.Info("Context deadline exceeded for docker request, restarting watch call")
 				} else {
 					logp.Err("Error watching for docker events: %v", err)
 				}
