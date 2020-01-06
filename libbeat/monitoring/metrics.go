@@ -272,13 +272,13 @@ func (v *Timestamp) Get() time.Time {
 }
 
 func (v *Timestamp) Visit(_ Mode, vs Visitor) {
-	v.mu.RLock()
-	defer v.mu.RUnlock()
-
 	vs.OnString(v.toString())
 }
 
 func (v *Timestamp) toString() string {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
 	if v.ts.IsZero() {
 		return ""
 	}
