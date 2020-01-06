@@ -18,9 +18,7 @@
 package mqtt
 
 import (
-	"context"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
@@ -75,7 +73,6 @@ func NewInput(
 		//				}
 		//			}
 		//		},
-		CloseRef:  doneChannelContext(inputContext.Done),
 		WaitClose: config.WaitClose,
 	})
 	if err != nil {
@@ -102,8 +99,6 @@ func (input *mqttInput) Run() {
 	input.runOnce.Do(func() {
 		go func() {
 
-			context := doneChannelContext(input.context.Done)
-
 			// If the consumer fails to connect, we use exponential backoff with
 			// jitter up to 8 * the initial backoff interval.
 			backoff := backoff.NewEqualJitterBackoff(
@@ -111,13 +106,11 @@ func (input *mqttInput) Run() {
 				input.config.ConnectBackoff,
 				8*input.config.ConnectBackoff)
 
-			for context.Err() == nil {
+			for !input.client.IsConnected() {
 				err := input.connect()
 				if err != nil {
 					logp.Error(err)
 					backoff.Wait()
-				} else {
-					break
 				}
 			}
 			//All the rest is working asynchronously within the MQTT client
@@ -135,27 +128,3 @@ func (input *mqttInput) Stop() {
 func (input *mqttInput) Wait() {
 	input.Stop()
 }
-
-// A barebones implementation of context.Context wrapped around the done
-// channels that are more common in the beats codebase.
-// TODO(faec): Generalize this to a common utility in a shared library
-// (https://github.com/elastic/beats/issues/13125).
-type channelCtx <-chan struct{}
-
-func doneChannelContext(ch <-chan struct{}) context.Context {
-	return channelCtx(ch)
-}
-
-func (c channelCtx) Deadline() (deadline time.Time, ok bool) { return }
-func (c channelCtx) Done() <-chan struct{} {
-	return (<-chan struct{})(c)
-}
-func (c channelCtx) Err() error {
-	select {
-	case <-c:
-		return context.Canceled
-	default:
-		return nil
-	}
-}
-func (c channelCtx) Value(key interface{}) interface{} { return nil }

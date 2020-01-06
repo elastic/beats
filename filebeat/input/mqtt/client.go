@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -119,7 +118,8 @@ func (input *mqttInput) setupMqttClient() error {
 
 func (input *mqttInput) connect() error {
 	if token := input.client.Connect(); token.WaitTimeout(input.config.WaitClose) && token.Error() != nil {
-		return errors.New("Failed to connect to broker, waiting a few seconds and retrying")
+		logp.Err("MQTT Failed to connect")
+		return token.Error()
 	}
 	logp.Info("MQTT Client connected: %t", input.client.IsConnected())
 	return nil
@@ -139,34 +139,30 @@ func (input *mqttInput) subscribeOnConnect(client MQTT.Client) {
 func (input *mqttInput) onMessage(client MQTT.Client, msg MQTT.Message) {
 	logp.Debug("MQTT", "MQTT message received: %s", string(msg.Payload()))
 	var beatEvent beat.Event
-	event := make(common.MapStr)
+	eventFields := make(common.MapStr)
 
 	// default case
-	var message = make(common.MapStr)
-	event["message"] = string(msg.Payload())
+	var mqtt = make(common.MapStr)
+	eventFields["message"] = string(msg.Payload())
 	if input.config.DecodePayload {
-		message["fields"] = DecodePayload(msg.Payload())
+		mqtt["fields"] = decodeBytes(msg.Payload())
 	}
 
-	if strings.HasPrefix(msg.Topic(), "$") {
-		event["isSystemTopic"] = true
-	} else {
-		event["isSystemTopic"] = false
-	}
-	event["topic"] = msg.Topic()
-	message["ID"] = msg.MessageID()
-	message["retained"] = msg.Retained()
-	event["mqtt"] = message
+	eventFields["is_system_topic"] = strings.HasPrefix(msg.Topic(), "$")
+	eventFields["topic"] = msg.Topic()
+
+	mqtt["id"] = msg.MessageID()
+	mqtt["retained"] = msg.Retained()
+	eventFields["mqtt"] = mqtt
 
 	// Finally sending the message to elasticsearch
-	beatEvent.Fields = event
-
+	beatEvent.Fields = eventFields
 	input.outlet.OnEvent(beatEvent)
 
 	logp.Debug("MQTT", "Event sent: %t")
 }
 
-// DefaultConnectionLostHandler does nothing
+// connectionLostHandler will try to reconnect when connection is lost
 func (input *mqttInput) connectionLostHandler(client MQTT.Client, reason error) {
 	logp.Warn("[MQTT] Connection lost: %s", reason.Error())
 
@@ -174,9 +170,12 @@ func (input *mqttInput) connectionLostHandler(client MQTT.Client, reason error) 
 	input.Run()
 }
 
-// DecodePayload will try to decode the payload. If every check fails, it will
-// return the payload as a string
-func DecodePayload(payload []byte) common.MapStr {
+// decodeBytes will try to decode the bytes in the following order
+// 1.) Check for msgpack format
+// 2.) Check for json format
+// 3.) If every check fails, it will
+// return the the string representation
+func decodeBytes(payload []byte) common.MapStr {
 	event := make(common.MapStr)
 
 	// A msgpack payload must be a json-like object
