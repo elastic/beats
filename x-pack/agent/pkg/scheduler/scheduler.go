@@ -4,7 +4,10 @@
 
 package scheduler
 
-import "time"
+import (
+	"math/rand"
+	"time"
+)
 
 // Scheduler simple interface that encapsulate the scheduling logic, this is useful if you want to
 // test asynchronous code in a synchronous way.
@@ -70,4 +73,61 @@ func (p *Periodic) WaitTick() <-chan time.Time {
 // using another mechanism.
 func (p *Periodic) Stop() {
 	p.Ticker.Stop()
+}
+
+// PeriodicJitter is as scheduler that will periodically create a timer ticker and sleep, to
+// better distribute the load on the network and remote endpoint the timer will introduce variance
+// on each sleep.
+type PeriodicJitter struct {
+	C        chan time.Time
+	ran      bool
+	d        time.Duration
+	variance time.Duration
+	done     chan struct{}
+}
+
+// NewPeriodicJitter creates a new PeriodicJitter.
+func NewPeriodicJitter(d, variance time.Duration) *PeriodicJitter {
+	return &PeriodicJitter{
+		C:        make(chan time.Time, 1),
+		d:        d,
+		variance: variance,
+		done:     make(chan struct{}),
+	}
+}
+
+// WaitTick wait on the duration plus some jitter to unblock the channel.
+// Note: you should not keep a reference to the channel.
+func (p *PeriodicJitter) WaitTick() <-chan time.Time {
+	if !p.ran {
+		// Sleep for only the variance, this will smooth the initial bootstrap of all the agents.
+		select {
+		case <-time.After(p.delay()):
+			p.C <- time.Now()
+		case <-p.done:
+			p.C <- time.Now()
+			close(p.C)
+		}
+		return p.C
+	}
+
+	select {
+	case <-time.After(p.d + p.delay()):
+		p.C <- time.Now()
+	case <-p.done:
+		p.C <- time.Now()
+		close(p.C)
+	}
+
+	return p.C
+}
+
+// Stop stops the PeriodicJitter scheduler.
+func (p *PeriodicJitter) Stop() {
+	close(p.done)
+}
+
+func (p *PeriodicJitter) delay() time.Duration {
+	t := int64(p.variance)
+	return time.Duration(rand.Int63n(t))
 }

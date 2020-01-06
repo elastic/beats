@@ -23,7 +23,10 @@ import (
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
 
-var durationTick = 10 * time.Second
+var gatewaySettings = &fleetGatewaySettings{
+	Duration: 30 * time.Second,
+	Jitter:   5 * time.Second,
+}
 
 type apiClient interface {
 	Send(
@@ -118,7 +121,7 @@ func newManaged(
 
 	gateway, err := newFleetGateway(
 		log,
-		&fleetGatewaySettings{Duration: durationTick},
+		gatewaySettings,
 		agentInfo,
 		client,
 		actionDispatcher,
