@@ -8,9 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common/backoff"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
@@ -125,7 +124,7 @@ func (f *fleetGateway) worker() {
 			}
 
 			if err := f.dispatcher.Dispatch(actions...); err != nil {
-				f.log.Errorf("Failed to dispatch actions, error: %s", err)
+				f.log.Errorf("failed to dispatch actions, error: %s", err)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
@@ -142,7 +141,7 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 		if err != nil {
 			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
 			if !f.backoff.Wait() {
-				return nil, errors.New("execute retry loop was stopped")
+				return nil, errors.M(errors.TypeNetwork, "execute retry loop was stopped")
 			}
 			continue
 		}
