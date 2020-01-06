@@ -89,7 +89,10 @@ func NewInput(
 		log:     logp.NewLogger("mqtt input").With("host", config.Host),
 	}
 
-	input.setupMqttClient()
+	err = input.setupMqttClient()
+	if err != nil {
+		return nil, err
+	}
 
 	return input, nil
 }
@@ -117,26 +120,18 @@ func (input *mqttInput) Run() {
 					break
 				}
 			}
-
-			// We've successfully connected, reset the backoff timer.
-			backoff.Reset()
-
 			//All the rest is working asynchronously within the MQTT client
 		}()
 	})
 }
 
-// Stop doesn't need to do anything because the kafka consumer group and the
-// input's outlet both have a context based on input.context.Done and will
-// shut themselves down, since the done channel is already closed as part of
-// the shutdown process in Runner.Stop().
+// Stop disconnects the MQTT client
 func (input *mqttInput) Stop() {
+	input.client.Disconnect(250)
 }
 
-// Wait should shut down the input and wait for it to complete, however (see
-// Stop above) we don't need to take actions to shut down as long as the
-// input.config.Done channel is closed, so we just make a (currently no-op)
-// call to Stop() and then wait for sarama to signal completion.
+// Wait should shut down the input and wait for it to complete
+// The disconnect of the client will do this for us
 func (input *mqttInput) Wait() {
 	input.Stop()
 }

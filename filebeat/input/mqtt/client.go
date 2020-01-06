@@ -34,7 +34,7 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
-func (input *mqttInput) newTLSConfig() *tls.Config {
+func (input *mqttInput) newTLSConfig() (*tls.Config, error) {
 	config := input.config
 
 	// Import trusted certificates from CAfile.pem.
@@ -44,9 +44,10 @@ func (input *mqttInput) newTLSConfig() *tls.Config {
 	if config.CA != "" {
 		logp.Info("[MQTT] Set the CA")
 		pemCerts, err := ioutil.ReadFile(config.CA)
-		if err == nil {
-			certpool.AppendCertsFromPEM(pemCerts)
+		if err != nil {
+			return nil, err
 		}
+		certpool.AppendCertsFromPEM(pemCerts)
 	}
 
 	tlsconfig := &tls.Config{
@@ -68,7 +69,7 @@ func (input *mqttInput) newTLSConfig() *tls.Config {
 		logp.Info("[MQTT] Set the Certs")
 		cert, err := tls.LoadX509KeyPair(config.ClientCert, config.ClientKey)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		// Certificates = list of certs client sends to server.
@@ -76,11 +77,11 @@ func (input *mqttInput) newTLSConfig() *tls.Config {
 	}
 
 	// Create tls.Config with desired tls properties
-	return tlsconfig
+	return tlsconfig, nil
 }
 
 // Prepare MQTT client
-func (input *mqttInput) setupMqttClient() {
+func (input *mqttInput) setupMqttClient() error {
 	c := input.config
 
 	logp.Info("[MQTT] Connect to broker URL: %s", c.Host)
@@ -90,7 +91,7 @@ func (input *mqttInput) setupMqttClient() {
 	mqttClientOpt.AddBroker(c.Host)
 
 	mqttClientOpt.SetMaxReconnectInterval(1 * time.Second)
-	mqttClientOpt.SetConnectionLostHandler(input.reConnectHandler)
+	mqttClientOpt.SetConnectionLostHandler(input.connectionLostHandler)
 	mqttClientOpt.SetOnConnectHandler(input.subscribeOnConnect)
 	mqttClientOpt.SetAutoReconnect(true)
 
@@ -105,15 +106,19 @@ func (input *mqttInput) setupMqttClient() {
 
 	if c.SSL == true {
 		logp.Info("[MQTT] Configure session to use SSL")
-		tlsconfig := input.newTLSConfig()
+		tlsconfig, err := input.newTLSConfig()
+		if err != nil {
+			return err
+		}
 		mqttClientOpt.SetTLSConfig(tlsconfig)
 	}
 
 	input.client = MQTT.NewClient(mqttClientOpt)
+	return nil
 }
 
 func (input *mqttInput) connect() error {
-	if token := input.client.Connect(); token.Wait() && token.Error() != nil {
+	if token := input.client.Connect(); token.WaitTimeout(input.config.WaitClose) && token.Error() != nil {
 		return errors.New("Failed to connect to broker, waiting a few seconds and retrying")
 	}
 	logp.Info("MQTT Client connected: %t", input.client.IsConnected())
@@ -121,27 +126,25 @@ func (input *mqttInput) connect() error {
 }
 
 func (input *mqttInput) subscribeOnConnect(client MQTT.Client) {
-	subscriptions := input.parseTopics(input.config.Topics, input.config.QoS)
-	//bt.beatConfig.TopicsSubscribe
-	logp.Info("Current status: %v", input.client.IsConnected())
+	subscriptions := prepareSubscriptionsForTopics(input.config.Topics, input.config.QoS)
 
 	// Mqtt client - Subscribe to every topic in the config file, and bind with message handler
-	if token := input.client.SubscribeMultiple(subscriptions, input.onMessage); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+	if token := input.client.SubscribeMultiple(subscriptions, input.onMessage); token.WaitTimeout(input.config.WaitClose) && token.Error() != nil {
+		logp.Error(token.Error())
 	}
-	logp.Info("Subscribed to configured topics")
+	logp.Info("MQTT Subscribed to configured topics")
 }
 
 // Mqtt message handler
 func (input *mqttInput) onMessage(client MQTT.Client, msg MQTT.Message) {
-	logp.Debug("MQTT Module", "MQTT message received: %s", string(msg.Payload()))
+	logp.Debug("MQTT", "MQTT message received: %s", string(msg.Payload()))
 	var beatEvent beat.Event
 	event := make(common.MapStr)
 
 	// default case
 	var message = make(common.MapStr)
 	event["message"] = string(msg.Payload())
-	if input.config.DecodePaylod == true {
+	if input.config.DecodePayload {
 		message["fields"] = DecodePayload(msg.Payload())
 	}
 
@@ -164,8 +167,11 @@ func (input *mqttInput) onMessage(client MQTT.Client, msg MQTT.Message) {
 }
 
 // DefaultConnectionLostHandler does nothing
-func (input *mqttInput) reConnectHandler(client MQTT.Client, reason error) {
+func (input *mqttInput) connectionLostHandler(client MQTT.Client, reason error) {
 	logp.Warn("[MQTT] Connection lost: %s", reason.Error())
+
+	//Rerun the input
+	input.Run()
 }
 
 // DecodePayload will try to decode the payload. If every check fails, it will
@@ -176,22 +182,22 @@ func DecodePayload(payload []byte) common.MapStr {
 	// A msgpack payload must be a json-like object
 	err := msgpack.Unmarshal(payload, &event)
 	if err == nil {
-		logp.Debug("mqttbeat", "Payload decoded - msgpack")
+		logp.Debug("MQTT", "Payload decoded - msgpack")
 		return event
 	}
 
 	err = json.Unmarshal(payload, &event)
 	if err == nil {
-		logp.Debug("mqttbeat", "Payload decoded - json")
+		logp.Debug("MQTT", "Payload decoded - as json")
 		return event
 	}
 
-	logp.Debug("mqttbeat", "decoded - text")
+	logp.Debug("MQTT", "decoded - as text")
 	return event
 }
 
 // ParseTopics will parse the config file and return a map with topic:QoS
-func (input *mqttInput) parseTopics(topics []string, qos int) map[string]byte {
+func prepareSubscriptionsForTopics(topics []string, qos int) map[string]byte {
 	subscriptions := make(map[string]byte)
 	for _, value := range topics {
 		// Finally, filling the subscriptions map

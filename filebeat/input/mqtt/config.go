@@ -29,7 +29,7 @@ type mqttInputConfig struct {
 	Username       string        `config:"user"`
 	Password       string        `config:"password"`
 	QoS            int           `config:"QoS"`
-	DecodePaylod   bool          `config:"decode_payload"`
+	DecodePayload  bool          `config:"decode_payload"`
 	SSL            bool          `config:"ssl"`
 	CA             string        `config:"CA"`
 	ClientCert     string        `config:"clientCert"`
@@ -47,13 +47,13 @@ func defaultConfig() mqttInputConfig {
 		ClientID:       "Filebeat",
 		Username:       "",
 		Password:       "",
-		DecodePaylod:   true,
+		DecodePayload:  true,
 		QoS:            0,
 		SSL:            false,
 		CA:             "",
 		ClientCert:     "",
 		ClientKey:      "",
-		WaitClose:      2 * time.Second,
+		WaitClose:      5 * time.Second,
 		ConnectBackoff: 30 * time.Second,
 	}
 }
@@ -66,6 +66,10 @@ func (c *mqttInputConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	}
+
+	if len(c.ClientID) > 23 || len(c.ClientID) < 1 {
+		return fmt.Errorf("client id must be between 1 and 23 characters long")
 	}
 	return nil
 }
