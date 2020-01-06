@@ -23,7 +23,7 @@ func RunCloudStorage(ctx context.Context, e transformer.StorageEvent) error {
 	settings := instance.Settings{
 		Name:            "functionbeat",
 		IndexPrefix:     "functionbeat",
-		ConfigOverrides: config.ConfigOverrides,
+		ConfigOverrides: config.FunctionOverrides,
 	}
 
 	cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
