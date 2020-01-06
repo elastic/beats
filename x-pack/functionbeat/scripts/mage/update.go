@@ -5,6 +5,8 @@
 package mage
 
 import (
+	"path/filepath"
+
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
@@ -20,7 +22,7 @@ var Aliases = map[string]interface{}{
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs)
+	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs, Update.VendorBeats)
 }
 
 // Config generates both the short and reference configs.
@@ -45,4 +47,45 @@ func (Update) IncludeFields() error {
 	mg.Deps(Update.Fields)
 
 	return devtools.GenerateAllInOneFieldsGo()
+}
+
+// VendorBeats collects the vendor folder required to deploy the function for GCP.
+func (Update) VendorBeats() error {
+	gcpVendorPath := filepath.Join("provider", "gcp", "build", "vendor")
+	vendorPath := filepath.Join("..", "..", "vendor")
+	beatsVendorPath := filepath.Join(gcpVendorPath, "github.com", "elastic", "beats")
+
+	cp := &devtools.CopyTask{
+		Source: vendorPath,
+		Dest:   gcpVendorPath,
+		Mode:   0600,
+	}
+	err := cp.Execute()
+	if err != nil {
+		return err
+	}
+
+	cp = &devtools.CopyTask{
+		Source:  "../../libbeat",
+		Dest:    filepath.Join(beatsVendorPath, "libbeat"),
+		Mode:    0600,
+		Exclude: []string{"build", "_meta", "libbeat.yml"},
+	}
+	err = cp.Execute()
+	if err != nil {
+		return err
+	}
+
+	cp = &devtools.CopyTask{
+		Source:  "../../x-pack/functionbeat",
+		Dest:    filepath.Join(beatsVendorPath, "x-pack", "functionbeat"),
+		Mode:    0600,
+		Exclude: []string{"build", "_meta", "functionbeat.yml"},
+	}
+	err = cp.Execute()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
