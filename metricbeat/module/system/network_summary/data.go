@@ -28,11 +28,11 @@ import (
 func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
 	fmt.Printf("%#v\n", raw)
 	eventByProto := common.MapStr{
-		"ip":      combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
-		"tcp":     combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
-		"udp":     raw.SNMP.UDP,
-		"udpLite": raw.SNMP.UDPLite,
-		"icmp":    combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP),
+		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
+		"tcp":      combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
+		"udp":      raw.SNMP.UDP,
+		"udp_lite": raw.SNMP.UDPLite,
+		"icmp":     combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP),
 	}
 
 	return eventByProto

@@ -31394,7 +31394,7 @@ type: object
 
 --
 
-*`system.network_summary.udpLite.*`*::
+*`system.network_summary.udp_lite.*`*::
 +
 --
 UDP Lite  counters

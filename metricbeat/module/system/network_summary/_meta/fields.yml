@@ -16,7 +16,7 @@
       type: object
       description: >
         UDP  counters
-    - name: udpLite.*
+    - name: udp_lite.*
       type: object
       description: >
         UDP Lite  counters
