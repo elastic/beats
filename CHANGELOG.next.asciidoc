@@ -159,6 +159,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
 - Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
 - Socket dataset: Fix start errors when IPv6 is disabled on the kernel. {issue}13953[13953] {pull}13966[13966]
+- Removed GUID index pattern reference from Auditbeat dashboard definition. {pull}15314[15314]
 
 *Filebeat*
 
