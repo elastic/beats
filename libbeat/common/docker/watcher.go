@@ -319,7 +319,7 @@ func (w *watcher) watch() {
 
 			case <-tickChan.C:
 				if time.Since(w.lastWatchReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
-					logp.Info("No events received withing %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
+					logp.Info("No events received within %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
 					time.Sleep(1 * time.Second)
 					break WATCH
 				}
