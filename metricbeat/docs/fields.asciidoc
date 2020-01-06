@@ -31367,7 +31367,7 @@ Metrics relating to global network activity
 *`system.network_summary.ip.*`*::
 +
 --
-IP protocol counters
+IP counters
 
 
 type: object
@@ -31377,7 +31377,7 @@ type: object
 *`system.network_summary.tcp.*`*::
 +
 --
-TCP protocol counters
+TCP  counters
 
 
 type: object
@@ -31387,7 +31387,7 @@ type: object
 *`system.network_summary.udp.*`*::
 +
 --
-UDP protocol counters
+UDP  counters
 
 
 type: object
@@ -31397,7 +31397,7 @@ type: object
 *`system.network_summary.udpLite.*`*::
 +
 --
-UDP Lite protocol counters
+UDP Lite  counters
 
 
 type: object
@@ -31407,7 +31407,7 @@ type: object
 *`system.network_summary.icmp.*`*::
 +
 --
-ICMP protocol counters
+ICMP  counters
 
 
 type: object
