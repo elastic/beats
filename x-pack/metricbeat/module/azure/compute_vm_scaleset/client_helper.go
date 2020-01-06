@@ -75,7 +75,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		if key != noDimension {
 			dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 		}
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, metric.Namespace, dimensions, defaultTimeGrain)...)
+		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, defaultTimeGrain)...)
 	}
 	return metrics, nil
 }

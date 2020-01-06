@@ -2970,6 +2970,16 @@ type: object
 
 --
 
+*`azure.resource.storage.*.*`*::
++
+--
+storage account
+
+
+type: object
+
+--
+
 [[exported-fields-beat-common]]
 == Beat fields
 

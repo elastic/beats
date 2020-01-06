@@ -82,7 +82,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		metrics = append(metrics, client.CreateMetric(resource, metric.Namespace, metricNames, key, dim, metric.Timegrain))
+		metrics = append(metrics, client.CreateMetric(*resource.ID, resource, metric.Namespace, metricNames, key, dim, metric.Timegrain))
 	}
 	return metrics, nil
 }

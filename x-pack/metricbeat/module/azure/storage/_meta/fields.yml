@@ -1,4 +1,4 @@
-- name: storage_account.*.*
+- name: storage.*.*
   release: beta
   type: object
   object_type: float

@@ -38,7 +38,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 			filteredMetricDefinitions = append(filteredMetricDefinitions, metricDefinition)
 		}
 		// map azure metric definitions to client metrics
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, filteredMetricDefinitions, resource, *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
+		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, filteredMetricDefinitions, resource, "", *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
 	}
 	return metrics, nil
 }

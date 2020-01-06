@@ -27,11 +27,12 @@ type Config struct {
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID      []string       `config:"resource_id"`
-	Group   []string       `config:"resource_group"`
-	Metrics []MetricConfig `config:"metrics"`
-	Type    string         `config:"resource_type"`
-	Query   string         `config:"resource_query"`
+	ID          []string       `config:"resource_id"`
+	Group       []string       `config:"resource_group"`
+	Metrics     []MetricConfig `config:"metrics"`
+	Type        string         `config:"resource_type"`
+	Query       string         `config:"resource_query"`
+	ServiceType []string       `config:"service_type"`
 }
 
 // MetricConfig contains metric specific configuration.
@@ -74,6 +75,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	Client    *Client
 	MapMetric mapMetric
+	InitEvent initEvent
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -130,5 +132,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	return EventsMapping(report, m.Client.Resources.Metrics, m.BaseMetricSet.Name())
+	return EventsMapping(m.InitEvent, m.Client.Resources.Metrics, m.BaseMetricSet.Name(), report)
 }
