@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
+- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 
 *Auditbeat*
 
