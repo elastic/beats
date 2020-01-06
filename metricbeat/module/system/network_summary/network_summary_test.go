@@ -43,11 +43,11 @@ func TestMapping(t *testing.T) {
 	}
 
 	exampleOut := common.MapStr{
-		"icmp":    map[string]int64{"InAddrMaskReps": 5, "InType3": 835},
-		"ip":      map[string]int64{"DefaultTTL": 64, "InBcastOctets": 431773621, "InBcastPkts": 1686995, "InCEPkts": 0},
-		"tcp":     map[string]int64{"DelayedACKLocked": 111, "DelayedACKLost": 1587, "DelayedACKs": 516004},
-		"udp":     map[string]int64{"IgnoredMulti": 10},
-		"udpLite": map[string]int64{"IgnoredMulti": 0}}
+		"icmp":     map[string]int64{"InAddrMaskReps": 5, "InType3": 835},
+		"ip":       map[string]int64{"DefaultTTL": 64, "InBcastOctets": 431773621, "InBcastPkts": 1686995, "InCEPkts": 0},
+		"tcp":      map[string]int64{"DelayedACKLocked": 111, "DelayedACKLost": 1587, "DelayedACKs": 516004},
+		"udp":      map[string]int64{"IgnoredMulti": 10},
+		"udp_lite": map[string]int64{"IgnoredMulti": 0}}
 
 	out := eventMapping(example)
 	assert.Equal(t, exampleOut, out)
