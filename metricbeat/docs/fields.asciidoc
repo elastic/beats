@@ -31377,7 +31377,7 @@ type: object
 *`system.network_summary.tcp.*`*::
 +
 --
-TCP  counters
+TCP counters
 
 
 type: object
@@ -31387,7 +31387,7 @@ type: object
 *`system.network_summary.udp.*`*::
 +
 --
-UDP  counters
+UDP counters
 
 
 type: object
@@ -31397,7 +31397,7 @@ type: object
 *`system.network_summary.udp_lite.*`*::
 +
 --
-UDP Lite  counters
+UDP Lite counters
 
 
 type: object
@@ -31407,7 +31407,7 @@ type: object
 *`system.network_summary.icmp.*`*::
 +
 --
-ICMP  counters
+ICMP counters
 
 
 type: object
