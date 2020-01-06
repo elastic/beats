@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/beater"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
@@ -20,6 +21,7 @@ import (
 )
 
 func RunCloudStorage(ctx context.Context, e transformer.StorageEvent) error {
+	cfgwarn.Beta("Google Cloud Platform support is in beta")
 	settings := instance.Settings{
 		Name:            "functionbeat",
 		IndexPrefix:     "functionbeat",
