@@ -13,8 +13,11 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/cloudformation"
+	lambdarunner "github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation/policies"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
@@ -103,7 +106,7 @@ func CloudwatchLogsDetails() *feature.Details {
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
 func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
-	lambda.Start(c.createHandler(client))
+	lambdarunner.Start(c.createHandler(client))
 	return nil
 }
 
@@ -156,7 +159,7 @@ func (r AWSLogsSubscriptionFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Type           string
 		Properties     Properties
-		DeletionPolicy cloudformation.DeletionPolicy `json:"DeletionPolicy,omitempty"`
+		DeletionPolicy policies.DeletionPolicy `json:"DeletionPolicy,omitempty"`
 	}{
 		Type:       r.AWSCloudFormationType(),
 		Properties: (Properties)(r),
@@ -177,7 +180,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 	template := cloudformation.NewTemplate()
 	for idx, trigger := range c.config.Triggers {
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html
-		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &cloudformation.AWSLambdaPermission{
+		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &lambda.Permission{
 			Action:       "lambda:InvokeFunction",
 			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
 			Principal: cloudformation.Join("", []string{
@@ -218,6 +221,6 @@ func (c *CloudwatchLogs) LambdaConfig() *LambdaConfig {
 }
 
 // Policies returns a slice of policy to add to the lambda.
-func (c *CloudwatchLogs) Policies() []cloudformation.AWSIAMRole_Policy {
-	return []cloudformation.AWSIAMRole_Policy{}
+func (c *CloudwatchLogs) Policies() []iam.Role_Policy {
+	return []iam.Role_Policy{}
 }

@@ -27,19 +27,19 @@ import (
 	"os"
 	"strconv"
 	"testing"
-
-	"github.com/elastic/go-lookslike/isdef"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
-
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
@@ -58,7 +58,8 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -81,7 +82,8 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
