@@ -7,6 +7,7 @@
 package flock
 
 import (
+	"os"
 	"syscall"
 )
 
@@ -27,7 +28,7 @@ func (f *Flock) Lock() error {
 	return f.lock(&f.l, syscall.LOCK_EX)
 }
 
-// RLock is a blocking call to try and take a ahred file lock. It will wait
+// RLock is a blocking call to try and take a shared file lock. It will wait
 // until it is able to obtain the shared file lock. It's recommended that
 // TryRLock() be used over this function. This function may block the ability to
 // query the current Locked() or RLocked() status due to a RW-mutex lock.
@@ -53,7 +54,18 @@ func (f *Flock) lock(locked *bool, flag int) error {
 	}
 
 	if err := syscall.Flock(int(f.fh.Fd()), flag); err != nil {
-		return err
+		shouldRetry, reopenErr := f.reopenFDOnError(err)
+		if reopenErr != nil {
+			return reopenErr
+		}
+
+		if !shouldRetry {
+			return err
+		}
+
+		if err = syscall.Flock(int(f.fh.Fd()), flag); err != nil {
+			return err
+		}
 	}
 
 	*locked = true
@@ -132,6 +144,8 @@ func (f *Flock) try(locked *bool, flag int) (bool, error) {
 		}
 	}
 
+	var retried bool
+retry:
 	err := syscall.Flock(int(f.fh.Fd()), flag|syscall.LOCK_NB)
 
 	switch err {
@@ -141,6 +155,41 @@ func (f *Flock) try(locked *bool, flag int) (bool, error) {
 		*locked = true
 		return true, nil
 	}
+	if !retried {
+		if shouldRetry, reopenErr := f.reopenFDOnError(err); reopenErr != nil {
+			return false, reopenErr
+		} else if shouldRetry {
+			retried = true
+			goto retry
+		}
+	}
 
 	return false, err
+}
+
+// reopenFDOnError determines whether we should reopen the file handle
+// in readwrite mode and try again. This comes from util-linux/sys-utils/flock.c:
+//  Since Linux 3.4 (commit 55725513)
+//  Probably NFSv4 where flock() is emulated by fcntl().
+func (f *Flock) reopenFDOnError(err error) (bool, error) {
+	if err != syscall.EIO && err != syscall.EBADF {
+		return false, nil
+	}
+	if st, err := f.fh.Stat(); err == nil {
+		// if the file is able to be read and written
+		if st.Mode()&0600 == 0600 {
+			f.fh.Close()
+			f.fh = nil
+
+			// reopen in read-write mode and set the filehandle
+			fh, err := os.OpenFile(f.path, os.O_CREATE|os.O_RDWR, os.FileMode(0600))
+			if err != nil {
+				return false, err
+			}
+			f.fh = fh
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
