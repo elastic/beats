@@ -5,37 +5,50 @@
 package mage
 
 import (
+	"fmt"
 	"os"
 	"strings"
 )
 
 var (
-	// SelectedProviders is the list of selected providers
-	// Can be configured by setting PROVIDERS enviroment variable.
-	SelectedProviders = getConfiguredProviders()
-
-	availableProviders = []string{
-		"aws",
-		"gcp",
+	availableProviders = []ProviderDetails{
+		{Name: "aws", Buildable: true},
+		{Name: "gcp", Buildable: false},
 	}
 )
 
-// IsBuildableProvider returns if the function needs to be built for the selected provider.
-func IsBuildableProvider(provider string) bool {
-	switch provider {
-	case "aws":
-		return true
-	default:
-		return false
-	}
-
+// ProviderDetails stores information about the available cloud providers.
+type ProviderDetails struct {
+	Name      string
+	Buildable bool
 }
 
-func getConfiguredProviders() []string {
+// SelectedProviders is the list of selected providers
+// Can be configured by setting PROVIDERS enviroment variable.
+func SelectedProviders() ([]ProviderDetails, error) {
 	providers := os.Getenv("PROVIDERS")
 	if len(providers) == 0 {
 		return availableProviders
 	}
 
-	return strings.Split(providers, ",")
+	names = strings.Split(providers, ",")
+	providerDetails := make([]ProviderDetails, len(names))
+	for i, name := range names {
+		p, err := findProviderDetails(name)
+		if err != nil {
+			return nil, err
+		}
+		providerDetails[i] = p
+	}
+	return providerDetails, nil
+}
+
+func findProviderDetails(name string) (ProviderDetails, error) {
+	for _, p := range availableProviders {
+		if p.Name == name {
+			return p, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no such provider")
 }

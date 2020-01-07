@@ -17,8 +17,7 @@ import (
 )
 
 const (
-	StorageEvtCtxStr     = "storage_event"
-	StorageContextCtxStr = "storage_context"
+	storageEvtCtxStr = "storage_event"
 )
 
 // Storage represents a Google Cloud function which reads event from Google Cloud Storage.
@@ -27,11 +26,13 @@ type Storage struct {
 	config *FunctionConfig
 }
 
-// StorageMsg is an alias to string
-type StorageMsg string
+// StorageEvent is an alias to string
+type StorageEventKey string
 
-// StorageContext is an alias to string
-type StorageContext string
+type StorageEvent struct {
+	Ctx   context.Context
+	Event transformer.StorageEvent
+}
 
 // NewStorage returns a new function to read from Google Cloud Storage.
 func NewStorage(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
@@ -47,13 +48,24 @@ func NewStorage(provider provider.Provider, cfg *common.Config) (provider.Functi
 	}, nil
 }
 
+// NewStorageContext creates a context from context and message returned from Google Cloud Storage.
+func NewStorageContext(beatCtx, ctx context.Context, e transformer.StorageEvent) context.Context {
+	c := Context.Background()
+	e := StorageEvent{
+		Ctx:   ctx,
+		Event: e,
+	}
+
+	return context.WithValue(beatCtx, StorageEventKey(storageEvtCtxStr), e)
+}
+
 // Run start
 func (s *Storage) Run(ctx context.Context, client core.Client) error {
-	evtCtx, evt, err := s.getEventDataFromContext(ctx)
+	evt, err := s.getEventDataFromContext(ctx)
 	if err != nil {
 		return err
 	}
-	event, err := transformer.Storage(evtCtx, evt)
+	event, err := transformer.Storage(evt.Ctx, evt.Event)
 	if err := client.Publish(event); err != nil {
 		s.log.Errorf("error while publishing Google Cloud Storage event %+v", err)
 		return err
@@ -63,25 +75,17 @@ func (s *Storage) Run(ctx context.Context, client core.Client) error {
 	return nil
 }
 
-func (s *Storage) getEventDataFromContext(ctx context.Context) (context.Context, transformer.StorageEvent, error) {
-	iEvtCtx := ctx.Value(StorageContext(StorageContextCtxStr))
-	if iEvtCtx == nil {
-		return nil, transformer.StorageEvent{}, fmt.Errorf("no storage event context")
+func (s *Storage) getEventDataFromContext(ctx context.Context) (StorageEvent, error) {
+	iEvt := ctx.Value(StorageEventKey(storageEvtCtxStr))
+	if iEvt == nil {
+		return nil, transformer.StorageEvent{}, fmt.Errorf("no storage_event in context")
 	}
-	evtCtx, ok := iEvtCtx.(context.Context)
+	evt, ok := iEvt.(StorageEvent)
 	if !ok {
-		return nil, transformer.StorageEvent{}, fmt.Errorf("not message context: %+v", iEvtCtx)
+		return StorageEvent{}, fmt.Errorf("not StorageEvent: %+v", iEvt)
 	}
 
-	iEvt := ctx.Value(StorageMsg(StorageEvtCtxStr))
-	if iEvt == nil {
-		return nil, transformer.StorageEvent{}, fmt.Errorf("no storage event")
-	}
-	evt, ok := iEvt.(transformer.StorageEvent)
-	if !ok {
-		return nil, transformer.StorageEvent{}, fmt.Errorf("not storage event: %+v", iEvt)
-	}
-	return evtCtx, evt, nil
+	return evt, nil
 }
 
 // StorageDetails returns the details of the feature.

@@ -174,39 +174,9 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 
 	var uncompressed int64
 	for _, file := range p.resources {
-		r, err := file.Open()
+		l, err := zipAddFile(zipWriter, file)
 		if err != nil {
 			return nil, err
-		}
-
-		header := &zip.FileHeader{
-			Name:   file.Name(),
-			Method: zip.Deflate,
-		}
-
-		header.SetMode(file.Mode())
-		w, err := zipWriter.CreateHeader(header)
-		if err != nil {
-			r.Close()
-			return nil, err
-		}
-
-		l, err := io.Copy(w, r)
-		if err != nil {
-			r.Close()
-			return nil, err
-		}
-		r.Close()
-
-		uncompressed = uncompressed + l
-		if p.maxSizeUncompressed != -1 && uncompressed > p.maxSizeUncompressed {
-			// Close the current zip, the zip has incomplete data.
-			zipWriter.Close()
-			return nil, fmt.Errorf(
-				"max uncompressed size reached, size %d, limit is %d",
-				uncompressed,
-				p.maxSizeUncompressed,
-			)
 		}
 
 		if l == 0 {
@@ -233,4 +203,42 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 	// Flush bytes/writes headers, the zip is valid at this point.
 	zipWriter.Close()
 	return buf.Bytes(), nil
+}
+
+func zipAddFile(w *zip.Writer, r Resource) (int, error) {
+	f, err := r.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	header := &zip.FileHeader{
+		Name:   r.Name(),
+		Method: zip.Deflate,
+	}
+
+	header.SetMode(r.Mode())
+	w, err := zipWriter.CreateHeader(header)
+	if err != nil {
+		f.Close()
+		return nil, err
+	}
+
+	l, err := io.Copy(w, r)
+	if err != nil {
+		return 0, err
+	}
+
+	uncompressed = uncompressed + l
+	if p.maxSizeUncompressed != -1 && uncompressed > p.maxSizeUncompressed {
+		// Close the current zip, the zip has incomplete data.
+		zipWriter.Close()
+		return nil, fmt.Errorf(
+			"max uncompressed size reached, size %d, limit is %d",
+			uncompressed,
+			p.maxSizeUncompressed,
+		)
+	}
+
+	return l, nil
 }

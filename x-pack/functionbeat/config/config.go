@@ -140,11 +140,11 @@ func (p *ProviderConfig) Validate() error {
 }
 
 // MemSizeFactor64 implements a human understandable format for bytes but also make sure that all
-// values used are a factory of 64.
+// values used are a factor of 64.
 type MemSizeFactor64 int
 
-// Unpack converts a size defined from a human readable format into bytes and ensure that the value
-// is a factoru of 64.
+// Unpack converts a size defined from a human readable format into bytes and verifies that the value
+// is a multiple of 64. If the value is not multple of 64, it returns an error.
 func (m *MemSizeFactor64) Unpack(v string) error {
 	sz, err := humanize.ParseBytes(v)
 	if isRawBytes(v) {
@@ -155,14 +155,14 @@ func (m *MemSizeFactor64) Unpack(v string) error {
 	}
 
 	if sz%64 != 0 {
-		return fmt.Errorf("number is not a factor of 64, %d bytes (user value: %s)", sz, v)
+		return fmt.Errorf("number is not a multiple of 64, %d bytes (user value: %s)", sz, v)
 	}
 
 	*m = MemSizeFactor64(sz)
 	return nil
 }
 
-// Megabytes return the value in megatebytes.
+// Megabytes return the value in megabytes.
 func (m *MemSizeFactor64) Megabytes() int {
 	return int(*m) / 1024 / 1024
 }

@@ -24,24 +24,21 @@ type installer interface {
 	Name() string
 }
 
-// CLIManager interacts with the AWS Lambda API to deploy, update or remove a function.
-// It will take care of creating the main lambda function and ask for each function type for the
-// operation that need to be executed to connect the lambda to the triggers.
+// CLIManager interacts with Google Cloud to deploy, update or remove a function.
 type CLIManager struct {
-	templateBuilder *defaultTemplateBuilder
+	templateBuilder provider.TemplateBuilder
 	location        string
 	tokenSrc        oauth2.TokenSource
 	log             *logp.Logger
 	config          *Config
 }
 
-// Deploy delegates deploy to the actual function implementation.
+// Deploy uploads the function to GCP.
 func (c *CLIManager) Deploy(name string) error {
 	c.log.Debugf("Deploying function: %s", name)
 	defer c.log.Debugf("Deploy finish for function '%s'", name)
 
-	create := false
-	err := c.deploy(create, name)
+	err := c.deploy(false, name)
 	if err != nil {
 		return err
 	}
@@ -55,8 +52,7 @@ func (c *CLIManager) Update(name string) error {
 	c.log.Debugf("Starting updating function '%s'", name)
 	defer c.log.Debugf("Update complete for function '%s'", name)
 
-	update := true
-	err := c.deploy(update, name)
+	err := c.deploy(true, name)
 	if err != nil {
 		return err
 	}
@@ -131,7 +127,7 @@ func (c *CLIManager) Export(name string) error {
 	return nil
 }
 
-// NewCLI returns the interface to manage function on Amazon lambda.
+// NewCLI returns the interface to manage functions on Google Cloud Platform.
 func NewCLI(
 	log *logp.Logger,
 	cfg *common.Config,
@@ -147,11 +143,6 @@ func NewCLI(
 		return nil, err
 	}
 
-	templateBuilder, ok := builder.(*defaultTemplateBuilder)
-	if !ok {
-		return nil, fmt.Errorf("not defaultTemplateBuilder")
-	}
-
 	location := fmt.Sprintf(locationTemplate, config.ProjectID, config.Location)
 
 	tokenSrc, err := google.DefaultTokenSource(context.TODO(), "https://www.googleapis.com/auth/cloud-platform")
@@ -164,6 +155,6 @@ func NewCLI(
 		log:             logp.NewLogger("gcp"),
 		location:        location,
 		tokenSrc:        tokenSrc,
-		templateBuilder: templateBuilder,
+		templateBuilder: builder,
 	}, nil
 }

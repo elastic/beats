@@ -43,16 +43,22 @@ func Build() error {
 		return err
 	}
 
+	// Getting selected cloud providers
+	selectedProviders, err := functionbeat.SelectedProviders()
+	if err != nil {
+		return err
+	}
+
 	// Building functions to deploy
-	for _, provider := range functionbeat.SelectedProviders {
-		if !functionbeat.IsBuildableProvider(provider) {
+	for _, provider := range selectedProviders {
+		if !provider.Buildable {
 			continue
 		}
 
-		inputFiles := filepath.Join("provider", provider, "main.go")
+		inputFiles := filepath.Join("provider", provider.Name, "main.go")
 		params.InputFiles = []string{inputFiles}
-		params.Name = devtools.BeatName + "-" + provider
-		params.OutputDir = filepath.Join("provider", provider)
+		params.Name = devtools.BeatName + "-" + provider.Name
+		params.OutputDir = filepath.Join("provider", provider.Name)
 		err := devtools.Build(params)
 		if err != nil {
 			return err

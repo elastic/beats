@@ -59,7 +59,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %+v", err)
 	}
 
-	provider, err := provider.Get(c.Provider)
+	provider, err := provider.Create(c.Provider)
 	if err != nil {
 		return nil, err
 	}

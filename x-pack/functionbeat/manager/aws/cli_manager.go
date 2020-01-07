@@ -110,7 +110,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	return nil
 }
 
-// Deploy delegate deploy to the actual function implementation.
+// Deploy uploads the function to AWS.
 func (c *CLIManager) Deploy(name string) error {
 	c.log.Debugf("Deploying function: %s", name)
 	defer c.log.Debugf("Deploy finish for function '%s'", name)

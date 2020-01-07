@@ -18,17 +18,18 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp/transformer"
 )
 
+const (
+	pubSubEventCtxStr = "pub_sub_event"
+)
+
 // PubSub represents a Google Cloud function which reads event from Google Pub/Sub triggers.
 type PubSub struct {
 	log    *logp.Logger
 	config *FunctionConfig
 }
 
-// PubSubMsg is an alias to string
-type PubSubMsg string
-
-// PubSubContext is an alias to string
-type PubSubContext string
+// PubSubEvent is an alias to string
+type PubSubEventKey string
 
 // NewPubSub returns a new function to read from Google Pub/Sub.
 func NewPubSub(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
@@ -44,13 +45,30 @@ func NewPubSub(provider provider.Provider, cfg *common.Config) (provider.Functio
 	}, nil
 }
 
+// PubSubEvent stores the context and the message from Google Pub/Sub.
+type PubSubEvent struct {
+	Ctx     context.Context
+	Message pubsub.Message
+}
+
+// NewPubSubContext creates a context from context and message returned from Google Pub/Sub.
+func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) context.Context {
+	c := Context.Background()
+	e := PubSubEvent{
+		Ctx:     ctx,
+		Message: m,
+	}
+
+	return context.WithValue(beatCtx, PubSubEventKey(pubSubEventCtxStr), e)
+}
+
 // Run start
 func (p *PubSub) Run(ctx context.Context, client core.Client) error {
-	msgCtx, msg, err := p.getEventDataFromContext(ctx)
+	pubsubEvent, err := p.getEventDataFromContext(ctx)
 	if err != nil {
 		return err
 	}
-	event, err := transformer.PubSub(msgCtx, msg)
+	event, err := transformer.PubSub(pubsubEvent.Ctx, pubsubEvent.Message)
 	if err := client.Publish(event); err != nil {
 		p.log.Errorf("error while publishing Pub/Sub event %+v", err)
 		return err
@@ -60,25 +78,17 @@ func (p *PubSub) Run(ctx context.Context, client core.Client) error {
 	return nil
 }
 
-func (p *PubSub) getEventDataFromContext(ctx context.Context) (context.Context, pubsub.Message, error) {
-	iMsgCtx := ctx.Value(PubSubContext("pub_sub_context"))
-	if iMsgCtx == nil {
-		return nil, pubsub.Message{}, fmt.Errorf("no pub/sub message context")
+func (p *PubSub) getEventDataFromContext(ctx context.Context) (PubSubEvent, error) {
+	iPubSubEvent := ctx.Value(PubSubEvent(pubSubEventCtxStr))
+	if iPubSubEvent == nil {
+		return PubSubEvent{}, fmt.Errorf("no pub_sub_event in context")
 	}
-	msgCtx, ok := iMsgCtx.(context.Context)
+	event, ok := iPubSubEvent.(PubSubEvent)
 	if !ok {
-		return nil, pubsub.Message{}, fmt.Errorf("not message context: %+v", iMsgCtx)
+		return nil, pubsub.Message{}, fmt.Errorf("not PubSubEvent: %+v", iPubSubEvent)
 	}
 
-	iMsg := ctx.Value(PubSubMsg("pub_sub_message"))
-	if iMsg == nil {
-		return nil, pubsub.Message{}, fmt.Errorf("no pub/sub message")
-	}
-	msg, ok := iMsg.(pubsub.Message)
-	if !ok {
-		return nil, pubsub.Message{}, fmt.Errorf("not message: %+v", iMsg)
-	}
-	return msgCtx, msg, nil
+	return event, nil
 }
 
 // PubSubDetails returns the details of the feature.
