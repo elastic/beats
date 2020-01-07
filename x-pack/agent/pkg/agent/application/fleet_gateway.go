@@ -144,7 +144,7 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 				return nil, errors.New(
 					"execute retry loop was stopped",
 					errors.TypeNetwork,
-					errors.M(errors.MetaKeyPath, f.client.URI()),
+					errors.M(errors.MetaKeyURI, f.client.URI()),
 				)
 			}
 			continue
