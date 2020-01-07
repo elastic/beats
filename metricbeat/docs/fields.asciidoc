@@ -1474,13 +1474,13 @@ type: long
 --
 
 [float]
-=== web.duration
+=== web.response_time
 
 Dashboard response time metrics
 
 
 
-*`appsearch.stats.requests.web.duration.avg.ms`*::
+*`appsearch.stats.requests.web.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
@@ -1490,7 +1490,7 @@ type: long
 
 --
 
-*`appsearch.stats.requests.web.duration.max.ms`*::
+*`appsearch.stats.requests.web.response_time.max.ms`*::
 +
 --
 Max response time in milliseconds
@@ -31039,7 +31039,7 @@ format: bytes
 *`system.memory.actual.free`*::
 +
 --
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
 
 type: long

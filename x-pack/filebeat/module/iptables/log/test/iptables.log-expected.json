@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-01-08T03:37:09.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -35,7 +34,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:37:57.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 1433,
@@ -69,7 +67,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:38:45.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -104,7 +101,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:39:25.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 80,
@@ -139,7 +135,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:40:21.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -174,7 +169,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:40:25.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -208,7 +202,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:41:17.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -243,7 +236,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:41:23.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
@@ -278,7 +270,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:43:18.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 139,
@@ -312,7 +303,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:43:42.000-02:00",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 8088,

@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
+- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 
 *Auditbeat*
 
@@ -59,6 +60,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Remove broken dashboard. {pull}15288[15288]
+
 *Metricbeat*
 
 - Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
@@ -77,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
 - Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
 - NFSv4: Always use opname `ILLEGAL` when failed to match request to a valid nfs operation. {pull}11503[11503]
 
@@ -156,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
 - Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
 - Socket dataset: Fix start errors when IPv6 is disabled on the kernel. {issue}13953[13953] {pull}13966[13966]
+- Removed GUID index pattern reference from Auditbeat dashboard definition. {pull}15314[15314]
 
 *Filebeat*
 
@@ -215,6 +220,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 - Fix a problem in Filebeat input httpjson where interval is not used as time.Duration. {issue}14752[14752] {pull}14753[14753]
 - Fix SSL config in input.yml for Filebeat httpjson input in the MISP module. {pull}14767[14767]
+- Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
 
 *Heartbeat*
 
@@ -293,6 +299,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 - Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
 - Fix mixed modules loading standard and light metricsets {pull}15011[15011]
+- Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
+- Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 
 *Packetbeat*
 
@@ -372,6 +381,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
 - Add `add_id` processor. {pull}14524[14524]
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
+- Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 
 *Auditbeat*
 
@@ -457,6 +467,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ActiveMQ. {pull}14840[14840]
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
 - Add STAN Metricbeat module. {pull}14839[14839]
+- Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
