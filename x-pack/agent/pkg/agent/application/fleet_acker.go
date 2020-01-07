@@ -15,7 +15,9 @@ import (
 )
 
 const (
+	// EventTypeAction is an event type describing action related events.
 	EventTypeAction = "ACTION"
+	// EventSubtypeACK is an ACTION event subtype specifying ACK event.
 	EventSubtypeACK = "ACKNOWLEDGED"
 )
 
