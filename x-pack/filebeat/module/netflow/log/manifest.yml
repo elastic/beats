@@ -11,7 +11,10 @@ var:
     default: 30m
   - name: queue_size
     default: 8192
-
+  - name: custom_definitions
+    default: []
+  - name: detect_sequence_reset
+    default: true
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 
