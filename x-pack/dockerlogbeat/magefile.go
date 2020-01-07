@@ -152,7 +152,7 @@ func Release() error {
 		return errors.Wrap(err, "error getting beats version")
 	}
 
-	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", name, version, "docker-build-context")
+	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", name, version, "docker-plugin")
 
 	bashScript := `#!/bin/bash
 docker plugin create %s
