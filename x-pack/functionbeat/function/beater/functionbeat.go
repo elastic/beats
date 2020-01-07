@@ -33,7 +33,7 @@ var (
 		"logstash",
 		"console", // for local debugging
 	}
-	metrics = monitoring.Default.NewRegistry("functionbeat")
+	metrics = monitoring.GetNamespace("state").GetRegistry().NewRegistry("functionbeat")
 )
 
 // Functionbeat is a beat designed to run under a serverless environment and listen to external triggers,

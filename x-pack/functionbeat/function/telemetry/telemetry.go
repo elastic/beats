@@ -13,7 +13,7 @@ import (
 
 // T is a telemetry instance
 type T interface {
-	AddTriggeredFunction(string, int64, int64)
+	AddTriggeredFunction(typeName string, triggerCount int64, eventCount int64)
 }
 
 type telemetry struct {
@@ -29,6 +29,11 @@ func New(r *monitoring.Registry) T {
 		nextID:   0,
 		registry: r.NewRegistry("functions"),
 	}
+}
+
+// Ignored is used when the package is not monitored.
+func Ignored() T {
+	return nil
 }
 
 // AddTriggeredFunction adds a triggered function data to the registry.
