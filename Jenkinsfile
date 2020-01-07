@@ -1,11 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@master',
-retriever: modernSCM(
-  [$class: 'GitSCMSource',
-  credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
-  id: '37cf2c00-2cc7-482e-8c62-7bbffef475e2',
-  remote: 'git@github.com:elastic/apm-pipeline-library.git'])
+@Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -83,6 +78,7 @@ pipeline {
           }
           stages {
             stage('Filebeat oss'){
+              when {expression {return false}}
               steps {
                 withBeatsEnv(){
                   makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
@@ -90,6 +86,7 @@ pipeline {
               }
             }
             stage('Filebeat x-pack'){
+              when {expression {return false}}
               steps {
                 withBeatsEnv(){
                   makeTarget("Filebeat x-pack Linux", "-C x-pack/filebeat testsuite")
@@ -97,11 +94,21 @@ pipeline {
               }
             }
             stage('Filebeat Mac OS X'){
+              when {expression {return false}}
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
                 withBeatsEnv(){
                   makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
+                }
+              }
+            }
+            stage('Filebeat Windows'){
+              agent { label 'windows-immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                withBeatsEnvWin(){
+                  makeTargetWin("Filebeat oss Windows", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
                 }
               }
             }
@@ -492,6 +499,17 @@ def makeTarget(context, target, clean = true){
   }
 }
 
+def makeTargetWin(context, target, clean = true){
+  withGithubNotify(context: "${context}") {
+    bat(label: "Make ${target}", script: """
+    set
+    go version
+    mage --version
+    gvm ${GO_VERSION}
+    make ${target}""")
+  }
+}
+
 def withBeatsEnv(Closure body){
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -516,9 +534,32 @@ def withBeatsEnv(Closure body){
   }
 }
 
+def withBeatsEnvWin(Closure body){
+  withEnv([
+    "HOME=${env.WORKSPACE}",
+    "GOPATH=${env.WORKSPACE}",
+    "PATH=${env.WORKSPACE}\\bin;${env.GOPATH}\\bin;C:\\tools\\mingw64\\bin;${env.PATH}",
+    "MAGEFILE_CACHE=${WORKSPACE}\\.magefile"
+  ]){
+    deleteDir()
+    unstash 'source'
+    powershell(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.ps1")
+    def envTmp = propertiesToEnv("go_env.properties")
+    withEnv(envTmp){
+      dir("${BASE_DIR}"){
+        try {
+          body()
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/TEST-*.xml")
+        }
+      }
+    }
+  }
+}
+
 def propertiesToEnv(file){
   def props = readProperties(file: file)
-  if(props.containsKey('PATH')){
+  if(props.containsKey('PATH') && isUnix()){
     newPath = sh(label: 'eval path', returnStdout: true, script: "echo \"${props['PATH']}\"").trim()
     props["PATH"] = "${newPath}:${env.PATH}"
   }
