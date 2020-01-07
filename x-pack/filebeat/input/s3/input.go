@@ -57,7 +57,7 @@ func init() {
 	}
 }
 
-// Input is a input for s3
+// s3Input is a input for s3
 type s3Input struct {
 	outlet     channel.Outleter // Output of received s3 logs.
 	config     config
@@ -368,7 +368,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		objectHash := s3ObjectHash(s3Info)
 
 		// read from s3 object
-		reader, err := p.newS3BucketReader(svc, s3Info)
+		reader, contentType, err := p.newS3BucketReader(svc, s3Info)
 		if err != nil {
 			return errors.Wrap(err, "newS3BucketReader failed")
 		}
@@ -376,6 +376,30 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			continue
 		}
 
+		// content-type is json but no json related config
+		if contentType == "application/json" {
+			decoder := json.NewDecoder(reader)
+			// when message_key is given in config
+			if p.config.JSON.MessageKey != "" {
+				err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
+				if err != nil {
+					err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
+					s3Context.Fail(err)
+					return err
+				}
+				return nil
+			}
+			// when there is no message_key
+			err := p.decodeJSONWithoutKey(decoder, objectHash, s3Info, s3Context)
+			if err != nil {
+				err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
+				s3Context.Fail(err)
+				return err
+			}
+			return nil
+		}
+
+		// handle s3 objects that are not json content-type
 		offset := 0
 		for {
 			log, err := reader.ReadString('\n')
@@ -383,19 +407,18 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				break
 			}
 
-			if err != nil {
-				if err == io.EOF {
-					// create event for last line
-					offset += len([]byte(log))
-					event := createEvent(log, offset, s3Info, objectHash, s3Context)
-					err = p.forwardEvent(event)
-					if err != nil {
-						err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
-						s3Context.Fail(err)
-						return err
-					}
-					return nil
+			if err == io.EOF {
+				// create event for last line
+				offset += len([]byte(log))
+				event := createEvent(log, offset, s3Info, objectHash, s3Context)
+				err = p.forwardEvent(event)
+				if err != nil {
+					err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+					s3Context.Fail(err)
+					return err
 				}
+				return nil
+			} else if err != nil {
 				return errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
 			}
 
@@ -414,7 +437,115 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 	return nil
 }
 
-func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
+func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	offset := 0
+	for {
+		var jsonFields map[string][]interface{}
+		err := decoder.Decode(&jsonFields)
+		if jsonFields == nil {
+			return nil
+		}
+
+		if err == io.EOF {
+			// create event for last line
+			err := p.convertJSONToEventWithKey(jsonFields, offset, objectHash, s3Info, s3Context)
+			if err != nil {
+				err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
+				s3Context.Fail(err)
+				return err
+			}
+		} else if err != nil {
+			// decode json failed, skip this log file
+			p.logger.Warnf(fmt.Sprintf("Decode json failed for '%s', skipping this file", s3Info.key))
+			return nil
+		}
+
+		err = p.convertJSONToEventWithKey(jsonFields, offset, objectHash, s3Info, s3Context)
+		if err != nil {
+			err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
+			s3Context.Fail(err)
+			return err
+		}
+	}
+}
+
+func (p *s3Input) decodeJSONWithoutKey(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	offset := 0
+	for {
+		var jsonFields map[string]interface{}
+		err := decoder.Decode(&jsonFields)
+		if jsonFields == nil {
+			return nil
+		}
+
+		if err == io.EOF {
+			// create event for last line
+			err := p.convertJSONToEventWithoutKey(jsonFields, offset, objectHash, s3Info, s3Context)
+			if err != nil {
+				err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
+				s3Context.Fail(err)
+				return err
+			}
+		} else if err != nil {
+			err = errors.Wrapf(err, "Decode json failed for '%s'", s3Info.key)
+			s3Context.Fail(err)
+			return err
+		}
+
+		err = p.convertJSONToEventWithoutKey(jsonFields, offset, objectHash, s3Info, s3Context)
+		if err != nil {
+			err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
+			s3Context.Fail(err)
+			return err
+		}
+	}
+}
+
+func (p *s3Input) convertJSONToEventWithKey(jsonFields map[string][]interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	textValues, ok := jsonFields[p.config.JSON.MessageKey]
+	if !ok {
+		return errors.New(fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+	}
+
+	for _, v := range textValues {
+		err := p.createAndForwardJSONEvent(v, offset, objectHash, s3Info, s3Context)
+		if err != nil {
+			err = errors.Wrapf(err, "createAndForwardJSONEvent failed for %v", s3Info.key)
+			s3Context.Fail(err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (p *s3Input) convertJSONToEventWithoutKey(jsonFields map[string]interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	err := p.createAndForwardJSONEvent(jsonFields, offset, objectHash, s3Info, s3Context)
+	if err != nil {
+		err = errors.Wrapf(err, "createAndForwardJSONEvent failed for %v", s3Info.key)
+		s3Context.Fail(err)
+		return err
+	}
+	return nil
+}
+
+func (p *s3Input) createAndForwardJSONEvent(v interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	vJSON, err := json.Marshal(v)
+	log := string(vJSON)
+	offset += len([]byte(log))
+	event := createEvent(log, offset, s3Info, objectHash, s3Context)
+
+	err = p.forwardEvent(event)
+	if err != nil {
+		err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+		s3Context.Fail(err)
+		return err
+	}
+
+	return nil
+}
+
+func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, string, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
@@ -425,34 +556,34 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				return nil, nil
+				return nil, "", nil
 			}
 
 			if awsErr.Code() == "NoSuchKey" {
 				p.logger.Warn("Cannot find s3 file with key ", s3Info.key)
-				return nil, nil
+				return nil, "", nil
 			}
 		}
-		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
+		return nil, "", errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
 	if resp.Body == nil {
-		return nil, errors.New("s3 get object response body is empty")
+		return nil, "", errors.New("s3 get object response body is empty")
 	}
 
 	// Check content-type
 	if resp.ContentType != nil {
 		switch *resp.ContentType {
 		case "text/plain", "text/plain; charset=utf-8":
-			return bufio.NewReader(resp.Body), nil
+			return bufio.NewReader(resp.Body), *resp.ContentType, nil
 		case "application/x-gzip":
 			reader, err := gzip.NewReader(resp.Body)
 			if err != nil {
-				return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+				return nil, *resp.ContentType, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 			}
-			return bufio.NewReader(reader), nil
+			return bufio.NewReader(reader), *resp.ContentType, nil
 		default:
-			return bufio.NewReader(resp.Body), nil
+			return bufio.NewReader(resp.Body), *resp.ContentType, nil
 		}
 	}
 
@@ -460,11 +591,11 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if strings.HasSuffix(s3Info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+			return nil, "", errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 		}
-		return bufio.NewReader(gzipReader), nil
+		return bufio.NewReader(gzipReader), "", nil
 	}
-	return bufio.NewReader(resp.Body), nil
+	return bufio.NewReader(resp.Body), "", nil
 }
 
 func (p *s3Input) forwardEvent(event beat.Event) error {

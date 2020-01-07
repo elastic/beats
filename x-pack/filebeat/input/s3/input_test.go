@@ -150,8 +150,10 @@ func TestHandleMessage(t *testing.T) {
 
 func TestNewS3BucketReader(t *testing.T) {
 	p := &s3Input{context: &channelContext{}}
-	reader, err := p.newS3BucketReader(mockSvc, info)
+	reader, contentType, err := p.newS3BucketReader(mockSvc, info)
+	fmt.Println("content = ", contentType)
 	assert.NoError(t, err)
+	assert.Equal(t, "", contentType)
 	for i := 0; i < 3; i++ {
 		switch i {
 		case 0:
@@ -172,7 +174,8 @@ func TestNewS3BucketReader(t *testing.T) {
 
 func TestNewS3BucketReaderErr(t *testing.T) {
 	p := &s3Input{context: &channelContext{}}
-	reader, err := p.newS3BucketReader(mockSvcErr, info)
+	reader, contentType, err := p.newS3BucketReader(mockSvcErr, info)
+	assert.Equal(t, "", contentType)
 	assert.Error(t, err, "s3 get object response body is empty")
 	assert.Nil(t, reader)
 }
@@ -194,7 +197,8 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	reader, err := p.newS3BucketReader(mockSvc, s3Info)
+	reader, contentType, err := p.newS3BucketReader(mockSvc, s3Info)
+	assert.Equal(t, "", contentType)
 	assert.NoError(t, err)
 	var events []beat.Event
 	for {
