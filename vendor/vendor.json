@@ -2920,124 +2920,124 @@
 			"versionExact": "v1.2.1"
 		},
 		{
-			"checksumSHA1": "bNf3GDGhZh86bfCIMM5c5AYfo3g=",
+			"checksumSHA1": "rdM+Flia4oo089kLcUUmogtO444=",
 			"path": "github.com/elastic/go-txfile",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "scDqDI8APDj/tB973/ehmPufSLc=",
 			"path": "github.com/elastic/go-txfile/dev-tools/lib/mage/gotool",
 			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
 			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "/WzE2caCHChUpoRAlXDU5uLTU5I=",
 			"path": "github.com/elastic/go-txfile/dev-tools/lib/mage/mgenv",
 			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
 			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "kD/TFYofNqdOjb0nMN0w3LC/nNU=",
+			"checksumSHA1": "zSeYMIMdohuN+AvwdbZ8Pq3iNKA=",
 			"path": "github.com/elastic/go-txfile/dev-tools/lib/mage/xbuild",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "re2W5hqGml/Q8vnx+DT3ooUNWxo=",
 			"path": "github.com/elastic/go-txfile/internal/cleanup",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "HjNNDapvfXgOJqs7l7pS3ho6SSI=",
 			"path": "github.com/elastic/go-txfile/internal/invariant",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "HLMF+V6Pt3YLUNOgmd2nR+vz9vM=",
 			"path": "github.com/elastic/go-txfile/internal/iter",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "EAIqvdq5S3FNBoTBAI/U02AwTSU=",
 			"path": "github.com/elastic/go-txfile/internal/strbld",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "0ThnGUs4X5RsvRRyNt31TqcOxLM=",
 			"path": "github.com/elastic/go-txfile/internal/tracelog",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "lejstOrGPfa+tJohvIOK/AjdLa4=",
 			"path": "github.com/elastic/go-txfile/internal/vfs",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "Wqp2VCpbcmfOFuZJrYkaxpvQQrE=",
+			"checksumSHA1": "oH2y5MfxChWLgCRp6jC7lQ2DP1A=",
 			"path": "github.com/elastic/go-txfile/internal/vfs/osfs",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "x+Zecu6NkXTdGlX2s6npntDOiCQ=",
 			"path": "github.com/elastic/go-txfile/internal/vfs/osfs/osfstest",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "LYeqHmalUZgk3oOHtJyPOKlM/j4=",
 			"path": "github.com/elastic/go-txfile/pq",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "fCx++6A9uzyCsDUanAIJb77u0MI=",
 			"path": "github.com/elastic/go-txfile/txerr",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "YMpex/CiJrYKGH05rpQyzdUaU2E=",
 			"path": "github.com/elastic/go-txfile/txfiletest",
-			"revision": "fa3d87c14381c01aaa1c7901877fb5e483294964",
-			"revisionTime": "2019-01-24T17:28:32Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4acb7500cf41aea9d6362378aee5ebacac831ea4",
+			"revisionTime": "2020-01-03T16:53:20Z",
+			"version": "v0.0.7",
+			"versionExact": "v0.0.7"
 		},
 		{
 			"checksumSHA1": "b91TSC0atoGVSMZdKuWTYsMOGiM=",
@@ -3219,6 +3219,12 @@
 			"path": "github.com/godbus/dbus",
 			"revision": "37bf87eef99d69c4f1d3528bd66e3a87dc201472",
 			"revisionTime": "2019-09-30T11:59:46Z"
+		},
+		{
+			"checksumSHA1": "MlaWEe1K+Kpb9wDF88qPoqO1uro=",
+			"path": "github.com/gofrs/flock",
+			"revision": "5135e617513b1e6e205a3a89b042249dee6730c8",
+			"revisionTime": "2019-03-20T16:07:11Z"
 		},
 		{
 			"checksumSHA1": "BfjvAbPn5t/2KrdC5E7418OuzV8=",
@@ -4139,14 +4145,6 @@
 			"versionExact": "v1.2.2"
 		},
 		{
-			"checksumSHA1": "CpcG17Q/0k1g2uy8AL26Uu7TouU=",
-			"path": "github.com/theckman/go-flock",
-			"revision": "b139a2487364247d91814e4a7c7b8fdc69e342b2",
-			"revisionTime": "2018-01-24T01:19:07Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
-		},
-		{
 			"checksumSHA1": "nlhGP9VLnwbYrykVzBdJMppDrFs=",
 			"path": "github.com/tsg/go-daemon",
 			"revision": "c6e0d1a849861166320520e9bae9bbda5f2ecb03",
@@ -4187,6 +4185,36 @@
 			"path": "github.com/urso/go-bin",
 			"revision": "781c575c9f0eb3cb9dca94521bd7ad7d5aec7fd4",
 			"revisionTime": "2018-02-20T13:58:11Z"
+		},
+		{
+			"checksumSHA1": "2bayf6GfVdEYIs6htpKwM0mchWU=",
+			"path": "github.com/urso/magetools/clitool",
+			"revision": "61080ed7b22b35d276d023e17437c85d8a5ade51",
+			"revisionTime": "2020-01-06T13:01:47Z"
+		},
+		{
+			"checksumSHA1": "B9PUK7F/gDfEjIktNrkJ088EMOM=",
+			"path": "github.com/urso/magetools/ctrl",
+			"revision": "61080ed7b22b35d276d023e17437c85d8a5ade51",
+			"revisionTime": "2020-01-06T13:01:47Z"
+		},
+		{
+			"checksumSHA1": "ti5S84P74ACJqthAlGdhHwQtx1c=",
+			"path": "github.com/urso/magetools/fs",
+			"revision": "61080ed7b22b35d276d023e17437c85d8a5ade51",
+			"revisionTime": "2020-01-06T13:01:47Z"
+		},
+		{
+			"checksumSHA1": "uEmOMEhLiHmq2kkl1gJycUedDx8=",
+			"path": "github.com/urso/magetools/gotool",
+			"revision": "61080ed7b22b35d276d023e17437c85d8a5ade51",
+			"revisionTime": "2020-01-06T13:01:47Z"
+		},
+		{
+			"checksumSHA1": "Dwh0SHLJXtQR4KDP9GE0yWeDaEg=",
+			"path": "github.com/urso/magetools/mgenv",
+			"revision": "61080ed7b22b35d276d023e17437c85d8a5ade51",
+			"revisionTime": "2020-01-06T13:01:47Z"
 		},
 		{
 			"checksumSHA1": "eNXPqquHSqrsae/NydhZJSqOP5c=",
