@@ -1,0 +1,66 @@
+[
+  {
+    "@timestamp": "2019-12-19T08:01:45.9824133Z",
+    "event": {
+      "action": "deleted-distribution-group-account",
+      "code": 4748,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "group": {
+      "domain": "TEST",
+      "name": "testdistlocal1"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A security-disabled local group was deleted.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2903\n\tGroup Name:\t\ttestdistlocal1\n\tGroup Domain:\t\tTEST\n\nAdditional Information:\n\tPrivileges:\t\t-",
+    "related": {
+      "user": [
+        "at_adm"
+      ]
+    },
+    "user": {
+      "domain": "TEST",
+      "id": "S-1-5-21-1717121054-434620538-60925301-2794",
+      "name": "at_adm"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "PrivilegeList": "-",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x2e67800",
+        "SubjectUserName": "at_adm",
+        "SubjectUserSid": "S-1-5-21-1717121054-434620538-60925301-2794",
+        "TargetDomainName": "TEST",
+        "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2903",
+        "TargetUserName": "testdistlocal1"
+      },
+      "event_id": 4748,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x2e67800"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 1076
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 3707490,
+      "task": "Distribution Group Management"
+    }
+  }
+]

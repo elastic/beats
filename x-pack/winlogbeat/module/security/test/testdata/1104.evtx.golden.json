@@ -1,0 +1,43 @@
+[
+  {
+    "@timestamp": "2019-11-08T07:56:17.3217049Z",
+    "event": {
+      "action": "logging-full",
+      "code": 1104,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Eventlog"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "error"
+    },
+    "message": "The security log is now full.",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer": {
+        "domain": "wlbeat",
+        "name": "WIN-41OB2LO92CR"
+      },
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_id": 1104,
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1096,
+        "thread": {
+          "id": 1444
+        }
+      },
+      "provider_guid": "{fc65ddd8-d6ef-4962-83d5-6e5cfe9ce148}",
+      "provider_name": "Microsoft-Windows-Eventlog",
+      "record_id": 19352,
+      "task": "Event processing"
+    }
+  }
+]

@@ -1265,7 +1265,7 @@ var security = (function () {
       };
 
     var addAuditInfo = function(evt) {
-        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{",'').replace("}",'');
+        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{",'').replace("}",'').toUpperCase();
         if (!subcategoryGuid) {
             return;
         }

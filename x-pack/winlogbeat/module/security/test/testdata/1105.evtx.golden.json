@@ -1,0 +1,48 @@
+[
+  {
+    "@timestamp": "2019-11-07T16:22:14.8425353Z",
+    "event": {
+      "action": "auditlog-archieved",
+      "code": 1105,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Eventlog"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Event log automatic backup\n\tLog:\tSecurity\n\tFile:\tC:\\Windows\\System32\\Winevt\\Logs\\Archive-Security-2019-11-07-16-22-14-780.evtx",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer": {
+        "domain": "wlbeat",
+        "name": "WIN-41OB2LO92CR"
+      },
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_id": 1105,
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1156,
+        "thread": {
+          "id": 1484
+        }
+      },
+      "provider_guid": "{fc65ddd8-d6ef-4962-83d5-6e5cfe9ce148}",
+      "provider_name": "Microsoft-Windows-Eventlog",
+      "record_id": 18197,
+      "task": "Log automatic backup",
+      "user_data": {
+        "BackupPath": "C:\\Windows\\System32\\Winevt\\Logs\\Archive-Security-2019-11-07-16-22-14-780.evtx",
+        "Channel": "Security",
+        "xml_name": "AutoBackup"
+      }
+    }
+  }
+]
