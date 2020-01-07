@@ -376,10 +376,10 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			continue
 		}
 
-		// content-type is json but no json related config
+		// handle s3 object with content-type is json
 		if contentType == "application/json" {
 			decoder := json.NewDecoder(reader)
-			// when message_key is given in config
+			// when json.message_key is given in config
 			if p.config.JSON.MessageKey != "" {
 				err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
 				if err != nil {
@@ -389,7 +389,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				}
 				return nil
 			}
-			// when there is no message_key
+			// when there is no json.message_key
 			err := p.decodeJSONWithoutKey(decoder, objectHash, s3Info, s3Context)
 			if err != nil {
 				err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
@@ -448,11 +448,21 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 
 		if err == io.EOF {
 			// create event for last line
-			err := p.convertJSONToEventWithKey(jsonFields, offset, objectHash, s3Info, s3Context)
-			if err != nil {
-				err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
-				s3Context.Fail(err)
+			// get logs from json.message_key
+			textValues, ok := jsonFields[p.config.JSON.MessageKey]
+			if !ok {
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+				p.logger.Error(err)
 				return err
+			}
+
+			for _, v := range textValues {
+				err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
+				if err != nil {
+					err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %v", s3Info.key))
+					p.logger.Error(err)
+					return err
+				}
 			}
 		} else if err != nil {
 			// decode json failed, skip this log file
@@ -460,11 +470,20 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 			return nil
 		}
 
-		err = p.convertJSONToEventWithKey(jsonFields, offset, objectHash, s3Info, s3Context)
-		if err != nil {
-			err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
-			s3Context.Fail(err)
+		textValues, ok := jsonFields[p.config.JSON.MessageKey]
+		if !ok {
+			err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+			p.logger.Error(err)
 			return err
+		}
+
+		for _, v := range textValues {
+			err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
+			if err != nil {
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+				p.logger.Error(err)
+				return err
+			}
 		}
 	}
 }
@@ -480,68 +499,39 @@ func (p *s3Input) decodeJSONWithoutKey(decoder *json.Decoder, objectHash string,
 
 		if err == io.EOF {
 			// create event for last line
-			err := p.convertJSONToEventWithoutKey(jsonFields, offset, objectHash, s3Info, s3Context)
+			err := p.convertJSONToEvent(jsonFields, offset, objectHash, s3Info, s3Context)
 			if err != nil {
-				err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
-				s3Context.Fail(err)
+				err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %s", s3Info.key))
+				p.logger.Error(err)
 				return err
 			}
 		} else if err != nil {
-			err = errors.Wrapf(err, "Decode json failed for '%s'", s3Info.key)
-			s3Context.Fail(err)
+			err = errors.Wrapf(err, fmt.Sprintf("decode failed for %s", s3Info.key))
+			p.logger.Error(err)
 			return err
 		}
 
-		err = p.convertJSONToEventWithoutKey(jsonFields, offset, objectHash, s3Info, s3Context)
+		err = p.convertJSONToEvent(jsonFields, offset, objectHash, s3Info, s3Context)
 		if err != nil {
-			err = errors.Wrapf(err, "convertJSONToEvent failed for %v", s3Info.key)
-			s3Context.Fail(err)
+			err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %s", s3Info.key))
+			p.logger.Error(err)
 			return err
 		}
 	}
 }
 
-func (p *s3Input) convertJSONToEventWithKey(jsonFields map[string][]interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
-	textValues, ok := jsonFields[p.config.JSON.MessageKey]
-	if !ok {
-		return errors.New(fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
-	}
-
-	for _, v := range textValues {
-		err := p.createAndForwardJSONEvent(v, offset, objectHash, s3Info, s3Context)
-		if err != nil {
-			err = errors.Wrapf(err, "createAndForwardJSONEvent failed for %v", s3Info.key)
-			s3Context.Fail(err)
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (p *s3Input) convertJSONToEventWithoutKey(jsonFields map[string]interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
-	err := p.createAndForwardJSONEvent(jsonFields, offset, objectHash, s3Info, s3Context)
-	if err != nil {
-		err = errors.Wrapf(err, "createAndForwardJSONEvent failed for %v", s3Info.key)
-		s3Context.Fail(err)
-		return err
-	}
-	return nil
-}
-
-func (p *s3Input) createAndForwardJSONEvent(v interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
-	vJSON, err := json.Marshal(v)
+func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+	vJSON, err := json.Marshal(jsonFields)
 	log := string(vJSON)
 	offset += len([]byte(log))
 	event := createEvent(log, offset, s3Info, objectHash, s3Context)
 
 	err = p.forwardEvent(event)
 	if err != nil {
-		err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
-		s3Context.Fail(err)
+		err = errors.Wrapf(err, fmt.Sprintf("forwardEvent failed for %s", s3Info.key))
+		p.logger.Error(err)
 		return err
 	}
-
 	return nil
 }
 

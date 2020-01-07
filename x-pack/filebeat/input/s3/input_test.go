@@ -151,7 +151,6 @@ func TestHandleMessage(t *testing.T) {
 func TestNewS3BucketReader(t *testing.T) {
 	p := &s3Input{context: &channelContext{}}
 	reader, contentType, err := p.newS3BucketReader(mockSvc, info)
-	fmt.Println("content = ", contentType)
 	assert.NoError(t, err)
 	assert.Equal(t, "", contentType)
 	for i := 0; i < 3; i++ {
