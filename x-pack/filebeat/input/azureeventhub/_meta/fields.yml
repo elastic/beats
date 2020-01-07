@@ -1,0 +1,14 @@
+- key: azure-eventhub
+  title: "azure eventhub"
+  description: >
+    eventhub related fields
+  release: beta
+  fields:
+  - name: eventhub
+    type: keyword
+    description: >
+      Name of the eventhub.
+  - name: offset
+    type: keyword
+    description: >
+      The offset.

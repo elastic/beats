@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-azure>>
+* <<exported-fields-azure-eventhub>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -2733,6 +2734,33 @@ type: keyword
 +
 --
 Status
+
+
+type: keyword
+
+--
+
+[[exported-fields-azure-eventhub]]
+== azure eventhub fields
+
+eventhub related fields
+
+
+
+*`eventhub`*::
++
+--
+Name of the eventhub.
+
+
+type: keyword
+
+--
+
+*`offset`*::
++
+--
+The offset.
 
 
 type: keyword

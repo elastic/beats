@@ -9,11 +9,76 @@
 <titleabbrev>Azure eventhub</titleabbrev>
 ++++
 
-beta[]
 
-Use the `azure-eventhub` input to read messages from an Azure event hub.
+Use the `azure-eventhub` input to read messages from an azure eventhub.
 
-Example configurations:
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "consumer"
+  connection_string: "Endpoint=sb://....."
+----
 
 ==== Configuration options
 
+The `azure-eventhub` input supports the following configuration:
+
+[float]
+==== `eventhub`
+
+The name of the eventhub users would like to read from.
+
+[float]
+==== `consumer_group`
+
+Optional, the default consumer group will be selected, we recommend using a dedicated consumer group for the azure input.
+
+[float]
+==== `connection_string`
+
+The connection string required to communicate with Event Hubs, steps here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string.
+
+The configuration above will use an in-memory checkpoint persister currently. Be aware that the in-memory persister is not reliable, if filebeat is restarted the offsets wil be lost.
+
+A more reliable option is enabling the `eph` option which is using an event processor host implementation (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
+The implementation of partition leasing and check pointing  in this option is based on Azure Storage.
+Offsets will be saved and updated to a storage account so after stopping filebeat it can start back up at the spot that it stopped processing messages.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "obstest"
+  connection_string: "Endpoint=sb://....."
+  enable_eph: true
+  storage_account: "azuresaeh"
+  storage_account_key: "....."
+  storage_account_container: ""
+----
+
+==== Added configuration options
+
+[float]
+==== `enable_eph`
+
+This configuration option will enable using the event processor host.
+
+[float]
+==== `storage_account`
+
+The name of the storage account.
+
+[float]
+==== `storage_account_key`
+
+The storage account key, this key will be used to authorize access to data in your storage account.
+
+[float]
+==== `storage_account_container`
+
+Optional, the name of the storage account container you would like to store the offset information in. Default name `ephcontainer`.

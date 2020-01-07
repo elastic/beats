@@ -71,7 +71,7 @@ func TestProcessEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, message, msg)
+	assert.Equal(t, message, single)
 }
 
 func TestParseMultipleMessages(t *testing.T) {
