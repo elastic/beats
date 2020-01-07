@@ -6,9 +6,10 @@ package azure
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/common"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 
@@ -74,6 +75,7 @@ func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
 		}
 		for _, res := range resourceList.Values() {
 			for _, metric := range resource.Metrics {
+				mapCustomFields(&metric, resource)
 				met, err := fn(client, metric, res)
 				if err != nil {
 					return err

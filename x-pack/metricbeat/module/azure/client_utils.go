@@ -151,3 +151,11 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	}
 	return false
 }
+
+// mapCustomFields will map the configuration custom fields to a metric configuration object (specific to an azure resource) , the mapping will most likelky contain more custom fields in the future
+func mapCustomFields(metricConfig *MetricConfig, resourceConfig ResourceConfig) {
+	metricConfig.CustomFields = CustomFieldsConfig{
+		ServiceType: resourceConfig.ServiceType,
+	}
+
+}

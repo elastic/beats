@@ -42,6 +42,12 @@ type MetricConfig struct {
 	Aggregations []string          `config:"aggregations"`
 	Dimensions   []DimensionConfig `config:"dimensions"`
 	Timegrain    string            `config:"timegrain"`
+	CustomFields CustomFieldsConfig
+}
+
+// CustomFieldsConfig struct will contain custom configuration options based on different types of resources
+type CustomFieldsConfig struct {
+	ServiceType []string
 }
 
 // DimensionConfig contains dimensions specific configuration.

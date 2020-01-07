@@ -6,17 +6,20 @@ package storage
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
-	"strings"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
 
-const resourceIdExtension = "/default"
+const resourceIDExtension = "/default"
+const serviceTypeNamespaceExtension = "Services"
 
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resources.GenericResource) ([]azure.Metric, error) {
@@ -33,9 +36,17 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 	}
 	namespaces = append(namespaces, *response.Value...)
 
-	// return all service namespaces for this resource (format of resource id will be resource path/servicetype/default)
-	for _, serviceNamespace := range storageServiceNamespaces {
-		response, err = client.AzureMonitorService.GetMetricNamespaces(fmt.Sprintf("%s%s%s", *resource.ID, serviceNamespace, resourceIdExtension))
+	// return all service namespaces for this resource (format of resource id will be resource path/servicetype/default) if serviceType is not configured
+	var serviceNamespaces []string
+	if len(metric.CustomFields.ServiceType) > 0 {
+		for _, ser := range metric.CustomFields.ServiceType {
+			serviceNamespaces = append(serviceNamespaces, ser+serviceTypeNamespaceExtension)
+		}
+	} else {
+		serviceNamespaces = storageServiceNamespaces
+	}
+	for _, serviceNamespace := range serviceNamespaces {
+		response, err = client.AzureMonitorService.GetMetricNamespaces(fmt.Sprintf("%s%s%s", *resource.ID, serviceNamespace, resourceIDExtension))
 		if err != nil {
 			return nil, errors.Wrapf(err, "no metric namespaces were found for resource %s", *resource.ID)
 		}
@@ -46,7 +57,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		var resourceID = *resource.ID
 		// get all metric definitions supported by the namespace provided
 		if i := retrieveServiceNamespace(*namespace.Properties.MetricNamespaceName); i != "" {
-			resourceID += i + resourceIdExtension
+			resourceID += i + resourceIDExtension
 		}
 		metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(resourceID, *namespace.Properties.MetricNamespaceName)
 		if err != nil {
