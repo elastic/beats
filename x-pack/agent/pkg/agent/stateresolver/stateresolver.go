@@ -12,6 +12,9 @@ import (
 	uid "github.com/elastic/beats/x-pack/agent/pkg/id"
 )
 
+// Acker allow to ack the should state from a converge operation.
+type Acker func()
+
 // StateResolver is a resolver of a config state change
 // it subscribes to Config event and publishes StateChange events based on that/
 // Based on StateChange event operator know what to do.
@@ -29,21 +32,32 @@ func NewStateResolver(log *logger.Logger) (*StateResolver, error) {
 }
 
 // Resolve resolves passed config into one or multiple steps
-func (s *StateResolver) Resolve(cfg configrequest.Request) (uid.ID, []configrequest.Step, error) {
+func (s *StateResolver) Resolve(
+	cfg configrequest.Request,
+) (uid.ID, []configrequest.Step, Acker, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	newState, steps := converge(s.curState, cfg)
 	id, err := uid.Generate()
 	if err != nil {
-		return id, nil, err
+		return id, nil, nil, err
 	}
 
 	s.l.Infof("New State ID is %s", newState.ShortID())
 	s.l.Infof("Converging state requires execution of %d step(s)", len(steps))
 
-	// Keep the should state for next tick.
-	s.curState = newState
+	// Allow the operator to ack the should state when applying the steps is done correctly.
+	ack := func() {
+		s.ack(newState)
+	}
 
-	return id, steps, nil
+	return id, steps, ack, nil
+}
+
+func (s *StateResolver) ack(newState state) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.l.Info("Updating internal state")
+	s.curState = newState
 }
