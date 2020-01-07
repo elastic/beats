@@ -26,9 +26,10 @@ type Storage struct {
 	config *FunctionConfig
 }
 
-// StorageEvent is an alias to string
+// StorageEventKey is an alias to string
 type StorageEventKey string
 
+// StorageEvent stores the storage event received from Google Cloud Storage.
 type StorageEvent struct {
 	Ctx   context.Context
 	Event transformer.StorageEvent

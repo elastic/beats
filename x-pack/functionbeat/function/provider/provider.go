@@ -96,6 +96,7 @@ func IsAvailable(name string) (bool, error) {
 	return false, nil
 }
 
+// ListFunctions returns the list of enabled function names.
 func ListFunctions(provider string) ([]string, error) {
 	functions, err := feature.GlobalRegistry().LookupAll(getNamespace(provider))
 	if err != nil {
@@ -109,7 +110,7 @@ func ListFunctions(provider string) ([]string, error) {
 	return names, nil
 }
 
-// Get returns the provider from a configuration.
+// Create returns the provider from a configuration.
 func Create(cfg *common.Config) (Provider, error) {
 	providers, err := List()
 	if err != nil {

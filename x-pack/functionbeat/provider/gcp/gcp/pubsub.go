@@ -28,7 +28,7 @@ type PubSub struct {
 	config *FunctionConfig
 }
 
-// PubSubEvent is an alias to string
+// PubSubEventKey is an alias to string
 type PubSubEventKey string
 
 // NewPubSub returns a new function to read from Google Pub/Sub.
