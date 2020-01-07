@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/flatbuffers/go"
+	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/module/file_integrity/schema"

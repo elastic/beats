@@ -65,12 +65,15 @@ func init() {
 
 // An adapter so that logp.Logger can be used as a log.Logger.
 type logDebugWrapper struct {
+	sync.Mutex
 	Logger *logp.Logger
 	buf    []byte
 }
 
 // Write writes messages to the log.
 func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
+	w.Lock()
+	defer w.Unlock()
 	n = len(p)
 	w.buf = append(w.buf, p...)
 	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
@@ -116,7 +119,8 @@ func NewInput(
 		WithProtocols(config.Protocols...).
 		WithExpiration(config.ExpirationTimeout).
 		WithLogOutput(&logDebugWrapper{Logger: logger}).
-		WithCustomFields(customFields...))
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(config.DetectSequenceReset))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}

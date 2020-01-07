@@ -48,6 +48,18 @@ monitoring:
 --------------------
 <1> Specify one of `api_key` or `username`/`password`.
 +
+If you want to send monitoring events to an https://cloud.elastic.co/[{ecloud}]
+monitoring cluster, you can use two simpler settings. When defined, these settings
+overwrite settings from other parts in the configuration. For example:
++
+[source,yaml]
+--------------------
+monitoring:
+  enabled: true
+  cloud.id: 'staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=='
+  cloud.auth: 'elastic:{pwd}'
+--------------------
++
 If you
 ifndef::no-output-logstash[]
 configured a different output, such as {ls} or you

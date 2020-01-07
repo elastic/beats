@@ -309,6 +309,24 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: googlecloud-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -453,6 +471,14 @@ filebeat.modules:
 - module: misp
   threat:
     enabled: true
+    # API key to access MISP
+    #var.api_key
+
+    # Array object in MISP response
+    #var.json_objects_array
+
+    # URL of the MISP REST API
+    #var.url
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
