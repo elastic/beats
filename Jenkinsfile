@@ -1,11 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@master',
-retriever: modernSCM(
-  [$class: 'GitSCMSource',
-  credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
-  id: '37cf2c00-2cc7-482e-8c62-7bbffef475e2',
-  remote: 'git@github.com:elastic/apm-pipeline-library.git'])
+@Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -36,16 +31,10 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
-        //TODO we need to configure the library in Jenkins to use privileged methods.
-        //gitCheckout(basedir: "${BASE_DIR}")
-        dir("${BASE_DIR}"){
-          checkout scm
-          githubEnv()
-        }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        gitCheckout(basedir: "${BASE_DIR}")
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
-          env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
+          env.BUILD_FILEBEAT = "true" //isChanged(["^filebeat/.*"])
           env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
           env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
           env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
@@ -59,14 +48,13 @@ pipeline {
           env.BUILD_DOCS = isGitRegionMatch(patterns: ["^docs/.*"], comparator: 'regexp') || params.runAllStages
           env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^Libbeat/.*"], comparator: 'regexp') || params.runAllStages
         }
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
       steps {
-        withBeatsEnv(){
-          makeTarget("Lint", "check")
-        }
+        makeTarget("Lint", "check")
       }
     }
     stage('Build and Test'){
@@ -83,26 +71,30 @@ pipeline {
           }
           stages {
             stage('Filebeat oss'){
+              when {expression {return false}}
               steps {
-                withBeatsEnv(){
-                  makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
-                }
+                makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
               }
             }
             stage('Filebeat x-pack'){
+              when {expression {return false}}
               steps {
-                withBeatsEnv(){
-                  makeTarget("Filebeat x-pack Linux", "-C x-pack/filebeat testsuite")
-                }
+                makeTarget("Filebeat x-pack Linux", "-C x-pack/filebeat testsuite")
               }
             }
             stage('Filebeat Mac OS X'){
+              when {expression {return false}}
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
-                }
+                makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
+              }
+            }
+            stage('Filebeat Windows'){
+              agent { label 'windows-immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                makeTargetWin("Filebeat oss Windows", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
               }
             }
           }
@@ -119,18 +111,14 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
-                }
+                makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
               }
             }
             stage('Heartbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
-                }
+                makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
               }
             }
           }
@@ -147,32 +135,24 @@ pipeline {
           stages {
             stage('Auditbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
-                }
+                makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
               }
             }
             stage('Auditbeat crosscompile'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
-                }
+                makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
               }
             }
             stage('Auditbeat x-pack'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
-                }
+                makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
               }
             }
             stage('Auditbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
-                }
+                makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
               }
             }
           }
@@ -189,30 +169,22 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
-                }
+                makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
               }
             }
             stage('Libbeat crosscompile'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
-                }
+                makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
               }
             }
             stage('Libbeat stress-tests'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
-                }
+                makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
               }
             }
             stage('Libbeat x-pack'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
-                }
+                makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
               }
             }
           }
@@ -227,9 +199,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
-            }
+            makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
           }
         }
         stage('Metricbeat Integration tests'){
@@ -242,9 +212,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
-            }
+            makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
           }
         }
         stage('Metricbeat System tests'){
@@ -257,9 +225,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
-            }
+            makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
           }
         }
         stage('Metricbeat oss'){
@@ -272,9 +238,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat x-pack Linux", "-C x-pack/metricbeat testsuite")
-            }
+            makeTarget("Metricbeat x-pack Linux", "-C x-pack/metricbeat testsuite")
           }
         }
         stage('Metricbeat crosscompile'){
@@ -287,9 +251,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
-            }
+            makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -302,9 +264,7 @@ pipeline {
             }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
-            }
+            makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
           }
         }
         stage('Packetbeat'){
@@ -319,9 +279,7 @@ pipeline {
           stages {
             stage('Packetbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
-                }
+                makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
               }
             }
           }
@@ -338,9 +296,7 @@ pipeline {
           stages {
             stage('Dockerlogbeat'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
-                }
+                makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
               }
             }
           }
@@ -357,9 +313,7 @@ pipeline {
           stages {
             stage('Winlogbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
-                }
+                makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
               }
             }
           }
@@ -376,18 +330,14 @@ pipeline {
           stages {
             stage('Functionbeat x-pack'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat testsuite")
-                }
+                makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat testsuite")
               }
             }
             stage('Functionbeat Mac OS X x-pack'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Functionbeat x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite")
-                }
+                makeTarget("Functionbeat x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite")
               }
             }
           }
@@ -404,9 +354,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
-                }
+                makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
               }
             }
           }
@@ -423,34 +371,28 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test test-package")
-                }
+                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
+                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                withBeatsEnv(){
-                  makeTarget("Generators Beat Linux", "-C generator/beat test test-package")
-                }
+                makeTarget("Generators Beat Linux", "-C generator/beat test")
+                makeTarget("Generators Beat Linux", "-C generator/beat test-package")
               }
             }
             stage('Generators Metricbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Generators Metricbeat Mac OS X", "-C generator/metricbeat test")
-                }
+                makeTarget("Generators Metricbeat Mac OS X", "-C generator/metricbeat test")
               }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                withBeatsEnv(){
-                  makeTarget("Generators Beat Mac OS X", "-C generator/beat test")
-                }
+                makeTarget("Generators Beat Mac OS X", "-C generator/beat test")
               }
             }
           }
@@ -476,9 +418,7 @@ pipeline {
             expression { return env.BUILD_DOCS != "false" }
           }
           steps {
-            withBeatsEnv(){
-              makeTarget("Docs", "docs")
-            }
+            makeTarget("Docs", "docs")
           }
         }
       }
@@ -488,7 +428,39 @@ pipeline {
 
 def makeTarget(context, target, clean = true){
   withGithubNotify(context: "${context}") {
-    sh(label: "Make ${target}", script: "make ${target}")
+    withBeatsEnv(){
+      sh(label: "Make ${target}", script: """
+        eval "\$(gvm use ${GO_VERSION} --format=bash)"
+        echo make ${target}
+      """)
+    }
+  }
+}
+
+def makeTargetWin(context, target, clean = true){
+  withGithubNotify(context: "${context}") {
+    withBeatsEnvWin(){
+      def envVars = bat(label: 'Env vars',
+        script: """
+          @echo off
+          gvm use --format=batch ${GO_VERSION}
+        """,
+        returnStdout: true
+      )
+      echo envVars
+      echo env.WORKSPACE
+      echo "${WORKSPACE}"
+      echo "${env.WORKSPACE}"
+      bat "echo %WORKSPACE%"
+      bat(label: "Make ${target}", script: """
+        ${envVars}
+        set GOROOT=${WORKSPACE}\\go${GO_VERSION}.windows.amd64
+        set PATH=%GOROOT%\\bin;${WORKSPACE}\\bin;C:\\tools\\mingw64\\bin;%PATH%
+        set GOFLAGS=-mod=vendor
+        set
+        make ${target}
+      """)
+    }
   }
 }
 
@@ -502,31 +474,38 @@ def withBeatsEnv(Closure body){
     unstash 'source'
     sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
     sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
-
-    def envTmp = propertiesToEnv("go_env.properties")
-    withEnv(envTmp){
-      dir("${BASE_DIR}"){
-        try {
-          body()
-        } finally {
-          reportCoverage()
-        }
+    dir("${BASE_DIR}"){
+      try {
+        body()
+      } finally {
+        reportCoverage()
       }
     }
   }
 }
 
-def propertiesToEnv(file){
-  def props = readProperties(file: file)
-  if(props.containsKey('PATH')){
-    newPath = sh(label: 'eval path', returnStdout: true, script: "echo \"${props['PATH']}\"").trim()
-    props["PATH"] = "${newPath}:${env.PATH}"
+def withBeatsEnvWin(Closure body){
+  def ws = "${WORKSPACE}"
+  def path = "${ws}\\bin;C:\\tools\\mingw64\\bin;${PATH}"
+  echo path
+  echo ws
+  withEnv([
+    "HOME=${ws}",
+    "GOPATH=${ws}",
+    "PATH=${path}",
+    "MAGEFILE_CACHE=${ws}\\.magefile"
+  ]){
+    deleteDir()
+    unstash 'source'
+    powershell(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.ps1")
+    dir("${BASE_DIR}"){
+      try {
+        body()
+      } finally {
+        junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/TEST-*.xml")
+      }
+    }
   }
-  def envTmp = []
-  props.each { key, value ->
-      envTmp += "${key}=${value}"
-  }
-  return envTmp
 }
 
 def k8sTest(versions){
@@ -545,6 +524,7 @@ def k8sTest(versions){
 
 def reportCoverage(){
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/TEST-*.xml")
     retry(2){
       sh(label: 'Report to Codecov', script: '''
         curl -sSLo codecov https://codecov.io/bash
@@ -557,7 +537,6 @@ def reportCoverage(){
         done
       ''')
     }
-    junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/TEST-*.xml")
   }
 }
 
