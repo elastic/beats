@@ -73,7 +73,7 @@ func TestDataEmptyFilter(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.Equal(t, 10, len(data))
+	assert.Equal(t, 9, len(data))
 }
 
 func TestDiskIOStat_CalIOStatistics(t *testing.T) {
@@ -113,4 +113,36 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 	assert.Equal(t, expected.AvgAwaitTime, got.AvgAwaitTime)
 	assert.Equal(t, expected.AvgReadAwaitTime, got.AvgReadAwaitTime)
 	assert.Equal(t, expected.AvgWriteAwaitTime, got.AvgWriteAwaitTime)
+}
+
+func TestSeparateTopLevelCounters(t *testing.T) {
+	stats := map[string]disk.IOCountersStat{
+		"md":         disk.IOCountersStat{},
+		"md1":        disk.IOCountersStat{},
+		"sda":        disk.IOCountersStat{},
+		"sda1":       disk.IOCountersStat{},
+		"sda10":      disk.IOCountersStat{},
+		"sdb":        disk.IOCountersStat{},
+		"sdc1":       disk.IOCountersStat{},
+		"nvme0n1":    disk.IOCountersStat{},
+		"nvme0n1p1":  disk.IOCountersStat{},
+		"nvme0n1p10": disk.IOCountersStat{},
+	}
+
+	topCounters := separateTopLevelCounters(stats)
+
+	assert.Contains(t, topCounters, "md")
+	assert.Contains(t, topCounters, "sda")
+	assert.Contains(t, topCounters, "sdb")
+	assert.Contains(t, topCounters, "sdc1")
+	assert.Contains(t, topCounters, "nvme0n1")
+	assert.NotContains(t, topCounters, "sda1")
+
+	assert.NotContains(t, stats, "md")
+	assert.NotContains(t, stats, "sda")
+	assert.NotContains(t, stats, "nvme0n1")
+	assert.Contains(t, stats, "sdb")
+	assert.Contains(t, stats, "sda1")
+	assert.Contains(t, stats, "sdc1")
+	assert.Contains(t, stats, "nvme0n1p1")
 }

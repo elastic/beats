@@ -34,7 +34,81 @@ func Get_CLK_TCK() uint32 {
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	return disk.IOCounters(names...)
+	stats, err := disk.IOCounters(names...)
+	if err != nil {
+		return nil, err
+	}
+	//Process `stats`, as `names` might be empty
+	topCounters := separateTopLevelCounters(stats)
+	stats["summary"] = summaryIOCounter(topCounters)
+	return stats, nil
+}
+
+func summaryIOCounter(stats map[string]disk.IOCountersStat) disk.IOCountersStat {
+	sum := disk.IOCountersStat{}
+	sum.Name = "summary"
+
+	for _, counter := range stats {
+		sum.ReadCount += counter.ReadCount
+		sum.ReadBytes += counter.ReadBytes
+		sum.ReadTime += counter.ReadTime
+		sum.WriteCount += counter.WriteCount
+		sum.WriteBytes += counter.WriteBytes
+		sum.WriteTime += counter.WriteTime
+		sum.IoTime += counter.IoTime
+		sum.MergedReadCount += counter.MergedReadCount
+		sum.MergedWriteCount += counter.MergedWriteCount
+		sum.WeightedIO += counter.WeightedIO
+	}
+
+	return sum
+}
+
+// separateTopLevelCounters will return a map of top level counters to ,
+// and it removes only aggregate counters from the passed map `stats`.
+// for example, it adds `hda` to a new map, and will not remove `hda`
+// if there is no sub counters such as `hda1`
+func separateTopLevelCounters(stats map[string]disk.IOCountersStat) map[string]disk.IOCountersStat {
+	separated := map[string]disk.IOCountersStat{}
+	for name := range stats {
+		i := len(name)
+
+		//Skip the index to the first digit of the tailing number
+		for name[i-1] <= '9' && name[i-1] >= '0' {
+			i--
+		}
+
+		if i == len(name) {
+			separated[name] = stats[name]
+			continue
+		}
+
+		// found is true if the high level disk name of the given one is found.
+		// This handles the situation that `m.includeDevices` contains sub level names only
+		found := false
+
+		//for SATA and IDE disks, the names are like `sda`, `sda1`, `sda2`
+		//for nvme disks, the names would be like `nvme0n1` and `nvme0n1p1`
+		for j := i; j > i-2 && !found; j-- {
+			if _, ok := separated[name[:j]]; ok {
+				found = true
+			}
+
+			if _, ok := stats[name[:j]]; ok {
+				if !found {
+					separated[name[:j]] = stats[name[:j]]
+					found = true
+				}
+				delete(stats, name[:j])
+			}
+		}
+
+		if !found {
+			separated[name] = stats[name]
+		}
+
+	}
+	return separated
 }
 
 // NewDiskIOStat :init DiskIOStat object.
