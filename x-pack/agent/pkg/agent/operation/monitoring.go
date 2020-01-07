@@ -43,7 +43,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	o.isMonitoring = true
 
 	for _, step := range o.getMonitoringSteps(s) {
-		p, cfg, err := getProgramFromStepWithTags(step, monitoringTags())
+		p, cfg, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,
@@ -68,7 +68,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 	for _, step := range o.getMonitoringSteps(s) {
-		p, _, err := getProgramFromStepWithTags(step, monitoringTags())
+		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,

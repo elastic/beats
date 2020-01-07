@@ -160,10 +160,7 @@ func (o *Operator) stop(p Descriptor) (err error) {
 // PushConfig tries to push config to a running process
 func (o *Operator) pushConfig(p Descriptor, cfg map[string]interface{}) error {
 	var flow []operation
-	configurable, err := p.IsGrpcConfigurable(o.config.DownloadConfig)
-	if err != nil {
-		return err
-	}
+	configurable := p.IsGrpcConfigurable()
 
 	if configurable {
 		flow = []operation{

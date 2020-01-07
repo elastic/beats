@@ -27,10 +27,12 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 // NOTE: Current spec are build at compile time, we want to revisit that to allow other program
 // to register their spec in a secure way.
 type Spec struct {
-	Name  string               `yaml:"name"`
-	Cmd   string               `yaml:"cmd"`
-	Rules *transpiler.RuleList `yaml:"rules"`
-	When  string               `yaml:"when"`
+	Name         string               `yaml:"name"`
+	Cmd          string               `yaml:"cmd"`
+	Configurable string               `yaml:"configurable"`
+	Args         []string             `yaml:"args"`
+	Rules        *transpiler.RuleList `yaml:"rules"`
+	When         string               `yaml:"when"`
 }
 
 // ReadSpecs reads all the specs that match the provided globbing path.
@@ -49,7 +51,7 @@ func ReadSpecs(path string) ([]Spec, error) {
 
 		spec := Spec{}
 		if err := yaml.Unmarshal(b, &spec); err != nil {
-			return []Spec{}, errors.New(err, fmt.Sprintf("cound unmarshal YAML for file %s", f), errors.TypeConfig)
+			return []Spec{}, errors.New(err, fmt.Sprintf("could not unmarshal YAML for file %s", f), errors.TypeConfig)
 		}
 		specs = append(specs, spec)
 	}
@@ -61,7 +63,7 @@ func ReadSpecs(path string) ([]Spec, error) {
 func NewSpecFromBytes(b []byte) (Spec, error) {
 	spec := Spec{}
 	if err := yaml.Unmarshal(b, &spec); err != nil {
-		return Spec{}, errors.New(err, "cound unmarshal YAML", errors.TypeConfig)
+		return Spec{}, errors.New(err, "could not unmarshal YAML", errors.TypeConfig)
 	}
 	return spec, nil
 }

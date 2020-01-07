@@ -15,6 +15,7 @@ import (
 	"time"
 
 	operatorCfg "github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
@@ -27,6 +28,38 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 )
+
+var installPath string = "tests/scripts"
+
+func TestMain(m *testing.M) {
+	// init supported with test cases
+	shortSpec := program.Spec{
+		Name:         "short",
+		Cmd:          "/bin/echo",
+		Configurable: "file",
+		Args:         []string{"123"},
+	}
+	longSpec := program.Spec{
+		Name:         "long",
+		Cmd:          "/bin/sh",
+		Configurable: "file",
+		Args:         []string{"-c", "echo 123; sleep 100"},
+	}
+	configurableSpec := program.Spec{
+		Name:         "configurable",
+		Cmd:          "configurable",
+		Configurable: "file",
+		Args:         []string{},
+	}
+	configByFileSpec := program.Spec{
+		Name:         "configurablebyfile",
+		Cmd:          "configurablebyfile",
+		Configurable: "file",
+		Args:         []string{},
+	}
+
+	program.Supported = append(program.Supported, shortSpec, longSpec, configurableSpec, configByFileSpec)
+}
 
 func TestShortRun(t *testing.T) {
 	p := getProgram("short", "1.0")
@@ -193,16 +226,8 @@ func TestTwoProcesses(t *testing.T) {
 
 func TestConfigurableRun(t *testing.T) {
 	p := getProgram("configurable", "1.0")
-	installPath := "tests/scripts"
-	downloadCfg := &artifact.Config{
-		InstallPath:     installPath,
-		OperatingSystem: "darwin",
-	}
-	spec, err := p.Spec(downloadCfg)
-	if err != nil {
-		t.Fatalf("spec not loaded %v", err)
-	}
 
+	spec := p.Spec()
 	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
 		t.Fatalf("binary not available %s", spec.BinaryPath)
 	} else {
@@ -276,18 +301,14 @@ func TestConfigurableRun(t *testing.T) {
 func TestConfigurableByFileRun(t *testing.T) {
 	cfg := make(map[string]interface{})
 	cfg["TestFile"] = "tstFilePath"
-
-	p := app.NewDescriptor("configurablebyfile", "1.0", nil)
-	installPath := "tests/scripts"
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
 	}
-	spec, err := p.Spec(downloadCfg)
-	if err != nil {
-		t.Fatalf("spec not loaded %v", err)
-	}
 
+	p := app.NewDescriptor("configurablebyfile", "1.0", downloadCfg, nil)
+	installPath := "tests/scripts"
+	spec := p.Spec()
 	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
 		t.Fatalf("binary not available %s", spec.BinaryPath)
 	} else {
@@ -392,7 +413,11 @@ func getLogger() *logger.Logger {
 }
 
 func getProgram(binary, version string) *app.Descriptor {
-	return app.NewDescriptor(binary, version, nil)
+	downloadCfg := &artifact.Config{
+		InstallPath:     installPath,
+		OperatingSystem: "darwin",
+	}
+	return app.NewDescriptor(binary, version, downloadCfg, nil)
 }
 
 type TestConfig struct {
