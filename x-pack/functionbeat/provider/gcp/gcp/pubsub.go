@@ -53,7 +53,6 @@ type PubSubEvent struct {
 
 // NewPubSubContext creates a context from context and message returned from Google Pub/Sub.
 func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) context.Context {
-	c := Context.Background()
 	e := PubSubEvent{
 		Ctx:     ctx,
 		Message: m,
@@ -79,13 +78,13 @@ func (p *PubSub) Run(ctx context.Context, client core.Client) error {
 }
 
 func (p *PubSub) getEventDataFromContext(ctx context.Context) (PubSubEvent, error) {
-	iPubSubEvent := ctx.Value(PubSubEvent(pubSubEventCtxStr))
+	iPubSubEvent := ctx.Value(PubSubEventKey(pubSubEventCtxStr))
 	if iPubSubEvent == nil {
 		return PubSubEvent{}, fmt.Errorf("no pub_sub_event in context")
 	}
 	event, ok := iPubSubEvent.(PubSubEvent)
 	if !ok {
-		return nil, pubsub.Message{}, fmt.Errorf("not PubSubEvent: %+v", iPubSubEvent)
+		return PubSubEvent{}, fmt.Errorf("not PubSubEvent: %+v", iPubSubEvent)
 	}
 
 	return event, nil

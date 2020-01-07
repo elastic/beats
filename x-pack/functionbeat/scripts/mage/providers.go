@@ -28,10 +28,10 @@ type ProviderDetails struct {
 func SelectedProviders() ([]ProviderDetails, error) {
 	providers := os.Getenv("PROVIDERS")
 	if len(providers) == 0 {
-		return availableProviders
+		return availableProviders, nil
 	}
 
-	names = strings.Split(providers, ",")
+	names := strings.Split(providers, ",")
 	providerDetails := make([]ProviderDetails, len(names))
 	for i, name := range names {
 		p, err := findProviderDetails(name)
@@ -50,5 +50,5 @@ func findProviderDetails(name string) (ProviderDetails, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("no such provider")
+	return ProviderDetails{}, fmt.Errorf("no such provider")
 }

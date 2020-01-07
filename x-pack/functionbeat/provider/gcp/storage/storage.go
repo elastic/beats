@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/beater"
+	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp/transformer"
 	_ "github.com/elastic/beats/x-pack/functionbeat/provider/gcp/include"
 )
@@ -44,7 +45,7 @@ func initFunctionbeat(ctx context.Context, e transformer.StorageEvent) func(*bea
 			return nil, fmt.Errorf("not Functionbeat")
 		}
 
-		fnbeat.Ctx = prov.NewStorageContext(fnbeat.Ctx, ctx, e)
+		fnbeat.Ctx = gcp.NewStorageContext(fnbeat.Ctx, ctx, e)
 
 		return fnbeat, nil
 	}

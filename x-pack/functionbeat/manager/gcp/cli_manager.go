@@ -26,7 +26,7 @@ type installer interface {
 
 // CLIManager interacts with Google Cloud to deploy, update or remove a function.
 type CLIManager struct {
-	templateBuilder provider.TemplateBuilder
+	templateBuilder *defaultTemplateBuilder
 	location        string
 	tokenSrc        oauth2.TokenSource
 	log             *logp.Logger
@@ -142,6 +142,10 @@ func NewCLI(
 	if err != nil {
 		return nil, err
 	}
+	templateBuilder, ok := builder.(*defaultTemplateBuilder)
+	if !ok {
+		return nil, fmt.Errorf("not defaultTemplateBuilder")
+	}
 
 	location := fmt.Sprintf(locationTemplate, config.ProjectID, config.Location)
 
@@ -155,6 +159,6 @@ func NewCLI(
 		log:             logp.NewLogger("gcp"),
 		location:        location,
 		tokenSrc:        tokenSrc,
-		templateBuilder: builder,
+		templateBuilder: templateBuilder,
 	}, nil
 }

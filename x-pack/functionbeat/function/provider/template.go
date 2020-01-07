@@ -16,6 +16,4 @@ type TemplateBuilderFactory func(*logp.Logger, *common.Config, Provider) (Templa
 type TemplateBuilder interface {
 	// RawTemplate returns a deployable template string.
 	RawTemplate(string) (string, error)
-	// Execute generates a template
-	Execute(string) ([]byte, error)
 }

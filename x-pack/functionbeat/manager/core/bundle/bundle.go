@@ -179,6 +179,17 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 			return nil, err
 		}
 
+		uncompressed = uncompressed + l
+		if p.maxSizeUncompressed != -1 && uncompressed > p.maxSizeUncompressed {
+			// Close the current zip, the zip has incomplete data.
+			zipWriter.Close()
+			return nil, fmt.Errorf(
+				"max uncompressed size reached, size %d, limit is %d",
+				uncompressed,
+				p.maxSizeUncompressed,
+			)
+		}
+
 		if l == 0 {
 			continue
 		}
@@ -205,10 +216,10 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func zipAddFile(w *zip.Writer, r Resource) (int, error) {
+func zipAddFile(zipWriter *zip.Writer, r Resource) (int64, error) {
 	f, err := r.Open()
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	defer f.Close()
 
@@ -220,24 +231,12 @@ func zipAddFile(w *zip.Writer, r Resource) (int, error) {
 	header.SetMode(r.Mode())
 	w, err := zipWriter.CreateHeader(header)
 	if err != nil {
-		f.Close()
-		return nil, err
-	}
-
-	l, err := io.Copy(w, r)
-	if err != nil {
 		return 0, err
 	}
 
-	uncompressed = uncompressed + l
-	if p.maxSizeUncompressed != -1 && uncompressed > p.maxSizeUncompressed {
-		// Close the current zip, the zip has incomplete data.
-		zipWriter.Close()
-		return nil, fmt.Errorf(
-			"max uncompressed size reached, size %d, limit is %d",
-			uncompressed,
-			p.maxSizeUncompressed,
-		)
+	l, err := io.Copy(w, f)
+	if err != nil {
+		return 0, err
 	}
 
 	return l, nil

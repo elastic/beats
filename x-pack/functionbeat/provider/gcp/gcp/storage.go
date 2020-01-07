@@ -50,13 +50,12 @@ func NewStorage(provider provider.Provider, cfg *common.Config) (provider.Functi
 
 // NewStorageContext creates a context from context and message returned from Google Cloud Storage.
 func NewStorageContext(beatCtx, ctx context.Context, e transformer.StorageEvent) context.Context {
-	c := Context.Background()
-	e := StorageEvent{
+	evt := StorageEvent{
 		Ctx:   ctx,
 		Event: e,
 	}
 
-	return context.WithValue(beatCtx, StorageEventKey(storageEvtCtxStr), e)
+	return context.WithValue(beatCtx, StorageEventKey(storageEvtCtxStr), evt)
 }
 
 // Run start
@@ -78,7 +77,7 @@ func (s *Storage) Run(ctx context.Context, client core.Client) error {
 func (s *Storage) getEventDataFromContext(ctx context.Context) (StorageEvent, error) {
 	iEvt := ctx.Value(StorageEventKey(storageEvtCtxStr))
 	if iEvt == nil {
-		return nil, transformer.StorageEvent{}, fmt.Errorf("no storage_event in context")
+		return StorageEvent{}, fmt.Errorf("no storage_event in context")
 	}
 	evt, ok := iEvt.(StorageEvent)
 	if !ok {
