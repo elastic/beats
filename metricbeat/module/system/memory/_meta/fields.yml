@@ -46,8 +46,9 @@
           type: long
           format: bytes
           description: >
-            Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
-            plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
+            Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo, 
+            or calculated from free memory plus caches and buffers if /proc/meminfo is not available.
+            On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
             to `system.memory.free`.
 
         - name: used.pct

@@ -574,12 +574,10 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	// Check content-type
 	if resp.ContentType != nil {
 		switch *resp.ContentType {
-		case "text/plain", "text/plain; charset=utf-8":
-			return bufio.NewReader(resp.Body), *resp.ContentType, nil
 		case "application/x-gzip":
 			reader, err := gzip.NewReader(resp.Body)
 			if err != nil {
-				return nil, *resp.ContentType, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+				return nil, "", errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 			}
 			return bufio.NewReader(reader), *resp.ContentType, nil
 		default:
