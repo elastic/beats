@@ -20,7 +20,7 @@ package osfs
 import (
 	"errors"
 
-	flock "github.com/theckman/go-flock"
+	"github.com/gofrs/flock"
 
 	"github.com/elastic/go-txfile/internal/vfs"
 )
