@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
-	"github.com/elastic/go-lumber/server/v2"
+	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
 const (
