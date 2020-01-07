@@ -34,6 +34,8 @@ type clienter interface {
 		headers http.Header,
 		body io.Reader,
 	) (*http.Response, error)
+
+	URI() string
 }
 
 // EnrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.

@@ -57,14 +57,21 @@ type Client struct {
 	log     *logger.Logger
 	request requestFunc
 	client  http.Client
+	config  *Config
 }
 
 // New creates new Kibana API client.
-func New(log *logger.Logger, factory requestFunc, httpClient http.Client) (*Client, error) {
+func New(
+	log *logger.Logger,
+	factory requestFunc,
+	cfg *Config,
+	httpClient http.Client,
+) (*Client, error) {
 	c := &Client{
 		log:     log,
 		request: factory,
 		client:  httpClient,
+		config:  cfg,
 	}
 	return c, nil
 }
@@ -150,7 +157,7 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 		return nil, errors.Wrap(err, "invalid Kibana endpoint")
 	}
 
-	return New(log, prefixRequestFactory(kibanaURL), httpClient)
+	return New(log, prefixRequestFactory(kibanaURL), cfg, httpClient)
 }
 
 // Send executes a direct calls agains't the Kibana API, the method will takes cares of cloning
@@ -188,6 +195,11 @@ func (c *Client) Send(
 	}
 
 	return c.client.Do(req)
+}
+
+// URI returns the remote URI.
+func (c *Client) URI() string {
+	return string(c.config.Protocol) + "://" + c.config.Host + "/" + c.config.Path
 }
 
 func prefixRequestFactory(URL string) requestFunc {
