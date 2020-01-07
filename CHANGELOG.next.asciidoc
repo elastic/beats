@@ -209,6 +209,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a problem in Filebeat input httpjson where interval is not used as time.Duration. {pull}14728[14728]
 - Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 - Fix SSL config in input.yml for Filebeat httpjson input in the MISP module. {pull}14767[14767]
+- Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
 
 *Heartbeat*
 
