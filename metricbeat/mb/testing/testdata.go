@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/testing/flags"
 
 	_ "github.com/elastic/beats/metricbeat/include/fields"
 )
@@ -221,7 +222,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	}
 
 	// Overwrites the golden files if run with -generate
-	if *dataFlag {
+	if *flags.DataFlag {
 		outputIndented, err := json.MarshalIndent(&data, "", "    ")
 		if err != nil {
 			t.Fatal(err)

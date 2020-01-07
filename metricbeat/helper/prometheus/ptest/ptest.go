@@ -19,7 +19,6 @@ package ptest
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -29,14 +28,13 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/metricbeat/mb/testing/flags"
 )
-
-var dataFlag = flag.Bool("data", false, "Update prometheus expected files")
 
 // TestCases holds the list of test cases to test a metricset
 type TestCases []struct {
@@ -79,7 +77,7 @@ func TestMetricSetEventsFetcher(t *testing.T, module, metricset string, cases Te
 		events, err := f.Fetch()
 		assert.Nil(t, err, "Errors while fetching metrics")
 
-		if *dataFlag {
+		if *flags.DataFlag {
 			sort.SliceStable(events, func(i, j int) bool {
 				h1, _ := hashstructure.Hash(events[i], nil)
 				h2, _ := hashstructure.Hash(events[j], nil)
@@ -160,7 +158,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		events, errs := f.FetchEvents()
 		assert.Nil(t, errs, "Errors while fetching metrics")
 
-		if *dataFlag {
+		if *flags.DataFlag {
 			sort.SliceStable(events, func(i, j int) bool {
 				h1, _ := hashstructure.Hash(events[i], nil)
 				h2, _ := hashstructure.Hash(events[j], nil)
