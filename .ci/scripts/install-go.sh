@@ -13,7 +13,9 @@ mkdir -p "${HOME}/bin"
 curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-${ARCH}-amd64"
 chmod +x "${GVM_CMD}"
 
-gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
+eval "$(gvm ${GO_VERSION})"
 
-eval $(gvm ${GO_VERSION})
+echo "PATH=${PATH}" > ${PROPERTIES_FILE}
+echo "GOROOT=${PATH}" >> ${PROPERTIES_FILE}
+
 go get -u github.com/kardianos/govendor
