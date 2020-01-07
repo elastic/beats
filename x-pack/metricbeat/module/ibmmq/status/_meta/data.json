@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2020-01-07T10:05:34.853Z",
+    "event": {
+        "dataset": "ibmmq.status",
+        "duration": 115000,
+        "module": "ibmmq"
+    },
+    "metricset": {
+        "name": "status",
+        "period": 10000
+    },
+    "prometheus": {
+        "labels": {
+            "handler": "prometheus",
+            "instance": "127.0.0.1:60576",
+            "job": "ibmmq"
+        },
+        "metrics": {
+            "http_request_duration_microseconds_count": 20,
+            "http_request_duration_microseconds_sum": 119184,
+            "http_request_size_bytes_count": 20,
+            "http_request_size_bytes_sum": 5540,
+            "http_response_size_bytes_count": 20,
+            "http_response_size_bytes_sum": 120494
+        }
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "ibmmq"
+    }
+}
