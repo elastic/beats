@@ -176,3 +176,24 @@ func MapMetricByPrimaryAggregation(client *Client, metrics []insights.MetricDefi
 	}
 	return clientMetrics
 }
+
+// GroupMetricsByAllDimensions will group metrics by dimension names in order to reduce the number of api calls
+func GroupMetricsByAllDimensions(metrics []insights.MetricDefinition) map[string][]insights.MetricDefinition {
+	var groupedMetrics = make(map[string][]insights.MetricDefinition)
+	for _, metric := range metrics {
+		if metric.Dimensions != nil {
+			for _, dimension := range *metric.Dimensions {
+				if _, ok := groupedMetrics[*dimension.Value]; !ok {
+					groupedMetrics[*dimension.Value] = make([]insights.MetricDefinition, 0)
+				}
+				groupedMetrics[*dimension.Value] = append(groupedMetrics[*dimension.Value], metric)
+			}
+		} else {
+			if _, ok := groupedMetrics[NoDimension]; !ok {
+				groupedMetrics[NoDimension] = make([]insights.MetricDefinition, 0)
+			}
+			groupedMetrics[NoDimension] = append(groupedMetrics[NoDimension], metric)
+		}
+	}
+	return groupedMetrics
+}

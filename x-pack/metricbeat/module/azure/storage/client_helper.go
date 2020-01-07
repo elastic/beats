@@ -46,7 +46,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		serviceNamespaces = storageServiceNamespaces
 	}
 	for _, serviceNamespace := range serviceNamespaces {
-		response, err = client.AzureMonitorService.GetMetricNamespaces(fmt.Sprintf("%s%s%s", *resource.ID, serviceNamespace, resourceIDExtension))
+		response, err = client.AzureMonitorService.GetMetricNamespaces(fmt.Sprintf("%s/%s%s", *resource.ID, serviceNamespace, resourceIDExtension))
 		if err != nil {
 			return nil, errors.Wrapf(err, "no metric namespaces were found for resource %s", *resource.ID)
 		}
@@ -73,9 +73,15 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		groupedMetrics := filterOnTimeGrain(filteredMetricDefinitions)
 		for time, groupedMetricList := range groupedMetrics {
 			// map azure metric definitions to client metrics
-			metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, groupedMetricList, resource, resourceID, *namespace.Properties.MetricNamespaceName, nil, time)...)
+			dimMetrics := azure.GroupMetricsByAllDimensions(groupedMetricList)
+			for dimension, mets := range dimMetrics {
+				var dimensions []azure.Dimension
+				if dimension != azure.NoDimension {
+					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
+				}
+				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, mets, resource, resourceID, *namespace.Properties.MetricNamespaceName, dimensions, time)...)
+			}
 		}
-
 	}
 	return metrics, nil
 }

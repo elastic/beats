@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	noDimension     = "none"
+	NoDimension     = "none"
 	nativeMetricset = "monitor"
 )
 
@@ -39,7 +39,7 @@ func EventsMapping(fn initEvent, metrics []Metric, metricset string, report mb.R
 	for resNamKey, resourceMetrics := range groupByResourceNamespace {
 		for _, resourceMetric := range resourceMetrics {
 			if len(resourceMetric.Dimensions) == 0 {
-				groupByDimensions[resNamKey+noDimension] = append(groupByDimensions[resNamKey+noDimension], resourceMetric)
+				groupByDimensions[resNamKey+NoDimension] = append(groupByDimensions[resNamKey+NoDimension], resourceMetric)
 			} else {
 				var dimKey string
 				for _, dim := range resourceMetric.Dimensions {

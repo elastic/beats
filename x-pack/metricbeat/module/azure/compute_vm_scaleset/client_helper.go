@@ -19,7 +19,6 @@ const (
 	customVMDimension      = "VirtualMachine"
 	defaultSlotIDDimension = "SlotId"
 	defaultTimeGrain       = "PT5M"
-	noDimension            = "none"
 )
 
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
@@ -59,7 +58,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 	}
 	for _, metricName := range supportedMetricNames {
 		if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
-			groupedMetrics[noDimension] = append(groupedMetrics[noDimension], metricName)
+			groupedMetrics[azure.NoDimension] = append(groupedMetrics[azure.NoDimension], metricName)
 		} else if containsDimension(vmdim, *metricName.Dimensions) {
 			groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
 		} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
@@ -72,7 +71,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 			metricNameList = append(metricNameList, *metricName.Name.Value)
 		}
 		var dimensions []azure.Dimension
-		if key != noDimension {
+		if key != azure.NoDimension {
 			dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 		}
 		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, defaultTimeGrain)...)
