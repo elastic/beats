@@ -100,8 +100,12 @@ func newManaged(
 	}
 
 	emit := emitter(log, router)
+	acker, err := newActionAcker(log, agentInfo, client)
+	if err != nil {
+		return nil, err
+	}
 
-	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
+	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log}, acker)
 	if err != nil {
 		return nil, err
 	}

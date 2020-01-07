@@ -10,7 +10,7 @@ type handlerDefault struct {
 	log *logger.Logger
 }
 
-func (h *handlerDefault) Handle(a action) error {
+func (h *handlerDefault) Handle(a action, acker fleetAcker) error {
 	h.log.Errorf("HandlerDefault: action '%+v' received", a)
 	return nil
 }

@@ -24,6 +24,10 @@ type fleetReporter interface {
 	Events() ([]fleetapi.SerializableEvent, func())
 }
 
+type fleetAcker interface {
+	Ack(actionID string) error
+}
+
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
 // bidirectional communication requirements. The gateway aggregates events and will periodically
 // call the API to send the events and will receive actions to be executed locally.

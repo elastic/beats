@@ -17,7 +17,7 @@ import (
 type action interface{}
 
 type actionHandler interface {
-	Handle(a action) error
+	Handle(a action, acker fleetAcker) error
 }
 
 type actionHandlers map[string]actionHandler
@@ -26,9 +26,10 @@ type actionDispatcher struct {
 	log      *logger.Logger
 	handlers actionHandlers
 	def      actionHandler
+	acker    fleetAcker
 }
 
-func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
+func newActionDispatcher(log *logger.Logger, def actionHandler, ack fleetAcker) (*actionDispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New()
@@ -45,6 +46,7 @@ func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatch
 		log:      log,
 		handlers: make(actionHandlers),
 		def:      def,
+		acker:    ack,
 	}, nil
 }
 
@@ -81,7 +83,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}
-		ad.log.Debugf("Succesfully dispatched action: '%+v'", action)
+		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 	return nil
 }
@@ -89,10 +91,10 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 func (ad *actionDispatcher) dispatchAction(a action) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
-		return ad.def.Handle(a)
+		return ad.def.Handle(a, ad.acker)
 	}
 
-	return handler.Handle(a)
+	return handler.Handle(a, ad.acker)
 }
 
 func detectTypes(actions []action) []string {
