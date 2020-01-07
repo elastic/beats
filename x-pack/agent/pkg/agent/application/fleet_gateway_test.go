@@ -46,6 +46,10 @@ func (t *testingClient) Send(
 	return t.callback(headers, body)
 }
 
+func (t *testingClient) URI() string {
+	return "http://localhost"
+}
+
 func (t *testingClient) Answer(fn clientCallbackFunc) <-chan struct{} {
 	t.Lock()
 	defer t.Unlock()
@@ -85,7 +89,7 @@ func newTestingDispatcher() *testingDispatcher {
 
 type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
-func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
+func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
 		scheduler := scheduler.NewStepper()
 		client := newTestingClient()
@@ -96,7 +100,7 @@ func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 
 		gateway, err := newFleetGatewayWithScheduler(
 			log,
-			&fleetGatewaySettings{},
+			settings,
 			agentInfo,
 			client,
 			dispatcher,
@@ -139,7 +143,12 @@ func wrapStrToResp(code int, body string) *http.Response {
 
 func TestFleetGateway(t *testing.T) {
 	agentInfo := &testAgentInfo{}
-	t.Run("send no event and receive no action", withGateway(agentInfo, func(
+	settings := &fleetGatewaySettings{
+		Duration: 5 * time.Second,
+		Backoff:  backoffSettings{Init: 1 * time.Second, Max: 5 * time.Second},
+	}
+
+	t.Run("send no event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -149,7 +158,6 @@ func TestFleetGateway(t *testing.T) {
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 				return resp, nil
 			}),
@@ -164,7 +172,7 @@ func TestFleetGateway(t *testing.T) {
 		<-received
 	}))
 
-	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, func(
+	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -216,7 +224,7 @@ func TestFleetGateway(t *testing.T) {
 		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
 			log,
-			&fleetGatewaySettings{},
+			settings,
 			agentInfo,
 			client,
 			dispatcher,
@@ -250,7 +258,7 @@ func TestFleetGateway(t *testing.T) {
 		}
 	})
 
-	t.Run("send event and receive no action", withGateway(agentInfo, func(
+	t.Run("send event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -273,7 +281,6 @@ func TestFleetGateway(t *testing.T) {
 
 				require.Equal(t, 1, len(cr.Events))
 
-				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 				return resp, nil
 			}),
@@ -287,11 +294,132 @@ func TestFleetGateway(t *testing.T) {
 		scheduler.Next()
 		<-received
 	}))
-	t.Run("Successfully connects and sends events back to fleet", skip)
+
+	t.Run("Test the wait loop is interruptible", func(t *testing.T) {
+		d := 10 * time.Minute
+		scheduler := scheduler.NewPeriodic(d)
+		client := newTestingClient()
+		dispatcher := newTestingDispatcher()
+
+		log, _ := logger.New()
+		gateway, err := newFleetGatewayWithScheduler(
+			log,
+			&fleetGatewaySettings{
+				Duration: d,
+				Backoff:  backoffSettings{Init: 1 * time.Second, Max: 30 * time.Second},
+			},
+			agentInfo,
+			client,
+			dispatcher,
+			scheduler,
+			getReporter(agentInfo, log, t),
+		)
+
+		go gateway.Start()
+		defer gateway.Stop()
+
+		require.NoError(t, err)
+
+		// Silently dispatch action.
+		go func() { <-dispatcher.Answer(func(actions ...action) error { return nil }) }()
+
+		// Make sure that all API calls to the checkin API are successfull, the following will happen:
+		// 1. Gateway -> checking api.
+		// 2. WaitTick() will block for 10 minutes.
+		// 3. Stop will unblock the Wait.
+		<-client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+			resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+			return resp, nil
+		})
+	})
 }
 
-func skip(t *testing.T) {
-	t.SkipNow()
+func TestRetriesOnFailures(t *testing.T) {
+	agentInfo := &testAgentInfo{}
+	settings := &fleetGatewaySettings{
+		Duration: 5 * time.Second,
+		Backoff:  backoffSettings{Init: 1 * time.Second, Max: 5 * time.Second},
+	}
+
+	t.Run("When the gateway fails to communicate with the checkin API we will retry",
+		withGateway(agentInfo, settings, func(
+			t *testing.T,
+			gateway *fleetGateway,
+			client *testingClient,
+			dispatcher *testingDispatcher,
+			scheduler *scheduler.Stepper,
+			rep repo.Backend,
+		) {
+			rep.Report(&testStateEvent{})
+
+			fail := func(_ http.Header, _ io.Reader) (*http.Response, error) {
+				return wrapStrToResp(http.StatusInternalServerError, "something is bad"), nil
+			}
+
+			// Initial tick is done out of bound so we can block on channels.
+			go scheduler.Next()
+
+			// Simulate a 500 errors for the next 3 calls.
+			<-client.Answer(fail)
+			<-client.Answer(fail)
+			<-client.Answer(fail)
+
+			// API recover
+			received := ackSeq(
+				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+					cr := &request{}
+					content, err := ioutil.ReadAll(body)
+					if err != nil {
+						t.Fatal(err)
+					}
+					err = json.Unmarshal(content, &cr)
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					require.Equal(t, 1, len(cr.Events))
+
+					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+					return resp, nil
+				}),
+
+				dispatcher.Answer(func(actions ...action) error {
+					require.Equal(t, 0, len(actions))
+					return nil
+				}),
+			)
+
+			<-received
+		}))
+
+	t.Run("The retry loop is interruptible",
+		withGateway(agentInfo, &fleetGatewaySettings{
+			Duration: 0 * time.Second,
+			Backoff:  backoffSettings{Init: 10 * time.Minute, Max: 20 * time.Minute},
+		}, func(
+			t *testing.T,
+			gateway *fleetGateway,
+			client *testingClient,
+			dispatcher *testingDispatcher,
+			scheduler *scheduler.Stepper,
+			rep repo.Backend,
+		) {
+			rep.Report(&testStateEvent{})
+
+			fail := func(_ http.Header, _ io.Reader) (*http.Response, error) {
+				return wrapStrToResp(http.StatusInternalServerError, "something is bad"), nil
+			}
+
+			// Initial tick is done out of bound so we can block on channels.
+			go scheduler.Next()
+
+			// Fail to enter retry loop, all other calls will fails and will force to wait on big initial
+			// delay.
+			<-client.Answer(fail)
+
+			// non-obvious but withGateway on return will stop the gateway before returning and we should
+			// exit the retry loop. The init value of the backoff is set to exceed the test default timeout.
+		}))
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {

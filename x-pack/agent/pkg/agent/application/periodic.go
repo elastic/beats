@@ -8,8 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/filewatcher"
 )
@@ -44,7 +43,7 @@ func (p *periodic) Start() error {
 func (p *periodic) work() error {
 	files, err := p.discover()
 	if err != nil {
-		return errors.Wrap(err, "could not discover configuration files")
+		return errors.New(err, "could not discover configuration files", errors.TypeConfig)
 	}
 
 	if len(files) == 0 {
@@ -66,7 +65,7 @@ func (p *periodic) work() error {
 	// - Files that we were watching but are not watched anymore.
 	s, err := p.watcher.Update()
 	if err != nil {
-		return errors.Wrap(err, "could not update the configuration states")
+		return errors.New(err, "could not update the configuration states", errors.TypeConfig)
 	}
 
 	if s.NeedUpdate {
@@ -88,7 +87,7 @@ func (p *periodic) work() error {
 			// assume something when really wrong and invalidate any cache
 			// so we get a full new config on next tick.
 			p.watcher.Invalidate()
-			return errors.Wrap(err, "could not emit configuration")
+			return errors.New(err, "could not emit configuration")
 		}
 	}
 

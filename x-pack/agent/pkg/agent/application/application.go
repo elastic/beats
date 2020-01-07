@@ -5,9 +5,8 @@
 package application
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
@@ -42,13 +41,13 @@ func createApplication(
 	c := localDefaultConfig()
 	err := config.Unpack(c)
 	if err != nil {
-		return nil, errors.Wrap(err, "initiating application")
+		return nil, errors.New(err, "initiating application")
 	}
 
 	mgmt := defaultManagementConfig()
 	err = c.Management.Unpack(mgmt)
 	if err != nil {
-		return nil, errors.Wrap(err, "initiating application")
+		return nil, errors.New(err, "initiating application")
 	}
 
 	switch mgmt.Mode {

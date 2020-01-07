@@ -9,9 +9,9 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/pkg/errors"
-
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
@@ -277,12 +277,12 @@ func (r *TranslateWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) erro
 	}{}
 
 	if err := unmarshal(&tmp); err != nil {
-		return errors.Wrap(err, "cannot unmarshal into a TranslateWithRegexpRule")
+		return errors.New(err, "cannot unmarshal into a TranslateWithRegexpRule")
 	}
 
 	re, err := regexp.Compile(tmp.Re)
 	if err != nil {
-		errors.Wrap(err, "invalid regular expression for TranslateWithRegexpRule")
+		errors.New(err, "invalid regular expression for TranslateWithRegexpRule")
 	}
 
 	*r = TranslateWithRegexpRule{
@@ -399,7 +399,7 @@ func (r *MapRule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}{}
 
 	if err := unmarshal(&tmp); err != nil {
-		return errors.Wrap(err, "cannot unmarshal into a MapRule")
+		return errors.New(err, "cannot unmarshal into a MapRule")
 	}
 
 	*r = MapRule{
@@ -546,12 +546,12 @@ func (r *FilterValuesWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) e
 	}{}
 
 	if err := unmarshal(&tmp); err != nil {
-		return errors.Wrap(err, "cannot unmarshal into a FilterValuesWithRegexpRule")
+		return errors.New(err, "cannot unmarshal into a FilterValuesWithRegexpRule")
 	}
 
 	re, err := regexp.Compile(tmp.Re)
 	if err != nil {
-		errors.Wrap(err, "invalid regular expression for FilterValuesWithRegexpRule")
+		errors.New(err, "invalid regular expression for FilterValuesWithRegexpRule")
 	}
 	*r = FilterValuesWithRegexpRule{
 		Selector: tmp.Selector,

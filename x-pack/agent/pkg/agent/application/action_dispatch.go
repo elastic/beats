@@ -9,8 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 

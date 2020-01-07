@@ -5,8 +5,11 @@
 package application
 
 import (
+	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/backoff"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
@@ -37,13 +40,23 @@ type fleetGateway struct {
 	dispatcher dispatcher
 	client     clienter
 	scheduler  scheduler.Scheduler
+	backoff    backoff.Backoff
+	settings   *fleetGatewaySettings
 	agentInfo  agentInfo
 	reporter   fleetReporter
 	done       chan struct{}
+	wg         sync.WaitGroup
 }
 
 type fleetGatewaySettings struct {
 	Duration time.Duration
+	Jitter   time.Duration
+	Backoff  backoffSettings
+}
+
+type backoffSettings struct {
+	Init time.Duration
+	Max  time.Duration
 }
 
 func newFleetGateway(
@@ -54,7 +67,7 @@ func newFleetGateway(
 	d dispatcher,
 	r fleetReporter,
 ) (*fleetGateway, error) {
-	scheduler := scheduler.NewPeriodic(settings.Duration)
+	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
 	return newFleetGatewayWithScheduler(
 		log,
 		settings,
@@ -75,14 +88,22 @@ func newFleetGatewayWithScheduler(
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
 ) (*fleetGateway, error) {
+	done := make(chan struct{})
+
 	return &fleetGateway{
 		log:        log,
 		dispatcher: d,
 		client:     client,
-		agentInfo:  agentInfo, //TODO(ph): this need to be a struct.
+		settings:   settings,
+		agentInfo:  agentInfo,
 		scheduler:  scheduler,
-		done:       make(chan struct{}),
-		reporter:   r,
+		backoff: backoff.NewEqualJitterBackoff(
+			done,
+			settings.Backoff.Init,
+			settings.Backoff.Max,
+		),
+		done:     done,
+		reporter: r,
 	}, nil
 }
 
@@ -91,7 +112,11 @@ func (f *fleetGateway) worker() {
 		select {
 		case <-f.scheduler.WaitTick():
 			f.log.Debug("FleetGateway calling Checkin API")
-			resp, err := f.execute()
+
+			// Execute the checkin call and for any errors returned by the fleet API
+			// the function will retry to communicate with fleet with an exponential delay and some
+			// jitter to help better distribute the load from a fleet of agents.
+			resp, err := f.doExecute()
 			if err != nil {
 				f.log.Error(err)
 				continue
@@ -103,13 +128,32 @@ func (f *fleetGateway) worker() {
 			}
 
 			if err := f.dispatcher.Dispatch(actions...); err != nil {
-				f.log.Error(err)
+				f.log.Errorf("failed to dispatch actions, error: %s", err)
 			}
 
-			f.log.Debug("FleetGateway sleeping")
+			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
 		case <-f.done:
 			return
 		}
+	}
+}
+
+func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
+	f.backoff.Reset()
+	for {
+		resp, err := f.execute()
+		if err != nil {
+			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
+			if !f.backoff.Wait() {
+				return nil, errors.New(
+					"execute retry loop was stopped",
+					errors.TypeNetwork,
+					errors.M(errors.MetaKeyURI, f.client.URI()),
+				)
+			}
+			continue
+		}
+		return resp, nil
 	}
 }
 
@@ -134,9 +178,15 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 }
 
 func (f *fleetGateway) Start() {
-	go f.worker()
+	f.wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done()
+		f.worker()
+	}(&f.wg)
 }
 
 func (f *fleetGateway) Stop() {
 	close(f.done)
+	f.scheduler.Stop()
+	f.wg.Wait()
 }

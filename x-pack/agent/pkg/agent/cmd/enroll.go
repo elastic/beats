@@ -6,17 +6,21 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/cli"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
+
+var defaultDelay = 1 * time.Second
 
 func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
@@ -41,14 +45,17 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	config, err := config.LoadYAML(flags.PathConfigFile)
 	if err != nil {
-		return errors.Wrapf(err, "could not read configuration file %s", flags.PathConfigFile)
+		return errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", flags.PathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, flags.PathConfigFile))
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
 	if !force {
 		confirm, err := c.Confirm("This will replace your current settings. Do you want to continue?", true)
 		if err != nil {
-			return errors.Wrap(err, "problem reading prompt response")
+			return errors.New(err, "problem reading prompt response")
 		}
 		if !confirm {
 			fmt.Fprintln(streams.Out, "Enrollment was canceled by the user")
@@ -67,6 +74,8 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
 
+	delay(defaultDelay)
+
 	c, err := application.NewEnrollCmd(
 		logger,
 		url,
@@ -82,9 +91,13 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	err = c.Execute()
 	if err != nil {
-		return errors.Wrap(err, "fail to enroll")
+		return errors.New(err, "fail to enroll")
 	}
 
 	fmt.Fprintln(streams.Out, "Successfully enrolled the Agent.")
 	return nil
+}
+
+func delay(t time.Duration) {
+	<-time.After(time.Duration(rand.Int63n(int64(t))))
 }

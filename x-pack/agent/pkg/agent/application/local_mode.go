@@ -5,10 +5,9 @@
 package application
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/dir"
@@ -26,7 +25,7 @@ type ConfigHandler interface {
 type discoverFunc func() ([]string, error)
 
 // ErrNoConfiguration is returned when no configuration are found.
-var ErrNoConfiguration = errors.New("no configuration found")
+var ErrNoConfiguration = errors.New("no configuration found", errors.TypeConfig)
 
 // Local represents a standalone agents, that will read his configuration directly from disk.
 // Some part of the configuration can be reloaded.
@@ -62,7 +61,7 @@ func newLocal(
 
 	c := localConfigDefault()
 	if err := config.Unpack(c); err != nil {
-		return nil, errors.Wrap(err, "initialize local mode")
+		return nil, errors.New(err, "initialize local mode")
 	}
 
 	logR := logreporter.NewReporter(log, c.Management.Reporting)
@@ -76,7 +75,7 @@ func newLocal(
 
 	router, err := newRouter(log, streamFactory(config, nil, reporter))
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to initialize pipeline router")
+		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
 	discover := discoverer(pathConfigFile, c.Management.Path)

@@ -7,8 +7,7 @@ package application
 import (
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
@@ -22,12 +21,12 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 		log.Debug("Transforming configuration into a tree")
 		m, err := c.ToMapStr()
 		if err != nil {
-			return errors.Wrap(err, "could not create the AST from the configuration")
+			return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 		}
 
 		ast, err := transpiler.NewAST(m)
 		if err != nil {
-			return errors.Wrap(err, "could not create the AST from the configuration")
+			return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 		}
 
 		log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
@@ -54,7 +53,7 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 func readfiles(files []string, emitter emitterFunc) error {
 	c, err := config.LoadFiles(files...)
 	if err != nil {
-		return errors.Wrap(err, "could not load or merge configuration")
+		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
 	}
 
 	return emitter(c)
