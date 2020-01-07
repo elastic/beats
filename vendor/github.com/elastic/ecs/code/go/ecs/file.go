@@ -33,10 +33,23 @@ type File struct {
 	// Name of the file including the extension, without the directory.
 	Name string `ecs:"name"`
 
-	// Directory where the file is located.
+	// Array of file attributes.
+	// Attributes names will vary by platform. Here's a non-exhaustive list of
+	// values that are expected in this field: archive, compressed, directory,
+	// encrypted, execute, hidden, read, readonly, system, write.
+	Attributes string `ecs:"attributes"`
+
+	// Directory where the file is located. It should include the drive letter,
+	// when appropriate.
 	Directory string `ecs:"directory"`
 
-	// Full path to the file.
+	// Drive letter where the file is located. This field is only relevant on
+	// Windows.
+	// The value should be uppercase, and not include the colon.
+	DriveLetter string `ecs:"drive_letter"`
+
+	// Full path to the file, including the file name. It should include the
+	// drive letter, when appropriate.
 	Path string `ecs:"path"`
 
 	// Target path for symlinks.

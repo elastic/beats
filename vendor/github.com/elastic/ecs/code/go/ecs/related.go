@@ -30,4 +30,7 @@ package ecs
 type Related struct {
 	// All of the IPs seen on your event.
 	IP string `ecs:"ip"`
+
+	// All the user names seen on your event.
+	User string `ecs:"user"`
 }

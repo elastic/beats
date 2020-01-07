@@ -22,14 +22,14 @@ package ecs
 // Fields to classify events and alerts according to a threat taxonomy such as
 // the Mitre ATT&CK framework.
 // These fields are for users to classify alerts from all of their sources
-// (e.g. IDS, NGFW, etc.) within a  common taxonomy. The threat.tactic.* are
-// meant to capture the high level category of the threat  (e.g. "impact"). The
+// (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are
+// meant to capture the high level category of the threat (e.g. "impact"). The
 // threat.technique.* fields are meant to capture which kind of approach is
-// used by  this detected threat, to accomplish the goal (e.g. "endpoint denial
+// used by this detected threat, to accomplish the goal (e.g. "endpoint denial
 // of service").
 type Threat struct {
 	// Name of the threat framework used to further categorize and classify the
-	// tactic and technique of the reported threat.   Framework classification
+	// tactic and technique of the reported threat. Framework classification
 	// can be provided by detecting systems, evaluated at ingest time, or
 	// retrospectively tagged to events.
 	Framework string `ecs:"framework"`

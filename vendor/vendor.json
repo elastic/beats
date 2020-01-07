@@ -2813,12 +2813,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "vnT/bnTC6RJqrJmiMZFiHX6Nhw0=",
+			"checksumSHA1": "Tt1KFInyaxjtvhGI75+crc75n/Q=",
 			"path": "github.com/elastic/ecs/code/go/ecs",
-			"revision": "e9c85195b644845b9628f556d2c702c112560e0b",
-			"revisionTime": "2019-12-03T18:08:53Z",
-			"version": "v1.3.1",
-			"versionExact": "v1.3.1"
+			"revision": "cc4b36eebec29975f57cd0475c3987c9bde5c15a",
+			"revisionTime": "2019-12-19T13:38:44Z",
+			"version": "v1.4.0",
+			"versionExact": "v1.4.0"
 		},
 		{
 			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",
