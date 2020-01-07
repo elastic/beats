@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
 - Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
+- Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
 
 *Auditbeat*
 
@@ -368,6 +369,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
 - Add `add_id` processor. {pull}14524[14524]
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
+- Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
 
 *Auditbeat*
 
