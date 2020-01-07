@@ -9032,7 +9032,7 @@ type: keyword
 --
 
 [float]
-=== source.instance 
+=== source.instance
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
 
