@@ -18,6 +18,7 @@
 package perfmon
 
 import (
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,5 +113,21 @@ func TestObjectNameRegexp(t *testing.T) {
 		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
 			assert.Equal(t, matches[1], "Web Service Cache")
 		}
+	}
+}
+
+func TestUTF16ToStringArray(t *testing.T) {
+	var array = []string{"\\\\DESKTOP\\Fysieke schijf(0 C:)\\Huidige wachtrijlengte op de schijf", "\\\\DESKTOP\\Fysieke schijf(_Total)\\Percentage schijftijd", ""}
+	var unicode []uint16
+	for _, i := range array {
+		uni, err := syscall.UTF16FromString(i)
+		assert.NoError(t, err)
+		unicode = append(unicode, uni...)
+	}
+	response := UTF16ToStringArray(unicode)
+	assert.NotNil(t, response)
+	assert.Equal(t, len(response), 2)
+	for _, res := range response {
+		assert.Contains(t, array, res)
 	}
 }
