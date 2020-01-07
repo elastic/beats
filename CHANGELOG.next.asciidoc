@@ -11,6 +11,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update to Golang 1.12.1. {pull}11330[11330]
+- Update to Golang 1.12.4. {pull}11782[11782]
+- Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
+- Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
+- Update to Golang 1.12.7. {pull}12931[12931]
+- Remove `in_cluster` configuration parameter for Kuberentes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
+- Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
+- Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
+- Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
+- By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
+- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
+- Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
+- Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
+- Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
+- Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
+- Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
+- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 
 *Auditbeat*
 
