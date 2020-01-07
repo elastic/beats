@@ -999,7 +999,7 @@ metricbeat.modules:
 #
 #processors:
 #- add_host_metadata:
-#   netinfo.enabled: false
+#   netinfo.enabled: true
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
