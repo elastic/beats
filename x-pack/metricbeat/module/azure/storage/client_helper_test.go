@@ -5,6 +5,7 @@
 package storage
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
@@ -64,21 +65,17 @@ func MockNamespace() insights.MetricNamespaceCollection {
 func MockMetricDefinitions() *[]insights.MetricDefinition {
 	metric1 := "TotalRequests"
 	metric2 := "Capacity"
-	metric3 := "BytesRead"
 	defs := []insights.MetricDefinition{
 		{
 			Name:                      &insights.LocalizableString{Value: &metric1},
 			PrimaryAggregationType:    insights.Average,
+			MetricAvailabilities:      &availability1,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
 		},
 		{
 			Name:                      &insights.LocalizableString{Value: &metric2},
 			PrimaryAggregationType:    insights.Average,
-			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
-		},
-		{
-			Name:                      &insights.LocalizableString{Value: &metric3},
-			PrimaryAggregationType:    insights.Minimum,
+			MetricAvailabilities:      &availability2,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 	}
@@ -95,7 +92,11 @@ func TestMapMetric(t *testing.T) {
 	emptyMetricDefinitions := insights.MetricDefinitionCollection{
 		Value: &emptyList,
 	}
-	metricConfig := azure.MetricConfig{Name: []string{"*"}}
+	metricConfig := azure.MetricConfig{Name: []string{"*"},
+		CustomFields: azure.CustomFieldsConfig{
+			ServiceType: []string{"blob"},
+		},
+	}
 	client := azure.NewMockClient()
 	t.Run("return error when the metric namespaces api call returns an error", func(t *testing.T) {
 		m := &azure.MockService{}
@@ -139,13 +140,17 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))
 
 		//order of elements can be different when running the test
-		if metrics[0].Aggregations == "Average" {
-			assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
-		} else {
-			assert.Equal(t, metrics[0].Names, []string{"BytesRead"})
-			assert.Equal(t, metrics[0].Aggregations, "Minimum")
+		assert.Equal(t, len(metrics), 4)
+		for _, metricValue := range metrics {
+			assert.Equal(t, metricValue.Aggregations, "Average")
+			assert.Equal(t, len(metricValue.Names), 1)
+			assert.Contains(t, []string{"TotalRequests", "Capacity"}, metricValue.Names[0])
+			if reflect.DeepEqual(metricValue.Names, []string{"Capacity"}) {
+				assert.Equal(t, metricValue.TimeGrain, "PT1H")
+			} else {
+				assert.Equal(t, metricValue.TimeGrain, "PT5M")
+			}
 		}
-
 		m.AssertExpectations(t)
 	})
 }
