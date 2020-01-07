@@ -1036,6 +1036,7 @@
         In normal conditions, assuming no tampering, the timestamps should chronologically
         look like this: `@timestamp` < `event.created` < `event.ingested`.'
       example: 2016-05-23 08:05:35.101000
+      default_field: false
     - name: kind
       level: core
       type: keyword
@@ -1186,6 +1187,7 @@
         that are expected in this field: archive, compressed, directory, encrypted,
         execute, hidden, read, readonly, system, write.'
       example: '["readonly", "system"]'
+      default_field: false
     - name: created
       level: extended
       type: date
@@ -1221,6 +1223,7 @@
 
         The value should be uppercase, and not include the colon.'
       example: C
+      default_field: false
     - name: extension
       level: extended
       type: keyword
@@ -1463,10 +1466,13 @@
       level: extended
       type: keyword
       ignore_above: 1024
-      description: "Name of the domain of which the host is a member. \nFor example,\
-        \ on Windows this could be the host's Active Directory domain or NetBIOS domain\
-        \ name.  For Linux this could be the domain of the host's LDAP provider."
+      description: 'Name of the domain of which the host is a member.
+
+        For example, on Windows this could be the host''s Active Directory domain
+        or NetBIOS domain name. For Linux this could be the domain of the host''s
+        LDAP provider.'
       example: CONTOSO
+      default_field: false
     - name: geo.city_name
       level: core
       type: keyword
@@ -2246,6 +2252,7 @@
 
         For example use the commit SHA of a non-released package.'
       example: 36f4f7e89dd61b0988b12ee000b98966867710cd
+      default_field: false
     - name: checksum
       level: extended
       type: keyword
@@ -2297,6 +2304,7 @@
       description: Home page or reference URL of the software in this package, if
         available.
       example: https://golang.org
+      default_field: false
     - name: size
       level: extended
       type: long
@@ -2312,6 +2320,7 @@
         This should contain the package file type, rather than the package manager
         name. Examples: rpm, dpkg, brew, npm, gem, nupkg, jar.'
       example: rpm
+      default_field: false
     - name: version
       level: extended
       type: keyword
@@ -2350,6 +2359,7 @@
         many arguments were provided to start a process. More arguments may be an
         indication of suspicious activity.'
       example: 4
+      default_field: false
     - name: command_line
       level: extended
       type: keyword
@@ -2363,6 +2373,7 @@
 
         Some arguments may be filtered to protect sensitive information.'
       example: /usr/bin/ssh -l user 10.0.0.16
+      default_field: false
     - name: executable
       level: extended
       type: keyword
@@ -2381,6 +2392,7 @@
         The field should be absent if there is no exit code for the event (e.g. process
         start).'
       example: 137
+      default_field: false
     - name: hash.md5
       level: extended
       type: keyword
@@ -2425,6 +2437,7 @@
       - -l
       - user
       - 10.0.0.16
+      default_field: false
     - name: parent.args_count
       level: extended
       type: long
@@ -2434,6 +2447,7 @@
         many arguments were provided to start a process. More arguments may be an
         indication of suspicious activity.'
       example: 4
+      default_field: false
     - name: parent.command_line
       level: extended
       type: keyword
@@ -2447,6 +2461,7 @@
 
         Some arguments may be filtered to protect sensitive information.'
       example: /usr/bin/ssh -l user 10.0.0.16
+      default_field: false
     - name: parent.executable
       level: extended
       type: keyword
@@ -2457,6 +2472,7 @@
         norms: false
       description: Absolute path to the process executable.
       example: /usr/bin/ssh
+      default_field: false
     - name: parent.exit_code
       level: extended
       type: long
@@ -2465,6 +2481,7 @@
         The field should be absent if there is no exit code for the event (e.g. process
         start).'
       example: 137
+      default_field: false
     - name: parent.name
       level: extended
       type: keyword
@@ -2477,40 +2494,47 @@
 
         Sometimes called program name or similar.'
       example: ssh
+      default_field: false
     - name: parent.pgid
       level: extended
       type: long
       format: string
       description: Identifier of the group of processes the process belongs to.
+      default_field: false
     - name: parent.pid
       level: core
       type: long
       format: string
       description: Process id.
       example: 4242
+      default_field: false
     - name: parent.ppid
       level: extended
       type: long
       format: string
       description: Parent process' pid.
       example: 4241
+      default_field: false
     - name: parent.start
       level: extended
       type: date
       description: The time the process started.
       example: '2016-05-23T08:05:34.853Z'
+      default_field: false
     - name: parent.thread.id
       level: extended
       type: long
       format: string
       description: Thread ID.
       example: 4242
+      default_field: false
     - name: parent.thread.name
       level: extended
       type: keyword
       ignore_above: 1024
       description: Thread name.
       example: thread-0
+      default_field: false
     - name: parent.title
       level: extended
       type: keyword
@@ -2523,11 +2547,13 @@
 
         The proctitle, some times the same as process name. Can also be different:
         for example a browser setting its title to the web page currently opened.'
+      default_field: false
     - name: parent.uptime
       level: extended
       type: long
       description: Seconds the process has been up.
       example: 1325
+      default_field: false
     - name: parent.working_directory
       level: extended
       type: keyword
@@ -2538,6 +2564,7 @@
         norms: false
       description: The working directory of the process.
       example: /home/alice
+      default_field: false
     - name: pgid
       level: extended
       type: long
@@ -2615,6 +2642,7 @@
         corresponds to the data pointed by `lp_data`. This is optional but provides
         better recoverability and should be populated for REG_BINARY encoded values.'
       example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
+      default_field: false
     - name: data.strings
       level: core
       type: keyword
@@ -2627,24 +2655,28 @@
         variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should
         be populated with the decimal representation (e.g `"1"`).'
       example: '["C:\rta\red_ttp\bin\myapp.exe"]'
+      default_field: false
     - name: data.type
       level: core
       type: keyword
       ignore_above: 1024
       description: Standard registry type for encoding contents
       example: REG_SZ
+      default_field: false
     - name: hive
       level: core
       type: keyword
       ignore_above: 1024
       description: Abbreviated name for the hive.
       example: HKLM
+      default_field: false
     - name: key
       level: core
       type: keyword
       ignore_above: 1024
       description: Hive-relative path of keys.
       example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
+      default_field: false
     - name: path
       level: core
       type: keyword
@@ -2652,12 +2684,14 @@
       description: Full path, including hive, key and value
       example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution
         Options\winword.exe\Debugger
+      default_field: false
     - name: value
       level: core
       type: keyword
       ignore_above: 1024
       description: Name of the value written.
       example: Debugger
+      default_field: false
   - name: related
     title: Related
     group: 2
@@ -2683,6 +2717,7 @@
       type: keyword
       ignore_above: 1024
       description: All the user names seen on your event.
+      default_field: false
   - name: rule
     title: Rule
     group: 2
@@ -2690,7 +2725,7 @@
       agent rules that generate alerts or other notable events.
 
       Examples of data sources that would populate the rule fields include: network
-      admission control platforms, network or  host IDS/IPS, network firewalls, web
+      admission control platforms, network or host IDS/IPS, network firewalls, web
       application firewalls, url filters, endpoint detection and response (EDR) systems,
       etc.'
     type: group
@@ -2702,12 +2737,14 @@
       description: A categorization value keyword used by the entity using the rule
         for detection of this event.
       example: Attempted Information Leak
+      default_field: false
     - name: description
       level: extended
       type: keyword
       ignore_above: 1024
       description: The description of the rule generating the event.
       example: Block requests to public DNS over HTTPS / TLS protocols
+      default_field: false
     - name: id
       level: extended
       type: keyword
@@ -2715,12 +2752,14 @@
       description: A rule ID that is unique within the scope of an agent, observer,
         or other entity using the rule for detection of this event.
       example: 101
+      default_field: false
     - name: name
       level: extended
       type: keyword
       ignore_above: 1024
       description: The name of the rule or signature generating the event.
       example: BLOCK_DNS_over_TLS
+      default_field: false
     - name: reference
       level: extended
       type: keyword
@@ -2732,6 +2771,7 @@
         not available, it can also be a link to a more general page describing this
         type of alert.'
       example: https://en.wikipedia.org/wiki/DNS_over_TLS
+      default_field: false
     - name: ruleset
       level: extended
       type: keyword
@@ -2739,6 +2779,7 @@
       description: Name of the ruleset, policy, group, or parent category in which
         the rule used to generate this event is a member.
       example: Standard_Protocol_Filters
+      default_field: false
     - name: uuid
       level: extended
       type: keyword
@@ -2747,12 +2788,14 @@
         agents, observers, or other entities using the rule for detection of this
         event.
       example: 1100110011
+      default_field: false
     - name: version
       level: extended
       type: keyword
       ignore_above: 1024
       description: The version / revision of the rule being used for analysis.
       example: 1.1
+      default_field: false
   - name: server
     title: Server
     group: 2
@@ -3382,6 +3425,7 @@
       ignore_above: 1024
       description: String indicating the cipher used during the current connection.
       example: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+      default_field: false
     - name: client.certificate
       level: extended
       type: keyword
@@ -3390,6 +3434,7 @@
         is usually mutually-exclusive of `client.certificate_chain` since this value
         also exists in that list.
       example: MII...
+      default_field: false
     - name: client.certificate_chain
       level: extended
       type: keyword
@@ -3400,6 +3445,7 @@
       example:
       - MII...
       - MII...
+      default_field: false
     - name: client.hash.md5
       level: extended
       type: keyword
@@ -3408,6 +3454,7 @@
         of certificate offered by the client. For consistency with other hash values,
         this value should be formatted as an uppercase hash.
       example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+      default_field: false
     - name: client.hash.sha1
       level: extended
       type: keyword
@@ -3416,6 +3463,7 @@
         of certificate offered by the client. For consistency with other hash values,
         this value should be formatted as an uppercase hash.
       example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+      default_field: false
     - name: client.hash.sha256
       level: extended
       type: keyword
@@ -3424,6 +3472,7 @@
         version of certificate offered by the client. For consistency with other hash
         values, this value should be formatted as an uppercase hash.
       example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+      default_field: false
     - name: client.issuer
       level: extended
       type: keyword
@@ -3431,6 +3480,7 @@
       description: Distinguished name of subject of the issuer of the x.509 certificate
         presented by the client.
       example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+      default_field: false
     - name: client.ja3
       level: extended
       type: keyword
@@ -3438,18 +3488,21 @@
       description: A hash that identifies clients based on how they perform an SSL/TLS
         handshake.
       example: d4e5b18d6b55c71272893221c96ba240
+      default_field: false
     - name: client.not_after
       level: extended
       type: date
       description: Date/Time indicating when client certificate is no longer considered
         valid.
       example: '2021-01-01T00:00:00.000Z'
+      default_field: false
     - name: client.not_before
       level: extended
       type: date
       description: Date/Time indicating when client certificate is first considered
         valid.
       example: '1970-01-01T00:00:00.000Z'
+      default_field: false
     - name: client.server_name
       level: extended
       type: keyword
@@ -3458,6 +3511,7 @@
         the client is attempting to connect. When this value is available, it should
         get copied to `destination.domain`.
       example: www.elastic.co
+      default_field: false
     - name: client.subject
       level: extended
       type: keyword
@@ -3465,6 +3519,7 @@
       description: Distinguished name of subject of the x.509 certificate presented
         by the client.
       example: CN=myclient, OU=Documentation Team, DC=mydomain, DC=com
+      default_field: false
     - name: client.supported_ciphers
       level: extended
       type: keyword
@@ -3474,17 +3529,20 @@
       - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
       - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
       - '...'
+      default_field: false
     - name: curve
       level: extended
       type: keyword
       ignore_above: 1024
       description: String indicating the curve used for the given cipher, when applicable.
       example: secp256r1
+      default_field: false
     - name: established
       level: extended
       type: boolean
       description: Boolean flag indicating if the TLS negotiation was successful and
         transitioned to an encrypted tunnel.
+      default_field: false
     - name: next_protocol
       level: extended
       type: keyword
@@ -3493,11 +3551,13 @@
         the IANA registry (https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids),
         this string should be lower case.
       example: http/1.1
+      default_field: false
     - name: resumed
       level: extended
       type: boolean
       description: Boolean flag indicating if this TLS connection was resumed from
         an existing TLS negotiation.
+      default_field: false
     - name: server.certificate
       level: extended
       type: keyword
@@ -3506,6 +3566,7 @@
         is usually mutually-exclusive of `server.certificate_chain` since this value
         also exists in that list.
       example: MII...
+      default_field: false
     - name: server.certificate_chain
       level: extended
       type: keyword
@@ -3516,6 +3577,7 @@
       example:
       - MII...
       - MII...
+      default_field: false
     - name: server.hash.md5
       level: extended
       type: keyword
@@ -3524,6 +3586,7 @@
         of certificate offered by the server. For consistency with other hash values,
         this value should be formatted as an uppercase hash.
       example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+      default_field: false
     - name: server.hash.sha1
       level: extended
       type: keyword
@@ -3532,6 +3595,7 @@
         of certificate offered by the server. For consistency with other hash values,
         this value should be formatted as an uppercase hash.
       example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+      default_field: false
     - name: server.hash.sha256
       level: extended
       type: keyword
@@ -3540,6 +3604,7 @@
         version of certificate offered by the server. For consistency with other hash
         values, this value should be formatted as an uppercase hash.
       example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+      default_field: false
     - name: server.issuer
       level: extended
       type: keyword
@@ -3547,6 +3612,7 @@
       description: Subject of the issuer of the x.509 certificate presented by the
         server.
       example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+      default_field: false
     - name: server.ja3s
       level: extended
       type: keyword
@@ -3554,36 +3620,42 @@
       description: A hash that identifies servers based on how they perform an SSL/TLS
         handshake.
       example: 394441ab65754e2207b1e1b457b3641d
+      default_field: false
     - name: server.not_after
       level: extended
       type: date
       description: Timestamp indicating when server certificate is no longer considered
         valid.
       example: '2021-01-01T00:00:00.000Z'
+      default_field: false
     - name: server.not_before
       level: extended
       type: date
       description: Timestamp indicating when server certificate is first considered
         valid.
       example: '1970-01-01T00:00:00.000Z'
+      default_field: false
     - name: server.subject
       level: extended
       type: keyword
       ignore_above: 1024
       description: Subject of the x.509 certificate presented by the server.
       example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
+      default_field: false
     - name: version
       level: extended
       type: keyword
       ignore_above: 1024
       description: Numeric part of the version parsed from the original string.
       example: '1.2'
+      default_field: false
     - name: version_protocol
       level: extended
       type: keyword
       ignore_above: 1024
       description: Normalized lowercase protocol name parsed from original string.
       example: tls
+      default_field: false
   - name: tracing
     title: Tracing
     group: 2
@@ -3909,6 +3981,7 @@
 
         This field must be an array.'
       example: '["Firewall"]'
+      default_field: false
     - name: classification
       level: extended
       type: keyword
@@ -3916,6 +3989,7 @@
       description: The classification of the vulnerability scoring system. For example
         (https://www.first.org/cvss/)
       example: CVSS
+      default_field: false
     - name: description
       level: extended
       type: keyword
@@ -3928,6 +4002,7 @@
         of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created[Common
         Vulnerabilities and Exposure CVE description])
       example: In macOS before 2.12.6, there is a vulnerability in the RPC...
+      default_field: false
     - name: enumeration
       level: extended
       type: keyword
@@ -3935,6 +4010,7 @@
       description: The type of identifier used for this vulnerability. For example
         (https://cve.mitre.org/about/)
       example: CVE
+      default_field: false
     - name: id
       level: extended
       type: keyword
@@ -3944,6 +4020,7 @@
         example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)[Common Vulnerabilities
         and Exposure CVE ID]
       example: CVE-2019-00001
+      default_field: false
     - name: reference
       level: extended
       type: keyword
@@ -3951,18 +4028,21 @@
       description: A resource that provides additional information, context, and mitigations
         for the identified vulnerability.
       example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-6111
+      default_field: false
     - name: report_id
       level: extended
       type: keyword
       ignore_above: 1024
       description: The report or scan identification number.
       example: 20191018.0001
+      default_field: false
     - name: scanner.vendor
       level: extended
       type: keyword
       ignore_above: 1024
       description: The name of the vulnerability scanner vendor.
       example: Tenable
+      default_field: false
     - name: score.base
       level: extended
       type: float
@@ -3972,6 +4052,7 @@
         complexity, privileges, and user interaction), impact metrics (confidentiality,
         integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)'
       example: 5.5
+      default_field: false
     - name: score.environmental
       level: extended
       type: float
@@ -3980,6 +4061,7 @@
         Environmental scores cover an assessment for any modified Base metrics, confidentiality,
         integrity, and availability requirements. For example (https://www.first.org/cvss/specification-document)'
       example: 5.5
+      default_field: false
     - name: score.temporal
       level: extended
       type: float
@@ -3987,6 +4069,7 @@
 
         Temporal scores cover an assessment for code maturity, remediation level,
         and confidence. For example (https://www.first.org/cvss/specification-document)'
+      default_field: false
     - name: score.version
       level: extended
       type: keyword
@@ -4000,6 +4083,7 @@
         organization, whose mission is to help computer security incident response
         teams across the world. For example (https://nvd.nist.gov/vuln-metrics/cvss)'
       example: 2.0
+      default_field: false
     - name: severity
       level: extended
       type: keyword
@@ -4007,3 +4091,4 @@
       description: The severity of the vulnerability can help with metrics and internal
         prioritization regarding remediation. For example (https://nvd.nist.gov/vuln-metrics/cvss)
       example: Critical
+      default_field: false
