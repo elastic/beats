@@ -76,13 +76,7 @@ endif::has_central_config[]
 [[privileges-to-publish-monitoring]]
 ==== Privileges needed to publish and view monitoring information
 
-{security} provides built-in users and roles for monitoring. The privileges and
-roles needed depend on the method used to collect monitoring data.
-
-===== Internal collection
-
-For <<monitoring-internal-collection,internal collection>>, {security}
-provides the +{beat_default_index_prefix}_system+
+{security} provides the +{beat_default_index_prefix}_system+
 {stack-ov}/built-in-users.html[built-in user] and
 +{beat_default_index_prefix}_system+ {stack-ov}/built-in-roles.html[built-in
 role] for sending monitoring information. You can use the built-in user, or
@@ -100,47 +94,6 @@ If you use the +{beat_default_index_prefix}_system+ user, make sure you
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |`monitoring_user` and `kibana_user` roles
 |====
-
-ifndef::serverless[]
-===== {metricbeat} collection
-
-For <<monitoring-metricbeat-collection,{metricbeat} collection>>, {security}
-provides the `remote_monitoring_user` {stack-ov}/built-in-users.html[built-in
-user], and the `remote_monitoring_collector` and `remote_monitoring_agent`
-{stack-ov}/built-in-roles.html[built-in roles] for collecting and sending
-monitoring information. You can use the built-in user, or
-create a user who has the privileges needed to collect and send monitoring
-information.
-
-If you use the `remote_monitoring_user` user, make sure you
-<<beats-system-user,set the password>>.
-
-If you don't use the `remote_monitoring_user` user:
-
-. Create a user on the production cluster who will collect and send monitoring
-information.
-
-. Assign the following roles to the user: 
-+
-[options="header"]
-|====
-|Role | Why needed?
-|`remote_monitoring_collector`
-|Collect monitoring metrics from {beatname_uc}
-|`remote_monitoring_agent`
-|Send monitoring data to the monitoring cluster
-|====
-
-. Assign the following role to users who will view the monitoring data in
-{kib}:
-
-[options="header"]
-|====
-|Role | Why needed?
-|`monitoring_user`
-|Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
-|====
-endif::serverless[]
 
 [[privileges-to-publish-events]]
 ==== Privileges needed to publish events

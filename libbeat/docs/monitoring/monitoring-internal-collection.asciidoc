@@ -11,16 +11,13 @@
 
 [role="xpack"]
 [[monitoring-internal-collection]]
-== Collect {beatname_uc} monitoring data with internal collectors
+== Use internal collection to send monitoring data
 ++++
 <titleabbrev>Internal collection</titleabbrev>
 ++++
 
-The following method involves sending the metrics to the production cluster, 
-which ultimately routes them to the monitoring cluster.
-ifndef::serverless[]
-For an alternative method, see <<monitoring-metricbeat-collection>>.
-endif::[]
+Use internal collectors to send {beats} monitoring data directly to your
+monitoring cluster.
 
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 

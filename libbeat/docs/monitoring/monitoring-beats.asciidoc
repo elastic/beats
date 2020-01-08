@@ -9,18 +9,14 @@ You can use the {stack} {monitor-features} to gain insight into the health of
 {beatname_uc} agents running in your environment. 
 
 To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
-then configure the method used to collect {beatname_uc} metrics. You
-ifndef::serverless[]
-can use one of following methods:
-endif::[]
-ifdef::serverless[]
-can use the following method:
-endif::[]
+then configure the method used to collect {beatname_uc} metrics. You can use one
+of following methods:
 
-* <<monitoring-internal-collection,Internal collection>>
-ifndef::serverless[]
-* <<monitoring-metricbeat-collection, {metricbeat} collection>>
-endif::[]
+* <<monitoring-internal-collection,Internal collection>> - Internal
+collectors send monitoring data directly to your monitoring cluster.
+* <<monitoring-internal-collection-legacy,Legacy internal collection (deprecated)>> - 
+Legacy internal collectors send monitoring data to your production cluster.
+
 
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
@@ -29,6 +25,4 @@ To learn about monitoring in general, see
 
 include::monitoring-internal-collection.asciidoc[]
 
-ifndef::serverless[]
-include::monitoring-metricbeat.asciidoc[]
-endif::[]
+include::monitoring-internal-collection-legacy.asciidoc[]
