@@ -21,7 +21,8 @@ of following methods:
 collectors send monitoring data directly to your monitoring cluster.
 ifndef::serverless[]
 * <<monitoring-metricbeat-collection, {metricbeat} collection>> - 
-{metricbeat} sends monitoring data directly to your monitoring cluster.
+{metricbeat} collects monitoring data from your {beatname_uc} instance
+and sends it directly to your monitoring cluster.
 endif::[]
 * <<monitoring-internal-collection-legacy,Legacy internal collection (deprecated)>> - 
 Legacy internal collectors send monitoring data to your production cluster.
@@ -41,4 +42,3 @@ include::monitoring-metricbeat.asciidoc[]
 endif::[]
 
 include::monitoring-internal-collection-legacy.asciidoc[]
-
