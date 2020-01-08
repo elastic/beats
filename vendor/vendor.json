@@ -5548,12 +5548,12 @@
 			"revision": "f660b865573183437d2d868f703fe88bb8af0b55",
 			"revisionTime": "2019-09-16T21:42:12Z"
 		},
-        {
-            "checksumSHA1": "nTQH9H1cWFc4Ft8sJylUT9ANl/Y=",
-            "path": "google.golang.org/genproto/googleapis/iam/v1",
-            "revision": "fa694d86fc64c7654a660f8908de4e879866748d",
-            "revisionTime": "2019-08-01T16:59:51Z"
-        },
+		{
+			"checksumSHA1": "nTQH9H1cWFc4Ft8sJylUT9ANl/Y=",
+			"path": "google.golang.org/genproto/googleapis/iam/v1",
+			"revision": "fa694d86fc64c7654a660f8908de4e879866748d",
+			"revisionTime": "2019-08-01T16:59:51Z"
+		},
 		{
 			"checksumSHA1": "tPsMOfjWDzlmqQt4i+B/vTU1Kxg=",
 			"path": "google.golang.org/genproto/googleapis/monitoring/v3",
