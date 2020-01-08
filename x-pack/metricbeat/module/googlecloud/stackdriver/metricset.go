@@ -49,7 +49,7 @@ type config struct {
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 
-	opt               []option.ClientOption
+	opt []option.ClientOption
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
