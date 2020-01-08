@@ -118,37 +118,37 @@ func (a *azureInput) Run() {
 }
 
 // run will run the input with the non-eph version, this option will be available once a more reliable storage is in place, it is curently using an in-memory storage
-func (a *azureInput) run() error {
-	var err error
-	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName))
-	if err != nil {
-		return err
-	}
-	// listen to each partition of the Event Hub
-	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
-	if err != nil {
-		return err
-	}
-
-	for _, partitionID := range runtimeInfo.PartitionIDs {
-		// Start receiving messages
-		handler := func(c context.Context, event *eventhub.Event) error {
-			a.log.Info(string(event.Data))
-			return a.processEvents(event, partitionID)
-		}
-		var err error
-		// sending a nill ReceiveOption will throw an exception
-		if a.config.ConsumerGroup != "" {
-			_, err = a.hub.Receive(a.workerCtx, partitionID, handler, eventhub.ReceiveWithConsumerGroup(a.config.ConsumerGroup))
-		} else {
-			_, err = a.hub.Receive(a.workerCtx, partitionID, handler)
-		}
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+//func (a *azureInput) run() error {
+//	var err error
+//	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName))
+//	if err != nil {
+//		return err
+//	}
+//	// listen to each partition of the Event Hub
+//	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
+//	if err != nil {
+//		return err
+//	}
+//
+//	for _, partitionID := range runtimeInfo.PartitionIDs {
+//		// Start receiving messages
+//		handler := func(c context.Context, event *eventhub.Event) error {
+//			a.log.Info(string(event.Data))
+//			return a.processEvents(event, partitionID)
+//		}
+//		var err error
+//		// sending a nill ReceiveOption will throw an exception
+//		if a.config.ConsumerGroup != "" {
+//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler, eventhub.ReceiveWithConsumerGroup(a.config.ConsumerGroup))
+//		} else {
+//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler)
+//		}
+//		if err != nil {
+//			return err
+//		}
+//	}
+//	return nil
+//}
 
 // Stop stops TCP server
 func (a *azureInput) Stop() {

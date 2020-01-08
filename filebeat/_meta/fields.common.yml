@@ -121,7 +121,7 @@
         IGMP type.
 
 
-    - name: azure-eventhub
+    - name: azure
       type: group
       fields:
         - name: eventhub

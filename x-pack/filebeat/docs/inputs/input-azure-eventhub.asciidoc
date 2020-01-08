@@ -11,6 +11,11 @@
 
 
 Use the `azure-eventhub` input to read messages from an azure eventhub.
+The azure-eventhub is using the event processor host implementation (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
+
+
+
+
 
 Example configuration:
 
@@ -61,9 +66,5 @@ The storage account key, this key will be used to authorize access to data in yo
 ==== `storage_account_container`
 
 Optional, the name of the storage account container you would like to store the offset information in. Default name `ephcontainer`.
-
-The azure-eventhub is using the event processor host implementation (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
-
-
 
 

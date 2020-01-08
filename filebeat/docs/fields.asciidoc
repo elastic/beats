@@ -12979,7 +12979,7 @@ type: keyword
 --
 
 
-*`azure-eventhub.eventhub`*::
+*`azure.eventhub`*::
 +
 --
 Name of the eventhub.
@@ -12989,7 +12989,7 @@ type: keyword
 
 --
 
-*`azure-eventhub.offset`*::
+*`azure.offset`*::
 +
 --
 The offset.
@@ -12999,7 +12999,7 @@ type: long
 
 --
 
-*`azure-eventhub.enqueued_time`*::
+*`azure.enqueued_time`*::
 +
 --
 The enqueued time.
@@ -13009,7 +13009,7 @@ type: date
 
 --
 
-*`azure-eventhub.partition_id`*::
+*`azure.partition_id`*::
 +
 --
 The partition id.
@@ -13019,7 +13019,7 @@ type: long
 
 --
 
-*`azure-eventhub.consumer_group`*::
+*`azure.consumer_group`*::
 +
 --
 The consumer group.
@@ -13029,7 +13029,7 @@ type: keyword
 
 --
 
-*`azure-eventhub.sequence_number`*::
+*`azure.sequence_number`*::
 +
 --
 The sequence number.

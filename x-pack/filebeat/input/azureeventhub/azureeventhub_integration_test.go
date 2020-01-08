@@ -32,7 +32,6 @@ var (
 		"connection_string":         os.Getenv("EVENTHUB_CONNECTION_STRING"),
 		"consumer_group":            os.Getenv("EVENTHUB_CONSUMERGROUP"),
 		"eventhub":                  os.Getenv("EVENTHUB_NAME"),
-		"enable_eph":                false,
 	})
 
 	message = "{\"records\":[{\"some_field\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
