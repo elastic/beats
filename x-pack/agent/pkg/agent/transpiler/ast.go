@@ -54,6 +54,11 @@ type AST struct {
 	root Node
 }
 
+// Root returns the root node.
+func (a *AST) Root() Node {
+	return a.root
+}
+
 func (a *AST) String() string {
 	return "{AST:" + a.root.String() + "}"
 }

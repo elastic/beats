@@ -113,7 +113,17 @@ func newManaged(
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
-	emit := emitter(log, router)
+	injectAPIKey, err := injectESOutputAPIKey(cfg.API.AccessAPIKey)
+	if err != nil {
+		return nil, err
+	}
+
+	emit := emitter(
+		log,
+		router,
+		injectAPIKey,
+		injectMonitoring,
+	)
 
 	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {

@@ -38,8 +38,8 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 		}
 
 		for _, decorator := range decorators {
-			for outputType, ptr := range programsToRun {
-				programsToRun[outputType], err = decorator(outputType, ast, ptr)
+			for outputName, ptr := range programsToRun {
+				programsToRun[outputName], err = decorator(outputName, ast, ptr)
 				if err != nil {
 					return err
 				}
