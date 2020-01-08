@@ -4,26 +4,15 @@
 
 package mage
 
-import (
-	"os"
-	"strings"
-)
+type FunctionbeatProvider struct {
+	Name   string
+	GOOS   string
+	GOARCH string
+}
 
 var (
 	// SelectedProviders is the list of selected providers
-	// Can be configured by setting PROVIDERS enviroment variable.
-	SelectedProviders = getConfiguredProviders()
-
-	availableProviders = []string{
-		"aws",
+	SelectedProviders = []FunctionbeatProvider{
+		{Name: "aws", GOOS: "darwin", GOARCH: "amd64"},
 	}
 )
-
-func getConfiguredProviders() []string {
-	providers := os.Getenv("PROVIDERS")
-	if len(providers) == 0 {
-		return availableProviders
-	}
-
-	return strings.Split(providers, ",")
-}

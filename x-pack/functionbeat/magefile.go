@@ -45,10 +45,12 @@ func Build() error {
 
 	// Building functions to deploy
 	for _, provider := range functionbeat.SelectedProviders {
-		inputFiles := filepath.Join("provider", provider, "main.go")
+		inputFiles := filepath.Join("provider", provider.Name, "main.go")
 		params.InputFiles = []string{inputFiles}
-		params.Name = devtools.BeatName + "-" + provider
-		params.OutputDir = filepath.Join("provider", provider)
+		params.Name = devtools.BeatName + "-" + provider.Name
+		params.OutputDir = filepath.Join("provider", provider.Name)
+		params.Env = map[string]string{"GOOS": provider.GOOS, "GOARCH": provider.GOARCH}
+
 		err := devtools.Build(params)
 		if err != nil {
 			return err
@@ -78,7 +80,7 @@ func CrossBuild() error {
 
 	// Building functions to deploy
 	for _, provider := range functionbeat.SelectedProviders {
-		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider))
+		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider.Name))
 		if err != nil {
 			return err
 		}
@@ -138,10 +140,10 @@ func BuildSystemTestBinary() error {
 
 	params := devtools.DefaultTestBinaryArgs()
 	for _, provider := range functionbeat.SelectedProviders {
-		params.Name = filepath.Join("provider", provider, devtools.BeatName+"-"+provider)
+		params.Name = filepath.Join("provider", provider.Name, devtools.BeatName+"-"+provider.Name)
 		inputFiles := make([]string, 0)
 		for _, inputFileName := range []string{"main.go", "main_test.go"} {
-			inputFiles = append(inputFiles, filepath.Join("provider", provider, inputFileName))
+			inputFiles = append(inputFiles, filepath.Join("provider", provider.Name, inputFileName))
 		}
 		params.InputFiles = inputFiles
 		err := devtools.BuildSystemTestGoBinary(params)
