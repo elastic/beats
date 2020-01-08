@@ -10,9 +10,9 @@
 ++++
 
 
-Use the `azure-eventhub` input to read messages from an azure eventhub.
-The azure-eventhub is using the event processor host implementation (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
-
+Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub.
+The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
+State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container so as a prerequisite to using this input users will have to create a storage account.
 
 
 
@@ -43,7 +43,7 @@ The name of the eventhub users would like to read from.
 [float]
 ==== `consumer_group`
 
-Optional, we recommend using a dedicated consumer group for the azure input.
+Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
 
 [float]
 ==== `connection_string`
@@ -65,6 +65,6 @@ The storage account key, this key will be used to authorize access to data in yo
 [float]
 ==== `storage_account_container`
 
-Optional, the name of the storage account container you would like to store the offset information in. Default name `ephcontainer`.
+Optional, the name of the storage account container you would like to store the offset information in. Default name `filebeat`.
 
 

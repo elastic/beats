@@ -16,7 +16,7 @@ type azureInputConfig struct {
 	SAContainer string `config:"storage_account_container"`
 }
 
-const ephContainerName = "ephcontainer"
+const ephContainerName = "filebeat"
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
