@@ -49,7 +49,6 @@ type config struct {
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 
-	credentialsOption option.ClientOption
 	opt               []option.ClientOption
 }
 
@@ -64,7 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m.config.credentialsOption = option.WithCredentialsFile(m.config.CredentialsFilePath)
+	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
 		return nil, err
@@ -77,8 +76,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	m.config.opt = []option.ClientOption{m.config.credentialsOption}
-
 	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
 		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s'", m.config.ProjectID, m.config.Zone)
