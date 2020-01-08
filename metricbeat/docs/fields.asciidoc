@@ -1556,7 +1556,7 @@ type: object
 *`aws.*.metrics.*.*`*::
 +
 --
-Metrics that returned from Cloudwatch api query. - name: billing
+Metrics that returned from Cloudwatch API query. - name: billing
   type: group
   description: >
     `billing` contains the estimated charges for your AWS account in Cloudwatch.

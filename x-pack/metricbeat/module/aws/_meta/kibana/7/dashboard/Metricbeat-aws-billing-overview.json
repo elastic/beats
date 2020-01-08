@@ -209,7 +209,7 @@
               "id": "1",
               "params": {
                 "customLabel": "",
-                "field": "aws.metrics.EstimatedCharges.max"
+                "field": "aws.billing.metrics.EstimatedCharges.max"
               },
               "schema": "metric",
               "type": "sum"
@@ -219,7 +219,7 @@
               "id": "2",
               "params": {
                 "customLabel": "",
-                "field": "aws.cloudwatch.dimensions.ServiceName",
+                "field": "aws.dimensions.ServiceName",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -227,7 +227,7 @@
                   "enabled": true,
                   "id": "2-orderAgg",
                   "params": {
-                    "field": "aws.metrics.EstimatedCharges.max"
+                    "field": "aws.billing.metrics.EstimatedCharges.max"
                   },
                   "schema": "orderAgg",
                   "type": "avg"
@@ -352,7 +352,7 @@
                 "fill": 0.5,
                 "filter": {
                   "language": "kuery",
-                  "query": "aws.cloudwatch.dimensions.ServiceName :* "
+                  "query": "aws.dimensions.ServiceName :* "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -360,7 +360,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -435,11 +435,11 @@
                 },
                 "formatter": "number",
                 "id": "729b1fc0-152a-11ea-ae8f-79fec1a0d4d3",
-                "label": "avg(aws.metrics.EstimatedCharges.max)",
+                "label": "avg(aws.billing.metrics.EstimatedCharges.max)",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                     "type": "avg"
                   }
@@ -450,7 +450,7 @@
                 "split_mode": "terms",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "aws.cloudwatch.dimensions.ServiceName",
+                "terms_field": "aws.dimensions.ServiceName",
                 "terms_include": "",
                 "terms_order_by": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                 "terms_size": "5",

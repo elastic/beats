@@ -33,4 +33,4 @@
       object_type: double
       object_type_mapping_type: "*"
       description: >
-        Metrics that returned from Cloudwatch api query.
+        Metrics that returned from Cloudwatch API query.

@@ -5,34 +5,36 @@
             "namespace": "AWS/NetworkELB"
         },
         "dimensions": {
-            "AvailabilityZone": "eu-central-1b",
-            "LoadBalancer": "net/ece-es-clusters-nlb/0c5bdb3b96cf1552"
+            "AvailabilityZone": "us-east-1b",
+            "LoadBalancer": "net/filebeat-aws-elb-test-tcp-lb/f0bd7ccbc9695b88"
         },
         "networkelb": {
-            "NewFlowCount": {
-                "sum": 0
-            },
-            "ProcessedBytes": {
-                "sum": 0
-            },
-            "TCP_Client_Reset_Count": {
-                "sum": 0
-            },
-            "TCP_ELB_Reset_Count": {
-                "sum": 0
-            },
-            "TCP_Target_Reset_Count": {
-                "sum": 0
+            "metrics": {
+                "NewFlowCount": {
+                    "sum": 0
+                },
+                "ProcessedBytes": {
+                    "sum": 0
+                },
+                "TCP_Client_Reset_Count": {
+                    "sum": 0
+                },
+                "TCP_ELB_Reset_Count": {
+                    "sum": 0
+                },
+                "TCP_Target_Reset_Count": {
+                    "sum": 0
+                }
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "eu-central-1"
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.elb",

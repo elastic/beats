@@ -6,25 +6,25 @@
         },
         "dimensions": {
             "Class": "None",
-            "Resource": "ListMetrics",
-            "Service": "CloudWatch",
-            "Type": "API"
+            "Resource": "AccountProvisionedWriteCapacityUnits",
+            "Service": "DynamoDB",
+            "Type": "Resource"
         },
         "usage": {
             "metrics": {
-                "CallCount": {
-                    "sum": 2
+                "ResourceCount": {
+                    "sum": 45
                 }
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "eu-north-1"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.usage",
