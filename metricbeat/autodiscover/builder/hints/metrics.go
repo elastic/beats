@@ -114,7 +114,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	sslConf := m.getSSLConfig(hints)
 	procs := m.getProcessors(hints)
 	metricspath := m.getMetricPath(hints)
-	username := m.getUserName(hints)
+	username := m.getUsername(hints)
 	password := m.getPassword(hints)
 
 	moduleConfig := common.MapStr{
@@ -208,7 +208,7 @@ func (m *metricHints) getMetricPath(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, metricspath)
 }
 
-func (m *metricHints) getUserName(hints common.MapStr) string {
+func (m *metricHints) getUsername(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, username)
 }
 
