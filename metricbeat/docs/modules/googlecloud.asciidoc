@@ -58,6 +58,8 @@ Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics
 
 If you also want to *extract service metadata and labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
 
+A recommended `period` value between fetches is between 5 and 10 minutes, depending on how granular you want your metrics. GCP restricts information for less than 5 minutes.
+
 [float]
 === Rough estimation of the number of API Calls
 For example, imagine that you have a Compute Metricset activated and you don't want to exclude labels. You have a total of 20 instances running in a particular GCP project, region and zone.
