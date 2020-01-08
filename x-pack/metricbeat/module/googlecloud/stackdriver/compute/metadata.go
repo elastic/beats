@@ -6,6 +6,7 @@ package compute
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -78,7 +79,8 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if s.computeMetadata.machineType != "" {
-		metadataCollectorData.ECS.Put(googlecloud.ECSCloudMachineTypeKey, s.computeMetadata.machineType)
+		lastIndex := strings.LastIndex(s.computeMetadata.machineType, "/")
+		metadataCollectorData.ECS.Put(googlecloud.ECSCloudMachineTypeKey, s.computeMetadata.machineType[lastIndex+1:])
 	}
 
 	s.computeMetadata.Metrics = metadataCollectorData.Labels[googlecloud.LabelMetrics]
