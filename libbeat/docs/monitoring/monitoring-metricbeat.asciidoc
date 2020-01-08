@@ -7,7 +7,9 @@
 ++++
 
 In 7.3 and later, you can use {metricbeat} to collect data about {beatname_uc} 
-and ship it to the monitoring cluster.
+and ship it to the monitoring cluster. The benefit of using {metricbeat} instead
+of internal collection is that the monitoring agent remains active even if the
+{beatname_uc} instance dies.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 Because you'll be using {metricbeat} to _monitor_ {beatname_uc}, you'll need to

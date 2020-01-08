@@ -69,7 +69,7 @@ Custom HTTP headers to add to each request. For more information, see
 ==== `hosts`
 
 The list of {es} nodes to connect to. Monitoring metrics are distributed to
-these nodes in round robin order. For more information, see
+these nodes in round-robin order. For more information, see
 <<elasticsearch-output>>.
 
 [float]
