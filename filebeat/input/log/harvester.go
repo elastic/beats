@@ -101,8 +101,7 @@ type Harvester struct {
 	outletFactory OutletFactory
 	publishState  func(file.State) bool
 
-	metrics   *harvesterProgressMetrics
-	checkSize chan struct{}
+	metrics *harvesterProgressMetrics
 
 	onTerminate func()
 }
@@ -141,7 +140,6 @@ func NewHarvester(
 		stopWg:        &sync.WaitGroup{},
 		id:            id,
 		outletFactory: outletFactory,
-		checkSize:     make(chan struct{}),
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -353,30 +351,28 @@ func (h *Harvester) Run() error {
 		h.metrics.readOffset.Set(state.Offset)
 		h.metrics.lastPublished.Set(time.Now())
 		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
-		h.checkSize <- struct{}{}
 	}
 }
 
 func (h *Harvester) monitorFileSize() {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
+	logp.Info("INDULOK")
 
 	for {
 		select {
 		case <-h.done:
+			logp.Info("ELEG")
 			return
-		case <-h.checkSize:
-			err := h.updateCurrentSize()
-			if err != nil {
-				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
-			}
 		case <-ticker.C:
+			logp.Info("UPDATING II")
 			err := h.updateCurrentSize()
 			if err != nil {
 				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
 			}
 		}
 	}
+	logp.Info("RETURNING")
 }
 
 // stop is intended for internal use and closed the done channel to stop execution
