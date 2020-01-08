@@ -44,8 +44,8 @@ const (
 	timeout     = "timeout"
 	ssl         = "ssl"
 	metricspath = "metrics_path"
-	username = "username"
-	password = "password"
+	username    = "username"
+	password    = "password"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
