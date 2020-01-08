@@ -5523,12 +5523,12 @@
 			"revisionTime": "2019-11-15T22:14:24Z",
 			"tree": true
 		},
-        {
-            "checksumSHA1": "ljqfcAc9b0yK8q1WKi0lQDKcuJo=",
-            "path": "google.golang.org/genproto/googleapis/api/httpbody",
-            "revision": "fa694d86fc64c7654a660f8908de4e879866748d",
-            "revisionTime": "2019-08-01T16:59:51Z"
-        },
+		{
+			"checksumSHA1": "ljqfcAc9b0yK8q1WKi0lQDKcuJo=",
+			"path": "google.golang.org/genproto/googleapis/api/httpbody",
+			"revision": "fa694d86fc64c7654a660f8908de4e879866748d",
+			"revisionTime": "2019-08-01T16:59:51Z"
+		},
 		{
 			"checksumSHA1": "XtdXJebhq+gy8FLEG3G/tehnMA4=",
 			"path": "google.golang.org/genproto/googleapis/api/label",
