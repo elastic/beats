@@ -29,6 +29,7 @@ Add a checklist of things that are required to be reviewed in order to have the 
 List here all the items you have verified BEFORE sending this PR. Please DO NOT remove any item, striking through those that do not apply.
 -->
 
+- [ ] I have signed our [Contributor License Agreement](https://www.elastic.co/contributor-agreement/). 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
