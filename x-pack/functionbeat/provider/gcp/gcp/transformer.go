@@ -2,10 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package transformer
+package gcp
 
 import (
-	"context"
 	"time"
 
 	"cloud.google.com/go/functions/metadata"
@@ -25,13 +24,8 @@ type StorageEvent struct {
 	Updated        time.Time `json:"updated"`
 }
 
-// PubSub takes a Pub/Sub message and context and transforms it into an event.
-func PubSub(ctx context.Context, msg pubsub.Message) (beat.Event, error) {
-	mData, err := metadata.FromContext(ctx)
-	if err != nil {
-		return beat.Event{}, err
-	}
-
+// transformPubSub takes a Pub/Sub message and context and transforms it into an event.
+func transformPubSub(mData *metadata.Metadata, msg pubsub.Message) (beat.Event, error) {
 	return beat.Event{
 		Timestamp: mData.Timestamp,
 		Fields: common.MapStr{
@@ -48,12 +42,8 @@ func PubSub(ctx context.Context, msg pubsub.Message) (beat.Event, error) {
 	}, nil
 }
 
-// Storage takes a Cloud Storage object and transforms it into an event.
-func Storage(ctx context.Context, evt StorageEvent) (beat.Event, error) {
-	mData, err := metadata.FromContext(ctx)
-	if err != nil {
-		return beat.Event{}, err
-	}
+// transformStorage takes a Cloud Storage object and transforms it into an event.
+func transformStorage(mData *metadata.Metadata, evt StorageEvent) (beat.Event, error) {
 
 	return beat.Event{
 		Timestamp: mData.Timestamp,

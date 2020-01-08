@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"cloud.google.com/go/functions/metadata"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
@@ -31,8 +33,8 @@ type StorageEventKey string
 
 // StorageEvent stores the storage event received from Google Cloud Storage.
 type StorageEvent struct {
-	Ctx   context.Context
-	Event transformer.StorageEvent
+	Metadata *metadata.Metadata
+	Event    transformer.StorageEvent
 }
 
 // NewStorage returns a new function to read from Google Cloud Storage.
@@ -50,13 +52,18 @@ func NewStorage(provider provider.Provider, cfg *common.Config) (provider.Functi
 }
 
 // NewStorageContext creates a context from context and message returned from Google Cloud Storage.
-func NewStorageContext(beatCtx, ctx context.Context, e transformer.StorageEvent) context.Context {
-	evt := StorageEvent{
-		Ctx:   ctx,
-		Event: e,
+func NewStorageContext(beatCtx, ctx context.Context, e transformer.StorageEvent) (context.Context, error) {
+	data, err := metadata.FromContext(ctx)
+	if err != nil {
+		return context.Context{}, err
 	}
 
-	return context.WithValue(beatCtx, StorageEventKey(storageEvtCtxStr), evt)
+	evt := StorageEvent{
+		Metadata: data,
+		Event:    e,
+	}
+
+	return context.WithValue(beatCtx, StorageEventKey(storageEvtCtxStr), evt), nil
 }
 
 // Run start
@@ -65,7 +72,7 @@ func (s *Storage) Run(ctx context.Context, client core.Client) error {
 	if err != nil {
 		return err
 	}
-	event, err := transformer.Storage(evt.Ctx, evt.Event)
+	event, err := transformStorage(evt.Ctx, evt.Event)
 	if err := client.Publish(event); err != nil {
 		s.log.Errorf("error while publishing Google Cloud Storage event %+v", err)
 		return err

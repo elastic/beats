@@ -45,7 +45,10 @@ func initFunctionbeat(ctx context.Context, e transformer.StorageEvent) func(*bea
 			return nil, fmt.Errorf("not Functionbeat")
 		}
 
-		fnbeat.Ctx = gcp.NewStorageContext(fnbeat.Ctx, ctx, e)
+		fnbeat.Ctx, err = gcp.NewStorageContext(fnbeat.Ctx, ctx, e)
+		if err != nil {
+			return nil, err
+		}
 
 		return fnbeat, nil
 	}

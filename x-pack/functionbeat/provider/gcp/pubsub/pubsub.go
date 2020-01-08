@@ -46,7 +46,10 @@ func initFunctionbeat(ctx context.Context, m gpubsub.Message) func(*beat.Beat, *
 			return nil, fmt.Errorf("not Functionbeat")
 		}
 
-		fnbeat.Ctx = prov.NewPubSubContext(fnbeat.Ctx, ctx, m)
+		fnbeat.Ctx, err = prov.NewPubSubContext(fnbeat.Ctx, ctx, m)
+		if err != nil {
+			return nil, err
+		}
 
 		return fnbeat, nil
 	}

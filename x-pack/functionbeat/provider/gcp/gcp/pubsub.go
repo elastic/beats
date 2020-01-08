@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"cloud.google.com/go/functions/metadata"
 	"cloud.google.com/go/pubsub"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -15,7 +16,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp/transformer"
 )
 
 const (
@@ -47,18 +47,22 @@ func NewPubSub(provider provider.Provider, cfg *common.Config) (provider.Functio
 
 // PubSubEvent stores the context and the message from Google Pub/Sub.
 type PubSubEvent struct {
-	Ctx     context.Context
-	Message pubsub.Message
+	Metadata *metadata.Metadata
+	Message  pubsub.Message
 }
 
 // NewPubSubContext creates a context from context and message returned from Google Pub/Sub.
-func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) context.Context {
+func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) (context.Context, error) {
+	data, err := metadata.FromContext(ctx)
+	if err != nil {
+		return context.Context{}, err
+	}
 	e := PubSubEvent{
-		Ctx:     ctx,
-		Message: m,
+		Metadata: data,
+		Message:  m,
 	}
 
-	return context.WithValue(beatCtx, PubSubEventKey(pubSubEventCtxStr), e)
+	return context.WithValue(beatCtx, PubSubEventKey(pubSubEventCtxStr), e), nil
 }
 
 // Run start
@@ -67,7 +71,7 @@ func (p *PubSub) Run(ctx context.Context, client core.Client) error {
 	if err != nil {
 		return err
 	}
-	event, err := transformer.PubSub(pubsubEvent.Ctx, pubsubEvent.Message)
+	event, err := transformPubSub(pubsubEvent.Metadata, pubsubEvent.Message)
 	if err := client.Publish(event); err != nil {
 		p.log.Errorf("error while publishing Pub/Sub event %+v", err)
 		return err
