@@ -357,22 +357,18 @@ func (h *Harvester) Run() error {
 func (h *Harvester) monitorFileSize() {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
-	logp.Info("INDULOK")
 
 	for {
 		select {
 		case <-h.done:
-			logp.Info("ELEG")
 			return
 		case <-ticker.C:
-			logp.Info("UPDATING II")
 			err := h.updateCurrentSize()
 			if err != nil {
 				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
 			}
 		}
 	}
-	logp.Info("RETURNING")
 }
 
 // stop is intended for internal use and closed the done channel to stop execution
