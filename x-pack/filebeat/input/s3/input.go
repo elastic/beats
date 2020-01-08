@@ -380,7 +380,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		if contentType == "application/json" {
 			decoder := json.NewDecoder(reader)
 			// when json.message_key is given in config
-			if p.config.JSON.MessageKey != "" {
+			if p.config.JSON != nil && p.config.JSON.MessageKey != "" {
 				err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
 				if err != nil {
 					err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
@@ -389,6 +389,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				}
 				return nil
 			}
+
 			// when there is no json.message_key
 			err := p.decodeJSONWithoutKey(decoder, objectHash, s3Info, s3Context)
 			if err != nil {
