@@ -159,3 +159,27 @@ func mapCustomFields(metricConfig *MetricConfig, resourceConfig ResourceConfig) 
 	}
 
 }
+
+func convertTimegrainToDuration(timegrain string) time.Duration {
+	var duration time.Duration
+	switch timegrain {
+	case "PT1M":
+		duration = time.Duration(time.Minute)
+	default:
+	case "PT5M":
+		duration = time.Duration(5 * time.Minute)
+	case "PT15M":
+		duration = time.Duration(15 * time.Minute)
+	case "PT30M":
+		duration = time.Duration(30 * time.Minute)
+	case "PT1H":
+		duration = time.Duration(time.Hour)
+	case "PT6H":
+		duration = time.Duration(6 * time.Hour)
+	case "PT12H":
+		duration = time.Duration(12 * time.Hour)
+	case "PT1D":
+		duration = time.Duration(24 * time.Hour)
+	}
+	return duration
+}

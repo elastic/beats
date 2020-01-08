@@ -98,8 +98,13 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 	// loop over the set of metrics
 	for i, metric := range client.Resources.Metrics {
 		// select period to collect metrics, will double the interval value in order to retrieve any missing values
+		//if timegrain is larger than intervalx2 then interval will be assigned the timegrain value
+		interval := client.Config.Period
+		if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
+			interval = t
+		}
 		endTime := time.Now().UTC()
-		startTime := endTime.Add(client.Config.Period * (-2))
+		startTime := endTime.Add(interval * (-2))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
@@ -117,7 +122,7 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.SubID, metric.Namespace)
 			client.LogError(report, err)
 		} else {
-			current := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period*(-1)), endTime.Truncate(time.Minute))
+			current := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
 			client.Resources.Metrics[i].Values = current
 		}
 	}
