@@ -12,7 +12,7 @@
 
 Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub.
 The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
-State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container so as a prerequisite to using this input users will have to create a storage account.
+State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
 
 
 
@@ -35,36 +35,30 @@ Example configuration:
 
 The `azure-eventhub` input supports the following configuration:
 
-[float]
 ==== `eventhub`
 
 The name of the eventhub users would like to read from.
 
-[float]
 ==== `consumer_group`
 
 Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
 
-[float]
 ==== `connection_string`
 
 The connection string required to communicate with Event Hubs, steps here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string.
 
-A Blob Storage account is required in order to store/retrieve/update the offset or location of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
+A Blob Storage account is required in order to store/retrieve/update the offset or state of the eventhub messages. This means that after stopping filebeat it can start back up at the spot that it stopped processing messages.
 
-[float]
 ==== `storage_account`
 
 The name of the storage account.
 
-[float]
 ==== `storage_account_key`
 
 The storage account key, this key will be used to authorize access to data in your storage account.
 
-[float]
 ==== `storage_account_container`
 
-Optional, the name of the storage account container you would like to store the offset information in. Default name `filebeat`.
+Optional, the name of the storage account container you would like to store the offset information in.
 
 
