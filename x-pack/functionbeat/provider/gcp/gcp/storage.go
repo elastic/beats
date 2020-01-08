@@ -30,7 +30,7 @@ type Storage struct {
 // StorageEventKey is an alias to string
 type StorageEventKey string
 
-// StorageEvent stores the storage event received from Google Cloud Storage.
+// StorageEventWithMeta stores the storage event received from Google Cloud Storage.
 type StorageEventWithMeta struct {
 	Metadata *metadata.Metadata
 	Event    StorageEvent
