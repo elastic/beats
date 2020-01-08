@@ -1,0 +1,609 @@
+[
+	{
+		"RootFields": {
+			"container": {
+				"id": "0b56d65ff6f79bba3fad18baa72c657deb86efeb0a7e18435960c6ca61152ee1",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "kube-state-metrics-898d4db8d-5zddj"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://0b56d65ff6f79bba3fad18baa72c657deb86efeb0a7e18435960c6ca61152ee1",
+			"image": "quay.io/coreos/kube-state-metrics:v1.8.0",
+			"name": "kube-state-metrics",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 7
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "76c057ebd5872085bd6e3b498ccf7cf39d46fcb4a3ed2375825636181fdd8e80",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "kube-scheduler-molusco"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "docker://76c057ebd5872085bd6e3b498ccf7cf39d46fcb4a3ed2375825636181fdd8e80",
+			"image": "k8s.gcr.io/kube-scheduler:v1.17.0",
+			"name": "kube-scheduler",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 3
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "9d1a9a82f66a5b0852ed1bd53719f8705b596fd92994c0eb1959bc2f3e31291e",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "coredns-6955765f44-lf62p"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "docker://9d1a9a82f66a5b0852ed1bd53719f8705b596fd92994c0eb1959bc2f3e31291e",
+			"image": "k8s.gcr.io/coredns:1.6.5",
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
+			"name": "coredns",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "a07d72b4852156de9632d87ed1ddc7465af764d980d89db30f37b73248730695",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "canal-ps7d4"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.25
+				}
+			},
+			"id": "docker://a07d72b4852156de9632d87ed1ddc7465af764d980d89db30f37b73248730695",
+			"image": "calico/node:v3.8.5",
+			"name": "calico-node",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "368bf13cd463ebd3bef941230000d592f3d8669125b514c142cf28a749a85e16",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "canal-wmjgq"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://368bf13cd463ebd3bef941230000d592f3d8669125b514c142cf28a749a85e16",
+			"image": "quay.io/coreos/flannel:v0.11.0",
+			"name": "kube-flannel",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "c8bba14ea70b2cf9c21c18acacfeb683ebd2caea9f9586bd908bf11be0254a53",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "canal-wmjgq"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.25
+				}
+			},
+			"id": "docker://c8bba14ea70b2cf9c21c18acacfeb683ebd2caea9f9586bd908bf11be0254a53",
+			"image": "calico/node:v3.8.5",
+			"name": "calico-node",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7d351b60741eb33a17c82e059275380be29765855d49d96df3ec996a8c358bbc",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "etcd-molusco"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://7d351b60741eb33a17c82e059275380be29765855d49d96df3ec996a8c358bbc",
+			"image": "k8s.gcr.io/etcd:3.4.3-0",
+			"name": "etcd",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "2db5ed54081b6e6a9c0225870fa22c67a47dddd66499e26a15743c74e6a50be7",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "kube-proxy-6ttqr"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://2db5ed54081b6e6a9c0225870fa22c67a47dddd66499e26a15743c74e6a50be7",
+			"image": "k8s.gcr.io/kube-proxy:v1.17.0",
+			"name": "kube-proxy",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "a7e26868c1ca6472830ae706edb0a5c55691fc707c68e76ab675da753586ae43",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "kube-controller-manager-molusco"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.2
+				}
+			},
+			"id": "docker://a7e26868c1ca6472830ae706edb0a5c55691fc707c68e76ab675da753586ae43",
+			"image": "k8s.gcr.io/kube-controller-manager:v1.17.0",
+			"name": "kube-controller-manager",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 3
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7121fed737be603d645e1e381642cfb471ff71e78d1fcb64398bead7ff9aa59a",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "playground"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://7121fed737be603d645e1e381642cfb471ff71e78d1fcb64398bead7ff9aa59a",
+			"image": "ubuntu:latest",
+			"name": "ubuntu",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "2d9882a022010c01327fde9606849a6024c5cb2c3ac8cfc59f25fb8123c69ac6",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "kube-proxy-whtqj"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://2d9882a022010c01327fde9606849a6024c5cb2c3ac8cfc59f25fb8123c69ac6",
+			"image": "k8s.gcr.io/kube-proxy:v1.17.0",
+			"name": "kube-proxy",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "c2fcd783d8c070d491ce0b125e0457d9c008739ac1129ebb9d23070df23a1360",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "kube-apiserver-molusco"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.25
+				}
+			},
+			"id": "docker://c2fcd783d8c070d491ce0b125e0457d9c008739ac1129ebb9d23070df23a1360",
+			"image": "k8s.gcr.io/kube-apiserver:v1.17.0",
+			"name": "kube-apiserver",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 6
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "976bd052ce256de8eb2d5b331559c4d8aa9ed90e32b0b0a26287e2c66e8a0a94",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "canal-ps7d4"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://976bd052ce256de8eb2d5b331559c4d8aa9ed90e32b0b0a26287e2c66e8a0a94",
+			"image": "quay.io/coreos/flannel:v0.11.0",
+			"name": "kube-flannel",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "942b28283764336501d5e02719058bc54e91ac4f483f8f1117edf3d09f99141f",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "molusco"
+			},
+			"pod": {
+				"name": "coredns-6955765f44-hvncc"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "docker://942b28283764336501d5e02719058bc54e91ac4f483f8f1117edf3d09f99141f",
+			"image": "k8s.gcr.io/coredns:1.6.5",
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
+			"name": "coredns",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "0d6feace5647cc70b6c19aef7847aa2ee60ffe565928c9ee7c9c054b47ab8b76",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "hello-1578434100-rknmd"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://0d6feace5647cc70b6c19aef7847aa2ee60ffe565928c9ee7c9c054b47ab8b76",
+			"image": "busybox:latest",
+			"name": "hello",
+			"status": {
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

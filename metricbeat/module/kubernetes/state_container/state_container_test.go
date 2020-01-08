@@ -39,6 +39,10 @@ func TestEventMapping(t *testing.T) {
 				MetricsFile:  "../_meta/test/kube-state-metrics.v1.3.0",
 				ExpectedFile: "./_meta/test/kube-state-metrics.v1.3.0.expected",
 			},
+			{
+				MetricsFile:  "../_meta/test/kube-state-metrics.v1.8.0",
+				ExpectedFile: "./_meta/test/kube-state-metrics.v1.8.0.expected",
+			},
 		},
 	)
 }
