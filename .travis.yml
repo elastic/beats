@@ -142,11 +142,11 @@ jobs:
 
     # Generators
     - os: linux
-      env: TARGETS="-C generator/metricbeat test"
+      env: TARGETS="-C generator/metricbeat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C generator/beat test"
+      env: TARGETS="-C generator/beat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
 
