@@ -17,7 +17,6 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-azure>>
-* <<exported-fields-azure-eventhub>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -2734,33 +2733,6 @@ type: keyword
 +
 --
 Status
-
-
-type: keyword
-
---
-
-[[exported-fields-azure-eventhub]]
-== azure eventhub fields
-
-eventhub related fields
-
-
-
-*`eventhub`*::
-+
---
-Name of the eventhub.
-
-
-type: keyword
-
---
-
-*`offset`*::
-+
---
-The offset.
 
 
 type: keyword
@@ -13003,6 +12975,67 @@ IGMP type.
 
 
 type: keyword
+
+--
+
+
+*`azure-eventhub.eventhub`*::
++
+--
+Name of the eventhub.
+
+
+type: keyword
+
+--
+
+*`azure-eventhub.offset`*::
++
+--
+The offset.
+
+
+type: long
+
+--
+
+*`azure-eventhub.enqueued_time`*::
++
+--
+The enqueued time.
+
+
+type: date
+
+--
+
+*`azure-eventhub.partition_id`*::
++
+--
+The partition id.
+
+
+type: long
+
+--
+
+*`azure-eventhub.consumer_group`*::
++
+--
+The consumer group.
+
+
+type: keyword
+
+--
+
+*`azure-eventhub.sequence_number`*::
++
+--
+The sequence number.
+
+
+type: long
 
 --
 

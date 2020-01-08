@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go/v3"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -62,11 +62,6 @@ func TestProcessEvents(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, len(o.Events), 1)
-	parse, err := time.Parse(time.RFC3339, "2019-12-17T13:43:44.4946995Z")
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, o.Events[0].Timestamp, parse)
 	message, err := o.Events[0].Fields.GetValue("message")
 	if err != nil {
 		t.Fatal(err)
@@ -75,40 +70,19 @@ func TestProcessEvents(t *testing.T) {
 }
 
 func TestParseMultipleMessages(t *testing.T) {
-	date1 := "2019-12-17T13:43:44.4946995Z"
-	date2 := "2019-12-17T14:43:44.4946995Z"
-	date3 := "2019-12-17T15:43:44.4946995Z"
-	msg := fmt.Sprintf("{\"records\":[{\"test\":\"this is some message\",\"time\":\"%s\"},"+
-		"{\"test\":\"this is 2nd message\",\"time\":\"%s\"},"+
-		"{\"test\":\"this is 3rd message\",\"time\":\"%s\"}]}", date1, date2, date3)
+	msg := "{\"records\":[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
 	input := azureInput{}
 	messages := input.parseMultipleMessages([]byte(msg))
 	assert.NotNil(t, messages)
-
 	assert.Equal(t, len(messages), 3)
-
-	pdate1, err := time.Parse(time.RFC3339, date1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	pdate2, err := time.Parse(time.RFC3339, date2)
-	if err != nil {
-		t.Fatal(err)
-	}
-	pdate3, err := time.Parse(time.RFC3339, date3)
-	if err != nil {
-		t.Fatal(err)
-	}
-	dates := []time.Time{pdate1, pdate2, pdate3}
 	msgs := []string{
-		fmt.Sprintf("{\"test\":\"this is some message\",\"time\":\"%s\"}", date1),
-		fmt.Sprintf("{\"test\":\"this is 2nd message\",\"time\":\"%s\"}", date2),
-		fmt.Sprintf("{\"test\":\"this is 3rd message\",\"time\":\"%s\"}", date3)}
+		fmt.Sprintf("{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"),
+		fmt.Sprintf("{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"),
+		fmt.Sprintf("{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}")}
 	for _, ms := range messages {
-		for key, val := range ms {
-			assert.Contains(t, dates, key)
-			assert.Contains(t, msgs, val)
-		}
+		assert.Contains(t, msgs, ms)
 	}
 }
 

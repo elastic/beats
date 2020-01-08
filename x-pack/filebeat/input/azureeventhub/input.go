@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/Azure/azure-event-hubs-go/v3"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
@@ -108,12 +108,7 @@ func (a *azureInput) Run() {
 			defer a.log.Infof("%s input worker has stopped.", inputName)
 			defer a.workerWg.Done()
 			defer a.workerCancel()
-			var err error
-			if a.config.EPHEnabled {
-				err = a.runWithEPH()
-			} else {
-				err = a.run()
-			}
+			err := a.runWithEPH()
 			if err != nil {
 				a.log.Error(err)
 				return
@@ -122,7 +117,7 @@ func (a *azureInput) Run() {
 	})
 }
 
-// run runs the input
+// run will run the input with the non-eph version, this option will be available once a more reliable storage is in place, it is curently using an in-memory storage
 func (a *azureInput) run() error {
 	var err error
 	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName))
@@ -179,58 +174,46 @@ func (a *azureInput) Wait() {
 }
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) error {
-	// timestamp temp disabled as the event date is applied for now, will be replaced
-	// timestamp := time.Now()
-	var events []beat.Event
+	timestamp := time.Now()
 	azure := common.MapStr{
-		"partition_id":   partitionID,
+		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
+		//"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
 	messages := a.parseMultipleMessages(event.Data)
 	for _, msg := range messages {
-		for key, value := range msg {
-			azure.Put("offset", event.SystemProperties.Offset)
-			azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-			azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
-			event := beat.Event{
-				Timestamp: key,
-				Fields: common.MapStr{
-					"message": value,
-					"azure":   azure,
-				},
-			}
-			events = append(events, event)
-		}
-	}
-	for _, event := range events {
-		ok := a.outlet.OnEvent(event)
+		azure.Put("offset", event.SystemProperties.Offset)
+		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		ok := a.outlet.OnEvent(beat.Event{
+			Timestamp: timestamp,
+			Fields: common.MapStr{
+				"message": msg,
+				"azure":   azure,
+			},
+		})
 		if !ok {
-			return errors.New("event has not been sent - ")
+			return errors.New("event has not been sent")
 		}
 	}
 	return nil
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (a *azureInput) parseMultipleMessages(bMessage []byte) []map[time.Time]string {
+func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var obj map[string][]interface{}
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-		return []map[time.Time]string{}
+		return []string{string(bMessage)}
 	}
-	var messages []map[time.Time]string
+	var messages []string
 	if len(obj[expandEventListFromField]) > 0 {
 		for _, ms := range obj[expandEventListFromField] {
 			js, err := json.Marshal(ms)
 			if err == nil {
-				// temporary implementation, retrieving the date in order to verify events are matching
-				timeInter := ms.(map[string]interface{})["time"]
-				date, _ := time.Parse(time.RFC3339, timeInter.(string))
-				item := make(map[time.Time]string)
-				item[date] = string(js)
-				messages = append(messages, item)
+				messages = append(messages, string(js))
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 			}

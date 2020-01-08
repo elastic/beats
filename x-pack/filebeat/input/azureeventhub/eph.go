@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Azure/azure-event-hubs-go/v3"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 	"github.com/Azure/azure-event-hubs-go/v3/storage"
 	"github.com/Azure/azure-storage-blob-go/azblob"
@@ -48,8 +48,8 @@ func (a *azureInput) runWithEPH() error {
 	// register a message handler -- many can be registered
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
+			// partitionID is not yet mapped in the azure-eventhub sdk
 			return a.processEvents(e, "")
-
 		})
 	if err != nil {
 		return err
