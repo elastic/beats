@@ -1574,7 +1574,7 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
-example: 2016-05-23 08:05:34.857000
+example: 2016-05-23T08:05:34.857Z
 
 --
 
@@ -1643,7 +1643,7 @@ In normal conditions, assuming no tampering, the timestamps should chronological
 
 type: date
 
-example: 2016-05-23 08:05:35.101000
+example: 2016-05-23T08:05:35.101Z
 
 --
 
@@ -1731,7 +1731,7 @@ type: float
 +
 --
 Sequence number of the event.
-The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regardless of the timestamp precision.
 
 type: long
 
@@ -4132,8 +4132,17 @@ example: Debugger
 
 This field set is meant to facilitate pivoting around a piece of data.
 Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
-A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:192.0.2.15`.
 
+
+*`related.hash`*::
++
+--
+All the hashes seen on your event. Populating this field, then using it to search for hashes can help in situations where you're unsure what the hash algorithm is (and therefore which key name to search).
+
+type: keyword
+
+--
 
 *`related.ip`*::
 +
