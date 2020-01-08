@@ -25,7 +25,10 @@ This is a list of the possible module parameters you can tune:
 == Authentication, authorization and permissions.
 Authentication and authorization in Google Cloud Platform can be achieved in many ways. For the current version of the Google Cloud Platform module for Metricbeat, the only supported method is using Service Account JSON files. A typical JSON with a private key looks like this:
 
-```json
+[float]
+==== Example Credentials
+[source,json]
+----
 {
   "type": "service_account",
   "project_id": "your-project-id",
@@ -38,7 +41,7 @@ Authentication and authorization in Google Cloud Platform can be achieved in man
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/metricbeat-testing%40your-project-id.iam.gserviceaccount.com"
 }
-```
+----
 
 Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role:
 
