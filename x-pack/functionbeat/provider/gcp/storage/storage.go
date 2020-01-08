@@ -16,11 +16,10 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/beater"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp/transformer"
 	_ "github.com/elastic/beats/x-pack/functionbeat/provider/gcp/include"
 )
 
-func RunCloudStorage(ctx context.Context, e transformer.StorageEvent) error {
+func RunCloudStorage(ctx context.Context, e gcp.StorageEvent) error {
 	cfgwarn.Beta("Google Cloud Platform support is in beta")
 	settings := instance.Settings{
 		Name:            "functionbeat",
@@ -33,7 +32,7 @@ func RunCloudStorage(ctx context.Context, e transformer.StorageEvent) error {
 	return instance.Run(settings, initFunctionbeat(ctx, e))
 }
 
-func initFunctionbeat(ctx context.Context, e transformer.StorageEvent) func(*beat.Beat, *common.Config) (beat.Beater, error) {
+func initFunctionbeat(ctx context.Context, e gcp.StorageEvent) func(*beat.Beat, *common.Config) (beat.Beater, error) {
 	return func(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		bt, err := beater.New(b, cfg)
 		if err != nil {

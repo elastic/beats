@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp/transformer"
 )
 
 const (
@@ -32,9 +31,9 @@ type Storage struct {
 type StorageEventKey string
 
 // StorageEvent stores the storage event received from Google Cloud Storage.
-type StorageEvent struct {
+type StorageEventWithMeta struct {
 	Metadata *metadata.Metadata
-	Event    transformer.StorageEvent
+	Event    StorageEvent
 }
 
 // NewStorage returns a new function to read from Google Cloud Storage.
@@ -52,13 +51,13 @@ func NewStorage(provider provider.Provider, cfg *common.Config) (provider.Functi
 }
 
 // NewStorageContext creates a context from context and message returned from Google Cloud Storage.
-func NewStorageContext(beatCtx, ctx context.Context, e transformer.StorageEvent) (context.Context, error) {
+func NewStorageContext(beatCtx, ctx context.Context, e StorageEvent) (context.Context, error) {
 	data, err := metadata.FromContext(ctx)
 	if err != nil {
-		return context.Context{}, err
+		return nil, err
 	}
 
-	evt := StorageEvent{
+	evt := StorageEventWithMeta{
 		Metadata: data,
 		Event:    e,
 	}
@@ -72,7 +71,7 @@ func (s *Storage) Run(ctx context.Context, client core.Client) error {
 	if err != nil {
 		return err
 	}
-	event, err := transformStorage(evt.Ctx, evt.Event)
+	event, err := transformStorage(evt.Metadata, evt.Event)
 	if err := client.Publish(event); err != nil {
 		s.log.Errorf("error while publishing Google Cloud Storage event %+v", err)
 		return err
@@ -82,14 +81,14 @@ func (s *Storage) Run(ctx context.Context, client core.Client) error {
 	return nil
 }
 
-func (s *Storage) getEventDataFromContext(ctx context.Context) (StorageEvent, error) {
+func (s *Storage) getEventDataFromContext(ctx context.Context) (StorageEventWithMeta, error) {
 	iEvt := ctx.Value(StorageEventKey(storageEvtCtxStr))
 	if iEvt == nil {
-		return StorageEvent{}, fmt.Errorf("no storage_event in context")
+		return StorageEventWithMeta{}, fmt.Errorf("no storage_event in context")
 	}
-	evt, ok := iEvt.(StorageEvent)
+	evt, ok := iEvt.(StorageEventWithMeta)
 	if !ok {
-		return StorageEvent{}, fmt.Errorf("not StorageEvent: %+v", iEvt)
+		return StorageEventWithMeta{}, fmt.Errorf("not StorageEvent: %+v", iEvt)
 	}
 
 	return evt, nil

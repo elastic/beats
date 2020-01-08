@@ -55,7 +55,7 @@ type PubSubEvent struct {
 func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) (context.Context, error) {
 	data, err := metadata.FromContext(ctx)
 	if err != nil {
-		return context.Context{}, err
+		return nil, err
 	}
 	e := PubSubEvent{
 		Metadata: data,
