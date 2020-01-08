@@ -2,43 +2,6 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "0b56d65ff6f79bba3fad18baa72c657deb86efeb0a7e18435960c6ca61152ee1",
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "crustaceo"
-			},
-			"pod": {
-				"name": "kube-state-metrics-898d4db8d-5zddj"
-			}
-		},
-		"MetricSetFields": {
-			"id": "docker://0b56d65ff6f79bba3fad18baa72c657deb86efeb0a7e18435960c6ca61152ee1",
-			"image": "quay.io/coreos/kube-state-metrics:v1.8.0",
-			"name": "kube-state-metrics",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 7
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
 				"id": "76c057ebd5872085bd6e3b498ccf7cf39d46fcb4a3ed2375825636181fdd8e80",
 				"runtime": "docker"
 			}
@@ -65,6 +28,43 @@
 				"phase": "running",
 				"ready": true,
 				"restarts": 3
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "319b6c1f6f024db63877a528d02ba20c946900c302bd5ac9a7536b0953f6229c",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "web-0"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://319b6c1f6f024db63877a528d02ba20c946900c302bd5ac9a7536b0953f6229c",
+			"image": "k8s.gcr.io/nginx-slim:0.8",
+			"name": "nginx",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
 			}
 		},
 		"Index": "",
@@ -156,6 +156,76 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "c7f0007614b0a147dc75c70fd57b5dbc707a0b2b97da2734f2b372f669394a69",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "hello-1578499920-gkn22"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://c7f0007614b0a147dc75c70fd57b5dbc707a0b2b97da2734f2b372f669394a69",
+			"image": "busybox:latest",
+			"name": "hello",
+			"status": {
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "hello-1578499980-qmwp9"
+			}
+		},
+		"MetricSetFields": {
+			"image": "busybox",
+			"name": "hello",
+			"status": {
+				"phase": "waiting",
+				"ready": false,
+				"reason": "ContainerCreating",
 				"restarts": 0
 			}
 		},
@@ -289,6 +359,44 @@
 	{
 		"RootFields": {
 			"container": {
+				"id": "4216451b96e46ec8d061acfee918d12cc019177eb28fd2ade637e11bd2296909",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "hello-1578499800-pmbtx"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://4216451b96e46ec8d061acfee918d12cc019177eb28fd2ade637e11bd2296909",
+			"image": "busybox:latest",
+			"name": "hello",
+			"status": {
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
 				"id": "2db5ed54081b6e6a9c0225870fa22c67a47dddd66499e26a15743c74e6a50be7",
 				"runtime": "docker"
 			}
@@ -368,7 +476,7 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "7121fed737be603d645e1e381642cfb471ff71e78d1fcb64398bead7ff9aa59a",
+				"id": "0317484c76692708087c03cfd473e11f39f5811ecf5f6f0cff0f6f54f2caa3ac",
 				"runtime": "docker"
 			}
 		},
@@ -378,16 +486,17 @@
 				"name": "crustaceo"
 			},
 			"pod": {
-				"name": "playground"
+				"name": "hello-1578499860-jl6z7"
 			}
 		},
 		"MetricSetFields": {
-			"id": "docker://7121fed737be603d645e1e381642cfb471ff71e78d1fcb64398bead7ff9aa59a",
-			"image": "ubuntu:latest",
-			"name": "ubuntu",
+			"id": "docker://0317484c76692708087c03cfd473e11f39f5811ecf5f6f0cff0f6f54f2caa3ac",
+			"image": "busybox:latest",
+			"name": "hello",
 			"status": {
-				"phase": "running",
-				"ready": true,
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
 				"restarts": 0
 			}
 		},
@@ -484,6 +593,43 @@
 	{
 		"RootFields": {
 			"container": {
+				"id": "64443bee5991bfe85b60f484171ed08bfecba87afd556b6d4d517b8096b1e77c",
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "crustaceo"
+			},
+			"pod": {
+				"name": "kube-state-metrics-898d4db8d-klj89"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://64443bee5991bfe85b60f484171ed08bfecba87afd556b6d4d517b8096b1e77c",
+			"image": "quay.io/coreos/kube-state-metrics:v1.8.0",
+			"name": "kube-state-metrics",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
 				"id": "976bd052ce256de8eb2d5b331559c4d8aa9ed90e32b0b0a26287e2c66e8a0a94",
 				"runtime": "docker"
 			}
@@ -554,44 +700,6 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "0d6feace5647cc70b6c19aef7847aa2ee60ffe565928c9ee7c9c054b47ab8b76",
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "default",
-			"node": {
-				"name": "crustaceo"
-			},
-			"pod": {
-				"name": "hello-1578434100-rknmd"
-			}
-		},
-		"MetricSetFields": {
-			"id": "docker://0d6feace5647cc70b6c19aef7847aa2ee60ffe565928c9ee7c9c054b47ab8b76",
-			"image": "busybox:latest",
-			"name": "hello",
-			"status": {
-				"phase": "terminated",
-				"ready": false,
-				"reason": "Completed",
 				"restarts": 0
 			}
 		},

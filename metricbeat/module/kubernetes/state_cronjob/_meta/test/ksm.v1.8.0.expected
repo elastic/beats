@@ -6,18 +6,18 @@
 		},
 		"MetricSetFields": {
 			"active": {
-				"count": 0
+				"count": 1
 			},
 			"created": {
 				"sec": 1578434061
 			},
 			"is_suspended": false,
 			"last_schedule": {
-				"sec": 1578434100
+				"sec": 1578499980
 			},
 			"name": "hello",
 			"next_schedule": {
-				"sec": 1578434160
+				"sec": 1578500040
 			}
 		},
 		"Index": "",
