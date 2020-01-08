@@ -68,9 +68,10 @@ Process execution data (state, memory, cpu, cmdline) should be available for an 
 If the beats process is running as less privileged user, it may not be able to read process data belonging to
 other users. The issue should be reported in application logs:
 
-```
+["source"]
+----
 2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
-```
+----
 
 [float]
 ==== process_summary
