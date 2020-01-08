@@ -682,6 +682,12 @@ headers are placed under the `headers` dictionary in the resulting JSON.
 Instead of sending a white list of headers to Elasticsearch, you can
 send all headers by setting this option to true. The default is false.
 
+===== `redact_headers`
+
+A list of headers to redact if present in the HTTP request. This will keep
+the header field present, but will redact it's value to show the header's
+presence.
+
 ===== `include_body_for`
 
 The list of content types for which Packetbeat exports the full HTTP payload. The HTTP body is available under
