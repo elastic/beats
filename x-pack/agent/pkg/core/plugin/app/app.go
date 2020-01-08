@@ -74,11 +74,7 @@ func NewApplication(id, appName, pipelineID string,
 	failureReporter ReportFailureFunc,
 	monitor monitoring.Monitor) (*Application, error) {
 
-	s, err := spec.Spec(cfg.DownloadConfig)
-	if err != nil {
-		return nil, err
-	}
-
+	s := spec.Spec()
 	uid, gid, err := getUserGroup(s)
 	if err != nil {
 		return nil, err

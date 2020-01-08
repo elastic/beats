@@ -1,5 +1,6 @@
 name: Filebeat
-cmd: filebeat
+cmd: Filebeat
+configurable: grpc
 rules:
 - map:
     path: streams

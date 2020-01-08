@@ -6,8 +6,6 @@ package app
 
 import (
 	"os/user"
-
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 )
 
 const (
@@ -20,7 +18,7 @@ const (
 
 // Specifier returns a process specification.
 type Specifier interface {
-	Spec(*artifact.Config) (ProcessSpec, error)
+	Spec() ProcessSpec
 }
 
 // ProcessSpec specifies a way of running a process

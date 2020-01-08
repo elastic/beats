@@ -5,13 +5,11 @@
 package app
 
 import (
-	"encoding/json"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
-	"sync"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 )
 
@@ -19,21 +17,18 @@ import (
 // Is passed around operator operations.
 type Descriptor struct {
 	executionCtx ExecutionContext
-	spec         *ProcessSpec
-	specLock     sync.Mutex
+	directory    string
+	spec         ProcessSpec
 }
 
 // NewDescriptor creates a program which satisfies Program interface and can be used with Operator.
-func NewDescriptor(binaryName, version string, tags map[Tag]string) *Descriptor {
-	return &Descriptor{
-		executionCtx: NewExecutionContext(binaryName, version, tags),
-	}
-}
+func NewDescriptor(binaryName, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
+	dir := directory(binaryName, version, config)
 
-// NewDescriptorWithContext creates a program with pregenerated execution context.
-func NewDescriptorWithContext(ctx ExecutionContext, config map[string]interface{}) *Descriptor {
 	return &Descriptor{
-		executionCtx: ctx,
+		directory:    dir,
+		executionCtx: NewExecutionContext(binaryName, version, tags),
+		spec:         spec(dir, binaryName),
 	}
 }
 
@@ -57,45 +52,46 @@ func (p *Descriptor) ID() string { return p.executionCtx.ID }
 func (p *Descriptor) ExecutionContext() ExecutionContext { return p.executionCtx }
 
 // Spec returns a Process Specification with resolved binary path.
-func (p *Descriptor) Spec(config *artifact.Config) (ProcessSpec, error) {
-	p.specLock.Lock()
-	defer p.specLock.Unlock()
-
-	if p.spec != nil {
-		return *p.spec, nil
-	}
-
-	dir := p.Directory(config)
-	specFile := filepath.Join(dir, p.BinaryName()+".spec")
-	f, err := os.Open(specFile)
-	if err != nil {
-
-		return getDefaultSpec(dir, p.executionCtx), nil
-	}
-
-	decoder := json.NewDecoder(f)
-	err = decoder.Decode(&p.spec)
-	if err == nil {
-		if !filepath.IsAbs(p.spec.BinaryPath) {
-			p.spec.BinaryPath = filepath.Join(dir, p.spec.BinaryPath)
-			if !filepath.IsAbs(p.spec.BinaryPath) {
-				p.spec.BinaryPath, err = filepath.Abs(p.spec.BinaryPath)
-				if err != nil {
-					return *p.spec, err
-				}
-			}
-		}
-	}
-	return *p.spec, err
+func (p *Descriptor) Spec() ProcessSpec {
+	return p.spec
 }
 
-// Directory specifies the root direcvory of the application within an install path.
-func (p *Descriptor) Directory(config *artifact.Config) string {
-	if p.Version() == "" {
-		return filepath.Join(config.InstallPath, p.BinaryName())
+// Directory specifies the root directory of the application within an install path.
+func (p *Descriptor) Directory() string {
+	return p.directory
+}
+
+// IsGrpcConfigurable yields true in case application is grpc configurable.
+func (p *Descriptor) IsGrpcConfigurable() bool {
+	return p.spec.Configurable == ConfigurableGrpc
+}
+
+func defaultSpec(dir string, binaryName string) ProcessSpec {
+	if !isKnownBeat(binaryName) {
+		return ProcessSpec{
+			BinaryPath: path.Join(dir, binaryName),
+		}
 	}
 
-	path, err := artifact.GetArtifactPath(p.BinaryName(), p.Version(), config.OS(), config.Arch(), config.InstallPath)
+	return ProcessSpec{
+		BinaryPath:   path.Join(dir, binaryName),
+		Args:         []string{},
+		Configurable: ConfigurableFile, // known unrolled beat will be started with a generated configuration file
+	}
+
+}
+
+func spec(directory, binaryName string) ProcessSpec {
+	defaultSpec := defaultSpec(directory, binaryName)
+	return populateSpec(directory, defaultSpec)
+}
+
+func directory(binaryName, version string, config *artifact.Config) string {
+	if version == "" {
+		return filepath.Join(config.InstallPath, binaryName)
+	}
+
+	path, err := artifact.GetArtifactPath(binaryName, version, config.OS(), config.Arch(), config.InstallPath)
 	if err != nil {
 		return ""
 	}
@@ -108,31 +104,6 @@ func (p *Descriptor) Directory(config *artifact.Config) string {
 	return strings.TrimSuffix(path, suffix)
 }
 
-// IsGrpcConfigurable yields true in case application is grpc configurable.
-func (p *Descriptor) IsGrpcConfigurable(config *artifact.Config) (bool, error) {
-	spec, err := p.Spec(config)
-	if err != nil {
-		return false, err
-	}
-
-	return spec.Configurable == ConfigurableGrpc, nil
-}
-
-func getDefaultSpec(dir string, ctx ExecutionContext) ProcessSpec {
-	if !isKnownBeat(ctx.BinaryName) {
-		return ProcessSpec{
-			BinaryPath: path.Join(dir, ctx.BinaryName),
-		}
-	}
-
-	return ProcessSpec{
-		BinaryPath:   path.Join(dir, ctx.BinaryName),
-		Args:         []string{},
-		Configurable: ConfigurableFile, // known unrolled beat will be started with a generated configuration file
-	}
-
-}
-
 func isKnownBeat(name string) bool {
 	switch name {
 	case "filebeat":
@@ -142,4 +113,35 @@ func isKnownBeat(name string) bool {
 	}
 
 	return false
+}
+
+func populateSpec(dir string, spec ProcessSpec) ProcessSpec {
+	var programSpec program.Spec
+	var found bool
+	for _, prog := range program.Supported {
+		if spec.BinaryPath != strings.ToLower(prog.Name) {
+			continue
+		}
+		found = true
+		programSpec = prog
+		break
+	}
+
+	if !found {
+		return spec
+	}
+
+	if programSpec.Cmd != "" {
+		spec.BinaryPath = filepath.Join(dir, programSpec.Cmd)
+	}
+
+	if len(programSpec.Args) > 0 {
+		spec.Args = programSpec.Args
+	}
+
+	if programSpec.Configurable != "" {
+		spec.Configurable = programSpec.Configurable
+	}
+
+	return spec
 }
