@@ -124,3 +124,14 @@ func Build() error {
 func CrossBuild() error {
 	return build.CrossBuild()
 }
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return build.BuildGoDaemon()
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return build.GolangCrossBuild()
+}

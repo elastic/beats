@@ -20,6 +20,7 @@ type config struct {
 	ExpirationTimeout         time.Duration `config:"expiration_timeout"`
 	PacketQueueSize           int           `config:"queue_size"`
 	CustomDefinitions         []string      `config:"custom_definitions"`
+	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
 }
 
 var defaultConfig = config{
@@ -31,7 +32,8 @@ var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: inputName,
 	},
-	Protocols:         []string{"v5", "v9", "ipfix"},
-	ExpirationTimeout: time.Minute * 30,
-	PacketQueueSize:   8192,
+	Protocols:           []string{"v5", "v9", "ipfix"},
+	ExpirationTimeout:   time.Minute * 30,
+	PacketQueueSize:     8192,
+	DetectSequenceReset: true,
 }
