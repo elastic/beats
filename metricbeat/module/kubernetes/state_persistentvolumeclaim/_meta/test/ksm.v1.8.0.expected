@@ -14,8 +14,8 @@
 			"request_storage": {
 				"bytes": 1073741824
 			},
-			"storage_class": "\u003cnone\u003e",
-			"volume_name": "pv0001"
+			"storage_class": "standard",
+			"volume_name": "pvc-c87e31f9-f853-4b20-b5db-fc41466c8b56"
 		},
 		"Index": "",
 		"ID": "",
@@ -39,11 +39,12 @@
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
 			"name": "www-web-1",
-			"phase": "Pending",
+			"phase": "Bound",
 			"request_storage": {
 				"bytes": 1073741824
 			},
-			"storage_class": "\u003cnone\u003e"
+			"storage_class": "standard",
+			"volume_name": "pvc-539a19cf-ea44-43a4-84c5-4acca3f9b583"
 		},
 		"Index": "",
 		"ID": "",

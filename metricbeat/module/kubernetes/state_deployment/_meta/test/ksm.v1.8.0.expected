@@ -8,9 +8,9 @@
 			"name": "kube-state-metrics",
 			"paused": false,
 			"replicas": {
-				"available": 0,
+				"available": 1,
 				"desired": 1,
-				"unavailable": 1,
+				"unavailable": 0,
 				"updated": 1
 			}
 		},
