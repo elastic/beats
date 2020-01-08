@@ -1,5 +1,3 @@
-from beat.beat import Proc
-from beat.beat import TestCase
 import os
 import sys
 import subprocess
@@ -7,6 +5,8 @@ import json
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
 
+from beat.beat import TestCase
+from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
                          "agent.type", "agent.hostname", "agent.version",
