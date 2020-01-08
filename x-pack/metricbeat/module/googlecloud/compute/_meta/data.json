@@ -1,10 +1,104 @@
-{
-    "_index": "metricbeat-8.0.0-2019.11.27-000001",
-    "_id": "H4iRrm4B7vvv-udOwwFO",
-    "_version": 1,
-    "_score": null,
-    "_source": {
-        "@timestamp": "2019-11-27T20:30:00.000Z",
+[
+    {
+        "@timestamp": "2019-12-30T22:49:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "agent": {
+            "version": "8.0.0",
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228"
+        },
+        "cloud": {
+            "instance": {
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            },
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud"
+        },
+        "event": {
+            "duration": 1291211951,
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud"
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        },
+        "googlecloud": {
+            "labels": {
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                },
+                "metrics": {
+                    "device_name": "instance-3",
+                    "device_type": "permanent",
+                    "storage_type": "pd-standard"
+                }
+            },
+            "compute": {
+                "instance": {
+                    "disk": {
+                        "write_ops_count": 8,
+                        "read_ops_count": 0,
+                        "read_bytes_count": 0,
+                        "write_bytes_count": 40571
+                    }
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:51:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "googlecloud": {
+            "compute": {
+                "instance": {
+                    "cpu": {
+                        "reserved_cores": 0.2,
+                        "utilization": 0.0045336671716237715
+                    }
+                }
+            },
+            "labels": {
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
         "ecs": {
             "version": "1.2.0"
         },
@@ -14,11 +108,85 @@
         "agent": {
             "version": "8.0.0",
             "type": "metricbeat",
-            "ephemeral_id": "cb56f25c-fc0e-4bbc-9c49-4551c1a97ab5",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
             "hostname": "mcastro",
             "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228"
         },
         "cloud": {
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud",
+            "instance": {
+                "name": "instance-3",
+                "id": "3296438752514919533"
+            }
+        },
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1291227802
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:50:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "googlecloud": {
+            "labels": {
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                }
+            },
+            "compute": {
+                "instance": {
+                    "cpu": {
+                        "usage_time": 0.054404006059485255,
+                        "reserved_cores": 0.2,
+                        "utilization": 0.004572693238325579
+                    },
+                    "uptime": 60
+                },
+                "firewall": {
+                    "dropped_bytes_count": 16,
+                    "dropped_packets_count": 0
+                }
+            }
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0",
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro"
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "cloud": {
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
             "availability_zone": "us-central1-a",
             "account": {
                 "id": "elastic-metricbeat"
@@ -30,48 +198,435 @@
             }
         },
         "event": {
+            "dataset": "googlecloud.compute",
             "module": "googlecloud",
-            "duration": 1252249339,
-            "dataset": "googlecloud.compute"
+            "duration": 1291230345
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:49:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "cloud": {
+            "provider": "googlecloud",
+            "instance": {
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            },
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            }
+        },
+        "event": {
+            "duration": 1291596374,
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud"
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0",
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro"
+        },
+        "googlecloud": {
+            "compute": {
+                "firewall": {
+                    "dropped_bytes_count": 165,
+                    "dropped_packets_count": 3
+                },
+                "instance": {
+                    "cpu": {
+                        "usage_time": 0.054872318859906954
+                    },
+                    "uptime": 60
+                }
+            },
+            "labels": {
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:50:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0"
+        },
+        "googlecloud": {
+            "labels": {
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                },
+                "metrics": {
+                    "loadbalanced": "false"
+                },
+                "user": {
+                    "label_key": "label_value"
+                }
+            },
+            "compute": {
+                "instance": {
+                    "network": {
+                        "received_packets_count": 8,
+                        "sent_bytes_count": 587
+                    }
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "cloud": {
+            "instance": {
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            },
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud"
+        },
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1291694700
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:50:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "googlecloud": {
+            "labels": {
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                },
+                "metrics": {
+                    "device_type": "permanent",
+                    "storage_type": "pd-standard",
+                    "device_name": "disk-1"
+                }
+            },
+            "compute": {
+                "instance": {
+                    "disk": {
+                        "write_ops_count": 0,
+                        "read_ops_count": 0,
+                        "read_bytes_count": 0,
+                        "write_bytes_count": 0
+                    }
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0"
+        },
+        "cloud": {
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud",
+            "instance": {
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            }
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        },
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1291831907
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:49:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "googlecloud": {
+            "compute": {
+                "instance": {
+                    "disk": {
+                        "read_ops_count": 0,
+                        "read_bytes_count": 0,
+                        "write_bytes_count": 0,
+                        "write_ops_count": 0
+                    }
+                }
+            },
+            "labels": {
+                "metrics": {
+                    "device_type": "permanent",
+                    "storage_type": "pd-standard",
+                    "device_name": "disk-1"
+                },
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0"
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "cloud": {
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud",
+            "instance": {
+                "name": "instance-3",
+                "id": "3296438752514919533"
+            }
+        },
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1291934138
+        },
+        "metricset": {
+            "name": "compute",
+            "period": 300000
+        }
+    },
+    {
+        "@timestamp": "2019-12-30T22:50:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0"
         },
         "metricset": {
             "period": 300000,
             "name": "compute"
         },
-        "service": {
-            "type": "googlecloud"
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1292024714
         },
         "googlecloud": {
-            "compute": {
-                "labels": {
-                    "user": {
-                        "label_key": "label_value"
-                    },
-                    "metadata": {
-                        "metadata_key": "metadata_value"
-                    }
+            "labels": {
+                "metrics": {
+                    "device_name": "instance-3",
+                    "device_type": "permanent",
+                    "storage_type": "pd-standard"
                 },
+                "user": {
+                    "label_key": "label_value"
+                },
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                }
+            },
+            "compute": {
                 "instance": {
-                    "uptime": 60,
-                    "cpu": {
-                        "usage_time": 0.049102112533603304,
-                        "utilization": 0.004462245110474328
+                    "disk": {
+                        "write_ops_count": 12,
+                        "read_ops_count": 0,
+                        "read_bytes_count": 0,
+                        "write_bytes_count": 74322
                     }
                 }
             }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "cloud": {
+            "instance": {
+                "name": "instance-3",
+                "id": "3296438752514919533"
+            },
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            },
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud"
+        },
+        "ecs": {
+            "version": "1.2.0"
         }
     },
-    "fields": {
-        "@timestamp": [
-            "2019-11-27T20:30:00.000Z"
-        ]
-    },
-    "highlight": {
-        "metricset.name": [
-            "@kibana-highlighted-field@compute@/kibana-highlighted-field@"
-        ]
-    },
-    "sort": [
-        1574886600000
-    ]
-}
+    {
+        "@timestamp": "2019-12-30T22:49:00.000Z",
+        "@metadata": {
+            "beat": "metricbeat",
+            "type": "_doc",
+            "version": "8.0.0"
+        },
+        "event": {
+            "dataset": "googlecloud.compute",
+            "module": "googlecloud",
+            "duration": 1292124665
+        },
+        "metricset": {
+            "period": 300000,
+            "name": "compute"
+        },
+        "googlecloud": {
+            "compute": {
+                "instance": {
+                    "network": {
+                        "received_bytes_count": 8740,
+                        "sent_bytes_count": 3060,
+                        "received_packets_count": 33
+                    }
+                }
+            },
+            "labels": {
+                "metadata": {
+                    "metadata_key": "metadata_value"
+                },
+                "metrics": {
+                    "loadbalanced": "false"
+                },
+                "user": {
+                    "label_key": "label_value"
+                }
+            }
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "type": "metricbeat",
+            "ephemeral_id": "35987e2e-fcf6-4bf4-8ca0-47c50395231b",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+            "version": "8.0.0"
+        },
+        "cloud": {
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
+            },
+            "provider": "googlecloud",
+            "instance": {
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            },
+            "machine": {
+                "type": "https://www.googleapis.com/compute/v1/projects/elastic-metricbeat/zones/us-central1-a/machineTypes/f1-micro"
+            }
+        }
+    }
+]
