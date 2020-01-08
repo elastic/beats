@@ -108,6 +108,7 @@ func (p *PeriodicJitter) WaitTick() <-chan time.Time {
 			p.C <- time.Now()
 			close(p.C)
 		}
+		p.ran = true
 		return p.C
 	}
 
