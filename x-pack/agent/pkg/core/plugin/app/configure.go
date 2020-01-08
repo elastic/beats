@@ -36,11 +36,7 @@ func (a *Application) Configure(config map[string]interface{}) (err error) {
 		}
 	}()
 
-	spec, err := a.spec.Spec(a.downloadConfig)
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-
+	spec := a.spec.Spec()
 	if spec.Configurable != ConfigurableGrpc {
 		return nil
 	}

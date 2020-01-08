@@ -1,5 +1,6 @@
 name: Metricbeat
 cmd: metricbeat
+configurable: grpc
 rules:
 - filter_values_with_regexp:
     key: type

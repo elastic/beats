@@ -5,7 +5,6 @@
 package operation
 
 import (
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 )
@@ -42,6 +41,6 @@ type Descriptor interface {
 	BinaryName() string
 	Version() string
 	ID() string
-	Directory(*artifact.Config) string
-	IsGrpcConfigurable(config *artifact.Config) (bool, error)
+	Directory() string
+	IsGrpcConfigurable() bool
 }

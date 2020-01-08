@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
 )
 
@@ -28,7 +29,7 @@ func (o *Operator) handleRun(step configrequest.Step) error {
 		return o.handleStartSidecar(step)
 	}
 
-	p, cfg, err := getProgramFromStep(step)
+	p, cfg, err := getProgramFromStep(step, o.config.DownloadConfig)
 	if err != nil {
 		return errors.New(err,
 			"operator.handleStart failed to create program",
@@ -44,7 +45,7 @@ func (o *Operator) handleRemove(step configrequest.Step) error {
 		return o.handleStopSidecar(step)
 	}
 
-	p, _, err := getProgramFromStep(step)
+	p, _, err := getProgramFromStep(step, o.config.DownloadConfig)
 	if err != nil {
 		return errors.New(err,
 			"operator.handleRemove failed to stop program",
@@ -55,17 +56,17 @@ func (o *Operator) handleRemove(step configrequest.Step) error {
 	return o.stop(p)
 }
 
-func getProgramFromStep(step configrequest.Step) (Descriptor, map[string]interface{}, error) {
-	return getProgramFromStepWithTags(step, nil)
+func getProgramFromStep(step configrequest.Step, artifactConfig *artifact.Config) (Descriptor, map[string]interface{}, error) {
+	return getProgramFromStepWithTags(step, artifactConfig, nil)
 }
 
-func getProgramFromStepWithTags(step configrequest.Step, tags map[app.Tag]string) (Descriptor, map[string]interface{}, error) {
+func getProgramFromStepWithTags(step configrequest.Step, artifactConfig *artifact.Config, tags map[app.Tag]string) (Descriptor, map[string]interface{}, error) {
 	config, err := getConfigFromStep(step)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	p := app.NewDescriptor(step.Process, step.Version, tags)
+	p := app.NewDescriptor(step.Process, step.Version, artifactConfig, tags)
 	return p, config, nil
 }
 

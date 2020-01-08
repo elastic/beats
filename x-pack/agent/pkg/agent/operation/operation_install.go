@@ -49,7 +49,7 @@ func (o *operationInstall) Name() string {
 // - Start does not need to run if process is running
 // - Fetch does not need to run if package is already present
 func (o *operationInstall) Check() (bool, error) {
-	installDir := o.program.Directory(o.operatorConfig.DownloadConfig)
+	installDir := o.program.Directory()
 	_, err := os.Stat(installDir)
 	return os.IsNotExist(err), nil
 }
@@ -66,5 +66,5 @@ func (o *operationInstall) Run(application Application) (err error) {
 		}
 	}()
 
-	return o.installer.Install(o.program.BinaryName(), o.program.Version(), o.program.Directory(o.operatorConfig.DownloadConfig))
+	return o.installer.Install(o.program.BinaryName(), o.program.Version(), o.program.Directory())
 }

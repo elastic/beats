@@ -51,11 +51,7 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 		return err
 	}
 
-	spec, err := a.spec.Spec(a.downloadConfig)
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-
+	spec := a.spec.Spec()
 	if err := a.configureByFile(&spec, cfg); err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
