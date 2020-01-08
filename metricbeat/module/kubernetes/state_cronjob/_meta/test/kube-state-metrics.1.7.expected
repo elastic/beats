@@ -28,6 +28,7 @@
 		"Host": "",
 		"Service": "",
 		"Took": 0,
+		"Period": 0,
 		"DisableTimeSeries": false
 	},
 	{
@@ -59,6 +60,7 @@
 		"Host": "",
 		"Service": "",
 		"Took": 0,
+		"Period": 0,
 		"DisableTimeSeries": false
 	}
 ]
