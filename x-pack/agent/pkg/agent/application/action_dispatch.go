@@ -25,10 +25,9 @@ type actionDispatcher struct {
 	log      *logger.Logger
 	handlers actionHandlers
 	def      actionHandler
-	acker    fleetAcker
 }
 
-func newActionDispatcher(log *logger.Logger, def actionHandler, ack fleetAcker) (*actionDispatcher, error) {
+func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New()
@@ -45,7 +44,6 @@ func newActionDispatcher(log *logger.Logger, def actionHandler, ack fleetAcker) 
 		log:      log,
 		handlers: make(actionHandlers),
 		def:      def,
-		acker:    ack,
 	}, nil
 }
 
@@ -70,7 +68,7 @@ func (ad *actionDispatcher) key(a action) string {
 	return reflect.TypeOf(a).String()
 }
 
-func (ad *actionDispatcher) Dispatch(actions ...action) error {
+func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
 	ad.log.Debugf(
 		"Dispatch %d actions of types: %s",
 		len(actions),
@@ -78,7 +76,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	)
 
 	for _, action := range actions {
-		if err := ad.dispatchAction(action); err != nil {
+		if err := ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}
@@ -87,13 +85,13 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	return nil
 }
 
-func (ad *actionDispatcher) dispatchAction(a action) error {
+func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
-		return ad.def.Handle(a, ad.acker)
+		return ad.def.Handle(a, acker)
 	}
 
-	return handler.Handle(a, ad.acker)
+	return handler.Handle(a, acker)
 }
 
 func detectTypes(actions []action) []string {

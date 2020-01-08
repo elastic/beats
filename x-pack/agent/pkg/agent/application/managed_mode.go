@@ -119,7 +119,7 @@ func newManaged(
 		return nil, err
 	}
 
-	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log}, acker)
+	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {
 		return nil, err
 	}
@@ -141,6 +141,7 @@ func newManaged(
 		client,
 		actionDispatcher,
 		fleetR,
+		acker,
 	)
 	if err != nil {
 		return nil, err

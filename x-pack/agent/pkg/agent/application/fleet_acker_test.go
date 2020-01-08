@@ -14,12 +14,18 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
 
 func TestAcker(t *testing.T) {
+	type serializedEvent struct {
+		Type     string `json:"type"`
+		Subtype  string `json:"subtype"`
+		ActionID string `json:"action_id"`
+	}
 
 	type ackRequest struct {
-		Events []actionEvent `json:"events"`
+		Events []serializedEvent `json:"events"`
 	}
 
 	log, _ := logger.New()
@@ -35,10 +41,11 @@ func TestAcker(t *testing.T) {
 	}
 
 	testID := "ack-test-action-id"
+	testAction := &fleetapi.ActionUnknown{ActionBase: &fleetapi.ActionBase{ActionID: testID}}
+
 	ch := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 		content, err := ioutil.ReadAll(body)
 		assert.NoError(t, err)
-
 		cr := &ackRequest{}
 		err = json.Unmarshal(content, &cr)
 		assert.NoError(t, err)
@@ -46,8 +53,8 @@ func TestAcker(t *testing.T) {
 		assert.EqualValues(t, 1, len(cr.Events))
 		ae := cr.Events[0]
 
-		assert.EqualValues(t, EventTypeAction, ae.Typ)
-		assert.EqualValues(t, EventSubtypeACK, ae.Subtype)
+		assert.EqualValues(t, "ACTION", ae.Type)
+		assert.EqualValues(t, "ACKNOWLEDGED", ae.Subtype)
 		assert.EqualValues(t, testID, ae.ActionID)
 
 		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
@@ -56,7 +63,7 @@ func TestAcker(t *testing.T) {
 
 	go func() { <-ch }()
 
-	if err := acker.Ack(testID); err != nil {
+	if err := acker.Ack(testAction); err != nil {
 		t.Fatal(err)
 	}
 

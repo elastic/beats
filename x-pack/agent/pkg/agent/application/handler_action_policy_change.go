@@ -33,7 +33,7 @@ func (h *handlerPolicyChange) Handle(a action, acker fleetAcker) error {
 	h.log.Debug("HandlerPolicyChange: emit configuration")
 
 	// ACK config
-	if err := acker.Ack(action.ID()); err != nil {
+	if err := acker.Ack(action); err != nil {
 		return err
 	}
 

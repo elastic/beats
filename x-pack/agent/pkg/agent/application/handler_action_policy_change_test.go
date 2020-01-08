@@ -95,7 +95,7 @@ type testAcker struct {
 	ackedLock sync.Mutex
 }
 
-func (t *testAcker) Ack(id string) error {
+func (t *testAcker) Ack(action fleetapi.Action) error {
 	t.ackedLock.Lock()
 	defer t.ackedLock.Unlock()
 
@@ -103,7 +103,7 @@ func (t *testAcker) Ack(id string) error {
 		t.acked = make([]string, 0)
 	}
 
-	t.acked = append(t.acked, id)
+	t.acked = append(t.acked, action.ID())
 	return nil
 }
 

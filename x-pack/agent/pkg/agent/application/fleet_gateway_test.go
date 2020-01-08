@@ -69,7 +69,7 @@ type testingDispatcher struct {
 	received chan struct{}
 }
 
-func (t *testingDispatcher) Dispatch(actions ...action) error {
+func (t *testingDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
@@ -106,6 +106,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			dispatcher,
 			scheduler,
 			rep,
+			newNoopAcker(),
 		)
 
 		go gateway.Start()
@@ -230,6 +231,7 @@ func TestFleetGateway(t *testing.T) {
 			dispatcher,
 			scheduler,
 			getReporter(agentInfo, log, t),
+			newNoopAcker(),
 		)
 
 		go gateway.Start()
@@ -313,6 +315,7 @@ func TestFleetGateway(t *testing.T) {
 			dispatcher,
 			scheduler,
 			getReporter(agentInfo, log, t),
+			newNoopAcker(),
 		)
 
 		go gateway.Start()
