@@ -4,7 +4,10 @@
 
 package azureeventhub
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type azureInputConfig struct {
 	ConnectionString string `config:"connection_string" validate:"required"`
@@ -30,7 +33,7 @@ func (conf *azureInputConfig) Validate() error {
 		return errors.New("missing storage account information")
 	}
 	if conf.SAContainer == "" {
-		conf.SAContainer = ephContainerName
+		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
 	return nil
 }
