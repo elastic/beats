@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 - Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
