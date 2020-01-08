@@ -36,10 +36,10 @@ func TestProcessorRun(t *testing.T) {
 		{false, "www.google.co.uk", "google.co.uk"},
 		{false, "google.com", "google.com"},
 		{false, "www.ak.local", "ak.local"},
-		{false, ".", "."},
 		{false, "www.navy.mil", "navy.mil"},
 
 		{true, "com", ""},
+		{true, ".", "."},
 		{true, "", ""},
 		{true, "localhost", ""},
 	}

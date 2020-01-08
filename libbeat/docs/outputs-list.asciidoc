@@ -28,10 +28,7 @@ include::{libbeat-outputs-dir}/fileout/docs/fileout.asciidoc[]
 
 include::{libbeat-outputs-dir}/console/docs/console.asciidoc[]
 
-include::outputs/output-cloud.asciidoc[]
-
-//REVIEWERS: Should the cloud ID topic live somewhere under libbeat/outputs. If
-//so, where? Or should it continue to live somewhere in the docs directory?
+include::output-cloud.asciidoc[]
 
 include::{libbeat-outputs-dir}/codec/docs/codec.asciidoc[]
 

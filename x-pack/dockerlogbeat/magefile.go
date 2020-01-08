@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -54,7 +53,6 @@ func getPluginName() (string, error) {
 
 // Build builds docker rootfs container root
 func Build() error {
-	mg.Deps(CleanDocker)
 	mage.CreateDir(packageStagingDir)
 	mage.CreateDir(packageEndDir)
 
@@ -147,10 +145,13 @@ func Package() {
 // Release builds a "release" tarball that can be used later with `docker plugin create`
 func Release() error {
 	mg.Deps(Build)
-	name, err := getPluginName()
+
+	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error getting beats version")
 	}
+
+	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", name, version, "docker-plugin")
 
 	bashScript := `#!/bin/bash
 docker plugin create %s
@@ -162,7 +163,7 @@ docker plugin enable %s
 		return errors.Wrap(err, "error writing script")
 	}
 
-	outpath := filepath.Join(packageEndDir, fmt.Sprintf("%s.gz", strings.Replace(name, "/", "-", -1)))
+	outpath := filepath.Join(packageEndDir, tarballName)
 
 	sh.RunV("tar", "zcf", outpath,
 		filepath.Join(packageStagingDir, "rootfs"),
