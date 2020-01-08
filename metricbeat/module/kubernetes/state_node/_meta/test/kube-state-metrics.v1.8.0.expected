@@ -5,21 +5,21 @@
 		"MetricSetFields": {
 			"cpu": {
 				"allocatable": {
-					"cores": 2
+					"cores": 8
 				},
 				"capacity": {
-					"cores": 2
+					"cores": 8
 				}
 			},
 			"memory": {
 				"allocatable": {
-					"bytes": 2097786880
+					"bytes": 8146313216
 				},
 				"capacity": {
-					"bytes": 2097786880
+					"bytes": 8251170816
 				}
 			},
-			"name": "minikube",
+			"name": "crustaceo",
 			"pod": {
 				"allocatable": {
 					"total": 110
@@ -50,7 +50,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"allocatable": {
-					"cores": 3
+					"cores": 4
 				},
 				"capacity": {
 					"cores": 4
@@ -58,24 +58,24 @@
 			},
 			"memory": {
 				"allocatable": {
-					"bytes": 3097786880
+					"bytes": 8199979008
 				},
 				"capacity": {
-					"bytes": 4097786880
+					"bytes": 8304836608
 				}
 			},
-			"name": "minikube-test",
+			"name": "molusco",
 			"pod": {
 				"allocatable": {
-					"total": 210
+					"total": 110
 				},
 				"capacity": {
-					"total": 310
+					"total": 110
 				}
 			},
 			"status": {
 				"ready": "true",
-				"unschedulable": true
+				"unschedulable": false
 			}
 		},
 		"Index": "",
