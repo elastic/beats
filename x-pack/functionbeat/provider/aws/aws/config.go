@@ -9,9 +9,12 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
-	"github.com/elastic/beats/x-pack/functionbeat/config"
+	"github.com/dustin/go-humanize"
+
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 // Config expose the configuration option the AWS provider.
@@ -41,14 +44,14 @@ var (
 
 // LambdaConfig stores the common configuration of Lambda functions.
 type LambdaConfig struct {
-	Concurrency      int                    `config:"concurrency" validate:"min=0,max=1000"`
-	DeadLetterConfig *deadLetterConfig      `config:"dead_letter_config"`
-	Description      string                 `config:"description"`
-	MemorySize       config.MemSizeFactor64 `config:"memory_size"`
-	Timeout          time.Duration          `config:"timeout" validate:"nonzero,positive"`
-	Role             string                 `config:"role"`
-	VPCConfig        *vpcConfig             `config:"virtual_private_cloud"`
-	Tags             map[string]string      `config:"tags"`
+	Concurrency      int               `config:"concurrency" validate:"min=0,max=1000"`
+	DeadLetterConfig *deadLetterConfig `config:"dead_letter_config"`
+	Description      string            `config:"description"`
+	MemorySize       MemSizeFactor64   `config:"memory_size"`
+	Timeout          time.Duration     `config:"timeout" validate:"nonzero,positive"`
+	Role             string            `config:"role"`
+	VPCConfig        *vpcConfig        `config:"virtual_private_cloud"`
+	Tags             map[string]string `config:"tags"`
 }
 
 // Validate checks a LambdaConfig
@@ -96,6 +99,43 @@ func validateTags(tags map[string]string) error {
 	}
 
 	return nil
+}
+
+// MemSizeFactor64 implements a human understandable format for bytes but also make sure that all
+// values used are a factor of 64.
+type MemSizeFactor64 int
+
+// Unpack converts a size defined from a human readable format into bytes and verifies that the value
+// is a multiple of 64. If the value is not multple of 64, it returns an error.
+func (m *MemSizeFactor64) Unpack(v string) error {
+	sz, err := humanize.ParseBytes(v)
+	if isRawBytes(v) {
+		cfgwarn.Deprecate("7.0.0", "size now requires a unit (KiB, MiB, etc...), current value: %s.", v)
+	}
+	if err != nil {
+		return err
+	}
+
+	if sz%64 != 0 {
+		return fmt.Errorf("number is not a multiple of 64, %d bytes (user value: %s)", sz, v)
+	}
+
+	*m = MemSizeFactor64(sz)
+	return nil
+}
+
+// Megabytes return the value in megabytes.
+func (m *MemSizeFactor64) Megabytes() int {
+	return int(*m) / 1024 / 1024
+}
+
+func isRawBytes(v string) bool {
+	for _, c := range v {
+		if !unicode.IsDigit(c) {
+			return false
+		}
+	}
+	return true
 }
 
 type bucket string

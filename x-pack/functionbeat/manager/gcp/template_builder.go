@@ -140,7 +140,7 @@ func (d *defaultTemplateBuilder) RawTemplate(name string) (string, error) {
 	if config.Timeout > 0*time.Second {
 		properties["timeout"] = config.Timeout.String()
 	}
-	if config.MemorySize > 0 {
+	if config.MemorySize != "" {
 		properties["availableMemoryMb"] = config.MemorySize
 	}
 	if len(config.ServiceAccountEmail) > 0 {

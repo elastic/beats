@@ -7,20 +7,18 @@ package gcp
 import (
 	"fmt"
 	"time"
-
-	"github.com/elastic/beats/x-pack/functionbeat/config"
 )
 
 // FunctionConfig stores the configuration of a Google Cloud Function
 type FunctionConfig struct {
-	Description         string                 `config:"description"`
-	MemorySize          config.MemSizeFactor64 `config:"memory_size"`
-	Timeout             time.Duration          `config:"timeout" validate:"nonzero,positive"`
-	ServiceAccountEmail string                 `config:"service_account_email"`
-	Labels              map[string]string      `config:"labels"`
-	VPCConnector        string                 `config:"vpc_connector"`
-	MaxInstances        int                    `config:"maximum_instances"`
-	Trigger             Trigger                `config:"trigger" validate:"required"`
+	Description         string            `config:"description"`
+	MemorySize          string            `config:"memory_size"`
+	Timeout             time.Duration     `config:"timeout" validate:"nonzero,positive"`
+	ServiceAccountEmail string            `config:"service_account_email"`
+	Labels              map[string]string `config:"labels"`
+	VPCConnector        string            `config:"vpc_connector"`
+	MaxInstances        int               `config:"maximum_instances"`
+	Trigger             Trigger           `config:"trigger" validate:"required"`
 
 	entryPoint string
 }
