@@ -16,6 +16,12 @@ test: prepare-test
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 
+.PHONY: test-package
+test-package: test
+	cd ${BEAT_PATH} ; \
+	export PATH=$${GOPATH}/bin:$${PATH}; \
+	mage package
+
 .PHONY: prepare-test
 prepare-test:: ${GOPATH}/bin/mage
 	rm -fr ${BEAT_PATH}
