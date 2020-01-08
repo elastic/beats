@@ -4,7 +4,7 @@
 
 package mage
 
-type FunctionbeatProvider struct {
+type functionbeatProvider struct {
 	Name   string
 	GOOS   string
 	GOARCH string
@@ -12,7 +12,7 @@ type FunctionbeatProvider struct {
 
 var (
 	// SelectedProviders is the list of selected providers
-	SelectedProviders = []FunctionbeatProvider{
+	SelectedProviders = []functionbeatProvider{
 		{Name: "aws", GOOS: "darwin", GOARCH: "amd64"},
 	}
 )
