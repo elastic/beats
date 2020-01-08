@@ -9,7 +9,7 @@ This is a list of the possible module parameters you can tune:
 * *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
 * *project_id*: A single string with your GCP Project ID
 * *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
-* *excluse_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
+* *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
 
 [float]
 == Authentication, authorization and permissions.
@@ -52,4 +52,4 @@ If you also want to *extract service metadata and labels* (by setting `exclude_l
 === Rough estimation of the number of API Calls
 For example, imagine that you have a Compute Metricset activated and you don't want to exclude labels. You have a total of 20 instances running in a particular GCP project, region and zone.
 
-Compute Metricset fetches 14 metrics. Each of those metrics will attempt an API call to Compute API to retrieve also their metadata. Because you have 20 different instances, the total number of API calls that will be done on each refresh period are: 14 metrics + 20 instances = 34 API requests every 5 minutes if that is your current Period. 9792 API requests per day with one zone. If you add 2 zones more with the same amount of instances you'll have 19584 API requests per day (9792 on each zone) or around 587520 per month for the Compute Metricset. This maths must be done for each different Metricset with slight variations.
+For example, if Compute Metricset fetches 14 metrics (which is the number of metrics fetched in the early beta version). Each of those metrics will attempt an API call to Compute API to retrieve also their metadata. Because you have 20 different instances, the total number of API calls that will be done on each refresh period are: 14 metrics + 20 instances = 34 API requests every 5 minutes if that is your current Period. 9792 API requests per day with one zone. If you add 2 zones more with the same amount of instances you'll have 19584 API requests per day (9792 on each zone) or around 587520 per month for the Compute Metricset. This maths must be done for each different Metricset with slight variations.

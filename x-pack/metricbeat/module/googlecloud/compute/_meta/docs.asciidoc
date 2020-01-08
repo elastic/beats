@@ -13,10 +13,10 @@ Extra labels and metadata are also extracted using the https://cloud.google.com/
 * `instance.firewall.dropped_packets_count`: Incoming packets dropped by the firewall.
 - `instance_name`: The name of the VM instance.
 
-* `instance.cpu.reserved_cores`: Number of cores reserved on the host of the `instance.
+* `instance.cpu.reserved_cores`: Number of cores reserved on the host of the `instance`.
 - `instance_name`: The name of the VM instance.
 
-* `instance.cpu.utilization`: The fraction of the allocated CPU that is currently in use on the `instance.
+* `instance.cpu.utilization`: The fraction of the allocated CPU that is currently in use on the `instance`.
 - `instance_name`: The name of the VM instance.
 * `instance.cpu.usage_time`: Usage for all cores in seconds.
 - `instance_name`: The name of the VM instance.
