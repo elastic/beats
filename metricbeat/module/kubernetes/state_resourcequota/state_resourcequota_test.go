@@ -27,12 +27,16 @@ import (
 
 const testFile = "_meta/test/metrics"
 
-func FLAKYTestEventMapping(t *testing.T) {
+func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_resourcequota",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/kube-state-metrics.1.7",
-				ExpectedFile: "./_meta/test/kube-state-metrics.1.7.expected",
+				MetricsFile:  "../_meta/test/ksm.v1.3.0",
+				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
+			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
 			},
 		},
 	)
