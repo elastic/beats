@@ -24,9 +24,6 @@ rules:
 - rename:
     from: auditbeat.streams
     to: modules
-- rename:
-    from: output.elasticsearch.url
-    to: hosts
 - filter:
     selectors:
     - auditbeat
