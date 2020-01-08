@@ -22,12 +22,12 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 9,
-              "i": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
-              "w": 16,
+              "i": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
+              "w": 7,
               "x": 0,
               "y": 0
             },
-            "panelIndex": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
+            "panelIndex": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
             "panelRefName": "panel_0",
             "version": "7.4.0"
           },
@@ -35,13 +35,26 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 9,
+              "i": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
+              "w": 14,
+              "x": 7,
+              "y": 0
+            },
+            "panelIndex": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
+            "panelRefName": "panel_1",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
               "i": "18810035-5e91-409a-98d7-c03166e1f9b3",
-              "w": 32,
-              "x": 16,
+              "w": 27,
+              "x": 21,
               "y": 0
             },
             "panelIndex": "18810035-5e91-409a-98d7-c03166e1f9b3",
-            "panelRefName": "panel_1",
+            "panelRefName": "panel_2",
             "version": "7.4.0"
           },
           {
@@ -54,7 +67,7 @@
               "y": 9
             },
             "panelIndex": "60e6e6e4-3237-430e-80fc-63fe9b718a7e",
-            "panelRefName": "panel_2",
+            "panelRefName": "panel_3",
             "version": "7.4.0"
           },
           {
@@ -67,7 +80,7 @@
               "y": 9
             },
             "panelIndex": "5e5d6509-2889-4383-bef4-9c2da0e759c6",
-            "panelRefName": "panel_3",
+            "panelRefName": "panel_4",
             "version": "7.4.0"
           },
           {
@@ -80,7 +93,7 @@
               "y": 9
             },
             "panelIndex": "2db371a7-20c5-460a-a2f7-06b5b03d7b34",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_5",
             "version": "7.4.0"
           },
           {
@@ -93,7 +106,7 @@
               "y": 18
             },
             "panelIndex": "1cd72292-ecba-4008-bb3c-e76c7fb6b4f4",
-            "panelRefName": "panel_5",
+            "panelRefName": "panel_6",
             "version": "7.4.0"
           },
           {
@@ -106,7 +119,7 @@
               "y": 18
             },
             "panelIndex": "cea56791-2602-4079-977b-7d088727872c",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_7",
             "version": "7.4.0"
           },
           {
@@ -119,7 +132,7 @@
               "y": 33
             },
             "panelIndex": "fe509a4d-700b-4092-9aae-ce14e8de103e",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_8",
             "version": "7.4.0"
           },
           {
@@ -132,7 +145,7 @@
               "y": 33
             },
             "panelIndex": "3d6b1fa0-746f-40ed-8fcc-ae89013f632b",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_9",
             "version": "7.4.0"
           },
           {
@@ -145,7 +158,7 @@
               "y": 48
             },
             "panelIndex": "0f9a5223-3c63-405c-a5c4-ea15416bad4a",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_10",
             "version": "7.4.0"
           }
         ],
@@ -159,59 +172,142 @@
       },
       "references": [
         {
-          "id": "9e012a20-20b4-11ea-8f72-2f8d21e50b0c",
+          "id": "bc8bd8f0-31fd-11ea-bcbf-59cb7eefc1f0",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "6b789730-2002-11ea-8f72-2f8d21e50b0c",
+          "id": "9e012a20-20b4-11ea-8f72-2f8d21e50b0c",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "5eaeaf50-20b4-11ea-8f72-2f8d21e50b0c",
+          "id": "6b789730-2002-11ea-8f72-2f8d21e50b0c",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "494adfe0-20b3-11ea-8f72-2f8d21e50b0c",
+          "id": "5eaeaf50-20b4-11ea-8f72-2f8d21e50b0c",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "8717f330-20b3-11ea-8f72-2f8d21e50b0c",
+          "id": "494adfe0-20b3-11ea-8f72-2f8d21e50b0c",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "64b587a0-20b1-11ea-8f72-2f8d21e50b0c",
+          "id": "8717f330-20b3-11ea-8f72-2f8d21e50b0c",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
+          "id": "64b587a0-20b1-11ea-8f72-2f8d21e50b0c",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "6d9c9fb0-20b2-11ea-8f72-2f8d21e50b0c",
+          "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "08d696d0-20b2-11ea-8f72-2f8d21e50b0c",
+          "id": "6d9c9fb0-20b2-11ea-8f72-2f8d21e50b0c",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+          "id": "08d696d0-20b2-11ea-8f72-2f8d21e50b0c",
           "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_10",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-12-17T10:17:20.141Z",
-      "version": "WzUxMzksMV0="
+      "updated_at": "2020-01-08T10:05:43.286Z",
+      "version": "WzUxNzIsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Region/Account Filters [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.region",
+                "id": "1549397251041",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "region",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "cloud.account.name",
+                "id": "1549512126406",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "account name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "Region/Account Filters [Metricbeat AWS]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "bc8bd8f0-31fd-11ea-bcbf-59cb7eefc1f0",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-01-08T10:00:44.799Z",
+      "version": "WzUxNjcsMV0="
     },
     {
       "attributes": {
