@@ -16,6 +16,7 @@ import (
 )
 
 type opDeleteFunction struct {
+	ctx      *functionContext
 	log      *logp.Logger
 	location string
 	name     string
@@ -23,12 +24,14 @@ type opDeleteFunction struct {
 }
 
 func newOpDeleteFunction(
+	ctx *functionContext,
 	log *logp.Logger,
 	location string,
 	name string,
 	tokenSrc oauth2.TokenSource,
 ) *opDeleteFunction {
 	return &opDeleteFunction{
+		ctx:      ctx,
 		log:      log,
 		location: location,
 		name:     name,
@@ -37,12 +40,7 @@ func newOpDeleteFunction(
 }
 
 // Execute creates a function from the zip uploaded.
-func (o *opDeleteFunction) Execute(ctx executor.Context) error {
-	c, ok := ctx.(*functionContext)
-	if !ok {
-		return errWrongContext
-	}
-
+func (o *opDeleteFunction) Execute(_ executor.Context) error {
 	client := oauth2.NewClient(context.TODO(), o.tokenSrc)
 	svc, err := cloudfunctions.New(client)
 	if err != nil {
@@ -55,7 +53,7 @@ func (o *opDeleteFunction) Execute(ctx executor.Context) error {
 		return fmt.Errorf("error while removing function %s: %+v", o.name, err)
 	}
 
-	c.name = &operation.Name
+	o.ctx.name = operation.Name
 
 	if operation.Done {
 		o.log.Debugf("Function %s removed successfully", o.name)

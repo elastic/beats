@@ -14,5 +14,5 @@ var (
 )
 
 type functionContext struct {
-	name *string
+	name string
 }

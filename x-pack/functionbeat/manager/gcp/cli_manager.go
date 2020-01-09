@@ -72,17 +72,17 @@ func (c *CLIManager) deploy(update bool, name string) error {
 	executer.Add(newOpEnsureBucket(c.log, c.config))
 	executer.Add(newOpUploadToBucket(c.log, c.config, name, functionData.raw))
 
+	ctx := &functionContext{}
 	if update {
-		executer.Add(newOpUpdateFunction(c.log, c.tokenSrc, functionData.function.Name, functionData.function))
+		executer.Add(newOpUpdateFunction(ctx, c.log, c.tokenSrc, functionData.function.Name, functionData.function))
 	} else {
-		executer.Add(newOpCreateFunction(c.log, c.tokenSrc, c.location, name, functionData.function))
+		executer.Add(newOpCreateFunction(ctx, c.log, c.tokenSrc, c.location, name, functionData.function))
 	}
 
-	executer.Add(newOpWaitForFunction(c.log, c.tokenSrc))
+	executer.Add(newOpWaitForFunction(ctx, c.log, c.tokenSrc))
 
-	ctx := &functionContext{}
-	if err := executer.Execute(ctx); err != nil {
-		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
+	if err := executer.Execute(nil); err != nil {
+		if rollbackErr := executer.Rollback(nil); rollbackErr != nil {
 			return errors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
 		}
 		return err
@@ -100,13 +100,13 @@ func (c *CLIManager) Remove(name string) error {
 		return err
 	}
 
+	ctx := &functionContext{}
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpDeleteFunction(c.log, c.location, functionData.function.Name, c.tokenSrc))
+	executer.Add(newOpDeleteFunction(ctx, c.log, c.location, functionData.function.Name, c.tokenSrc))
 	executer.Add(newOpDeleteFromBucket(c.log, c.config, name))
 
-	ctx := &functionContext{}
-	if err := executer.Execute(ctx); err != nil {
-		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
+	if err := executer.Execute(nil); err != nil {
+		if rollbackErr := executer.Rollback(nil); rollbackErr != nil {
 			return errors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
 		}
 		return err

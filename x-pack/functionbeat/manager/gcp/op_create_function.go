@@ -16,6 +16,7 @@ import (
 )
 
 type opCreateFunction struct {
+	ctx      *functionContext
 	log      *logp.Logger
 	tokenSrc oauth2.TokenSource
 	location string
@@ -24,6 +25,7 @@ type opCreateFunction struct {
 }
 
 func newOpCreateFunction(
+	ctx *functionContext,
 	log *logp.Logger,
 	tokenSrc oauth2.TokenSource,
 	location string,
@@ -31,6 +33,7 @@ func newOpCreateFunction(
 	f *cloudfunctions.CloudFunction,
 ) *opCreateFunction {
 	return &opCreateFunction{
+		ctx:      ctx,
 		log:      log,
 		tokenSrc: tokenSrc,
 		name:     name,
@@ -40,12 +43,7 @@ func newOpCreateFunction(
 }
 
 // Execute creates a function from the zip uploaded.
-func (o *opCreateFunction) Execute(ctx executor.Context) error {
-	c, ok := ctx.(*functionContext)
-	if !ok {
-		return errWrongContext
-	}
-
+func (o *opCreateFunction) Execute(_ executor.Context) error {
 	o.log.Debugf("Creating function %s at %s", o.function.Name, o.function.SourceArchiveUrl)
 
 	client := oauth2.NewClient(context.TODO(), o.tokenSrc)
@@ -60,7 +58,7 @@ func (o *opCreateFunction) Execute(ctx executor.Context) error {
 		return fmt.Errorf("error while creating function: %+v", err)
 	}
 
-	c.name = &operation.Name
+	o.ctx.name = operation.Name
 
 	if operation.Done {
 		o.log.Debugf("Function %s created successfully", o.function.Name)
@@ -72,6 +70,6 @@ func (o *opCreateFunction) Execute(ctx executor.Context) error {
 }
 
 // Rollback removes the deployed function.
-func (o *opCreateFunction) Rollback(ctx executor.Context) error {
-	return newOpDeleteFunction(o.log, o.location, o.function.Name, o.tokenSrc).Execute(ctx)
+func (o *opCreateFunction) Rollback(_ executor.Context) error {
+	return newOpDeleteFunction(o.ctx, o.log, o.location, o.function.Name, o.tokenSrc).Execute(nil)
 }

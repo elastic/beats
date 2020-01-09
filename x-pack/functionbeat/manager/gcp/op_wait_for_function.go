@@ -19,24 +19,21 @@ import (
 var periodicCheck = 5 * time.Second
 
 type opWaitForFunction struct {
+	ctx      *functionContext
 	log      *logp.Logger
 	tokenSrc oauth2.TokenSource
 }
 
-func newOpWaitForFunction(log *logp.Logger, tokenSrc oauth2.TokenSource) *opWaitForFunction {
+func newOpWaitForFunction(ctx *functionContext, log *logp.Logger, tokenSrc oauth2.TokenSource) *opWaitForFunction {
 	return &opWaitForFunction{
+		ctx:      ctx,
 		log:      log,
 		tokenSrc: tokenSrc,
 	}
 }
 
-func (o *opWaitForFunction) Execute(ctx executor.Context) error {
-	c, ok := ctx.(*functionContext)
-	if !ok {
-		return errWrongContext
-	}
-
-	if c.name == nil {
+func (o *opWaitForFunction) Execute(_ executor.Context) error {
+	if o.ctx.name == "" {
 		return errMissingFunctionName
 	}
 
@@ -48,7 +45,7 @@ func (o *opWaitForFunction) Execute(ctx executor.Context) error {
 
 	opSvc := cloudfunctions.NewOperationsService(svc)
 	for {
-		op, err := opSvc.Get(*c.name).Context(context.Background()).Do()
+		op, err := opSvc.Get(o.ctx.name).Context(context.Background()).Do()
 		if err != nil {
 			return err
 		}
@@ -61,7 +58,7 @@ func (o *opWaitForFunction) Execute(ctx executor.Context) error {
 			return nil
 		}
 
-		o.log.Debugf("Operation %s has not finished yet. Retrying in 5 seconds.", *c.name)
+		o.log.Debugf("Operation %s has not finished yet. Retrying in 5 seconds.", o.ctx.name)
 
 		timer := time.NewTimer(periodicCheck)
 		<-timer.C

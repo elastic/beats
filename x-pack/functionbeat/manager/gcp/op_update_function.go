@@ -16,6 +16,7 @@ import (
 )
 
 type opUpdateFunction struct {
+	ctx      *functionContext
 	log      *logp.Logger
 	tokenSrc oauth2.TokenSource
 	name     string
@@ -23,12 +24,14 @@ type opUpdateFunction struct {
 }
 
 func newOpUpdateFunction(
+	ctx *functionContext,
 	log *logp.Logger,
 	tokenSrc oauth2.TokenSource,
 	name string,
 	f *cloudfunctions.CloudFunction,
 ) *opUpdateFunction {
 	return &opUpdateFunction{
+		ctx:      ctx,
 		log:      log,
 		tokenSrc: tokenSrc,
 		name:     name,
@@ -37,12 +40,7 @@ func newOpUpdateFunction(
 }
 
 // Execute updates an existing function.
-func (o *opUpdateFunction) Execute(ctx executor.Context) error {
-	c, ok := ctx.(*functionContext)
-	if !ok {
-		return errWrongContext
-	}
-
+func (o *opUpdateFunction) Execute(_ executor.Context) error {
 	o.log.Debugf("Updating function %s at %s", o.function.Name, o.function.SourceArchiveUrl)
 
 	client := oauth2.NewClient(context.TODO(), o.tokenSrc)
@@ -57,7 +55,7 @@ func (o *opUpdateFunction) Execute(ctx executor.Context) error {
 		return fmt.Errorf("error while updating function: %+v", err)
 	}
 
-	c.name = &operation.Name
+	o.ctx.name = operation.Name
 
 	if operation.Done {
 		o.log.Debugf("Function %s updated successfully", o.function.Name)
