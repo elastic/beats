@@ -24,7 +24,6 @@ type Config struct {
 	TargetField   string         `config:"target_field"`               // Target field for the fingerprint
 	Encoding      encodingMethod `config:"encoding"`                   // Encoding to use for target field value
 	IgnoreMissing bool           `config:"ignore_missing"`             // Ignore missing fields?
-	UseXXHash     bool           `config:"use_xxhash"`                 // Use xxhash as default fingerprint method instead of sha256
 }
 
 func defaultConfig() Config {
@@ -33,6 +32,5 @@ func defaultConfig() Config {
 		TargetField:   "fingerprint",
 		Encoding:      encodings["hex"],
 		IgnoreMissing: false,
-		UseXXHash:     false,
 	}
 }
