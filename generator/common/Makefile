@@ -27,6 +27,7 @@ test: prepare-test
 .PHONY: test-package
 test-package: test
 	cd ${BEAT_PATH} ; \
+	export GOPATH=${PWD}/build ; \
 	export PATH=$${GOPATH}/bin:$${PATH}; \
 	mage package
 
