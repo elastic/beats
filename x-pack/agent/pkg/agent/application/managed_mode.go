@@ -24,8 +24,8 @@ import (
 )
 
 var gatewaySettings = &fleetGatewaySettings{
-	Duration: 30 * time.Second,
-	Jitter:   5 * time.Second,
+	Duration: 2 * time.Second,
+	Jitter:   1 * time.Second,
 }
 
 type apiClient interface {
