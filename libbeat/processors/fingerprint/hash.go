@@ -30,17 +30,13 @@ import (
 
 type hashMethod func() hash.Hash
 
-func newXXHash() hash.Hash {
-	return xxhash.New64()
-}
-
 var hashes = map[string]hashMethod{
 	"md5":    md5.New,
 	"sha1":   sha1.New,
 	"sha256": sha256.New,
 	"sha384": sha512.New384,
 	"sha512": sha512.New,
-	"xxhash": newXXHash,
+	"xxhash": func() hash.Hash { return xxhash.New64() },
 }
 
 // Unpack creates the hashMethod from the given string
