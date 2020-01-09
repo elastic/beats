@@ -25,8 +25,6 @@ import (
 	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
 )
 
-const testFile = "_meta/test/metrics"
-
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_service",
 		ptest.TestCases{
