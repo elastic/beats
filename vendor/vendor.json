@@ -3918,10 +3918,12 @@
 			"revisionTime": "2020-01-02T16:47:12Z"
 		},
 		{
-			"checksumSHA1": "MA07KaAp1aPVheuopyrFr7pxANs=",
+			"checksumSHA1": "mdUukOXCVJxmT0CufSKDeMg5JFM=",
 			"path": "github.com/opencontainers/runc/libcontainer/user",
-			"revision": "653207bc29a6d2d62b5d4f55b596467cb715a128",
-			"revisionTime": "2017-03-27T18:58:03Z"
+			"revision": "d736ef14f0288d6993a1845745d6756cfc9ddd5a",
+			"revisionTime": "2019-09-30T16:36:09Z",
+			"version": "v1.0.0-rc9",
+			"versionExact": "v1.0.0-rc9"
 		},
 		{
 			"checksumSHA1": "WmrPO1ovmQ7t7hs9yZGbr2SAoM4=",
