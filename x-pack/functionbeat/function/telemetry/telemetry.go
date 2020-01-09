@@ -5,7 +5,6 @@
 package telemetry
 
 import (
-	"strconv"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -13,21 +12,21 @@ import (
 
 // T is a telemetry instance
 type T interface {
-	AddTriggeredFunction(typeName string, triggerCount int64, eventCount int64)
+	AddTriggeredFunction()
 }
 
 type telemetry struct {
 	sync.Mutex
-	nextID int
 
-	registry *monitoring.Registry
+	registry       *monitoring.Registry
+	countFunctions *monitoring.Int
 }
 
 // New returns a new telemetry registry.
 func New(r *monitoring.Registry) T {
 	return &telemetry{
-		nextID:   0,
-		registry: r.NewRegistry("functions"),
+		registry:       r.NewRegistry("functions"),
+		countFunctions: monitoring.NewInt(r, "count"),
 	}
 }
 
@@ -37,20 +36,9 @@ func Ignored() T {
 }
 
 // AddTriggeredFunction adds a triggered function data to the registry.
-func (t *telemetry) AddTriggeredFunction(typeName string, triggerCount, eventCount int64) {
-	r := t.createFunctionRegistry()
-
-	monitoring.NewString(r, "type").Set(typeName)
-	monitoring.NewInt(r, "trigger_count").Set(triggerCount)
-	monitoring.NewInt(r, "event_count").Set(eventCount)
-}
-
-func (t *telemetry) createFunctionRegistry() *monitoring.Registry {
+func (t *telemetry) AddTriggeredFunction() {
 	t.Lock()
 	defer t.Unlock()
 
-	r := t.registry.NewRegistry(strconv.Itoa(t.nextID))
-	t.nextID++
-
-	return r
+	t.countFunctions.Inc()
 }

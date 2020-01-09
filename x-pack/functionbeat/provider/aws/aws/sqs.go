@@ -69,17 +69,17 @@ func SQSDetails() *feature.Details {
 
 // Run starts the lambda function and wait for web triggers.
 func (s *SQS) Run(_ context.Context, client core.Client, t telemetry.T) error {
-	lambdarunner.Start(s.createHandler(client, t))
+	t.AddTriggeredFunction()
+
+	lambdarunner.Start(s.createHandler(client))
 	return nil
 }
 
-func (s *SQS) createHandler(client core.Client, t telemetry.T) func(request events.SQSEvent) error {
+func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) error {
 	return func(request events.SQSEvent) error {
 		s.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.SQS(request)
-
-		t.AddTriggeredFunction(s.Name(), s.triggerCount(), int64(len(events)))
 
 		if err := client.PublishAll(events); err != nil {
 			s.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
@@ -93,10 +93,6 @@ func (s *SQS) createHandler(client core.Client, t telemetry.T) func(request even
 // Name return the name of the lambda function.
 func (s *SQS) Name() string {
 	return "sqs"
-}
-
-func (s *SQS) triggerCount() int64 {
-	return int64(len(s.config.Triggers))
 }
 
 // Template returns the cloudformation template for configuring the service with the specified triggers.

@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 func TestSQS(t *testing.T) {
@@ -34,7 +33,7 @@ func TestSQS(t *testing.T) {
 		}
 
 		c, _ := s.(*SQS)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 		err = handler(generateSQSEvent())
 		assert.NoError(t, err)
 	})
@@ -49,7 +48,7 @@ func TestSQS(t *testing.T) {
 		}
 
 		c, _ := s.(*SQS)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 		err = handler(generateSQSEvent())
 		assert.Equal(t, e, err)
 	})

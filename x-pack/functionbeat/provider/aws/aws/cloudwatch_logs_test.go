@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 type arrayBackedClient struct {
@@ -67,7 +66,7 @@ func TestCloudwatchLogs(t *testing.T) {
 		}
 
 		c, _ := cwl.(*CloudwatchLogs)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 
 		err = handler(generateCloudwatchLogRawEvent())
 
@@ -83,7 +82,7 @@ func TestCloudwatchLogs(t *testing.T) {
 		}
 
 		c, _ := cwl.(*CloudwatchLogs)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 
 		err = handler(generateCloudwatchLogRawEvent())
 

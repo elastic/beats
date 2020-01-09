@@ -46,7 +46,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: nil},
 		}
 
-		errReceived := runnable.Run(context.Background(), telemetry.NewMock())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.Equal(t, err, e.Cause(errReceived))
 	})
 
@@ -58,7 +58,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: err},
 		}
 
-		errReceived := runnable.Run(context.Background(), telemetry.NewMock())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.Equal(t, err, e.Cause(errReceived))
 	})
 
@@ -69,7 +69,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: nil},
 		}
 
-		errReceived := runnable.Run(context.Background(), telemetry.NewMock())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.NoError(t, errReceived)
 	})
 }

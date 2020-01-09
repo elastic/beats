@@ -46,19 +46,18 @@ func APIGatewayProxyDetails() *feature.Details {
 
 // Run starts the lambda function and wait for web triggers.
 func (a *APIGatewayProxy) Run(_ context.Context, client core.Client, telemetry telemetry.T) error {
-	lambda.Start(a.createHandler(client, telemetry))
+	telemetry.AddTriggeredFunction()
+
+	lambda.Start(a.createHandler(client))
 	return nil
 }
 
 func (a *APIGatewayProxy) createHandler(
 	client core.Client,
-	telemetry telemetry.T,
 ) func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 		a.log.Debugf("The handler receives a new event from the gateway (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)
-
-		telemetry.AddTriggeredFunction(a.Name(), 1, 1)
 
 		if err := client.Publish(event); err != nil {
 			a.log.Errorf("could not publish event to the pipeline, error: %+v", err)

@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 func TestKinesis(t *testing.T) {
@@ -35,7 +34,7 @@ func TestKinesis(t *testing.T) {
 		}
 
 		c, _ := k.(*Kinesis)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 		err = handler(generateKinesisEvent())
 		assert.NoError(t, err)
 	})
@@ -50,7 +49,7 @@ func TestKinesis(t *testing.T) {
 		}
 
 		c, _ := k.(*Kinesis)
-		handler := c.createHandler(client, telemetry.NewMock())
+		handler := c.createHandler(client)
 		err = handler(generateKinesisEvent())
 		assert.Equal(t, e, err)
 	})

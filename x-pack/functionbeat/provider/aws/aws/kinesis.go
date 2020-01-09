@@ -134,17 +134,17 @@ func KinesisDetails() *feature.Details {
 
 // Run starts the lambda function and wait for web triggers.
 func (k *Kinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
-	lambdarunner.Start(k.createHandler(client, t))
+	t.AddTriggeredFunction()
+
+	lambdarunner.Start(k.createHandler(client))
 	return nil
 }
 
-func (k *Kinesis) createHandler(client core.Client, t telemetry.T) func(request events.KinesisEvent) error {
+func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
 		k.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)
-
-		t.AddTriggeredFunction(k.Name(), k.triggerCount(), int64(len(events)))
 
 		if err := client.PublishAll(events); err != nil {
 			k.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
@@ -158,10 +158,6 @@ func (k *Kinesis) createHandler(client core.Client, t telemetry.T) func(request 
 // Name return the name of the lambda function.
 func (k *Kinesis) Name() string {
 	return "kinesis"
-}
-
-func (k *Kinesis) triggerCount() int64 {
-	return int64(len(k.config.Triggers))
 }
 
 // LambdaConfig returns the configuration to use when creating the lambda.
