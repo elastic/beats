@@ -134,8 +134,8 @@ def has_license(folder):
         for dir in os.listdir(os.path.join(folder, subdir)):
             if not os.path.isdir(os.path.join(folder, subdir, dir)):
                 return False, subdir
-        if len(get_licenses(os.path.join(folder, subdir, dir))) == 0:
-            return False, os.path.join(folder, subdir, dir)
+            if len(get_licenses(os.path.join(folder, subdir, dir))) == 0:
+                return False, os.path.join(folder, subdir, dir)
 
     return True, ""
 
