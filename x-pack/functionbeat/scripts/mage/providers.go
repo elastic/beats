@@ -31,10 +31,12 @@ func getConfiguredProviders() []functionbeatProvider {
 	}
 
 	providers := make([]functionbeatProvider, 0)
+
 	for _, name := range strings.Split(providersList, ",") {
 		for _, provider := range availableProviders {
 			if provider.Name == name {
 				providers = append(providers, provider)
+				break
 			}
 		}
 	}
