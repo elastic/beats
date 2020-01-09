@@ -8,9 +8,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 
 	"github.com/pkg/errors"
 
