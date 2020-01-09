@@ -115,10 +115,12 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// AddKey add a key value to an existing dictionary.
 func (d *Dict) AddKey(k *Key) {
 	d.value = append(d.value, k)
 }
 
+// NewKV creates a new Key value node.
 func NewKV(k string, value interface{}) (*Key, error) {
 	v, err := loadVal(value)
 	if err != nil {
