@@ -6,14 +6,10 @@ package storage
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
@@ -84,26 +80,6 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		}
 	}
 	return metrics, nil
-}
-
-// addMetricValues will map the metric values in a specific way for the storage metricset
-func addMetricValues(event *mb.Event, metricValues common.MapStr) error {
-	namespace, err := event.ModuleFields.GetValue("namespace")
-	if err != nil {
-		return errors.New("event namespace has not been set")
-	}
-	if i := retrieveServiceNamespace(namespace.(string)); i != "" {
-		name := strings.TrimPrefix(i, "/")
-		name = strings.TrimSuffix(name, "Services")
-		for key, metric := range metricValues {
-			event.MetricSetFields.Put(fmt.Sprintf("%s.%s", name, key), metric)
-		}
-	} else {
-		for key, metric := range metricValues {
-			event.MetricSetFields.Put(key, metric)
-		}
-	}
-	return nil
 }
 
 // filterOnTimeGrain - some metrics do not support the default timegrain value so the closest supported timegrain will be selected

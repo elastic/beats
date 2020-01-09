@@ -1,4 +1,4 @@
-This is the compute_vm metricset of the module azure.
+This is the storage metricset of the module azure.
 
 This metricset allows users to retrieve all metrics from specified storage accounts.
 

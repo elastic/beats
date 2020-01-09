@@ -81,7 +81,6 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	Client    *Client
 	MapMetric mapMetric
-	InitEvent initEvent
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -138,5 +137,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	return EventsMapping(m.InitEvent, m.Client.Resources.Metrics, m.BaseMetricSet.Name(), report)
+	return EventsMapping(m.Client.Resources.Metrics, m.BaseMetricSet.Name(), report)
 }

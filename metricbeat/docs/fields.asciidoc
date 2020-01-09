@@ -2856,36 +2856,6 @@ azure module
 
 
 
-*`azure.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.dimensions.*`*::
-+
---
-Azure metric dimensions.
-
-
-type: object
-
---
-
 [float]
 === resource
 
@@ -2933,7 +2903,37 @@ type: object
 
 --
 
-*`azure.resource.compute_vm.*.*`*::
+*`azure.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.*.*`*::
 +
 --
 compute_vm
@@ -2943,7 +2943,7 @@ type: object
 
 --
 
-*`azure.resource.compute_vm_scaleset.*.*`*::
+*`azure.compute_vm_scaleset.*.*`*::
 +
 --
 compute_vm_scaleset
@@ -2960,7 +2960,7 @@ monitor
 
 
 
-*`azure.resource.monitor.metrics.*.*`*::
+*`azure.monitor.metrics.*.*`*::
 +
 --
 Metrics returned.
@@ -2970,7 +2970,7 @@ type: object
 
 --
 
-*`azure.resource.storage.*.*`*::
+*`azure.storage.*.*`*::
 +
 --
 storage account

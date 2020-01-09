@@ -14,12 +14,13 @@ import (
 )
 
 const (
+	// NoDimension is used to group metrics in separate api calls in order to reduce the number of executions
 	NoDimension     = "none"
 	nativeMetricset = "monitor"
 )
 
 // EventsMapping will map metric values to beats events
-func EventsMapping(fn initEvent, metrics []Metric, metricset string, report mb.ReporterV2) error {
+func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) error {
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
@@ -79,25 +80,16 @@ func EventsMapping(fn initEvent, metrics []Metric, metricset string, report mb.R
 			} else {
 				event, metricList = createEvent(timestamp, defaultMetric, groupTimeValues)
 			}
-			if fn != nil {
-				err := fn(&event, metricList)
-				if err != nil {
-					return err
-				}
+			if metricset == nativeMetricset {
+				event.ModuleFields.Put("metrics", metricList)
 			} else {
-				if metricset == nativeMetricset {
-					event.ModuleFields.Put("metrics", metricList)
-				} else {
-					for key, metric := range metricList {
-						event.MetricSetFields.Put(key, metric)
-					}
+				for key, metric := range metricList {
+					event.MetricSetFields.Put(key, metric)
 				}
 			}
 			report.Event(event)
 		}
-
 	}
-
 	return nil
 }
 

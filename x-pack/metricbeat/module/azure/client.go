@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
@@ -30,9 +28,6 @@ type Client struct {
 
 // mapMetric function type will map the configuration options to client metrics (depending on the metricset)
 type mapMetric func(client *Client, metric MetricConfig, resource resources.GenericResource) ([]Metric, error)
-
-// mapMetric function type will map the configuration options to client metrics (depending on the metricset)
-type initEvent func(event *mb.Event, str common.MapStr) error
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
