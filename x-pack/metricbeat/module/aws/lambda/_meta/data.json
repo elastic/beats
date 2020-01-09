@@ -2,24 +2,26 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
-            "dimensions": {
-                "FunctionName": "cloudtrail-ingest-test-ingestLog",
-                "Resource": "cloudtrail-ingest-test-ingestLog"
-            },
             "namespace": "AWS/Lambda"
         },
-        "metrics": {
-            "Duration": {
-                "avg": 198.9780769230769
-            },
-            "Errors": {
-                "avg": 0
-            },
-            "Invocations": {
-                "avg": 1
-            },
-            "Throttles": {
-                "avg": 0
+        "dimensions": {
+            "FunctionName": "ec2-owner-tagger-serverless",
+            "Resource": "ec2-owner-tagger-serverless"
+        },
+        "lambda": {
+            "metrics": {
+                "Duration": {
+                    "avg": 8218.073333333334
+                },
+                "Errors": {
+                    "avg": 1
+                },
+                "Invocations": {
+                    "avg": 1
+                },
+                "Throttles": {
+                    "avg": 0
+                }
             }
         }
     },

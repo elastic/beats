@@ -156,8 +156,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-12-27T18:03:43.571Z",
-      "version": "WzYwOSwxXQ=="
+      "updated_at": "2020-01-09T23:14:56.640Z",
+      "version": "WzI3MDAsM10="
     },
     {
       "attributes": {
@@ -208,14 +208,14 @@
       },
       "references": [
         {
-          "id": "f4a030c0-2838-11ea-ba6c-49a884eb104f",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:59:17.384Z",
-      "version": "WzYwMywxXQ=="
+      "updated_at": "2020-01-09T22:47:51.746Z",
+      "version": "WzIzMTUsM10="
     },
     {
       "attributes": {
@@ -283,7 +283,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.Errors.avg",
+                    "field": "aws.lambda.metrics.Errors.avg",
                     "id": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                     "type": "max"
                   }
@@ -293,7 +293,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                "terms_field": "aws.dimensions.FunctionName",
                 "terms_order_by": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -302,7 +302,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "top_n"
+            "type": "timeseries"
           },
           "title": "Lambda Top Errors [Metricbeat AWS]",
           "type": "metrics"
@@ -314,8 +314,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:49:57.555Z",
-      "version": "WzU5NCwxXQ=="
+      "updated_at": "2020-01-09T22:58:19.013Z",
+      "version": "WzI2OTAsM10="
     },
     {
       "attributes": {
@@ -356,7 +356,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "AWS Region Filter [Metricbeat AWS]",
+          "title": "AWS Region Filter",
           "type": "input_control_vis"
         }
       },
@@ -366,14 +366,14 @@
       },
       "references": [
         {
-          "id": "f4a030c0-2838-11ea-ba6c-49a884eb104f",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:57:44.234Z",
-      "version": "WzU5OSwxXQ=="
+      "updated_at": "2020-01-09T22:47:51.746Z",
+      "version": "WzIzMTIsM10="
     },
     {
       "attributes": {
@@ -423,7 +423,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.Duration.avg",
+                    "field": "aws.lambda.metrics.Duration.avg",
                     "id": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                     "type": "avg"
                   }
@@ -433,8 +433,9 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                "terms_field": "aws.dimensions.FunctionName",
                 "terms_order_by": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
+                "type": "timeseries",
                 "value_template": "{{value}}"
               }
             ],
@@ -453,8 +454,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:35:08.253Z",
-      "version": "WzU4MywxXQ=="
+      "updated_at": "2020-01-09T23:09:15.122Z",
+      "version": "WzI2OTgsM10="
     },
     {
       "attributes": {
@@ -514,7 +515,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.Invocations.avg",
+                    "field": "aws.lambda.metrics.Invocations.avg",
                     "id": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                     "type": "max"
                   }
@@ -524,7 +525,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                "terms_field": "aws.dimensions.FunctionName",
                 "terms_order_by": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -545,8 +546,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:48:42.572Z",
-      "version": "WzU5MywxXQ=="
+      "updated_at": "2020-01-09T22:59:29.714Z",
+      "version": "WzI2OTEsM10="
     },
     {
       "attributes": {
@@ -614,7 +615,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.Throttles.avg",
+                    "field": "aws.lambda.metrics.Duration.avg",
                     "id": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                     "type": "max"
                   }
@@ -624,7 +625,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                "terms_field": "aws.dimensions.FunctionName",
                 "terms_order_by": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -645,8 +646,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-27T17:51:54.021Z",
-      "version": "WzU5NSwxXQ=="
+      "updated_at": "2020-01-09T22:59:58.449Z",
+      "version": "WzI2OTIsM10="
     }
   ],
   "version": "7.5.0"
