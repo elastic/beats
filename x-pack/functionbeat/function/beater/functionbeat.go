@@ -65,7 +65,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 
-	telemetryReg = monitoring.GetNamespace("state").GetRegistry().NewRegistry("functionbeat")
+	telemetryReg := monitoring.GetNamespace("state").GetRegistry().NewRegistry("functionbeat")
 
 	bt := &Functionbeat{
 		ctx:       ctx,
