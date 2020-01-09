@@ -37,7 +37,7 @@ func TestWhenPriorityIsSet(t *testing.T) {
 	e.SetPid([]byte("123"))
 
 	m := dummyMetadata()
-	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+	event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 
 	expected := common.MapStr{
 		"log": common.MapStr{
@@ -71,7 +71,7 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 	e.SetPid([]byte("123"))
 
 	m := dummyMetadata()
-	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+	event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 	expected := common.MapStr{
 		"log": common.MapStr{
 			"source": common.MapStr{
@@ -96,7 +96,7 @@ func TestPid(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetPid([]byte("123"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 		v, err := event.GetValue("process")
 		if !assert.NoError(t, err) {
 			return
@@ -108,7 +108,7 @@ func TestPid(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("process")
 		assert.Equal(t, common.ErrKeyNotFound, err)
@@ -121,7 +121,7 @@ func TestHostname(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetHostname([]byte("wopr"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 		v, err := event.GetValue("hostname")
 		if !assert.NoError(t, err) {
 			return
@@ -133,7 +133,7 @@ func TestHostname(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("hostname")
 		if !assert.Error(t, err) {
@@ -148,7 +148,7 @@ func TestProgram(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetProgram([]byte("sudo"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 		v, err := event.GetValue("process")
 		if !assert.NoError(t, err) {
 			return
@@ -160,7 +160,7 @@ func TestProgram(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("process")
 		assert.Equal(t, common.ErrKeyNotFound, err)
@@ -174,7 +174,7 @@ func TestSequence(t *testing.T) {
 		e.SetProgram([]byte("sudo"))
 		e.SetSequence([]byte("123"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 		v, err := event.GetValue("event.sequence")
 		if !assert.NoError(t, err) {
 			return
@@ -186,7 +186,7 @@ func TestSequence(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent3164(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("event.sequence")
 		assert.Error(t, err)
