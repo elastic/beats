@@ -28,12 +28,7 @@ func injectESOutputAPIKey(
 		return nil, errors.New(errors.TypeConfig, "fail to decode API key")
 	}
 
-	insert, err := transpiler.NewAST(map[string]interface{}{
-		apiKeyKey: string(APIStrdec),
-	})
-	if err != nil {
-		return nil, errors.New(errors.TypeConfig, "error reading the API Key")
-	}
+	APIStr := string(APIStrdec)
 
 	return func(_ string, _ *transpiler.AST, programs []program.Program) ([]program.Program, error) {
 		if len(programs) == 0 {
@@ -55,16 +50,25 @@ func injectESOutputAPIKey(
 		}
 
 		for _, program := range programs {
-			fmt.Printf("%+v\n", insert.Root())
+			n, found := transpiler.Lookup(program.Config, esOutputKey)
+			if !found {
+				return nil, errors.New("waat")
+			}
 
-			err := transpiler.Insert(program.Config, insert.Root(), esOutputKey)
-			if err != nil {
+			d, ok := n.Value().(*transpiler.Dict)
+			if !ok {
 				return nil, errors.New(
-					err,
 					errors.TypeConfig,
-					"could not insert api key to the configuration",
+					fmt.Sprintf("incompatible type expected Dictionary and received %T", n),
 				)
 			}
+
+			kv, err := transpiler.NewKV(apiKeyKey, APIStr)
+			if err != nil {
+				return nil, errors.New(err, errors.TypeConfig, "fail to add api_key to output")
+			}
+
+			d.AddKey(kv)
 		}
 
 		return programs, nil

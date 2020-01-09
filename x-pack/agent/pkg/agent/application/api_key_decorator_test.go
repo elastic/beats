@@ -53,8 +53,8 @@ func TestInjectESOutputAPIKey(t *testing.T) {
 								},
 							},
 							"output.elasticsearch": map[string]interface{}{
-								"api_key": decodedAPIKey,
 								"hosts":   "xxx",
+								"api_key": decodedAPIKey,
 							},
 						},
 					),
@@ -104,8 +104,8 @@ func TestInjectESOutputAPIKey(t *testing.T) {
 								},
 							},
 							"output.elasticsearch": map[string]interface{}{
-								"api_key": decodedAPIKey,
 								"hosts":   "xxx",
+								"api_key": decodedAPIKey,
 							},
 						},
 					),
@@ -157,8 +157,8 @@ func TestInjectESOutputAPIKey(t *testing.T) {
 								},
 							},
 							"output.elasticsearch": map[string]interface{}{
-								"api_key": "another:apikey",
 								"hosts":   "xxx",
+								"api_key": "another:apikey",
 							},
 						},
 					),
@@ -211,10 +211,13 @@ func TestInjectESOutputAPIKey(t *testing.T) {
 			programs, err := decorate("", nil, test.config)
 			require.NoError(t, err)
 
-			if !assert.True(t, cmp.Equal(test.expected, programs)) {
-				diff := cmp.Diff(test.expected, programs)
-				if diff != "" {
-					t.Errorf("%s mismatch (-want +got):\n%s", name, diff)
+			assert.Equal(t, len(test.expected), len(programs))
+			for idx, expected := range test.expected {
+				if !assert.True(t, cmp.Equal(expected.Configuration(), programs[idx].Configuration())) {
+					diff := cmp.Diff(expected, programs[idx])
+					if diff != "" {
+						t.Errorf("%s-%d mismatch (-want +got):\n%s", name, idx, diff)
+					}
 				}
 			}
 		})

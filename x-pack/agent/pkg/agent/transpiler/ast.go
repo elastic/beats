@@ -115,6 +115,18 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+func (d *Dict) AddKey(k *Key) {
+	d.value = append(d.value, k)
+}
+
+func NewKV(k string, value interface{}) (*Key, error) {
+	v, err := loadVal(value)
+	if err != nil {
+		return nil, err
+	}
+	return &Key{name: k, value: v}, nil
+}
+
 // Key represents a Key / value pair in the dictionary.
 type Key struct {
 	name  string
@@ -399,6 +411,11 @@ func MustNewAST(m map[string]interface{}) *AST {
 		panic(err)
 	}
 	return v
+}
+
+func loadVal(v interface{}) (Node, error) {
+	val := reflect.ValueOf(v)
+	return load(val)
 }
 
 func load(val reflect.Value) (Node, error) {
