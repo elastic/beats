@@ -437,7 +437,7 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 
 		if err == io.EOF {
 			// create event for last line
-			// get logs from json.message_key
+			// get logs from expand_event_list_from_field
 			textValues, ok := jsonFields[p.config.ExpendEventListFromField]
 			if !ok {
 				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))

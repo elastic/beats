@@ -31,7 +31,7 @@ stopped and the sqs message will be returned back to the queue.
 - type: s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
   credential_profile_name: elastic-beats
-  json.message_key: Records
+  expand_event_list_from_field: Records
 ----
 
 The `s3` input supports the following configuration options plus the
