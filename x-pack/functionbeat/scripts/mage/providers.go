@@ -4,6 +4,11 @@
 
 package mage
 
+import (
+	"os"
+	"strings"
+)
+
 type functionbeatProvider struct {
 	Name   string
 	GOOS   string
@@ -12,7 +17,27 @@ type functionbeatProvider struct {
 
 var (
 	// SelectedProviders is the list of selected providers
-	SelectedProviders = []functionbeatProvider{
-		{Name: "aws", GOOS: "darwin", GOARCH: "amd64"},
+	SelectedProviders = getConfiguredProviders()
+
+	availableProviders = []functionbeatProvider{
+		{Name: "aws", GOOS: "linux", GOARCH: "amd64"},
 	}
 )
+
+func getConfiguredProviders() []functionbeatProvider {
+	providersList := os.Getenv("PROVIDERS")
+	if len(providersList) == 0 {
+		return availableProviders
+	}
+
+	providers := make([]functionbeatProvider, 0)
+	for _, name := range strings.Split(providersList, ",") {
+		for _, provider := range availableProviders {
+			if provider.Name == name {
+				providers = append(providers, provider)
+			}
+		}
+	}
+
+	return providers
+}
