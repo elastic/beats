@@ -32,16 +32,13 @@ type MetaGenerator interface {
 
 // MetaGeneratorConfig settings
 type MetaGeneratorConfig struct {
-	IncludeLabels      []string `config:"include_labels"`
-	ExcludeLabels      []string `config:"exclude_labels"`
-	IncludeAnnotations []string `config:"include_annotations"`
+	IncludeLabels []string `config:"include_labels"`
+	ExcludeLabels []string `config:"exclude_labels"`
 
 	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
-	LabelsDedot            bool `config:"labels.dedot"`
-	AnnotationsDedot       bool `config:"annotations.dedot"`
-	client                 *Client
-	nodesCache             map[string]string
+	LabelsDedot bool `config:"labels.dedot"`
+	client      *Client
+	nodesCache  map[string]string
 }
 
 type metaGenerator = MetaGeneratorConfig
@@ -50,10 +47,8 @@ type metaGenerator = MetaGeneratorConfig
 func NewMetaGenerator(cfg *common.Config, c *Client) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
-		IncludeCreatorMetadata: true,
-		LabelsDedot:            true,
-		AnnotationsDedot:       true,
-		client:                 c,
+		LabelsDedot: true,
+		client:      c,
 	}
 
 	err := cfg.Unpack(&generator)
@@ -141,8 +136,8 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 
 		for _, service := range task.Services {
 			svcMeta["name"] = append(svcMeta["name"].([]string), service.Name)
-			svcMeta["tags"] = append(svcMeta["name"].([]string), service.Tags...)
-			svcMeta["canary_tags"] = append(svcMeta["name"].([]string),
+			svcMeta["tags"] = append(svcMeta["tags"].([]string), service.Tags...)
+			svcMeta["canary_tags"] = append(svcMeta["canary_tags"].([]string),
 				service.CanaryTags...)
 		}
 

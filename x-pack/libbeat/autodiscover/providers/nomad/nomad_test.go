@@ -163,9 +163,9 @@ func TestEmitEvent(t *testing.T) {
 						"key1":      "task-value",
 						"name":      "task1",
 						"service": common.MapStr{
-							"canary_tags": []string{"web", "nginx"},
+							"canary_tags": []string{},
 							"name":        []string{"web", "nginx"},
-							"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
+							"tags":        []string{"tag-a", "tag-b", "tag-c", "tag-d"},
 						},
 						"task-key": "task.value",
 					},
