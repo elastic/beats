@@ -24,66 +24,54 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 	if metric.Name == nil {
 		return nil, nil
 	}
-	var namespaces []insights.MetricNamespace
-	// return all namespaces supported for this resource
-	response, err := client.AzureMonitorService.GetMetricNamespaces(*resource.ID)
-	if err != nil {
-		return nil, errors.Wrapf(err, "no metric namespaces were found for resource %s", *resource.ID)
-	}
-	namespaces = append(namespaces, *response.Value...)
-
-	// return all service namespaces for this resource (format of resource id will be resource path/servicetype/default) if serviceType is not configured
-	var serviceNamespaces []string
+	namespaces := []string{defaultStorageAccountNamespace}
+	// if serviceType is configured, add only the selected serviceType namespaces
 	if len(metric.CustomFields.ServiceType) > 0 {
-		for _, ser := range metric.CustomFields.ServiceType {
-			serviceNamespaces = append(serviceNamespaces, ser+serviceTypeNamespaceExtension)
+		for _, selectedServiceNamespace := range metric.CustomFields.ServiceType {
+			namespaces = append(namespaces, fmt.Sprintf("%s/%s%s", defaultStorageAccountNamespace, selectedServiceNamespace, serviceTypeNamespaceExtension))
 		}
 	} else {
-		serviceNamespaces = storageServiceNamespaces
-	}
-	for _, serviceNamespace := range serviceNamespaces {
-		response, err = client.AzureMonitorService.GetMetricNamespaces(fmt.Sprintf("%s/%s%s", *resource.ID, serviceNamespace, resourceIDExtension))
-		if err != nil {
-			return nil, errors.Wrapf(err, "no metric namespaces were found for resource %s", *resource.ID)
+		for _, service := range storageServiceNamespaces {
+			namespaces = append(namespaces, fmt.Sprintf("%s%s", defaultStorageAccountNamespace, service))
 		}
-		namespaces = append(namespaces, *response.Value...)
 	}
-
 	for _, namespace := range namespaces {
+		// resourceID will be different for a  serviceType namespace, format will be resourceID/service/default
 		var resourceID = *resource.ID
-		// get all metric definitions supported by the namespace provided
-		if i := retrieveServiceNamespace(*namespace.Properties.MetricNamespaceName); i != "" {
+		if i := retrieveServiceNamespace(namespace); i != "" {
 			resourceID += i + resourceIDExtension
 		}
-		metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(resourceID, *namespace.Properties.MetricNamespaceName)
+		// get all metric definitions supported by the namespace provided
+		metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(resourceID, namespace)
 		if err != nil {
-			return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", resourceID, *namespace.Properties.MetricNamespaceName)
+			return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", resourceID, namespace)
 		}
 		if len(*metricDefinitions.Value) == 0 {
-			return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", resourceID, *namespace.Properties.MetricNamespaceName)
+			return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", resourceID, namespace)
 		}
 		var filteredMetricDefinitions []insights.MetricDefinition
 		for _, metricDefinition := range *metricDefinitions.Value {
 			filteredMetricDefinitions = append(filteredMetricDefinitions, metricDefinition)
 		}
-		groupedMetrics := filterOnTimeGrain(filteredMetricDefinitions)
+		// some metrics do not support the default PT5M timegrain so they will have to be grouped in a different API call, else call will fail
+		groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions)
 		for time, groupedMetricList := range groupedMetrics {
-			// map azure metric definitions to client metrics
-			dimMetrics := azure.GroupMetricsByAllDimensions(groupedMetricList)
+			// metrics will have to be grouped by allowed dimensions
+			dimMetrics := groupMetricsByAllowedDimensions(groupedMetricList)
 			for dimension, mets := range dimMetrics {
 				var dimensions []azure.Dimension
 				if dimension != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 				}
-				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, mets, resource, resourceID, *namespace.Properties.MetricNamespaceName, dimensions, time)...)
+				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, mets, resource, resourceID, namespace, dimensions, time)...)
 			}
 		}
 	}
 	return metrics, nil
 }
 
-// filterOnTimeGrain - some metrics do not support the default timegrain value so the closest supported timegrain will be selected
-func filterOnTimeGrain(list []insights.MetricDefinition) map[string][]insights.MetricDefinition {
+// groupOnTimeGrain - some metrics do not support the default timegrain value so the closest supported timegrain will be selected
+func groupOnTimeGrain(list []insights.MetricDefinition) map[string][]insights.MetricDefinition {
 	var groupedList = make(map[string][]insights.MetricDefinition)
 	for _, metric := range list {
 		timegrain := retrieveSupportedMetricAvailability(*metric.MetricAvailabilities)
@@ -122,4 +110,41 @@ func retrieveServiceNamespace(item string) string {
 		}
 	}
 	return ""
+}
+
+// filterAllowedDimension func will filter out all unallowed dimensions
+func filterAllowedDimension(metric insights.MetricDefinition) []string {
+	if metric.Dimensions == nil {
+		return nil
+	}
+	var dimensions []string
+	for _, dimension := range *metric.Dimensions {
+		for _, dim := range allowedDimensions {
+			if dim == *dimension.Value {
+				dimensions = append(dimensions, dim)
+			}
+		}
+	}
+	return dimensions
+}
+
+// groupMetricsByAllowedDimensions will group metrics by dimension names in order to reduce the number of api calls
+func groupMetricsByAllowedDimensions(metrics []insights.MetricDefinition) map[string][]insights.MetricDefinition {
+	var groupedMetrics = make(map[string][]insights.MetricDefinition)
+	for _, metric := range metrics {
+		if dimensions := filterAllowedDimension(metric); len(dimensions) > 0 {
+			for _, dimension := range dimensions {
+				if _, ok := groupedMetrics[dimension]; !ok {
+					groupedMetrics[dimension] = make([]insights.MetricDefinition, 0)
+				}
+				groupedMetrics[dimension] = append(groupedMetrics[dimension], metric)
+			}
+		} else {
+			if _, ok := groupedMetrics[azure.NoDimension]; !ok {
+				groupedMetrics[azure.NoDimension] = make([]insights.MetricDefinition, 0)
+			}
+			groupedMetrics[azure.NoDimension] = append(groupedMetrics[azure.NoDimension], metric)
+		}
+	}
+	return groupedMetrics
 }

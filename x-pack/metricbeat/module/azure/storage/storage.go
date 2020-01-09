@@ -13,7 +13,10 @@ import (
 
 const defaultStorageAccountNamespace = "Microsoft.Storage/storageAccounts"
 
-var storageServiceNamespaces = []string{"/blobServices", "/tableServices", "/queueServices", "/fileServices"}
+var (
+	storageServiceNamespaces = []string{"/blobServices", "/tableServices", "/queueServices", "/fileServices"}
+	allowedDimensions        = []string{"ResponseType", "ApiName"}
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
