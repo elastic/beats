@@ -1820,10 +1820,28 @@
 			"revisionTime": "2019-09-27T01:04:35Z"
 		},
 		{
+			"checksumSHA1": "NCbMhsHDjvCTNYw10fV7deTC8/4=",
+			"path": "github.com/containerd/continuity/fs",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
+		},
+		{
 			"checksumSHA1": "6aGvzibOCGGTbCFKOHRWIASC+Us=",
 			"path": "github.com/containerd/continuity/pathdriver",
 			"revision": "75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec",
 			"revisionTime": "2019-08-27T14:05:05Z"
+		},
+		{
+			"checksumSHA1": "za2TXa2xq+zMGLTZT/RPsUz/17s=",
+			"path": "github.com/containerd/continuity/syscallx",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
+		},
+		{
+			"checksumSHA1": "UxFYDqJHgqsKPBO0FQOHNoeo1Tk=",
+			"path": "github.com/containerd/continuity/sysx",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
 		},
 		{
 			"checksumSHA1": "ARPWcCZaH5T/+LVCWHgAc2e3uwQ=",
@@ -2177,6 +2195,15 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "R4EHRKN+Xu8AhENs0xak3mZm4vg=",
+			"origin": "github.com/docker/engine/pkg/archive",
+			"path": "github.com/docker/docker/pkg/archive",
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
+		},
+		{
 			"checksumSHA1": "eMoRb/diYeuYLojU7ChN5DaETHc=",
 			"origin": "github.com/docker/engine/pkg/fileutils",
 			"path": "github.com/docker/docker/pkg/fileutils",
@@ -2283,6 +2310,12 @@
 			"revisionTime": "2019-11-13T04:22:39Z",
 			"version": "v19.03.5",
 			"versionExact": "v19.03.5"
+		},
+		{
+			"checksumSHA1": "Yl6cD918tLOXa0I/iuGiovmszQU=",
+			"path": "github.com/docker/docker/pkg/pools",
+			"revision": "5947fa1b3e441586269f1ccb04ed3f2ec08e73dc",
+			"revisionTime": "2020-01-09T20:08:02Z"
 		},
 		{
 			"checksumSHA1": "TzcP4JKm2Sylo6qFay+UJ4YlwPU=",
@@ -3877,6 +3910,12 @@
 			"path": "github.com/opencontainers/image-spec/specs-go/v1",
 			"revision": "775207bd45b6cb8153ce218cc59351799217451f",
 			"revisionTime": "2019-08-23T10:51:29Z"
+		},
+		{
+			"checksumSHA1": "SInqynLK8NjJIeFs0Mtk4g8LJ+A=",
+			"path": "github.com/opencontainers/runc/libcontainer/system",
+			"revision": "2b52db75279ca687e18156de86d845876e9ef35d",
+			"revisionTime": "2020-01-02T16:47:12Z"
 		},
 		{
 			"checksumSHA1": "MA07KaAp1aPVheuopyrFr7pxANs=",
