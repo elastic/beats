@@ -191,6 +191,14 @@
 			"revisionTime": "2019-09-04T14:17:38Z"
 		},
 		{
+			"checksumSHA1": "R2m2GM40MMllg36k9ZK31fWodxM=",
+			"path": "github.com/OneOfOne/xxhash",
+			"revision": "8f0be54a8d5ccf68817143d8c996147ec5cbd795",
+			"revisionTime": "2019-11-05T18:42:16Z",
+			"version": "v1.2.6",
+			"versionExact": "v1.2.6"
+		},
+		{
 			"checksumSHA1": "k3QogVVkVCGcCw4iMIxTWrnfiUc=",
 			"origin": "github.com/elastic/sarama",
 			"path": "github.com/Shopify/sarama",
