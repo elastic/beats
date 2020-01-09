@@ -80,7 +80,7 @@ class Test(BaseTest):
             self.wait_until(lambda: self.log_contains(
                 "Starting reload procedure, current runners: 1"))
 
-            self.wait_until(lambda: self.output_has(lines=1))
+            self.wait_until(lambda: self.output_lines() > 0)
 
             self.proc.check_kill_and_wait()
         finally:

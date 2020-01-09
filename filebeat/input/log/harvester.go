@@ -58,6 +58,7 @@ import (
 
 var (
 	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+	filesMetrics     = harvesterMetrics.NewRegistry("files")
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
@@ -100,7 +101,20 @@ type Harvester struct {
 	outletFactory OutletFactory
 	publishState  func(file.State) bool
 
+	metrics *harvesterProgressMetrics
+
 	onTerminate func()
+}
+
+// stores the metrics of the harvester
+type harvesterProgressMetrics struct {
+	metricsRegistry             *monitoring.Registry
+	filename                    *monitoring.String
+	started                     *monitoring.String
+	lastPublished               *monitoring.Timestamp
+	lastPublishedEventTimestamp *monitoring.Timestamp
+	currentSize                 *monitoring.Int
+	readOffset                  *monitoring.Int
 }
 
 // NewHarvester creates a new harvester
@@ -179,8 +193,40 @@ func (h *Harvester) Setup() error {
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
+	h.metrics = newHarvesterProgressMetrics(h.id.String())
+	h.metrics.filename.Set(h.source.Name())
+	h.metrics.started.Set(common.Time(time.Now()).String())
+	h.metrics.readOffset.Set(h.state.Offset)
+	err = h.updateCurrentSize()
+	if err != nil {
+		return err
+	}
+
 	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
 
+	return nil
+}
+
+func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
+	r := filesMetrics.NewRegistry(id)
+	return &harvesterProgressMetrics{
+		metricsRegistry:             r,
+		filename:                    monitoring.NewString(r, "name"),
+		started:                     monitoring.NewString(r, "start_time"),
+		lastPublished:               monitoring.NewTimestamp(r, "last_event_published_time"),
+		lastPublishedEventTimestamp: monitoring.NewTimestamp(r, "last_event_timestamp"),
+		currentSize:                 monitoring.NewInt(r, "size"),
+		readOffset:                  monitoring.NewInt(r, "read_offset"),
+	}
+}
+
+func (h *Harvester) updateCurrentSize() error {
+	fInfo, err := h.source.Stat()
+	if err != nil {
+		return err
+	}
+
+	h.metrics.currentSize.Set(fInfo.Size())
 	return nil
 }
 
@@ -250,6 +296,8 @@ func (h *Harvester) Run() error {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
+	go h.monitorFileSize()
+
 	for {
 		select {
 		case <-h.done:
@@ -298,6 +346,28 @@ func (h *Harvester) Run() error {
 
 		// Update state of harvester as successfully sent
 		h.state = state
+
+		// Update metics of harvester as event was sent
+		h.metrics.readOffset.Set(state.Offset)
+		h.metrics.lastPublished.Set(time.Now())
+		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
+	}
+}
+
+func (h *Harvester) monitorFileSize() {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-h.done:
+			return
+		case <-ticker.C:
+			err := h.updateCurrentSize()
+			if err != nil {
+				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
+			}
+		}
 	}
 }
 
@@ -305,6 +375,8 @@ func (h *Harvester) Run() error {
 func (h *Harvester) stop() {
 	h.stopOnce.Do(func() {
 		close(h.done)
+
+		filesMetrics.Remove(h.id.String())
 	})
 }
 
