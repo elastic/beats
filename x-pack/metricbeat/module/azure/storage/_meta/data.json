@@ -1,153 +1,84 @@
 {
-    "@timestamp":"2019-09-20T11:02:00.000Z",
-    "azure":{
-        "resource":{
-            "name":"obslinux",
-            "type":"Microsoft.Compute/virtualMachines",
-            "group":"resource-group"
+    "_index" : "metricbeat-8.0.0-2020.01.09-000001",
+    "_type" : "_doc",
+    "_id" : "XxYjjG8BQe78yNOEwING",
+    "_score" : null,
+    "_source" : {
+        "@timestamp" : "2020-01-09T21:04:00.000Z",
+        "event" : {
+            "duration" : 122304420600,
+            "dataset" : "azure.storage",
+            "module" : "azure"
         },
-        "subscription_id":"123456-qwer-1234-5678-12345678",
-        "namespace":"Microsoft.Compute/virtualMachines",
-        "compute_vm":{
-            "inbound_flows_maximum_creation_rate":{
-                "avg":14.6
+        "metricset" : {
+            "name" : "storage",
+            "period" : 300000
+        },
+        "azure" : {
+            "namespace" : "Microsoft.Storage/storageAccounts/blobServices",
+            "dimensions" : {
+                "apiname" : "DeleteBlob"
             },
-            "os_per_disk_write_bytes_per_sec":{
-                "avg":15261.86
+            "storage" : {
+                "successe2elatency" : {
+                    "avg" : 9.1
+                },
+                "availability" : {
+                    "avg" : 100
+                },
+                "transactions" : {
+                    "total" : 10
+                },
+                "ingress" : {
+                    "total" : 5330
+                },
+                "egress" : {
+                    "total" : 1010
+                },
+                "successserverlatency" : {
+                    "avg" : 9.1
+                }
             },
-            "outbound_flows_maximum_creation_rate":{
-                "avg":18.6
+            "resource" : {
+                "name" : "obsdiaglinux",
+                "type" : "Microsoft.Storage/storageAccounts",
+                "group" : "obs-infrastructure"
             },
-            "os_per_disk_read_operations_per_sec":{
-                "avg":0
+            "subscription_id" : "12345678-qwer-1234-5678-12345678"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "ecs" : {
+            "version" : "1.2.0"
+        },
+        "host" : {
+            "architecture" : "x86_64",
+            "name" : "DESKTOP-RFOOE09",
+            "os" : {
+                "kernel" : "10.0.18362.535 (WinBuild.160101.0800)",
+                "build" : "18362.535",
+                "platform" : "windows",
+                "version" : "10.0",
+                "family" : "windows",
+                "name" : "Windows 10 Pro"
             },
-            "data_disk_queue_depth":{
-                "avg":0
-            },
-            "per_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "inbound_flows":{
-                "avg":60.4
-            },
-            "os_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "per_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_write_operations_per_sec":{
-                "avg":1.03
-            },
-            "outbound_flows":{
-                "avg":60.4
-            },
-            "network_in":{
-                "total":3624009.0
-            },
-            "os_per_disk_qd":{
-                "avg":0
-            },
-            "data_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "os_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "per_disk_qd":{
-                "avg":0
-            },
-            "os_disk_write_bytes_per_sec":{
-                "avg":15261.86
-            },
-            "disk_write_bytes":{
-                "total":2806782.57
-            },
-            "per_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_out":{
-                "total":704862
-            },
-            "os_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "os_per_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "os_per_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "percentage_cpu":{
-                "avg":7.683333333333334
-            },
-            "data_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_in_total":{
-                "total":6787492.0
-            },
-            "disk_read_bytes":{
-                "total":0
-            },
-            "data_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "per_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "data_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "os_disk_queue_depth":{
-                "avg":0
-            },
-            "network_out_total":{
-                "total":1889767.0
-            }
+            "id" : "12345678-qwer-1234-5678-12345678",
+            "hostname" : "DESKTOP-RFOOE09"
+        },
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "12345678-qwer-1234-5678-12345678",
+            "version" : "8.0.0",
+            "type" : "metricbeat",
+            "ephemeral_id" : "12345678-qwer-1234-5678-12345678"
+        },
+        "cloud" : {
+            "provider" : "azure",
+            "region" : "westeurope"
         }
     },
-    "service":{
-        "type":"azure"
-    },
-    "cloud":{
-        "provider":"azure",
-        "region":"westeurope"
-    },
-    "ecs":{
-        "version":"1.1.0"
-    },
-    "host":{
-        "architecture":"x86_64",
-        "os":{
-            "build":"17134.1006",
-            "platform":"windows",
-            "version":"10.0",
-            "family":"windows",
-            "name":"Windows 10 Pro",
-            "kernel":"10.0.17134.1006 (WinBuild.160101.0800)"
-        },
-        "id":"123456-qwer-1234-5678-12345678",
-        "name":"DESKTOP-RFOOE09",
-        "hostname":"DESKTOP-RFOOE09"
-    },
-    "agent":{
-        "hostname":"DESKTOP-RFOOE09",
-        "id":"123456-qwer-1234-5678-12345678",
-        "version":"8.0.0",
-        "type":"metricbeat",
-        "ephemeral_id":"123456-qwer-1234-5678-12345678"
-    },
-    "event":{
-        "duration":4611928900,
-        "dataset":"azure.compute_vm",
-        "module":"azure"
-    },
-    "metricset":{
-        "name":"compute_vm",
-        "period":300000
-    }
+    "sort" : [
+        1578603840000
+    ]
 }

@@ -5,7 +5,6 @@
 package azure
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -88,9 +87,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 					event.MetricSetFields.Put(key, metric)
 				}
 			}
-			if ok := report.Event(event); !ok {
-				report.Error(errors.New("event not sent"))
-			}
+			report.Event(event)
 		}
 	}
 	return nil
