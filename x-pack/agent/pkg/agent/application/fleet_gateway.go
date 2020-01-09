@@ -29,6 +29,7 @@ type fleetReporter interface {
 
 type fleetAcker interface {
 	Ack(action fleetapi.Action) error
+	Commit() error
 }
 
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the

@@ -52,6 +52,30 @@ func (f *actionAcker) Ack(action fleetapi.Action) error {
 	return nil
 }
 
+func (f *actionAcker) AckBatch(actions []fleetapi.Action) error {
+	// checkin
+	events := make([]fleetapi.SerializableEvent, 0, len(actions))
+	for _, action := range actions {
+		events = append(events, fleetapi.Ack(action))
+	}
+
+	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
+	req := &fleetapi.CheckinRequest{
+		Events: events,
+	}
+
+	_, err := cmd.Execute(req)
+	if err != nil {
+		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' failed", len(actions), actions), errors.TypeNetwork)
+	}
+
+	return nil
+}
+
+func (f *actionAcker) Commit() error {
+	return nil
+}
+
 type noopAcker struct{}
 
 func newNoopAcker() *noopAcker {
@@ -61,3 +85,8 @@ func newNoopAcker() *noopAcker {
 func (f *noopAcker) Ack(action fleetapi.Action) error {
 	return nil
 }
+
+func (*noopAcker) Commit() error { return nil }
+
+var _ fleetAcker = &actionAcker{}
+var _ fleetAcker = &noopAcker{}

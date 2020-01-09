@@ -119,6 +119,8 @@ func newManaged(
 		return nil, err
 	}
 
+	batchedAcker := newLazyAcker(acker)
+
 	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {
 		return nil, err
@@ -141,7 +143,7 @@ func newManaged(
 		client,
 		actionDispatcher,
 		fleetR,
-		acker,
+		batchedAcker,
 	)
 	if err != nil {
 		return nil, err
