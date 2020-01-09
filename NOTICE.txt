@@ -4552,6 +4552,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/OneOfOne/xxhash
+Version: v1.2.6
+Revision: 8f0be54a8d5ccf68817143d8c996147ec5cbd795
+License type (autodetected): Apache-2.0
+./vendor/github.com/OneOfOne/xxhash/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: ac19fd6e7483ff933754af248d80be865e543d22
 License type (autodetected): Apache-2.0
