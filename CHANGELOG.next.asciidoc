@@ -330,7 +330,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 - Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 - Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
 - Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
@@ -388,6 +387,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
+- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 
 *Auditbeat*
 
