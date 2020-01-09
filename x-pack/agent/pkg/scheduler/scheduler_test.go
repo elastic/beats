@@ -125,7 +125,7 @@ func testPeriodicJitter(t *testing.T) {
 		diff := nE.at.Sub(startedAt)
 		require.True(
 			t,
-			diff <= variance,
+			diff < duration,
 		)
 
 		startedAt = time.Now()
