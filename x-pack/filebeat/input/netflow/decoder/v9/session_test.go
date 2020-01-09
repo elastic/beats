@@ -7,6 +7,7 @@ package v9
 import (
 	"io/ioutil"
 	"log"
+	"math"
 	"sync"
 	"testing"
 	"time"
@@ -223,4 +224,51 @@ func TestTemplateExpiration(t *testing.T) {
 	s.ExpireTemplates()
 
 	assert.Nil(t, s.GetTemplate(256))
+}
+
+func TestSessionCheckReset(t *testing.T) {
+	for _, testCase := range []struct {
+		title         string
+		current, next uint32
+		reset         bool
+	}{
+		{
+			title:   "Regular advance",
+			current: 12345,
+			next:    12385,
+			reset:   false,
+		},
+		{
+			title:   "Out of order packet",
+			current: 12388,
+			next:    12345,
+			reset:   false,
+		},
+		{
+			title:   "Actual reset",
+			current: 12345,
+			next:    9,
+			reset:   true,
+		},
+		{
+			title:   "32-bit Wrap around",
+			current: math.MaxUint32,
+			next:    9,
+			reset:   false,
+		},
+		{
+			title:   "Non-sequential stream",
+			current: 12345,
+			next:    78910,
+			reset:   true,
+		},
+	} {
+		t.Run(testCase.title, func(t *testing.T) {
+			s := NewSession(logger)
+			s.lastSequence = testCase.current
+			prev, isReset := s.CheckReset(testCase.next)
+			assert.Equal(t, prev, testCase.current)
+			assert.Equal(t, testCase.reset, isReset)
+		})
+	}
 }
