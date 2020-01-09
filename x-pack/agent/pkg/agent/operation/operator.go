@@ -7,11 +7,13 @@ package operation
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact/install"
@@ -119,6 +121,12 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	}
 
 	for _, step := range steps {
+		if _, isSupported := program.SupportedMap[strings.ToLower(step.Process)]; !isSupported {
+			return errors.New(fmt.Sprintf("program '%s' is not supported", step.Process),
+				errors.TypeApplication,
+				errors.M(errors.MetaKeyAppName, step.Process))
+		}
+
 		handler, found := o.handlers[step.ID]
 		if !found {
 			return errors.New(fmt.Sprintf("operator: received unexpected event '%s'", step.ID), errors.TypeConfig)

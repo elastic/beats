@@ -8,7 +8,10 @@ package program
 
 import "github.com/elastic/beats/x-pack/agent/pkg/packer"
 
+import "strings"
+
 var Supported []Spec
+var SupportedMap map[string]bool
 
 func init() {
 	// Packed Files
@@ -18,6 +21,7 @@ func init() {
 	// spec/journalbeat.yml
 	// spec/metricbeat.yml
 	unpacked := packer.MustUnpack("eJy8V9+TqjgWft8/477u1g4/rtZlq+ZB6CGANo7YDSFvJLEBTcBVRGFr//etgCio3TO903UfrLqXTk7OOfm+73z5z7f9dkV+iQ40LfAqKv5ZcfbtX98wNwv0kscL6G8i6KUoMCWDuwV6yuOw/y1zZAz8eh7nhQ3QFlseI0xTwuAkI+i+UYVJkalVKKBsZU3GRjqJbUPfIbgZ25Y3IuB1ahuT2LYcNk/1VRt7Uc7S/fm7yzDw1xRo1TzVa2o5LAzk2kilGAfmcR7nsVhHgClFT3lMVK9CgVmQ4/l75u8RfD6fOylsy6vCYFRjYErI19QIejlUHYYU/zt5ytszm59+DKGXz1NdWkGdnfe3Mfnr2DZHCQ28LTV+5LN0v+3/van5KY+dp9+ms6W+xqo+6vJEmVPil/s8KfgxtoEpI8CkkPsJnYh+ysklJ0tPKIiHa4xRrx9NzhUNTozUXR1STLh/CAOZdec3P4AqrEjD/rc1S7jOYxxoGxFH9Ph2f5d/HwOzzJUI9xMMn8+5euU81QuseA02PoqDVV8ili/NuL8PoStFgVujwKxCJT5Q6OzPdTV5RUCrqfUsesqj4CQhaHd4qlFwYqHqlSTr3fWwn825s6VeUugdKVxcehQp/oiIvfx1SpWE4XUeL4FZL6HHMHzOHVjgQb1cLpElcOXSt+UmdtKwWf8iOAPdYxi4bGrQ7pxsZkwyFJwSonrbUHVZCJ11ZJCmNkdgD7DaqY6xoxQJ4kXS/vtUItWVQujmTrWZfvtHy9O3lK0e0NTjbI8Ch4VwMQ0VeTNPdRCJljSlb9dYGfEooDLhZorB69gGtCLgeXqlxxfQ6eXP0UecQ4BfDSApIAERw9miRKIWAQ2gZf19tqEzyv0DNbSaAm8rromo3iYKvk/7cWzgKygYSTPVW5OnPKbAPb4TR0bWZGxb/oZMhrmIs2eKV4ZKwcg6jxHQ1pHiVzdx9lghJeECGu4bUU4lFddW53H77fkmr1OJKq1eQVfsG9uWOxJ70PGRdD7fQ3t9fx8CusMe6zf7BQ2aMzr4t72LL/8XPbhQoderwgbn+q9rKxR4W9KLda7lkzKHthj47fj4QBrQFdOHx3HYQUgHEf2zHHbmwnQgcUCTqaXL1BgxDMyaArYmip8Q7uazzK/wpB8vKYnqNXIlzqY9jBLF36PAlbDq1PNrP/iVY39NXvq1RsHoSKFXQyhtbSPk9m9JQqRRggO/JsBco2WcdbLZSsWddDaSc8ZgNmtyo7swQLtwSfa2QfdYoTUFZh0ZZGvEv/7ayUuyinaPbMAS+AnJhjYg6n/7YhuAA+0QQa8k6Y/D9Hh7B7bgzmXkzJZ6EcJLzE53/nA0UstJcObuQ+gxqNItBckb4X6GYHIcaFM3eu/HZSV6A7lcYs5EXuX0SVv83q77+7u24Bznc5xJxNi4WoN38d5bd28PuvHe9jZrelehQGDrtesfJ1wr5ukFx4f70TWSCT/2R32OVbflYXf36/zOvvV7P8DORW/OXL1yaYcgq8VetNiqEfAP81S3Q+g6FPgFqWK2kotcYJ6CljvX2n7+aF7nh10WsUfs4ZpM+CjBYDCh/41Vv8Lc3J+n9AWhV4PjvFFu7mng1/dKNGRBi4KCrV7ymFrsiBZn9Nzsny3bqRV1OTVG0y2JtblFwEP0RDe1fICgYX3voLFTu0+o7k3f/pzyfi3S30Xjbc1bnOkytX4+Gvmq2KXkARhfAl8inK0v1jBYjG0gM2o521DpAKodEGcZhU4S8pOQ5Ixk+vrrZb7NZVZ93/2B3Xn8GrolgHXJrwOFRLh5IMopocB/J7/JwPL2yfM41/iX16dTY7l+T7/vpoO1YozEY9vw+rb3Xq6NAQDvLHIr+edXxuJzBMWD+/1oVAzu/B2L1b10PvPqGmKpI2NnWa7rCraCDbk/fGn+Py/E92zWoDfG6PJC/UtWq7VXrTWuGnv1sdX679/+FwAA///ZoO7u")
+	SupportedMap = make(map[string]bool)
 
 	for f, v := range unpacked {
 		s, err := NewSpecFromBytes(v)
@@ -25,5 +29,6 @@ func init() {
 			panic("Cannot read spec from " + f)
 		}
 		Supported = append(Supported, s)
+		SupportedMap[strings.ToLower(s.Name)] = true
 	}
 }

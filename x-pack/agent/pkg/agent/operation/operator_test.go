@@ -61,6 +61,16 @@ func TestMain(m *testing.M) {
 	program.Supported = append(program.Supported, shortSpec, longSpec, configurableSpec, configByFileSpec)
 }
 
+func TestNotSupported(t *testing.T) {
+	p := getProgram("notsupported", "1.0")
+
+	operator, _ := getTestOperator(t, "tests/scripts")
+	err := operator.start(p, nil)
+	if err == nil {
+		t.Fatal("was expecting error but got none")
+	}
+}
+
 func TestShortRun(t *testing.T) {
 	p := getProgram("short", "1.0")
 
