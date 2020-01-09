@@ -33,7 +33,6 @@ var (
 		"logstash",
 		"console", // for local debugging
 	}
-	metrics = monitoring.Default.NewRegistry("functionbeat")
 )
 
 // Functionbeat is a beat designed to run under a serverless environment and listen to external triggers,
@@ -66,11 +65,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 
+	telemetryReg = monitoring.GetNamespace("state").GetRegistry().NewRegistry("functionbeat")
+
 	bt := &Functionbeat{
 		ctx:       ctx,
 		log:       logp.NewLogger("functionbeat"),
 		cancel:    cancel,
-		telemetry: telemetry.New(metrics),
+		telemetry: telemetry.New(telemetryReg),
 		Provider:  provider,
 		Config:    c,
 	}
