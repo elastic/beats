@@ -388,7 +388,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfMessagesPublished.sum",
+                    "field": "aws.sns.metrics.NumberOfMessagesPublished.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -413,7 +413,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsDelivered.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsDelivered.sum",
                     "id": "204ff2b1-1b77-11ea-9357-231d0e09a8a9",
                     "type": "avg"
                   }
@@ -438,7 +438,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFailed.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFailed.sum",
                     "id": "32e925e1-1b77-11ea-9357-231d0e09a8a9",
                     "type": "avg"
                   }
@@ -491,7 +491,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "aws.cloudwatch.dimensions.TopicName",
+                "fieldName": "aws.dimensions.TopicName",
                 "id": "1565034367477",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "topic name",
@@ -570,7 +570,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.PublishSize.avg",
+                    "field": "aws.sns.metrics.PublishSize.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -644,7 +644,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -718,7 +718,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -792,7 +792,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -866,7 +866,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -940,7 +940,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.SMSSuccessRate.avg",
+                    "field": "aws.sns.metrics.SMSSuccessRate.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -1014,7 +1014,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsRedrivenToDlq.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsRedrivenToDlq.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -1088,7 +1088,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.SMSMonthToDateSpentUSD.sum",
+                    "field": "aws.sns.metrics.SMSMonthToDateSpentUSD.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
