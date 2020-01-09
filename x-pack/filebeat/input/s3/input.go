@@ -368,7 +368,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		objectHash := s3ObjectHash(s3Info)
 
 		// read from s3 object
-		reader, contentType, err := p.newS3BucketReader(svc, s3Info)
+		reader, err := p.newS3BucketReader(svc, s3Info)
 		if err != nil {
 			return errors.Wrap(err, "newS3BucketReader failed")
 		}
@@ -376,22 +376,10 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			continue
 		}
 
-		// handle s3 object with content-type is json
-		if contentType == "application/json" {
+		// Decode JSON documents when expand_event_list_from_field is given in config
+		if p.config.ExpendEventListFromField != "" {
 			decoder := json.NewDecoder(reader)
-			// when json.message_key is given in config
-			if p.config.JSON != nil && p.config.JSON.MessageKey != "" {
-				err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
-				if err != nil {
-					err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
-					s3Context.Fail(err)
-					return err
-				}
-				return nil
-			}
-
-			// when there is no json.message_key
-			err := p.decodeJSONWithoutKey(decoder, objectHash, s3Info, s3Context)
+			err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
 			if err != nil {
 				err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
 				s3Context.Fail(err)
@@ -450,9 +438,9 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 		if err == io.EOF {
 			// create event for last line
 			// get logs from json.message_key
-			textValues, ok := jsonFields[p.config.JSON.MessageKey]
+			textValues, ok := jsonFields[p.config.ExpendEventListFromField]
 			if !ok {
-				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
 				p.logger.Error(err)
 				return err
 			}
@@ -471,9 +459,9 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 			return nil
 		}
 
-		textValues, ok := jsonFields[p.config.JSON.MessageKey]
+		textValues, ok := jsonFields[p.config.ExpendEventListFromField]
 		if !ok {
-			err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+			err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
 			p.logger.Error(err)
 			return err
 		}
@@ -481,42 +469,10 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 		for _, v := range textValues {
 			err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
 			if err != nil {
-				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.JSON.MessageKey))
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
 				p.logger.Error(err)
 				return err
 			}
-		}
-	}
-}
-
-func (p *s3Input) decodeJSONWithoutKey(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Context *s3Context) error {
-	offset := 0
-	for {
-		var jsonFields map[string]interface{}
-		err := decoder.Decode(&jsonFields)
-		if jsonFields == nil {
-			return nil
-		}
-
-		if err == io.EOF {
-			// create event for last line
-			err := p.convertJSONToEvent(jsonFields, offset, objectHash, s3Info, s3Context)
-			if err != nil {
-				err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %s", s3Info.key))
-				p.logger.Error(err)
-				return err
-			}
-		} else if err != nil {
-			err = errors.Wrapf(err, fmt.Sprintf("decode failed for %s", s3Info.key))
-			p.logger.Error(err)
-			return err
-		}
-
-		err = p.convertJSONToEvent(jsonFields, offset, objectHash, s3Info, s3Context)
-		if err != nil {
-			err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %s", s3Info.key))
-			p.logger.Error(err)
-			return err
 		}
 	}
 }
@@ -536,7 +492,7 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 	return nil
 }
 
-func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, string, error) {
+func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
@@ -547,19 +503,19 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				return nil, "", nil
+				return nil, nil
 			}
 
 			if awsErr.Code() == "NoSuchKey" {
 				p.logger.Warn("Cannot find s3 file with key ", s3Info.key)
-				return nil, "", nil
+				return nil, nil
 			}
 		}
-		return nil, "", errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
+		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
 	if resp.Body == nil {
-		return nil, "", errors.New("s3 get object response body is empty")
+		return nil, errors.New("s3 get object response body is empty")
 	}
 
 	// Check content-type
@@ -568,11 +524,11 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 		case "application/x-gzip":
 			reader, err := gzip.NewReader(resp.Body)
 			if err != nil {
-				return nil, "", errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+				return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 			}
-			return bufio.NewReader(reader), *resp.ContentType, nil
+			return bufio.NewReader(reader), nil
 		default:
-			return bufio.NewReader(resp.Body), *resp.ContentType, nil
+			return bufio.NewReader(resp.Body), nil
 		}
 	}
 
@@ -580,11 +536,11 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if strings.HasSuffix(s3Info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
-			return nil, "", errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 		}
-		return bufio.NewReader(gzipReader), "", nil
+		return bufio.NewReader(gzipReader), nil
 	}
-	return bufio.NewReader(resp.Body), "", nil
+	return bufio.NewReader(resp.Body), nil
 }
 
 func (p *s3Input) forwardEvent(event beat.Event) error {

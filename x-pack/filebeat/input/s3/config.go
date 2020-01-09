@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/libbeat/reader/readjson"
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
@@ -18,7 +17,7 @@ type config struct {
 	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
-	JSON                      *readjson.Config    `config:"json"`
+	ExpendEventListFromField  string              `config:"expand_event_list_from_field"`
 }
 
 func defaultConfig() config {
