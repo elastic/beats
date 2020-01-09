@@ -114,6 +114,10 @@ func newManaged(
 	}
 
 	emit := emitter(log, router)
+	acker, err := newActionAcker(log, agentInfo, client)
+	if err != nil {
+		return nil, err
+	}
 
 	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {
@@ -137,6 +141,7 @@ func newManaged(
 		client,
 		actionDispatcher,
 		fleetR,
+		acker,
 	)
 	if err != nil {
 		return nil, err

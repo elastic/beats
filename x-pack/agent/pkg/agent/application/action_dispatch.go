@@ -16,7 +16,7 @@ import (
 type action interface{}
 
 type actionHandler interface {
-	Handle(a action) error
+	Handle(a action, acker fleetAcker) error
 }
 
 type actionHandlers map[string]actionHandler
@@ -68,7 +68,7 @@ func (ad *actionDispatcher) key(a action) string {
 	return reflect.TypeOf(a).String()
 }
 
-func (ad *actionDispatcher) Dispatch(actions ...action) error {
+func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
 	ad.log.Debugf(
 		"Dispatch %d actions of types: %s",
 		len(actions),
@@ -76,7 +76,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	)
 
 	for _, action := range actions {
-		if err := ad.dispatchAction(action); err != nil {
+		if err := ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}
@@ -85,13 +85,13 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	return nil
 }
 
-func (ad *actionDispatcher) dispatchAction(a action) error {
+func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
-		return ad.def.Handle(a)
+		return ad.def.Handle(a, acker)
 	}
 
-	return handler.Handle(a)
+	return handler.Handle(a, acker)
 }
 
 func detectTypes(actions []action) []string {

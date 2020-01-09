@@ -12,7 +12,7 @@ type handlerUnknown struct {
 	log *logger.Logger
 }
 
-func (h *handlerUnknown) Handle(a action) error {
+func (h *handlerUnknown) Handle(a action, acker fleetAcker) error {
 	h.log.Errorf("HandlerUnknown: action '%+v' received", a)
 	return nil
 }

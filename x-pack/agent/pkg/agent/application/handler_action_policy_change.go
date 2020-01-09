@@ -18,7 +18,7 @@ type handlerPolicyChange struct {
 	emitter emitterFunc
 }
 
-func (h *handlerPolicyChange) Handle(a action) error {
+func (h *handlerPolicyChange) Handle(a action, acker fleetAcker) error {
 	h.log.Debugf("HandlerPolicyChange: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionPolicyChange)
 	if !ok {
@@ -31,6 +31,11 @@ func (h *handlerPolicyChange) Handle(a action) error {
 	}
 
 	h.log.Debug("HandlerPolicyChange: emit configuration")
+
+	// ACK config
+	if err := acker.Ack(action); err != nil {
+		return err
+	}
 
 	return h.emitter(c)
 }

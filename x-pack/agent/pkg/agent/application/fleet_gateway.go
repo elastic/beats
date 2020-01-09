@@ -16,7 +16,7 @@ import (
 )
 
 type dispatcher interface {
-	Dispatch(...action) error
+	Dispatch(acker fleetAcker, actions ...action) error
 }
 
 type agentInfo interface {
@@ -25,6 +25,10 @@ type agentInfo interface {
 
 type fleetReporter interface {
 	Events() ([]fleetapi.SerializableEvent, func())
+}
+
+type fleetAcker interface {
+	Ack(action fleetapi.Action) error
 }
 
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
@@ -42,6 +46,7 @@ type fleetGateway struct {
 	reporter   fleetReporter
 	done       chan struct{}
 	wg         sync.WaitGroup
+	acker      fleetAcker
 }
 
 type fleetGatewaySettings struct {
@@ -62,6 +67,7 @@ func newFleetGateway(
 	client clienter,
 	d dispatcher,
 	r fleetReporter,
+	acker fleetAcker,
 ) (*fleetGateway, error) {
 	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
 	return newFleetGatewayWithScheduler(
@@ -72,6 +78,7 @@ func newFleetGateway(
 		d,
 		scheduler,
 		r,
+		acker,
 	)
 }
 
@@ -83,6 +90,7 @@ func newFleetGatewayWithScheduler(
 	d dispatcher,
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
+	acker fleetAcker,
 ) (*fleetGateway, error) {
 	done := make(chan struct{})
 
@@ -100,6 +108,7 @@ func newFleetGatewayWithScheduler(
 		),
 		done:     done,
 		reporter: r,
+		acker:    acker,
 	}, nil
 }
 
@@ -123,7 +132,7 @@ func (f *fleetGateway) worker() {
 				actions[idx] = a
 			}
 
-			if err := f.dispatcher.Dispatch(actions...); err != nil {
+			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
 				f.log.Errorf("failed to dispatch actions, error: %s", err)
 			}
 
