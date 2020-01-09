@@ -7,10 +7,14 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -26,15 +30,21 @@ import (
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 )
 
 var hubID = "elastic"
-var name = "elastic-logging-plugin"
-var containerName = name + "_container"
-var dockerPluginName = filepath.Join(hubID, name)
+var logDriverName = "elastic-logging-plugin"
+var dockerPluginName = filepath.Join(hubID, logDriverName)
 var packageStagingDir = "build/package/"
 var packageEndDir = "build/distributions/"
 var dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+var rootImageName = "rootfsimage"
 
 func init() {
 	devtools.BeatLicense = "Elastic License"
@@ -47,50 +57,122 @@ func getPluginName() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "error getting beats version")
 	}
-
 	return dockerPluginName + ":" + version, nil
 }
 
-// Build builds docker rootfs container root
-func Build() error {
-	mage.CreateDir(packageStagingDir)
-	mage.CreateDir(packageEndDir)
+// createContainer builds the plugin and creates the container that will later become the rootfs used by the plugin
+func createContainer(cli *client.Client) error {
+	gv, err := mage.GoVersion()
+	if err != nil {
+		return errors.Wrap(err, "error determining go version")
+	}
 
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "error getting work dir")
 	}
 
+	// change back to the root beats dir so we can send the proper build context to docker
 	err = os.Chdir("../..")
 	if err != nil {
 		return errors.Wrap(err, "error changing directory")
 	}
 
-	gv, err := mage.GoVersion()
+	// start to build the root container that'll be used to build the plugin
+	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
-		return errors.Wrap(err, "error determining go version")
+		return errors.Wrap(err, "Error locating temp dir")
+	}
+	tarPath := filepath.Join(tmpDir, "tarRoot.tar")
+	err = sh.RunV("tar", "cf", tarPath, "./")
+	if err != nil {
+		return errors.Wrap(err, "error creating tar")
 	}
 
-	err = sh.RunV("docker", "build", "--build-arg", "versionString"+"="+gv, "--target", "final", "-t", "rootfsimage", "-f", "x-pack/dockerlogbeat/Dockerfile", ".")
+	buildContext, err := os.Open(tarPath)
 	if err != nil {
+		return errors.Wrap(err, "error opening temp dur")
+	}
+	defer buildContext.Close()
+
+	buildOpts := types.ImageBuildOptions{
+		BuildArgs:  map[string]*string{"versionString": &gv},
+		Target:     "final",
+		Tags:       []string{rootImageName},
+		Dockerfile: "x-pack/dockerlogbeat/Dockerfile",
+	}
+	//build, wait for output
+	buildResp, err := cli.ImageBuild(context.Background(), buildContext, buildOpts)
+	defer buildResp.Body.Close()
+	buf := new(bytes.Buffer)
+	_, errBufRead := buf.ReadFrom(buildResp.Body)
+	if errBufRead != nil {
+		return errors.Wrap(err, "error reading from docker output")
+	}
+	if err != nil {
+		fmt.Printf("Docker response: \n %s\n", buf.String())
 		return errors.Wrap(err, "error building final container image")
 	}
 
+	// move back to the x-pack dir
 	err = os.Chdir(dockerLogBeatDir)
 	if err != nil {
 		return errors.Wrap(err, "error returning to dockerlogbeat dir")
 	}
 
+	err = sh.Rm(tmpDir)
+	if err != nil {
+		return errors.Wrap(err, "error removing temp dir")
+	}
+
+	return nil
+}
+
+// Build builds docker rootfs container root
+// There's a somewhat complicated process for this:
+// * Create a container to build the plugin itself
+// * Copy that to a bare-bones container that will become the runc container used by docker
+// * Export that container
+// * Unpack the tar from the exported container
+// * send this to the plugin create API endpoint
+func Build() error {
+	// setup
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return errors.Wrap(err, "Error creating docker client")
+	}
+
+	mage.CreateDir(packageStagingDir)
+	mage.CreateDir(packageEndDir)
 	os.Mkdir(filepath.Join(packageStagingDir, "rootfs"), 0755)
 
-	err = sh.RunV("docker", "create", "--name", containerName, "rootfsimage", "true")
+	err = createContainer(cli)
+	if err != nil {
+		return errors.Wrap(err, "error creating base container")
+	}
+
+	// create the container that will become our rootfs
+	CreatedContainerBody, err := cli.ContainerCreate(context.Background(), &container.Config{Image: rootImageName}, nil, nil, "")
 	if err != nil {
 		return errors.Wrap(err, "error creating container")
 	}
 
-	err = sh.RunV("docker", "export", containerName, "-o", dockerExportPath)
+	fmt.Printf("Got image: %#v\n", CreatedContainerBody.ID)
+
+	file, err := os.Create(dockerExportPath)
+	if err != nil {
+		return errors.Wrap(err, "error creating tar archive")
+	}
+
+	// export the container to a tar file
+	exportReader, err := cli.ContainerExport(context.Background(), CreatedContainerBody.ID)
 	if err != nil {
 		return errors.Wrap(err, "error exporting container")
+	}
+
+	_, err = io.Copy(file, exportReader)
+	if err != nil {
+		return errors.Wrap(err, "Error writing exported container")
 	}
 
 	err = mage.Copy("config.json", filepath.Join(packageStagingDir, "config.json"))
@@ -98,7 +180,32 @@ func Build() error {
 		return errors.Wrap(err, "error copying config.json")
 	}
 
-	return sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(packageStagingDir, "rootfs"))
+	// unpack the tar file into a root directory, which is the format needed for the docker plugin create tool
+	err = sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(packageStagingDir, "rootfs"))
+	if err != nil {
+		return errors.Wrap(err, "error unpacking exported container")
+	}
+
+	// cleanup
+	err = cleanDockerArtifacts(CreatedContainerBody.ID, cli)
+	if err != nil {
+		return errors.Wrap(err, "error cleaning up")
+	}
+
+	return nil
+}
+
+func cleanDockerArtifacts(containerID string, cli *client.Client) error {
+	err := cli.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error removing container")
+	}
+
+	_, err = cli.ImageRemove(context.Background(), rootImageName, types.ImageRemoveOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error removing image")
+	}
+	return nil
 }
 
 // CleanDocker removes working objects and containers
@@ -108,28 +215,65 @@ func CleanDocker() error {
 		return err
 	}
 
-	sh.RunV("docker", "rm", "-vf", containerName)
-	sh.RunV("docker", "rmi", "rootfsimage")
-	sh.Rm(packageStagingDir)
-	sh.RunV("docker", "plugin", "disable", "-f", name)
-	sh.RunV("docker", "plugin", "rm", "-f", name)
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return errors.Wrap(err, "Error creating docker client")
+	}
+
+	//check to see if we have a plugin we need to remove
+	plugins, err := cli.PluginList(context.Background(), filters.Args{})
+	if err != nil {
+		return errors.Wrap(err, "error getting list of plugins")
+	}
+	oursExists := false
+	for _, plugin := range plugins {
+		if strings.Contains(plugin.Name, logDriverName) {
+			oursExists = true
+		}
+	}
+	if oursExists {
+		err = cli.PluginDisable(context.Background(), name, types.PluginDisableOptions{Force: true})
+		if err != nil {
+			return errors.Wrap(err, "error disabling plugin")
+		}
+		err = cli.PluginRemove(context.Background(), name, types.PluginRemoveOptions{Force: true})
+		if err != nil {
+			return errors.Wrap(err, "error removing plugin")
+		}
+	}
 
 	return nil
 }
 
-// Install installs the beat
+// Install installs the plugin
 func Install() error {
+	mg.Deps(CleanDocker)
+
 	name, err := getPluginName()
 	if err != nil {
 		return err
 	}
 
-	err = sh.RunV("docker", "plugin", "create", name, packageStagingDir)
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return errors.Wrap(err, "Error creating docker client")
+	}
+
+	archiveOpts := &archive.TarOptions{
+		Compression:  archive.Uncompressed,
+		IncludeFiles: []string{"rootfs", "config.json"},
+	}
+	archive, err := archive.TarWithOptions(packageStagingDir, archiveOpts)
+	if err != nil {
+		return errors.Wrap(err, "error creating archive of work dir")
+	}
+
+	err = cli.PluginCreate(context.Background(), archive, types.PluginCreateOptions{RepoName: name})
 	if err != nil {
 		return errors.Wrap(err, "error creating plugin")
 	}
 
-	err = sh.RunV("docker", "plugin", "enable", name)
+	err = cli.PluginEnable(context.Background(), name, types.PluginEnableOptions{})
 	if err != nil {
 		return errors.Wrap(err, "error enabling plugin")
 	}
@@ -143,21 +287,24 @@ func Package() {
 }
 
 // Release builds a "release" tarball that can be used later with `docker plugin create`
-func Release() error {
-	mg.Deps(Build)
+func Release() {
+	mg.SerialDeps(Build, Export)
+}
 
+// Export exports a "ready" root filesystem and config.json into a tarball
+func Export() error {
 	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
 		return errors.Wrap(err, "error getting beats version")
 	}
 
-	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", name, version, "docker-plugin")
+	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", logDriverName, version, "docker-plugin")
 
 	bashScript := `#!/bin/bash
 docker plugin create %s
 docker plugin enable %s
 	`
-	formatted := []byte(fmt.Sprintf(bashScript, name, name))
+	formatted := []byte(fmt.Sprintf(bashScript, logDriverName, logDriverName))
 	err = ioutil.WriteFile(filepath.Join(packageStagingDir, "install.sh"), formatted, 0774)
 	if err != nil {
 		return errors.Wrap(err, "error writing script")
