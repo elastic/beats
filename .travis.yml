@@ -242,12 +242,14 @@ before_install:
 install: true
 
 script:
+  - while sleep 30; do echo "=====[ Memory usage ]====="; ps -e -orss=,args= | sort -b -k1,1n; done &
   # Replacement for travis_wait which doesn't print output in real time.
   # Default Travis timeout is 10min, so this workaround prints timestamps every 9min to reset the counter.
   # Using seconds (540s = 9min) instead of minutes for shell compatibility reasons.
   - while sleep 540; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
   - make $TARGETS
   - kill %1
+  - kill %2
 
 notifications:
   slack:
