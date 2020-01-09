@@ -152,14 +152,7 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	return false
 }
 
-// mapCustomFields will map the configuration custom fields to a metric configuration object (specific to an azure resource) , the mapping will most likelky contain more custom fields in the future
-func mapCustomFields(metricConfig *MetricConfig, resourceConfig ResourceConfig) {
-	metricConfig.CustomFields = CustomFieldsConfig{
-		ServiceType: resourceConfig.ServiceType,
-	}
-
-}
-
+// convertTimegrainToDuration will convert azure timegrain options to actual duration values
 func convertTimegrainToDuration(timegrain string) time.Duration {
 	var duration time.Duration
 	switch timegrain {
@@ -182,4 +175,16 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 		duration = time.Duration(24 * time.Hour)
 	}
 	return duration
+}
+
+// groupMetricsByResource is used in order to group metrics by resource and return data faster
+func groupMetricsByResource(metrics []Metric) map[string][]Metric {
+	grouped := make(map[string][]Metric)
+	for _, metric := range metrics {
+		if _, ok := grouped[metric.Resource.ID]; !ok {
+			grouped[metric.Resource.ID] = make([]Metric, 0)
+		}
+		grouped[metric.Resource.ID] = append(grouped[metric.Resource.ID], metric)
+	}
+	return grouped
 }

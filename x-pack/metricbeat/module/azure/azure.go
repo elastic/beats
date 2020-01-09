@@ -42,12 +42,6 @@ type MetricConfig struct {
 	Aggregations []string          `config:"aggregations"`
 	Dimensions   []DimensionConfig `config:"dimensions"`
 	Timegrain    string            `config:"timegrain"`
-	CustomFields CustomFieldsConfig
-}
-
-// CustomFieldsConfig struct will contain custom configuration options based on different types of resources
-type CustomFieldsConfig struct {
-	ServiceType []string
 }
 
 // DimensionConfig contains dimensions specific configuration.
@@ -79,8 +73,8 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client    *Client
-	MapMetric mapMetric
+	Client     *Client
+	MapMetrics mapResourceMetrics
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -124,7 +118,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.Client.InitResources(m.MapMetric, report)
+	err := m.Client.InitResources(m.MapMetrics, report)
 	if err != nil {
 		return err
 	}
@@ -133,9 +127,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return nil
 	}
 	// retrieve metrics
-	err = m.Client.GetMetricValues(report)
-	if err != nil {
-		return err
+	groupedMetrics := groupMetricsByResource(m.Client.Resources.Metrics)
+
+	for _, metrics := range groupedMetrics {
+		results := m.Client.GetMetricValues(report, metrics)
+		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
+		if err != nil {
+			return err
+		}
 	}
-	return EventsMapping(m.Client.Resources.Metrics, m.BaseMetricSet.Name(), report)
+	return nil
 }

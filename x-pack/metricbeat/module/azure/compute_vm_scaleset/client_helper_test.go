@@ -63,12 +63,13 @@ func TestMapMetric(t *testing.T) {
 		Value: &emptyList,
 	}
 	metricConfig := azure.MetricConfig{Name: []string{"*"}, Namespace: "namespace"}
+	var resourceConfig = azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
 	client := azure.NewMockClient()
 	t.Run("return error when the metric metric definition api call returns an error", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
-		metric, err := mapMetric(client, metricConfig, resource)
+		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NotNil(t, err)
 		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace namespace: invalid resource ID")
 		assert.Equal(t, metric, []azure.Metric(nil))
@@ -78,7 +79,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
-		metric, err := mapMetric(client, metricConfig, resource)
+		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NotNil(t, err)
 		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace namespace.")
 		assert.Equal(t, metric, []azure.Metric(nil))
@@ -88,7 +89,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
-		metrics, err := mapMetric(client, metricConfig, resource)
+		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
 		assert.Equal(t, len(metrics), 2)
 

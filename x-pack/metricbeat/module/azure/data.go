@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -87,7 +88,9 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 					event.MetricSetFields.Put(key, metric)
 				}
 			}
-			report.Event(event)
+			if ok := report.Event(event); !ok {
+				report.Error(errors.New("event not sent"))
+			}
 		}
 	}
 	return nil
@@ -103,7 +106,7 @@ func managePropertyName(metric string) string {
 	// replace actual percentage symbol with the smbol "pct"
 	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, ":", ".", -1)
+	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
@@ -113,7 +116,7 @@ func managePropertyName(metric string) string {
 		obj[index] = strings.TrimPrefix(obj[index], "_")
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
-	resultMetricName = strings.ToLower(strings.Join(obj, "."))
+	resultMetricName = strings.ToLower(strings.Join(obj, "_"))
 
 	return resultMetricName
 }

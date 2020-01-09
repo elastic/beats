@@ -60,12 +60,13 @@ func TestMapMetric(t *testing.T) {
 		Value: MockMetricDefinitions(),
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
 	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
-		metric, err := mapMetric(client, metricConfig, resource)
+		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NotNil(t, err)
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
@@ -75,7 +76,8 @@ func TestMapMetric(t *testing.T) {
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"*"}
-		metrics, err := mapMetric(client, metricConfig, resource)
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
 		assert.Equal(t, metrics[0].Resource.ID, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
@@ -93,7 +95,8 @@ func TestMapMetric(t *testing.T) {
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"TotalRequests", "Capacity"}
 		metricConfig.Aggregations = []string{"Average"}
-		metrics, err := mapMetric(client, metricConfig, resource)
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
 
 		assert.True(t, len(metrics) > 0)
