@@ -110,7 +110,7 @@ func testPeriodic(t *testing.T) {
 
 func testPeriodicJitter(t *testing.T) {
 	t.Run("tick than wait", func(t *testing.T) {
-		duration := 1 * time.Minute
+		duration := 5 * time.Second
 		variance := 2 * time.Second
 		scheduler := NewPeriodicJitter(duration, variance)
 		defer scheduler.Stop()
@@ -122,7 +122,19 @@ func testPeriodicJitter(t *testing.T) {
 
 		nE := <-recorder.recorder
 
-		require.True(t, nE.at.Sub(startedAt) <= variance)
+		diff := nE.at.Sub(startedAt)
+		require.True(
+			t,
+			diff < duration,
+		)
+
+		startedAt = time.Now()
+		nE = <-recorder.recorder
+		diff = nE.at.Sub(startedAt)
+		require.True(
+			t,
+			diff >= duration,
+		)
 	})
 
 	t.Run("multiple ticks", func(t *testing.T) {
