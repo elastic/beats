@@ -11,33 +11,33 @@
 //////////////////////////////////////////////////////////////////////////
 
 [role="xpack"]
-[[configuration-monitor]]
-=== Settings for internal collection
+[[configuration-monitor-legacy]]
+=== Settings for legacy internal collection
 
-Use the following settings to configure internal collection when you are not
-using {metricbeat} to collect monitoring data.
+deprecated::[7.2.0,These settings are deprecated and will be removed in version 8.0.0. Instead of sending monitoring data to your production cluster it's recommended that you use the configuration described under <<monitoring-internal-collection>> to route monitoring data directly to your monitoring cluster.]
 
-You specify these settings in the X-Pack monitoring section of the
-+{beatname_lc}.yml+ config file:
+[float]
+=== `xpack.monitoring.enabled` deprecated:[7.2]
 
-==== `monitoring.enabled`
-
-The `monitoring.enabled` config is a boolean setting to enable or disable {monitoring}.
+The `enabled` config is a boolean setting to enable or disable {monitoring}.
 If set to `true`, monitoring is enabled.
 
 The default value is `false`.
 
-==== `monitoring.elasticsearch`
+[float]
+=== `xpack.monitoring.elasticsearch` deprecated:[7.2]
 
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:
 
-===== `bulk_max_size`
+[float]
+==== `bulk_max_size`
 
 The maximum number of metrics to bulk in a single {es} bulk API index request.
 The default is `50`. For more information, see <<elasticsearch-output>>.
 
-===== `backoff.init`
+[float]
+==== `backoff.init`
 
 The number of seconds to wait before trying to reconnect to Elasticsearch after
 a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
@@ -45,79 +45,94 @@ reconnect. If the attempt fails, the backoff timer is increased exponentially up
 to `backoff.max`. After a successful connection, the backoff timer is reset. The
 default is 1s.
 
+[float]
 ===== `backoff.max`
 
 The maximum number of seconds to wait before attempting to connect to
 Elasticsearch after a network error. The default is 60s.
 
-===== `compression_level`
+[float]
+==== `compression_level`
 
 The gzip compression level. Setting this value to `0` disables compression. The
 compression level must be in the range of `1` (best speed) to `9` (best
 compression). The default value is `0`. Increasing the compression level
 reduces the network usage but increases the CPU usage.
 
-===== `headers`
+[float]
+==== `headers`
 
 Custom HTTP headers to add to each request. For more information, see
 <<elasticsearch-output>>.
 
-===== `hosts`
+[float]
+==== `hosts`
 
 The list of {es} nodes to connect to. Monitoring metrics are distributed to
-these nodes in round robin order. For more information, see
+these nodes in round-robin order. For more information, see
 <<elasticsearch-output>>.
 
-===== `max_retries`
+[float]
+==== `max_retries`
 
 The number of times to retry sending the monitoring metrics after a failure.
 After the specified number of retries, the metrics are typically dropped. The
 default value is `3`. For more information, see <<elasticsearch-output>>.
 
-===== `parameters`
+[float]
+==== `parameters`
 
 Dictionary of HTTP parameters to pass within the url with index operations.
 
-===== `password`
+[float]
+==== `password`
 
 The password that {beatname_uc} uses to authenticate with the {es} instances for
 shipping monitoring data.
 
-===== `metrics.period`
+[float]
+==== `metrics.period`
 
 The time interval (in seconds) when metrics are sent to the {es} cluster. A new
 snapshot of {beatname_uc} metrics is generated and scheduled for publishing each
 period. The default value is 10 * time.Second.
 
-===== `state.period`
+[float]
+==== `state.period`
 
 The time interval (in seconds) when state information are sent to the {es} cluster. A new
 snapshot of {beatname_uc} state is generated and scheduled for publishing each
 period. The default value is 60 * time.Second.
 
-===== `protocol`
+[float]
+==== `protocol`
 
 The name of the protocol to use when connecting to the {es} cluster. The options
 are: `http` or `https`. The default is `http`. If you specify a URL for `hosts`,
 however, the value of protocol is overridden by the scheme you specify in the URL.
 
-===== `proxy_url`
+[float]
+==== `proxy_url`
 
 The URL of the proxy to use when connecting to the {es} cluster. For more
 information, see <<elasticsearch-output>>.
 
-===== `timeout`
+[float]
+==== `timeout`
 
 The HTTP request timeout in seconds for the {es} request. The default is `90`.
 
-===== `ssl`
+[float]
+==== `ssl`
 
 Configuration options for Transport Layer Security (TLS) or Secure Sockets Layer
 (SSL) parameters like the certificate authority (CA) to use for HTTPS-based
 connections. If the `ssl` section is missing, the host CAs are used for
 HTTPS connections to {es}. For more information, see <<configuration-ssl>>.
 
-===== `username`
+[float]
+==== `username`
 
 The user ID that {beatname_uc} uses to authenticate with the {es} instances for
 shipping monitoring data.
+
