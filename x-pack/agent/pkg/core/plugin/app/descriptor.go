@@ -23,6 +23,7 @@ type Descriptor struct {
 
 // NewDescriptor creates a program which satisfies Program interface and can be used with Operator.
 func NewDescriptor(binaryName, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
+	binaryName = strings.ToLower(binaryName)
 	dir := directory(binaryName, version, config)
 
 	return &Descriptor{
@@ -83,7 +84,7 @@ func defaultSpec(dir string, binaryName string) ProcessSpec {
 
 func spec(directory, binaryName string) ProcessSpec {
 	defaultSpec := defaultSpec(directory, binaryName)
-	return populateSpec(directory, defaultSpec)
+	return populateSpec(directory, binaryName, defaultSpec)
 }
 
 func directory(binaryName, version string, config *artifact.Config) string {
@@ -115,11 +116,12 @@ func isKnownBeat(name string) bool {
 	return false
 }
 
-func populateSpec(dir string, spec ProcessSpec) ProcessSpec {
+func populateSpec(dir, binaryName string, spec ProcessSpec) ProcessSpec {
 	var programSpec program.Spec
 	var found bool
+	binaryName = strings.ToLower(binaryName)
 	for _, prog := range program.Supported {
-		if spec.BinaryPath != strings.ToLower(prog.Name) {
+		if binaryName != strings.ToLower(prog.Name) {
 			continue
 		}
 		found = true
