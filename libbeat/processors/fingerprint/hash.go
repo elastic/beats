@@ -36,7 +36,7 @@ var hashes = map[string]hashMethod{
 	"sha256": sha256.New,
 	"sha384": sha512.New384,
 	"sha512": sha512.New,
-	"xxhash": func() hash.Hash { return xxhash.New64() },
+	"xxhash": xxhash.NewHash64,
 }
 
 // Unpack creates the hashMethod from the given string
