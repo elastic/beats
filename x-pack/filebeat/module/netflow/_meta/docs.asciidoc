@@ -54,6 +54,10 @@ expiration.
 processing. Use this setting to avoid packet-loss when dealing with occasional
 bursts of traffic.
 
+`var.detect_sequence_reset`:: Flag controlling whether {beatname_uc} should
+monitor sequence numbers in the Netflow packets to detect an Exporting Process
+reset. See <<filebeat-input-netflow,netflow input>> for details.
+
 :has-dashboards!:
 
 :fileset_ex!:
