@@ -332,7 +332,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ThrottleRequests",
-                "field": "aws.metrics.ThrottledRequests.sum"
+                "field": "aws.dynamodb.metrics.ThrottledRequests.sum"
               },
               "schema": "metric",
               "type": "max"
@@ -503,7 +503,7 @@
               "id": "1",
               "params": {
                 "customLabel": "AccountMaxReads",
-                "field": "aws.metrics.AccountMaxReads.max"
+                "field": "aws.dynamodb.metrics.AccountMaxReads.max"
               },
               "schema": "metric",
               "type": "max"
@@ -513,7 +513,7 @@
               "id": "2",
               "params": {
                 "customLabel": "AccountMaxWrites",
-                "field": "aws.metrics.AccountMaxWrites.max"
+                "field": "aws.dynamodb.metrics.AccountMaxWrites.max"
               },
               "schema": "metric",
               "type": "max"
@@ -523,7 +523,7 @@
               "id": "3",
               "params": {
                 "customLabel": "AccountMaxTableLevelReads",
-                "field": "aws.metrics.AccountMaxTableLevelReads.max"
+                "field": "aws.dynamodb.metrics.AccountMaxTableLevelReads.max"
               },
               "schema": "metric",
               "type": "max"
@@ -533,7 +533,7 @@
               "id": "4",
               "params": {
                 "customLabel": "AccountMaxTableLevelWrites",
-                "field": "aws.metrics.AccountMaxTableLevelWrites.max"
+                "field": "aws.dynamodb.metrics.AccountMaxTableLevelWrites.max"
               },
               "schema": "metric",
               "type": "max"
@@ -638,7 +638,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ReadThrottleEvents",
-                "field": "aws.metrics.ReadThrottleEvents.sum"
+                "field": "aws.dynamodb.metrics.ReadThrottleEvents.sum"
               },
               "schema": "metric",
               "type": "max"
@@ -796,7 +796,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ConsumedReadCapacityUnits",
-                "field": "aws.metrics.ConsumedReadCapacityUnits.sum"
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum"
               },
               "schema": "metric",
               "type": "max"
@@ -919,7 +919,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ConsumedWriteCapacityUnits",
-                "field": "aws.metrics.ConsumedReadCapacityUnits.sum"
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum"
               },
               "schema": "metric",
               "type": "max"
@@ -1033,7 +1033,7 @@
               "id": "1",
               "params": {
                 "customLabel": "SuccessfulRequestLatency",
-                "field": "aws.metrics.SuccessfulRequestLatency.avg"
+                "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.avg"
               },
               "schema": "metric",
               "type": "avg"
@@ -1061,7 +1061,7 @@
               "id": "3",
               "params": {
                 "customLabel": "MAX SuccessfulRequestLatency",
-                "field": "aws.metrics.SuccessfulRequestLatency.max"
+                "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.max"
               },
               "schema": "metric",
               "type": "max"
@@ -1234,7 +1234,7 @@
               "id": "1",
               "params": {
                 "customLabel": "AccountProvisionedReadCapacityUtilization",
-                "field": "aws.metrics.AccountProvisionedReadCapacityUtilization.avg"
+                "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg"
               },
               "schema": "metric",
               "type": "avg"
@@ -1383,7 +1383,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ConsumedWriteCapacityUnits",
-                "field": "aws.metrics.ConsumedWriteCapacityUnits.avg"
+                "field": "aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg"
               },
               "schema": "metric",
               "type": "avg"
@@ -1554,7 +1554,7 @@
               "id": "1",
               "params": {
                 "customLabel": "ConsumedReadCapacityUnits",
-                "field": "aws.metrics.ConsumedReadCapacityUnits.avg"
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg"
               },
               "schema": "metric",
               "type": "avg"
@@ -1703,7 +1703,7 @@
               "id": "1",
               "params": {
                 "customLabel": "AccountProvisionedWriteCapacityUtilization",
-                "field": "aws.metrics.AccountProvisionedWriteCapacityUtilization.avg"
+                "field": "aws.dynamodb.metrics.AccountProvisionedWriteCapacityUtilization.avg"
               },
               "schema": "metric",
               "type": "avg"
