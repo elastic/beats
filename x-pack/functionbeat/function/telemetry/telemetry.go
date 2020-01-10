@@ -5,8 +5,6 @@
 package telemetry
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -16,8 +14,6 @@ type T interface {
 }
 
 type telemetry struct {
-	sync.Mutex
-
 	registry       *monitoring.Registry
 	countFunctions *monitoring.Int
 }
@@ -37,8 +33,5 @@ func Ignored() T {
 
 // AddTriggeredFunction adds a triggered function data to the registry.
 func (t *telemetry) AddTriggeredFunction() {
-	t.Lock()
-	defer t.Unlock()
-
 	t.countFunctions.Inc()
 }
