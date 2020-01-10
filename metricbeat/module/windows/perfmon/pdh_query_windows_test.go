@@ -131,3 +131,4 @@ func TestUTF16ToStringArray(t *testing.T) {
 		assert.Contains(t, array, res)
 	}
 }
+
