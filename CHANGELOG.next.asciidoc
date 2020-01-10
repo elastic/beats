@@ -597,6 +597,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable Logstash output. {pull}13345[13345]
 - Make `bulk_max_size` configurable in outputs. {pull}13493[13493]
 - Add `index` option to all functions to directly set a per-function index value. {issue}15064[15064] {pull}15101[15101]
+- Add monitoring info about triggered functions. {pull}14876[14876]
 
 *Winlogbeat*
 
