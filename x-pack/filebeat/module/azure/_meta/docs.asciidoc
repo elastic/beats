@@ -41,7 +41,7 @@ image::./images/filebeat-azure-overview.png[]
 ```
 - module: azure
   activitylogs:
-    enabled: false
+    enabled: true
     var:
       eventhub: "insights-operational-logs"
       consumer_group: "$Default"
@@ -50,7 +50,7 @@ image::./images/filebeat-azure-overview.png[]
       storage_account_key: ""
 
    auditlogs:
-     enabled: true
+     enabled: false
      var:
        eventhub: "insights-logs-auditlogs"
        consumer_group: "$Default"
@@ -59,7 +59,7 @@ image::./images/filebeat-azure-overview.png[]
        storage_account_key: ""
 
    signinlogs:
-     enabled: true
+     enabled: false
      var:
        eventhub: ["insights-logs-signinlogs"]
        consumer_group: "$Default"
