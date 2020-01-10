@@ -1,56 +1,72 @@
 {
-    "@timestamp": "2019-12-17T09:18:26.062Z",
+    "@timestamp": "2020-01-10T11:01:22.612Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
+    "host": {
+        "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84",
+        "hostname": "vm1",
+        "architecture": "x86_64",
+        "name": "vm1",
+        "os": {
+            "family": "darwin",
+            "name": "Mac OS X",
+            "kernel": "18.7.0",
+            "build": "18G95",
+            "platform": "darwin",
+            "version": "10.14.6"
+        }
+    },
     "agent": {
-        "hostname": "testnode1",
+        "hostname": "vm1",
         "id": "fbaf40e4-c9f2-4d9f-840f-b3d8de51b42c",
         "version": "8.0.0",
         "type": "metricbeat",
-        "ephemeral_id": "d9bd89a5-56fd-4502-b3c5-2a5c8b5b986b"
-    },
-    "ecs": {
-        "version": "1.2.0"
-    },
-    "service": {
-        "type": "aws"
+        "ephemeral_id": "ccb69319-4fbd-4881-996a-4c710322da8b"
     },
     "cloud": {
+        "region": "eu-central-1",
         "account": {
-            "id": "428152502467",
-            "name": "elastic-beats"
+            "name": "elastic-beats",
+            "id": "428152502467"
         },
-        "provider": "aws",
-        "region": "eu-central-1"
+        "provider": "aws"
     },
     "aws": {
-        "metrics": {
-            "SuccessfulRequestLatency": {
-                "max": 17.713318,
-                "avg": 4.457840625
+        "dimensions": {
+            "TableName": "TryDaxTable",
+            "Operation": "Query"
+        },
+        "dynamodb": {
+            "metrics": {
+                "SuccessfulRequestLatency": {
+                    "avg": 1.6592021822660081,
+                    "max": 2.883089
+                },
+                "ThrottledRequests": {
+                    "sum": 112
+                }
             }
         },
         "cloudwatch": {
-            "dimensions": {
-                "Operation": "Scan",
-                "TableName": "TryDaxTable"
-            },
             "namespace": "AWS/DynamoDB"
         }
     },
     "event": {
-        "module": "aws",
-        "duration": 1027498360,
-        "dataset": "aws.dynamodb"
+        "duration": 1447079629,
+        "dataset": "aws.dynamodb",
+        "module": "aws"
     },
     "metricset": {
         "name": "dynamodb",
         "period": 60000
     },
-    "host": {
-        "name": "testnode1"
+    "service": {
+        "type": "aws"
+    },
+    "ecs": {
+        "version": "1.2.0"
     }
 }
