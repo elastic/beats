@@ -88,6 +88,7 @@ type httpPlugin struct {
 	splitCookie         bool
 	hideKeywords        []string
 	redactAuthorization bool
+	redactHeaders       []string
 	maxMessageSize      int
 	mustDecodeBody      bool
 
@@ -146,6 +147,11 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
 	http.mustDecodeBody = config.DecodeBody
+
+	http.redactHeaders = make([]string, len(config.RedactHeaders))
+	for i, header := range config.RedactHeaders {
+		http.redactHeaders[i] = strings.ToLower(header)
+	}
 
 	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeRequestBodyFor} {
 		http.parserConfig.includeRequestBodyFor = append(http.parserConfig.includeRequestBodyFor, list...)
@@ -725,6 +731,12 @@ func extractHostHeader(header string) (host string, port int) {
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {
+	for _, header := range http.redactHeaders {
+		if _, exists := m.headers[header]; exists {
+			m.headers[header] = []byte("REDACTED")
+		}
+	}
+
 	if !m.isRequest || !http.redactAuthorization {
 		return
 	}

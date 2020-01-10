@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -69,7 +70,9 @@ func CloudwatchKinesisDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client) error {
+func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
 	lambdarunner.Start(c.createHandler(client))
 	return nil
 }
