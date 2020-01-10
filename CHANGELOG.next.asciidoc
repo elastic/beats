@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
 - Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 
 *Packetbeat*
