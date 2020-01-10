@@ -2,6 +2,13 @@
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
       {
+          "rename" : {
+              "field" : "azure",
+              "target_field" : "azure-eventhub",
+              "ignore_missing": true
+          }
+      },
+      {
           "script": {
               "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
               "params": {

@@ -1,0 +1,6 @@
+type: azure-eventhub
+connection_string: {{ .connection_string }}
+eventhub: {{ .eventhub }}
+consumer_group: {{ .consumer_group }}
+storage_account: {{ .storage_account }}
+storage_account_key: {{ .storage_account_key }}
