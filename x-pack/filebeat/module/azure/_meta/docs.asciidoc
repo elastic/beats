@@ -50,7 +50,7 @@ image::./images/filebeat-azure-overview.png[]
       storage_account_key: ""
 
    auditlogs:
-     enabled: false
+     enabled: true
      var:
        eventhub: "insights-logs-auditlogs"
        consumer_group: "$Default"
