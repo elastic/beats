@@ -3557,15 +3557,6 @@ required: True
 
 --
 
-*`process.exit_code`*::
-+
---
-the exit code of a process
-
-type: long
-
---
-
 *`systemd.fragment_path`*::
 +
 --
