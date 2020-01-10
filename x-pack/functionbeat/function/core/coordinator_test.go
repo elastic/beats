@@ -10,13 +10,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 var errUnhappy = errors.New("unhappy :(")
 
 type happyRunner struct{}
 
-func (hr *happyRunner) Run(ctx context.Context) error {
+func (hr *happyRunner) Run(ctx context.Context, _ telemetry.T) error {
 	<-ctx.Done()
 	return nil
 }
@@ -24,7 +26,7 @@ func (hr *happyRunner) String() string { return "happyRunner" }
 
 type unhappyRunner struct{}
 
-func (uhr *unhappyRunner) Run(ctx context.Context) error {
+func (uhr *unhappyRunner) Run(ctx context.Context, _ telemetry.T) error {
 	return errUnhappy
 }
 
@@ -36,7 +38,7 @@ func TestStart(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		var err error
 		go func() {
-			err = coordinator.Run(ctx)
+			err = coordinator.Run(ctx, telemetry.Ignored())
 			assert.NoError(t, err)
 		}()
 		cancel()
@@ -44,13 +46,13 @@ func TestStart(t *testing.T) {
 
 	t.Run("on error shutdown all the runner", func(t *testing.T) {
 		coordinator := NewCoordinator(nil, &happyRunner{}, &unhappyRunner{})
-		err := coordinator.Run(context.Background())
+		err := coordinator.Run(context.Background(), telemetry.Ignored())
 		assert.Error(t, err)
 	})
 
 	t.Run("aggregate all errors", func(t *testing.T) {
 		coordinator := NewCoordinator(nil, &unhappyRunner{}, &unhappyRunner{})
-		err := coordinator.Run(context.Background())
+		err := coordinator.Run(context.Background(), telemetry.Ignored())
 		assert.Error(t, err)
 	})
 }
