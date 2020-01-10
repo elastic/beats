@@ -20,7 +20,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
-|<<metricbeat-metricset-aws-elb,elb>> beta[]  
+|<<metricbeat-metricset-aws-elb,elb>>   
 |<<metricbeat-metricset-aws-rds,rds>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
 |<<metricbeat-metricset-aws-s3_request,s3_request>>   
