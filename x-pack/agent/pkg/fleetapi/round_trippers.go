@@ -48,10 +48,15 @@ func (r *FleetAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, er
 
 	req.Header.Set(key, prefix+r.apiKey)
 	resp, err := r.rt.RoundTrip(req)
+	if err != nil {
+		return resp, err
+	}
+
 	if resp.StatusCode == http.StatusUnauthorized {
 		defer resp.Body.Close()
 		return resp, ErrInvalidAPIKey
 	}
+
 	return resp, err
 }
 
