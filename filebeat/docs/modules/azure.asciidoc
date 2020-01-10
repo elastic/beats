@@ -44,7 +44,8 @@ image::./images/filebeat-azure-overview.png[]
 [float]
 === Module configuration
 
-```
+["source","yaml"]
+----
 - module: azure
   activitylogs:
     enabled: true
@@ -68,8 +69,7 @@ image::./images/filebeat-azure-overview.png[]
        eventhub: ["insights-logs-signinlogs"]
        consumer_group: "$Default"
        connection_string: ""
-
-```
+----
 
 
 A side by side kafka/event hubs notation, we will follow Azure notations in this case.
