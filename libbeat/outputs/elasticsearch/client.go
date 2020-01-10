@@ -668,10 +668,8 @@ func (client *Client) Test(d testing.Driver) {
 		u, err := url.Parse(client.URL)
 		d.Fatal("parse url", err)
 
-		address := u.Hostname()
-		if u.Port() != "" {
-			address += ":" + u.Port()
-		}
+		address := u.Host
+
 		d.Run("connection", func(d testing.Driver) {
 			netDialer := transport.TestNetDialer(d, client.timeout)
 			_, err = netDialer.Dial("tcp", address)
