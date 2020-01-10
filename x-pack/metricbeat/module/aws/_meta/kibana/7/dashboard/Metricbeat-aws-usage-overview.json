@@ -260,7 +260,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "aws.metrics.ResourceCount.sum"
+                "field": "aws.usage.metrics.ResourceCount.sum"
               },
               "schema": "metric",
               "type": "sum"
@@ -273,7 +273,7 @@
                   {
                     "input": {
                       "language": "kuery",
-                      "query": "aws.cloudwatch.dimensions.Type : \"Resource\" "
+                      "query": "aws.dimensions.Type : \"Resource\" "
                     },
                     "label": ""
                   }
@@ -287,7 +287,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "aws.cloudwatch.dimensions.Service",
+                "field": "aws.dimensions.Service",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -303,7 +303,7 @@
               "enabled": true,
               "id": "4",
               "params": {
-                "field": "aws.cloudwatch.dimensions.Resource",
+                "field": "aws.dimensions.Resource",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -416,7 +416,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "aws.metrics.CallCount.sum"
+                "field": "aws.usage.metrics.CallCount.sum"
               },
               "schema": "metric",
               "type": "sum"
@@ -429,7 +429,7 @@
                   {
                     "input": {
                       "language": "kuery",
-                      "query": "aws.cloudwatch.dimensions.Type : \"API\" "
+                      "query": "aws.dimensions.Type : \"API\" "
                     },
                     "label": ""
                   }
@@ -443,7 +443,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "aws.cloudwatch.dimensions.Service",
+                "field": "aws.dimensions.Service",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -459,7 +459,7 @@
               "enabled": true,
               "id": "4",
               "params": {
-                "field": "aws.cloudwatch.dimensions.Resource",
+                "field": "aws.dimensions.Resource",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -628,7 +628,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "aws.cloudwatch.dimensions.Service",
+                "fieldName": "aws.dimensions.Service",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "service name",
@@ -701,7 +701,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "aws.cloudwatch.dimensions.Type : \"Resource\" "
+                  "query": "aws.dimensions.Type : \"Resource\" "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -709,7 +709,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "aws.metrics.ResourceCount.sum",
+                    "field": "aws.usage.metrics.ResourceCount.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -719,7 +719,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.Service",
+                "terms_field": "aws.dimensions.Service",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -777,7 +777,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "aws.cloudwatch.dimensions.Type : \"API\"  "
+                  "query": "aws.dimensions.Type : \"API\"  "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -785,7 +785,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "aws.metrics.CallCount.sum",
+                    "field": "aws.usage.metrics.CallCount.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -795,7 +795,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.Service",
+                "terms_field": "aws.dimensions.Service",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }

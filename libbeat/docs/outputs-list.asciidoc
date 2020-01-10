@@ -1,0 +1,35 @@
+// TODO: Create script that generates this file. Conditional coding needs to
+// be preserved.
+
+//# tag::outputs-list[]
+
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<kafka-output>>
+ifndef::no-output-redis[]
+* <<redis-output>>
+endif::[]
+* <<file-output>>
+* <<console-output>>
+* <<configure-cloud-id>>
+
+//# end::outputs-list[]
+
+//# tag::outputs-include[]
+include::{libbeat-outputs-dir}/elasticsearch/docs/elasticsearch.asciidoc[]
+
+include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[]
+
+include::{libbeat-outputs-dir}/kafka/docs/kafka.asciidoc[]
+
+include::{libbeat-outputs-dir}/redis/docs/redis.asciidoc[]
+
+include::{libbeat-outputs-dir}/fileout/docs/fileout.asciidoc[]
+
+include::{libbeat-outputs-dir}/console/docs/console.asciidoc[]
+
+include::output-cloud.asciidoc[]
+
+include::{libbeat-outputs-dir}/codec/docs/codec.asciidoc[]
+
+//# end::outputs-include[]

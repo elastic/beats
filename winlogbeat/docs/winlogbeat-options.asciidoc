@@ -377,6 +377,18 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `event_logs.index`
+
+If present, this formatted string overrides the index for events from this
+event log (for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"winlogbeat-myindex-2019.12.13"`.
+
+[float]
 ==== `event_logs.keep_null`
 
 If this option is set to true, fields with `null` values will be published in

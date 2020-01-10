@@ -44,6 +44,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_cronjob"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_deployment"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_persistentvolume"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_persistentvolumeclaim"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_pod"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_replicaset"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_resourcequota"

@@ -89,6 +89,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-golang,Golang>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
+|<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   
 |<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -109,7 +111,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.19+| .19+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.20+| .20+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -121,6 +123,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
+|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>> experimental[]  
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>   
@@ -246,6 +249,7 @@ include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/golang.asciidoc[]
+include::modules/googlecloud.asciidoc[]
 include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/http.asciidoc[]

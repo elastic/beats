@@ -1,0 +1,21 @@
+default: true
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: compute
+      metrics:
+        - "compute.googleapis.com/firewall/dropped_bytes_count"
+        - "compute.googleapis.com/firewall/dropped_packets_count"
+        - "compute.googleapis.com/instance/cpu/reserved_cores"
+        - "compute.googleapis.com/instance/cpu/usage_time"
+        - "compute.googleapis.com/instance/cpu/utilization"
+        - "compute.googleapis.com/instance/disk/read_bytes_count"
+        - "compute.googleapis.com/instance/disk/read_ops_count"
+        - "compute.googleapis.com/instance/disk/write_bytes_count"
+        - "compute.googleapis.com/instance/disk/write_ops_count"
+        - "compute.googleapis.com/instance/network/received_bytes_count"
+        - "compute.googleapis.com/instance/network/received_packets_count"
+        - "compute.googleapis.com/instance/network/sent_bytes_count"
+        - "compute.googleapis.com/instance/uptime"
