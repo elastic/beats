@@ -137,12 +137,17 @@ func TestSeparateTopLevelCounters(t *testing.T) {
 	assert.Contains(t, topCounters, "sdc1")
 	assert.Contains(t, topCounters, "nvme0n1")
 	assert.NotContains(t, topCounters, "sda1")
+	assert.NotContains(t, topCounters, "sda10")
+	assert.NotContains(t, topCounters, "nvme0n1p1")
+	assert.NotContains(t, topCounters, "nvme0n1p10")
 
 	assert.NotContains(t, stats, "md")
 	assert.NotContains(t, stats, "sda")
 	assert.NotContains(t, stats, "nvme0n1")
 	assert.Contains(t, stats, "sdb")
 	assert.Contains(t, stats, "sda1")
+	assert.Contains(t, stats, "sda10")
 	assert.Contains(t, stats, "sdc1")
 	assert.Contains(t, stats, "nvme0n1p1")
+	assert.Contains(t, stats, "nvme0n1p10")
 }

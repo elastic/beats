@@ -64,46 +64,68 @@ func summaryIOCounter(stats map[string]disk.IOCountersStat) disk.IOCountersStat 
 	return sum
 }
 
-// separateTopLevelCounters will return a map of top level counters to ,
-// and it removes only aggregate counters from the passed map `stats`.
-// for example, it adds `hda` to a new map, and will not remove `hda`
-// if there is no sub counters such as `hda1`
+// separateTopLevelCounters will return a map of top level counters,
+// and it removes only aggregate counters from the given map `stats`.
+// For example, when `stats` with keys {"hda","hda1","sda1","sdb"} is given,
+// it will return a map with keys {"hda","sda1","sdb"},
+// and `stats` will remain elements with keys {"hda1","sda1","sdb"}
 func separateTopLevelCounters(stats map[string]disk.IOCountersStat) map[string]disk.IOCountersStat {
 	separated := map[string]disk.IOCountersStat{}
+
 	for name := range stats {
 		i := len(name)
 
-		//Skip the index to the first digit of the tailing number
+		// Skip the partition number if there is, and this also
+		// handles the situation with 10 or more partitions in one disk
 		for name[i-1] <= '9' && name[i-1] >= '0' {
 			i--
 		}
 
+		// a) If nothing skipped, the name represents a disk.
+		// Not to remove `name` from `stats`, as it may not have any children.
+		// NVMe disks are handled below in c) instead.
 		if i == len(name) {
 			separated[name] = stats[name]
 			continue
 		}
 
-		// found is true if the high level disk name of the given one is found.
-		// This handles the situation that `m.includeDevices` contains sub level names only
-		found := false
+		// Assume that it is a partition name.
+		// It could be a NVMe disk name.
+		foundStem := false
 
-		//for SATA and IDE disks, the names are like `sda`, `sda1`, `sda2`
-		//for nvme disks, the names would be like `nvme0n1` and `nvme0n1p1`
-		for j := i; j > i-2 && !found; j-- {
+		// b) Search the stem for `name`.
+		// Loop a bit as there are two naming conventions:
+		// - For SATA and IDE devices(as well as RAID), a partition name of the disk "sda" would be "sda#",
+		//   replacing '#' with a number.
+		// - For NVMe devices, the names would be like `nvme0n1`(disk) and `nvme0n1p1`(partition)
+		for j := i; j > i-2 && !foundStem; j-- {
+
+			// Check if possible stem exists in `separated`,
+			// in case that it has been deleted from `stats`.
 			if _, ok := separated[name[:j]]; ok {
-				found = true
+				foundStem = true
 			}
 
+			// This is entered at most once for each disk.
 			if _, ok := stats[name[:j]]; ok {
-				if !found {
+
+				// Only copy the stem to `separated` if it does not exist.
+				// The stem could have already copied itself to `separated` in previous loops
+				if !foundStem {
 					separated[name[:j]] = stats[name[:j]]
-					found = true
+					foundStem = true
 				}
+
+				// remove `name[:j]` from `stats`, since it has at least one child `name`,
 				delete(stats, name[:j])
 			}
 		}
 
-		if !found {
+		// c) If no stem was found, add the element to `separated`,
+		// This happens when:
+		//   i) the stem is not contained,
+		//   ii) it is a NVMe disk name.
+		if !foundStem {
 			separated[name] = stats[name]
 		}
 
