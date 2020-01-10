@@ -37,7 +37,7 @@ func (e *AckRequest) Validate() error {
 // 	 "success": true
 // }
 type AckResponse struct {
-	Action  string `json:"actions"`
+	Action  string `json:"action"`
 	Success bool   `json:"success"`
 }
 
@@ -69,7 +69,7 @@ func (e *AckCmd) Execute(r *AckRequest) (*AckResponse, error) {
 	b, err := json.Marshal(r)
 	if err != nil {
 		return nil, errors.New(err,
-			"fail to encode the checkin request",
+			"fail to encode the ack request",
 			errors.TypeUnexpected)
 	}
 
