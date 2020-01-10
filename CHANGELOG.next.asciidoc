@@ -140,6 +140,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- New options to configure roles and VPC. {pull}11779[11779]
+- Export automation templates used to create functions. {pull}11923[11923]
+- Configurable Amazon endpoint. {pull}12369[12369]
+- Add timeout option to reference configuration. {pull}13351[13351]
+- Configurable tags for Lambda functions. {pull}13352[13352]
+- Add input for Cloudwatch logs through Kinesis. {pull}13317[13317]
+- Enable Logstash output. {pull}13345[13345]
+- Make `bulk_max_size` configurable in outputs. {pull}13493[13493]
+- Add `index` option to all functions to directly set a per-function index value. {issue}15064[15064] {pull}15101[15101]
+- Add monitoring info about triggered functions. {pull}14876[14876]
 
 *Winlogbeat*
 
