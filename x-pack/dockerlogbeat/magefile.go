@@ -326,14 +326,14 @@ func Export() error {
 	return nil
 }
 
-// Package builds and creates a docker plugin
+// Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
-	mg.SerialDeps(Build, Install)
+	mg.SerialDeps(Build, Export)
 }
 
-// Release builds a "release" tarball that can be used later with `docker plugin create`
-func Release() {
-	mg.SerialDeps(Build, Export)
+// BuildAndInstall builds and installs the plugin
+func BuildAndInstall() {
+	mg.SerialDeps(Build, Install)
 }
 
 // IntegTest is currently a dummy test for the `testsuite` target
