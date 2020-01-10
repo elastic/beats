@@ -1,5 +1,5 @@
 name: Filebeat
-cmd: Filebeat
+cmd: filebeat
 configurable: grpc
 rules:
 - map:
