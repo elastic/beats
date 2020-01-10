@@ -23,7 +23,9 @@ import (
 	"math"
 	"strconv"
 	"sync"
+	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
@@ -231,4 +233,58 @@ func fullName(r *Registry, name string) string {
 		return name
 	}
 	return r.name + "." + name
+}
+
+// Timestamp is a timestamp variable satisfying the Var interface.
+type Timestamp struct {
+	mu     sync.RWMutex
+	ts     time.Time
+	cached string
+}
+
+// NewTimestamp creates and registeres a new timestamp variable.
+func NewTimestamp(r *Registry, name string, opts ...Option) *Timestamp {
+	if r == nil {
+		r = Default
+	}
+
+	v := &Timestamp{}
+	addVar(r, name, opts, v, makeExpvar(func() string {
+		return v.toString()
+
+	}))
+	return v
+}
+
+func (v *Timestamp) Set(t time.Time) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	v.ts = t
+	v.cached = ""
+}
+
+func (v *Timestamp) Get() time.Time {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	return v.ts
+}
+
+func (v *Timestamp) Visit(_ Mode, vs Visitor) {
+	vs.OnString(v.toString())
+}
+
+func (v *Timestamp) toString() string {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	if v.ts.IsZero() {
+		return ""
+	}
+
+	if v.cached == "" {
+		v.cached = v.ts.Format(common.TsLayout)
+	}
+	return v.cached
 }

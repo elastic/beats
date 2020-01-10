@@ -1,0 +1,73 @@
+{
+    "@timestamp": "2020-01-08T16:04:00.000Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "host": {
+        "os": {
+            "platform": "antergos",
+            "version": "",
+            "family": "",
+            "name": "Antergos Linux",
+            "kernel": "5.4.3-arch1-1"
+        },
+        "id": "54f70115bae545cbac2b150f254472a0",
+        "containerized": false,
+        "hostname": "mcastro",
+        "name": "mcastro",
+        "architecture": "x86_64"
+    },
+    "agent": {
+        "ephemeral_id": "8b802033-b611-414b-bcaf-1aa19e5f5901",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    },
+    "cloud": {
+        "provider": "googlecloud",
+        "instance": {
+            "id": "4503798379141677974",
+            "name": "instance-1"
+        },
+        "machine": {
+            "type": "f1-micro"
+        },
+        "availability_zone": "us-central1-a",
+        "account": {
+            "id": "elastic-metricbeat"
+        }
+    },
+    "event": {
+        "module": "googlecloud",
+        "duration": 1397750508,
+        "dataset": "googlecloud.compute"
+    },
+    "metricset": {
+        "period": 300000,
+        "name": "compute"
+    },
+    "googlecloud": {
+        "labels": {},
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": 0,
+                "dropped_packets_count": 0
+            },
+            "instance": {
+                "uptime": 46.181442,
+                "cpu": {
+                    "usage_time": 4.5843222587388945
+                }
+            }
+        }
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}
