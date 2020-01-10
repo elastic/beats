@@ -155,6 +155,10 @@ def main():
         labels = ["backport"]
 
         if args.zube_team:
+            resp = session.get(base + "/labels/Team:"+args.zube_team)
+            if resp.status_code != 200:
+                print("Cannot find team label", resp.text)
+                sys.exit(1)
             labels.append("Team:"+args.zube_team)
             labels.append("[zube]: In Review")
         else:
