@@ -2312,10 +2312,13 @@
 			"versionExact": "v19.03.5"
 		},
 		{
-			"checksumSHA1": "Yl6cD918tLOXa0I/iuGiovmszQU=",
+			"checksumSHA1": "dj8atalGWftfM9vdzCsh9YF1Seg=",
+			"origin": "github.com/docker/engine/pkg/pools",
 			"path": "github.com/docker/docker/pkg/pools",
-			"revision": "5947fa1b3e441586269f1ccb04ed3f2ec08e73dc",
-			"revisionTime": "2020-01-09T20:08:02Z"
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
 		},
 		{
 			"checksumSHA1": "TzcP4JKm2Sylo6qFay+UJ4YlwPU=",
@@ -3914,8 +3917,10 @@
 		{
 			"checksumSHA1": "SInqynLK8NjJIeFs0Mtk4g8LJ+A=",
 			"path": "github.com/opencontainers/runc/libcontainer/system",
-			"revision": "2b52db75279ca687e18156de86d845876e9ef35d",
-			"revisionTime": "2020-01-02T16:47:12Z"
+			"revision": "d736ef14f0288d6993a1845745d6756cfc9ddd5a",
+			"revisionTime": "2019-09-30T16:36:09Z",
+			"version": "v1.0.0-rc9",
+			"versionExact": "v1.0.0-rc9"
 		},
 		{
 			"checksumSHA1": "mdUukOXCVJxmT0CufSKDeMg5JFM=",
