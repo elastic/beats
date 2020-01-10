@@ -345,10 +345,14 @@ func createEvent5424(
 	if message.Priority() != nil {
 		syslog["priority"] = *message.Priority()
 	}
+
+	// Severity and facility meanings are shared between rfc 3264 and 5424, so we
+	// can reuse the same string tables. go-syslog also allows reading the
+	// string directly, but the strings differ slightly from the ones we used
+	// so for output consistency we still use our own lookups here.
 	if message.Severity() != nil {
 		severity := *message.Severity()
 		event["severity"] = severity
-		// Severity values are the same in both syslog versions.
 		v, err := mapValueToName(int(severity), severityLabels)
 		if err != nil {
 			log.Debugw("could not find severity label", "error", err)
@@ -356,43 +360,22 @@ func createEvent5424(
 			syslog["severity_label"] = v
 		}
 	}
+
 	if message.Facility() != nil {
-		// Facility values are the same in both syslog versions.
-		//facility := *message.Facility()
-
+		facility := *message.Facility()
+		v, err := mapValueToName(int(facility), facilityLabels)
+		if err != nil {
+			log.Debugw("could not find facility label", "error", err)
+		} else {
+			syslog["facility_label"] = v
+		}
 	}
-	/*
+	f["syslog"] = syslog
+	f["event"] = event
+	if len(process) > 0 {
+		f["process"] = process
+	}
 
-		if ev.HasPriority() {
-			syslog["priority"] = ev.Priority()
-
-			event["severity"] = ev.Severity()
-			v, err := mapValueToName(ev.Severity(), severityLabels)
-			if err != nil {
-				log.Debugw("could not find severity label", "error", err)
-			} else {
-				syslog["severity_label"] = v
-			}
-
-			syslog["facility"] = ev.Facility()
-			v, err = mapValueToName(ev.Facility(), facilityLabels)
-			if err != nil {
-				log.Debugw("could not find facility label", "error", err)
-			} else {
-				syslog["facility_label"] = v
-			}
-		}
-
-		f["syslog"] = syslog
-		f["event"] = event
-		if len(process) > 0 {
-			f["process"] = process
-		}
-
-		if ev.Sequence() != -1 {
-			f["event.sequence"] = ev.Sequence()
-		}
-	*/
 	var timestamp time.Time
 	timestampPtr := message.Timestamp()
 	if timestampPtr != nil {
