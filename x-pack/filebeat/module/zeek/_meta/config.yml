@@ -19,6 +19,8 @@
     enabled: true
   http:
     enabled: true
+  intel:
+    enabled: true    
   irc:
     enabled: true
   kerberos:

@@ -1,0 +1,167 @@
+[
+  {
+    "@timestamp": "2019-11-14T21:26:49.4961966Z",
+    "event": {
+      "action": "exited-process",
+      "category": "process",
+      "code": 4689,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "executable": "C:\\Windows\\System32\\wevtutil.exe",
+      "name": "wevtutil.exe",
+      "pid": 5412
+    },
+    "user": {
+      "domain": "VAGRANT",
+      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Status": "0x0",
+        "SubjectDomainName": "VAGRANT",
+        "SubjectLogonId": "0x274a2",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
+      },
+      "event_id": 4689,
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 1168
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 7538,
+      "task": "Process Termination"
+    }
+  },
+  {
+    "@timestamp": "2019-11-14T21:27:46.9609089Z",
+    "event": {
+      "action": "exited-process",
+      "category": "process",
+      "code": 4689,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "executable": "C:\\Windows\\System32\\taskhostw.exe",
+      "name": "taskhostw.exe",
+      "pid": 3988
+    },
+    "user": {
+      "domain": "VAGRANT",
+      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Status": "0x0",
+        "SubjectDomainName": "VAGRANT",
+        "SubjectLogonId": "0x274f1",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
+      },
+      "event_id": 4689,
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 500
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 7542,
+      "task": "Process Termination"
+    }
+  },
+  {
+    "@timestamp": "2019-11-14T21:28:18.4605129Z",
+    "event": {
+      "action": "exited-process",
+      "category": "process",
+      "code": 4689,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "executable": "C:\\Windows\\System32\\wevtutil.exe",
+      "name": "wevtutil.exe",
+      "pid": 2760
+    },
+    "user": {
+      "domain": "VAGRANT",
+      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Status": "0x0",
+        "SubjectDomainName": "VAGRANT",
+        "SubjectLogonId": "0x274a2",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
+      },
+      "event_id": 4689,
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 5636
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 7544,
+      "task": "Process Termination"
+    }
+  }
+]

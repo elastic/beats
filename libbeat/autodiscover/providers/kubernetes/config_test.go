@@ -53,6 +53,22 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestConfigWithIncorrectScope(t *testing.T) {
+	cfg := common.MapStr{
+		"scope":         "node",
+		"resource":      "service",
+		"hints.enabled": true,
+	}
+
+	config := common.MustNewConfigFrom(&cfg)
+	c := defaultConfig()
+	err := config.Unpack(&c)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "service", c.Resource)
+	assert.Equal(t, "cluster", c.Scope)
+}
+
 type mockBuilder struct {
 }
 

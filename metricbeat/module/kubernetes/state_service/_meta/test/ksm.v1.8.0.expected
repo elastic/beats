@@ -1,0 +1,105 @@
+[
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"k8s_app": "kube-state-metrics"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.101.63.187",
+			"created": "2020-01-07T17:43:43.000Z",
+			"name": "kube-state-metrics",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"k8s_app": "kube-dns",
+				"kubernetes_io_cluster_service": "true",
+				"kubernetes_io_name": "KubeDNS"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.96.0.10",
+			"created": "2020-01-07T16:11:03.000Z",
+			"name": "kube-dns",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"app": "nginx"
+			},
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "None",
+			"created": "2020-01-08T18:15:25.000Z",
+			"name": "nginx",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"component": "apiserver",
+				"provider": "kubernetes"
+			},
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.96.0.1",
+			"created": "2020-01-07T16:11:02.000Z",
+			"name": "kubernetes",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

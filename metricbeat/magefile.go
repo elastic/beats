@@ -47,11 +47,12 @@ import (
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
 	update "github.com/elastic/beats/dev-tools/mage/target/update"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
 )
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
@@ -114,7 +115,7 @@ func MockedTests(ctx context.Context) error {
 	}
 
 	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")); generate {
-		params.ExtraFlags = append(params.ExtraFlags, "-generate")
+		params.ExtraFlags = append(params.ExtraFlags, "-data")
 	}
 
 	params.Packages = nil
@@ -132,13 +133,6 @@ func Fields() error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
@@ -167,4 +161,11 @@ func FieldsDocs() error {
 // CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
 }

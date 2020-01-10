@@ -37,7 +37,7 @@ import (
 	"testing"
 
 	"github.com/blakesmith/ar"
-	"github.com/cavaliercoder/go-rpm"
+	rpm "github.com/cavaliercoder/go-rpm"
 )
 
 const (
@@ -179,7 +179,7 @@ func checkZip(t *testing.T, file string) {
 func checkDocker(t *testing.T, file string) {
 	p, info, err := readDocker(file)
 	if err != nil {
-		t.Error(err)
+		t.Errorf("error reading file %v: %v", file, err)
 		return
 	}
 

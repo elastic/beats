@@ -63,6 +63,24 @@ func Load(
 	processors processing.Supporter,
 	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 ) (*Pipeline, error) {
+
+	settings := Settings{
+		WaitClose:     0,
+		WaitCloseMode: NoWaitOnClose,
+		Processors:    processors,
+	}
+
+	return LoadWithSettings(beatInfo, monitors, config, makeOutput, settings)
+}
+
+// LoadWithSettings is the same as Load, but it exposes a Settings object that includes processors and WaitClose behavior
+func LoadWithSettings(
+	beatInfo beat.Info,
+	monitors Monitors,
+	config Config,
+	makeOutput func(outputs.Observer) (string, outputs.Group, error),
+	settings Settings,
+) (*Pipeline, error) {
 	log := monitors.Logger
 	if log == nil {
 		log = logp.L()
@@ -73,11 +91,6 @@ func Load(
 	}
 
 	name := beatInfo.Name
-	settings := Settings{
-		WaitClose:     0,
-		WaitCloseMode: NoWaitOnClose,
-		Processors:    processors,
-	}
 
 	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
 	if err != nil {

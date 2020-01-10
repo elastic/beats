@@ -4,6 +4,9 @@ from elasticsearch import Elasticsearch
 import re
 from nose.plugins.attrib import attr
 import unittest
+import requests
+import random
+import string
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -150,6 +153,29 @@ class Test(BaseTest):
         self.assert_same_structure(indirect_beats_state_doc['beats_state'], direct_beats_state_doc['beats_state'])
         self.assert_same_structure(indirect_beats_stats_doc['beats_stats'], direct_beats_stats_doc['beats_stats'])
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_cluster_uuid_setting(self):
+        """
+        Test that monitoring.cluster_uuid setting may be set without any other monitoring.* settings
+        """
+        test_cluster_uuid = self.random_string(10)
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "cluster_uuid": test_cluster_uuid
+            },
+            http_enabled="true"
+        )
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+
+        state = self.get_beat_state()
+        proc.check_kill_and_wait()
+
+        self.assertEqual(test_cluster_uuid, state["monitoring"]["cluster_uuid"])
+
     def search_monitoring_doc(self, monitoring_type):
         results = self.es_monitoring.search(
             index='.monitoring-beats-*',
@@ -241,3 +267,11 @@ class Test(BaseTest):
             host=os.getenv("ES_MONITORING_HOST", "localhost"),
             port=os.getenv("ES_MONITORING_PORT", "9210")
         )
+
+    def get_beat_state(self):
+        url = "http://localhost:5066/state"
+        return requests.get(url).json()
+
+    def random_string(self, size):
+        char_pool = string.ascii_letters + string.digits
+        return ''.join(random.choice(char_pool) for i in range(size))

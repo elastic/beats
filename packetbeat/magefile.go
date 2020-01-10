@@ -36,6 +36,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
 )
 
 func init() {
@@ -188,11 +190,6 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 
 // UnitTest executes the unit tests.

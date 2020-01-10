@@ -1,0 +1,25 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/SNS
+        tags.resource_type_filter: sns
+        statistic: ["Average"]
+        name:
+          - PublishSize
+          - SMSSuccessRate
+      - namespace: AWS/SNS
+        tags.resource_type_filter: sns
+        statistic: ["Sum"]
+        name:
+          - NumberOfMessagesPublished
+          - NumberOfNotificationsDelivered
+          - NumberOfNotificationsFailed
+          - NumberOfNotificationsFilteredOut
+          - NumberOfNotificationsFilteredOut-InvalidAttributes
+          - NumberOfNotificationsFilteredOut-NoMessageAttributes
+          - NumberOfNotificationsRedrivenToDlq
+          - NumberOfNotificationsFailedToRedriveToDlq
+          - SMSMonthToDateSpentUSD

@@ -1,4 +1,3 @@
-ifdef::has_timestamp_processor[]
 [[processor-timestamp]]
 === Timestamp
 
@@ -64,4 +63,3 @@ processors:
 - drop_fields:
     fields: [start_time]
 ----
-endif::[]

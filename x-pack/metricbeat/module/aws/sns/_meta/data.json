@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "TopicName": "test-sns"
+            },
+            "namespace": "AWS/SNS"
+        },
+        "metrics": {
+            "NumberOfMessagesPublished": {
+                "sum": 3
+            },
+            "PublishSize": {
+                "avg": 25.666666666666668
+            }
+        },
+        "tags": {
+            "created-by": "foo"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "ap-southeast-1"
+    },
+    "event": {
+        "dataset": "aws.sns",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "sns",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

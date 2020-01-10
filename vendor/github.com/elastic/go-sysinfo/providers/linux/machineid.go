@@ -27,11 +27,9 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-var (
-	// Possible (current and historic) locations of the machine-id file.
-	// These will be searched in order.
-	machineIDFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
-)
+// Possible (current and historic) locations of the machine-id file.
+// These will be searched in order.
+var machineIDFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
 
 func MachineID() (string, error) {
 	var contents []byte

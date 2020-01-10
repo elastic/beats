@@ -123,7 +123,8 @@ type License struct {
 	IssueDateInMillis  int        `json:"issue_date_in_millis"`
 	ExpiryDate         *time.Time `json:"expiry_date,omitempty"`
 	ExpiryDateInMillis int        `json:"expiry_date_in_millis,omitempty"`
-	MaxNodes           int        `json:"max_nodes"`
+	MaxNodes           int        `json:"max_nodes,omitempty"`
+	MaxResourceUnits   int        `json:"max_resource_units,omitempty"`
 	IssuedTo           string     `json:"issued_to"`
 	Issuer             string     `json:"issuer"`
 	StartDateInMillis  int        `json:"start_date_in_millis"`
@@ -485,15 +486,13 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 // particular it ensures that ms-since-epoch values are marshaled as longs
 // and not floats in scientific notation as Elasticsearch does not like that.
 func (l *License) ToMapStr() common.MapStr {
-
 	m := common.MapStr{
 		"status":               l.Status,
-		"id":                   l.ID,
+		"uid":                  l.ID,
 		"type":                 l.Type,
 		"issue_date":           l.IssueDate,
 		"issue_date_in_millis": l.IssueDateInMillis,
 		"expiry_date":          l.ExpiryDate,
-		"max_nodes":            l.MaxNodes,
 		"issued_to":            l.IssuedTo,
 		"issuer":               l.Issuer,
 		"start_date_in_millis": l.StartDateInMillis,
@@ -503,6 +502,16 @@ func (l *License) ToMapStr() common.MapStr {
 		// We don't want to record a 0 expiry date as this means the license has expired
 		// in the Stack Monitoring UI
 		m["expiry_date_in_millis"] = l.ExpiryDateInMillis
+	}
+
+	// Enterprise licenses have max_resource_units. All other licenses have
+	// max_nodes.
+	if l.MaxNodes != 0 {
+		m["max_nodes"] = l.MaxNodes
+	}
+
+	if l.MaxResourceUnits != 0 {
+		m["max_resource_units"] = l.MaxResourceUnits
 	}
 
 	return m

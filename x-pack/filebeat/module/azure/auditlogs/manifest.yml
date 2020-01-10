@@ -9,6 +9,6 @@ var:
     default: "$Default"
 
 ingest_pipeline:
-- ingest/pipeline.json
-- ../azure-shared-pipeline.json
-input: config/auditlogs.yml
+  - ingest/pipeline.json
+  - ../azure-shared-pipeline.json
+input: config/{{.input}}.yml

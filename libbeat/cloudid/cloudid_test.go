@@ -79,11 +79,11 @@ func TestDecode(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		esURL, kbURL, err := decodeCloudID(test.cloudID)
+		cid, err := NewCloudID(test.cloudID, "")
 		assert.NoError(t, err, test.cloudID)
 
-		assert.Equal(t, esURL, test.expectedEsURL, test.cloudID)
-		assert.Equal(t, kbURL, test.expectedKibanaURL, test.cloudID)
+		assert.Equal(t, cid.ElasticsearchURL(), test.expectedEsURL, test.cloudID)
+		assert.Equal(t, cid.KibanaURL(), test.expectedKibanaURL, test.cloudID)
 	}
 }
 
@@ -103,7 +103,7 @@ func TestDecodeError(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, _, err := decodeCloudID(test.cloudID)
+		_, err := NewCloudID(test.cloudID, "")
 		assert.Error(t, err, test.cloudID)
 		assert.Contains(t, err.Error(), test.errorMsg, test.cloudID)
 	}

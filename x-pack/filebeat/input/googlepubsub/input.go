@@ -128,7 +128,7 @@ func (in *pubsubInput) run() error {
 	defer cancel()
 
 	// Make pubsub client.
-	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
+	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat", false))}
 	if in.CredentialsFile != "" {
 		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
 	} else if len(in.CredentialsJSON) > 0 {

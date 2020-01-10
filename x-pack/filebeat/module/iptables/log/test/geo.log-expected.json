@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-10-10T07:25:12.000-02:00",
         "destination.ip": "10.4.0.5",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
@@ -34,13 +33,10 @@
         "service.type": "iptables",
         "source.as.number": 13041,
         "source.as.organization.name": "Consorci de Serveis Universitaris de Catalunya",
-        "source.geo.city_name": "Bellaterra",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
-        "source.geo.location.lat": 41.5026,
-        "source.geo.location.lon": 2.0875,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
+        "source.geo.location.lat": 40.4172,
+        "source.geo.location.lon": -3.684,
         "source.ip": "158.109.0.1",
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 38842,

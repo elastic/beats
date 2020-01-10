@@ -1,0 +1,22 @@
+- key: activemq
+  title: "activemq"
+  release: beta
+  description: >
+    Module for parsing ActiveMQ log files.
+  fields:
+    - name: activemq
+      type: group
+      description: >
+      fields:
+        - name: caller
+          type: keyword
+          description: >
+            Name of the caller issuing the logging request (class or resource).
+        - name: thread
+          type: keyword
+          description: >
+            Thread that generated the logging event.
+        - name: user
+          type: keyword
+          description: >
+            User that generated the logging event.

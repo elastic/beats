@@ -1,0 +1,65 @@
+[
+  {
+    "@timestamp": "2019-10-08T10:20:44.4724208Z",
+    "event": {
+      "action": "user-member-enumerated",
+      "code": 4799,
+      "kind": "event",
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "group": {
+      "domain": "Builtin",
+      "name": "Administrators"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "name": "null"
+    },
+    "user": {
+      "domain": "WORKGROUP",
+      "id": "S-1-5-18",
+      "name": "WIN-41OB2LO92CR$"
+    },
+    "winlog": {
+      "activity_id": "{c3ff3c1c-7dc1-0000-233e-ffc3c17dd501}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR",
+      "event_data": {
+        "CallerProcessId": "0x494",
+        "CallerProcessName": "C:\\Windows\\System32\\svchost.exe",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-41OB2LO92CR$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Builtin",
+        "TargetSid": "S-1-5-32-544",
+        "TargetUserName": "Administrators"
+      },
+      "event_id": 4799,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 780,
+        "thread": {
+          "id": 820
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 3002,
+      "task": "Security Group Management"
+    }
+  }
+]

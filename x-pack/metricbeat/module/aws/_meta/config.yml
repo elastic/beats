@@ -1,18 +1,36 @@
 - module: aws
-  period: 300s
+  period: 1m
   metricsets:
-    - ec2
-  regions:
-    - us-east-1
+    - usage
 - module: aws
-  period: 300s
+  period: 5m
   metricsets:
     - cloudwatch
   metrics:
     - namespace: AWS/EC2
-      name: ["CPUUtilization", "DiskWriteOps"]
+      #name: ["CPUUtilization", "DiskWriteOps"]
       tags.resource_type_filter: ec2:instance
       #dimensions:
       #  - name: InstanceId
       #    value: i-0686946e22cf9494a
-      statistic: ["Average", "Maximum"]
+      #statistic: ["Average", "Maximum"]
+- module: aws
+  period: 5m
+  metricsets:
+    - ebs
+    - ec2
+    - elb
+    - sns
+    - sqs
+    - rds
+- module: aws
+  period: 12h
+  metricsets:
+    - billing
+  regions:
+    - us-east-1
+- module: aws
+  period: 24h
+  metricsets:
+    - s3_daily_storage
+    - s3_request

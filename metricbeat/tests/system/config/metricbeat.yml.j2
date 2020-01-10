@@ -37,8 +37,12 @@ metricbeat.modules:
   period: {{ m.period }}
   {% endif -%}
 
+  {% if m.metrics_path -%}
+  metrics_path: {{ m.metrics_path }}
+  {% endif -%}
+
   {% if m.path -%}
-  metrics_path: {{ m.path }}
+  path: {{ m.path }}
   {% endif -%}
 
   {% if m.port -%}
