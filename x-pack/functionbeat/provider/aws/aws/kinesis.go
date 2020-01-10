@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -132,7 +133,9 @@ func KinesisDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (k *Kinesis) Run(_ context.Context, client core.Client) error {
+func (k *Kinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
 	lambdarunner.Start(k.createHandler(client))
 	return nil
 }
@@ -142,6 +145,7 @@ func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisE
 		k.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)
+
 		if err := client.PublishAll(events); err != nil {
 			k.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
