@@ -1,0 +1,108 @@
+[
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"addonmanager_kubernetes_io_mode": "Reconcile",
+				"app": "kubernetes-dashboard",
+				"kubernetes_io_minikube_addons": "dashboard",
+				"kubernetes_io_minikube_addons_endpoint": "dashboard"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.109.175.127",
+			"created": "2018-05-30T16:24:44.000Z",
+			"name": "kubernetes-dashboard",
+			"type": "NodePort"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"k8s_app": "kube-dns",
+				"kubernetes_io_cluster_service": "true",
+				"kubernetes_io_name": "KubeDNS"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.96.0.10",
+			"created": "2018-05-30T16:24:36.000Z",
+			"name": "kube-dns",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"component": "apiserver",
+				"provider": "kubernetes"
+			},
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.96.0.1",
+			"created": "2018-05-30T16:24:29.000Z",
+			"name": "kubernetes",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"labels": {
+				"k8s_app": "kube-state-metrics"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.108.182.194",
+			"created": "2018-05-30T16:24:45.000Z",
+			"name": "kube-state-metrics",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

@@ -1,0 +1,47 @@
+[
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"cpu": {
+				"allocatable": {
+					"cores": 2
+				},
+				"capacity": {
+					"cores": 2
+				}
+			},
+			"memory": {
+				"allocatable": {
+					"bytes": 1992347648
+				},
+				"capacity": {
+					"bytes": 2097205248
+				}
+			},
+			"name": "minikube",
+			"pod": {
+				"allocatable": {
+					"total": 110
+				},
+				"capacity": {
+					"total": 110
+				}
+			},
+			"status": {
+				"ready": "true",
+				"unschedulable": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]
