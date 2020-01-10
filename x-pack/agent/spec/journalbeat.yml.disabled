@@ -1,5 +1,6 @@
 name: Journalbeat
 cmd: journalbeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false"]
 rules:
 - filter_values:
     selector: streams
