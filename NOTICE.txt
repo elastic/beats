@@ -4571,7 +4571,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/runc
-Revision: 2b52db75279ca687e18156de86d845876e9ef35d
+Version: v1.0.0-rc9
+Revision: d736ef14f0288d6993a1845745d6756cfc9ddd5a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/opencontainers/runc/LICENSE:
 --------------------------------------------------------------------
