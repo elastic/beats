@@ -4,21 +4,17 @@
 The {beats} framework guarantees at-least-once delivery to ensure that no data
 is lost when events are sent to {es}. This is great if everything goes as
 planned. But if {beatname_uc} shuts down during processing, or the connection is
-lost before events are acknowledged, you can end up with duplicate events in
+lost before events are acknowledged, you can end up with duplicate data in
 {es}.
 
 [float]
 === What causes duplicates?
 
-The {beats} retry mechanism may result in duplicate data in {es}.
-
-When an output is blocked, {beatname_uc} will attempt to resend events until
-they are acknowledged by the output. If the output receives the data, but is
-unable to send an acknowledgement, the data may be sent to {es} multiple times.
-When {es} processes the data, it looks for a document ID. If the ID exists,
-{es} overwrites the existing document. If not, {es} creates a new document.
-Because document IDs are typically set by {es} (by default), this problem is
-common for data sent by {beats} or {ls}.
+When an output is blocked, the retry mechanism in {beatname_uc} attempts to
+resend events until they are acknowledged by the output. If the output receives
+the events, but is unable to acknowledge them, the data might be sent to {es}
+multiple times. Because document IDs are typically set by {es} _after_ it
+receives the data from {beats}, the duplicate events are indexed as new data.
 
 [float]
 === How can I avoid duplicates?
@@ -33,8 +29,7 @@ The `@metadata.id` field is passed along with the event so that you can use
 it to set the document ID later in your processing pipeline, for example, in
 {ls}.
 
-There are several methods available for setting the document ID in {beats}. The
-one you use depends on your specific use case:
+There are several ways to set the document ID in {beats}:
 
 TODO: Need some realistic examples to flesh out the following sections. Also need to test these...haha.
 
