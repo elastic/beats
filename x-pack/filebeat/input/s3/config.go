@@ -17,7 +17,7 @@ type config struct {
 	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
-	ExpendEventListFromField  string              `config:"expand_event_list_from_field"`
+	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
 }
 
 func defaultConfig() config {

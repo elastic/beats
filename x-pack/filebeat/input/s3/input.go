@@ -377,7 +377,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		}
 
 		// Decode JSON documents when expand_event_list_from_field is given in config
-		if p.config.ExpendEventListFromField != "" {
+		if p.config.ExpandEventListFromField != "" {
 			decoder := json.NewDecoder(reader)
 			err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
 			if err != nil {
@@ -438,9 +438,9 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 		if err == io.EOF {
 			// create event for last line
 			// get logs from expand_event_list_from_field
-			textValues, ok := jsonFields[p.config.ExpendEventListFromField]
+			textValues, ok := jsonFields[p.config.ExpandEventListFromField]
 			if !ok {
-				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpandEventListFromField))
 				p.logger.Error(err)
 				return err
 			}
@@ -459,9 +459,9 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 			return nil
 		}
 
-		textValues, ok := jsonFields[p.config.ExpendEventListFromField]
+		textValues, ok := jsonFields[p.config.ExpandEventListFromField]
 		if !ok {
-			err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
+			err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpandEventListFromField))
 			p.logger.Error(err)
 			return err
 		}
@@ -469,7 +469,7 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 		for _, v := range textValues {
 			err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
 			if err != nil {
-				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpendEventListFromField))
+				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpandEventListFromField))
 				p.logger.Error(err)
 				return err
 			}
