@@ -307,6 +307,10 @@ func Export() error {
 		return errors.Wrap(err, "error getting beats version")
 	}
 
+	if mage.Snapshot {
+		version = version + "-SNAPSHOT"
+	}
+
 	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", logDriverName, version, "docker-plugin")
 
 	outpath := filepath.Join("../..", packageEndDir, tarballName)
