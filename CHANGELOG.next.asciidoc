@@ -11,18 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update to Golang 1.12.1. {pull}11330[11330]
-- Update to Golang 1.12.4. {pull}11782[11782]
-- Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
-- Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
-- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
-- Update to Golang 1.12.7. {pull}12931[12931]
-- Remove `in_cluster` configuration parameter for Kuberentes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
-- Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
-- Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
-- By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
-- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
-- Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
@@ -36,6 +25,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 
 *Heartbeat*
 
@@ -47,6 +38,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+- Update cloudwatch metricset mapping for both metrics and dimensions. {pull}15245[15245]
 
 *Packetbeat*
 
@@ -62,9 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
-- Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
-- Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
+- Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 
 *Auditbeat*
 
@@ -74,8 +65,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fix a problem in Filebeat input httpjson where interval is not used as time.Duration. {pull}14728[14728]
-- Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 - Fix SSL config in input.yml for Filebeat httpjson input in the MISP module. {pull}14767[14767]
+- Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
 - Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
 
 *Heartbeat*
@@ -91,9 +82,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
 - Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
+- Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
 
 *Packetbeat*
 
@@ -108,51 +102,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 - Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
-- Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
-- Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
-- Add if/then/else support to processors. {pull}10744[10744]
-- Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
-- Add output test to kafka output {pull}10834[10834]
-- Gracefully shut down on SIGHUP {pull}10704[10704]
-- New processor: `copy_fields`. {pull}11303[11303]
-- Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
-- New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
-- Add `add_observer_metadata` processor. {pull}11394[11394]
-- Add `decode_csv_fields` processor. {pull}11753[11753]
-- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
-- New `extract_array` processor. {pull}11761[11761]
-- Add number of goroutines to reported metrics. {pull}12135[12135]
-- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
-- Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
-- Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
-- Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
-- Add support for reading the `network.iana_number` field by default to the community_id processor. {pull}12701[12701]
-- Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
-- Add `decompress_gzip_field` processor. {pull}12733[12733]
-- Add `timestamp` processor for parsing time fields. {pull}12699[12699]
-- Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
-- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
-- Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
-- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
-- add_host_metadata is now GA. {pull}13148[13148]
-- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 - add_host_metadata is no GA. {pull}13148[13148]
-- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
-- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
-- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
-- Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
-- Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 - Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
-- Use less restrictive API to check if template exists. {pull}13847[13847]
-- Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
-- Add support for numeric time zone offsets in timestamp processor. {pull}13902[13902]
-- Add condition to the config file template for add_kubernetes_metadata {pull}14056[14056]
-- Marking Central Management deprecated. {pull}14018[14018]
-- Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
-- Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
 - GA the `script` processor. {pull}14325[14325]
 - Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
 - Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
@@ -171,6 +126,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
+- Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
 
@@ -179,12 +138,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add cost warnings for the azure module. {pull}15356[15356]
 
 *Packetbeat*
 
 
 *Functionbeat*
 
+- Add monitoring info about triggered functions. {pull}14876[14876]
 
 *Winlogbeat*
 

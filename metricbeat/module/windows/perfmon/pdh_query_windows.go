@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	instanceNameRegexp = regexp.MustCompile(`.*\((.*)\).*`)
+	instanceNameRegexp = regexp.MustCompile(`.*?\((.*?)\).*`)
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 

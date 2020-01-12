@@ -53,7 +53,6 @@ func getPluginName() (string, error) {
 
 // Build builds docker rootfs container root
 func Build() error {
-	mg.Deps(CleanDocker)
 	mage.CreateDir(packageStagingDir)
 	mage.CreateDir(packageEndDir)
 

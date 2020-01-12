@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -67,7 +68,9 @@ func SQSDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (s *SQS) Run(_ context.Context, client core.Client) error {
+func (s *SQS) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
 	lambdarunner.Start(s.createHandler(client))
 	return nil
 }
@@ -77,6 +80,7 @@ func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) er
 		s.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.SQS(request)
+
 		if err := client.PublishAll(events); err != nil {
 			s.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
