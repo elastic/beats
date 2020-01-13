@@ -262,7 +262,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_ELB_5XX.sum",
+                    "field": "aws.elb.metrics.HTTPCode_ELB_5XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -272,7 +272,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -354,7 +354,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.RequestCount.sum",
+                    "field": "aws.elb.metrics.RequestCount.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -364,7 +364,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -450,7 +450,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.UnHealthyHostCount.max",
+                    "field": "aws.elb.metrics.UnHealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "max"
                   }
@@ -460,7 +460,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.AvailabilityZone",
+                "terms_field": "aws.dimensions.AvailabilityZone",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -545,7 +545,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HealthyHostCount.max",
+                    "field": "aws.elb.metrics.HealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "max"
                   }
@@ -555,7 +555,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.AvailabilityZone",
+                "terms_field": "aws.dimensions.AvailabilityZone",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -637,7 +637,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.Latency.avg",
+                    "field": "aws.elb.metrics.Latency.avg",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -647,7 +647,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -729,7 +729,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_Backend_4XX.sum",
+                    "field": "aws.elb.metrics.HTTPCode_Backend_4XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -739,7 +739,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -821,7 +821,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.BackendConnectionErrors.sum",
+                    "field": "aws.elb.metrics.BackendConnectionErrors.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -832,7 +832,7 @@
                 "split_mode": "terms",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -972,7 +972,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_Backend_2XX.sum",
+                    "field": "aws.elb.metrics.HTTPCode_Backend_2XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -982,7 +982,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                "terms_field": "aws.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }

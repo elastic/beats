@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 // Create a new pipeline client based on the function configuration.
@@ -21,7 +22,7 @@ type clientFactory func(*common.Config) (core.Client, error)
 
 // Function is temporary
 type Function interface {
-	Run(context.Context, core.Client) error
+	Run(context.Context, core.Client, telemetry.T) error
 	Name() string
 }
 
@@ -46,13 +47,13 @@ type Runnable struct {
 
 // Run call the the function's Run method, the method is a specific goroutine, it will block until
 // beats shutdown or an error happen.
-func (r *Runnable) Run(ctx context.Context) error {
+func (r *Runnable) Run(ctx context.Context, t telemetry.T) error {
 	client, err := r.makeClient(r.config)
 	if err != nil {
 		return errors.Wrap(err, "could not create a client for the function")
 	}
 	defer client.Close()
-	return r.function.Run(ctx, client)
+	return r.function.Run(ctx, client, t)
 }
 
 func (r *Runnable) String() string {
