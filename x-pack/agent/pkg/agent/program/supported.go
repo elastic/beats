@@ -6,15 +6,21 @@
 
 package program
 
-import "github.com/elastic/beats/x-pack/agent/pkg/packer"
+import (
+	"strings"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/packer"
+)
 
 var Supported []Spec
+var SupportedMap map[string]bool
 
 func init() {
 	// Packed Files
 	// spec/filebeat.yml
 	// spec/metricbeat.yml
 	unpacked := packer.MustUnpack("eJykVE9zuzYUvPdj5NzpD+TgqTvzOxhSBPhPapxIQjckOWAsgcfG2NDpd+/IBgfHSXrogQMavad9+3b374f9dsV/vK3liq3i8rdayYc/HphyS/pSJKGSe4oDGZHFJALm5nltqxifZKRQKsbbjAFLxViYXLlrBl+HPhQ1h7MJz9GektnQWRsJw+7xOSkS3xknHLpG/FQkfBDWFLslP7bn1/tj/V/6XlhH2GoYdA36Ukz0nctnHyMSFs9r21gRW7b3z59+h0NUd291HyVUsnxRUT3LS5EwOMr7db5jS6HQQTijRsBwy7Izvk2MHyf9Pj5EgGLLmA7CjD8ViYDz4xd9TOqNh76HNnx8i0W/PQVhFYFS8qxIKBxlMUD1hz57BnjFFdrEZP7GwakS4FTRpkguZ7MPuE4VrUfNisx13dD35pauocei9CHdMi+UXI5AhE/mO8d2Q/UeB2HFs/t9xABZtxzbH+rH5fnd9v50aV+4S67/moMWp9HnqvRhO//73ZricMt7vdpZJtOlnbGBbXU7pXlQsZd7vAL+PjzPCtGaYtfQuuMKHSJsyo+19F3Th8/7yAP3kME1f14gWy9cZoG0ZsAY+nBkCs82hWNJBt1GQJlxgFKu5sU0RzUb9/ulFR+Ejcak3xY9jXKA9hTPDTYImud3Pnoeu55VgoRHQRZXTvWOuN6fep0IkEqt2yV0myUJJSOzIiAl688aY+soSNgQYmx9J1L+n2nKDStlGDUcuhldJjkbIEPPHtTHJABoH5G5EeN5Q7FbRyDJp844bzWYT8/YxC7CdBct+d53xJ4B0QjoNrHDt07y8+fDr5d4Uatyt+afBMwLRgZXMrsGCl4MfWhK4QXbCHTBMzpQJXNBgjRSJ/m8tnOe25mTByaDSBP3idDnbwJII3ZHNcVCrrxxJ/wdJZuh74UWh68XMr1A91yxFsu0ftz9h0lKH5opf2pF4dmpgIk2nsEVSllnUO+Kr1uiwZV74OCUCoi+wDe+CUrhySNd9ELkDmvy4/XpdDbqX+vH3eTmrtiecTlhPyzvRX0JHcXVqPwsWC8iNivqoT1d6NnnFfc2HZ9dXSO8QEbYbNpzgzVFwm72+52hbnb+hTFbDGQ2aU1iUOLfB1reD6lbLXXm6YT+fq+UK3I2ovwuPLq6qbozx0GQYN+fPYajRnizL815w41jlQyEZ738L4NeTHkJ1Ppsyu8N+s8v/wYAAP//VQ22/g==")
+	SupportedMap = make(map[string]bool)
 
 	for f, v := range unpacked {
 		s, err := NewSpecFromBytes(v)
@@ -22,5 +28,6 @@ func init() {
 			panic("Cannot read spec from " + f)
 		}
 		Supported = append(Supported, s)
+		SupportedMap[strings.ToLower(s.Name)] = true
 	}
 }
