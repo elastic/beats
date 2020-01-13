@@ -87,12 +87,8 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	if err != nil {
 		return errors.Wrap(err, "Error locating temp dir")
 	}
-	defer func() {
-		err = sh.Rm(tmpDir)
-		if err != nil {
-			errors.Wrap(err, "error removing temp dir")
-		}
-	}()
+	defer sh.Rm(tmpDir)
+
 	tarPath := filepath.Join(tmpDir, "tarRoot.tar")
 	err = sh.RunV("tar", "cf", tarPath, "./")
 	if err != nil {
