@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
 - Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 - Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
 
@@ -126,8 +127,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
+- Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
 - Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
+- Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
