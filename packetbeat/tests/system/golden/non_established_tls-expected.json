@@ -96,6 +96,8 @@
         ],
         "tls.detailed.client_hello.version": "3.3",
         "tls.detailed.version": "TLS 1.2",
+        "tls.established": false,
+        "tls.resumed": false,
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "type": "tls"

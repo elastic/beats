@@ -190,6 +190,7 @@
         "tls.detailed.version": "TLS 1.2",
         "tls.established": true,
         "tls.next_protocol": "h2",
+        "tls.resumed": false,
         "tls.server.hash.sha1": "7BB698386970363D2919CC5772846984FFD4A889",
         "tls.server.issuer": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
         "tls.server.not_after": "2020-12-02T12:00:00.000Z",

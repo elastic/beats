@@ -463,7 +463,13 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if tls.ClientSupportedCiphers == "" && len(tlsClientSupportedCiphers) > 0 {
 		fields.Put("tls.client.supported_ciphers", tlsClientSupportedCiphers)
 	}
-
+	// Enforce booleans (not serialized when false)
+	if !tls.Established {
+		fields.Put("tls.established", tls.Established)
+	}
+	if !tls.Resumed {
+		fields.Put("tls.resumed", tls.Resumed)
+	}
 	return evt
 }
 
