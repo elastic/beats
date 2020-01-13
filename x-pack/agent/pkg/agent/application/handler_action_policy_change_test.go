@@ -107,6 +107,10 @@ func (t *testAcker) Ack(action fleetapi.Action) error {
 	return nil
 }
 
+func (t *testAcker) Commit() error {
+	return nil
+}
+
 func (t *testAcker) Clear() {
 	t.ackedLock.Lock()
 	defer t.ackedLock.Unlock()

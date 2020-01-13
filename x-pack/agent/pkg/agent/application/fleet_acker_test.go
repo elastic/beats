@@ -61,10 +61,15 @@ func TestAcker(t *testing.T) {
 		return resp, nil
 	})
 
-	go func() { <-ch }()
+	go func() {
+		for range ch {
+		}
+	}()
 
 	if err := acker.Ack(testAction); err != nil {
 		t.Fatal(err)
 	}
-
+	if err := acker.Commit(); err != nil {
+		t.Fatal(err)
+	}
 }
