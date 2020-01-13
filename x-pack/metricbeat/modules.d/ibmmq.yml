@@ -1,3 +1,6 @@
+# Module: ibmmq
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-ibmmq.html
+
 - module: ibmmq
   metricsets: ['status']
   period: 10s
