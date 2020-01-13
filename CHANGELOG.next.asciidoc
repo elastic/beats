@@ -486,6 +486,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
 - Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
+- Add cloudtrail fileset to AWS module. {issue}14657[14657] {pull}15227[15227]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
