@@ -31204,7 +31204,7 @@ format: number
 *`system.memory.page_stats.direct_efficiency.pct`*::
 +
 --
-direct reclaim efficiency percentage
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
 
 type: scaled_float
 
@@ -31215,7 +31215,7 @@ format: percent
 *`system.memory.page_stats.kswapd_efficiency.pct`*::
 +
 --
-kswapd reclaim efficiency percentage
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
 
 type: scaled_float
 
