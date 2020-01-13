@@ -130,6 +130,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
 - Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
 - Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
