@@ -78,7 +78,7 @@ func TestCheckin(t *testing.T) {
 				},
 			}
 
-			cmd := NewCheckinCmd(&agentinfo{}, client, nil)
+			cmd := NewCheckinCmd(&agentinfo{}, client)
 
 			request := CheckinRequest{
 				Events: []SerializableEvent{
@@ -109,7 +109,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentInfo, client, nil)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -160,7 +160,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentInfo, client, nil)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -222,7 +222,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentInfo, client, nil)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -260,7 +260,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentInfo, client, nil)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -310,9 +310,9 @@ Something went wrong
 				"key": "value",
 			}
 
-			cmd := NewCheckinCmd(agentInfo, client, meta)
+			cmd := NewCheckinCmd(agentInfo, client)
 
-			request := CheckinRequest{}
+			request := CheckinRequest{Metadata: meta}
 
 			r, err := cmd.Execute(&request)
 			require.NoError(t, err)
@@ -348,7 +348,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentInfo, client, nil)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 

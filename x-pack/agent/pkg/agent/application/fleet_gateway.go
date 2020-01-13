@@ -172,9 +172,10 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	}
 
 	// checkin
-	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client, metaData)
+	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
-		Events: ee,
+		Events:   ee,
+		Metadata: metaData,
 	}
 
 	resp, err := cmd.Execute(req)
