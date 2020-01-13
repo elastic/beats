@@ -6,18 +6,21 @@
 
 package program
 
-import "github.com/elastic/beats/x-pack/agent/pkg/packer"
+import (
+	"strings"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/packer"
+)
 
 var Supported []Spec
+var SupportedMap map[string]bool
 
 func init() {
 	// Packed Files
-	// spec/auditbeat.yml
 	// spec/filebeat.yml
-	// spec/heartbeat.yml
-	// spec/journalbeat.yml
 	// spec/metricbeat.yml
-	unpacked := packer.MustUnpack("eJy8V9+TqjgWft8/477u1g4/rtZlq+ZB6CGANo7YDSFvJLEBTcBVRGFr//etgCio3TO903UfrLqXTk7OOfm+73z5z7f9dkV+iQ40LfAqKv5ZcfbtX98wNwv0kscL6G8i6KUoMCWDuwV6yuOw/y1zZAz8eh7nhQ3QFlseI0xTwuAkI+i+UYVJkalVKKBsZU3GRjqJbUPfIbgZ25Y3IuB1ahuT2LYcNk/1VRt7Uc7S/fm7yzDw1xRo1TzVa2o5LAzk2kilGAfmcR7nsVhHgClFT3lMVK9CgVmQ4/l75u8RfD6fOylsy6vCYFRjYErI19QIejlUHYYU/zt5ytszm59+DKGXz1NdWkGdnfe3Mfnr2DZHCQ28LTV+5LN0v+3/van5KY+dp9+ms6W+xqo+6vJEmVPil/s8KfgxtoEpI8CkkPsJnYh+ysklJ0tPKIiHa4xRrx9NzhUNTozUXR1STLh/CAOZdec3P4AqrEjD/rc1S7jOYxxoGxFH9Ph2f5d/HwOzzJUI9xMMn8+5euU81QuseA02PoqDVV8ili/NuL8PoStFgVujwKxCJT5Q6OzPdTV5RUCrqfUsesqj4CQhaHd4qlFwYqHqlSTr3fWwn825s6VeUugdKVxcehQp/oiIvfx1SpWE4XUeL4FZL6HHMHzOHVjgQb1cLpElcOXSt+UmdtKwWf8iOAPdYxi4bGrQ7pxsZkwyFJwSonrbUHVZCJ11ZJCmNkdgD7DaqY6xoxQJ4kXS/vtUItWVQujmTrWZfvtHy9O3lK0e0NTjbI8Ch4VwMQ0VeTNPmxaxtvTtGisjHgVUJtxMMXgd24BWBDxPr/T4Ajq9/Dn6iHMI8KsBJAUkIGI4W5RI1CKgAbSsv882dEa5f6CGVlPgbcU1EdXbRMH3aT+ODXwFBSNppnpr8pTHFLjHd+LIyJqMbcvfkMkwF3H2TPHKUCkYWecxAto6UvzqJs4eK6QkXEDDfSPKqaTi2uo8br893+R1KlGl1Svoin1j23JHYg86PpLO53tor+/vQ0B32GP9Zr+gQXNGB/+2d/Hl/6IHFyr0elXY4Fz/dW2FAm9LerHOtXxS5tAWA78dHx9IA7pi+vA4DjsI6SCif5bDzlyYDiQOaDK1dJkaI4aBWVPA1kTxE8LdfJb5FZ704yUlUb1GrsTZtIdRovh7FLgSVp16fu1Hj2N/TV76tUbB6EihV0MobW0j5PZvSUKkUYIDvybAXKNlnHWy2UrFnXQ2knPGYDZrcqO7MEC7cEn2tkH3WKE1BWYdGWRrxL/+2slLsop2j2zAEvgJyYY2IOp/+2IbgAPtEEGvJOmPw/R4ewe24M5l5MyWehHCS8xOd/5wNFLLSXDm7kPoMajSLQXJG+F+hmByHGhTN3rvx2UlegO5XGLORF7l9Elb/N6u+/u7tuAc53OcScTYuFqDd/HeW3dvD7rx3vY2a3pXoUBg67XrHydcK+bpBceH+9E1kgk/9kd9jlW35WF39+v8zr71ez/AzkVvzly9cmmHIKvFXrTYqhHwD/NUt0PoOhT4BalitpKLXGCegpY719p+/mhe54ddFrFH7OGaTPgowWAwof+NVb/C3Nyfp/QFoVeD47xRbu5p4Nf3SjRkQYuCgq1e8pha7IgWZ/Tc7J8t26kVdTk1RtMtibW5RcBD9EQ3tXyAoGF976CxU7tPqO5N3/6c8n4t0t9F423NW5zpMrV+Phr5qtil5AEYXwJfIpytL9YwWIxtIDNqOdtQ6QCqHRBnGYVOEvKTkOSMZPr662W+zWVWfd/9gd15/Bq6JYB1ya8DhUS4eSDKKaHAfye/ycDy9snzONf4l9enU2O5fk+/76aDtWKMxGPb8Pq2916ujQEA7yxyK/nnV8bicwTFg/v9aFQM7vwdi9W9dD7z6hpiqSNjZ1mu6wq2gg25P3xp/j8vxPds1qA3xujyQv1LVqu1V601rhp79bHV+u/f/hcAAP//3sDvFA==")
+	unpacked := packer.MustUnpack("eJykVE9zuzYUvPdj5NzpD+TgqTvzOxhSBPhPapxIQjckOWAsgcfG2NDpd+/IBgfHSXrogQMavad9+3b374f9dsV/vK3liq3i8rdayYc/HphyS/pSJKGSe4oDGZHFJALm5nltqxifZKRQKsbbjAFLxViYXLlrBl+HPhQ1h7MJz9GektnQWRsJw+7xOSkS3xknHLpG/FQkfBDWFLslP7bn1/tj/V/6XlhH2GoYdA36Ukz0nctnHyMSFs9r21gRW7b3z59+h0NUd291HyVUsnxRUT3LS5EwOMr7db5jS6HQQTijRsBwy7Izvk2MHyf9Pj5EgGLLmA7CjD8ViYDz4xd9TOqNh76HNnx8i0W/PQVhFYFS8qxIKBxlMUD1hz57BnjFFdrEZP7GwakS4FTRpkguZ7MPuE4VrUfNisx13dD35pauocei9CHdMi+UXI5AhE/mO8d2Q/UeB2HFs/t9xABZtxzbH+rH5fnd9v50aV+4S67/moMWp9HnqvRhO//73ZricMt7vdpZJtOlnbGBbXU7pXlQsZd7vAL+PjzPCtGaYtfQuuMKHSJsyo+19F3Th8/7yAP3kME1f14gWy9cZoG0ZsAY+nBkCs82hWNJBt1GQJlxgFKu5sU0RzUb9/ulFR+Ejcak3xY9jXKA9hTPDTYImud3Pnoeu55VgoRHQRZXTvWOuN6fep0IkEqt2yV0myUJJSOzIiAl688aY+soSNgQYmx9J1L+n2nKDStlGDUcuhldJjkbIEPPHtTHJABoH5G5EeN5Q7FbRyDJp844bzWYT8/YxC7CdBct+d53xJ4B0QjoNrHDt07y8+fDr5d4Uatyt+afBMwLRgZXMrsGCl4MfWhK4QXbCHTBMzpQJXNBgjRSJ/m8tnOe25mTByaDSBP3idDnbwJII3ZHNcVCrrxxJ/wdJZuh74UWh68XMr1A91yxFsu0ftz9h0lKH5opf2pF4dmpgIk2nsEVSllnUO+Kr1uiwZV74OCUCoi+wDe+CUrhySNd9ELkDmvy4/XpdDbqX+vH3eTmrtiecTlhPyzvRX0JHcXVqPwsWC8iNivqoT1d6NnnFfc2HZ9dXSO8QEbYbNpzgzVFwm72+52hbnb+hTFbDGQ2aU1iUOLfB1reD6lbLXXm6YT+fq+UK3I2ovwuPLq6qbozx0GQYN+fPYajRnizL815w41jlQyEZ738L4NeTHkJ1Ppsyu8N+s8v/wYAAP//VQ22/g==")
+	SupportedMap = make(map[string]bool)
 
 	for f, v := range unpacked {
 		s, err := NewSpecFromBytes(v)
@@ -25,5 +28,6 @@ func init() {
 			panic("Cannot read spec from " + f)
 		}
 		Supported = append(Supported, s)
+		SupportedMap[strings.ToLower(s.Name)] = true
 	}
 }
