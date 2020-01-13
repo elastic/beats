@@ -22,7 +22,6 @@ type DefaultProvider struct {
 	log             *logp.Logger
 	managerFactory  CLIManagerFactory
 	templateFactory TemplateBuilderFactory
-	zipResourcer    ZipResourcesFunc
 }
 
 // NewDefaultProvider returns factory methods to handle generic provider.
@@ -52,11 +51,6 @@ func NewDefaultProvider(
 			templateFactory: templater,
 		}, nil
 	}
-}
-
-// ZipResourcer returns the function to retrieve files to be zipped.
-func (d *DefaultProvider) ZipResourcer() ZipResourcesFunc {
-	return d.zipResourcer
 }
 
 // Name returns the name of the provider.

@@ -34,7 +34,6 @@ type Provider interface {
 	EnabledFunctions() ([]string, error)
 	CLIManager() (CLIManager, error)
 	TemplateBuilder() (TemplateBuilder, error)
-	ZipResourcer() ZipResourcesFunc
 	Name() string
 }
 

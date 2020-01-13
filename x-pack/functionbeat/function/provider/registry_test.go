@@ -40,8 +40,6 @@ func (m *mockProvider) TemplateBuilder() (TemplateBuilder, error) { return nil, 
 
 func (m *mockProvider) EnabledFunctions() ([]string, error) { return []string{}, nil }
 
-func (m *mockProvider) ZipResourcer() ZipResourcesFunc { return nil }
-
 func TestRegistry(t *testing.T) {
 	t.Run("provider", testProviderLookup)
 	t.Run("functions", testFunctionLookup)
