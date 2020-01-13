@@ -18,7 +18,8 @@ const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
-	Events []SerializableEvent `json:"events"`
+	Events   []SerializableEvent    `json:"events"`
+	Metadata map[string]interface{} `json:"local_metadata"`
 }
 
 // SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
@@ -57,23 +58,30 @@ func (e *CheckinResponse) Validate() error {
 type CheckinCmd struct {
 	client clienter
 	info   agentInfo
+	metaFn metadataFunc
 }
 
 type agentInfo interface {
 	AgentID() string
 }
 
-// NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
+type metadataFunc func() (map[string]interface{}, error)
 
+// NewCheckinCmd creates a new api command.
+func NewCheckinCmd(info agentInfo, client clienter, metaFn metadataFunc) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,
+		metaFn: metaFn,
 	}
 }
 
 // Execute enroll the Agent in the Fleet.
 func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
+	if err := e.injectMetadata(r); err != nil {
+		return nil, errors.New(err, "injecting metadata")
+	}
+
 	if err := r.Validate(); err != nil {
 		return nil, err
 	}
@@ -113,4 +121,18 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 	}
 
 	return checkinResponse, nil
+}
+
+func (e *CheckinCmd) injectMetadata(r *CheckinRequest) error {
+	if e.metaFn == nil {
+		return nil
+	}
+
+	meta, err := e.metaFn()
+	if err != nil {
+		return err
+	}
+
+	r.Metadata = meta
+	return nil
 }

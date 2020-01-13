@@ -9,13 +9,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
-	"runtime"
 
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/agent/kibana"
-	"github.com/elastic/beats/agent/release"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
@@ -169,19 +166,6 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	return nil
-}
-
-func metadata() (map[string]interface{}, error) {
-	hostname, err := os.Hostname()
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{
-		"platform": runtime.GOOS,
-		"version":  release.Version(),
-		"host":     hostname,
-	}, nil
 }
 
 func yamlToReader(in interface{}) (io.Reader, error) {
