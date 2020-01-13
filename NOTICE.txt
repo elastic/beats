@@ -688,7 +688,7 @@ See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
 Dependency: github.com/containerd/continuity
-Revision: 75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec
+Revision: 26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/containerd/continuity/LICENSE:
 --------------------------------------------------------------------
@@ -4766,7 +4766,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/runc
-Revision: 653207bc29a6d2d62b5d4f55b596467cb715a128
+Version: v1.0.0-rc9
+Revision: d736ef14f0288d6993a1845745d6756cfc9ddd5a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/opencontainers/runc/LICENSE:
 --------------------------------------------------------------------
