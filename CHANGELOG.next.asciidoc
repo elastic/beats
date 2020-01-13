@@ -590,6 +590,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all modules to specify a module-specific output index. {pull}15100[15100]
 - Add a `system/service` metricset for systemd data. {pull}14206[14206]
 - Add cost warnings for the azure module. {pull}15356[15356]
+- Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]
 
 *Packetbeat*
 
