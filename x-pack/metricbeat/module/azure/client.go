@@ -84,7 +84,7 @@ func (client *Client) InitResources(fn mapResourceMetrics, report mb.ReporterV2)
 }
 
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
-func (client *Client) GetMetricValues(report mb.ReporterV2, metrics []Metric) []Metric {
+func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []Metric {
 	var resultedMetrics []Metric
 	// loop over the set of metrics
 	for _, metric := range metrics {
@@ -111,7 +111,8 @@ func (client *Client) GetMetricValues(report mb.ReporterV2, metrics []Metric) []
 			metric.Aggregations, filter)
 		if err != nil {
 			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.SubID, metric.Namespace)
-			client.LogError(report, err)
+			client.Log.Error(err)
+			report.Error(err)
 		} else {
 			for i, currentMetric := range client.Resources.Metrics {
 				if matchMetrics(currentMetric, metric) {
@@ -123,12 +124,6 @@ func (client *Client) GetMetricValues(report mb.ReporterV2, metrics []Metric) []
 		}
 	}
 	return resultedMetrics
-}
-
-// LogError is used to reduce the number of lines written when logging errors
-func (client *Client) LogError(report mb.ReporterV2, err error) {
-	client.Log.Error(err)
-	report.Error(err)
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured

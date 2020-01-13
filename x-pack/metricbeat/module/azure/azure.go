@@ -130,7 +130,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	groupedMetrics := groupMetricsByResource(m.Client.Resources.Metrics)
 
 	for _, metrics := range groupedMetrics {
-		results := m.Client.GetMetricValues(report, metrics)
+		results := m.Client.GetMetricValues(metrics, report)
 		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
 		if err != nil {
 			return err
