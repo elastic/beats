@@ -2,7 +2,6 @@
     {
         "@metadata.beat": "packetbeat",
         "@metadata.type": "_doc",
-        "@metadata.version": "8.0.0",
         "client.ip": "192.168.1.36",
         "client.port": 60946,
         "destination.domain": "play.google.com",

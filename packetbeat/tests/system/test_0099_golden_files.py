@@ -62,6 +62,7 @@ class Test(BaseTest):
 def clean_keys(obj):
     # These keys are host dependent
     keys = [
+        "@metadata.version",
         "agent.ephemeral_id",
         "agent.hostname",
         "agent.id",
@@ -80,13 +81,9 @@ def clean_keys(obj):
         "network.direction",
     ]
     for key in keys:
-        delete_key(obj, key)
+        if key in obj:
+            del obj[key]
     return obj
-
-
-def delete_key(obj, key):
-    if key in obj:
-        del obj[key]
 
 
 def pretty_json(obj):
