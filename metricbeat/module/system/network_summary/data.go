@@ -18,15 +18,13 @@
 package network_summary
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // eventMapping maps the network counters to a MapStr that wil be sent to report.Event
 func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
-	fmt.Printf("%#v\n", raw)
+
 	eventByProto := common.MapStr{
 		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
 		"tcp":      combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
@@ -35,18 +33,32 @@ func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
 		"icmp":     combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP),
 	}
 
+	// if value, ok := raw.SNMP.TCP["MaxConn"]; ok && value != 0 {
+	// 	eventByProto["tcp"].(map)
+	// }
+
 	return eventByProto
 }
 
 // combineMap concatinates two given maps
-func combineMap(map1, map2 map[string]int64) map[string]int64 {
-	var compMap = make(map[string]int64)
+func combineMap(map1, map2 map[string]uint64) map[string]interface{} {
+	var compMap = make(map[string]interface{})
 
 	for k, v := range map1 {
-		compMap[k] = v
+		compMap[k] = checkMaxConn(k, v)
 	}
 	for k, v := range map2 {
-		compMap[k] = v
+		compMap[k] = checkMaxConn(k, v)
 	}
 	return compMap
+}
+
+// checkMaxConn deals with the "oddball" MaxConn value, which is defined by RFC2012 as a integer
+// while the other values are going to be unsigned counters
+func checkMaxConn(inKey string, in uint64) interface{} {
+
+	if inKey == "MaxConn" {
+		return int64(in)
+	}
+	return in
 }
