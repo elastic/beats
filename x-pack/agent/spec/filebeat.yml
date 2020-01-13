@@ -32,9 +32,6 @@ rules:
 - rename:
     from: filebeat.streams
     to: inputs
-- rename:
-    from: output.elasticsearch.url
-    to: hosts
 - filter:
     selectors:
     - filebeat

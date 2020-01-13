@@ -27,8 +27,5 @@ rules:
     - metricbeat
     - output
     - keystore
-- rename:
-    from: output.elasticsearch.url
-    to: hosts
 when: HasItems(%{[metricbeat.modules]}) && HasNamespace('output', 'elasticsearch',
   'redis', 'kafka', 'logstash')

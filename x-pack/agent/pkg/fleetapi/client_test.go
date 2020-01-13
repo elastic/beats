@@ -101,6 +101,19 @@ func TestHTTPClient(t *testing.T) {
 			assert.Equal(t, `{ message: "hello" }`, string(body))
 		},
 	))
+
+	t.Run("Fleet endpoint is not responding", func(t *testing.T) {
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
+			"host": "127.0.0.0:7278",
+		})
+
+		client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+			return NewFleetAuthRoundTripper(wrapped, "abc123")
+		})
+
+		_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+		require.Error(t, err)
+	})
 }
 
 // NOTE(ph): Usually I would be agaisnt testing private methods as much as possible but in this

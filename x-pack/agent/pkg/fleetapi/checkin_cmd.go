@@ -18,7 +18,8 @@ const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
-	Events []SerializableEvent `json:"events"`
+	Events   []SerializableEvent    `json:"events"`
+	Metadata map[string]interface{} `json:"local_metadata,omitempty"`
 }
 
 // SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
@@ -65,7 +66,6 @@ type agentInfo interface {
 
 // NewCheckinCmd creates a new api command.
 func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
-
 	return &CheckinCmd{
 		client: client,
 		info:   info,

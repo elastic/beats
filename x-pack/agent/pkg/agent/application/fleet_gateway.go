@@ -167,10 +167,16 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	// get events
 	ee, ack := f.reporter.Events()
 
+	var metaData map[string]interface{}
+	if m, err := metadata(); err == nil {
+		metaData = m
+	}
+
 	// checkin
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
-		Events: ee,
+		Events:   ee,
+		Metadata: metaData,
 	}
 
 	resp, err := cmd.Execute(req)
@@ -186,13 +192,16 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 func (f *fleetGateway) Start() {
 	f.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
+		defer f.log.Info("Fleet gateway is stopped")
 		defer wg.Done()
+
 		f.worker()
 	}(&f.wg)
 }
 
 func (f *fleetGateway) Stop() {
+	f.log.Info("Fleet gateway is stopping")
+	defer f.scheduler.Stop()
 	close(f.done)
-	f.scheduler.Stop()
 	f.wg.Wait()
 }
