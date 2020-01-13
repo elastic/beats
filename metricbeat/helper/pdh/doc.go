@@ -17,7 +17,7 @@
 
 // Package perfmon implements a Metricbeat metricset for reading Windows
 // performance counters.
-package perfmon
+package pdh
 
 //go:generate go run mkpdh_defs.go
 //go:generate go run ../run.go -cmd "go tool cgo -godefs defs_pdh_windows.go" -goarch amd64 -output defs_pdh_windows_amd64.go

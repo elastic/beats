@@ -17,7 +17,7 @@
 
 // +build ignore
 
-package main
+package pdh
 
 import (
 	"bufio"
