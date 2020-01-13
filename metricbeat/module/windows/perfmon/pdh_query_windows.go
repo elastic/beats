@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	instanceNameRegexp = regexp.MustCompile(`.*\((.*)\).*`)
+	instanceNameRegexp = regexp.MustCompile(`.*?\((.*?)\).*`)
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 
@@ -274,7 +274,7 @@ func UTF16ToStringArray(buf []uint16) []string {
 	stringLine := UTF16PtrToString(&buf[0])
 	for stringLine != "" {
 		strings = append(strings, stringLine)
-		nextLineStart += len(stringLine) + 1
+		nextLineStart += len([]rune(stringLine)) + 1
 		remainingBuf := buf[nextLineStart:]
 		stringLine = UTF16PtrToString(&remainingBuf[0])
 	}

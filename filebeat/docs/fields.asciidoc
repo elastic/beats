@@ -12861,6 +12861,67 @@ type: keyword
 --
 
 
+*`azure.eventhub`*::
++
+--
+Name of the eventhub.
+
+
+type: keyword
+
+--
+
+*`azure.offset`*::
++
+--
+The offset.
+
+
+type: long
+
+--
+
+*`azure.enqueued_time`*::
++
+--
+The enqueued time.
+
+
+type: date
+
+--
+
+*`azure.partition_id`*::
++
+--
+The partition id.
+
+
+type: long
+
+--
+
+*`azure.consumer_group`*::
++
+--
+The consumer group.
+
+
+type: keyword
+
+--
+
+*`azure.sequence_number`*::
++
+--
+The sequence number.
+
+
+type: long
+
+--
+
+
 *`kafka.topic`*::
 +
 --
