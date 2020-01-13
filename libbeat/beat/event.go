@@ -19,6 +19,7 @@ package beat
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -130,4 +131,29 @@ func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
 	if addErrKey {
 		e.Fields["error"] = jsonErr
 	}
+}
+
+// AddECSErrorMessage sets or appends to error.message, converting
+// it to an array of strings if more than one error is present.
+func (e *Event) AddECSErrorMessage(msg string) {
+	const errorMsgKey = "error.message"
+	prev, _ := e.GetValue(errorMsgKey)
+	var value interface{}
+	switch v := prev.(type) {
+	case nil:
+		value = msg
+	case string:
+		value = []string{v, msg}
+	case []string:
+		value = append(v, msg)
+	case []interface{}:
+		value = append(v, msg)
+	default:
+		value = []string{
+			fmt.Sprintf("%v", prev),
+			fmt.Sprintf("Previous error message has unexpected type %T", v),
+			msg,
+		}
+	}
+	e.PutValue(errorMsgKey, value)
 }
