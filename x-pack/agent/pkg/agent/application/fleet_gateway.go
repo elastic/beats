@@ -186,13 +186,16 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 func (f *fleetGateway) Start() {
 	f.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
+		defer f.log.Info("Fleet gateway is stopped")
 		defer wg.Done()
+
 		f.worker()
 	}(&f.wg)
 }
 
 func (f *fleetGateway) Stop() {
+	f.log.Info("Fleet gateway is stopping")
+	defer f.scheduler.Stop()
 	close(f.done)
-	f.scheduler.Stop()
 	f.wg.Wait()
 }
