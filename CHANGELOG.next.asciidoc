@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_id` processor. {pull}14524[14524]
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
+- Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 
 *Auditbeat*
 

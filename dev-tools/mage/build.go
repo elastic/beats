@@ -88,6 +88,12 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 	if bp, found := BuildPlatforms.Get(Platform.Name); found {
 		args.CGO = bp.Flags.SupportsCGO()
 	}
+
+	// Enable DEP (data execution protection) for Windows binaries.
+	if Platform.GOOS == "windows" {
+		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat")
+	}
+
 	return args
 }
 
