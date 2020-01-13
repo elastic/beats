@@ -117,7 +117,11 @@ func TestObjectNameRegexp(t *testing.T) {
 }
 
 func TestUTF16ToStringArray(t *testing.T) {
-	var array = []string{"\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(0 C:)\\Schreibvorgänge/s", "\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(_Total)\\Schreibvorgänge/s", ""}
+	var array = []string{
+		"\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(0 C:)\\Schreibvorgänge/s",
+		"\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(_Total)\\Schreibvorgänge/s",
+		"",
+	}
 	var unicode []uint16
 	for _, i := range array {
 		uni, err := syscall.UTF16FromString(i)
