@@ -9360,26 +9360,6 @@ example: TLS 1.3
 
 --
 
-*`tls.detailed.handshake_completed`*::
-+
---
-Whether the TLS negotiation has been successful and the session has transitioned to encrypted mode.
-
-
-type: boolean
-
---
-
-*`tls.detailed.resumed`*::
-+
---
-If the TLS session has been resumed from a previous session.
-
-
-type: boolean
-
---
-
 *`tls.detailed.resumption_method`*::
 +
 --
@@ -9418,16 +9398,6 @@ Unique number to identify the session for the corresponding connection with the 
 
 
 type: keyword
-
---
-
-*`tls.detailed.client_hello.supported_ciphers`*::
-+
---
-List of ciphers the client is willing to use for this session. See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
-
-
-type: array
 
 --
 
@@ -9531,16 +9501,6 @@ type: keyword
 +
 --
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
-
-
-type: keyword
-
---
-
-*`tls.detailed.server_hello.selected_cipher`*::
-+
---
-The cipher suite selected by the server from the list provided by in the client hello.
 
 
 type: keyword
@@ -9702,15 +9662,6 @@ type: array
 
 --
 
-*`tls.detailed.client_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
-
-type: keyword
-
---
-
 [float]
 === subject
 
@@ -9831,34 +9782,6 @@ type: keyword
 
 --
 
-
-*`tls.detailed.client_certificate.fingerprint.md5`*::
-+
---
-Certificate's MD5 fingerprint.
-
-type: keyword
-
---
-
-*`tls.detailed.client_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.detailed.client_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
-
-type: keyword
-
---
-
 [float]
 === server_certificate
 
@@ -9936,15 +9859,6 @@ type: keyword
 Subject Alternative Names for this certificate.
 
 type: array
-
---
-
-*`tls.detailed.server_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
-
-type: keyword
 
 --
 
@@ -10068,34 +9982,6 @@ type: keyword
 
 --
 
-
-*`tls.detailed.server_certificate.fingerprint.md5`*::
-+
---
-Certificate's MD5 fingerprint.
-
-type: keyword
-
---
-
-*`tls.detailed.server_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.detailed.server_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
-
-type: keyword
-
---
-
 *`tls.detailed.server_certificate_chain`*::
 +
 --
@@ -10118,38 +10004,6 @@ type: array
 +
 --
 An array containing the TLS alert type for every alert received.
-
-
-type: keyword
-
---
-
-[float]
-=== fingerprints
-
-Fingerprints for this TLS session.
-
-
-[float]
-=== ja3
-
-JA3 TLS client fingerprint
-
-
-*`tls.detailed.fingerprints.ja3.hash`*::
-+
---
-The JA3 fingerprint hash for the client side.
-
-
-type: keyword
-
---
-
-*`tls.detailed.fingerprints.ja3.str`*::
-+
---
-The JA3 string used to calculate the hash.
 
 
 type: keyword
