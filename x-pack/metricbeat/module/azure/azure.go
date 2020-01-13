@@ -133,7 +133,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		results := m.Client.GetMetricValues(metrics, report)
 		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "error running EventsMapping")
 		}
 	}
 	return nil
