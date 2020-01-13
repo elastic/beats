@@ -61,7 +61,7 @@ func getPluginName() (string, error) {
 }
 
 // createContainer builds the plugin and creates the container that will later become the rootfs used by the plugin
-func createContainer(cli *client.Client) error {
+func createContainer(ctx context.Context, cli *client.Client) error {
 	goVersion, err := mage.GoVersion()
 	if err != nil {
 		return errors.Wrap(err, "error determining go version")
@@ -87,6 +87,12 @@ func createContainer(cli *client.Client) error {
 	if err != nil {
 		return errors.Wrap(err, "Error locating temp dir")
 	}
+	defer func() {
+		err = sh.Rm(tmpDir)
+		if err != nil {
+			errors.Wrap(err, "error removing temp dir")
+		}
+	}()
 	tarPath := filepath.Join(tmpDir, "tarRoot.tar")
 	err = sh.RunV("tar", "cf", tarPath, "./")
 	if err != nil {
@@ -106,10 +112,8 @@ func createContainer(cli *client.Client) error {
 		Dockerfile: "x-pack/dockerlogbeat/Dockerfile",
 	}
 	//build, wait for output
-	buildResp, err := cli.ImageBuild(context.Background(), buildContext, buildOpts)
+	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
 	defer buildResp.Body.Close()
-	// buf := new(bytes.Buffer)
-	// _, errBufRead := buf.ReadFrom(buildResp.Body)
 	buf, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return errors.Wrap(err, "error reading from docker output")
@@ -125,11 +129,6 @@ func createContainer(cli *client.Client) error {
 		return errors.Wrap(err, "error returning to dockerlogbeat dir")
 	}
 
-	err = sh.Rm(tmpDir)
-	if err != nil {
-		return errors.Wrap(err, "error removing temp dir")
-	}
-
 	return nil
 }
 
@@ -140,7 +139,7 @@ func createContainer(cli *client.Client) error {
 // * Export that container
 // * Unpack the tar from the exported container
 // * send this to the plugin create API endpoint
-func Build() error {
+func Build(ctx context.Context) error {
 	// setup
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -154,13 +153,13 @@ func Build() error {
 		return errors.Wrap(err, "Error creating build dir")
 	}
 
-	err = createContainer(cli)
+	err = createContainer(ctx, cli)
 	if err != nil {
 		return errors.Wrap(err, "error creating base container")
 	}
 
 	// create the container that will become our rootfs
-	CreatedContainerBody, err := cli.ContainerCreate(context.Background(), &container.Config{Image: rootImageName}, nil, nil, "")
+	CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
 	if err != nil {
 		return errors.Wrap(err, "error creating container")
 	}
@@ -168,7 +167,7 @@ func Build() error {
 	defer func() {
 		// cleanup
 		if _, noClean := os.LookupEnv("DOCKERLOGBEAT_NO_CLEANUP"); !noClean {
-			err = cleanDockerArtifacts(CreatedContainerBody.ID, cli)
+			err = cleanDockerArtifacts(ctx, CreatedContainerBody.ID, cli)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error cleaning up docker: %s", err)
 			}
@@ -183,7 +182,7 @@ func Build() error {
 	}
 
 	// export the container to a tar file
-	exportReader, err := cli.ContainerExport(context.Background(), CreatedContainerBody.ID)
+	exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
 	if err != nil {
 		return errors.Wrap(err, "error exporting container")
 	}
@@ -209,14 +208,14 @@ func Build() error {
 	return nil
 }
 
-func cleanDockerArtifacts(containerID string, cli *client.Client) error {
+func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.Client) error {
 	fmt.Printf("Removing container %s\n", containerID)
-	err := cli.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	err := cli.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	if err != nil {
 		return errors.Wrap(err, "error removing container")
 	}
 
-	resp, err := cli.ImageRemove(context.Background(), rootImageName, types.ImageRemoveOptions{Force: true})
+	resp, err := cli.ImageRemove(ctx, rootImageName, types.ImageRemoveOptions{Force: true})
 	if err != nil {
 		return errors.Wrap(err, "error removing image")
 	}
@@ -225,7 +224,7 @@ func cleanDockerArtifacts(containerID string, cli *client.Client) error {
 }
 
 // Uninstall removes working objects and containers
-func Uninstall() error {
+func Uninstall(ctx context.Context) error {
 	name, err := getPluginName()
 	if err != nil {
 		return err
@@ -237,7 +236,7 @@ func Uninstall() error {
 	}
 
 	//check to see if we have a plugin we need to remove
-	plugins, err := cli.PluginList(context.Background(), filters.Args{})
+	plugins, err := cli.PluginList(ctx, filters.Args{})
 	if err != nil {
 		return errors.Wrap(err, "error getting list of plugins")
 	}
@@ -248,11 +247,11 @@ func Uninstall() error {
 		}
 	}
 	if oursExists {
-		err = cli.PluginDisable(context.Background(), name, types.PluginDisableOptions{Force: true})
+		err = cli.PluginDisable(ctx, name, types.PluginDisableOptions{Force: true})
 		if err != nil {
 			return errors.Wrap(err, "error disabling plugin")
 		}
-		err = cli.PluginRemove(context.Background(), name, types.PluginRemoveOptions{Force: true})
+		err = cli.PluginRemove(ctx, name, types.PluginRemoveOptions{Force: true})
 		if err != nil {
 			return errors.Wrap(err, "error removing plugin")
 		}
@@ -262,7 +261,7 @@ func Uninstall() error {
 }
 
 // Install installs the plugin
-func Install() error {
+func Install(ctx context.Context) error {
 	mg.Deps(Uninstall)
 	if _, err := os.Stat(filepath.Join(packageStagingDir, "rootfs")); os.IsNotExist(err) {
 		mg.Deps(Build)
@@ -287,12 +286,12 @@ func Install() error {
 		return errors.Wrap(err, "error creating archive of work dir")
 	}
 
-	err = cli.PluginCreate(context.Background(), archive, types.PluginCreateOptions{RepoName: name})
+	err = cli.PluginCreate(ctx, archive, types.PluginCreateOptions{RepoName: name})
 	if err != nil {
 		return errors.Wrap(err, "error creating plugin")
 	}
 
-	err = cli.PluginEnable(context.Background(), name, types.PluginEnableOptions{})
+	err = cli.PluginEnable(ctx, name, types.PluginEnableOptions{})
 	if err != nil {
 		return errors.Wrap(err, "error enabling plugin")
 	}
