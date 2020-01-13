@@ -129,11 +129,11 @@
         - name: direct_efficiency.pct
           type: scaled_float
           format: percent
-          description: direct reclaim efficiency percentage
+          description: direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
         - name: kswapd_efficiency.pct
           type: scaled_float
           format: percent
-          description: kswapd reclaim efficiency percentage
+          description: kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
 
     - name: hugepages
       type: group
