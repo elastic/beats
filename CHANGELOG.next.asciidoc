@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
+- Update to ECS 1.4.0. {pull}14844[14844]
 
 *Auditbeat*
 
@@ -482,6 +483,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
 - Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
