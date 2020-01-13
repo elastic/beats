@@ -27,6 +27,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The custom beat generator now uses mage instead of python, `mage GenerateCustomBeat` can be used to create a new beat, and `mage vendorUpdate` to update the vendored libbeat in a custom beat. {pull}13610[13610]
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
+- Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
 
 ==== Bugfixes
 
@@ -62,3 +63,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
 - Added a `default_field` option to fields in fields.yml to offer a way to exclude fields from the default_field list. {issue}14262[14262] {pull}14341[14341]
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
+- Fix dropped errors in the tests for the metricbeat Azure module. {pull}13773[13773]

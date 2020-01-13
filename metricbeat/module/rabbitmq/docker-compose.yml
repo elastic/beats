@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   rabbitmq:
-    image: docker.elastic.co/observability-ci/beats-integration-rabbitmq:${RABBITMQ_VERSION:-3.7.4}-1
+    image: docker.elastic.co/integrations-ci/beats-rabbitmq:${RABBITMQ_VERSION:-3.7.4}-1
     build:
       context: ./_meta
       args:

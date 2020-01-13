@@ -261,8 +261,92 @@ GoFormation
 Copyright 2011-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
 
 --------------------------------------------------------------------
+Dependency: github.com/Azure/azure-amqp-common-go/v3
+Version: v3.0.0
+Revision: af261efd31b6641d91d5c53cc4f9bc1e438f4e5a
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-amqp-common-go/v3/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-event-hubs-go/v3
+Version: v3.0.0
+Revision: 7a1b2e2089e284bcec716b3bdc64ee2e5e626871
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-event-hubs-go/v3/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-pipeline-go
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-pipeline-go/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+--------------------------------------------------------------------
 Dependency: github.com/Azure/azure-sdk-for-go
-Revision: a629ae7873bf2a86184a8bc1b65e65e1ab532f57
+Revision: 0820c0553d6c410603056869f7b0e52d61ce5bee
 License type (autodetected): Apache-2.0
 ./vendor/github.com/Azure/azure-sdk-for-go/LICENSE:
 --------------------------------------------------------------------
@@ -274,6 +358,60 @@ Copyright 2014-2017 Microsoft
 
 This product includes software developed at
 the Microsoft Corporation (https://www.microsoft.com).
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-storage-blob-go
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-storage-blob-go/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+--------------------------------------------------------------------
+Dependency: github.com/Azure/go-amqp
+Revision: 35df54553cf7e6d1b8526b67fb5dd2e1ff0b0ff2
+License type (autodetected): MIT
+./vendor/github.com/Azure/go-amqp/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
 
 --------------------------------------------------------------------
 Dependency: github.com/Azure/go-ansiterm
@@ -716,6 +854,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/devigned/tab
+Revision: 0c15cf42f9a213a393bbc9ddbd13c231c7a36af0
+License type (autodetected): MIT
+./vendor/github.com/devigned/tab/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2019 David Justice
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/dgrijalva/jwt-go
 Revision: 5e25c22bd5d6de03265bbe5462dcd162f85046f6
 License type (autodetected): MIT
@@ -1090,8 +1256,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: v1.2.0
-Revision: 2eaac192a1ca67edab727d7d9d526c5142ae3eb5
+Version: v1.4.0
+Revision: cc4b36eebec29975f57cd0475c3987c9bde5c15a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -1215,8 +1381,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.6
-Revision: fa3d87c14381c01aaa1c7901877fb5e483294964
+Version: v0.0.7
+Revision: 4acb7500cf41aea9d6362378aee5ebacac831ea4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -1932,6 +2098,40 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/gofrs/flock
+Revision: 5135e617513b1e6e205a3a89b042249dee6730c8
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/gofrs/flock/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2015, Tim Heckman
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of linode-netint nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gofrs/uuid
@@ -3978,6 +4178,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/jpillora/backoff
+Revision: d80867952dff4e2fbfb4280ded4ff94d67790457
+License type (autodetected): MIT
+./vendor/github.com/jpillora/backoff/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2017 Jaime Pillora
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/json-iterator/go
 Revision: 27518f6661eba504be5a7a9a9f6d9460d892ade3
 License type (autodetected): MIT
@@ -4264,6 +4492,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/mattn/go-ieproxy
+Revision: 7c0f6868bffe087073376feaab3ace57f2ef90b2
+License type (autodetected): MIT
+./vendor/github.com/mattn/go-ieproxy/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2014 mattn
+Copyright (c) 2017 oliverpool
+Copyright (c) 2019 Adele Reed
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/mattn/go-isatty
 Revision: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 License type (autodetected): MIT
@@ -4445,7 +4703,8 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mitchellh/mapstructure
-Revision: 740c764bc6149d3f1806231418adb9f52c11bcbf
+Version: v1.1.2
+Revision: 3536a929edddb9a5b34bd6861dc4a9647cb459fe
 License type (autodetected): MIT
 ./vendor/github.com/mitchellh/mapstructure/LICENSE:
 --------------------------------------------------------------------
@@ -4516,6 +4775,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/OneOfOne/xxhash
+Version: v1.2.7
+Revision: 85d5025fe15b385888b1886ea99f722f549a6934
+License type (autodetected): Apache-2.0
+./vendor/github.com/OneOfOne/xxhash/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
@@ -5280,41 +5549,6 @@ OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/theckman/go-flock
-Version: v0.4.0
-Revision: b139a2487364247d91814e4a7c7b8fdc69e342b2
-License type (autodetected): BSD-3-Clause
-./vendor/github.com/theckman/go-flock/LICENSE:
---------------------------------------------------------------------
-Copyright (c) 2015, Tim Heckman
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-* Neither the name of linode-netint nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
 Dependency: github.com/tsg/go-daemon
 Revision: c6e0d1a849861166320520e9bae9bbda5f2ecb03
 License type (autodetected): BSD-2-Clause
@@ -5388,6 +5622,15 @@ Dependency: github.com/urso/go-bin
 Revision: 781c575c9f0eb3cb9dca94521bd7ad7d5aec7fd4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/urso/go-bin/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/magetools
+Revision: 61080ed7b22b35d276d023e17437c85d8a5ade51
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/magetools/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -5895,12 +6138,73 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/api
-Version: v0.7.0
-Revision: 02490b97dff7cfde1995bd77de808fd27053bc87
+Version: v0.14.0
+Revision: 8a410c21381766a810817fd6200fce8838ecb277
 License type (autodetected): BSD-3-Clause
 ./vendor/google.golang.org/api/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2011 Google Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/api/googleapi/internal/uritemplates
+Version: v0.7.0
+Revision: 02490b97dff7cfde1995bd77de808fd27053bc87
+License type (autodetected): MIT
+./vendor/google.golang.org/api/googleapi/internal/uritemplates/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013 Joshua Tacoma
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/api/internal/third_party/uritemplates
+Version: v0.14.0
+Revision: 8a410c21381766a810817fd6200fce8838ecb277
+License type (autodetected): BSD-3-Clause
+./vendor/google.golang.org/api/internal/third_party/uritemplates/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013 Joshua Tacoma. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -5940,7 +6244,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/genproto
-Revision: fa694d86fc64c7654a660f8908de4e879866748d
+Revision: 83cc0476cb11ea0da33dacd4c6354ab192de6fe6
 License type (autodetected): Apache-2.0
 ./vendor/google.golang.org/genproto/LICENSE:
 --------------------------------------------------------------------
@@ -6530,6 +6834,34 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: pack.ag/amqp
+Revision: ddf76e6b06138e7e73606c99f40d6f21a02c0be5
+License type (autodetected): MIT
+./vendor/pack.ag/amqp/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (C) 2017 Kale Blankenship
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: sigs.k8s.io/yaml

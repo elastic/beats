@@ -29,8 +29,16 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_persistentvolumeclaim",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/ksm-unit-1.8",
-				ExpectedFile: "./_meta/test/ksm-unit-1.8.expected",
+				MetricsFile:  "../_meta/test/ksm.v1.3.0",
+				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
+			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
+			},
+			{
+				MetricsFile:  "./_meta/test/ksm.unit.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.unit.v1.8.0.expected",
 			},
 		},
 	)
