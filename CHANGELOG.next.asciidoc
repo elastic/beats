@@ -573,6 +573,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add overview dashboard for AWS SNS module {pull}14977[14977]
 - Add `index` option to all modules to specify a module-specific output index. {pull}15100[15100]
 - Add a `system/service` metricset for systemd data. {pull}14206[14206]
+- Expand data for the `system/memory` metricset {pull}15492[15492]
 
 *Packetbeat*
 
