@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 const (
@@ -66,7 +67,9 @@ func NewPubSubContext(beatCtx, ctx context.Context, m pubsub.Message) (context.C
 }
 
 // Run start
-func (p *PubSub) Run(ctx context.Context, client core.Client) error {
+func (p *PubSub) Run(ctx context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
 	pubsubEvent, err := p.getEventDataFromContext(ctx)
 	if err != nil {
 		return err

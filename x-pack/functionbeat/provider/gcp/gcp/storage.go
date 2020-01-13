@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 const (
@@ -66,7 +67,9 @@ func NewStorageContext(beatCtx, ctx context.Context, e StorageEvent) (context.Co
 }
 
 // Run start
-func (s *Storage) Run(ctx context.Context, client core.Client) error {
+func (s *Storage) Run(ctx context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
 	evt, err := s.getEventDataFromContext(ctx)
 	if err != nil {
 		return err
