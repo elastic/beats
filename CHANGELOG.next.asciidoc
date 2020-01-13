@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 - Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
+- Update to ECS 1.4.0. {pull}14844[14844]
 
 *Auditbeat*
 
@@ -147,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
 - Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
+- Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 
 *Auditbeat*
 
@@ -306,6 +308,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mixed modules loading standard and light metricsets {pull}15011[15011]
 - Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
 - Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 - Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
 
@@ -390,6 +393,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
+- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 
 *Auditbeat*
 
@@ -476,7 +480,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
 - Add STAN Metricbeat module. {pull}14839[14839]
 - Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
+- Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
+- Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
+- Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -597,6 +607,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable Logstash output. {pull}13345[13345]
 - Make `bulk_max_size` configurable in outputs. {pull}13493[13493]
 - Add `index` option to all functions to directly set a per-function index value. {issue}15064[15064] {pull}15101[15101]
+- Add monitoring info about triggered functions. {pull}14876[14876]
 
 *Winlogbeat*
 

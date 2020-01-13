@@ -61,7 +61,7 @@ type Dns struct {
 	// The type of record being queried.
 	QuestionType string `ecs:"question.type"`
 
-	// The class of of records being queried.
+	// The class of records being queried.
 	QuestionClass string `ecs:"question.class"`
 
 	// The highest registered domain, stripped of the subdomain.
