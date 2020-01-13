@@ -8,7 +8,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This module periodically fetches metrics from IBM MQ.
+This module periodically fetches metrics from a containerized distribution of IBM MQ.
 
 [float]
 === Compatibility
