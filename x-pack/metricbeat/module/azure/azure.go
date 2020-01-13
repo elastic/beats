@@ -27,11 +27,12 @@ type Config struct {
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID      []string       `config:"resource_id"`
-	Group   []string       `config:"resource_group"`
-	Metrics []MetricConfig `config:"metrics"`
-	Type    string         `config:"resource_type"`
-	Query   string         `config:"resource_query"`
+	ID          []string       `config:"resource_id"`
+	Group       []string       `config:"resource_group"`
+	Metrics     []MetricConfig `config:"metrics"`
+	Type        string         `config:"resource_type"`
+	Query       string         `config:"resource_query"`
+	ServiceType []string       `config:"service_type"`
 }
 
 // MetricConfig contains metric specific configuration.
@@ -72,8 +73,8 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client    *Client
-	MapMetric mapMetric
+	Client     *Client
+	MapMetrics mapResourceMetrics
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -117,7 +118,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.Client.InitResources(m.MapMetric, report)
+	err := m.Client.InitResources(m.MapMetrics, report)
 	if err != nil {
 		return err
 	}
@@ -126,9 +127,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return nil
 	}
 	// retrieve metrics
-	err = m.Client.GetMetricValues(report)
-	if err != nil {
-		return err
+	groupedMetrics := groupMetricsByResource(m.Client.Resources.Metrics)
+
+	for _, metrics := range groupedMetrics {
+		results := m.Client.GetMetricValues(metrics, report)
+		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
+		if err != nil {
+			return errors.Wrap(err, "error running EventsMapping")
+		}
 	}
-	return EventsMapping(report, m.Client.Resources.Metrics, m.BaseMetricSet.Name())
+	return nil
 }
