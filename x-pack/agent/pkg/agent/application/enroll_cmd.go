@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"runtime"
 
 	"gopkg.in/yaml.v2"
@@ -127,12 +128,17 @@ func NewEnrollCmdWithStore(
 func (c *EnrollCmd) Execute() error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
+	metadata, err := metadata()
+	if err != nil {
+		return errors.New(err, "acquiring hostname")
+	}
+
 	r := &fleetapi.EnrollRequest{
 		EnrollAPIKey: c.enrollAPIKey,
 		SharedID:     c.id,
 		Type:         fleetapi.PermanentEnroll,
 		Metadata: fleetapi.Metadata{
-			Local:        metadata(),
+			Local:        metadata,
 			UserProvided: c.userProvidedMetadata,
 		},
 	}
@@ -165,11 +171,17 @@ func (c *EnrollCmd) Execute() error {
 	return nil
 }
 
-func metadata() map[string]interface{} {
+func metadata() (map[string]interface{}, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
 	return map[string]interface{}{
 		"platform": runtime.GOOS,
 		"version":  release.Version(),
-	}
+		"host":     hostname,
+	}, nil
 }
 
 func yamlToReader(in interface{}) (io.Reader, error) {
