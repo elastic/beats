@@ -84,6 +84,24 @@ func filterMetricNames(resourceID string, metricConfig azure.MetricConfig, metri
 	return supportedMetricNames, nil
 }
 
+// filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
+func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
+	var inRange []string
+	var notInRange []string
+	var allMetrics string
+	for _, definition := range allRange {
+		allMetrics += *definition.Name.Value + " "
+	}
+	for _, name := range selectedRange {
+		if strings.Contains(allMetrics, name) {
+			inRange = append(inRange, name)
+		} else {
+			notInRange = append(notInRange, name)
+		}
+	}
+	return inRange, notInRange
+}
+
 // filterOnSupportedAggregations will verify if the aggregation values entered are supported and will also return the corresponding list of aggregations
 func filterOnSupportedAggregations(metricNames []string, metricConfig azure.MetricConfig, metricDefinitions []insights.MetricDefinition) (map[string][]insights.MetricDefinition, error) {
 	var supportedAggregations []string
@@ -109,25 +127,6 @@ func filterOnSupportedAggregations(metricNames []string, metricConfig azure.Metr
 		metricGroups[key] = append(metricGroups[key], metricDefs...)
 	}
 	return metricGroups, nil
-}
-
-// filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
-func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
-	var inRange []string
-	var notInRange []string
-	var allMetrics string
-	for _, definition := range allRange {
-		allMetrics += *definition.Name.Value + " "
-	}
-	for _, name := range selectedRange {
-		if strings.Contains(allMetrics, name) {
-			inRange = append(inRange, name)
-		} else {
-			notInRange = append(notInRange, name)
-		}
-
-	}
-	return inRange, notInRange
 }
 
 // filterAggregations will filter out any unsupported aggregations based on the metrics selected
