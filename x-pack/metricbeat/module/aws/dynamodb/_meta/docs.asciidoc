@@ -9,7 +9,7 @@ For all other DynamoDB metrics, the aggregation granularity is five minutes.
 - module: aws
   period: 300s
   metricsets:
-    - sns
+    - dynamodb
   # This module uses the aws cloudwatch metricset, all
   # the options for this metricset are also available here.
 ----
