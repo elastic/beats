@@ -20,8 +20,8 @@ package instance
 import (
 	"os"
 
+	"github.com/gofrs/flock"
 	"github.com/pkg/errors"
-	flock "github.com/theckman/go-flock"
 
 	"github.com/elastic/beats/libbeat/paths"
 )

@@ -1,6 +1,6 @@
 - name: s3access
   type: group
-  release: beta
+  release: ga
   description: >
     Fields for AWS S3 server access logs.
   fields:
