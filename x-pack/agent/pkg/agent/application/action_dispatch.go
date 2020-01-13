@@ -82,7 +82,8 @@ func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 		}
 		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
-	return nil
+
+	return acker.Commit()
 }
 
 func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
