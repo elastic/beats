@@ -37,7 +37,7 @@ func newActionAcker(
 
 func (f *actionAcker) Ack(action fleetapi.Action) error {
 	// checkin
-	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
+	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client, nil)
 	req := &fleetapi.CheckinRequest{
 		Events: []fleetapi.SerializableEvent{
 			fleetapi.Ack(action),
