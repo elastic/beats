@@ -96,6 +96,27 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
+- Remove beta flag for some filebeat modules. {pull}14374[14374]
+- Add support for http hostname in nginx filebeat module. {pull}14505[14505]
+- Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
+- Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
+- Add vpc flow log fileset to AWS module. {issue}13880[13880] {pull}14345[14345]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
+- Add document for Filebeat input httpjson. {pull}14602[14602]
+- Add more configuration options to the Netflow module. {pull}14628{14628}
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module).
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
+- Add module for ActiveMQ. {pull}14840[14840]
+- Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
+- Add STAN Metricbeat module. {pull}14839[14839]
+- Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
+- Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
+- Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
+- Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
+- Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
 
