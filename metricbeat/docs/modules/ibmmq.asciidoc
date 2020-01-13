@@ -43,6 +43,23 @@ metricbeat.modules:
   # This module uses the Prometheus collector metricset, all
   # the options for this metricset are also available here.
   metrics_path: /metrics
+
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var metrics = event.Get("prometheus.metrics");
+            Object.keys(metrics).forEach(function(key) {
+              if (!(key.match(/^ibmmq_.*$/))) {
+                event.Delete("prometheus.metrics." + key);
+              }
+            });
+            metrics = event.Get("prometheus.metrics");
+            if (Object.keys(metrics).length == 0) {
+              event.Cancel();
+            }
+          }
 ----
 
 It also supports the options described in <<module-http-config-options>>.
