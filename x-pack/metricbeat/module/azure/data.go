@@ -136,9 +136,6 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 	if len(metric.Resource.Tags) > 0 {
 		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)
 	}
-	if len(metric.Resource.Tags) > 0 {
-		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)
-	}
 	if len(metric.Dimensions) > 0 {
 		for _, dimension := range metric.Dimensions {
 			if dimension.Value == "*" {

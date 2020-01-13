@@ -29,48 +29,19 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 			if len(*metricDefinitions.Value) == 0 {
 				return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
 			}
-			// validate metric names
-			// check if all metric names are selected (*)
-			var supportedMetricNames []string
-			var unsupportedMetricNames []string
-			if strings.Contains(strings.Join(metric.Name, " "), "*") {
-				for _, definition := range *metricDefinitions.Value {
-					supportedMetricNames = append(supportedMetricNames, *definition.Name.Value)
-				}
-			} else {
-				// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
-				supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metric.Name, *metricDefinitions.Value)
-				if len(unsupportedMetricNames) > 0 {
-					return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
-						strings.Join(unsupportedMetricNames, ","), *resource.ID, metric.Namespace)
-				}
-			}
-			if len(supportedMetricNames) == 0 {
-				return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metric.Name, ","), *resource.ID, metric.Namespace)
-			}
-			//validate aggregations and filter on supported ones
-			var supportedAggregations []string
-			var unsupportedAggregations []string
-			metricGroups := make(map[string][]insights.MetricDefinition)
-			metricDefs := getMetricDefinitionsByNames(*metricDefinitions.Value, supportedMetricNames)
 
-			if len(metric.Aggregations) == 0 {
-				for _, metricDef := range metricDefs {
-					metricGroups[string(metricDef.PrimaryAggregationType)] = append(metricGroups[string(metricDef.PrimaryAggregationType)], metricDef)
-				}
-			} else {
-				supportedAggregations, unsupportedAggregations = filterAggregations(metric.Aggregations, metricDefs)
-				if len(unsupportedAggregations) > 0 {
-					return nil, errors.Errorf("the aggregations configured : %s are not supported for some of the metrics selected %s ",
-						strings.Join(unsupportedAggregations, ","), strings.Join(supportedMetricNames, ","))
-				}
-				if len(supportedAggregations) == 0 {
-					return nil, errors.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
-						strings.Join(supportedMetricNames, ","))
-				}
-				key := strings.Join(supportedAggregations, ",")
-				metricGroups[key] = append(metricGroups[key], metricDefs...)
+			// validate metric names and filter on the supported metrics
+			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, *metricDefinitions.Value)
+			if err != nil {
+				return nil, err
 			}
+
+			//validate aggregations and filter on supported aggregations
+			metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, *metricDefinitions.Value)
+			if err != nil {
+				return nil, err
+			}
+
 			// map dimensions
 			var dim []azure.Dimension
 			if len(metric.Dimensions) > 0 {
@@ -88,6 +59,56 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 		}
 	}
 	return metrics, nil
+}
+
+// filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
+func filterMetricNames(resourceID string, metricConfig azure.MetricConfig, metricDefinitions []insights.MetricDefinition) ([]string, error) {
+	var supportedMetricNames []string
+	var unsupportedMetricNames []string
+	// check if all metric names are selected (*)
+	if strings.Contains(strings.Join(metricConfig.Name, " "), "*") {
+		for _, definition := range metricDefinitions {
+			supportedMetricNames = append(supportedMetricNames, *definition.Name.Value)
+		}
+	} else {
+		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
+		supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metricConfig.Name, metricDefinitions)
+		if len(unsupportedMetricNames) > 0 {
+			return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
+				strings.Join(unsupportedMetricNames, ","), resourceID, metricConfig.Namespace)
+		}
+	}
+	if len(supportedMetricNames) == 0 {
+		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metricConfig.Name, ","), resourceID, metricConfig.Namespace)
+	}
+	return supportedMetricNames, nil
+}
+
+// filterOnSupportedAggregations will verify if the aggregation values entered are supported and will also return the corresponding list of aggregations
+func filterOnSupportedAggregations(metricNames []string, metricConfig azure.MetricConfig, metricDefinitions []insights.MetricDefinition) (map[string][]insights.MetricDefinition, error) {
+	var supportedAggregations []string
+	var unsupportedAggregations []string
+	metricGroups := make(map[string][]insights.MetricDefinition)
+	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
+
+	if len(metricConfig.Aggregations) == 0 {
+		for _, metricDef := range metricDefs {
+			metricGroups[string(metricDef.PrimaryAggregationType)] = append(metricGroups[string(metricDef.PrimaryAggregationType)], metricDef)
+		}
+	} else {
+		supportedAggregations, unsupportedAggregations = filterAggregations(metricConfig.Aggregations, metricDefs)
+		if len(unsupportedAggregations) > 0 {
+			return nil, errors.Errorf("the aggregations configured : %s are not supported for some of the metrics selected %s ",
+				strings.Join(unsupportedAggregations, ","), strings.Join(metricNames, ","))
+		}
+		if len(supportedAggregations) == 0 {
+			return nil, errors.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
+				strings.Join(metricNames, ","))
+		}
+		key := strings.Join(supportedAggregations, ",")
+		metricGroups[key] = append(metricGroups[key], metricDefs...)
+	}
+	return metricGroups, nil
 }
 
 // filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
