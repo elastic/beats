@@ -54,14 +54,14 @@ func (f *actionAcker) Ack(action fleetapi.Action) error {
 
 func (f *actionAcker) AckBatch(actions []fleetapi.Action) error {
 	// checkin
-	events := make([]fleetapi.SerializableEvent, 0, len(actions))
+	ids := make([]string, 0, len(actions))
 	for _, action := range actions {
-		events = append(events, fleetapi.Ack(action))
+		ids = append(ids, action.ID())
 	}
 
-	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
-	req := &fleetapi.CheckinRequest{
-		Events: events,
+	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
+	req := &fleetapi.AckRequest{
+		Actions: ids,
 	}
 
 	_, err := cmd.Execute(req)
