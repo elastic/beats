@@ -104,6 +104,8 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 			continue
 		}
 
+		r.log.Debuf("Removing routing key %s", k)
+
 		p.(stream).Close()
 		r.routes.Remove(k)
 	}
