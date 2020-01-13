@@ -101,26 +101,9 @@ func (b *builder) nanoOfSecond(digits int) {
 		return
 	}
 
-	switch digits {
-	case 1:
-		b.appendExtDecimal(ftNanoOfSecond, 8, 1, 1)
-	case 2:
-		b.appendExtDecimal(ftNanoOfSecond, 7, 2, 2)
-	case 3:
-		b.appendExtDecimal(ftNanoOfSecond, 6, 3, 3)
-	case 4:
-		b.appendExtDecimal(ftNanoOfSecond, 5, 4, 4)
-	case 5:
-		b.appendExtDecimal(ftNanoOfSecond, 4, 5, 5)
-	case 6:
-		b.appendExtDecimal(ftNanoOfSecond, 3, 6, 6)
-	case 7:
-		b.appendExtDecimal(ftNanoOfSecond, 2, 7, 7)
-	case 8:
-		b.appendExtDecimal(ftNanoOfSecond, 1, 8, 8)
-	case 9:
-		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
-	default:
+	if digits <= 9 {
+		b.appendExtDecimal(ftNanoOfSecond, 9-digits, digits, digits)
+	} else {
 		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
 		b.appendZeros(digits - 9)
 	}

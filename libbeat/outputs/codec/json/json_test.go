@@ -37,7 +37,7 @@ func TestJsonCodec(t *testing.T) {
 		"default json": testCase{
 			config:   defaultConfig,
 			in:       common.MapStr{"msg": "message"},
-			expected: `{"@timestamp":"0001-01-01T00:00:000000000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000000000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"pretty enabled": testCase{
 			config: Config{Pretty: true},
@@ -65,13 +65,13 @@ func TestJsonCodec(t *testing.T) {
 		"UTC timezone offset": testCase{
 			config:   Config{LocalTime: true},
 			in:       common.MapStr{"msg": "message"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000+00:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000000000+00:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"PST timezone offset": testCase{
 			config:   Config{LocalTime: true},
 			ts:       time.Time{}.In(time.FixedZone("PST", -8*60*60)),
 			in:       common.MapStr{"msg": "message"},
-			expected: `{"@timestamp":"0000-12-31T16:00:00.000-08:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+			expected: `{"@timestamp":"0000-12-31T16:00:00.000000000-08:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 	}
 

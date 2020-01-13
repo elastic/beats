@@ -85,7 +85,7 @@ func TestConsoleOutput(t *testing.T) {
 			[]beat.Event{
 				{Fields: event("field", "value")},
 			},
-			"{\"@timestamp\":\"0001-01-01T00:00:00.000Z\",\"@metadata\":{\"beat\":\"test\",\"type\":\"_doc\",\"version\":\"1.2.3\"},\"field\":\"value\"}\n",
+			"{\"@timestamp\":\"0001-01-01T00:00:00.000000000Z\",\"@metadata\":{\"beat\":\"test\",\"type\":\"_doc\",\"version\":\"1.2.3\"},\"field\":\"value\"}\n",
 		},
 		{
 			"single json event (pretty=true)",
@@ -96,7 +96,7 @@ func TestConsoleOutput(t *testing.T) {
 			[]beat.Event{
 				{Fields: event("field", "value")},
 			},
-			"{\n  \"@timestamp\": \"0001-01-01T00:00:00.000Z\",\n  \"@metadata\": {\n    \"beat\": \"test\",\n    \"type\": \"_doc\",\n    \"version\": \"1.2.3\"\n  },\n  \"field\": \"value\"\n}\n",
+			"{\n  \"@timestamp\": \"0001-01-01T00:00:00.000000000Z\",\n  \"@metadata\": {\n    \"beat\": \"test\",\n    \"type\": \"_doc\",\n    \"version\": \"1.2.3\"\n  },\n  \"field\": \"value\"\n}\n",
 		},
 		// TODO: enable test after update fmtstr support to beat.Event
 		{
