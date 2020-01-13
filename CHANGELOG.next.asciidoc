@@ -127,6 +127,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 
 *Heartbeat*
