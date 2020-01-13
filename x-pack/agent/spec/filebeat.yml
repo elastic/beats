@@ -1,5 +1,6 @@
 name: Filebeat
 cmd: filebeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false"]
 configurable: grpc
 rules:
 - map:

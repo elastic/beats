@@ -1,5 +1,6 @@
 name: Auditbeat
 cmd: auditbeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false"]
 rules:
 - filter_values_with_regexp:
     key: type
