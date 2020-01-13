@@ -1,0 +1,29 @@
+test_cases:
+  - name: Test non-established TLS
+    pcap: pcaps/tls-sample1.pcap
+    config: {}
+
+  - name: Test established TLS
+    pcap: pcaps/tls-sample2.pcap
+    config: {}
+
+  - name: Test established TLS all options
+    pcap: pcaps/tls-sample2.pcap
+    config:
+      tls_include_raw_certificates: true
+      tls_fingerprints: [ md5, sha1, sha256 ]
+
+  - name: Test established TLS not detailed
+    pcap: pcaps/tls-sample2.pcap
+    config:
+      tls_include_detailed_fields: false
+
+  - name: Test established TLS not certs but raw
+    pcap: pcaps/tls-sample2.pcap
+    config:
+      tls_send_certificates: false
+      tls_include_raw_certificates: true
+
+  - name: Test TLS 1.3 version
+    pcap: pcaps/tls-version-13.pcap
+    config: {}

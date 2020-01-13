@@ -1,0 +1,104 @@
+[
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "@metadata.version": "8.0.0",
+        "client.ip": "172.20.10.2",
+        "client.port": 58938,
+        "destination.domain": "www.elastic.co",
+        "destination.ip": "151.101.134.217",
+        "destination.port": 443,
+        "event.category": "network_traffic",
+        "event.dataset": "tls",
+        "event.kind": "event",
+        "network.community_id": "1:OD+OA3Fyagq6ZdQ3T94i6r2zqWA=",
+        "network.protocol": "tls",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "server.domain": "www.elastic.co",
+        "server.ip": "151.101.134.217",
+        "server.port": 443,
+        "source.ip": "172.20.10.2",
+        "source.port": 58938,
+        "status": "Error",
+        "tls.client.ja3": "b20b44b18b853ef29ab773e921b03422",
+        "tls.client.server_name": "www.elastic.co",
+        "tls.client.supported_ciphers": [
+            "TLS_AES_128_GCM_SHA256",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "TLS_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_3DES_EDE_CBC_SHA"
+        ],
+        "tls.detailed.client_certificate_requested": false,
+        "tls.detailed.client_hello.extensions._unparsed_": [
+            "23",
+            "renegotiation_info",
+            "status_request",
+            "51",
+            "45",
+            "28",
+            "21"
+        ],
+        "tls.detailed.client_hello.extensions.application_layer_protocol_negotiation": [
+            "h2",
+            "http/1.1"
+        ],
+        "tls.detailed.client_hello.extensions.ec_points_formats": [
+            "uncompressed"
+        ],
+        "tls.detailed.client_hello.extensions.server_name_indication": [
+            "www.elastic.co"
+        ],
+        "tls.detailed.client_hello.extensions.session_ticket": "",
+        "tls.detailed.client_hello.extensions.signature_algorithms": [
+            "ecdsa_secp256r1_sha256",
+            "ecdsa_secp384r1_sha384",
+            "ecdsa_secp521r1_sha512",
+            "rsa_pss_sha256",
+            "rsa_pss_sha384",
+            "rsa_pss_sha512",
+            "rsa_pkcs1_sha256",
+            "rsa_pkcs1_sha384",
+            "rsa_pkcs1_sha512",
+            "ecdsa_sha1",
+            "rsa_pkcs1_sha1"
+        ],
+        "tls.detailed.client_hello.extensions.supported_groups": [
+            "x25519",
+            "secp256r1",
+            "secp384r1",
+            "secp521r1",
+            "ffdhe2048",
+            "ffdhe3072"
+        ],
+        "tls.detailed.client_hello.extensions.supported_versions": [
+            "TLS 1.3",
+            "TLS 1.2",
+            "TLS 1.1",
+            "TLS 1.0"
+        ],
+        "tls.detailed.client_hello.session_id": "e0181848607f91f9b42672de709ed1df3a811c7b913f9348da2136b758d0242f",
+        "tls.detailed.client_hello.supported_compression_methods": [
+            "NULL"
+        ],
+        "tls.detailed.client_hello.version": "3.3",
+        "tls.detailed.version": "TLS 1.2",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
+        "type": "tls"
+    }
+]
