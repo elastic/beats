@@ -7,10 +7,12 @@ package fleetapi
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -252,6 +254,94 @@ Something went wrong
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, raw)
+			}, withAPIKey))
+			return mux
+		}, withAPIKey,
+		func(t *testing.T, client clienter) {
+			cmd := NewCheckinCmd(agentInfo, client)
+
+			request := CheckinRequest{}
+
+			r, err := cmd.Execute(&request)
+			require.NoError(t, err)
+			require.True(t, r.Success)
+
+			require.Equal(t, 0, len(r.Actions))
+		},
+	))
+
+	t.Run("Meta are sent", withServerWithAuthClient(
+		func(t *testing.T) *http.ServeMux {
+			raw := `
+{
+  "actions": [],
+	"success": true
+}
+`
+			mux := http.NewServeMux()
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
+				type Request struct {
+					Metadata map[string]interface{} `json:"local_metadata"`
+				}
+				req := &Request{}
+
+				content, err := ioutil.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.NoError(t, json.Unmarshal(content, &req))
+
+				assert.Equal(t, 1, len(req.Metadata))
+				v, found := req.Metadata["key"]
+				assert.True(t, found)
+
+				intV, ok := v.(string)
+				assert.True(t, ok)
+				assert.Equal(t, "value", intV)
+
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, raw)
+			}, withAPIKey))
+			return mux
+		}, withAPIKey,
+		func(t *testing.T, client clienter) {
+			meta := map[string]interface{}{
+				"key": "value",
+			}
+
+			cmd := NewCheckinCmd(agentInfo, client)
+
+			request := CheckinRequest{Metadata: meta}
+
+			r, err := cmd.Execute(&request)
+			require.NoError(t, err)
+			require.True(t, r.Success)
+
+			require.Equal(t, 0, len(r.Actions))
+		},
+	))
+
+	t.Run("No meta are sent when not provided", withServerWithAuthClient(
+		func(t *testing.T) *http.ServeMux {
+			raw := `
+{
+  "actions": [],
+	"success": true
+}
+`
+			mux := http.NewServeMux()
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
+				req := make(map[string]interface{})
+
+				content, err := ioutil.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.NoError(t, json.Unmarshal(content, &req))
+
+				_, found := req["key"]
+				assert.False(t, found)
+
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
 			}, withAPIKey))
