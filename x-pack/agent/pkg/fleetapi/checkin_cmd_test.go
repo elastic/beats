@@ -272,7 +272,6 @@ Something went wrong
 		},
 	))
 
-	key, value := "key", "val"
 	t.Run("Meta are sent", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
@@ -294,12 +293,12 @@ Something went wrong
 				assert.NoError(t, json.Unmarshal(content, &req))
 
 				assert.Equal(t, 1, len(req.Metadata))
-				v, found := req.Metadata[key]
+				v, found := req.Metadata["key"]
 				assert.True(t, found)
 
 				intV, ok := v.(string)
 				assert.True(t, ok)
-				assert.Equal(t, value, intV)
+				assert.Equal(t, "value", intV)
 
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -307,12 +306,49 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			metaFn := func() (map[string]interface{}, error) {
-				return map[string]interface{}{
-					key: value,
-				}, nil
+			meta := map[string]interface{}{
+				"key": "value",
 			}
-			cmd := NewCheckinCmd(agentInfo, client, metaFn)
+
+			cmd := NewCheckinCmd(agentInfo, client, meta)
+
+			request := CheckinRequest{}
+
+			r, err := cmd.Execute(&request)
+			require.NoError(t, err)
+			require.True(t, r.Success)
+
+			require.Equal(t, 0, len(r.Actions))
+		},
+	))
+
+	t.Run("No meta are sent when not provided", withServerWithAuthClient(
+		func(t *testing.T) *http.ServeMux {
+			raw := `
+{
+  "actions": [],
+	"success": true
+}
+`
+			mux := http.NewServeMux()
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
+				req := make(map[string]interface{})
+
+				content, err := ioutil.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.NoError(t, json.Unmarshal(content, &req))
+
+				_, found := req["key"]
+				assert.False(t, found)
+
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, raw)
+			}, withAPIKey))
+			return mux
+		}, withAPIKey,
+		func(t *testing.T, client clienter) {
+			cmd := NewCheckinCmd(agentInfo, client, nil)
 
 			request := CheckinRequest{}
 

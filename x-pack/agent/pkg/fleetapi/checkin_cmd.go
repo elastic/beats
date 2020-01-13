@@ -58,21 +58,19 @@ func (e *CheckinResponse) Validate() error {
 type CheckinCmd struct {
 	client clienter
 	info   agentInfo
-	metaFn metadataFunc
+	meta   map[string]interface{}
 }
 
 type agentInfo interface {
 	AgentID() string
 }
 
-type metadataFunc func() (map[string]interface{}, error)
-
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client clienter, metaFn metadataFunc) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client clienter, metadata map[string]interface{}) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,
-		metaFn: metaFn,
+		meta:   metadata,
 	}
 }
 
@@ -124,15 +122,10 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 }
 
 func (e *CheckinCmd) injectMetadata(r *CheckinRequest) error {
-	if e.metaFn == nil {
+	if e.meta == nil || len(e.meta) == 0 {
 		return nil
 	}
 
-	meta, err := e.metaFn()
-	if err != nil {
-		return err
-	}
-
-	r.Metadata = meta
+	r.Metadata = e.meta
 	return nil
 }
