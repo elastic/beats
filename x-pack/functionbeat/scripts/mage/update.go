@@ -59,6 +59,37 @@ func (Update) VendorBeats() error {
 		Source: vendorPath,
 		Dest:   gcpVendorPath,
 		Mode:   0600,
+		Exclude: []string{
+			".*/awslabs",
+			".*/goracle",
+			".*/k8s.io",
+			".*/docker",
+			".*/Azure",
+			".*/govmomi",
+			".*/prometheus",
+			".*/aws",
+			".*/go-mssql",
+			".*/aerospike",
+			".*/zmap",
+			".*/go-sytemd",
+			".*/godbus",
+			".*/gogo",
+			".*/howett.net",
+			".*/grpc",
+			".*/genproto",
+			".*/gopkg.in",
+			".*/appengine",
+			".*/containerd",
+			".*/go-sql-driver",
+			".*/sarama",
+			".*/klauspost",
+			".*/gopacket",
+			".*/shirou",
+			".*/4d64.com",
+			".*/go/storage",
+			".*go.opencensus.io",
+			".*/x/sys/windows",
+		}, // exclude big unused deps
 	}
 	err := cp.Execute()
 	if err != nil {
@@ -69,7 +100,7 @@ func (Update) VendorBeats() error {
 		Source:  "../../libbeat",
 		Dest:    filepath.Join(beatsVendorPath, "libbeat"),
 		Mode:    0600,
-		Exclude: []string{"build", "_meta", "libbeat.yml"},
+		Exclude: []string{".*/build", "_meta", "libbeat.yml", "docs"},
 	}
 	err = cp.Execute()
 	if err != nil {
@@ -80,7 +111,7 @@ func (Update) VendorBeats() error {
 		Source:  "../../x-pack/functionbeat",
 		Dest:    filepath.Join(beatsVendorPath, "x-pack", "functionbeat"),
 		Mode:    0600,
-		Exclude: []string{"build", "_meta", "functionbeat.yml"},
+		Exclude: []string{".*/build", "_meta", "functionbeat.yml", ".*/provider/aws", ".*/tests", ".*/manager"},
 	}
 	err = cp.Execute()
 	if err != nil {

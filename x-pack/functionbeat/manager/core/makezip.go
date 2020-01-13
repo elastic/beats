@@ -18,11 +18,6 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
 )
 
-// Package size limits for function providers, we should be a lot under this limit but
-// adding a check to make sure we never go over.
-const packageCompressedLimit = 50 * 1000 * 1000    // 50MB
-const packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
-
 func rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
@@ -44,7 +39,11 @@ func rawYaml() ([]byte, error) {
 }
 
 // MakeZip creates a zip from the the current artifacts and the currently available configuration.
-func MakeZip(providerResources []bundle.Resource) ([]byte, error) {
+func MakeZip(
+	packageUncompressedLimit int64,
+	packageCompressedLimit int64,
+	providerResources []bundle.Resource,
+) ([]byte, error) {
 	if len(providerResources) == 0 {
 		return nil, fmt.Errorf("no provider specific resources are set")
 	}

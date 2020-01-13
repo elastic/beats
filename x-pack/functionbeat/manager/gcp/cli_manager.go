@@ -7,6 +7,9 @@ package gcp
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -15,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/executor"
 	fngcp "github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
 )
@@ -124,6 +128,26 @@ func (c *CLIManager) Export(name string) error {
 	}
 	fmt.Println(tmpl)
 
+	return nil
+}
+
+// Package packages functions for GCP.
+func (c *CLIManager) Package(outputPattern string) error {
+	resources := zipResources()
+	for providerSuffix, r := range resources {
+		content, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, r)
+		if err != nil {
+			return err
+		}
+
+		output := strings.ReplaceAll(outputPattern, "{{.Provider}}", providerSuffix)
+		err = ioutil.WriteFile(output, content, 0644)
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintf(os.Stderr, "Generated package for provider %s at: %s\n", providerSuffix, output)
+	}
 	return nil
 }
 

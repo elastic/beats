@@ -26,6 +26,10 @@ const (
 	archiveURL       = "gs://%s/%s"                       // path to the function archive
 	locationTemplate = "projects/%s/locations/%s"         // full name of the location
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions
+
+	// Package size limits for GCP provider
+	packageCompressedLimit   = 100 * 1000 * 1000 // 100MB
+	packageUncompressedLimit = 500 * 1000 * 1000 // 500MB
 )
 
 // defaultTemplateBuilder builds request object when deploying Functionbeat using
@@ -60,8 +64,8 @@ func (d *defaultTemplateBuilder) execute(name string) (*functionData, error) {
 		return nil, err
 	}
 
-	resources := zipResources(fn.Name())
-	raw, err := core.MakeZip(resources)
+	resources := zipResourcesOfFunc(fn.Name())
+	raw, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, resources)
 	if err != nil {
 		return nil, err
 	}
@@ -170,8 +174,7 @@ func (d *defaultTemplateBuilder) RawTemplate(name string) (string, error) {
 	return string(yamlBytes), err
 }
 
-// ZipResources returns the list of zip resources
-func ZipResources() map[string][]bundle.Resource {
+func zipResources() map[string][]bundle.Resource {
 	functions, err := provider.ListFunctions("gcp")
 	if err != nil {
 		fmt.Println(err)
@@ -180,12 +183,12 @@ func ZipResources() map[string][]bundle.Resource {
 
 	resources := make(map[string][]bundle.Resource)
 	for _, f := range functions {
-		resources["gcp-"+f] = zipResources(f)
+		resources["gcp-"+f] = zipResourcesOfFunc(f)
 	}
 	return resources
 }
 
-func zipResources(typeName string) []bundle.Resource {
+func zipResourcesOfFunc(typeName string) []bundle.Resource {
 	root := filepath.Join("pkg", typeName)
 	vendor := bundle.Folder(filepath.Join("pkg", "vendor"), root, 0655)
 	return append(vendor, &bundle.LocalFile{Path: filepath.Join("pkg", typeName, typeName+".go"), FileMode: 0755})

@@ -112,6 +112,16 @@ func (c *cliHandler) Export(names []string) error {
 	return nil
 }
 
+func (c *cliHandler) Package(outputPattern string) error {
+	for _, cli := range c.clis {
+		err := cli.Package(outputPattern)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (c *cliHandler) iterateCLIFuncVerbose(names []string, operation string, f func(provider.CLIManager, string) error) int {
 	return c.iterateCLIFunc(names, operation, f, true)
 }

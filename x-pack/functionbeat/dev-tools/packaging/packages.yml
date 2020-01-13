@@ -67,7 +67,7 @@ shared:
         mode: 0755
       pkg/vendor:
         source: 'provider/gcp/build/vendor'
-        mode: 0655
+        mode: 0644
       pkg/pubsub/pubsub.go:
         source: 'provider/gcp/pubsub/pubsub.go'
         mode: 0655

@@ -5,11 +5,8 @@
 package cmd
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -17,10 +14,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
 )
-
-var output string
 
 func initProviders() ([]provider.Provider, error) {
 	b, err := instance.NewInitializedBeat(instance.Settings{
@@ -129,29 +123,11 @@ func genPackageCmd() *cobra.Command {
 		Use:   "package",
 		Short: "Package the configuration and the executable in a zip",
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
-			providers, err := initProviders()
+			h, err := handler()
 			if err != nil {
 				return err
 			}
-
-			for _, p := range providers {
-				resourcer := p.ZipResourcer()
-				for providerSuffix, resources := range resourcer() {
-					content, err := core.MakeZip(resources)
-					if err != nil {
-						return err
-					}
-
-					output := strings.ReplaceAll(outputPattern, "{{.Provider}}", providerSuffix)
-					err = ioutil.WriteFile(output, content, 0644)
-					if err != nil {
-						return err
-					}
-
-					fmt.Fprintf(os.Stderr, "Generated package for provider %s at: %s\n", providerSuffix, output)
-				}
-			}
-			return nil
+			return h.Package(outputPattern)
 		}),
 	}
 

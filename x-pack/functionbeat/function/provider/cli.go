@@ -24,6 +24,9 @@ type CLIManager interface {
 
 	// Export prints exported function template to stdout.
 	Export(string) error
+
+	// Package packages functions for the provider configurable output.
+	Package(string) error
 }
 
 // ZipResourcesFunc is a function which returns the list of resources for each function type for a provider.

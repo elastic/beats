@@ -6,6 +6,9 @@ package aws
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -18,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/executor"
 	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
 )
@@ -164,6 +168,24 @@ func (c *CLIManager) Export(name string) error {
 
 	fmt.Println(tmpl)
 
+	return nil
+}
+
+// Package packages functions for AWS.
+func (c *CLIManager) Package(outputPattern string) error {
+	resource := zipResources()
+	content, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, resource)
+	if err != nil {
+		return err
+	}
+
+	output := strings.ReplaceAll(outputPattern, "{{.Provider}}", "aws")
+	err = ioutil.WriteFile(output, content, 0644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
 	return nil
 }
 
