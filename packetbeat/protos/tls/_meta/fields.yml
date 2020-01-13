@@ -1,5 +1,5 @@
 - key: tls_detailed
-  title: "Detailed TLS fields"
+  title: "Detailed TLS"
   description: >
     Detailed TLS-specific event fields.
   fields:
