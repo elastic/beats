@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   ibmmq:
-    image: docker.elastic.co/observability-ci/beats-integration-ibmmq:${IBMMQ_VERSION:-9.1.4.0-r1-amd64}-1
+    image: docker.elastic.co/integrations-ci/beats-ibmmq:${IBMMQ_VERSION:-9.1.4.0-r1-amd64}-1
     build:
       context: ./_meta
       args:
