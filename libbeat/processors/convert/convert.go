@@ -408,7 +408,7 @@ func cloneValue(value interface{}) interface{} {
 func strToInt(s string, bitSize int) (int64, error) {
 	base := 10
 	if hasHexPrefix(s) {
-		// ParseInt accepts the hex prefix when base=0, not when base=16.
+		// strconv.ParseInt will accept the '0x' or '0X` prefix only when base is 0.
 		base = 0
 	}
 	return strconv.ParseInt(s, base, bitSize)
