@@ -71,6 +71,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix SSL config in input.yml for Filebeat httpjson input in the MISP module. {pull}14767[14767]
 - Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
 - Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
+- Handle errors in handleS3Objects function and add more debug messages for s3 input. {pull}15545[15545]
+- netflow: Allow for options templates without scope fields. {pull}15449[15449]
+- netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
+- netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
+- Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 
 *Heartbeat*
 
