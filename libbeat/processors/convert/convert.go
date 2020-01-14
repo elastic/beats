@@ -404,12 +404,23 @@ func cloneValue(value interface{}) interface{} {
 	}
 }
 
-// Helper to interpret a string as either base-10 or base-16.
-func strToInt(v string, bitSize int) (int64, error) {
+// strToInt is a helper to interpret a string as either base 10 or base 16.
+func strToInt(s string, bitSize int) (int64, error) {
 	base := 10
-	if strings.IndexAny(v, "xX") != -1 {
-		// strconv.ParseInt only accepts the '0x' prefix when base is 0.
+	if hasHexPrefix(s) {
+		// ParseInt accepts the hex prefix when base=0, not when base=16.
 		base = 0
 	}
-	return strconv.ParseInt(v, base, bitSize)
+	return strconv.ParseInt(s, base, bitSize)
+}
+
+func hasHexPrefix(s string) bool {
+	if len(s) < 3 {
+		return false
+	}
+	a, b := s[0], s[1]
+	if a == '+' || a == '-' {
+		a, b = b, s[2]
+	}
+	return a == '0' && (b == 'x' || b == 'X')
 }
