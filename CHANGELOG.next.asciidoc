@@ -54,6 +54,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
 - Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
+- netflow: Allow for options templates without scope fields. {pull}15449[15449]
+- netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
+- netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 
 *Heartbeat*
 
