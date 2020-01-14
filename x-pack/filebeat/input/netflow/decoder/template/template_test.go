@@ -313,6 +313,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:      7,
 				ScopeFields: 1,
+				IsOptions:   true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: 2, Info: &fields.Field{Name: "destinationTransportPort", Decoder: fields.Unsigned16}},
@@ -343,6 +344,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:      7,
 				ScopeFields: 2,
+				IsOptions:   true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: 2, Info: &fields.Field{Name: "destinationTransportPort", Decoder: fields.Unsigned16}},
@@ -386,6 +388,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:      7,
 				ScopeFields: 3,
+				IsOptions:   true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: 2, Info: &fields.Field{Name: "destinationTransportPort", Decoder: fields.Unsigned16}},
@@ -415,6 +418,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:      7,
 				ScopeFields: 1,
+				IsOptions:   true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: 2, Info: &fields.Field{Name: "destinationTransportPort", Decoder: fields.Unsigned16}},
@@ -446,6 +450,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:      7,
 				ScopeFields: 2,
+				IsOptions:   true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: 2, Info: &fields.Field{Name: "destinationTransportPort", Decoder: fields.Unsigned16}},
@@ -489,6 +494,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:         6,
 				ScopeFields:    1,
+				IsOptions:      true,
 				VariableLength: true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
@@ -522,6 +528,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 			record: Template{
 				Length:         6,
 				ScopeFields:    1,
+				IsOptions:      true,
 				VariableLength: true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
@@ -571,6 +578,7 @@ func TestOptionsTemplate_Apply(t *testing.T) {
 				Length:         6,
 				VariableLength: true,
 				ScopeFields:    2,
+				IsOptions:      true,
 				Fields: []FieldTemplate{
 					{Length: 4, Info: &fields.Field{Name: "sourceIPv4Address", Decoder: fields.Ipv4Address}},
 					{Length: VariableLength, Info: &fields.Field{Name: "vpnIdentifier", Decoder: fields.OctetArray}},
