@@ -1573,6 +1573,12 @@ Metrics that returned from Cloudwatch API query. - name: billing
       type: keyword
       description: >
         The namespace specified when query cloudwatch api.
+- name: dynamodb
+  type: group
+  description: >
+    `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
+  release: beta
+  fields:
 - name: ebs
   type: group
   description: >
@@ -2131,36 +2137,6 @@ azure module
 
 
 
-*`azure.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.dimensions.*`*::
-+
---
-Azure metric dimensions.
-
-
-type: object
-
---
-
 [float]
 === resource
 
@@ -2208,7 +2184,37 @@ type: object
 
 --
 
-*`azure.resource.compute_vm.*.*`*::
+*`azure.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.*.*`*::
 +
 --
 compute_vm
@@ -2218,7 +2224,7 @@ type: object
 
 --
 
-*`azure.resource.compute_vm_scaleset.*.*`*::
+*`azure.compute_vm_scaleset.*.*`*::
 +
 --
 compute_vm_scaleset
@@ -2235,10 +2241,20 @@ monitor
 
 
 
-*`azure.resource.monitor.metrics.*.*`*::
+*`azure.monitor.metrics.*.*`*::
 +
 --
 Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.storage.*.*`*::
++
+--
+storage account
 
 
 type: object
@@ -31706,6 +31722,89 @@ format: percent
 --
 
 [float]
+=== page_stats
+
+memory page statistics
+
+
+*`system.memory.page_stats.pgscan_kswapd.pages`*::
++
+--
+pages scanned by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgscan_direct.pages`*::
++
+--
+pages scanned directly
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgfree.pages`*::
++
+--
+pages freed by the system
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgsteal_kswapd.pages`*::
++
+--
+number of pages reclaimed by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgsteal_direct.pages`*::
++
+--
+number of pages reclaimed directly
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.direct_efficiency.pct`*::
++
+--
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`system.memory.page_stats.kswapd_efficiency.pct`*::
++
+--
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
 === hugepages
 
 This group contains statistics related to huge pages usage on the system.
@@ -31919,6 +32018,63 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 
 
 type: long
+
+--
+
+[float]
+=== network_summary
+
+Metrics relating to global network activity
+
+
+
+*`system.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`system.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
 
 --
 
