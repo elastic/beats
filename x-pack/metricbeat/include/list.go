@@ -22,6 +22,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/azure/compute_vm"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/azure/compute_vm_scaleset"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/azure/monitor"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/azure/storage"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/cockroachdb"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/coredns"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/coredns/stats"

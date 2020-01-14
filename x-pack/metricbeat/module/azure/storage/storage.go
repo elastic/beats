@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package compute_vm
+package storage
 
 import (
 	"fmt"
@@ -11,14 +11,19 @@ import (
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
 
-const defaultVMNamespace = "Microsoft.Compute/virtualMachines"
+const defaultStorageAccountNamespace = "Microsoft.Storage/storageAccounts"
+
+var (
+	storageServiceNamespaces = []string{"/blobServices", "/tableServices", "/queueServices", "/fileServices"}
+	allowedDimensions        = []string{"ResponseType", "ApiName"}
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("azure", "compute_vm", New)
+	mb.Registry.MustAddMetricSet("azure", "storage", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -40,14 +45,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if len(ms.Client.Config.Resources) == 0 {
 		ms.Client.Config.Resources = []azure.ResourceConfig{
 			{
-				Query: fmt.Sprintf("resourceType eq '%s'", defaultVMNamespace),
+				Query: fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace),
 			},
 		}
 	}
 	for index := range ms.Client.Config.Resources {
 		// if any resource groups were configured the resource type should be added
 		if len(ms.Client.Config.Resources[index].Group) > 0 {
-			ms.Client.Config.Resources[index].Type = defaultVMNamespace
+			ms.Client.Config.Resources[index].Type = defaultStorageAccountNamespace
 		}
 		// one metric configuration will be added containing all metrics names
 		ms.Client.Config.Resources[index].Metrics = []azure.MetricConfig{
