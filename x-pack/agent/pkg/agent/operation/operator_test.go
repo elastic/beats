@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 )
 
-var installPath string = "tests/scripts"
+var installPath = "tests/scripts"
 
 func TestMain(m *testing.M) {
 	// init supported with test cases
