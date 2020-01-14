@@ -205,7 +205,7 @@ func toString(value interface{}) (string, error) {
 func toLong(value interface{}) (int64, error) {
 	switch v := value.(type) {
 	case string:
-		return strconv.ParseInt(v, 0, 64)
+		return strToInt(v, 64)
 	case int:
 		return int64(v), nil
 	case int8:
@@ -238,7 +238,7 @@ func toLong(value interface{}) (int64, error) {
 func toInteger(value interface{}) (int32, error) {
 	switch v := value.(type) {
 	case string:
-		i, err := strconv.ParseInt(v, 0, 32)
+		i, err := strToInt(v, 32)
 		return int32(i), err
 	case int:
 		return int32(v), nil
@@ -402,4 +402,14 @@ func cloneValue(value interface{}) interface{} {
 	default:
 		return value
 	}
+}
+
+// Helper to interpret a string as either base-10 or base-16.
+func strToInt(v string, bitSize int) (int64, error) {
+	base := 10
+	if strings.IndexAny(v, "xX") != -1 {
+		// strconv.ParseInt only accepts the '0x' prefix when base is 0.
+		base = 0
+	}
+	return strconv.ParseInt(v, base, bitSize)
 }
