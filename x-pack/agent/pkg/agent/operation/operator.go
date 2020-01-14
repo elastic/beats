@@ -102,7 +102,7 @@ func defaultOperatorConfig() *operatorCfg.Config {
 			Enabled:      false,
 			RetriesCount: 0,
 			Delay:        30 * time.Second,
-			MaxDelay:     300 * time.Second,
+			MaxDelay:     5 * time.Minute,
 			Exponential:  false,
 		},
 	}
