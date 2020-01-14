@@ -5689,8 +5689,6 @@
 			"versionExact": "v0.7.0"
 		},
 		{
-<<<<<<< HEAD
-=======
 			"checksumSHA1": "I4Oe5Q+AuaxmN3duL38r2evqGKk=",
 			"path": "google.golang.org/api/internal/gensupport",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
@@ -5713,7 +5711,6 @@
 			"versionExact": "v0.7.0"
 		},
 		{
->>>>>>> e8e18d0f8... Add Google Cloud Platform support (#13598)
 			"checksumSHA1": "zh9AcT6oNvhnOqb7w7njY48TkvI=",
 			"path": "google.golang.org/api/iterator",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
