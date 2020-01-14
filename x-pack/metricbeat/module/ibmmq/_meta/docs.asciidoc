@@ -14,3 +14,15 @@ The image provides an option to easily enable metrics exporter using an environm
 variable:
 
 `MQ_ENABLE_METRICS` - Set this to `true` to generate Prometheus metrics for the Queue Manager.
+
+[float]
+=== Dashboard
+
+The ibmmq module includes predefined dashboards with overview information
+of the monitored Queue Manager, including subscriptions, calls and messages.
+
+image::./images/metricbeat-ibmmq-calls.png[]
+
+image::./images/metricbeat-ibmmq-messages.png[]
+
+image::./images/metricbeat-ibmmq-subscriptions.png[]
