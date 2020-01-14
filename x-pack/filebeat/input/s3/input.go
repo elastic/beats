@@ -232,6 +232,7 @@ func (p *s3Input) Wait() {
 func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
 	var wg sync.WaitGroup
 	numMessages := len(messages)
+	p.logger.Debugf("Processing %v messages", numMessages)
 	wg.Add(numMessages * 2)
 
 	// process messages received from sqs
@@ -257,7 +258,7 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	if err != nil {
 		err = errors.Wrap(err, "handleS3Objects failed")
 		p.logger.Error(err)
-		errC <- err
+		return
 	}
 }
 
@@ -408,7 +409,9 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				}
 				return nil
 			} else if err != nil {
-				return errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
+				err = errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
+				s3Context.Fail(err)
+				return err
 			}
 
 			// create event per log line
