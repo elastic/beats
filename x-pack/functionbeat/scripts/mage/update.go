@@ -73,7 +73,6 @@ func (Update) VendorBeats() error {
 				Mode:   0600,
 				Exclude: []string{
 					".*_test.go$",
-					".*/testing",
 					".*.yml",
 				},
 			}
