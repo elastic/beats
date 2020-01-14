@@ -66,7 +66,6 @@ func (Update) VendorBeats() error {
 			in = filepath.Join("..", "..", in)
 
 			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
-			out = strings.ReplaceAll(out, "github.com/elastic/beats", "")
 
 			cp := &devtools.CopyTask{
 				Source: in,
