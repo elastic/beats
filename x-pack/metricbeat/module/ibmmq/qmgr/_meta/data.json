@@ -103,12 +103,12 @@
         }
     },
     "event": {
-        "dataset": "ibmmq.status",
+        "dataset": "ibmmq.qmgr",
         "module": "ibmmq",
         "duration": 4421890
     },
     "metricset": {
-        "name": "status",
+        "name": "qmgr",
         "period": 10000
     }
 }

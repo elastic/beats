@@ -3,7 +3,7 @@ This module periodically fetches metrics from a containerized distribution of IB
 [float]
 === Compatibility
 
-The ibmmq `status` metricset is compatible with a containerized distribution of IBM MQ (since version 9.1.0).
+The ibmmq `qmgr` metricset is compatible with a containerized distribution of IBM MQ (since version 9.1.0).
 The Docker image starts the `runmqserver` process, which spawns the HTTP server exposing metrics in Prometheus
 format ([source code](https://github.com/ibm-messaging/mq-container/blob/9.1.0/internal/metrics/metrics.go)).
 

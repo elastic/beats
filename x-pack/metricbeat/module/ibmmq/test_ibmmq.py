@@ -11,13 +11,13 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['ibmmq']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_status(self):
+    def test_qmgr(self):
         """
-        ibmmq status test
+        ibmmq qmgr test
         """
         self.render_config_template(modules=[{
             "name": "ibmmq",
-            "metricsets": ["status"],
+            "metricsets": ["qmgr"],
             "hosts": self.get_hosts(),
             "period": "5s",
         }])

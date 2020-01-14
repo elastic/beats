@@ -1,5 +1,5 @@
 - module: ibmmq
-  metricsets: ['status']
+  metricsets: ['qmgr']
   period: 10s
   hosts: ['localhost:9157']
 

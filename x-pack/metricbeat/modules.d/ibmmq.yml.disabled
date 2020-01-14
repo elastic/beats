@@ -2,7 +2,7 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-ibmmq.html
 
 - module: ibmmq
-  metricsets: ['status']
+  metricsets: ['qmgr']
   period: 10s
   hosts: ['localhost:9157']
 

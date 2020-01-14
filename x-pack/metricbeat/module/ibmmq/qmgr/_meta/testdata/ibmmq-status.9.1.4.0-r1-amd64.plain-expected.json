@@ -1,12 +1,12 @@
 [
     {
         "event": {
-            "dataset": "ibmmq.status",
+            "dataset": "ibmmq.qmgr",
             "duration": 115000,
             "module": "ibmmq"
         },
         "metricset": {
-            "name": "status",
+            "name": "qmgr",
             "period": 10000
         },
         "prometheus": {

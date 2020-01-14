@@ -2,15 +2,17 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !integration
+// +build integration
 
-package status
+package stats
 
 import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
@@ -25,8 +27,22 @@ func init() {
 	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
 }
 
-func TestEventMapping(t *testing.T) {
-	logp.TestingSetup()
+func TestFetch(t *testing.T) {
+	service := compose.EnsureUp(t, "ibmmq")
 
-	mbtest.TestDataFiles(t, "ibmmq", "status")
+	f := mbtest.NewFetcher(t, getConfig(service.Host()))
+	events, errs := f.FetchEvents()
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "ibmmq",
+		"metricsets": []string{"qmgr"},
+		"hosts":      []string{host},
+	}
 }
