@@ -21,10 +21,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEncodeDecode(t *testing.T) {
