@@ -33,7 +33,7 @@ Authentication and authorization in Google Cloud Platform can be achieved in man
 }
 ----
 
-Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role:
+Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role (applies to all metricsets):
 
 * `Compute Viewer` (1 permission in use of 138):
 - `monitoring.metricDescriptors.list`

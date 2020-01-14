@@ -43,7 +43,7 @@ Authentication and authorization in Google Cloud Platform can be achieved in man
 }
 ----
 
-Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role:
+Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role (applies to all metricsets):
 
 * `Compute Viewer` (1 permission in use of 138):
 - `monitoring.metricDescriptors.list`
@@ -82,6 +82,7 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+    - pubsub
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -96,5 +97,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
+* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
+
 include::googlecloud/compute.asciidoc[]
+
+include::googlecloud/pubsub.asciidoc[]
 
