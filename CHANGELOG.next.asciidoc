@@ -89,14 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 - Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
-- Fix perfmon expanding counter path/adding counter to query when OS language is not english. {issue}14684[14684] {pull}14800[14800]
-- Add extra check on `ignore_non_existent_counters` flag if the PdhExpandWildCardPathW returns no errors but does not expand the counter path successfully in windows/perfmon metricset. {pull}14797[14797]
-- Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
-- Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
-- Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
-- Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 - Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
-- Fix mixed modules loading standard and light metricsets {pull}15011[15011]
 
 *Packetbeat*
 
