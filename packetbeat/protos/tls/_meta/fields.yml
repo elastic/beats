@@ -362,341 +362,273 @@
     - name: tls.handshake_completed
       type: alias
       path: tls.established
-      migration: true
 
     - name: tls.client_hello.supported_ciphers
       type: alias
       path: tls.client.supported_ciphers
-      migration: true
 
     - name: tls.server_hello.selected_cipher
       type: alias
       path: tls.cipher
-      migration: true
 
     - name: tls.fingerprints.ja3
       type: alias
       path: tls.client.ja3
-      migration: true
 
     # Moved fields
 
     - name: tls.resumption_method
       type: alias
       path: tls.detailed.resumption_method
-      migration: true
 
     - name: tls.client_certificate_requested
       type: alias
       path: tls.detailed.client_certificate_requested
-      migration: true
 
     - name: tls.client_hello.version
       type: alias
       path: tls.detailed.client_hello.version
-      migration: true
 
     - name: tls.client_hello.session_id
       type: alias
       path: tls.detailed.client_hello.session_id
-      migration: true
 
     - name: tls.client_hello.supported_compression_methods
       type: alias
       path: tls.detailed.client_hello.supported_compression_methods
-      migration: true
 
     - name: tls.client_hello.extensions.server_name_indication
       type: alias
       path: tls.detailed.client_hello.extensions.server_name_indication
-      migration: true
 
     - name: tls.client_hello.extensions.application_layer_protocol_negotiation
       type: alias
       path: tls.detailed.client_hello.extensions.application_layer_protocol_negotiation
-      migration: true
 
     - name: tls.client_hello.extensions.session_ticket
       type: alias
       path: tls.detailed.client_hello.extensions.session_ticket
-      migration: true
 
     - name: tls.client_hello.extensions.supported_versions
       type: alias
       path: tls.detailed.client_hello.extensions.supported_versions
-      migration: true
 
     - name: tls.client_hello.extensions.supported_groups
       type: alias
       path: tls.detailed.client_hello.extensions.supported_groups
-      migration: true
 
     - name: tls.client_hello.extensions.signature_algorithms
       type: alias
       path: tls.detailed.client_hello.extensions.signature_algorithms
-      migration: true
 
     - name: tls.client_hello.extensions.ec_points_formats
       type: alias
       path: tls.detailed.client_hello.extensions.ec_points_formats
-      migration: true
 
     - name: tls.client_hello.extensions._unparsed_
       type: alias
       path: tls.detailed.client_hello.extensions._unparsed_
-      migration: true
 
     - name: tls.server_hello.version
       type: alias
       path: tls.detailed.server_hello.version
-      migration: true
 
     - name: tls.server_hello.selected_compression_method
       type: alias
       path: tls.detailed.server_hello.selected_compression_method
-      migration: true
 
     - name: tls.server_hello.session_id
       type: alias
       path: tls.detailed.server_hello.session_id
-      migration: true
 
     - name: tls.server_hello.extensions.application_layer_protocol_negotiation
       type: alias
       path: tls.detailed.server_hello.extensions.application_layer_protocol_negotiation
-      migration: true
 
     - name: tls.server_hello.extensions.session_ticket
       type: alias
       path: tls.detailed.server_hello.extensions.session_ticket
-      migration: true
 
     - name: tls.server_hello.extensions.supported_versions
       type: alias
       path: tls.detailed.server_hello.extensions.supported_versions
-      migration: true
 
     - name: tls.server_hello.extensions.ec_points_formats
       type: alias
       path: tls.detailed.server_hello.extensions.ec_points_formats
-      migration: true
 
     - name: tls.server_hello.extensions._unparsed_
       type: alias
       path: tls.detailed.server_hello.extensions._unparsed_
-      migration: true
 
     - name: tls.client_certificate.version
       type: alias
       path: tls.detailed.client_certificate.version
-      migration: true
 
     - name: tls.client_certificate.serial_number
       type: alias
       path: tls.detailed.client_certificate.serial_number
-      migration: true
 
     - name: tls.client_certificate.not_before
       type: alias
       path: tls.detailed.client_certificate.not_before
-      migration: true
 
     - name: tls.client_certificate.not_after
       type: alias
       path: tls.detailed.client_certificate.not_after
-      migration: true
 
     - name: tls.client_certificate.public_key_algorithm
       type: alias
       path: tls.detailed.client_certificate.public_key_algorithm
-      migration: true
 
     - name: tls.client_certificate.public_key_size
       type: alias
       path: tls.detailed.client_certificate.public_key_size
-      migration: true
 
     - name: tls.client_certificate.signature_algorithm
       type: alias
       path: tls.detailed.client_certificate.signature_algorithm
-      migration: true
 
     - name: tls.client_certificate.alternative_names
       type: alias
       path: tls.detailed.client_certificate.alternative_names
-      migration: true
 
     - name: tls.client_certificate.subject.country
       type: alias
       path: tls.detailed.client_certificate.subject.country
-      migration: true
 
     - name: tls.client_certificate.subject.organization
       type: alias
       path: tls.detailed.client_certificate.subject.organization
-      migration: true
 
     - name: tls.client_certificate.subject.organizational_unit
       type: alias
       path: tls.detailed.client_certificate.subject.organizational_unit
-      migration: true
 
     - name: tls.client_certificate.subject.province
       type: alias
       path: tls.detailed.client_certificate.subject.province
-      migration: true
 
     - name: tls.client_certificate.subject.common_name
       type: alias
       path: tls.detailed.client_certificate.subject.common_name
-      migration: true
 
     - name: tls.client_certificate.subject.locality
       type: alias
       path: tls.detailed.client_certificate.subject.locality
-      migration: true
 
     - name: tls.client_certificate.issuer.country
       type: alias
       path: tls.detailed.client_certificate.issuer.country
-      migration: true
 
     - name: tls.client_certificate.issuer.organization
       type: alias
       path: tls.detailed.client_certificate.issuer.organization
-      migration: true
 
     - name: tls.client_certificate.issuer.organizational_unit
       type: alias
       path: tls.detailed.client_certificate.issuer.organizational_unit
-      migration: true
 
     - name: tls.client_certificate.issuer.province
       type: alias
       path: tls.detailed.client_certificate.issuer.province
-      migration: true
 
     - name: tls.client_certificate.issuer.common_name
       type: alias
       path: tls.detailed.client_certificate.issuer.common_name
-      migration: true
 
     - name: tls.client_certificate.issuer.locality
       type: alias
       path: tls.detailed.client_certificate.issuer.locality
-      migration: true
 
     - name: tls.server_certificate.version
       type: alias
       path: tls.detailed.server_certificate.version
-      migration: true
 
     - name: tls.server_certificate.serial_number
       type: alias
       path: tls.detailed.server_certificate.serial_number
-      migration: true
 
     - name: tls.server_certificate.not_before
       type: alias
       path: tls.detailed.server_certificate.not_before
-      migration: true
 
     - name: tls.server_certificate.not_after
       type: alias
       path: tls.detailed.server_certificate.not_after
-      migration: true
 
     - name: tls.server_certificate.public_key_algorithm
       type: alias
       path: tls.detailed.server_certificate.public_key_algorithm
-      migration: true
 
     - name: tls.server_certificate.public_key_size
       type: alias
       path: tls.detailed.server_certificate.public_key_size
-      migration: true
 
     - name: tls.server_certificate.signature_algorithm
       type: alias
       path: tls.detailed.server_certificate.signature_algorithm
-      migration: true
 
     - name: tls.server_certificate.alternative_names
       type: alias
       path: tls.detailed.server_certificate.alternative_names
-      migration: true
 
     - name: tls.server_certificate.subject.country
       type: alias
       path: tls.detailed.server_certificate.subject.country
-      migration: true
 
     - name: tls.server_certificate.subject.organization
       type: alias
       path: tls.detailed.server_certificate.subject.organization
-      migration: true
 
     - name: tls.server_certificate.subject.organizational_unit
       type: alias
       path: tls.detailed.server_certificate.subject.organizational_unit
-      migration: true
 
     - name: tls.server_certificate.subject.province
       type: alias
       path: tls.detailed.server_certificate.subject.province
-      migration: true
 
     - name: tls.server_certificate.subject.common_name
       type: alias
       path: tls.detailed.server_certificate.subject.common_name
-      migration: true
 
     - name: tls.server_certificate.subject.locality
       type: alias
       path: tls.detailed.server_certificate.subject.locality
-      migration: true
 
     - name: tls.server_certificate.issuer.country
       type: alias
       path: tls.detailed.server_certificate.issuer.country
-      migration: true
 
     - name: tls.server_certificate.issuer.organization
       type: alias
       path: tls.detailed.server_certificate.issuer.organization
-      migration: true
 
     - name: tls.server_certificate.issuer.organizational_unit
       type: alias
       path: tls.detailed.server_certificate.issuer.organizational_unit
-      migration: true
 
     - name: tls.server_certificate.issuer.province
       type: alias
       path: tls.detailed.server_certificate.issuer.province
-      migration: true
 
     - name: tls.server_certificate.issuer.common_name
       type: alias
       path: tls.detailed.server_certificate.issuer.common_name
-      migration: true
 
     - name: tls.server_certificate.issuer.locality
       type: alias
       path: tls.detailed.server_certificate.issuer.locality
-      migration: true
 
     - name: tls.server_certificate_chain
       type: alias
       path: tls.detailed.server_certificate_chain
-      migration: true
 
     - name: tls.client_certificate_chain
       type: alias
       path: tls.detailed.client_certificate_chain
-      migration: true
 
     - name: tls.alert_types
       type: alias
       path: tls.detailed.alert_types
-      migration: true
