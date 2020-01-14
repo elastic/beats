@@ -37,6 +37,10 @@ The virtual machine scale sets dashboard is similar to the VM dashboard and show
 
 image::./images/metricbeat-azure-vmss-overview.png[]
 
+The Azure storage dashboards dashboards show all relevant metrics for the blob, file, table and queue storage services:
+
+image::./images/metricbeat-azure-storage-overview.png[]
+
 [float]
 === Module-specific configuration notes
 
