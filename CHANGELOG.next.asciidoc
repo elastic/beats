@@ -231,6 +231,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
 - Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
 - netflow v9: Allow for options templates without scope fields. {pull}15449[15449]
+- netflow v9: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
 
 *Heartbeat*
 
