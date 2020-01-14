@@ -5633,20 +5633,20 @@
 			"versionExact": "release-branch.go1.13"
 		},
 		{
-			"checksumSHA1": "WvhCpgIKNQ1psrswDf1GC5hFKWM=",
-			"path": "google.golang.org/api/compute/v1",
-			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
-			"revisionTime": "2019-11-15T18:09:15Z",
-			"version": "v0.14.0",
-			"versionExact": "v0.14.0"
-		},
-		{
 			"checksumSHA1": "xzYkHGnGgOHW4QNWLR4jbx+81P0=",
 			"path": "google.golang.org/api/cloudfunctions/v1",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
 			"revisionTime": "2019-06-24T17:16:18Z",
 			"version": "v0.7.0",
 			"versionExact": "v0.7.0"
+		},
+		{
+			"checksumSHA1": "WvhCpgIKNQ1psrswDf1GC5hFKWM=",
+			"path": "google.golang.org/api/compute/v1",
+			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
+			"revisionTime": "2019-11-15T18:09:15Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
 			"checksumSHA1": "FhzGDPlkW5SaQGtSgKnjQAiYVk0=",
@@ -5689,6 +5689,12 @@
 			"versionExact": "v0.7.0"
 		},
 		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
 			"checksumSHA1": "I4Oe5Q+AuaxmN3duL38r2evqGKk=",
 			"path": "google.golang.org/api/internal/gensupport",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
@@ -5703,12 +5709,6 @@
 			"revisionTime": "2019-11-15T18:09:15Z",
 			"version": "v0.14.0",
 			"versionExact": "v0.14.0"
-        },
-        {
-			"path": "google.golang.org/api/internal/gensupport",
-			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
 		},
 		{
 			"checksumSHA1": "zh9AcT6oNvhnOqb7w7njY48TkvI=",
