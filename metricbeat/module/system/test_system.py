@@ -294,6 +294,9 @@ class Test(metricbeat.BaseTest):
         if not re.match("(?i)linux", sys.platform) and not "hugepages" in memory:
             # Ensure presence of hugepages only in Linux
             memory["hugepages"] = None
+        if not re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
+            # Ensure presence of page_stats only in Linux
+            memory["page_stats"] = None
         self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.
