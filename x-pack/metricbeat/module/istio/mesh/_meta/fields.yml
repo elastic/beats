@@ -1,0 +1,6 @@
+- name: mesh
+  type: group
+  description: >
+    Contains statistics related to the Istio mesh service
+  release: beta
+  fields:

@@ -503,6 +503,12 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
+#-------------------------------- Istio Module --------------------------------
+- module: coredns
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:9153"]
+
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
