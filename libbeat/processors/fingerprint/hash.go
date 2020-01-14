@@ -25,7 +25,7 @@ import (
 	"hash"
 	"strings"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 )
 
 type hashMethod func() hash.Hash
@@ -36,7 +36,7 @@ var hashes = map[string]hashMethod{
 	"sha256": sha256.New,
 	"sha384": sha512.New384,
 	"sha512": sha512.New,
-	"xxhash": xxhash.NewHash64,
+	"xxhash": newXxHash,
 }
 
 // Unpack creates the hashMethod from the given string
@@ -50,4 +50,9 @@ func (f *hashMethod) Unpack(str string) error {
 
 	*f = m
 	return nil
+}
+
+// newXxHash returns a hash.Hash instead of the *Digest which implements the same
+func newXxHash() hash.Hash {
+	return xxhash.New()
 }
