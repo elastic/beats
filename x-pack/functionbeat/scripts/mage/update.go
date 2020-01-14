@@ -6,10 +6,12 @@ package mage
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 // Update target namespace.
@@ -51,73 +53,37 @@ func (Update) IncludeFields() error {
 
 // VendorBeats collects the vendor folder required to deploy the function for GCP.
 func (Update) VendorBeats() error {
-	gcpVendorPath := filepath.Join("provider", "gcp", "build", "vendor")
-	vendorPath := filepath.Join("..", "..", "vendor")
-	beatsVendorPath := filepath.Join(gcpVendorPath, "github.com", "elastic", "beats")
+	for _, f := range []string{"pubsub", "storage"} {
+		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
 
-	cp := &devtools.CopyTask{
-		Source: vendorPath,
-		Dest:   gcpVendorPath,
-		Mode:   0600,
-		Exclude: []string{
-			".*/4d64.com",
-			".*/Azure",
-			".*/aerospike",
-			".*/appengine",
-			".*/aws",
-			".*/awslabs",
-			".*/containerd",
-			".*/docker",
-			".*/genproto",
-			".*/go-mssql",
-			".*/go-sql-driver",
-			".*/go-sytemd",
-			".*/go/storage",
-			".*/godbus",
-			".*/gogo",
-			".*/gopacket",
-			".*/gopkg.in",
-			".*/goracle",
-			".*/govmomi",
-			".*/grpc",
-			".*/howett.net",
-			".*/k8s.io",
-			".*/klauspost",
-			".*/pack.ag",
-			".*/prometheus",
-			".*/sarama",
-			".*/shirou",
-			".*/sigs.k8s.io",
-			".*/x/sys/windows",
-			".*/zmap",
-			".*go.opencensus.io",
-		}, // exclude big unused deps
-	}
-	err := cp.Execute()
-	if err != nil {
-		return err
-	}
+		deps, err := gotool.ListDeps("github.com/elastic/beats/x-pack/functionbeat/provider/gcp/" + f)
+		if err != nil {
+			return err
+		}
 
-	cp = &devtools.CopyTask{
-		Source:  "../../libbeat",
-		Dest:    filepath.Join(beatsVendorPath, "libbeat"),
-		Mode:    0600,
-		Exclude: []string{".*/build", "_meta", "libbeat.yml", "docs"},
-	}
-	err = cp.Execute()
-	if err != nil {
-		return err
-	}
+		for _, d := range deps {
+			in := strings.ReplaceAll(d, "github.com/elastic/beats/", "")
+			in = filepath.Join("..", "..", in)
 
-	cp = &devtools.CopyTask{
-		Source:  "../../x-pack/functionbeat",
-		Dest:    filepath.Join(beatsVendorPath, "x-pack", "functionbeat"),
-		Mode:    0600,
-		Exclude: []string{".*/build", "_meta", "functionbeat.yml", ".*/provider/aws", ".*/tests", ".*/manager"},
-	}
-	err = cp.Execute()
-	if err != nil {
-		return err
+			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
+			out = strings.ReplaceAll(out, "github.com/elastic/beats", "")
+
+			cp := &devtools.CopyTask{
+				Source: in,
+				Dest:   filepath.Join(gcpVendorPath, out),
+				Mode:   0600,
+				Exclude: []string{
+					".*_test.go$",
+					".*/testing",
+					".*.yml",
+				},
+			}
+			err := cp.Execute()
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
 	return nil

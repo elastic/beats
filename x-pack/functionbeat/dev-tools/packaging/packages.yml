@@ -65,8 +65,11 @@ shared:
       pkg/functionbeat-aws:
         source: 'provider/aws/build/golang-crossbuild/aws-linux-amd64'
         mode: 0755
-      pkg/vendor:
-        source: 'provider/gcp/build/vendor'
+      pkg/pubsub/vendor:
+        source: 'provider/gcp/build/pubsub/vendor'
+        mode: 0644
+      pkg/storage/vendor:
+        source: 'provider/gcp/build/storage/vendor'
         mode: 0644
       pkg/pubsub/pubsub.go:
         source: 'provider/gcp/pubsub/pubsub.go'
