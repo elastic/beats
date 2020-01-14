@@ -29,6 +29,9 @@ type Template struct {
 	Length         int
 	VariableLength bool
 	ScopeFields    int
+	// IsOptions signals that this is an options template. Previously
+	// ScopeFields>0 was used for this, but that's unreliable under v9.
+	IsOptions bool
 }
 
 type FieldTemplate struct {
@@ -84,7 +87,7 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 		}
 	}
 	makeFn := t.makeFlow
-	if t.ScopeFields > 0 {
+	if t.IsOptions {
 		makeFn = t.makeOptions
 	}
 	events := make([]record.Record, 0, alloc)
