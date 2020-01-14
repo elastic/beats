@@ -10010,6 +10010,618 @@ type: keyword
 
 --
 
+*`tls.handshake_completed`*::
++
+--
+type: alias
+
+alias to: tls.established
+
+--
+
+*`tls.client_hello.supported_ciphers`*::
++
+--
+type: alias
+
+alias to: tls.client.supported_ciphers
+
+--
+
+*`tls.server_hello.selected_cipher`*::
++
+--
+type: alias
+
+alias to: tls.cipher
+
+--
+
+*`tls.fingerprints.ja3`*::
++
+--
+type: alias
+
+alias to: tls.client.ja3
+
+--
+
+*`tls.resumption_method`*::
++
+--
+type: alias
+
+alias to: tls.detailed.resumption_method
+
+--
+
+*`tls.client_certificate_requested`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate_requested
+
+--
+
+*`tls.client_hello.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.version
+
+--
+
+*`tls.client_hello.session_id`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.session_id
+
+--
+
+*`tls.client_hello.supported_compression_methods`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.supported_compression_methods
+
+--
+
+*`tls.client_hello.extensions.server_name_indication`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.server_name_indication
+
+--
+
+*`tls.client_hello.extensions.application_layer_protocol_negotiation`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.application_layer_protocol_negotiation
+
+--
+
+*`tls.client_hello.extensions.session_ticket`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.session_ticket
+
+--
+
+*`tls.client_hello.extensions.supported_versions`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.supported_versions
+
+--
+
+*`tls.client_hello.extensions.supported_groups`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.supported_groups
+
+--
+
+*`tls.client_hello.extensions.signature_algorithms`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.signature_algorithms
+
+--
+
+*`tls.client_hello.extensions.ec_points_formats`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.ec_points_formats
+
+--
+
+*`tls.client_hello.extensions._unparsed_`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions._unparsed_
+
+--
+
+*`tls.server_hello.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.version
+
+--
+
+*`tls.server_hello.selected_compression_method`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.selected_compression_method
+
+--
+
+*`tls.server_hello.session_id`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.session_id
+
+--
+
+*`tls.server_hello.extensions.application_layer_protocol_negotiation`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.application_layer_protocol_negotiation
+
+--
+
+*`tls.server_hello.extensions.session_ticket`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.session_ticket
+
+--
+
+*`tls.server_hello.extensions.supported_versions`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.supported_versions
+
+--
+
+*`tls.server_hello.extensions.ec_points_formats`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.ec_points_formats
+
+--
+
+*`tls.server_hello.extensions._unparsed_`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions._unparsed_
+
+--
+
+*`tls.client_certificate.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.version
+
+--
+
+*`tls.client_certificate.serial_number`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.serial_number
+
+--
+
+*`tls.client_certificate.not_before`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.not_before
+
+--
+
+*`tls.client_certificate.not_after`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.not_after
+
+--
+
+*`tls.client_certificate.public_key_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.public_key_algorithm
+
+--
+
+*`tls.client_certificate.public_key_size`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.public_key_size
+
+--
+
+*`tls.client_certificate.signature_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.signature_algorithm
+
+--
+
+*`tls.client_certificate.alternative_names`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.alternative_names
+
+--
+
+*`tls.client_certificate.subject.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.country
+
+--
+
+*`tls.client_certificate.subject.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.organization
+
+--
+
+*`tls.client_certificate.subject.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.organizational_unit
+
+--
+
+*`tls.client_certificate.subject.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.province
+
+--
+
+*`tls.client_certificate.subject.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.common_name
+
+--
+
+*`tls.client_certificate.subject.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.locality
+
+--
+
+*`tls.client_certificate.issuer.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.country
+
+--
+
+*`tls.client_certificate.issuer.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.organization
+
+--
+
+*`tls.client_certificate.issuer.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.organizational_unit
+
+--
+
+*`tls.client_certificate.issuer.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.province
+
+--
+
+*`tls.client_certificate.issuer.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.common_name
+
+--
+
+*`tls.client_certificate.issuer.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.locality
+
+--
+
+*`tls.server_certificate.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.version
+
+--
+
+*`tls.server_certificate.serial_number`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.serial_number
+
+--
+
+*`tls.server_certificate.not_before`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.not_before
+
+--
+
+*`tls.server_certificate.not_after`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.not_after
+
+--
+
+*`tls.server_certificate.public_key_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.public_key_algorithm
+
+--
+
+*`tls.server_certificate.public_key_size`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.public_key_size
+
+--
+
+*`tls.server_certificate.signature_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.signature_algorithm
+
+--
+
+*`tls.server_certificate.alternative_names`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.alternative_names
+
+--
+
+*`tls.server_certificate.subject.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.country
+
+--
+
+*`tls.server_certificate.subject.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.organization
+
+--
+
+*`tls.server_certificate.subject.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.organizational_unit
+
+--
+
+*`tls.server_certificate.subject.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.province
+
+--
+
+*`tls.server_certificate.subject.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.common_name
+
+--
+
+*`tls.server_certificate.subject.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.locality
+
+--
+
+*`tls.server_certificate.issuer.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.country
+
+--
+
+*`tls.server_certificate.issuer.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.organization
+
+--
+
+*`tls.server_certificate.issuer.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.organizational_unit
+
+--
+
+*`tls.server_certificate.issuer.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.province
+
+--
+
+*`tls.server_certificate.issuer.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.common_name
+
+--
+
+*`tls.server_certificate.issuer.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.locality
+
+--
+
+*`tls.server_certificate_chain`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate_chain
+
+--
+
+*`tls.client_certificate_chain`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate_chain
+
+--
+
+*`tls.alert_types`*::
++
+--
+type: alias
+
+alias to: tls.detailed.alert_types
+
+--
+
 [[exported-fields-trans_event]]
 == Transaction Event fields
 
