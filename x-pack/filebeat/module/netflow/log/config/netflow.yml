@@ -4,3 +4,7 @@ host: '{{.netflow_host}}:{{.netflow_port}}'
 max_message_size: '{{.max_message_size}}'
 expiration_timeout: '{{.expiration_timeout}}'
 queue_size: {{.queue_size}}
+
+{{ if .detect_sequence_reset}}
+detect_sequence_reset: {{.detect_sequence_reset}}
+{{end}}

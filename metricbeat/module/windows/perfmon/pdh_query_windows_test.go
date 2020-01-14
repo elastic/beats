@@ -18,6 +18,7 @@
 package perfmon
 
 import (
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -88,4 +89,45 @@ func TestSuccessfulQuery(t *testing.T) {
 	list, err := q.GetFormattedCounterValues()
 	assert.Nil(t, err)
 	assert.NotNil(t, list)
+}
+
+// TestInstanceNameRegexp tests regular expression for instance.
+func TestInstanceNameRegexp(t *testing.T) {
+	queryPaths := []string{`\SQLServer:Databases(*)\Log File(s) Used Size (KB)`, `\Search Indexer(*)\L0 Indexes (Wordlists)`,
+		`\Search Indexer(*)\L0 Merges (flushes) Now.`, `\NUMA Node Memory(*)\Free & Zero Page List MBytes`}
+	for _, path := range queryPaths {
+		matches := instanceNameRegexp.FindStringSubmatch(path)
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
+			assert.Equal(t, matches[1], "*")
+		}
+	}
+}
+
+// TestObjectNameRegexp tests regular expression for object.
+func TestObjectNameRegexp(t *testing.T) {
+	queryPaths := []string{`\Web Service Cache\Output Cache Current Flushed Items`,
+		`\Web Service Cache\Output Cache Total Flushed Items`, `\Web Service Cache\Total Flushed Metadata`,
+		`\Web Service Cache\Kernel: Current URIs Cached`}
+	for _, path := range queryPaths {
+		matches := objectNameRegexp.FindStringSubmatch(path)
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
+			assert.Equal(t, matches[1], "Web Service Cache")
+		}
+	}
+}
+
+func TestUTF16ToStringArray(t *testing.T) {
+	var array = []string{"\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(0 C:)\\Schreibvorgänge/s", "\\\\DESKTOP-RFOOE09\\Physikalischer Datenträger(_Total)\\Schreibvorgänge/s", ""}
+	var unicode []uint16
+	for _, i := range array {
+		uni, err := syscall.UTF16FromString(i)
+		assert.NoError(t, err)
+		unicode = append(unicode, uni...)
+	}
+	response := UTF16ToStringArray(unicode)
+	assert.NotNil(t, response)
+	assert.Equal(t, len(response), 2)
+	for _, res := range response {
+		assert.Contains(t, array, res)
+	}
 }

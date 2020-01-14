@@ -24,6 +24,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Remove broken dashboard. {pull}15288[15288]
+
 *Metricbeat*
 
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
@@ -50,6 +52,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
+- Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
+- Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
 
 *Heartbeat*
 
@@ -63,7 +67,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
+- Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
+- Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 
 *Packetbeat*
 
@@ -78,6 +87,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 
 *Auditbeat*
 

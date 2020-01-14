@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-10-10T07:25:12.000-02:00",
         "destination.ip": "10.4.0.5",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
