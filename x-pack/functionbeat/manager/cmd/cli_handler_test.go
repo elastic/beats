@@ -35,6 +35,16 @@ func (m *mockCLIManager) Remove(name string) error {
 	return args.Error(0)
 }
 
+func (m *mockCLIManager) Export(name string) error {
+	args := m.Called(name)
+	return args.Error(0)
+}
+
+func (m *mockCLIManager) Package(outputPattern string) error {
+	args := m.Called(outputPattern)
+	return args.Error(0)
+}
+
 func outputs() (io.Writer, io.Writer) {
 	errOut := new(bytes.Buffer)
 	output := new(bytes.Buffer)

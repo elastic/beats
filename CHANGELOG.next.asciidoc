@@ -160,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Add monitoring info about triggered functions. {pull}14876[14876]
+- Add Google Cloud Platform support. {pull}13598[13598]
 
 *Winlogbeat*
 
