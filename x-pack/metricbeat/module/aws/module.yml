@@ -5,3 +5,4 @@ metricsets:
   - usage
   - billing
   - sns
+  - dynamodb
