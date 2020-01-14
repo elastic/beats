@@ -165,7 +165,7 @@ func (d *defaultTemplateBuilder) RawTemplate(name string) (string, error) {
 		"resources": []common.MapStr{
 			common.MapStr{
 				"name":       fmt.Sprintf(functionName, d.gcpConfig.ProjectID, d.gcpConfig.Location, name),
-				"type":       "cloudfunctions.v1beta2.function", // TODO
+				"type":       "google.cloud.functions.v1.CloudFunction",
 				"properties": properties,
 			},
 		},
