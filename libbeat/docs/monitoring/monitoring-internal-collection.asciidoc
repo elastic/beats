@@ -22,8 +22,6 @@ monitoring cluster.
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
 
-//TODO: Not sure if these docs need to be updated to be parallel with other
-//stack components since this is the old way of configuring monitoring. 
 
 . Create a user that has appropriate authority to send system-level monitoring
 data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
