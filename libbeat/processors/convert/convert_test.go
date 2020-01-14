@@ -309,7 +309,7 @@ var testCases = []testCase{
 	{Integer, true, nil, true},
 	{Integer, "1", int32(1), false},
 	{Integer, "-1", int32(-1), false},
-	{Integer, "017", int32(7), false},
+	{Integer, "017", int32(17), false},
 	{Integer, "08", int32(8), false},
 	{Integer, "0X0A", int32(10), false},
 	{Integer, "-0x12", int32(-18), false},
