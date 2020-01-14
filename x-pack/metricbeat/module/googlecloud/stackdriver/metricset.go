@@ -44,6 +44,7 @@ type MetricSet struct {
 type config struct {
 	Metrics             []string `config:"stackdriver.metrics" validate:"required"`
 	Zone                string   `config:"zone" validate:"required"`
+	Region              string   `config:"region"`
 	ProjectID           string   `config:"project_id" validate:"required"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`

@@ -7,6 +7,7 @@ package stackdriver
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"sync"
 	"time"
 
@@ -51,11 +52,13 @@ type stackdriverMetricsRequester struct {
 func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
+	filter := r.getFilterForMetric(m)
+
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   fmt.Sprintf(`metric.type="%s" AND resource.labels.zone = "%s"`, m, r.config.Zone),
+		Filter:   filter,
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
@@ -102,6 +105,27 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) 
 	}
 
 	return results, nil
+}
+
+var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
+
+// getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
+// if they have a region specified.
+func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
+	f = fmt.Sprintf(`metric.type="%s"`, m)
+
+	service := serviceRegexp.ReplaceAllString(m, "${service}")
+
+	switch service {
+	case googlecloud.ServicePubsub:
+		return
+	case googlecloud.ServiceLoadBalancing:
+		return
+	default:
+		f = fmt.Sprintf(`%s AND resource.labels.zone = "%s"`, f, r.config.Zone)
+	}
+
+	return
 }
 
 // Returns a GCP TimeInterval based on the provided config
