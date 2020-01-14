@@ -14,12 +14,13 @@ import (
 )
 
 const (
-	noDimension     = "none"
+	// NoDimension is used to group metrics in separate api calls in order to reduce the number of executions
+	NoDimension     = "none"
 	nativeMetricset = "monitor"
 )
 
 // EventsMapping will map metric values to beats events
-func EventsMapping(report mb.ReporterV2, metrics []Metric, metricset string) error {
+func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) error {
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
@@ -39,7 +40,7 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric, metricset string) err
 	for resNamKey, resourceMetrics := range groupByResourceNamespace {
 		for _, resourceMetric := range resourceMetrics {
 			if len(resourceMetric.Dimensions) == 0 {
-				groupByDimensions[resNamKey+noDimension] = append(groupByDimensions[resNamKey+noDimension], resourceMetric)
+				groupByDimensions[resNamKey+NoDimension] = append(groupByDimensions[resNamKey+NoDimension], resourceMetric)
 			} else {
 				var dimKey string
 				for _, dim := range resourceMetric.Dimensions {
@@ -61,6 +62,8 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric, metricset string) err
 			}
 		}
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
+			var event mb.Event
+			var metricList common.MapStr
 			// group events by dimension values
 			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
 			if exists {
@@ -71,16 +74,22 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric, metricset string) err
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						report.Event(initEvent(timestamp, defaultMetric, groupDimValues, metricset))
+						event, metricList = createEvent(timestamp, defaultMetric, groupDimValues)
 					}
 				}
 			} else {
-				report.Event(initEvent(timestamp, defaultMetric, groupTimeValues, metricset))
+				event, metricList = createEvent(timestamp, defaultMetric, groupTimeValues)
 			}
+			if metricset == nativeMetricset {
+				event.ModuleFields.Put("metrics", metricList)
+			} else {
+				for key, metric := range metricList {
+					event.MetricSetFields.Put(key, metric)
+				}
+			}
+			report.Event(event)
 		}
-
 	}
-
 	return nil
 }
 
@@ -94,7 +103,7 @@ func managePropertyName(metric string) string {
 	// replace actual percentage symbol with the smbol "pct"
 	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, ":", ".", -1)
+	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
@@ -104,32 +113,13 @@ func managePropertyName(metric string) string {
 		obj[index] = strings.TrimPrefix(obj[index], "_")
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
-	resultMetricName = strings.ToLower(strings.Join(obj, "."))
+	resultMetricName = strings.ToLower(strings.Join(obj, "_"))
 
 	return resultMetricName
 }
 
-// initEvent will create a new base event
-func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue, metricset string) mb.Event {
-	metricList := common.MapStr{}
-	for _, value := range metricValues {
-		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
-		if value.min != nil {
-			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "min"), *value.min)
-		}
-		if value.max != nil {
-			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "max"), *value.max)
-		}
-		if value.avg != nil {
-			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "avg"), *value.avg)
-		}
-		if value.total != nil {
-			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "total"), *value.total)
-		}
-		if value.count != nil {
-			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), *value.count)
-		}
-	}
+// createEvent will create a new base event
+func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) (mb.Event, common.MapStr) {
 	event := mb.Event{
 		ModuleFields: common.MapStr{
 			"resource": common.MapStr{
@@ -156,18 +146,30 @@ func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue, m
 
 		}
 	}
-	if metricset == nativeMetricset {
-		event.ModuleFields.Put("metrics", metricList)
-	} else {
-		for key, metric := range metricList {
-			event.MetricSetFields.Put(key, metric)
-		}
-	}
-
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.RootFields.Put("cloud.region", metric.Resource.Location)
-	return event
+
+	metricList := common.MapStr{}
+	for _, value := range metricValues {
+		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
+		if value.min != nil {
+			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "min"), *value.min)
+		}
+		if value.max != nil {
+			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "max"), *value.max)
+		}
+		if value.avg != nil {
+			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "avg"), *value.avg)
+		}
+		if value.total != nil {
+			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "total"), *value.total)
+		}
+		if value.count != nil {
+			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), *value.count)
+		}
+	}
+	return event, metricList
 }
 
 // getDimensionValue will return dimension value for the key provided

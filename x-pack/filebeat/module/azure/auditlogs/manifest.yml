@@ -2,7 +2,7 @@ module_version: 1.0
 
 var:
   - name: input
-    default: kafka
+    default: azure-eventhub
   - name: eventhub
     default: "insights-logs-auditlogs"
   - name: consumer_group

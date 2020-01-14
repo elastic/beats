@@ -68,6 +68,11 @@ so the `period` for `compute_vm` metricset  should be `300s` or multiples of `30
 This metricset will collect metrics from the virtual machine scalesets, these metrics will have a timegrain every 5 minutes,
 so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
 
+[float]
+=== `storage`
+This metricset will collect metrics from the storage accounts, these metrics will have a timegrain every 5 minutes,
+so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
+
 
 [float]
 == Additional notes about metrics and costs

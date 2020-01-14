@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [unreleased]
+## [Unreleased]
 
 ### Added
 
@@ -17,19 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-## [1.2.1] - 2020-1-3
-
-### Added
+## [1.3.0] - 2020-01-13
 
 ### Changed
 
-### Deprecated
+- Convert NetworkCountersInfo maps to uint64 [#75](https://github.com/elastic/go-sysinfo/pull/75)
 
-### Removed
+## [1.2.1] - 2020-01-03
 
 ### Fixed
 
-- create a sidToString function to deal with API changes in various versions of golang.org/x/sys/windows [#74](https://github.com/elastic/go-sysinfo/pull/74)
+- Create a `sidToString` function to deal with API changes in various versions of golang.org/x/sys/windows. [#74](https://github.com/elastic/go-sysinfo/pull/74)
 
 ## [1.2.0] - 2019-12-09
 
@@ -83,7 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.3.0
 [1.2.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.1
 [1.2.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.0
 [1.1.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
