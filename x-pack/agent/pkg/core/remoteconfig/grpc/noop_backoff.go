@@ -12,7 +12,7 @@ import (
 // Used when no backoff is configured.
 type NoopBackoff struct{}
 
-// NewEqualJitterBackoff returns a new EqualJitter object.
+// NewNoopBackoff returns a new EqualJitter object.
 func NewNoopBackoff() backoff.Backoff {
 	return &NoopBackoff{}
 }
