@@ -5,4 +5,3 @@
   metricsets: ["mesh"]
   period: 10s
   hosts: ["localhost:9090"]
-  #mesh.metrics_path: "/federate?match[]={__name__=~"istio.*"}"

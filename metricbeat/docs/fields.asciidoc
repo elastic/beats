@@ -41,6 +41,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
+* <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -15838,6 +15839,26 @@ json metricset
 === server
 
 server
+
+
+[[exported-fields-istio]]
+== istio fields
+
+istio Module
+
+
+
+[float]
+=== istio
+
+`istio` contains statistics that were read from Istio
+
+
+
+[float]
+=== mesh
+
+Contains statistics related to the Istio mesh service
 
 
 [[exported-fields-jolokia]]
