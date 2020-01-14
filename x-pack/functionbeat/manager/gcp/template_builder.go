@@ -28,6 +28,7 @@ const (
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions
 
 	// Package size limits for GCP provider
+	// Ref: https://cloud.google.com/functions/quotas
 	packageCompressedLimit   = 100 * 1000 * 1000 // 100MB
 	packageUncompressedLimit = 500 * 1000 * 1000 // 500MB
 )

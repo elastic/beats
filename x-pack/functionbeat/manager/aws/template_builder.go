@@ -52,6 +52,7 @@ const (
 
 	// Package size limits for AWS, we should be a lot under this limit but
 	// adding a check to make sure we never go over.
+	// Ref: https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
 	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 )
