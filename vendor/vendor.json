@@ -348,6 +348,14 @@
 			"revisionTime": "2019-09-04T14:17:38Z"
 		},
 		{
+			"checksumSHA1": "srK5tLmK7dEdari4lk3r7eU5sUU=",
+			"path": "github.com/OneOfOne/xxhash",
+			"revision": "85d5025fe15b385888b1886ea99f722f549a6934",
+			"revisionTime": "2020-01-09T23:38:23Z",
+			"version": "v1.2.7",
+			"versionExact": "v1.2.7"
+		},
+		{
 			"checksumSHA1": "w5NkRQ2Cebz7a6UfrbwFdhyRWnM=",
 			"path": "github.com/Shopify/sarama",
 			"revision": "46c83074a05474240f9620fb7c70fb0d80ca401a",
@@ -2838,12 +2846,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "HHke2QXMP829s8Fe5qa8oLlejAw=",
+			"checksumSHA1": "Tt1KFInyaxjtvhGI75+crc75n/Q=",
 			"path": "github.com/elastic/ecs/code/go/ecs",
-			"revision": "2eaac192a1ca67edab727d7d9d526c5142ae3eb5",
-			"revisionTime": "2019-10-03T15:52:51Z",
-			"version": "v1.2.0",
-			"versionExact": "v1.2.0"
+			"revision": "cc4b36eebec29975f57cd0475c3987c9bde5c15a",
+			"revisionTime": "2019-12-19T13:38:44Z",
+			"version": "v1.4.0",
+			"versionExact": "v1.4.0"
 		},
 		{
 			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",

@@ -24,6 +24,8 @@ import (
 	"crypto/sha512"
 	"hash"
 	"strings"
+
+	"github.com/OneOfOne/xxhash"
 )
 
 type hashMethod func() hash.Hash
@@ -34,6 +36,7 @@ var hashes = map[string]hashMethod{
 	"sha256": sha256.New,
 	"sha384": sha512.New384,
 	"sha512": sha512.New,
+	"xxhash": xxhash.NewHash64,
 }
 
 // Unpack creates the hashMethod from the given string

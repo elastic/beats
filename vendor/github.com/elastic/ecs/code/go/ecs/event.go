@@ -43,20 +43,26 @@ type Event struct {
 	// example of this is the Windows Event ID.
 	Code string `ecs:"code"`
 
-	// The kind of the event.
-	// This gives information about what type of information the event
-	// contains, without being specific to the contents of the event.  Examples
-	// are `event`, `state`, `alarm`. Warning: In future versions of ECS, we
-	// plan to provide a list of acceptable values for this field, please use
-	// with caution.
+	// This is one of four ECS Categorization Fields, and indicates the highest
+	// level in the ECS category hierarchy.
+	// `event.kind` gives high-level information about what type of information
+	// the event contains, without being specific to the contents of the event.
+	// For example, values of this field distinguish alert events from metric
+	// events.
+	// The value of this field can be used to inform how these kinds of events
+	// should be handled. They may warrant different retention, different
+	// access control, it may also help understand whether the data coming in
+	// at a regular interval or not.
 	Kind string `ecs:"kind"`
 
-	// Event category.
-	// This contains high-level information about the contents of the event. It
-	// is more generic than `event.action`, in the sense that typically a
-	// category contains multiple actions. Warning: In future versions of ECS,
-	// we plan to provide a list of acceptable values for this field, please
-	// use with caution.
+	// This is one of four ECS Categorization Fields, and indicates the second
+	// level in the ECS category hierarchy.
+	// `event.category` represents the "big buckets" of ECS categories. For
+	// example, filtering on `event.category:process` yields all events
+	// relating to process activity. This field is closely related to
+	// `event.type`, which is used as a subcategory.
+	// This field is an array. This will allow proper categorization of some
+	// events that fall in multiple categories.
 	Category string `ecs:"category"`
 
 	// The action captured by the event.
@@ -65,15 +71,21 @@ type Event struct {
 	// `file-created`. The value is normally defined by the implementer.
 	Action string `ecs:"action"`
 
-	// The outcome of the event.
-	// If the event describes an action, this fields contains the outcome of
-	// that action. Examples outcomes are `success` and `failure`. Warning: In
-	// future versions of ECS, we plan to provide a list of acceptable values
-	// for this field, please use with caution.
+	// This is one of four ECS Categorization Fields, and indicates the lowest
+	// level in the ECS category hierarchy.
+	// `event.outcome` simply denotes whether the event represent a success or
+	// a failure. Note that not all events will have an associated outcome. For
+	// example, this field is generally not populated for metric events or
+	// events with `event.type:info`.
 	Outcome string `ecs:"outcome"`
 
-	// Reserved for future usage.
-	// Please avoid using this field for user data.
+	// This is one of four ECS Categorization Fields, and indicates the third
+	// level in the ECS category hierarchy.
+	// `event.type` represents a categorization "sub-bucket" that, when used
+	// along with the `event.category` field values, enables filtering events
+	// down to a level appropriate for single visualization.
+	// This field is an array. This will allow proper categorization of some
+	// events that fall in multiple event types.
 	Type string `ecs:"type"`
 
 	// Name of the module this data is coming from.
@@ -164,4 +176,13 @@ type Event struct {
 	// This is mainly useful if you use more than one system that assigns risk
 	// scores, and you want to see a normalized value across all systems.
 	RiskScoreNorm float64 `ecs:"risk_score_norm"`
+
+	// Timestamp when an event arrived in the central data store.
+	// This is different from `@timestamp`, which is when the event originally
+	// occurred.  It's also different from `event.created`, which is meant to
+	// capture the first time an agent saw the event.
+	// In normal conditions, assuming no tampering, the timestamps should
+	// chronologically look like this: `@timestamp` < `event.created` <
+	// `event.ingested`.
+	Ingested time.Time `ecs:"ingested"`
 }
