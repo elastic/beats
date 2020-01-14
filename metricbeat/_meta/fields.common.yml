@@ -35,9 +35,6 @@
       description: >
         The document type. Always set to "doc".
 
-    - name: process.exit_code
-      type: long
-      description: the exit code of a process
     - name: systemd.fragment_path
       type: keyword
       description: the location of the systemd unit path
