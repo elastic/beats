@@ -19,30 +19,15 @@ type Action interface {
 	ID() string
 }
 
-// ActionBase is the base of all actions to be executed.
-type ActionBase struct {
-	ActionID   string
-	ActionType string
-}
-
-// Type returns the action type.
-func (a *ActionBase) Type() string {
-	return a.ActionType
-}
-
-// ID returns the action ID.
-func (a *ActionBase) ID() string {
-	return a.ActionID
-}
-
 // ActionUnknown is an action that is not know by the current version of the Agent and we don't want
 // to return an error at parsing time but at execution time we can report or ignore.
 //
 // NOTE: We only keep the original type and the action id, the payload of the event is dropped, we
 // do this to make sure we do not leak any unwanted information.
 type ActionUnknown struct {
-	*ActionBase
 	originalType string
+	ActionID     string
+	ActionType   string
 }
 
 // Type returns the type of the Action.
@@ -50,12 +35,17 @@ func (a *ActionUnknown) Type() string {
 	return "UNKNOWN"
 }
 
+// ID returns the ID of the Action.
+func (a *ActionUnknown) ID() string {
+	return a.ActionID
+}
+
 func (a *ActionUnknown) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
-	s.WriteString(a.ID())
+	s.WriteString(a.ActionID)
 	s.WriteString(", type: ")
-	s.WriteString(a.Type())
+	s.WriteString(a.ActionType)
 	s.WriteString(" (original type: ")
 	s.WriteString(a.OriginalType())
 	s.WriteString(")")
@@ -69,17 +59,28 @@ func (a *ActionUnknown) OriginalType() string {
 
 // ActionPolicyChange is a request to apply a new
 type ActionPolicyChange struct {
-	*ActionBase
-	Policy map[string]interface{} `json:"policy"`
+	ActionID   string
+	ActionType string
+	Policy     map[string]interface{} `json:"policy"`
 }
 
 func (a *ActionPolicyChange) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
-	s.WriteString(a.ID())
+	s.WriteString(a.ActionID)
 	s.WriteString(", type: ")
-	s.WriteString(a.Type())
+	s.WriteString(a.ActionType)
 	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionPolicyChange) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionPolicyChange) ID() string {
+	return a.ActionID
 }
 
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
@@ -108,10 +109,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 		switch response.ActionType {
 		case "POLICY_CHANGE":
 			action = &ActionPolicyChange{
-				ActionBase: &ActionBase{
-					ActionID:   response.ActionID,
-					ActionType: response.ActionType,
-				},
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
 			}
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
@@ -120,7 +119,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 			}
 		default:
 			action = &ActionUnknown{
-				ActionBase:   &ActionBase{ActionID: response.ActionID, ActionType: "UNKNOWN"},
+				ActionID:     response.ActionID,
+				ActionType:   "UNKNOWN",
 				originalType: response.ActionType,
 			}
 		}

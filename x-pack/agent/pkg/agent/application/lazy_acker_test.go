@@ -40,9 +40,9 @@ func TestLazyAcker(t *testing.T) {
 	testID1 := "ack-test-action-id"
 	testID2 := testID1 + "2"
 	testID3 := testID1 + "3"
-	testAction1 := &fleetapi.ActionUnknown{ActionBase: &fleetapi.ActionBase{ActionID: testID1}}
-	testAction2 := &actionImmediate{ActionBase: &fleetapi.ActionBase{ActionID: testID2}}
-	testAction3 := &fleetapi.ActionUnknown{ActionBase: &fleetapi.ActionBase{ActionID: testID3}}
+	testAction1 := &fleetapi.ActionUnknown{ActionID: testID1}
+	testAction2 := &actionImmediate{ActionID: testID2}
+	testAction3 := &fleetapi.ActionUnknown{ActionID: testID3}
 
 	ch := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 		content, err := ioutil.ReadAll(body)
@@ -88,13 +88,18 @@ func TestLazyAcker(t *testing.T) {
 }
 
 type actionImmediate struct {
-	*fleetapi.ActionBase
+	ActionID     string
+	ActionType   string
 	originalType string
 }
 
 // Type returns the type of the Action.
 func (a *actionImmediate) Type() string {
 	return "IMMEDIATE"
+}
+
+func (a *actionImmediate) ID() string {
+	return a.ActionID
 }
 
 func (a *actionImmediate) ForceAck() {}

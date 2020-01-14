@@ -21,6 +21,9 @@ import (
 const AgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent_info"
 
+// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+const AgentActionStoreFile = "action_store.yml"
+
 type persistentAgentInfo struct {
 	ID string `json:"ID" yaml:"ID" config:"ID"`
 }

@@ -36,7 +36,8 @@ func TestPolicyChange(t *testing.T) {
 
 		policy := map[string]interface{}{"hello": "world"}
 		action := &fleetapi.ActionPolicyChange{
-			ActionBase: &fleetapi.ActionBase{ActionID: "abc123", ActionType: "POLICY_CHANGE"},
+			ActionID:   "abc123",
+			ActionType: "POLICY_CHANGE",
 			Policy:     policy,
 		}
 
@@ -53,7 +54,8 @@ func TestPolicyChange(t *testing.T) {
 
 		policy := map[string]interface{}{"hello": "world"}
 		action := &fleetapi.ActionPolicyChange{
-			ActionBase: &fleetapi.ActionBase{ActionID: "abc123", ActionType: "POLICY_CHANGE"},
+			ActionID:   "abc123",
+			ActionType: "POLICY_CHANGE",
 			Policy:     policy,
 		}
 
@@ -66,7 +68,7 @@ func TestPolicyChange(t *testing.T) {
 
 func TestPolicyAcked(t *testing.T) {
 	log, _ := logger.New()
-	t.Run("Policy change acked", func(t *testing.T) {
+	t.Run("Policy change should not ACK on error", func(t *testing.T) {
 		tacker := &testAcker{}
 
 		mockErr := errors.New("error returned")
@@ -75,7 +77,8 @@ func TestPolicyAcked(t *testing.T) {
 		policy := map[string]interface{}{"hello": "world"}
 		actionID := "abc123"
 		action := &fleetapi.ActionPolicyChange{
-			ActionBase: &fleetapi.ActionBase{ActionID: actionID, ActionType: "POLICY_CHANGE"},
+			ActionID:   actionID,
+			ActionType: "POLICY_CHANGE",
 			Policy:     policy,
 		}
 
@@ -85,8 +88,30 @@ func TestPolicyAcked(t *testing.T) {
 		require.Error(t, err)
 
 		actions := tacker.Items()
+		assert.EqualValues(t, 0, len(actions))
+	})
+
+	t.Run("Policy change should ACK", func(t *testing.T) {
+		tacker := &testAcker{}
+
+		emitter := &mockEmitter{}
+
+		policy := map[string]interface{}{"hello": "world"}
+		actionID := "abc123"
+		action := &fleetapi.ActionPolicyChange{
+			ActionID:   actionID,
+			ActionType: "POLICY_CHANGE",
+			Policy:     policy,
+		}
+
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+
+		err := handler.Handle(action, tacker)
+		require.NoError(t, err)
+
+		actions := tacker.Items()
 		assert.EqualValues(t, 1, len(actions))
-		assert.EqualValues(t, actionID, actions[0])
+		assert.Equal(t, actionID, actions[0])
 	})
 }
 

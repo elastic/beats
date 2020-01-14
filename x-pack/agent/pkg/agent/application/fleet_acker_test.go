@@ -35,7 +35,7 @@ func TestAcker(t *testing.T) {
 	}
 
 	testID := "ack-test-action-id"
-	testAction := &fleetapi.ActionUnknown{ActionBase: &fleetapi.ActionBase{ActionID: testID}}
+	testAction := &fleetapi.ActionUnknown{ActionID: testID}
 
 	ch := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 		content, err := ioutil.ReadAll(body)

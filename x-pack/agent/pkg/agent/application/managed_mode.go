@@ -125,6 +125,13 @@ func newManaged(
 
 	batchedAcker := newLazyAcker(acker)
 
+	// Create the action store that will persist the last good policy change on disk.
+	actionStore, err := newActionStore(log, fleetActionStoreFile())
+	if err != nil {
+		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", fleetActionStoreFile()))
+	}
+	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
+
 	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {
 		return nil, err
@@ -132,13 +139,26 @@ func newManaged(
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{log: log, emitter: emit},
+		&handlerPolicyChange{
+			log:     log,
+			emitter: emit,
+		},
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)
+
+	actions := actionStore.Actions()
+	if len(actions) > 0 {
+		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
+		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
+		// But at the moment this is not possible because the policy change was acked.
+		if err := replayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
+			log.Errorf("could not recover state, error %+v, skipping...", err)
+		}
+	}
 
 	gateway, err := newFleetGateway(
 		log,
@@ -147,7 +167,7 @@ func newManaged(
 		client,
 		actionDispatcher,
 		fleetR,
-		batchedAcker,
+		actionAcker,
 	)
 	if err != nil {
 		return nil, err
