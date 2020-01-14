@@ -1,13 +1,9 @@
-## Type of change
-
-<!-- Mandatory
-Please delete options that are not relevant
+<!-- Type of change
+Please label this PR with one of the following labels, depending on the scope of your change:
+- Bug
+- Enhancement
+- Breaking change
 -->
-
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Enhancement
-- [ ] Breaking change
 
 ## What does this PR do?
 
@@ -29,17 +25,10 @@ Add a checklist of things that are required to be reviewed in order to have the 
 List here all the items you have verified BEFORE sending this PR. Please DO NOT remove any item, striking through those that do not apply.
 -->
 
-- [ ] I have signed the [Contributor License Agreement](https://www.elastic.co/contributor-agreement/). 
 - [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing **unit** tests pass locally with my changes
-- [ ] New and existing **integration** tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
-- [ ] New dependencies have been vendorised
 
 ## Author's Checklist
 
@@ -61,6 +50,7 @@ Link related issues below. Insert the issue link or reference after the word "Cl
 
 - Closes #123
 - Relates #123
+- Requires #123
 - Superseeds #123
 -->
 - 
@@ -82,5 +72,5 @@ Add here screenshots about how the project will be changed after the PR is appli
 ## Logs
 
 <!-- Recommended
-Paste here output logs discovered while creating this PR, or any other output you consider important to be shared with the team.
+Paste here output logs discovered while creating this PR, such as stack traces or integration logs, or any other output you consider important to be shared with the team.
 -->
