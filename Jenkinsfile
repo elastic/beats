@@ -262,6 +262,21 @@ pipeline {
             }
           }
         }
+        stage('Metricbeat Module tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false"
+            }
+          }
+          steps {
+            withBeatsEnv(){
+              makeTarget("Metricbeat Module tests", "-C metricbeat test-module")
+            }
+          }
+        }
         stage('Metricbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
