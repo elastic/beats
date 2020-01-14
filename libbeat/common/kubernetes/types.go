@@ -46,6 +46,9 @@ type PodStatus = v1.PodStatus
 // Node data
 type Node = v1.Node
 
+// Namespace data
+type Namespace = v1.Namespace
+
 // Container data
 type Container = v1.Container
 
