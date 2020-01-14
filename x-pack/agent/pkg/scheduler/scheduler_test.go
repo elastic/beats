@@ -106,6 +106,7 @@ func testPeriodic(t *testing.T) {
 		nE = <-recorder.recorder
 		require.Equal(t, 3, nE.count)
 	})
+
 }
 
 func testPeriodicJitter(t *testing.T) {
