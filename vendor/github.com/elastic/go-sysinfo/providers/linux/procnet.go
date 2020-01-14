@@ -29,7 +29,7 @@ import (
 )
 
 // fillStruct is some reflection work that can dynamically fill one of our tagged `netstat` structs with netstat data
-func fillStruct(str interface{}, data map[string]map[string]int64) {
+func fillStruct(str interface{}, data map[string]map[string]uint64) {
 	val := reflect.ValueOf(str).Elem()
 	typ := reflect.TypeOf(str).Elem()
 
@@ -44,7 +44,7 @@ func fillStruct(str interface{}, data map[string]map[string]int64) {
 }
 
 // parseEntry parses two lines from the net files, the first line being keys, the second being values
-func parseEntry(line1, line2 string) (map[string]int64, error) {
+func parseEntry(line1, line2 string) (map[string]uint64, error) {
 	keyArr := strings.Split(strings.TrimSpace(line1), " ")
 	valueArr := strings.Split(strings.TrimSpace(line2), " ")
 
@@ -52,20 +52,36 @@ func parseEntry(line1, line2 string) (map[string]int64, error) {
 		return nil, errors.New("key and value lines are mismatched")
 	}
 
-	counters := make(map[string]int64, len(valueArr))
+	counters := make(map[string]uint64, len(valueArr))
 	for iter, value := range valueArr {
-		parsed, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error parsing string to int in line: %#v", valueArr)
+
+		// This if-else block is to deal with the MaxConn value in SNMP,
+		// which is a signed value according to RFC2012.
+		// This library emulates the behavior of the kernel: store all values as a uint, then cast to a signed value for printing
+		// Users of this library need to be aware that this value should be printed as a signed int or hex value to make it useful.
+		var parsed uint64
+		var err error
+		if strings.Contains(value, "-") {
+			signedParsed, err := strconv.ParseInt(value, 10, 64)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing string to int in line: %#v", valueArr)
+			}
+			parsed = uint64(signedParsed)
+		} else {
+			parsed, err = strconv.ParseUint(value, 10, 64)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing string to int in line: %#v", valueArr)
+			}
 		}
+
 		counters[keyArr[iter]] = parsed
 	}
 	return counters, nil
 }
 
 // parseNetFile parses an entire file, and returns a 2D map, representing how files are sorted by protocol
-func parseNetFile(body string) (map[string]map[string]int64, error) {
-	fileMetrics := make(map[string]map[string]int64)
+func parseNetFile(body string) (map[string]map[string]uint64, error) {
+	fileMetrics := make(map[string]map[string]uint64)
 	bodySplit := strings.Split(strings.TrimSpace(body), "\n")
 	// There should be an even number of lines. If not, something is wrong.
 	if len(bodySplit)%2 != 0 {

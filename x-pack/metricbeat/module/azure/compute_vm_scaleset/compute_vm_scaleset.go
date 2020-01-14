@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			},
 		}
 	}
-	ms.MapMetric = mapMetric
+	ms.MapMetrics = mapMetrics
 	return &MetricSet{
 		MetricSet: ms,
 	}, nil

@@ -25,6 +25,12 @@
 			"versionExact": "v0.40.0"
 		},
 		{
+			"checksumSHA1": "oiDi7i6Ksvm0Smkl9kjgUkr71yU=",
+			"path": "cloud.google.com/go/functions/metadata",
+			"revision": "fe5ac47354fef18304f2f4b6981c3cf149c84779",
+			"revisionTime": "2019-08-13T14:39:03Z"
+		},
+		{
 			"checksumSHA1": "+S/9jBntS1iHZwxkR64vsy97Gh8=",
 			"path": "cloud.google.com/go/iam",
 			"revision": "457ea5c15ccf3b87db582c450e80101989da35f7",
@@ -33,12 +39,24 @@
 			"versionExact": "v0.40.0"
 		},
 		{
+			"checksumSHA1": "JfGXEtr79UaxukcL05IERkjYm/g=",
+			"path": "cloud.google.com/go/internal",
+			"revision": "fe5ac47354fef18304f2f4b6981c3cf149c84779",
+			"revisionTime": "2019-08-13T14:39:03Z"
+		},
+		{
 			"checksumSHA1": "wQ4uGuRwMb24vG16pPQDOOCPkFo=",
 			"path": "cloud.google.com/go/internal/optional",
 			"revision": "457ea5c15ccf3b87db582c450e80101989da35f7",
 			"revisionTime": "2019-06-06T17:46:50Z",
 			"version": "v0.40.0",
 			"versionExact": "v0.40.0"
+		},
+		{
+			"checksumSHA1": "jHOn3QLqvr1luNqyOg24/BXLrsM=",
+			"path": "cloud.google.com/go/internal/trace",
+			"revision": "fe5ac47354fef18304f2f4b6981c3cf149c84779",
+			"revisionTime": "2019-08-13T14:39:03Z"
 		},
 		{
 			"checksumSHA1": "FSifvUBJjm4OsSU5rp5s5+bqvN0=",
@@ -79,6 +97,12 @@
 			"revisionTime": "2019-06-06T17:46:50Z",
 			"version": "v0.40.0",
 			"versionExact": "v0.40.0"
+		},
+		{
+			"checksumSHA1": "cKChGdNHPPcLUvPjenYJ1FMcc68=",
+			"path": "cloud.google.com/go/storage",
+			"revision": "fe5ac47354fef18304f2f4b6981c3cf149c84779",
+			"revisionTime": "2019-08-13T14:39:03Z"
 		},
 		{
 			"checksumSHA1": "6uv2eI5FyjWtTg5AsZ++csclSqc=",
@@ -348,14 +372,6 @@
 			"path": "github.com/Microsoft/hcsshim/osversion",
 			"revision": "84b0c364e1e3bb91e43b85bf20d72e7948666817",
 			"revisionTime": "2019-09-04T14:17:38Z"
-		},
-		{
-			"checksumSHA1": "srK5tLmK7dEdari4lk3r7eU5sUU=",
-			"path": "github.com/OneOfOne/xxhash",
-			"revision": "85d5025fe15b385888b1886ea99f722f549a6934",
-			"revisionTime": "2020-01-09T23:38:23Z",
-			"version": "v1.2.7",
-			"versionExact": "v1.2.7"
 		},
 		{
 			"checksumSHA1": "k3QogVVkVCGcCw4iMIxTWrnfiUc=",
@@ -1995,10 +2011,28 @@
 			"revisionTime": "2019-09-27T01:04:35Z"
 		},
 		{
+			"checksumSHA1": "NCbMhsHDjvCTNYw10fV7deTC8/4=",
+			"path": "github.com/containerd/continuity/fs",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
+		},
+		{
 			"checksumSHA1": "6aGvzibOCGGTbCFKOHRWIASC+Us=",
 			"path": "github.com/containerd/continuity/pathdriver",
 			"revision": "75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec",
 			"revisionTime": "2019-08-27T14:05:05Z"
+		},
+		{
+			"checksumSHA1": "za2TXa2xq+zMGLTZT/RPsUz/17s=",
+			"path": "github.com/containerd/continuity/syscallx",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
+		},
+		{
+			"checksumSHA1": "UxFYDqJHgqsKPBO0FQOHNoeo1Tk=",
+			"path": "github.com/containerd/continuity/sysx",
+			"revision": "26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4",
+			"revisionTime": "2020-01-07T19:41:36Z"
 		},
 		{
 			"checksumSHA1": "ARPWcCZaH5T/+LVCWHgAc2e3uwQ=",
@@ -2358,6 +2392,15 @@
 			"versionExact": "v19.03.5"
 		},
 		{
+			"checksumSHA1": "R4EHRKN+Xu8AhENs0xak3mZm4vg=",
+			"origin": "github.com/docker/engine/pkg/archive",
+			"path": "github.com/docker/docker/pkg/archive",
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
+		},
+		{
 			"checksumSHA1": "eMoRb/diYeuYLojU7ChN5DaETHc=",
 			"origin": "github.com/docker/engine/pkg/fileutils",
 			"path": "github.com/docker/docker/pkg/fileutils",
@@ -2460,6 +2503,15 @@
 			"checksumSHA1": "uJagSmJVfXoAt1ZsC0dJwU6l0yk=",
 			"origin": "github.com/docker/engine/pkg/plugins/transport",
 			"path": "github.com/docker/docker/pkg/plugins/transport",
+			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
+			"revisionTime": "2019-11-13T04:22:39Z",
+			"version": "v19.03.5",
+			"versionExact": "v19.03.5"
+		},
+		{
+			"checksumSHA1": "dj8atalGWftfM9vdzCsh9YF1Seg=",
+			"origin": "github.com/docker/engine/pkg/pools",
+			"path": "github.com/docker/docker/pkg/pools",
 			"revision": "ea84732a77251e0d7af278e2b7df1d6a59fca46b",
 			"revisionTime": "2019-11-13T04:22:39Z",
 			"version": "v19.03.5",
@@ -3040,60 +3092,60 @@
 			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "s37l3najJFu22RNPP9udnam+YnU=",
+			"checksumSHA1": "eV7V/y/SW5Slvn07K1VH0mZmKmg=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
 			"checksumSHA1": "GiZCjX17K265TtamGZZw4R2Jwbk=",
 			"path": "github.com/elastic/go-sysinfo/internal/registry",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
 			"checksumSHA1": "dVSTUnZHCLNd0tYIENqdj05RyI8=",
 			"path": "github.com/elastic/go-sysinfo/providers/darwin",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
-			"checksumSHA1": "Kc5GlAf7iwLd/d1X68JFM8b12GM=",
+			"checksumSHA1": "VXUC6tRsvez0VUvpby3AKoS+LVE=",
 			"path": "github.com/elastic/go-sysinfo/providers/linux",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
 			"checksumSHA1": "RWLvcP1w9ynKbuCqiW6prwd+EDU=",
 			"path": "github.com/elastic/go-sysinfo/providers/shared",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
 			"checksumSHA1": "SI4WoiEzBJFS73GRQV6EsfA90RI=",
 			"path": "github.com/elastic/go-sysinfo/providers/windows",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
-			"checksumSHA1": "dtxTdCkTAMgGmJS7Bn5jDXsQ8nA=",
+			"checksumSHA1": "MCYCYQjbvgi5ddkf20pp4SqWnBA=",
 			"path": "github.com/elastic/go-sysinfo/types",
-			"revision": "cee67141de1bdfb666367301f44e559e58b16734",
-			"revisionTime": "2020-01-03T17:30:45Z",
-			"version": "v1.2.1",
-			"versionExact": "v1.2.1"
+			"revision": "b719bc42e40963c707571af208683a049e61f07f",
+			"revisionTime": "2020-01-13T16:32:57Z",
+			"version": "v1.3.0",
+			"versionExact": "v1.3.0"
 		},
 		{
 			"checksumSHA1": "rdM+Flia4oo089kLcUUmogtO444=",
@@ -4074,10 +4126,20 @@
 			"revisionTime": "2019-08-23T10:51:29Z"
 		},
 		{
-			"checksumSHA1": "MA07KaAp1aPVheuopyrFr7pxANs=",
+			"checksumSHA1": "SInqynLK8NjJIeFs0Mtk4g8LJ+A=",
+			"path": "github.com/opencontainers/runc/libcontainer/system",
+			"revision": "d736ef14f0288d6993a1845745d6756cfc9ddd5a",
+			"revisionTime": "2019-09-30T16:36:09Z",
+			"version": "v1.0.0-rc9",
+			"versionExact": "v1.0.0-rc9"
+		},
+		{
+			"checksumSHA1": "mdUukOXCVJxmT0CufSKDeMg5JFM=",
 			"path": "github.com/opencontainers/runc/libcontainer/user",
-			"revision": "653207bc29a6d2d62b5d4f55b596467cb715a128",
-			"revisionTime": "2017-03-27T18:58:03Z"
+			"revision": "d736ef14f0288d6993a1845745d6756cfc9ddd5a",
+			"revisionTime": "2019-09-30T16:36:09Z",
+			"version": "v1.0.0-rc9",
+			"versionExact": "v1.0.0-rc9"
 		},
 		{
 			"checksumSHA1": "WmrPO1ovmQ7t7hs9yZGbr2SAoM4=",
@@ -5612,6 +5674,22 @@
 			"versionExact": "v0.14.0"
 		},
 		{
+			"checksumSHA1": "xzYkHGnGgOHW4QNWLR4jbx+81P0=",
+			"path": "google.golang.org/api/cloudfunctions/v1",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"revisionTime": "2019-06-24T17:16:18Z",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
+			"checksumSHA1": "FhzGDPlkW5SaQGtSgKnjQAiYVk0=",
+			"path": "google.golang.org/api/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"revisionTime": "2019-06-24T17:16:18Z",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
 			"checksumSHA1": "YIDE68w/xMptf6Nu9hHiOwXOvho=",
 			"path": "google.golang.org/api/googleapi",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
@@ -5658,6 +5736,12 @@
 			"revisionTime": "2019-11-15T18:09:15Z",
 			"version": "v0.14.0",
 			"versionExact": "v0.14.0"
+        },
+        {
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
 		},
 		{
 			"checksumSHA1": "zh9AcT6oNvhnOqb7w7njY48TkvI=",
@@ -5670,6 +5754,14 @@
 		{
 			"checksumSHA1": "2AyxThTPscWdy49fGsU2tg0Uyw8=",
 			"path": "google.golang.org/api/option",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"revisionTime": "2019-06-24T17:16:18Z",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
+			"checksumSHA1": "Aka6Sle3vs6xGP70PADl9lAlZIE=",
+			"path": "google.golang.org/api/storage/v1",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
 			"revisionTime": "2019-06-24T17:16:18Z",
 			"version": "v0.7.0",
@@ -5878,6 +5970,12 @@
 		{
 			"checksumSHA1": "mWjsifWBYj/tA+lOpAnJzk+x4hw=",
 			"path": "google.golang.org/genproto/googleapis/pubsub/v1",
+			"revision": "fa694d86fc64c7654a660f8908de4e879866748d",
+			"revisionTime": "2019-08-01T16:59:51Z"
+		},
+		{
+			"checksumSHA1": "EOkBjXBkCQcsEf9fk2KOQZcJO08=",
+			"path": "google.golang.org/genproto/googleapis/rpc/code",
 			"revision": "fa694d86fc64c7654a660f8908de4e879866748d",
 			"revisionTime": "2019-08-01T16:59:51Z"
 		},

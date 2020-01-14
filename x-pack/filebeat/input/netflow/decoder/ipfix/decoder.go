@@ -108,6 +108,7 @@ func (d DecoderIPFIX) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates [
 		}
 		template.ID = tID
 		template.ScopeFields = scopeCount
+		template.IsOptions = true
 		templates = append(templates, &template)
 	}
 	return templates, nil
