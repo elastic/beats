@@ -173,7 +173,10 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 		grouped[k] = clone
 	}
 
-	s, _ := normMap[streamsKey]
+	s, ok := normMap[streamsKey]
+	if !ok {
+		s = make([]interface{}, 0)
+	}
 
 	list, ok := s.([]interface{})
 	if !ok {

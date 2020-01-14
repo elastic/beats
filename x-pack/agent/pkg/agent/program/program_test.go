@@ -465,7 +465,7 @@ func TestGroupBy(t *testing.T) {
 		require.Equal(t, c2.Hash(), infosec1Config.Hash())
 	})
 
-	t.Run("no streams are defined", func(t *testing.T) {
+	t.Run("streams is an empty list", func(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
@@ -482,6 +482,32 @@ func TestGroupBy(t *testing.T) {
 				},
 			},
 			"streams": []map[string]interface{}{},
+		}
+
+		ast, err := transpiler.NewAST(sConfig)
+		require.NoError(t, err)
+
+		grouped, err := groupByOutputs(ast)
+		require.NoError(t, err)
+		require.Equal(t, 0, len(grouped))
+	})
+
+	t.Run("no streams are defined", func(t *testing.T) {
+		sConfig := map[string]interface{}{
+			"outputs": map[string]interface{}{
+				"default": map[string]interface{}{
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
+				},
+				"infosec1": map[string]interface{}{
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
+				},
+			},
 		}
 
 		ast, err := transpiler.NewAST(sConfig)
