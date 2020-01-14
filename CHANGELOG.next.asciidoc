@@ -43,6 +43,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- TLS: Fields have been changed to adapt to ECS. {pull}15497[15497]
+- TLS: The behavior of send_certificates and include_raw_certificates options has changed. {pull}15497[15497]
 
 *Winlogbeat*
 

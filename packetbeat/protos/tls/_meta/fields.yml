@@ -1,410 +1,634 @@
-- key: tls
-  title: "TLS"
+- key: tls_detailed
+  title: "Detailed TLS"
   description: >
-    TLS-specific event fields.
+    Detailed TLS-specific event fields.
   fields:
     - name: tls
       type: group
       fields:
-        - name: version
-          type: keyword
-          description: >
-            The version of the TLS protocol used.
-          example: "TLS 1.3"
-
-        - name: handshake_completed
-          type: boolean
-          description: >
-            Whether the TLS negotiation has been successful and the session has
-            transitioned to encrypted mode.
-
-        - name: resumed
-          type: boolean
-          description: >
-            If the TLS session has been resumed from a previous session.
-
-        - name: resumption_method
-          type: keyword
-          description: >
-            If the session has been resumed, the underlying method used. One of
-            "id" for TLS session ID or "ticket" for TLS ticket extension.
-
-        - name: client_certificate_requested
-          type: boolean
-          description: >
-            Whether the server has requested the client to authenticate itself
-            using a client certificate.
-
-        - name: client_hello
+        - name: detailed
           type: group
+          default_fields: false
           fields:
-            - name: version
-              type: keyword
-              description: >
-                The version of the TLS protocol by which the client wishes to
-                communicate during this session.
+          - name: version
+            type: keyword
+            description: >
+              The version of the TLS protocol used.
+            example: "TLS 1.3"
 
-            - name: supported_ciphers
-              type: array
-              description: >
-                List of ciphers the client is willing to use for this session.
-                See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+          - name: resumption_method
+            type: keyword
+            description: >
+              If the session has been resumed, the underlying method used. One of
+              "id" for TLS session ID or "ticket" for TLS ticket extension.
 
-            - name: supported_compression_methods
-              type: array
-              description: >
-                The list of compression methods the client supports.
-                See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
+          - name: client_certificate_requested
+            type: boolean
+            description: >
+              Whether the server has requested the client to authenticate itself
+              using a client certificate.
 
-            - name: extensions
-              type: group
-              description: The hello extensions provided by the client.
-              fields:
-                - name: server_name_indication
-                  type: keyword
-                  description: List of hostnames
-
-                - name: application_layer_protocol_negotiation
-                  type: keyword
-                  description: >
-                    List of application-layer protocols the client is willing to use.
-
-                - name: session_ticket
-                  type: keyword
-                  description: >
-                    Length of the session ticket, if provided, or an empty string
-                    to advertise support for tickets.
-
-                - name: supported_versions
-                  type: keyword
-                  description: >
-                    List of TLS versions that the client is willing to use.
-
-                - name: supported_groups
-                  type: keyword
-                  description: >
-                    List of Elliptic Curve Cryptography (ECC) curve groups
-                    supported by the client.
-
-                - name: signature_algorithms
-                  type: keyword
-                  description: >
-                    List of signature algorithms that may be use in digital
-                    signatures.
-
-                - name: ec_points_formats
-                  type: keyword
-                  description: >
-                    List of Elliptic Curve (EC) point formats. Indicates the
-                    set of point formats that the client can parse.
-
-                - name: _unparsed_
-                  type: keyword
-                  description: >
-                    List of extensions that were left unparsed by Packetbeat.
-
-        - name: server_hello
-          type: group
-          fields:
-            - name: version
-              type: keyword
-              description: >
-                The version of the TLS protocol that is used for this session.
-                It is the highest version supported by the server not exceeding
-                the version requested in the client hello.
-
-            - name: selected_cipher
-              type: keyword
-              description: >
-                The cipher suite selected by the server from the list provided
-                by in the client hello.
-
-            - name: selected_compression_method
-              type: keyword
-              description: >
-                The compression method selected by the server from the list
-                provided in the client hello.
-
-            - name: session_id
-              type: keyword
-              description: >
-                Unique number to identify the session for the corresponding
-                connection with the client.
-
-            - name: extensions
-              type: group
-              description: The hello extensions provided by the server.
-              fields:
-                - name: application_layer_protocol_negotiation
-                  type: array
-                  description: Negotiated application layer protocol
-
-                - name: session_ticket
-                  type: keyword
-                  description: >
-                    Used to announce that a session ticket will be provided
-                    by the server. Always an empty string.
-
-                - name: supported_versions
-                  type: keyword
-                  description: >
-                    Negotiated TLS version to be used.
-
-                - name: ec_points_formats
-                  type: keyword
-                  description: >
-                    List of Elliptic Curve (EC) point formats. Indicates the
-                    set of point formats that the server can parse.
-
-                - name: _unparsed_
-                  type: keyword
-                  description: >
-                    List of extensions that were left unparsed by Packetbeat.
-
-        - name: client_certificate
-          type: group
-          description: Certificate provided by the client for authentication.
-          fields:
-
-            - name: version
-              type: long
-              description: X509 format version.
-
-            - name: serial_number
-              type: keyword
-              description: The certificate's serial number.
-
-            - name: not_before
-              type: date
-              description: Date before which the certificate is not valid.
-
-            - name: not_after
-              type: date
-              description: Date after which the certificate expires.
-
-            - name: public_key_algorithm
-              type: keyword
-              description: >
-                The algorithm used for this certificate's public key.
-                One of RSA, DSA or ECDSA.
-
-            - name: public_key_size
-              type: long
-              description: Size of the public key.
-
-            - name: signature_algorithm
-              type: keyword
-              description: >
-                The algorithm used for the certificate's signature.
-
-            - name: alternative_names
-              type: array
-              description: Subject Alternative Names for this certificate.
-
-            - name: raw
-              type: keyword
-              description: The raw certificate in PEM format.
-
-            - name: subject
-              type: group
-              description: Subject represented by this certificate.
-              fields:
-                - name: country
-                  type: keyword
-                  description: Country code.
-
-                - name: organization
-                  type: keyword
-                  description: Organization name.
-
-                - name: organizational_unit
-                  type: keyword
-                  description: Unit within organization.
-
-                - name: province
-                  type: keyword
-                  description: Province or region within country.
-
-                - name: common_name
-                  type: keyword
-                  description: Name or host name identified by the certificate.
-
-            - name: issuer
-              type: group
-              description: Entity that issued and signed this certificate.
-              fields:
-                - name: country
-                  type: keyword
-                  description: Country code.
-
-                - name: organization
-                  type: keyword
-                  description: Organization name.
-
-                - name: organizational_unit
-                  type: keyword
-                  description: Unit within organization.
-
-                - name: province
-                  type: keyword
-                  description: Province or region within country.
-
-                - name: common_name
-                  type: keyword
-                  description: Name or host name identified by the certificate.
-
-            - name: fingerprint
-              type: group
-              fields:
-              - name: md5
+          - name: client_hello
+            type: group
+            fields:
+              - name: version
                 type: keyword
-                description: Certificate's MD5 fingerprint.
+                description: >
+                  The version of the TLS protocol by which the client wishes to
+                  communicate during this session.
 
-              - name: sha1
+              - name: session_id
                 type: keyword
-                description: Certificate's SHA-1 fingerprint.
+                description: >
+                  Unique number to identify the session for the corresponding
+                  connection with the client.
 
-              - name: sha256
+              - name: supported_compression_methods
+                type: array
+                description: >
+                  The list of compression methods the client supports.
+                  See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
+
+              - name: extensions
+                type: group
+                description: The hello extensions provided by the client.
+                fields:
+                  - name: server_name_indication
+                    type: keyword
+                    description: List of hostnames
+
+                  - name: application_layer_protocol_negotiation
+                    type: keyword
+                    description: >
+                      List of application-layer protocols the client is willing to use.
+
+                  - name: session_ticket
+                    type: keyword
+                    description: >
+                      Length of the session ticket, if provided, or an empty string
+                      to advertise support for tickets.
+
+                  - name: supported_versions
+                    type: keyword
+                    description: >
+                      List of TLS versions that the client is willing to use.
+
+                  - name: supported_groups
+                    type: keyword
+                    description: >
+                      List of Elliptic Curve Cryptography (ECC) curve groups
+                      supported by the client.
+
+                  - name: signature_algorithms
+                    type: keyword
+                    description: >
+                      List of signature algorithms that may be use in digital
+                      signatures.
+
+                  - name: ec_points_formats
+                    type: keyword
+                    description: >
+                      List of Elliptic Curve (EC) point formats. Indicates the
+                      set of point formats that the client can parse.
+
+                  - name: _unparsed_
+                    type: keyword
+                    description: >
+                      List of extensions that were left unparsed by Packetbeat.
+
+          - name: server_hello
+            type: group
+            fields:
+              - name: version
                 type: keyword
-                description: Certificate's SHA-256 fingerprint.
+                description: >
+                  The version of the TLS protocol that is used for this session.
+                  It is the highest version supported by the server not exceeding
+                  the version requested in the client hello.
 
-
-        - name: server_certificate
-          type: group
-          description: Certificate provided by the server for authentication.
-          fields:
-
-            - name: version
-              type: long
-              description: X509 format version.
-
-            - name: serial_number
-              type: keyword
-              description: The certificate's serial number.
-
-            - name: not_before
-              type: date
-              description: Date before which the certificate is not valid.
-
-            - name: not_after
-              type: date
-              description: Date after which the certificate expires.
-
-            - name: public_key_algorithm
-              type: keyword
-              description: >
-                The algorithm used for this certificate's public key.
-                One of RSA, DSA or ECDSA.
-
-            - name: public_key_size
-              type: long
-              description: Size of the public key.
-
-            - name: signature_algorithm
-              type: keyword
-              description: >
-                The algorithm used for the certificate's signature.
-
-            - name: alternative_names
-              type: array
-              description: Subject Alternative Names for this certificate.
-
-            - name: raw
-              type: keyword
-              description: The raw certificate in PEM format.
-
-            - name: subject
-              type: group
-              description: Subject represented by this certificate.
-              fields:
-                - name: country
-                  type: keyword
-                  description: Country code.
-
-                - name: organization
-                  type: keyword
-                  description: Organization name.
-
-                - name: organizational_unit
-                  type: keyword
-                  description: Unit within organization.
-
-                - name: province
-                  type: keyword
-                  description: Province or region within country.
-
-                - name: common_name
-                  type: keyword
-                  description: Name or host name identified by the certificate.
-
-            - name: issuer
-              type: group
-              description: Entity that issued and signed this certificate.
-              fields:
-                - name: country
-                  type: keyword
-                  description: Country code.
-
-                - name: organization
-                  type: keyword
-                  description: Organization name.
-
-                - name: organizational_unit
-                  type: keyword
-                  description: Unit within organization.
-
-                - name: province
-                  type: keyword
-                  description: Province or region within country.
-
-                - name: common_name
-                  type: keyword
-                  description: Name or host name identified by the certificate.
-
-            - name: fingerprint
-              type: group
-              fields:
-              - name: md5
+              - name: selected_compression_method
                 type: keyword
-                description: Certificate's MD5 fingerprint.
+                description: >
+                  The compression method selected by the server from the list
+                  provided in the client hello.
 
-              - name: sha1
+              - name: session_id
                 type: keyword
-                description: Certificate's SHA-1 fingerprint.
+                description: >
+                  Unique number to identify the session for the corresponding
+                  connection with the client.
 
-              - name: sha256
+              - name: extensions
+                type: group
+                description: The hello extensions provided by the server.
+                fields:
+                  - name: application_layer_protocol_negotiation
+                    type: array
+                    description: Negotiated application layer protocol
+
+                  - name: session_ticket
+                    type: keyword
+                    description: >
+                      Used to announce that a session ticket will be provided
+                      by the server. Always an empty string.
+
+                  - name: supported_versions
+                    type: keyword
+                    description: >
+                      Negotiated TLS version to be used.
+
+                  - name: ec_points_formats
+                    type: keyword
+                    description: >
+                      List of Elliptic Curve (EC) point formats. Indicates the
+                      set of point formats that the server can parse.
+
+                  - name: _unparsed_
+                    type: keyword
+                    description: >
+                      List of extensions that were left unparsed by Packetbeat.
+
+          - name: client_certificate
+            type: group
+            description: Certificate provided by the client for authentication.
+            fields:
+
+              - name: version
+                type: long
+                description: X509 format version.
+
+              - name: serial_number
                 type: keyword
-                description: Certificate's SHA-256 fingerprint.
+                description: The certificate's serial number.
 
-        - name: server_certificate_chain
-          type: array
-          description: Chain of trust for the server certificate.
+              - name: not_before
+                type: date
+                description: Date before which the certificate is not valid.
 
-        - name: client_certificate_chain
-          type: array
-          description: Chain of trust for the client certificate.
+              - name: not_after
+                type: date
+                description: Date after which the certificate expires.
 
-        - name: alert_types
-          type: keyword
-          description: >
-            An array containing the TLS alert type for every alert received.
+              - name: public_key_algorithm
+                type: keyword
+                description: >
+                  The algorithm used for this certificate's public key.
+                  One of RSA, DSA or ECDSA.
 
-        - name: fingerprints
-          type: group
-          description: Fingerprints for this TLS session.
-          fields:
+              - name: public_key_size
+                type: long
+                description: Size of the public key.
 
-            - name: ja3
-              type: group
-              description: JA3 TLS client fingerprint
-              fields:
+              - name: signature_algorithm
+                type: keyword
+                description: >
+                  The algorithm used for the certificate's signature.
 
-                - name: hash
-                  type: keyword
-                  description: >
-                    The JA3 fingerprint hash for the client side.
+              - name: alternative_names
+                type: array
+                description: Subject Alternative Names for this certificate.
 
-                - name: str
-                  type: keyword
-                  description: >
-                    The JA3 string used to calculate the hash.
+              - name: subject
+                type: group
+                description: Subject represented by this certificate.
+                fields:
+                  - name: country
+                    type: keyword
+                    description: Country code.
+
+                  - name: organization
+                    type: keyword
+                    description: Organization name.
+
+                  - name: organizational_unit
+                    type: keyword
+                    description: Unit within organization.
+
+                  - name: province
+                    type: keyword
+                    description: Province or region within country.
+
+                  - name: common_name
+                    type: keyword
+                    description: Name or host name identified by the certificate.
+
+                  - name: locality
+                    type: keyword
+                    description: Locality.
+
+              - name: issuer
+                type: group
+                description: Entity that issued and signed this certificate.
+                fields:
+                  - name: country
+                    type: keyword
+                    description: Country code.
+
+                  - name: organization
+                    type: keyword
+                    description: Organization name.
+
+                  - name: organizational_unit
+                    type: keyword
+                    description: Unit within organization.
+
+                  - name: province
+                    type: keyword
+                    description: Province or region within country.
+
+                  - name: common_name
+                    type: keyword
+                    description: Name or host name identified by the certificate.
+
+                  - name: locality
+                    type: keyword
+                    description: Locality.
+
+          - name: server_certificate
+            type: group
+            description: Certificate provided by the server for authentication.
+            fields:
+
+              - name: version
+                type: long
+                description: X509 format version.
+
+              - name: serial_number
+                type: keyword
+                description: The certificate's serial number.
+
+              - name: not_before
+                type: date
+                description: Date before which the certificate is not valid.
+
+              - name: not_after
+                type: date
+                description: Date after which the certificate expires.
+
+              - name: public_key_algorithm
+                type: keyword
+                description: >
+                  The algorithm used for this certificate's public key.
+                  One of RSA, DSA or ECDSA.
+
+              - name: public_key_size
+                type: long
+                description: Size of the public key.
+
+              - name: signature_algorithm
+                type: keyword
+                description: >
+                  The algorithm used for the certificate's signature.
+
+              - name: alternative_names
+                type: array
+                description: Subject Alternative Names for this certificate.
+
+              - name: subject
+                type: group
+                description: Subject represented by this certificate.
+                fields:
+                  - name: country
+                    type: keyword
+                    description: Country code.
+
+                  - name: organization
+                    type: keyword
+                    description: Organization name.
+
+                  - name: organizational_unit
+                    type: keyword
+                    description: Unit within organization.
+
+                  - name: province
+                    type: keyword
+                    description: Province or region within country.
+
+                  - name: common_name
+                    type: keyword
+                    description: Name or host name identified by the certificate.
+
+                  - name: locality
+                    type: keyword
+                    description: Locality.
+
+              - name: issuer
+                type: group
+                description: Entity that issued and signed this certificate.
+                fields:
+                  - name: country
+                    type: keyword
+                    description: Country code.
+
+                  - name: organization
+                    type: keyword
+                    description: Organization name.
+
+                  - name: organizational_unit
+                    type: keyword
+                    description: Unit within organization.
+
+                  - name: province
+                    type: keyword
+                    description: Province or region within country.
+
+                  - name: common_name
+                    type: keyword
+                    description: Name or host name identified by the certificate.
+
+                  - name: locality
+                    type: keyword
+                    description: Locality.
+
+          - name: server_certificate_chain
+            type: array
+            description: Chain of trust for the server certificate.
+
+          - name: client_certificate_chain
+            type: array
+            description: Chain of trust for the client certificate.
+
+          - name: alert_types
+            type: keyword
+            description: >
+              An array containing the TLS alert type for every alert received.
+
+    #
+    # Aliases from pre-ECS fields to tls.detailed
+    #
+
+    # Replaced fields
+
+    - name: tls.handshake_completed
+      type: alias
+      path: tls.established
+
+    - name: tls.client_hello.supported_ciphers
+      type: alias
+      path: tls.client.supported_ciphers
+
+    - name: tls.server_hello.selected_cipher
+      type: alias
+      path: tls.cipher
+
+    - name: tls.fingerprints.ja3
+      type: alias
+      path: tls.client.ja3
+
+    # Moved fields
+
+    - name: tls.resumption_method
+      type: alias
+      path: tls.detailed.resumption_method
+
+    - name: tls.client_certificate_requested
+      type: alias
+      path: tls.detailed.client_certificate_requested
+
+    - name: tls.client_hello.version
+      type: alias
+      path: tls.detailed.client_hello.version
+
+    - name: tls.client_hello.session_id
+      type: alias
+      path: tls.detailed.client_hello.session_id
+
+    - name: tls.client_hello.supported_compression_methods
+      type: alias
+      path: tls.detailed.client_hello.supported_compression_methods
+
+    - name: tls.client_hello.extensions.server_name_indication
+      type: alias
+      path: tls.detailed.client_hello.extensions.server_name_indication
+
+    - name: tls.client_hello.extensions.application_layer_protocol_negotiation
+      type: alias
+      path: tls.detailed.client_hello.extensions.application_layer_protocol_negotiation
+
+    - name: tls.client_hello.extensions.session_ticket
+      type: alias
+      path: tls.detailed.client_hello.extensions.session_ticket
+
+    - name: tls.client_hello.extensions.supported_versions
+      type: alias
+      path: tls.detailed.client_hello.extensions.supported_versions
+
+    - name: tls.client_hello.extensions.supported_groups
+      type: alias
+      path: tls.detailed.client_hello.extensions.supported_groups
+
+    - name: tls.client_hello.extensions.signature_algorithms
+      type: alias
+      path: tls.detailed.client_hello.extensions.signature_algorithms
+
+    - name: tls.client_hello.extensions.ec_points_formats
+      type: alias
+      path: tls.detailed.client_hello.extensions.ec_points_formats
+
+    - name: tls.client_hello.extensions._unparsed_
+      type: alias
+      path: tls.detailed.client_hello.extensions._unparsed_
+
+    - name: tls.server_hello.version
+      type: alias
+      path: tls.detailed.server_hello.version
+
+    - name: tls.server_hello.selected_compression_method
+      type: alias
+      path: tls.detailed.server_hello.selected_compression_method
+
+    - name: tls.server_hello.session_id
+      type: alias
+      path: tls.detailed.server_hello.session_id
+
+    - name: tls.server_hello.extensions.application_layer_protocol_negotiation
+      type: alias
+      path: tls.detailed.server_hello.extensions.application_layer_protocol_negotiation
+
+    - name: tls.server_hello.extensions.session_ticket
+      type: alias
+      path: tls.detailed.server_hello.extensions.session_ticket
+
+    - name: tls.server_hello.extensions.supported_versions
+      type: alias
+      path: tls.detailed.server_hello.extensions.supported_versions
+
+    - name: tls.server_hello.extensions.ec_points_formats
+      type: alias
+      path: tls.detailed.server_hello.extensions.ec_points_formats
+
+    - name: tls.server_hello.extensions._unparsed_
+      type: alias
+      path: tls.detailed.server_hello.extensions._unparsed_
+
+    - name: tls.client_certificate.version
+      type: alias
+      path: tls.detailed.client_certificate.version
+
+    - name: tls.client_certificate.serial_number
+      type: alias
+      path: tls.detailed.client_certificate.serial_number
+
+    - name: tls.client_certificate.not_before
+      type: alias
+      path: tls.detailed.client_certificate.not_before
+
+    - name: tls.client_certificate.not_after
+      type: alias
+      path: tls.detailed.client_certificate.not_after
+
+    - name: tls.client_certificate.public_key_algorithm
+      type: alias
+      path: tls.detailed.client_certificate.public_key_algorithm
+
+    - name: tls.client_certificate.public_key_size
+      type: alias
+      path: tls.detailed.client_certificate.public_key_size
+
+    - name: tls.client_certificate.signature_algorithm
+      type: alias
+      path: tls.detailed.client_certificate.signature_algorithm
+
+    - name: tls.client_certificate.alternative_names
+      type: alias
+      path: tls.detailed.client_certificate.alternative_names
+
+    - name: tls.client_certificate.subject.country
+      type: alias
+      path: tls.detailed.client_certificate.subject.country
+
+    - name: tls.client_certificate.subject.organization
+      type: alias
+      path: tls.detailed.client_certificate.subject.organization
+
+    - name: tls.client_certificate.subject.organizational_unit
+      type: alias
+      path: tls.detailed.client_certificate.subject.organizational_unit
+
+    - name: tls.client_certificate.subject.province
+      type: alias
+      path: tls.detailed.client_certificate.subject.province
+
+    - name: tls.client_certificate.subject.common_name
+      type: alias
+      path: tls.detailed.client_certificate.subject.common_name
+
+    - name: tls.client_certificate.subject.locality
+      type: alias
+      path: tls.detailed.client_certificate.subject.locality
+
+    - name: tls.client_certificate.issuer.country
+      type: alias
+      path: tls.detailed.client_certificate.issuer.country
+
+    - name: tls.client_certificate.issuer.organization
+      type: alias
+      path: tls.detailed.client_certificate.issuer.organization
+
+    - name: tls.client_certificate.issuer.organizational_unit
+      type: alias
+      path: tls.detailed.client_certificate.issuer.organizational_unit
+
+    - name: tls.client_certificate.issuer.province
+      type: alias
+      path: tls.detailed.client_certificate.issuer.province
+
+    - name: tls.client_certificate.issuer.common_name
+      type: alias
+      path: tls.detailed.client_certificate.issuer.common_name
+
+    - name: tls.client_certificate.issuer.locality
+      type: alias
+      path: tls.detailed.client_certificate.issuer.locality
+
+    - name: tls.server_certificate.version
+      type: alias
+      path: tls.detailed.server_certificate.version
+
+    - name: tls.server_certificate.serial_number
+      type: alias
+      path: tls.detailed.server_certificate.serial_number
+
+    - name: tls.server_certificate.not_before
+      type: alias
+      path: tls.detailed.server_certificate.not_before
+
+    - name: tls.server_certificate.not_after
+      type: alias
+      path: tls.detailed.server_certificate.not_after
+
+    - name: tls.server_certificate.public_key_algorithm
+      type: alias
+      path: tls.detailed.server_certificate.public_key_algorithm
+
+    - name: tls.server_certificate.public_key_size
+      type: alias
+      path: tls.detailed.server_certificate.public_key_size
+
+    - name: tls.server_certificate.signature_algorithm
+      type: alias
+      path: tls.detailed.server_certificate.signature_algorithm
+
+    - name: tls.server_certificate.alternative_names
+      type: alias
+      path: tls.detailed.server_certificate.alternative_names
+
+    - name: tls.server_certificate.subject.country
+      type: alias
+      path: tls.detailed.server_certificate.subject.country
+
+    - name: tls.server_certificate.subject.organization
+      type: alias
+      path: tls.detailed.server_certificate.subject.organization
+
+    - name: tls.server_certificate.subject.organizational_unit
+      type: alias
+      path: tls.detailed.server_certificate.subject.organizational_unit
+
+    - name: tls.server_certificate.subject.province
+      type: alias
+      path: tls.detailed.server_certificate.subject.province
+
+    - name: tls.server_certificate.subject.common_name
+      type: alias
+      path: tls.detailed.server_certificate.subject.common_name
+
+    - name: tls.server_certificate.subject.locality
+      type: alias
+      path: tls.detailed.server_certificate.subject.locality
+
+    - name: tls.server_certificate.issuer.country
+      type: alias
+      path: tls.detailed.server_certificate.issuer.country
+
+    - name: tls.server_certificate.issuer.organization
+      type: alias
+      path: tls.detailed.server_certificate.issuer.organization
+
+    - name: tls.server_certificate.issuer.organizational_unit
+      type: alias
+      path: tls.detailed.server_certificate.issuer.organizational_unit
+
+    - name: tls.server_certificate.issuer.province
+      type: alias
+      path: tls.detailed.server_certificate.issuer.province
+
+    - name: tls.server_certificate.issuer.common_name
+      type: alias
+      path: tls.detailed.server_certificate.issuer.common_name
+
+    - name: tls.server_certificate.issuer.locality
+      type: alias
+      path: tls.detailed.server_certificate.issuer.locality
+
+    - name: tls.server_certificate_chain
+      type: alias
+      path: tls.detailed.server_certificate_chain
+
+    - name: tls.client_certificate_chain
+      type: alias
+      path: tls.detailed.client_certificate_chain
+
+    - name: tls.alert_types
+      type: alias
+      path: tls.detailed.alert_types
