@@ -20,6 +20,8 @@ package util
 import (
 	"testing"
 
+	"k8s.io/client-go/tools/cache"
+
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -147,6 +149,11 @@ func (m *mockWatcher) Start() error {
 func (m *mockWatcher) Stop() {
 
 }
+
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
+}
+
+func (m *mockWatcher) Store() cache.Store {
+	return nil
 }
