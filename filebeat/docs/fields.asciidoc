@@ -12898,7 +12898,7 @@ type: long
 *`netflow.class_id`*::
 +
 --
-type: short
+type: long
 
 --
 
