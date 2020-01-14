@@ -69,6 +69,11 @@ func (ad *actionDispatcher) key(a action) string {
 }
 
 func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
+	if len(actions) == 0 {
+		ad.log.Debug("No action to dispatch")
+		return nil
+	}
+
 	ad.log.Debugf(
 		"Dispatch %d actions of types: %s",
 		len(actions),

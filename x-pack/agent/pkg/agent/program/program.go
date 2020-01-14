@@ -175,7 +175,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 	s, ok := normMap[streamsKey]
 	if !ok {
-		return nil, errors.New("no streams are configured")
+		s = make([]interface{}, 0)
 	}
 
 	list, ok := s.([]interface{})
