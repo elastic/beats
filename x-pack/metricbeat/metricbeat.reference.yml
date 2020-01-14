@@ -427,6 +427,7 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+    - pubsub
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
