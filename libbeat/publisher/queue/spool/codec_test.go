@@ -30,17 +30,19 @@ import (
 
 func TestEncodeDecode(t *testing.T) {
 	tests := map[string]codecID{
-		"jsob":   codecJSON,
+		"json":   codecJSON,
 		"ubjson": codecUBJSON,
 		"cborl":  codecCBORL,
 	}
 
+	fieldTimeStr := "2020-01-14T20:33:23.779Z"
+	fieldTime, _ := time.Parse(time.RFC3339Nano, fieldTimeStr)
 	event := publisher.Event{
 		Content: beat.Event{
 			Timestamp: time.Now().Round(0),
 			Fields: common.MapStr{
-				"time":       time.Now().UTC().Round(time.Millisecond),
-				"commontime": common.Time(time.Now().UTC().Round(time.Millisecond)),
+				"time":       fieldTime,
+				"commontime": common.Time(fieldTime),
 			},
 		},
 	}
@@ -48,8 +50,8 @@ func TestEncodeDecode(t *testing.T) {
 		Content: beat.Event{
 			Timestamp: event.Content.Timestamp,
 			Fields: common.MapStr{
-				"time":       event.Content.Fields["time"].(time.Time).Format(time.RFC3339Nano),
-				"commontime": event.Content.Fields["commontime"].(common.Time).String(),
+				"time":       fieldTime.Format(time.RFC3339Nano),
+				"commontime": common.Time(fieldTime).String(),
 			},
 		},
 	}
