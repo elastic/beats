@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/common/x509util"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -183,7 +182,7 @@ func (header *recordHeader) isValid() bool {
 	return header.version.major == 3 && header.length <= maxTLSRecordLength
 }
 
-func (hello helloMessage) toMap() common.MapStr {
+func (hello *helloMessage) toMap() common.MapStr {
 	m := common.MapStr{
 		"version": fmt.Sprintf("%d.%d", hello.version.major, hello.version.minor),
 	}
@@ -191,20 +190,13 @@ func (hello helloMessage) toMap() common.MapStr {
 		m["session_id"] = hello.sessionID
 	}
 
-	if len(hello.supported.cipherSuites) > 0 || len(hello.supported.compression) > 0 {
-		ciphers := make([]string, len(hello.supported.cipherSuites))
-		for idx, code := range hello.supported.cipherSuites {
-			ciphers[idx] = code.String()
-		}
-		m["supported_ciphers"] = ciphers
-
+	if len(hello.supported.compression) > 0 {
 		comp := make([]string, len(hello.supported.compression))
 		for idx, code := range hello.supported.compression {
 			comp[idx] = code.String()
 		}
 		m["supported_compression_methods"] = comp
 	} else {
-		m["selected_cipher"] = hello.selected.cipherSuite.String()
 		m["selected_compression_method"] = hello.selected.compression.String()
 	}
 
@@ -212,6 +204,14 @@ func (hello helloMessage) toMap() common.MapStr {
 		m["extensions"] = hello.extensions.Parsed
 	}
 	return m
+}
+
+func (hello *helloMessage) supportedCiphers() []string {
+	ciphers := make([]string, len(hello.supported.cipherSuites))
+	for idx, code := range hello.supported.cipherSuites {
+		ciphers[idx] = code.String()
+	}
+	return ciphers
 }
 
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
@@ -512,6 +512,31 @@ func (version tlsVersion) String() string {
 	return fmt.Sprintf("(raw %d.%d)", version.major, version.minor)
 }
 
+// ProtocolVersion represents a version of the TLS protocol.
+type ProtocolVersion struct {
+	// Protocol in use. One of "tls", "ssl" or "unknown".
+	Protocol string
+	// Version is the protocol version, as in "1.3" for tls or "3.0" for ssl.
+	Version string
+}
+
+// GetProtocolVersion returns the protocol and protocol version number
+// associated to the raw TLS protocol version.
+func (version tlsVersion) GetProtocolVersion() ProtocolVersion {
+	if version.major == 3 {
+		if version.minor == 0 {
+			return ProtocolVersion{Protocol: "ssl", Version: "3.0"}
+		}
+		return ProtocolVersion{Protocol: "tls", Version: fmt.Sprintf("1.%d", version.minor-1)}
+	}
+	return ProtocolVersion{Protocol: "unknown", Version: fmt.Sprintf("%d.%d", version.major, version.minor)}
+}
+
+// IsZero returns if this version is the zero value (unset).
+func (version tlsVersion) IsZero() bool {
+	return version.major == 0 && version.minor == 0
+}
+
 func getKeySize(key interface{}) int {
 	if key == nil {
 		return 0
@@ -541,9 +566,8 @@ func getKeySize(key interface{}) int {
 	return 0
 }
 
-// certToMap takes an x509 cert and converts it into a map. If includeRaw is set
-// to true a PEM encoded copy of the cert is encoded into the map as well.
-func certToMap(cert *x509.Certificate, includeRaw bool, hashes []*FingerprintAlgorithm) common.MapStr {
+// certToMap takes an x509 cert and converts it into a map.
+func certToMap(cert *x509.Certificate) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
@@ -564,16 +588,6 @@ func certToMap(cert *x509.Certificate, includeRaw bool, hashes []*FingerprintAlg
 	}
 	if len(san) > 0 {
 		certMap["alternative_names"] = san
-	}
-	if includeRaw {
-		certMap["raw"] = x509util.CertToPEMString(cert)
-	}
-	if len(hashes) > 0 {
-		fingerprints := common.MapStr{}
-		for _, hash := range hashes {
-			fingerprints[hash.name] = hash.algo.Hash(cert.Raw)
-		}
-		certMap["fingerprint"] = fingerprints
 	}
 	return certMap
 }
