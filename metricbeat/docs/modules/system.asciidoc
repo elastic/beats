@@ -1,0 +1,183 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-system]]
+== System module
+
+The System module allows you to monitor your servers. Because the System module
+always applies to the local server, the `hosts` config option is not needed.
+
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process`, and
+`process_summary`. To disable a default metricset, comment it out in the
+`modules.d/system.yml` configuration file. If _all_ metricsets are commented out
+and the System module is enabled, {beatname_uc} uses the default metricsets.
+
+Note that certain metricsets may access `/proc` to gather process information,
+and the resulting `ptrace_may_access()` call by the kernel to check for
+permissions can be blocked by
+https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor
+and other LSM software], even though the System module doesn't use `ptrace`
+directly.
+
+[float]
+=== Dashboard
+
+The System module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_system_dashboard.png[]
+
+
+[float]
+=== Example configuration
+
+The System module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    #- load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    - uptime          # System Uptime
+    - socket_summary  # Socket summary
+    #- core           # Per CPU core usage
+    #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
+    #- raid           # Raid
+    #- socket         # Sockets and connection info (linux only)
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages"]  # The other available option is ticks.
+
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  # If not set, types associated to virtual filesystems are automatically
+  # added when this information is available in the system (e.g. the list of
+  # `nodev` types in `/proc/filesystem`).
+  #filesystem.ignore_types: []
+
+  # These options allow you to filter out all processes that are not
+  # in the top N by CPU or memory, in order to reduce the number of documents created.
+  # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
+  # is included.
+  #process.include_top_n:
+
+    # Set to false to disable this feature and include all processes
+    #enabled: true
+
+    # How many processes to include from the top by CPU. The processes are sorted
+    # by the `system.process.cpu.total.pct` field.
+    #by_cpu: 0
+
+    # How many processes to include from the top by memory. The processes are sorted
+    # by the `system.process.memory.rss.bytes` field.
+    #by_memory: 0
+
+  # If false, cmdline of a process is not cached.
+  #process.cmdline.cache.enabled: true
+
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
+
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
+
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
+
+  # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
+  #socket.reverse_lookup.enabled: false
+  #socket.reverse_lookup.success_ttl: 60s
+  #socket.reverse_lookup.failure_ttl: 60s
+
+  # Diskio configurations
+  #diskio.include_devices: []
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-system-core,core>>
+
+* <<metricbeat-metricset-system-cpu,cpu>>
+
+* <<metricbeat-metricset-system-diskio,diskio>>
+
+* <<metricbeat-metricset-system-entropy,entropy>>
+
+* <<metricbeat-metricset-system-filesystem,filesystem>>
+
+* <<metricbeat-metricset-system-fsstat,fsstat>>
+
+* <<metricbeat-metricset-system-load,load>>
+
+* <<metricbeat-metricset-system-memory,memory>>
+
+* <<metricbeat-metricset-system-network,network>>
+
+* <<metricbeat-metricset-system-process,process>>
+
+* <<metricbeat-metricset-system-process_summary,process_summary>>
+
+* <<metricbeat-metricset-system-raid,raid>>
+
+* <<metricbeat-metricset-system-service,service>>
+
+* <<metricbeat-metricset-system-socket,socket>>
+
+* <<metricbeat-metricset-system-socket_summary,socket_summary>>
+
+* <<metricbeat-metricset-system-uptime,uptime>>
+
+include::system/core.asciidoc[]
+
+include::system/cpu.asciidoc[]
+
+include::system/diskio.asciidoc[]
+
+include::system/entropy.asciidoc[]
+
+include::system/filesystem.asciidoc[]
+
+include::system/fsstat.asciidoc[]
+
+include::system/load.asciidoc[]
+
+include::system/memory.asciidoc[]
+
+include::system/network.asciidoc[]
+
+include::system/process.asciidoc[]
+
+include::system/process_summary.asciidoc[]
+
+include::system/raid.asciidoc[]
+
+include::system/service.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/socket_summary.asciidoc[]
+
+include::system/uptime.asciidoc[]
+

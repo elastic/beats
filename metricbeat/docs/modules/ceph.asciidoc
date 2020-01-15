@@ -1,0 +1,76 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-ceph]]
+== Ceph module
+
+The Ceph module collects metrics by submitting HTTP GET requests to
+the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The default metricsets are `cluster_disk`, `cluster_health`, `monitor_health`, `pool_disk`, `osd_tree`.
+
+[float]
+=== Compatibility
+
+The Ceph module is tested with Ceph Jewel (10.2.10).
+
+[float]
+=== Dashboard
+
+The Ceph module comes with a predefined dashboard showing Ceph cluster related metrics. For example:
+
+image::./images/ceph-overview-dashboard.png[]
+
+
+
+[float]
+=== Example configuration
+
+The Ceph module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: ceph
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
+  period: 10s
+  hosts: ["localhost:5000"]
+  enabled: true
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>
+
+* <<metricbeat-metricset-ceph-cluster_health,cluster_health>>
+
+* <<metricbeat-metricset-ceph-cluster_status,cluster_status>>
+
+* <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
+
+* <<metricbeat-metricset-ceph-osd_df,osd_df>>
+
+* <<metricbeat-metricset-ceph-osd_tree,osd_tree>>
+
+* <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
+
+include::ceph/cluster_disk.asciidoc[]
+
+include::ceph/cluster_health.asciidoc[]
+
+include::ceph/cluster_status.asciidoc[]
+
+include::ceph/monitor_health.asciidoc[]
+
+include::ceph/osd_df.asciidoc[]
+
+include::ceph/osd_tree.asciidoc[]
+
+include::ceph/pool_disk.asciidoc[]
+

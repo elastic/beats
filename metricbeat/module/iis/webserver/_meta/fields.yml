@@ -3,9 +3,3 @@
   description: >
     webserver
   release: beta
-
-  fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field

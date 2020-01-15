@@ -1,0 +1,64 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-apache]]
+== Apache module
+
+This module periodically fetches metrics from https://httpd.apache.org/[Apache
+HTTPD] servers. The default metricset is `status`.
+
+[float]
+=== Compatibility
+
+The Apache metricsets were tested with Apache 2.4.12 and 2.4.20 and are expected to work with
+all versions >= 2.2.31 and >= 2.4.16.
+
+
+[float]
+=== Dashboard
+
+The Apache module comes with a predefined dashboard. For example:
+
+image::./images/apache_httpd_server_status.png[]
+
+
+[float]
+=== Example configuration
+
+The Apache module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: apache
+  metricsets: ["status"]
+  period: 10s
+  enabled: true
+
+  # Apache hosts
+  hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  #server_status_path: "server-status"
+
+  # Username of hosts.  Empty by default
+  #username: username
+
+  # Password of hosts. Empty by default
+  #password: password
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-apache-status,status>>
+
+include::apache/status.asciidoc[]
+

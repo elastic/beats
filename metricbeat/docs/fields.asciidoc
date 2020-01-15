@@ -15283,33 +15283,11 @@ iis module
 webserver
 
 
-
-*`iis.webserver.example`*::
-+
---
-Example field
-
-
-type: keyword
-
---
-
 [float]
 === website
 
 website
 
-
-
-*`iis.website.example`*::
-+
---
-Example field
-
-
-type: keyword
-
---
 
 [[exported-fields-jolokia]]
 == Jolokia fields

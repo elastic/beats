@@ -1,0 +1,12 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  defaults:
+    perfmon.ignore_non_existent_counters: true
+    perfmon.counters:
+        - instance_label: ''
+          measurement_label: network.bytes_recv_per_sec
+          query: '\Web Service(_Total)\Total Bytes Received'
+
+

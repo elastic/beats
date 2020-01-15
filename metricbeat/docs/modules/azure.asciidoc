@@ -1,0 +1,151 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-azure]]
+[role="xpack"]
+== azure module
+
+beta[]
+
+This is the azure module.
+
+The Azure Monitor feature collects and aggregates logs and metrics from a variety of sources into a common data platform where it can be used for analysis, visualization, and alerting.
+
+
+The azure monitor metrics are numerical values that describe some aspect of a system at a particular point in time. They are collected at regular intervals and are identified with a timestamp, a name, a value, and one or more defining labels.
+
+The azure module will periodically retrieve the azure monitor metrics using the Azure REST APIs as MetricList.
+Additional azure API calls will be executed in order to retrieve information regarding the resources targeted by the user.
+
+The azure module mericsets are `monitor`,  `compute_vm` and `compute_vm_scaleset`
+
+[float]
+=== Dashboards
+
+The azure module comes with several predefined dashboards for virtual machines, VM guest metrics and virtual machine scale sets.
+
+The VM overview dashboard shows information about CPU, memory, disk usage as well as operations per second. The two available filters help narrowing down the dashbord to specific regions and/or resource groups. For example:
+
+image::./images/metricbeat-azure-vm-overview.png[]
+
+If VM guest metrics are enabled then the guest metrics overview dashboard can help with monitoring ASP.NET applications and SQL Server metrics. For example:
+
+image::./images/metricbeat-azure-vm-guestmetrics-overview.png[]
+
+The virtual machine scale sets dashboard is similar to the VM dashboard and shows relevant health information about running vm scale sets. For example:
+
+image::./images/metricbeat-azure-vmss-overview.png[]
+
+[float]
+=== Module-specific configuration notes
+
+All the tasks executed against the Azure Monitor REST API will use the Azure Resource Manager authentication model.
+Therefore, all requests must be authenticated with Azure Active Directory (Azure AD).
+One approach to authenticate the client application is to create an Azure AD service principal and retrieve the authentication (JWT) token.
+For a more detailed walk-through, have a look at using Azure PowerShell to create a service principal to access resources https://docs.microsoft.com/en-us/powershell/azure/create-azure-service-principal-azureps?view=azps-2.7.0.
+ It is also possible to create a service principal via the Azure portal https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
+Users will have to make sure the roles assigned to the application contain at least reading permissions to the monitor data, more on the roles here https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles.
+
+Required credentials for the `azure` module:
+
+`client_id`:: The unique identifier for the application (also known as Application Id)
+
+`client_secret`:: The client/application secret/key
+
+`subscription_id`:: The unique identifier for the azure subscription
+
+`tenant_id`:: The unique identifier of the Azure Active Directory instance
+
+
+Users can use the azure credentials keys if configured `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+
+[float]
+== Metricsets
+
+[float]
+=== `monitor`
+This metricset allows users to retrieve metrics from specified resources. Added filters can apply here as the interval of retrieving these metrics, metric names,
+aggregation list, namespaces and metric dimensions.
+
+[float]
+=== `compute_vm`
+This metricset will collect metrics from the virtual machines, these metrics will have a timegrain every 5 minutes,
+so the `period` for `compute_vm` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `compute_vm_scaleset`
+This metricset will collect metrics from the virtual machine scalesets, these metrics will have a timegrain every 5 minutes,
+so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
+
+
+[float]
+== Additional notes about metrics and costs
+
+Costs: Metric queries are charged based on the number of standard API calls. More information on pricing here https://azure.microsoft.com/id-id/pricing/details/monitor/.
+
+Authentication: we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
+
+
+[float]
+=== Example configuration
+
+The azure module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: azure
+  metricsets:
+  - monitor
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  resources:
+    - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+      metrics:
+      - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+- module: azure
+  metricsets:
+  - compute_vm
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - compute_vm_scaleset
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-azure-compute_vm,compute_vm>>
+
+* <<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>
+
+* <<metricbeat-metricset-azure-monitor,monitor>>
+
+include::azure/compute_vm.asciidoc[]
+
+include::azure/compute_vm_scaleset.asciidoc[]
+
+include::azure/monitor.asciidoc[]
+

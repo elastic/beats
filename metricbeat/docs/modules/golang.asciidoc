@@ -1,0 +1,47 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-golang]]
+== Golang module
+
+The golang module collects metrics by submitting HTTP GET requests to https://golang.org/pkg/expvar/[golang-expvar-api].
+
+
+[float]
+=== Example configuration
+
+The Golang module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: golang
+  #metricsets:
+  #  - expvar
+  #  - heap
+  period: 10s
+  hosts: ["localhost:6060"]
+  heap.path: "/debug/vars"
+  expvar:
+    namespace: "example"
+    path: "/debug/vars"
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-golang-expvar,expvar>>
+
+* <<metricbeat-metricset-golang-heap,heap>>
+
+include::golang/expvar.asciidoc[]
+
+include::golang/heap.asciidoc[]
+

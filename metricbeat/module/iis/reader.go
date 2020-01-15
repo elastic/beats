@@ -20,9 +20,10 @@
 package iis
 
 import (
-	"github.com/elastic/beats/metricbeat/module/windows/perfmon"
 	"regexp"
 	"strings"
+
+	"github.com/elastic/beats/metricbeat/module/windows/perfmon"
 
 	"github.com/pkg/errors"
 

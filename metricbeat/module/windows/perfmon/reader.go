@@ -176,7 +176,7 @@ func (r *Reader) Read() ([]mb.Event, error) {
 					MetricSetFields: common.MapStr{},
 					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
 				}
-				if val.Instance != "" {
+				if val.Instance != "" && r.instanceLabel[counterPath] != "" {
 					//will ignore instance counter
 					if ok, match := matchesParentProcess(val.Instance); ok {
 						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)

@@ -1,0 +1,124 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-postgresql]]
+== PostgreSQL module
+
+This module periodically fetches metrics from
+https://www.postgresql.org/[PostgreSQL] servers.
+
+Default metricsets are `activity`, `bgwriter` and `database`.
+
+
+[float]
+=== Dashboard
+
+The PostgreSQL module comes with a predefined dashboard showing databse related metrics. For example:
+
+image::./images/metricbeat-postgresql-overview.png[]
+
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use Postgres URLs of the following
+format:
+
+-----------------------------------
+[postgres://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost:40001?sslmode=disable", "postgres://otherhost:40001"]
+----------------------------------------------------------------------
+
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the URL take
+precedence over those specified in the `username` and `password` config options.
+
+[source,yaml]
+----
+- module: postgresql
+  metricsets: ["status"]
+  hosts: ["postgres://localhost:5432"]
+  username: root
+  password: test
+----
+
+[float]
+=== Compatibility
+
+This module was tested with PostgreSQL 9.5.3 and is expected to work with all
+versions >= 9.
+
+
+[float]
+=== Example configuration
+
+The PostgreSQL module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: postgresql
+  enabled: true
+  metricsets:
+    # Stats about every PostgreSQL database
+    - database
+
+    # Stats about the background writer process's activity
+    - bgwriter
+
+    # Stats about every PostgreSQL process
+    - activity
+
+  period: 10s
+
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  hosts: ["postgres://localhost:5432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-postgresql-activity,activity>>
+
+* <<metricbeat-metricset-postgresql-bgwriter,bgwriter>>
+
+* <<metricbeat-metricset-postgresql-database,database>>
+
+* <<metricbeat-metricset-postgresql-statement,statement>>
+
+include::postgresql/activity.asciidoc[]
+
+include::postgresql/bgwriter.asciidoc[]
+
+include::postgresql/database.asciidoc[]
+
+include::postgresql/statement.asciidoc[]
+

@@ -1,0 +1,11 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  defaults:
+    perfmon.counters:
+    - instance_label: physical_disk.name
+      measurement_label: total_bytes_recv_per_sec
+      query: '\Web Service(_Total)\Total Bytes Received'
+
+

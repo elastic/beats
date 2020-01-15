@@ -1,0 +1,60 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-etcd]]
+== Etcd module
+
+This module targets Etcd V2 and V3.
+
+When using V2, metrics are collected using https://coreos.com/etcd/docs/latest/v2/api.html[Etcd v2 API].
+When using V3, metrics are retrieved from the `/metrics` endpoint as intended for https://coreos.com/etcd/docs/latest/metrics.html[Etcd v3]
+
+When using V3, metricsest are bundled into `metrics`
+When using V2, metricsets available are `leader`, `self` and `store`.
+
+[float]
+=== Compatibility
+
+The etcd module is tested with etcd 3.2 and 3.3.
+
+
+[float]
+=== Example configuration
+
+The Etcd module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: etcd
+  metricsets: ["leader", "self", "store"]
+  period: 10s
+  hosts: ["localhost:2379"]
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-etcd-leader,leader>>
+
+* <<metricbeat-metricset-etcd-metrics,metrics>>
+
+* <<metricbeat-metricset-etcd-self,self>>
+
+* <<metricbeat-metricset-etcd-store,store>>
+
+include::etcd/leader.asciidoc[]
+
+include::etcd/metrics.asciidoc[]
+
+include::etcd/self.asciidoc[]
+
+include::etcd/store.asciidoc[]
+

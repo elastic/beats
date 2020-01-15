@@ -31,7 +31,7 @@ import (
 
 // CounterConfig for perfmon counters.
 type CounterConfig struct {
-	InstanceLabel    string `config:"instance_label"    validate:"required"`
+	InstanceLabel    string `config:"instance_label"`
 	InstanceName     string `config:"instance_name"`
 	MeasurementLabel string `config:"measurement_label" validate:"required"`
 	Query            string `config:"query"             validate:"required"`
@@ -45,8 +45,10 @@ type Config struct {
 	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
 }
 
+const metricsetName = "perfmon"
+
 func init() {
-	mb.Registry.MustAddMetricSet("windows", "perfmon", New)
+	mb.Registry.MustAddMetricSet("windows", metricsetName, New)
 }
 
 type MetricSet struct {
@@ -62,6 +64,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+	if metricsetName == base.Name() {
+		err := validateCounterConfig(config.CounterConfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 	for _, value := range config.CounterConfig {
 		form := strings.ToLower(value.Format)
@@ -83,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
-		log:           logp.NewLogger("perfmon"),
+		log:           logp.NewLogger(metricsetName),
 	}, nil
 }
 
@@ -123,6 +131,15 @@ func (m *MetricSet) Close() error {
 	err := m.reader.Close()
 	if err != nil {
 		return errors.Wrap(err, "failed to close pdh query")
+	}
+	return nil
+}
+
+func validateCounterConfig(counters []CounterConfig) error {
+	for _, counter := range counters {
+		if counter.InstanceLabel == "" {
+			return errors.Errorf("no instance label has been configured for query %s", counter.Query)
+		}
 	}
 	return nil
 }

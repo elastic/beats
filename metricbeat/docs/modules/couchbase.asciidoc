@@ -1,0 +1,60 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-couchbase]]
+== Couchbase module
+
+This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
+servers. The default metricsets are `bucket`, `cluster`, `node`.
+
+[float]
+=== Compatibility
+
+The Couchbase module is tested with Couchbase 4.5.1.
+
+
+[float]
+=== Dashboard
+
+The Couchbase module comes with a predefined dashboard for Couchbase cluster, node, bucket specific stats. For example:
+
+image::./images/metricbeat-couchbase-overview.png[]
+
+
+[float]
+=== Example configuration
+
+The Couchbase module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: couchbase
+  metricsets: ["bucket", "cluster", "node"]
+  period: 10s
+  hosts: ["localhost:8091"]
+  enabled: true
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-couchbase-bucket,bucket>>
+
+* <<metricbeat-metricset-couchbase-cluster,cluster>>
+
+* <<metricbeat-metricset-couchbase-node,node>>
+
+include::couchbase/bucket.asciidoc[]
+
+include::couchbase/cluster.asciidoc[]
+
+include::couchbase/node.asciidoc[]
+
