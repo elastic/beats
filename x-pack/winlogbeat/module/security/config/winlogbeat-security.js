@@ -1475,15 +1475,6 @@ var security = (function () {
         })
         .Build();
 
-    var addComputerData = function(evt) {
-        var computer = evt.Get("winlog.computer_name");
-        if (!computer) {
-            return;
-    }
-        evt.Put("winlog.computer.name", computer.split(".")[0]);
-        evt.Put("winlog.computer.domain", computer.split(".")[1]);
-    };
-
     // Handles 4634 and 4647.
     var logoff = new processor.Chain()
         .Add(copyTargetUser)
@@ -1593,14 +1584,12 @@ var security = (function () {
     var auditChanged = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
-        .Add(addComputerData)
         .Add(renameCommonAuthFields)
         .Add(addAuditInfo)
         .Add(addActionDesc)
         .Build();
 
     var auditLogMgmt = new processor.Chain()
-        .Add(addComputerData)
         .Add(renameCommonAuthFields)
         .Add(addActionDesc)
         .Build();
