@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -145,6 +146,34 @@ func TestPackages() error {
 // GoTestUnit is an alias for goUnitTest.
 func GoTestUnit() {
 	mg.Deps(unittest.GoUnitTest)
+}
+
+func BuildPkgForFunctions() error {
+	mg.Deps(Update, Build)
+
+	err := os.MkdirAll("pkg", 700)
+	if err != nil {
+		return err
+	}
+
+	filesToCopy := map[string]string{
+		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
+		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
+	}
+	for src, dest := range filesToCopy {
+		c := &devtools.CopyTask{
+			Source: src,
+			Dest:   dest,
+		}
+		err = c.Execute()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // BuildSystemTestBinary build a binary for testing that is instrumented for
