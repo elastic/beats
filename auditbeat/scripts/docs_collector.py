@@ -44,7 +44,7 @@ This file is generated! See scripts/docs_collector.py
         os.mkdir(os.path.join(module_docs_path(module_dir), "modules", module))
 
         module_file = generated_note
-        
+
         module_file += ":modulename: " + module + "\n\n"
 
         module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
@@ -86,7 +86,7 @@ is an example configuration:
                     module_file += line
 
             module_file += "----\n\n"
-            
+
         # Close modulename variable
         module_file += "\n:modulename!:\n\n"
 
