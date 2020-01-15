@@ -3,6 +3,49 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.5.2]]
+=== Beats version 7.5.2
+https://github.com/elastic/beats/compare/v7.5.1...v7.5.2[View commits]
+
+==== Breaking changes
+
+*Journalbeat*
+
+- Remove broken dashboard. {pull}15288[15288]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+
+*Filebeat*
+
+- Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
+- Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
+- netflow: Allow for options templates without scope fields. {pull}15449[15449]
+- netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
+- netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
+- Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+
+*Metricbeat*
+
+- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
+- Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
+- Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
+- Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
+
+*Filebeat*
+
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+
 [[release-notes-7.5.1]]
 === Beats version 7.5.1
 https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
