@@ -6,7 +6,20 @@ input:
     perfmon.ignore_non_existent_counters: true
     perfmon.counters:
         - instance_label: ''
-          measurement_label: network.bytes_recv_per_sec
+          measurement_label: network.total_bytes_recv_per_sec
           query: '\Web Service(_Total)\Total Bytes Received'
 
 
+#"total_bytes_sent_per_sec": "\\Web Service(_Total)\\Total Bytes Sent",
+#"total_bytes_recv_per_sec": "\\Web Service(_Total)\\Total Bytes Received",
+#\Web Service(*)\Total Files Sent
+#\Web Service(*)\Files Sent/sec
+#\Web Service(*)\Total Files Received
+#\Web Service(*)\Files Received/sec
+#\Web Service(*)\Current Connections
+#\Web Service(*)\Maximum Connections
+#\Web Service(*)\Total Connection Attempts (all instances)
+#\Web Service(*)\Total Get Requests
+#\Web Service(*)\Get Requests/sec
+#\Web Service(*)\Total Post Requests
+#\Web Service(*)\Post Requests/sec

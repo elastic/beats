@@ -4,8 +4,21 @@ input:
   metricset: perfmon
   defaults:
     perfmon.counters:
-    - instance_label: physical_disk.name
-      measurement_label: total_bytes_recv_per_sec
-      query: '\Web Service(_Total)\Total Bytes Received'
+    - instance_label: ''
+      measurement_label: bytes_recv_per_sec
+      query: '\Web Service(*)\Bytes Sent/sec'
 
-
+#"total_bytes_sent_per_sec": "\\Web Service(*)\\Total Bytes Sent",
+#"bytes_recv_per_sec":       "\\Web Service(*)\\Bytes Received/sec",
+#"total_bytes_recv_per_sec": "\\Web Service(*)\\Total Bytes Received",
+#\Web Service(*)\Total Files Sent
+#\Web Service(*)\Files Sent/sec
+#\Web Service(*)\Total Files Received
+#\Web Service(*)\Files Received/sec
+#\Web Service(*)\Current Connections
+#\Web Service(*)\Maximum Connections
+#\Web Service(*)\Total Connection Attempts (all instances)
+#\Web Service(*)\Total Get Requests
+#\Web Service(*)\Get Requests/sec
+#\Web Service(*)\Total Post Requests
+#\Web Service(*)\Post Requests/sec

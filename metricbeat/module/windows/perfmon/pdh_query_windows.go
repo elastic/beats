@@ -72,20 +72,20 @@ func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) 
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, counterInstance string, counterFormat string, wildcard bool) error {
+func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
 		return nil
 	}
 	var err error
 	var instanceName string
 	// Extract the instance name from the counterPath.
-	if counterInstance == "" || wildcard {
+	if counter.InstanceName == "" || wildcard {
 		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
 	} else {
-		instanceName = counterInstance
+		instanceName = counter.InstanceName
 	}
 	h, err := PdhAddCounter(q.handle, counterPath, 0)
 	if err != nil {
@@ -95,7 +95,7 @@ func (q *Query) AddCounter(counterPath string, counterInstance string, counterFo
 	q.counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
-		format:       getPDHFormat(counterFormat),
+		format:       getPDHFormat(counter.Format),
 	}
 	return nil
 }

@@ -117,7 +117,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = q.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = q.AddCounter(path[0], counter, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +243,7 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -283,7 +283,7 @@ func TestFloatOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
