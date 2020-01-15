@@ -33,10 +33,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-- module: coredns
-  metricsets: ["stats"]
+- module: istio
+  metricsets: ["mesh"]
   period: 10s
-  hosts: ["localhost:9153"]
+  hosts: ["localhost:42422"]
 ----
 
 [float]

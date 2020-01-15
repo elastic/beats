@@ -4,3 +4,128 @@
     Contains statistics related to the Istio mesh service
   release: beta
   fields:
+    - name: instance
+      type: text
+      description: >
+        The prometheus instance
+    - name: job
+      type: keyword
+      description: >
+        The prometheus job
+    - name: requests
+      type: long
+      description: >
+        Total requests handled by an Istio proxy
+    - name: request.duration.ms.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Request duration histogram buckets in milliseconds
+    - name: request.duration.ms.sum
+      type: long
+      format: duration
+      description: >
+        Requests duration, sum of durations in milliseconds
+    - name: request.duration.ms.count
+      type: long
+      description: >
+        Requests duration, number of requests
+    - name: request.size.bytes.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Request Size histogram buckets
+    - name: request.size.bytes.sum
+      type: long
+      description: >
+        Request Size histogram sum
+    - name: request.size.bytes.count
+      type: long
+      description: >
+        Request Size histogram count
+
+    - name: response.size.bytes.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Request Size histogram buckets
+    - name: response.size.bytes.sum
+      type: long
+      description: >
+        Request Size histogram sum
+    - name: response.size.bytes.count
+      type: long
+      description: >
+        Request Size histogram count
+
+    - name: reporter
+      type: keyword
+      description: >
+        Reporter identifies the reporter of the request. It is set to destination if report is from a server Istio proxy and source if report is from a client Istio proxy.
+    - name: source.workload.name
+      type: keyword
+      description: >
+        This identifies the name of source workload which controls the source.
+    - name: source.workload.namespace
+      type: keyword
+      description: >
+        This identifies the namespace of the source workload.
+    - name: source.principal
+      type: keyword
+      description: >
+        This identifies the peer principal of the traffic source. It is set when peer authentication is used.
+    - name: source.app
+      type: keyword
+      description: >
+        This identifies the source app based on app label of the source workload.
+    - name: source.version
+      type: keyword
+      description: >
+        This identifies the version of the source workload.
+
+    - name: destination.workload.name
+      type: keyword
+      description: >
+        This identifies the name of destination workload.
+    - name: destination.workload.namespace
+      type: keyword
+      description: >
+        This identifies the namespace of the destination workload.
+    - name: destination.principal
+      type: keyword
+      description: >
+        This identifies the peer principal of the traffic destination. It is set when peer authentication is used.
+    - name: destination.app
+      type: keyword
+      description: >
+        This identifies the destination app based on app label of the destination workload..
+    - name: destination.version
+      type: keyword
+      description: >
+        This identifies the version of the destination workload.
+
+    - name: destination.service.host
+      type: keyword
+      description: >
+        This identifies destination service host responsible for an incoming request.
+    - name: destination.service.name
+      type: keyword
+      description: >
+        This identifies the destination service name.
+    - name: destination.service.namespace
+      type: keyword
+      description: >
+        This identifies the namespace of destination service.
+
+    - name: request.protocol
+      type: keyword
+      description: >
+        This identifies the protocol of the request. It is set to API protocol if provided, otherwise request or connection protocol.
+    - name: response.code
+      type: long
+      description: >
+        This identifies the response code of the request. This label is present only on HTTP metrics.
+    - name: connection.security.policy
+      type: keyword
+      description: >
+        This identifies the service authentication policy of the request. It is set to mutual_tls when Istio is used to make communication secure and report is from destination. It is set to unknown when report is from source since security policy cannot be properly populated.
