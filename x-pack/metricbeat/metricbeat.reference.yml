@@ -503,6 +503,14 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+  enabled: true
+  period: 10s
+
+
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
