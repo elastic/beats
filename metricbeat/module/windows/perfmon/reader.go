@@ -20,10 +20,11 @@
 package perfmon
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
 
