@@ -1,7 +1,7 @@
 - module: system
   metricsets:
     - cpu             # CPU usage
-    #- load            # CPU load averages
+    - load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
     - process         # Per process metrics
