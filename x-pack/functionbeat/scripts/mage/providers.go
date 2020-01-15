@@ -12,7 +12,7 @@ import (
 
 var (
 	availableProviders = []ProviderDetails{
-		{Name: "aws", Buildable: true, GOOS: "windows", GOARCH: "amd64"},
+		{Name: "aws", Buildable: true, GOOS: "linux", GOARCH: "amd64"},
 		{Name: "gcp", Buildable: false},
 	}
 )
