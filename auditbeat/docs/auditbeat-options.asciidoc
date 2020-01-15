@@ -15,24 +15,18 @@ You can specify the following options for any {beatname_uc} module.
 
 *`module`*:: The name of the module to run.
 
-*`datasets`*:: A list of datasets to execute. Make sure that you only list datasets that
-are available in the module. It is not possible to reference datasets from
-other modules.
-
-*`enabled`*:: A Boolean value that specifies whether the module is enabled. If you use the
-default config file, +{beatname_lc}.yml+, the System module is enabled (set to
-`enabled: true`) by default. If the `enabled` option is missing from the
-configuration block, the module is enabled by default.
-
-*`period`*:: The frequency at which the datasets check for changes. If a system
-is not reachable, {beatname_uc} returns an error for each period. This setting
-is required.
 ifeval::["{modulename}"=="system"]
-For most datasets, especially `process` and `socket`, a shorter period is recommended.
+*`datasets`*:: A list of datasets to execute.
 endif::[]
 
-*`hosts`*:: A list of hosts to fetch information from. For some datasets, such as the
-System module, this setting is optional.
+*`enabled`*:: A Boolean value that specifies whether the module is enabled.
+
+ifeval::["{modulename}"=="system"]
+*`period`*:: The frequency at which the datasets check for changes. If a system
+is not reachable, {beatname_uc} returns an error for each period. This setting
+is required. For most datasets, especially `process` and `socket`, a shorter
+period is recommended.
+endif::[]
 
 *`fields`*:: A dictionary of fields that will be sent with the dataset event. This setting
 is optional.
