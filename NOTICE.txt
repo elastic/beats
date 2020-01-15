@@ -6099,8 +6099,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/api
-Version: v0.14.0
-Revision: 8a410c21381766a810817fd6200fce8838ecb277
+Version: v0.7.0
+Revision: 02490b97dff7cfde1995bd77de808fd27053bc87
 License type (autodetected): BSD-3-Clause
 ./vendor/google.golang.org/api/LICENSE:
 --------------------------------------------------------------------
