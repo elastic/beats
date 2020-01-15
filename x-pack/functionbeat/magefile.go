@@ -148,6 +148,8 @@ func GoTestUnit() {
 	mg.Deps(unittest.GoUnitTest)
 }
 
+// BuildPkgForFunctions creates a folder named pkg and adds functions to it.
+// This makes testing the manager more comfortable.
 func BuildPkgForFunctions() error {
 	mg.Deps(Update, Build)
 
