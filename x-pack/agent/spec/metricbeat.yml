@@ -1,5 +1,6 @@
 name: Metricbeat
 cmd: metricbeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
 - filter_values_with_regexp:

@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -21,6 +22,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 	rconfig "github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
@@ -58,20 +60,13 @@ func NewOperator(
 	stateResolver *stateresolver.StateResolver,
 	eventProcessor callbackHooks) (*Operator, error) {
 
-	operatorConfig := &operatorCfg.Config{}
+	operatorConfig := defaultOperatorConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
 	}
 
 	if operatorConfig.DownloadConfig == nil {
 		return nil, fmt.Errorf("artifacts configuration not provided")
-	}
-
-	if operatorConfig.MonitoringConfig == nil {
-		operatorConfig.MonitoringConfig = &monitoring.Config{
-			MonitorLogs:    false,
-			MonitorMetrics: false,
-		}
 	}
 
 	if eventProcessor == nil {
@@ -95,6 +90,22 @@ func NewOperator(
 	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
+}
+
+func defaultOperatorConfig() *operatorCfg.Config {
+	return &operatorCfg.Config{
+		MonitoringConfig: &monitoring.Config{
+			MonitorLogs:    false,
+			MonitorMetrics: false,
+		},
+		RetryConfig: &retry.Config{
+			Enabled:      false,
+			RetriesCount: 0,
+			Delay:        30 * time.Second,
+			MaxDelay:     5 * time.Minute,
+			Exponential:  false,
+		},
+	}
 }
 
 // State describes the current state of the system.

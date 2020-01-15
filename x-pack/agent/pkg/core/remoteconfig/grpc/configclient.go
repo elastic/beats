@@ -34,13 +34,20 @@ func CreateConfiguratorClient(conn interface{}, delay, maxDelay time.Duration) (
 		return nil, ErrNotGrpcClient
 	}
 
+	var boff backoff.Backoff
 	done := make(chan struct{})
-	backoff := backoff.NewEqualJitterBackoff(done, delay, maxDelay)
+
+	if delay > 0 && maxDelay > 0 {
+		boff = backoff.NewEqualJitterBackoff(done, delay, maxDelay)
+	} else {
+		// no retry strategy configured
+		boff = NewNoopBackoff()
+	}
 
 	return &client{
 		grpcConn: grpcConn,
 		client:   NewConfiguratorClient(grpcConn),
-		backoff:  backoff,
+		backoff:  boff,
 		done:     done,
 	}, nil
 }

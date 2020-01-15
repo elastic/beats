@@ -16,7 +16,7 @@ type Scheduler interface {
 	Stop()
 }
 
-// Stepper is a scheduler where each Tick is manully triggered, this is useful in scenario
+// Stepper is a scheduler where each Tick is manually triggered, this is useful in scenario
 // when you want to test the behavior of asynchronous code in a synchronous way.
 type Stepper struct {
 	C chan time.Time
