@@ -36,7 +36,7 @@ grouped in the following categories:
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
-* <<exported-fields-tls>>
+* <<exported-fields-tls_detailed>>
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
@@ -2285,6 +2285,13 @@ example: Google LLC
 
 --
 
+*`as.organization.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === client
 
@@ -2322,6 +2329,13 @@ Organization name.
 type: keyword
 
 example: Google LLC
+
+--
+
+*`client.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -2555,6 +2569,13 @@ example: Albert Einstein
 
 --
 
+*`client.user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`client.user.group.domain`*::
 +
 --
@@ -2610,6 +2631,13 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+*`client.user.name.text`*::
++
+--
+type: text
 
 --
 
@@ -2794,6 +2822,13 @@ Organization name.
 type: keyword
 
 example: Google LLC
+
+--
+
+*`destination.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -3027,6 +3062,13 @@ example: Albert Einstein
 
 --
 
+*`destination.user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`destination.user.group.domain`*::
 +
 --
@@ -3082,6 +3124,13 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+*`destination.user.name.text`*::
++
+--
+type: text
 
 --
 
@@ -3197,7 +3246,7 @@ example: QUERY
 *`dns.question.class`*::
 +
 --
-The class of of records being queried.
+The class of records being queried.
 
 type: keyword
 
@@ -3364,6 +3413,13 @@ type: keyword
 
 --
 
+*`error.stack_trace.text`*::
++
+--
+type: text
+
+--
+
 *`error.type`*::
 +
 --
@@ -3397,12 +3453,13 @@ example: user-password-change
 *`event.category`*::
 +
 --
-Event category.
-This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the second level in the ECS category hierarchy.
+`event.category` represents the "big buckets" of ECS categories. For example, filtering on `event.category:process` yields all events relating to process activity. This field is closely related to `event.type`, which is used as a subcategory.
+This field is an array. This will allow proper categorization of some events that fall in multiple categories.
 
 type: keyword
 
-example: user-management
+example: authentication
 
 --
 
@@ -3427,6 +3484,8 @@ In most situations, these two timestamps will be slightly different. The differe
 In case the two timestamps are identical, @timestamp should be used.
 
 type: date
+
+example: 2016-05-23 08:05:34.857000
 
 --
 
@@ -3486,15 +3545,29 @@ example: 8a4f500d
 
 --
 
+*`event.ingested`*::
++
+--
+Timestamp when an event arrived in the central data store.
+This is different from `@timestamp`, which is when the event originally occurred.  It's also different from `event.created`, which is meant to capture the first time an agent saw the event.
+In normal conditions, assuming no tampering, the timestamps should chronologically look like this: `@timestamp` < `event.created` < `event.ingested`.
+
+type: date
+
+example: 2016-05-23 08:05:35.101000
+
+--
+
 *`event.kind`*::
 +
 --
-The kind of the event.
-This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the highest level in the ECS category hierarchy.
+`event.kind` gives high-level information about what type of information the event contains, without being specific to the contents of the event. For example, values of this field distinguish alert events from metric events.
+The value of this field can be used to inform how these kinds of events should be handled. They may warrant different retention, different access control, it may also help understand whether the data coming in at a regular interval or not.
 
 type: keyword
 
-example: state
+example: alert
 
 --
 
@@ -3525,8 +3598,8 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 *`event.outcome`*::
 +
 --
-The outcome of the event.
-If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
+`event.outcome` simply denotes whether the event represent a success or a failure. Note that not all events will have an associated outcome. For example, this field is generally not populated for metric events or events with `event.type:info`.
 
 type: keyword
 
@@ -3614,8 +3687,9 @@ type: keyword
 *`event.type`*::
 +
 --
-Reserved for future usage.
-Please avoid using this field for user data.
+This is one of four ECS Categorization Fields, and indicates the third level in the ECS category hierarchy.
+`event.type` represents a categorization "sub-bucket" that, when used along with the `event.category` field values, enables filtering events down to a level appropriate for single visualization.
+This field is an array. This will allow proper categorization of some events that fall in multiple event types.
 
 type: keyword
 
@@ -3635,6 +3709,18 @@ Last time the file was accessed.
 Note that not all filesystems keep track of access time.
 
 type: date
+
+--
+
+*`file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
 
 --
 
@@ -3672,11 +3758,23 @@ example: sda
 *`file.directory`*::
 +
 --
-Directory where the file is located.
+Directory where the file is located. It should include the drive letter, when appropriate.
 
 type: keyword
 
 example: /home/alice
+
+--
+
+*`file.drive_letter`*::
++
+--
+Drive letter where the file is located. This field is only relevant on Windows.
+The value should be uppercase, and not include the colon.
+
+type: keyword
+
+example: C
 
 --
 
@@ -3805,11 +3903,18 @@ example: alice
 *`file.path`*::
 +
 --
-Full path to the file.
+Full path to the file, including the file name. It should include the drive letter, when appropriate.
 
 type: keyword
 
 example: /home/alice/example.png
+
+--
+
+*`file.path.text`*::
++
+--
+type: text
 
 --
 
@@ -3831,6 +3936,13 @@ example: 16384
 Target path for symlinks.
 
 type: keyword
+
+--
+
+*`file.target_path.text`*::
++
+--
+type: text
 
 --
 
@@ -4048,6 +4160,18 @@ example: x86_64
 
 --
 
+*`host.domain`*::
++
+--
+Name of the domain of which the host is a member.
+For example, on Windows this could be the host's Active Directory domain or NetBIOS domain name. For Linux this could be the domain of the host's LDAP provider.
+
+type: keyword
+
+example: CONTOSO
+
+--
+
 *`host.geo.city_name`*::
 +
 --
@@ -4209,6 +4333,13 @@ example: Mac OS Mojave
 
 --
 
+*`host.os.full.text`*::
++
+--
+type: text
+
+--
+
 *`host.os.kernel`*::
 +
 --
@@ -4228,6 +4359,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`host.os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -4304,6 +4442,13 @@ example: Albert Einstein
 
 --
 
+*`host.user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`host.user.group.domain`*::
 +
 --
@@ -4362,6 +4507,13 @@ example: albert
 
 --
 
+*`host.user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === http
 
@@ -4389,6 +4541,13 @@ The full HTTP request body.
 type: keyword
 
 example: Hello world
+
+--
+
+*`http.request.body.content.text`*::
++
+--
+type: text
 
 --
 
@@ -4449,6 +4608,13 @@ The full HTTP response body.
 type: keyword
 
 example: Hello world
+
+--
+
+*`http.response.body.content.text`*::
++
+--
+type: text
 
 --
 
@@ -4944,6 +5110,13 @@ example: Mac OS Mojave
 
 --
 
+*`observer.os.full.text`*::
++
+--
+type: text
+
+--
+
 *`observer.os.kernel`*::
 +
 --
@@ -4963,6 +5136,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`observer.os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -5065,6 +5245,13 @@ type: keyword
 
 --
 
+*`organization.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === os
 
@@ -5093,6 +5280,13 @@ example: Mac OS Mojave
 
 --
 
+*`os.full.text`*::
++
+--
+type: text
+
+--
+
 *`os.kernel`*::
 +
 --
@@ -5112,6 +5306,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -5151,6 +5352,18 @@ Package architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`package.build_version`*::
++
+--
+Additional information about the build version of the installed package.
+For example use the commit SHA of a non-released package.
+
+type: keyword
+
+example: 36f4f7e89dd61b0988b12ee000b98966867710cd
 
 --
 
@@ -5230,6 +5443,17 @@ example: /usr/local/Cellar/go/1.12.9/
 
 --
 
+*`package.reference`*::
++
+--
+Home page or reference URL of the software in this package, if available.
+
+type: keyword
+
+example: https://golang.org
+
+--
+
 *`package.size`*::
 +
 --
@@ -5240,6 +5464,18 @@ type: long
 example: 62231
 
 format: string
+
+--
+
+*`package.type`*::
++
+--
+Type of package.
+This should contain the package file type, rather than the package manager name. Examples: rpm, dpkg, brew, npm, gem, nupkg, jar.
+
+type: keyword
+
+example: rpm
 
 --
 
@@ -5264,12 +5500,43 @@ These fields can help you correlate metrics information with a process id/name f
 *`process.args`*::
 +
 --
-Array of process arguments.
+Array of process arguments, starting with the absolute path to the executable.
 May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['ssh', '-l', 'user', '10.0.0.16']
+example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
+
+--
+
+*`process.command_line.text`*::
++
+--
+type: text
 
 --
 
@@ -5281,6 +5548,25 @@ Absolute path to the process executable.
 type: keyword
 
 example: /usr/bin/ssh
+
+--
+
+*`process.executable.text`*::
++
+--
+type: text
+
+--
+
+*`process.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
 
 --
 
@@ -5329,6 +5615,223 @@ Sometimes called program name or similar.
 type: keyword
 
 example: ssh
+
+--
+
+*`process.name.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.args`*::
++
+--
+Array of process arguments.
+May be filtered to protect sensitive information.
+
+type: keyword
+
+example: ['ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.parent.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.parent.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
+
+--
+
+*`process.parent.command_line.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.executable`*::
++
+--
+Absolute path to the process executable.
+
+type: keyword
+
+example: /usr/bin/ssh
+
+--
+
+*`process.parent.executable.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
+
+--
+
+*`process.parent.name`*::
++
+--
+Process name.
+Sometimes called program name or similar.
+
+type: keyword
+
+example: ssh
+
+--
+
+*`process.parent.name.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.pid`*::
++
+--
+Process id.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.ppid`*::
++
+--
+Parent process' pid.
+
+type: long
+
+example: 4241
+
+format: string
+
+--
+
+*`process.parent.start`*::
++
+--
+The time the process started.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
+*`process.parent.thread.id`*::
++
+--
+Thread ID.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
+*`process.parent.title`*::
++
+--
+Process title.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+type: keyword
+
+--
+
+*`process.parent.title.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`process.parent.working_directory`*::
++
+--
+The working directory of the process.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`process.parent.working_directory.text`*::
++
+--
+type: text
 
 --
 
@@ -5414,6 +5917,13 @@ type: keyword
 
 --
 
+*`process.title.text`*::
++
+--
+type: text
+
+--
+
 *`process.uptime`*::
 +
 --
@@ -5436,6 +5946,98 @@ example: /home/alice
 
 --
 
+*`process.working_directory.text`*::
++
+--
+type: text
+
+--
+
+[float]
+=== registry
+
+Fields related to Windows Registry operations.
+
+
+*`registry.data.bytes`*::
++
+--
+Original bytes written with base64 encoding.
+For Windows registry operations, such as SetValueEx and RegQueryValueEx, this corresponds to the data pointed by `lp_data`. This is optional but provides better recoverability and should be populated for REG_BINARY encoded values.
+
+type: keyword
+
+example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
+
+--
+
+*`registry.data.strings`*::
++
+--
+Content when writing string types.
+Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`registry.data.type`*::
++
+--
+Standard registry type for encoding contents
+
+type: keyword
+
+example: REG_SZ
+
+--
+
+*`registry.hive`*::
++
+--
+Abbreviated name for the hive.
+
+type: keyword
+
+example: HKLM
+
+--
+
+*`registry.key`*::
++
+--
+Hive-relative path of keys.
+
+type: keyword
+
+example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
+
+--
+
+*`registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
 [float]
 === related
 
@@ -5450,6 +6052,111 @@ A concrete example is IP addresses, which can be under host, observer, source, d
 All of the IPs seen on your event.
 
 type: ip
+
+--
+
+*`related.user`*::
++
+--
+All the user names seen on your event.
+
+type: keyword
+
+--
+
+[float]
+=== rule
+
+Rule fields are used to capture the specifics of any observer or agent rules that generate alerts or other notable events.
+Examples of data sources that would populate the rule fields include: network admission control platforms, network or host IDS/IPS, network firewalls, web application firewalls, url filters, endpoint detection and response (EDR) systems, etc.
+
+
+*`rule.category`*::
++
+--
+A categorization value keyword used by the entity using the rule for detection of this event.
+
+type: keyword
+
+example: Attempted Information Leak
+
+--
+
+*`rule.description`*::
++
+--
+The description of the rule generating the event.
+
+type: keyword
+
+example: Block requests to public DNS over HTTPS / TLS protocols
+
+--
+
+*`rule.id`*::
++
+--
+A rule ID that is unique within the scope of an agent, observer, or other entity using the rule for detection of this event.
+
+type: keyword
+
+example: 101
+
+--
+
+*`rule.name`*::
++
+--
+The name of the rule or signature generating the event.
+
+type: keyword
+
+example: BLOCK_DNS_over_TLS
+
+--
+
+*`rule.reference`*::
++
+--
+Reference URL to additional information about the rule used to generate this event.
+The URL can point to the vendor's documentation about the rule. If that's not available, it can also be a link to a more general page describing this type of alert.
+
+type: keyword
+
+example: https://en.wikipedia.org/wiki/DNS_over_TLS
+
+--
+
+*`rule.ruleset`*::
++
+--
+Name of the ruleset, policy, group, or parent category in which the rule used to generate this event is a member.
+
+type: keyword
+
+example: Standard_Protocol_Filters
+
+--
+
+*`rule.uuid`*::
++
+--
+A rule ID that is unique within the scope of a set or group of agents, observers, or other entities using the rule for detection of this event.
+
+type: keyword
+
+example: 1100110011
+
+--
+
+*`rule.version`*::
++
+--
+The version / revision of the rule being used for analysis.
+
+type: keyword
+
+example: 1.1
 
 --
 
@@ -5490,6 +6197,13 @@ Organization name.
 type: keyword
 
 example: Google LLC
+
+--
+
+*`server.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -5723,6 +6437,13 @@ example: Albert Einstein
 
 --
 
+*`server.user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`server.user.group.domain`*::
 +
 --
@@ -5778,6 +6499,13 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+*`server.user.name.text`*::
++
+--
+type: text
 
 --
 
@@ -5909,6 +6637,13 @@ Organization name.
 type: keyword
 
 example: Google LLC
+
+--
+
+*`source.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -6142,6 +6877,13 @@ example: Albert Einstein
 
 --
 
+*`source.user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`source.user.group.domain`*::
 +
 --
@@ -6200,17 +6942,24 @@ example: albert
 
 --
 
+*`source.user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === threat
 
 Fields to classify events and alerts according to a threat taxonomy such as the Mitre ATT&CK framework.
-These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a  common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat  (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by  this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
 *`threat.framework`*::
 +
 --
-Name of the threat framework used to further categorize and classify the tactic and technique of the reported threat.   Framework classification can be provided by detecting systems, evaluated at ingest time, or retrospectively tagged to events.
+Name of the threat framework used to further categorize and classify the tactic and technique of the reported threat. Framework classification can be provided by detecting systems, evaluated at ingest time, or retrospectively tagged to events.
 
 type: keyword
 
@@ -6273,6 +7022,13 @@ example: endpoint denial of service
 
 --
 
+*`threat.technique.name.text`*::
++
+--
+type: text
+
+--
+
 *`threat.technique.reference`*::
 +
 --
@@ -6281,6 +7037,327 @@ The reference url of technique used by this tactic. You can use the Mitre ATT&CK
 type: keyword
 
 example: https://attack.mitre.org/techniques/T1499/
+
+--
+
+[float]
+=== tls
+
+Fields related to a TLS connection. These fields focus on the TLS protocol itself and intentionally avoids in-depth analysis of the related x.509 certificate files.
+
+
+*`tls.cipher`*::
++
+--
+String indicating the cipher used during the current connection.
+
+type: keyword
+
+example: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+
+--
+
+*`tls.client.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.client.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.client.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.client.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.client.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.client.issuer`*::
++
+--
+Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.ja3`*::
++
+--
+A hash that identifies clients based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: d4e5b18d6b55c71272893221c96ba240
+
+--
+
+*`tls.client.not_after`*::
++
+--
+Date/Time indicating when client certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.not_before`*::
++
+--
+Date/Time indicating when client certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.server_name`*::
++
+--
+Also called an SNI, this tells the server which hostname to which the client is attempting to connect. When this value is available, it should get copied to `destination.domain`.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`tls.client.subject`*::
++
+--
+Distinguished name of subject of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=myclient, OU=Documentation Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.supported_ciphers`*::
++
+--
+Array of ciphers offered by the client during the client hello.
+
+type: keyword
+
+example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+
+--
+
+*`tls.curve`*::
++
+--
+String indicating the curve used for the given cipher, when applicable.
+
+type: keyword
+
+example: secp256r1
+
+--
+
+*`tls.established`*::
++
+--
+Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
+
+type: boolean
+
+--
+
+*`tls.next_protocol`*::
++
+--
+String indicating the protocol being tunneled. Per the values in the IANA registry (https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
+
+type: keyword
+
+example: http/1.1
+
+--
+
+*`tls.resumed`*::
++
+--
+Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
+
+type: boolean
+
+--
+
+*`tls.server.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.server.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.server.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.server.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.server.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.server.issuer`*::
++
+--
+Subject of the issuer of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.server.ja3s`*::
++
+--
+A hash that identifies servers based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: 394441ab65754e2207b1e1b457b3641d
+
+--
+
+*`tls.server.not_after`*::
++
+--
+Timestamp indicating when server certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.not_before`*::
++
+--
+Timestamp indicating when server certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.subject`*::
++
+--
+Subject of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.version`*::
++
+--
+Numeric part of the version parsed from the original string.
+
+type: keyword
+
+example: 1.2
+
+--
+
+*`tls.version_protocol`*::
++
+--
+Normalized lowercase protocol name parsed from original string.
+
+type: keyword
+
+example: tls
 
 --
 
@@ -6366,6 +7443,13 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 
 --
 
+*`url.full.text`*::
++
+--
+type: text
+
+--
+
 *`url.original`*::
 +
 --
@@ -6376,6 +7460,13 @@ This field is meant to represent the URL as it was observed, complete or not.
 type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+--
+
+*`url.original.text`*::
++
+--
+type: text
 
 --
 
@@ -6503,6 +7594,13 @@ example: Albert Einstein
 
 --
 
+*`user.full_name.text`*::
++
+--
+type: text
+
+--
+
 *`user.group.domain`*::
 +
 --
@@ -6561,6 +7659,13 @@ example: albert
 
 --
 
+*`user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === user_agent
 
@@ -6593,11 +7698,18 @@ example: Safari
 *`user_agent.original`*::
 +
 --
-Unparsed version of the user_agent.
+Unparsed user_agent string.
 
 type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+--
+
+*`user_agent.original.text`*::
++
+--
+type: text
 
 --
 
@@ -6623,6 +7735,13 @@ example: Mac OS Mojave
 
 --
 
+*`user_agent.os.full.text`*::
++
+--
+type: text
+
+--
+
 *`user_agent.os.kernel`*::
 +
 --
@@ -6642,6 +7761,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`user_agent.os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -6675,6 +7801,165 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vulnerability
+
+The vulnerability fields describe information about a vulnerability that is relevant to an event.
+
+
+*`vulnerability.category`*::
++
+--
+The type of system or architecture that the vulnerability affects. These may be platform-specific (for example, Debian or SUSE) or general (for example, Database or Firewall). For example (https://qualysguard.qualys.com/qwebhelp/fo_portal/knowledgebase/vulnerability_categories.htm[Qualys vulnerability categories])
+This field must be an array.
+
+type: keyword
+
+example: ["Firewall"]
+
+--
+
+*`vulnerability.classification`*::
++
+--
+The classification of the vulnerability scoring system. For example (https://www.first.org/cvss/)
+
+type: keyword
+
+example: CVSS
+
+--
+
+*`vulnerability.description`*::
++
+--
+The description of the vulnerability that provides additional context of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created[Common Vulnerabilities and Exposure CVE description])
+
+type: keyword
+
+example: In macOS before 2.12.6, there is a vulnerability in the RPC...
+
+--
+
+*`vulnerability.description.text`*::
++
+--
+type: text
+
+--
+
+*`vulnerability.enumeration`*::
++
+--
+The type of identifier used for this vulnerability. For example (https://cve.mitre.org/about/)
+
+type: keyword
+
+example: CVE
+
+--
+
+*`vulnerability.id`*::
++
+--
+The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)[Common Vulnerabilities and Exposure CVE ID]
+
+type: keyword
+
+example: CVE-2019-00001
+
+--
+
+*`vulnerability.reference`*::
++
+--
+A resource that provides additional information, context, and mitigations for the identified vulnerability.
+
+type: keyword
+
+example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-6111
+
+--
+
+*`vulnerability.report_id`*::
++
+--
+The report or scan identification number.
+
+type: keyword
+
+example: 20191018.0001
+
+--
+
+*`vulnerability.scanner.vendor`*::
++
+--
+The name of the vulnerability scanner vendor.
+
+type: keyword
+
+example: Tenable
+
+--
+
+*`vulnerability.score.base`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Base scores cover an assessment for exploitability metrics (attack vector, complexity, privileges, and user interaction), impact metrics (confidentiality, integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.environmental`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Environmental scores cover an assessment for any modified Base metrics, confidentiality, integrity, and availability requirements. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.temporal`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Temporal scores cover an assessment for code maturity, remediation level, and confidence. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+--
+
+*`vulnerability.score.version`*::
++
+--
+The National Vulnerability Database (NVD) provides qualitative severity rankings of "Low", "Medium", and "High" for CVSS v2.0 base score ranges in addition to the severity ratings for CVSS v3.0 as they are defined in the CVSS v3.0 specification.
+CVSS is owned and managed by FIRST.Org, Inc. (FIRST), a US-based non-profit organization, whose mission is to help computer security incident response teams across the world. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: 2.0
+
+--
+
+*`vulnerability.severity`*::
++
+--
+The severity of the vulnerability can help with metrics and internal prioritization regarding remediation. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: Critical
 
 --
 
@@ -8054,15 +9339,16 @@ If the call resulted in exceptions, this field contains the exceptions in a huma
 
 --
 
-[[exported-fields-tls]]
-== TLS fields
+[[exported-fields-tls_detailed]]
+== Detailed TLS fields
 
-TLS-specific event fields.
-
-
+Detailed TLS-specific event fields.
 
 
-*`tls.version`*::
+
+
+
+*`tls.detailed.version`*::
 +
 --
 The version of the TLS protocol used.
@@ -8074,27 +9360,7 @@ example: TLS 1.3
 
 --
 
-*`tls.handshake_completed`*::
-+
---
-Whether the TLS negotiation has been successful and the session has transitioned to encrypted mode.
-
-
-type: boolean
-
---
-
-*`tls.resumed`*::
-+
---
-If the TLS session has been resumed from a previous session.
-
-
-type: boolean
-
---
-
-*`tls.resumption_method`*::
+*`tls.detailed.resumption_method`*::
 +
 --
 If the session has been resumed, the underlying method used. One of "id" for TLS session ID or "ticket" for TLS ticket extension.
@@ -8104,7 +9370,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate_requested`*::
+*`tls.detailed.client_certificate_requested`*::
 +
 --
 Whether the server has requested the client to authenticate itself using a client certificate.
@@ -8115,7 +9381,7 @@ type: boolean
 --
 
 
-*`tls.client_hello.version`*::
+*`tls.detailed.client_hello.version`*::
 +
 --
 The version of the TLS protocol by which the client wishes to communicate during this session.
@@ -8125,17 +9391,17 @@ type: keyword
 
 --
 
-*`tls.client_hello.supported_ciphers`*::
+*`tls.detailed.client_hello.session_id`*::
 +
 --
-List of ciphers the client is willing to use for this session. See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+Unique number to identify the session for the corresponding connection with the client.
 
 
-type: array
+type: keyword
 
 --
 
-*`tls.client_hello.supported_compression_methods`*::
+*`tls.detailed.client_hello.supported_compression_methods`*::
 +
 --
 The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
@@ -8151,7 +9417,7 @@ type: array
 The hello extensions provided by the client.
 
 
-*`tls.client_hello.extensions.server_name_indication`*::
+*`tls.detailed.client_hello.extensions.server_name_indication`*::
 +
 --
 List of hostnames
@@ -8160,7 +9426,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.application_layer_protocol_negotiation`*::
+*`tls.detailed.client_hello.extensions.application_layer_protocol_negotiation`*::
 +
 --
 List of application-layer protocols the client is willing to use.
@@ -8170,7 +9436,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.session_ticket`*::
+*`tls.detailed.client_hello.extensions.session_ticket`*::
 +
 --
 Length of the session ticket, if provided, or an empty string to advertise support for tickets.
@@ -8180,7 +9446,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.supported_versions`*::
+*`tls.detailed.client_hello.extensions.supported_versions`*::
 +
 --
 List of TLS versions that the client is willing to use.
@@ -8190,7 +9456,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.supported_groups`*::
+*`tls.detailed.client_hello.extensions.supported_groups`*::
 +
 --
 List of Elliptic Curve Cryptography (ECC) curve groups supported by the client.
@@ -8200,7 +9466,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.signature_algorithms`*::
+*`tls.detailed.client_hello.extensions.signature_algorithms`*::
 +
 --
 List of signature algorithms that may be use in digital signatures.
@@ -8210,7 +9476,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.ec_points_formats`*::
+*`tls.detailed.client_hello.extensions.ec_points_formats`*::
 +
 --
 List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
@@ -8220,7 +9486,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions._unparsed_`*::
+*`tls.detailed.client_hello.extensions._unparsed_`*::
 +
 --
 List of extensions that were left unparsed by Packetbeat.
@@ -8231,7 +9497,7 @@ type: keyword
 --
 
 
-*`tls.server_hello.version`*::
+*`tls.detailed.server_hello.version`*::
 +
 --
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
@@ -8241,17 +9507,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.selected_cipher`*::
-+
---
-The cipher suite selected by the server from the list provided by in the client hello.
-
-
-type: keyword
-
---
-
-*`tls.server_hello.selected_compression_method`*::
+*`tls.detailed.server_hello.selected_compression_method`*::
 +
 --
 The compression method selected by the server from the list provided in the client hello.
@@ -8261,7 +9517,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.session_id`*::
+*`tls.detailed.server_hello.session_id`*::
 +
 --
 Unique number to identify the session for the corresponding connection with the client.
@@ -8277,7 +9533,7 @@ type: keyword
 The hello extensions provided by the server.
 
 
-*`tls.server_hello.extensions.application_layer_protocol_negotiation`*::
+*`tls.detailed.server_hello.extensions.application_layer_protocol_negotiation`*::
 +
 --
 Negotiated application layer protocol
@@ -8286,7 +9542,7 @@ type: array
 
 --
 
-*`tls.server_hello.extensions.session_ticket`*::
+*`tls.detailed.server_hello.extensions.session_ticket`*::
 +
 --
 Used to announce that a session ticket will be provided by the server. Always an empty string.
@@ -8296,7 +9552,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions.supported_versions`*::
+*`tls.detailed.server_hello.extensions.supported_versions`*::
 +
 --
 Negotiated TLS version to be used.
@@ -8306,7 +9562,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions.ec_points_formats`*::
+*`tls.detailed.server_hello.extensions.ec_points_formats`*::
 +
 --
 List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the server can parse.
@@ -8316,7 +9572,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions._unparsed_`*::
+*`tls.detailed.server_hello.extensions._unparsed_`*::
 +
 --
 List of extensions that were left unparsed by Packetbeat.
@@ -8332,7 +9588,7 @@ type: keyword
 Certificate provided by the client for authentication.
 
 
-*`tls.client_certificate.version`*::
+*`tls.detailed.client_certificate.version`*::
 +
 --
 X509 format version.
@@ -8341,7 +9597,7 @@ type: long
 
 --
 
-*`tls.client_certificate.serial_number`*::
+*`tls.detailed.client_certificate.serial_number`*::
 +
 --
 The certificate's serial number.
@@ -8350,7 +9606,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.not_before`*::
+*`tls.detailed.client_certificate.not_before`*::
 +
 --
 Date before which the certificate is not valid.
@@ -8359,7 +9615,7 @@ type: date
 
 --
 
-*`tls.client_certificate.not_after`*::
+*`tls.detailed.client_certificate.not_after`*::
 +
 --
 Date after which the certificate expires.
@@ -8368,7 +9624,7 @@ type: date
 
 --
 
-*`tls.client_certificate.public_key_algorithm`*::
+*`tls.detailed.client_certificate.public_key_algorithm`*::
 +
 --
 The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
@@ -8378,7 +9634,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.public_key_size`*::
+*`tls.detailed.client_certificate.public_key_size`*::
 +
 --
 Size of the public key.
@@ -8387,7 +9643,7 @@ type: long
 
 --
 
-*`tls.client_certificate.signature_algorithm`*::
+*`tls.detailed.client_certificate.signature_algorithm`*::
 +
 --
 The algorithm used for the certificate's signature.
@@ -8397,21 +9653,12 @@ type: keyword
 
 --
 
-*`tls.client_certificate.alternative_names`*::
+*`tls.detailed.client_certificate.alternative_names`*::
 +
 --
 Subject Alternative Names for this certificate.
 
 type: array
-
---
-
-*`tls.client_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
-
-type: keyword
 
 --
 
@@ -8421,7 +9668,7 @@ type: keyword
 Subject represented by this certificate.
 
 
-*`tls.client_certificate.subject.country`*::
+*`tls.detailed.client_certificate.subject.country`*::
 +
 --
 Country code.
@@ -8430,7 +9677,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.organization`*::
+*`tls.detailed.client_certificate.subject.organization`*::
 +
 --
 Organization name.
@@ -8439,7 +9686,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.organizational_unit`*::
+*`tls.detailed.client_certificate.subject.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -8448,7 +9695,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.province`*::
+*`tls.detailed.client_certificate.subject.province`*::
 +
 --
 Province or region within country.
@@ -8457,10 +9704,19 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.common_name`*::
+*`tls.detailed.client_certificate.subject.common_name`*::
 +
 --
 Name or host name identified by the certificate.
+
+type: keyword
+
+--
+
+*`tls.detailed.client_certificate.subject.locality`*::
++
+--
+Locality.
 
 type: keyword
 
@@ -8472,7 +9728,7 @@ type: keyword
 Entity that issued and signed this certificate.
 
 
-*`tls.client_certificate.issuer.country`*::
+*`tls.detailed.client_certificate.issuer.country`*::
 +
 --
 Country code.
@@ -8481,7 +9737,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.organization`*::
+*`tls.detailed.client_certificate.issuer.organization`*::
 +
 --
 Organization name.
@@ -8490,7 +9746,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.organizational_unit`*::
+*`tls.detailed.client_certificate.issuer.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -8499,7 +9755,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.province`*::
+*`tls.detailed.client_certificate.issuer.province`*::
 +
 --
 Province or region within country.
@@ -8508,7 +9764,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.common_name`*::
+*`tls.detailed.client_certificate.issuer.common_name`*::
 +
 --
 Name or host name identified by the certificate.
@@ -8517,29 +9773,10 @@ type: keyword
 
 --
 
-
-*`tls.client_certificate.fingerprint.md5`*::
+*`tls.detailed.client_certificate.issuer.locality`*::
 +
 --
-Certificate's MD5 fingerprint.
-
-type: keyword
-
---
-
-*`tls.client_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.client_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
+Locality.
 
 type: keyword
 
@@ -8551,7 +9788,7 @@ type: keyword
 Certificate provided by the server for authentication.
 
 
-*`tls.server_certificate.version`*::
+*`tls.detailed.server_certificate.version`*::
 +
 --
 X509 format version.
@@ -8560,7 +9797,7 @@ type: long
 
 --
 
-*`tls.server_certificate.serial_number`*::
+*`tls.detailed.server_certificate.serial_number`*::
 +
 --
 The certificate's serial number.
@@ -8569,7 +9806,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.not_before`*::
+*`tls.detailed.server_certificate.not_before`*::
 +
 --
 Date before which the certificate is not valid.
@@ -8578,7 +9815,7 @@ type: date
 
 --
 
-*`tls.server_certificate.not_after`*::
+*`tls.detailed.server_certificate.not_after`*::
 +
 --
 Date after which the certificate expires.
@@ -8587,7 +9824,7 @@ type: date
 
 --
 
-*`tls.server_certificate.public_key_algorithm`*::
+*`tls.detailed.server_certificate.public_key_algorithm`*::
 +
 --
 The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
@@ -8597,7 +9834,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.public_key_size`*::
+*`tls.detailed.server_certificate.public_key_size`*::
 +
 --
 Size of the public key.
@@ -8606,7 +9843,7 @@ type: long
 
 --
 
-*`tls.server_certificate.signature_algorithm`*::
+*`tls.detailed.server_certificate.signature_algorithm`*::
 +
 --
 The algorithm used for the certificate's signature.
@@ -8616,21 +9853,12 @@ type: keyword
 
 --
 
-*`tls.server_certificate.alternative_names`*::
+*`tls.detailed.server_certificate.alternative_names`*::
 +
 --
 Subject Alternative Names for this certificate.
 
 type: array
-
---
-
-*`tls.server_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
-
-type: keyword
 
 --
 
@@ -8640,7 +9868,7 @@ type: keyword
 Subject represented by this certificate.
 
 
-*`tls.server_certificate.subject.country`*::
+*`tls.detailed.server_certificate.subject.country`*::
 +
 --
 Country code.
@@ -8649,7 +9877,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.organization`*::
+*`tls.detailed.server_certificate.subject.organization`*::
 +
 --
 Organization name.
@@ -8658,7 +9886,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.organizational_unit`*::
+*`tls.detailed.server_certificate.subject.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -8667,7 +9895,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.province`*::
+*`tls.detailed.server_certificate.subject.province`*::
 +
 --
 Province or region within country.
@@ -8676,10 +9904,19 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.common_name`*::
+*`tls.detailed.server_certificate.subject.common_name`*::
 +
 --
 Name or host name identified by the certificate.
+
+type: keyword
+
+--
+
+*`tls.detailed.server_certificate.subject.locality`*::
++
+--
+Locality.
 
 type: keyword
 
@@ -8691,7 +9928,7 @@ type: keyword
 Entity that issued and signed this certificate.
 
 
-*`tls.server_certificate.issuer.country`*::
+*`tls.detailed.server_certificate.issuer.country`*::
 +
 --
 Country code.
@@ -8700,7 +9937,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.organization`*::
+*`tls.detailed.server_certificate.issuer.organization`*::
 +
 --
 Organization name.
@@ -8709,7 +9946,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.organizational_unit`*::
+*`tls.detailed.server_certificate.issuer.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -8718,7 +9955,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.province`*::
+*`tls.detailed.server_certificate.issuer.province`*::
 +
 --
 Province or region within country.
@@ -8727,7 +9964,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.common_name`*::
+*`tls.detailed.server_certificate.issuer.common_name`*::
 +
 --
 Name or host name identified by the certificate.
@@ -8736,35 +9973,16 @@ type: keyword
 
 --
 
-
-*`tls.server_certificate.fingerprint.md5`*::
+*`tls.detailed.server_certificate.issuer.locality`*::
 +
 --
-Certificate's MD5 fingerprint.
+Locality.
 
 type: keyword
 
 --
 
-*`tls.server_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.server_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
-
-type: keyword
-
---
-
-*`tls.server_certificate_chain`*::
+*`tls.detailed.server_certificate_chain`*::
 +
 --
 Chain of trust for the server certificate.
@@ -8773,7 +9991,7 @@ type: array
 
 --
 
-*`tls.client_certificate_chain`*::
+*`tls.detailed.client_certificate_chain`*::
 +
 --
 Chain of trust for the client certificate.
@@ -8782,7 +10000,7 @@ type: array
 
 --
 
-*`tls.alert_types`*::
+*`tls.detailed.alert_types`*::
 +
 --
 An array containing the TLS alert type for every alert received.
@@ -8792,35 +10010,615 @@ type: keyword
 
 --
 
-[float]
-=== fingerprints
-
-Fingerprints for this TLS session.
-
-
-[float]
-=== ja3
-
-JA3 TLS client fingerprint
-
-
-*`tls.fingerprints.ja3.hash`*::
+*`tls.handshake_completed`*::
 +
 --
-The JA3 fingerprint hash for the client side.
+type: alias
 
-
-type: keyword
+alias to: tls.established
 
 --
 
-*`tls.fingerprints.ja3.str`*::
+*`tls.client_hello.supported_ciphers`*::
 +
 --
-The JA3 string used to calculate the hash.
+type: alias
 
+alias to: tls.client.supported_ciphers
 
-type: keyword
+--
+
+*`tls.server_hello.selected_cipher`*::
++
+--
+type: alias
+
+alias to: tls.cipher
+
+--
+
+*`tls.fingerprints.ja3`*::
++
+--
+type: alias
+
+alias to: tls.client.ja3
+
+--
+
+*`tls.resumption_method`*::
++
+--
+type: alias
+
+alias to: tls.detailed.resumption_method
+
+--
+
+*`tls.client_certificate_requested`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate_requested
+
+--
+
+*`tls.client_hello.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.version
+
+--
+
+*`tls.client_hello.session_id`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.session_id
+
+--
+
+*`tls.client_hello.supported_compression_methods`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.supported_compression_methods
+
+--
+
+*`tls.client_hello.extensions.server_name_indication`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.server_name_indication
+
+--
+
+*`tls.client_hello.extensions.application_layer_protocol_negotiation`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.application_layer_protocol_negotiation
+
+--
+
+*`tls.client_hello.extensions.session_ticket`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.session_ticket
+
+--
+
+*`tls.client_hello.extensions.supported_versions`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.supported_versions
+
+--
+
+*`tls.client_hello.extensions.supported_groups`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.supported_groups
+
+--
+
+*`tls.client_hello.extensions.signature_algorithms`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.signature_algorithms
+
+--
+
+*`tls.client_hello.extensions.ec_points_formats`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions.ec_points_formats
+
+--
+
+*`tls.client_hello.extensions._unparsed_`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_hello.extensions._unparsed_
+
+--
+
+*`tls.server_hello.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.version
+
+--
+
+*`tls.server_hello.selected_compression_method`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.selected_compression_method
+
+--
+
+*`tls.server_hello.session_id`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.session_id
+
+--
+
+*`tls.server_hello.extensions.application_layer_protocol_negotiation`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.application_layer_protocol_negotiation
+
+--
+
+*`tls.server_hello.extensions.session_ticket`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.session_ticket
+
+--
+
+*`tls.server_hello.extensions.supported_versions`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.supported_versions
+
+--
+
+*`tls.server_hello.extensions.ec_points_formats`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions.ec_points_formats
+
+--
+
+*`tls.server_hello.extensions._unparsed_`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_hello.extensions._unparsed_
+
+--
+
+*`tls.client_certificate.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.version
+
+--
+
+*`tls.client_certificate.serial_number`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.serial_number
+
+--
+
+*`tls.client_certificate.not_before`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.not_before
+
+--
+
+*`tls.client_certificate.not_after`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.not_after
+
+--
+
+*`tls.client_certificate.public_key_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.public_key_algorithm
+
+--
+
+*`tls.client_certificate.public_key_size`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.public_key_size
+
+--
+
+*`tls.client_certificate.signature_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.signature_algorithm
+
+--
+
+*`tls.client_certificate.alternative_names`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.alternative_names
+
+--
+
+*`tls.client_certificate.subject.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.country
+
+--
+
+*`tls.client_certificate.subject.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.organization
+
+--
+
+*`tls.client_certificate.subject.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.organizational_unit
+
+--
+
+*`tls.client_certificate.subject.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.province
+
+--
+
+*`tls.client_certificate.subject.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.common_name
+
+--
+
+*`tls.client_certificate.subject.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.subject.locality
+
+--
+
+*`tls.client_certificate.issuer.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.country
+
+--
+
+*`tls.client_certificate.issuer.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.organization
+
+--
+
+*`tls.client_certificate.issuer.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.organizational_unit
+
+--
+
+*`tls.client_certificate.issuer.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.province
+
+--
+
+*`tls.client_certificate.issuer.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.common_name
+
+--
+
+*`tls.client_certificate.issuer.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate.issuer.locality
+
+--
+
+*`tls.server_certificate.version`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.version
+
+--
+
+*`tls.server_certificate.serial_number`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.serial_number
+
+--
+
+*`tls.server_certificate.not_before`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.not_before
+
+--
+
+*`tls.server_certificate.not_after`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.not_after
+
+--
+
+*`tls.server_certificate.public_key_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.public_key_algorithm
+
+--
+
+*`tls.server_certificate.public_key_size`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.public_key_size
+
+--
+
+*`tls.server_certificate.signature_algorithm`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.signature_algorithm
+
+--
+
+*`tls.server_certificate.alternative_names`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.alternative_names
+
+--
+
+*`tls.server_certificate.subject.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.country
+
+--
+
+*`tls.server_certificate.subject.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.organization
+
+--
+
+*`tls.server_certificate.subject.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.organizational_unit
+
+--
+
+*`tls.server_certificate.subject.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.province
+
+--
+
+*`tls.server_certificate.subject.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.common_name
+
+--
+
+*`tls.server_certificate.subject.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.subject.locality
+
+--
+
+*`tls.server_certificate.issuer.country`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.country
+
+--
+
+*`tls.server_certificate.issuer.organization`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.organization
+
+--
+
+*`tls.server_certificate.issuer.organizational_unit`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.organizational_unit
+
+--
+
+*`tls.server_certificate.issuer.province`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.province
+
+--
+
+*`tls.server_certificate.issuer.common_name`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.common_name
+
+--
+
+*`tls.server_certificate.issuer.locality`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate.issuer.locality
+
+--
+
+*`tls.server_certificate_chain`*::
++
+--
+type: alias
+
+alias to: tls.detailed.server_certificate_chain
+
+--
+
+*`tls.client_certificate_chain`*::
++
+--
+type: alias
+
+alias to: tls.detailed.client_certificate_chain
+
+--
+
+*`tls.alert_types`*::
++
+--
+type: alias
+
+alias to: tls.detailed.alert_types
 
 --
 
