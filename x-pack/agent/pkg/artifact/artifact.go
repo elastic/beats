@@ -16,7 +16,7 @@ var packageArchMap = map[string]string{
 	"linux-binary-64":   "linux-x86_64.tar.gz",
 	"windows-binary-32": "windows-x86.zip",
 	"windows-binary-64": "windows-x86_64.zip",
-	"darwin-binary-32":  "darwin-x86_64.tar.gz",
+	"darwin-binary-32":  "darwin-x86.tar.gz",
 	"darwin-binary-64":  "darwin-x86_64.tar.gz",
 }
 
