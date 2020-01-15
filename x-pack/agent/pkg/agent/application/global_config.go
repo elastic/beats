@@ -22,7 +22,7 @@ func init() {
 	dataPath = retrieveDataPath()
 }
 
-// InjectAgentConfig injects config to a provided configuration. 
+// InjectAgentConfig injects config to a provided configuration.
 func InjectAgentConfig(c *config.Config) error {
 	globalConfig := AgentGlobalConfig()
 	if err := c.Merge(globalConfig); err != nil {
