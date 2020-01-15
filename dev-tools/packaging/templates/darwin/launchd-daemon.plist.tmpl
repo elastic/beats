@@ -7,6 +7,8 @@
 	<key>ProgramArguments</key>
 	<array>
             <string>{{.install_path}}/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}</string>
+	    <string>--environment</string>
+	    <string>macOS_service</string>
             <string>-c</string>
             <string>/etc/{{.BeatName}}/{{.BeatName}}.yml</string>
             <string>--path.home</string>

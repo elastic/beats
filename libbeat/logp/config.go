@@ -58,10 +58,13 @@ type FileConfig struct {
 // Beat is supposed to be run within.
 func DefaultConfig(environment Environment) Config {
 	switch environment {
-	case SystemdEnvironment:
+	case SystemdEnvironment, ContainerEnvironment:
 		return defaultSystemdConfig()
+
+	case MacOSServiceEnvironment, WindowsServiceEnvironment:
+		fallthrough
 	default:
-		return defaultEnvConfig()
+		return defaultToFileConfig()
 	}
 }
 
@@ -73,7 +76,7 @@ func defaultSystemdConfig() Config {
 	}
 }
 
-func defaultEnvConfig() Config {
+func defaultToFileConfig() Config {
 	return Config{
 		Level:   InfoLevel,
 		ToFiles: true,

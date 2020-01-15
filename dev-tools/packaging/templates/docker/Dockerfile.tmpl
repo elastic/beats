@@ -50,4 +50,4 @@ EXPOSE {{ $port }}
 
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-CMD ["-e"]
+CMD ["-environment", "docker"]

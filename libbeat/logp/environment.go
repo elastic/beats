@@ -17,11 +17,16 @@
 
 package logp
 
+import "strings"
+
 type Environment int
 
 const (
 	DefaultEnvironment Environment = iota
 	SystemdEnvironment
+	ContainerEnvironment
+	MacOSServiceEnvironment
+	WindowsServiceEnvironment
 	InvalidEnvironment
 )
 
@@ -31,17 +36,29 @@ func (v Environment) String() string {
 		return "default"
 	case SystemdEnvironment:
 		return "systemd"
+	case ContainerEnvironment:
+		return "container"
+	case MacOSServiceEnvironment:
+		return "macOS_service"
+	case WindowsServiceEnvironment:
+		return "windows_service"
 	default:
 		return "<invalid>"
 	}
 }
 
 func ParseEnvironment(in string) Environment {
-	switch in {
+	switch strings.ToLower(in) {
 	case "default":
 		return DefaultEnvironment
 	case "systemd":
 		return SystemdEnvironment
+	case "docker", "container", "kubernetes", "k8s":
+		return ContainerEnvironment
+	case "macos_service":
+		return MacOSServiceEnvironment
+	case "windows_service":
+		return WindowsServiceEnvironment
 	default:
 		return InvalidEnvironment
 	}
