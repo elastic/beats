@@ -29,10 +29,12 @@ import (
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys bool, addErrKey bool) {
 	if !overwriteKeys {
-		for k, v := range keys {
-			if _, exists := event.Fields[k]; !exists && k != "@timestamp" && k != "@metadata" {
-				event.Fields[k] = v
-			}
+		if keys != nil {
+			// DeepUpdate the event fields over the keys from the JSON. Ensures that the predefined
+			// event keys are not overwritten, but any nesting of map values is still added to the event.
+			fields := common.MapStr(keys)
+			fields.DeepUpdate(event.Fields)
+			event.Fields.Update(fields)
 		}
 		return
 	}
