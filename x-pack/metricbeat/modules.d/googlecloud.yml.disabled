@@ -1,5 +1,5 @@
 # Module: googlecloud
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-googlecloud.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-googlecloud.html
 
 - module: googlecloud
   metricsets:
