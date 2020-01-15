@@ -180,9 +180,11 @@ var ciscoIOS = (function() {
 
             setLogSource(evt);
 
+            var dissect = "";
+
             switch (facility) {
                 case "SEC":
-                    var dissect = accessListMessagePatterns[eventCode];
+                    dissect = accessListMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         coerceNumbers(evt);
@@ -202,9 +204,9 @@ var ciscoIOS = (function() {
                         }
                         return;
                     }
-
+                    break;
                 case "LINK":
-                    var dissect = linkMessagePatterns[eventCode];
+                    dissect = linkMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         setInterfaceProperties(evt);
@@ -217,8 +219,9 @@ var ciscoIOS = (function() {
                         normalizeEventAction(evt);
                         return;
                     }
+                    break;
                 case "LINEPROTO":
-                    var dissect = lineProtoMessagePatterns[eventCode];
+                    dissect = lineProtoMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         setInterfaceProperties(evt);
@@ -231,8 +234,9 @@ var ciscoIOS = (function() {
                         normalizeEventAction(evt);
                         return;
                     }
+                    break;
                 case "ILPOWER":
-                    var dissect = ilPowerMessagePatterns[eventCode];
+                    dissect = ilPowerMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         setInterfaceProperties(evt);
@@ -246,8 +250,9 @@ var ciscoIOS = (function() {
                         normalizeEventAction(evt);
                         return;
                     }
+                    break;
                 case "PORT_SECURITY":
-                    var dissect = portSecurityMessagePatterns[eventCode];
+                    dissect = portSecurityMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         normalizeInterfaceName(evt);
@@ -257,8 +262,9 @@ var ciscoIOS = (function() {
                         normalizeEventAction(evt);
                         return;
                     }
+                    break;
                 case "PM":
-                    var dissect = pmMessagePatterns[eventCode];
+                    dissect = pmMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         normalizeInterfaceName(evt);
@@ -272,8 +278,9 @@ var ciscoIOS = (function() {
                         normalizeEventAction(evt);
                         return;
                     }
+                    break;
                 case "PLATFORM":
-                    var dissect = platformMessagePatterns[eventCode];
+                    dissect = platformMessagePatterns[eventCode];
                     if (dissect) {
                         dissect(evt);
                         setCategorization(evt,"event","host","info","unknown");
@@ -291,6 +298,7 @@ var ciscoIOS = (function() {
                         }
                         return;
                     }
+                    break;
             }
         })
         .CommunityID()
@@ -320,7 +328,7 @@ var ciscoIOS = (function() {
 
     var normalizeInterfaceName = function(evt) {
         var ifName = evt.Get("interface.name");
-        var ifName = ifName.split('.').join('');
+        ifName = ifName.split('.').join('');
         var iSpace = ifName.indexOf(' ');
         if (iSpace > 0) {
             ifName = ifName.substring(0,iSpace);
@@ -335,18 +343,12 @@ var ciscoIOS = (function() {
         }
 
         var iCut = action.indexOf(' (');
-        if (iCut > 0) {
-            evt.Put("eventAction", action.substring(0,iCut));
-        }
-    };
-
-    var normalizeEventAction = function(evt) {
-        var action = evt.Get("event.action");
-        if (!action) {
-            return;
-        }
 
         switch (true) {
+            case (iCut > 0):
+                evt.Put("eventAction", action.substring(0,iCut));
+                break;
+
             case (action.search("Power granted") == 0):
                 evt.Put("event.action", "Power granted");
                 break;
@@ -387,7 +389,7 @@ var ciscoIOS = (function() {
             evt.Put("log.source.ip", source_address[0]);
             evt.Put("log.source.port", source_address[1]);
         }
-    }
+    };
 
     var setRelatedIP = function(event) {
         event.AppendTo("related.ip", event.Get("source.ip"));
