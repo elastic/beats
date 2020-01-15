@@ -95,7 +95,6 @@ If you use the +{beat_default_index_prefix}_system+ user, make sure you
 |`monitoring_user` and `kibana_user` roles
 |====
 
-
 [[privileges-to-publish-events]]
 ==== Privileges needed to publish events
 
