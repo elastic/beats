@@ -51,7 +51,7 @@ Link related issues below. Insert the issue link or reference after the word "Cl
 - Closes #123
 - Relates #123
 - Requires #123
-- Superseeds #123
+- Superseds #123
 -->
 - 
 
