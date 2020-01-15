@@ -341,11 +341,11 @@
                     description: Locality.
 
           - name: server_certificate_chain
-            type: keyword
+            type: array
             description: Chain of trust for the server certificate.
 
           - name: client_certificate_chain
-            type: keyword
+            type: array
             description: Chain of trust for the client certificate.
 
           - name: alert_types
