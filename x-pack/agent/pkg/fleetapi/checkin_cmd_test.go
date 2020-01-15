@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
