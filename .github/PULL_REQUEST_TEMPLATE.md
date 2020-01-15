@@ -3,6 +3,7 @@ Please label this PR with one of the following labels, depending on the scope of
 - Bug
 - Enhancement
 - Breaking change
+- Deprecation
 -->
 
 ## What does this PR do?
