@@ -9407,7 +9407,7 @@ type: keyword
 The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
 
 
-type: array
+type: keyword
 
 --
 
@@ -9538,7 +9538,7 @@ The hello extensions provided by the server.
 --
 Negotiated application layer protocol
 
-type: array
+type: keyword
 
 --
 
@@ -9658,7 +9658,7 @@ type: keyword
 --
 Subject Alternative Names for this certificate.
 
-type: array
+type: keyword
 
 --
 
@@ -9858,7 +9858,7 @@ type: keyword
 --
 Subject Alternative Names for this certificate.
 
-type: array
+type: keyword
 
 --
 
@@ -9987,7 +9987,7 @@ type: keyword
 --
 Chain of trust for the server certificate.
 
-type: array
+type: keyword
 
 --
 
@@ -9996,7 +9996,7 @@ type: array
 --
 Chain of trust for the client certificate.
 
-type: array
+type: keyword
 
 --
 

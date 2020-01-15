@@ -44,7 +44,7 @@
                   connection with the client.
 
               - name: supported_compression_methods
-                type: array
+                type: keyword
                 description: >
                   The list of compression methods the client supports.
                   See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
@@ -123,7 +123,7 @@
                 description: The hello extensions provided by the server.
                 fields:
                   - name: application_layer_protocol_negotiation
-                    type: array
+                    type: keyword
                     description: Negotiated application layer protocol
 
                   - name: session_ticket
@@ -185,7 +185,7 @@
                   The algorithm used for the certificate's signature.
 
               - name: alternative_names
-                type: array
+                type: keyword
                 description: Subject Alternative Names for this certificate.
 
               - name: subject
@@ -281,7 +281,7 @@
                   The algorithm used for the certificate's signature.
 
               - name: alternative_names
-                type: array
+                type: keyword
                 description: Subject Alternative Names for this certificate.
 
               - name: subject
@@ -341,11 +341,11 @@
                     description: Locality.
 
           - name: server_certificate_chain
-            type: array
+            type: keyword
             description: Chain of trust for the server certificate.
 
           - name: client_certificate_chain
-            type: array
+            type: keyword
             description: Chain of trust for the client certificate.
 
           - name: alert_types
