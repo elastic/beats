@@ -277,7 +277,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 				}
-				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
+				p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
 				// When ACK done, message will be deleted. Or when message is
 				// not s3 ObjectCreated event related(handleSQSMessage function
@@ -502,17 +502,37 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 }
 
 func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
+	// Create a context with a timeout that will abort the download if it takes
+	// more than the default timeout 1 minute.
+	timeout := time.Duration(1 * time.Minute)
+	ctx := context.Background()
+
+	var cancelFn func()
+	if timeout > 0 {
+		ctx, cancelFn = context.WithTimeout(ctx, timeout)
+	}
+
+	// Ensure the context is canceled to prevent leaking.
+	// See context package for more information, https://golang.org/pkg/context/
+	if cancelFn != nil {
+		defer cancelFn()
+	}
+
+	// Download the S3 object using GetObjectRequest. The Context will interrupt
+	// the request if the timeout expires.
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(p.context)
+	resp, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
+			// If the SDK can determine the request or retry delay was canceled
+			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				return nil, nil
+				return nil, errors.Wrapf(err, "GetObject of s3 file with key %v failed due to timeout", s3Info.key)
 			}
 
 			if awsErr.Code() == "NoSuchKey" {
