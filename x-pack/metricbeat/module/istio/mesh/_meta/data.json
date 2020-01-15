@@ -1,78 +1,95 @@
 {
-    "@timestamp": "2020-01-15T09:44:51.095Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "istio.mesh",
-        "module": "istio",
-        "duration": 63667069
+        "duration": 115000,
+        "module": "istio"
+    },
+    "istio": {
+        "mesh": {
+            "connection_security_policy": "none",
+            "destination": {
+                "app": "productpage",
+                "service": {
+                    "name": "productpage",
+                    "namespace": "default",
+                    "path": "productpage.default.svc.cluster.local"
+                },
+                "version": "v1",
+                "workload_namespace": "default"
+            },
+            "reporter": "destination",
+            "request": {
+                "bytes": {
+                    "count": {
+                        "bucket": {
+                            "+Inf": 1,
+                            "1": 1,
+                            "10": 1,
+                            "100": 1,
+                            "1000": 1,
+                            "10000": 1,
+                            "100000": 1,
+                            "1000000": 1,
+                            "10000000": 1,
+                            "100000000": 1
+                        },
+                        "count": 1,
+                        "sum": 0
+                    }
+                },
+                "duration": {
+                    "count": {
+                        "bucket": {
+                            "+Inf": 1,
+                            "0.005": 0,
+                            "0.01": 0,
+                            "0.025": 0,
+                            "0.05": 0,
+                            "0.1": 0,
+                            "0.25": 0,
+                            "0.5": 0,
+                            "1": 1,
+                            "10": 1,
+                            "2.5": 1,
+                            "5": 1
+                        },
+                        "count": 1,
+                        "sum": 0.656875796
+                    }
+                },
+                "protocol": "http"
+            },
+            "requests": 1,
+            "response": {
+                "bytes": {
+                    "count": {
+                        "bucket": {
+                            "+Inf": 1,
+                            "1": 0,
+                            "10": 0,
+                            "100": 0,
+                            "1000": 0,
+                            "10000": 1,
+                            "100000": 1,
+                            "1000000": 1,
+                            "10000000": 1,
+                            "100000000": 1
+                        },
+                        "count": 1,
+                        "sum": 5183
+                    }
+                },
+                "code": "200"
+            }
+        }
     },
     "metricset": {
         "name": "mesh",
         "period": 10000
     },
-    "istio": {
-        "mesh": {
-            "destination": {
-                "version": "v1",
-                "app": "ratings",
-                "workload_namespace": "default",
-                "service": {
-                    "name": "ratings",
-                    "namespace": "default",
-                    "path": "ratings.default.svc.cluster.local"
-                }
-            },
-            "response_code": "200",
-            "reporter": "destination",
-            "request_protocol": "http",
-            "connection_security_policy": "none",
-            "instance": "172.17.0.2:42422",
-            "job": "istio-mesh",
-            "bucket": {
-                "le": "10000",
-                "request": {
-                    "bytes": {
-                        "count": 14
-                    }
-                },
-                "response": {
-                    "bytes": {
-                        "count": 14
-                    }
-                }
-            }
-        }
-    },
-    "ecs": {
-        "version": "1.4.0"
-    },
-    "host": {
-        "os": {
-            "version": "10.14.6",
-            "family": "centos",
-            "name": "centos",
-            "kernel": "18.7.0",
-            "build": "18G95",
-            "platform": "centos"
-        },
-        "name": "vm1.local",
-        "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84",
-        "hostname": "Christoss-MacBook-Pro.local",
-        "architecture": "x86_64"
-    },
-    "agent": {
-        "ephemeral_id": "9a0f3fb7-362c-4502-aff8-3d68489978e3",
-        "hostname": "vm1.local",
-        "id": "fbaf40e4-c9f2-4d9f-840f-b3d8de51b42c",
-        "version": "8.0.0",
-        "type": "metricbeat"
-    },
     "service": {
-        "address": "localhost:9090",
+        "address": "127.0.0.1:55555",
         "type": "istio"
     }
 }

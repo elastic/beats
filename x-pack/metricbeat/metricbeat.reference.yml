@@ -504,10 +504,10 @@ metricbeat.modules:
   #      key: "value"
 
 #-------------------------------- Istio Module --------------------------------
-- module: coredns
-  metricsets: ["stats"]
+- module: istio
+  metricsets: ["mesh"]
   period: 10s
-  hosts: ["localhost:9153"]
+  hosts: ["localhost:42422"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

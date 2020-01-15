@@ -12,23 +12,22 @@ import (
 
 const (
 	defaultScheme = "http"
-	defaultPath   = "/federate"
+	defaultPath   = "/metrics"
 )
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		QueryParams:   mb.QueryParams{"match[]": "{__name__=~\"istio.*\"}"}.String(),
 	}.Build()
 )
 
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
-		"istio_requests_total":                  prometheus.Metric("requests"),
-		"istio_request_duration_seconds_bucket": prometheus.Metric("bucket.request.duration.count"),
-		"istio_request_bytes_bucket": prometheus.Metric("bucket.request.bytes.count"),
-		"istio_response_bytes_bucket": prometheus.Metric("bucket.response.bytes.count"),
+		"istio_requests_total":           prometheus.Metric("requests"),
+		"istio_request_duration_seconds": prometheus.Metric("request.duration.count"),
+		"istio_request_bytes":            prometheus.Metric("request.bytes.count"),
+		"istio_response_bytes":           prometheus.Metric("response.bytes.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
@@ -40,12 +39,11 @@ var mapping = &prometheus.MetricsMapping{
 		"destination_service_name":      prometheus.KeyLabel("destination.service.name"),
 		"destination_service_namespace": prometheus.KeyLabel("destination.service.namespace"),
 		"destination_version":           prometheus.KeyLabel("destination.version"),
-		"le":                            prometheus.KeyLabel("bucket.le"),
 
 		"destination_workload_namespace": prometheus.KeyLabel("destination.workload_namespace"),
 		"reporter":                       prometheus.KeyLabel("reporter"),
-		"request_protocol":               prometheus.KeyLabel("request_protocol"),
-		"response_code":                  prometheus.KeyLabel("response_code"),
+		"request_protocol":               prometheus.KeyLabel("request.protocol"),
+		"response_code":                  prometheus.KeyLabel("response.code"),
 	},
 }
 

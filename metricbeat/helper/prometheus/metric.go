@@ -195,13 +195,6 @@ func (m *commonMetric) GetConfiguration() Configuration {
 
 // GetValue returns the resulting value
 func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
-	untyped := metric.GetUntyped()
-	if untyped != nil {
-		if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
-			return int64(untyped.GetValue())
-		}
-	}
-
 	counter := metric.GetCounter()
 	if counter != nil {
 		if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
