@@ -889,6 +889,11 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 	}
 
 	if monitoring.IsEnabled(monitoringCfg) {
+		err := monitoring.OverrideWithCloudSettings(monitoringCfg)
+		if err != nil {
+			return nil, err
+		}
+
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			Format:          reporterSettings.Format,

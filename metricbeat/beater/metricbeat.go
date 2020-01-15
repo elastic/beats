@@ -170,7 +170,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 		failed := false
 
-		connector, err := module.NewConnector(b.Publisher, moduleCfg, nil)
+		connector, err := module.NewConnector(b.Info, b.Publisher, moduleCfg, nil)
 		if err != nil {
 			errs = append(errs, err)
 			failed = true
@@ -201,7 +201,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 	if config.Autodiscover != nil {
 		var err error
-		factory := module.NewFactory(metricbeat.moduleOptions...)
+		factory := module.NewFactory(b.Info, metricbeat.moduleOptions...)
 		adapter := autodiscover.NewFactoryAdapter(factory)
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
@@ -238,7 +238,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(bt.moduleOptions...)
+	factory := module.NewFactory(b.Info, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
 	wg.Add(1)

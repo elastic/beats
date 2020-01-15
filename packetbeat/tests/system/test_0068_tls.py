@@ -31,7 +31,7 @@ class Test(BaseTest):
 
         assert o["status"] == "OK"
 
-        assert o["tls.fingerprints.ja3.hash"] == "ba7a226ea102737ecfa8959f26b28b95"
-        assert o["tls.version"] == "TLS 1.2"
-        assert o["tls.client_hello.extensions.server_name_indication"] == ["localhost"]
-        assert o["tls.server_certificate.subject.common_name"] == "localhost"
+        assert o["tls.client.ja3"] == "ba7a226ea102737ecfa8959f26b28b95"
+        assert o["tls.detailed.version"] == "TLS 1.2"
+        assert o["tls.detailed.client_hello.extensions.server_name_indication"] == ["localhost"]
+        assert o["tls.detailed.server_certificate.subject.common_name"] == "localhost"

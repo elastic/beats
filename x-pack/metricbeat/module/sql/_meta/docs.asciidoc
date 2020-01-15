@@ -1,0 +1,3 @@
+This is the sql module that fetches metrics from a SQL database. You can define driver, datasource and SQL query.
+
+

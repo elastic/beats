@@ -87,7 +87,7 @@ options that are specific to that monitor type.
 The type of monitor to run. One of:
 
 * `icmp`: Uses an ICMP (v4 and v6) Echo Request to ping the configured hosts.
-Requires root access. See <<monitor-icmp-options>>.
+Requires special permissions or root access. See <<monitor-icmp-options>>.
 * `tcp`: Connects via TCP and optionally verifies the endpoint by sending and/or
 receiving a custom payload. See <<monitor-tcp-options>>.
 * `http`: Connects via HTTP and optionally verifies that the host returns the
@@ -231,7 +231,15 @@ the output document. By default, `keep_null` is set to `false`.
 
 These options configure {beatname_uc} to use ICMP (v4 and v6) Echo Requests to check
 the configured hosts. These options are valid when the <<monitor-type,`type`>> is
-`icmp`.
+`icmp`. Please note that on most platforms you must execute Heartbeat with elevated permissions
+to perform ICMP pings.
+
+On Linux, regular users may perform pings if the right file capabilities are set. Run
+`sudo setcap cap_net_raw+eip /path/to/heartbeat` to  grant {beatname_uc} ping capabilities on Linux.
+Alternatively, one may grant ping permissions to the user {beatname_uc} runs as. To grant ping permissions
+in this way, run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
+
+Other platforms may require {beatname_uc} to run as root or administrator to execute pings.
 
 [float]
 [[monitor-icmp-hosts]]
@@ -697,5 +705,3 @@ the following JSON objects in `dynamic.json`:
 restarts it with a schedule of 15 seconds between checks.
 <2> {beatname_uc} starts a new monitor that uses a TLS-based connection with a
 custom CA certificate.
-
-

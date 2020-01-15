@@ -237,6 +237,10 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEA
 
 - Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
 
+*Winlogbeat*
+
+- Add an `index` option to all event logs to specify the output index for events from that source. {pull}15062[15062]
+
 
 ==== Known Issue
 

@@ -25,32 +25,10 @@ security-related configuration options.
 
 // end::shared-outputconfig[]
 
-* <<elasticsearch-output>>
-* <<logstash-output>>
-* <<kafka-output>>
-ifndef::no-output-redis[]
-* <<redis-output>>
-endif::[]
-* <<file-output>>
-* <<console-output>>
-* <<configure-cloud-id>>
+include::outputs-list.asciidoc[tag=outputs-list]
 
 ifdef::beat-specific-output-config[]
 include::{beat-specific-output-config}[]
 endif::[]
 
-include::outputs/output-elasticsearch.asciidoc[]
-
-include::outputs/output-logstash.asciidoc[]
-
-include::outputs/output-kafka.asciidoc[]
-
-include::outputs/output-redis.asciidoc[]
-
-include::outputs/output-file.asciidoc[]
-
-include::outputs/output-console.asciidoc[]
-
-include::outputs/output-cloud.asciidoc[]
-
-include::outputs/change-output-codec.asciidoc[]
+include::outputs-list.asciidoc[tag=outputs-include]

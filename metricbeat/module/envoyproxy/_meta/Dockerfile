@@ -1,5 +1,5 @@
 ARG ENVOYPROXY_VERSION
-FROM envoyproxy/envoy:${ENVOYPROXY_VERSION}
+FROM envoyproxy/envoy:v${ENVOYPROXY_VERSION}
 RUN apt-get update && apt-get install -y wget
 EXPOSE 10000 9901
 COPY envoy.yaml /etc/envoy.yaml

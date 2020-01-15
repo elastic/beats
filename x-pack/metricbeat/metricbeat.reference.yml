@@ -281,6 +281,16 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -422,6 +432,16 @@ metricbeat.modules:
   expvar:
     namespace: "example"
     path: "/debug/vars"
+
+#------------------------ Google Cloud Platform Module ------------------------
+- module: googlecloud
+  metricsets:
+    - compute
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
 
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
@@ -616,6 +636,8 @@ metricbeat.modules:
     - state_cronjob
     - state_resourcequota
     - state_service
+    - state_persistentvolume
+    - state_persistentvolumeclaim
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -734,7 +756,9 @@ metricbeat.modules:
   metricsets:
     - "transaction_log"
     - "performance"
-  hosts: ["sqlserver://sa@localhost"]
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
   period: 10s
 
 
@@ -905,6 +929,27 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#--------------------------------- Sql Module ---------------------------------
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["localhost"]
+
+  driver: "postgres"
+  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
+  sql_query: "select now()"
+
+
+#--------------------------------- Stan Module ---------------------------------
+- module: stan
+  metricsets: ["stats", "channels", "subscriptions"]
+  period: 60s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/streaming/serverz"
+  #channels.metrics_path: "/streaming/channelsz"
+  #subscriptions.metrics_path: "/streaming/channelsz" # we retrieve streaming subscriptions with a detailed query param to the channelsz endpoint
 
 #-------------------------------- Statsd Module --------------------------------
 - module: statsd

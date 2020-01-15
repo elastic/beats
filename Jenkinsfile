@@ -51,6 +51,7 @@ pipeline {
           env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
           env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
           env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+          env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
           env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
           env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
           env.BUILD_GENERATOR = isChanged(["^generator/.*"])
@@ -325,6 +326,25 @@ pipeline {
             }
           }
         }
+        stage('dockerlogbeat'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_DOCKERLOGBEAT != "false"
+            }
+          }
+          stages {
+            stage('Dockerlogbeat'){
+              steps {
+                withBeatsEnv(){
+                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
+                }
+              }
+            }
+          }
+        }
         stage('Winlogbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -404,14 +424,14 @@ pipeline {
             stage('Generators Metricbeat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
+                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test test-package")
                 }
               }
             }
             stage('Generators Beat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Beat Linux", "-C generator/beat test")
+                  makeTarget("Generators Beat Linux", "-C generator/beat test test-package")
                 }
               }
             }

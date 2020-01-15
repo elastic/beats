@@ -123,36 +123,48 @@ filebeat.modules:
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
 
+  cloudtrail:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
   activitylogs:
     enabled: true
     var:
-      # Azure event hub namespace FQDN for example "eventhubs.servicebus.windows.net:9093"
-      namespace: ""
       # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
-      eventhub: ["insights-operational-logs"]
+      eventhub: "insights-operational-logs"
       # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
       consumer_group: "$Default"
       # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
       connection_string: ""
+      # the name of the storage account the state/offsets will be stored and updated.
+      storage_account: ""
+      #The storage account key, this key will be used to authorize access to data in your storage account.
+      storage_account_key: ""
 
- # auditlogs:
- #   enabled: true
+  auditlogs:
+    enabled: false
  #   var:
- #     namespace: ""
- #     eventhub: ["insights-logs-auditlogs"]
+ #     eventhub: "insights-logs-auditlogs"
  #     consumer_group: "$Default"
  #     connection_string: ""
-
- # signinlogs:
- #   enabled: true
+ #     storage_account: ""
+ #     storage_account_key: ""
+  signinlogs:
+    enabled: false
  #   var:
- #     namespace: ""
- #     eventhub: ["insights-logs-signinlogs"]
+ #     eventhub: "insights-logs-signinlogs"
  #     consumer_group: "$Default"
  #     connection_string: ""
+ #     storage_account: ""
+ #     storage_account_key: ""
 
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
@@ -309,6 +321,24 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: googlecloud-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -453,6 +483,14 @@ filebeat.modules:
 - module: misp
   threat:
     enabled: true
+    # API key to access MISP
+    #var.api_key
+
+    # Array object in MISP response
+    #var.json_objects_array
+
+    # URL of the MISP REST API
+    #var.url
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb

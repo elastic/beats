@@ -34,8 +34,8 @@
         "zeek.connection.local_orig": true,
         "zeek.connection.local_resp": true,
         "zeek.connection.missed_bytes": 0,
-        "zeek.connection.state.code": "SF",
-        "zeek.connection.state.msg": "Normal establishment and termination.",
+        "zeek.connection.state": "SF",
+        "zeek.connection.state_message": "Normal establishment and termination.",
         "zeek.session_id": "CAcJw21BbVedgFnYH3"
     },
     {
@@ -78,8 +78,8 @@
         "zeek.connection.local_orig": true,
         "zeek.connection.local_resp": false,
         "zeek.connection.missed_bytes": 0,
-        "zeek.connection.state.code": "SF",
-        "zeek.connection.state.msg": "Normal establishment and termination.",
+        "zeek.connection.state": "SF",
+        "zeek.connection.state_message": "Normal establishment and termination.",
         "zeek.session_id": "CAcJw21BbVedgFnYH4"
     },
     {
@@ -127,8 +127,8 @@
         "zeek.connection.local_orig": false,
         "zeek.connection.local_resp": false,
         "zeek.connection.missed_bytes": 0,
-        "zeek.connection.state.code": "SF",
-        "zeek.connection.state.msg": "Normal establishment and termination.",
+        "zeek.connection.state": "SF",
+        "zeek.connection.state_message": "Normal establishment and termination.",
         "zeek.session_id": "CAcJw21BbVedgFnYH5"
     },
     {
@@ -161,8 +161,8 @@
         "zeek.connection.local_orig": false,
         "zeek.connection.local_resp": false,
         "zeek.connection.missed_bytes": 0,
-        "zeek.connection.state.code": "OTH",
-        "zeek.connection.state.msg": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
+        "zeek.connection.state": "OTH",
+        "zeek.connection.state_message": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
         "zeek.session_id": "Cc6NJ3GRlfjE44I3h"
     }
 ]

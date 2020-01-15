@@ -192,9 +192,6 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
-		if logp.IsDebug(debugSelector) {
-			debugf("setting event.Meta[\"topic\"] = %v", topic)
-		}
 		if _, err := data.Cache.Put("topic", topic); err != nil {
 			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %v", err)
 		}

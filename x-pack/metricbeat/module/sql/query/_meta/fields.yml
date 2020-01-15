@@ -1,0 +1,24 @@
+- name: query
+  type: group
+  release: beta
+  description: >
+    query
+  fields:
+    - name: driver
+      type: keyword
+      description: >
+        Driver used to execute the query.
+    - name: query
+      type: keyword
+      description: >
+        Query executed to collect metrics.
+    - name: metrics.numeric.*
+      type: object
+      object_type: double
+      description: >
+        Numeric metrics collected.
+    - name: metrics.string.*
+      type: object
+      object_type: keyword
+      description: >
+        Non-numeric values collected.

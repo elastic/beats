@@ -139,6 +139,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/load"
 	_ "github.com/elastic/beats/metricbeat/module/system/memory"
 	_ "github.com/elastic/beats/metricbeat/module/system/network"
+	_ "github.com/elastic/beats/metricbeat/module/system/network_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/metricbeat/module/system/process_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/raid"

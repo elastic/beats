@@ -1,5 +1,6 @@
 - key: activemq
   title: "activemq"
+  release: beta
   description: >
     Module for parsing ActiveMQ log files.
   fields:

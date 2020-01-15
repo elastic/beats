@@ -1,50 +1,47 @@
 {
-    "@timestamp": "2019-11-27T18:13:26.661Z",
+    "@timestamp": "2019-12-18T14:47:52.427Z",
     "@metadata": {
       "beat": "metricbeat",
       "type": "_doc",
       "version": "8.0.0"
     },
+    "event": {
+      "dataset": "kubernetes.service",
+      "module": "kubernetes",
+      "duration": 44555276
+    },
     "metricset": {
-      "period": 10000,
-      "name": "state_service"
+      "name": "state_service",
+      "period": 10000
     },
     "service": {
-      "address": "kube-state-metrics.kube-system:8080",
-      "type": "kubernetes"
+      "type": "kubernetes",
+      "address": "kube-state-metrics.kube-system:8080"
     },
     "kubernetes": {
-      "namespace": "istio-system",
       "service": {
-        "name": "prometheus",
-        "created": "2019-11-25T21:00:49.000Z",
-        "cluster_ip": "10.98.33.120",
         "type": "ClusterIP",
-        "labels": {
-          "label_release": "istio",
-          "label_app": "prometheus",
-          "label_operator_istio_io_component": "Prometheus",
-          "label_operator_istio_io_managed": "Reconcile",
-          "label_operator_istio_io_version": "1.4.0"
-        }
+        "name": "productpage",
+        "created": "2019-11-25T21:08:36.000Z",
+        "cluster_ip": "10.104.43.66"
+      },
+      "namespace": "default",
+      "labels": {
+        "app": "productpage"
       }
+    },
+    "agent": {
+      "type": "metricbeat",
+      "ephemeral_id": "c2655cd5-2091-4cd2-848d-6abba04bc26c",
+      "hostname": "minikube",
+      "id": "e9952df4-592e-4102-84a6-ad0b333b3b98",
+      "version": "8.0.0"
     },
     "ecs": {
       "version": "1.2.0"
     },
     "host": {
       "name": "minikube"
-    },
-    "agent": {
-      "ephemeral_id": "74d75916-9e2d-4d4c-8b5d-30dfdec1eb34",
-      "hostname": "minikube",
-      "id": "228b79ac-d00f-4272-89ea-867e9b07faa3",
-      "version": "8.0.0",
-      "type": "metricbeat"
-    },
-    "event": {
-      "dataset": "kubernetes.service",
-      "module": "kubernetes",
-      "duration": 45413119
     }
- }
+  }
+  
