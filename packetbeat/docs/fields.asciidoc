@@ -9987,7 +9987,7 @@ type: keyword
 --
 Chain of trust for the server certificate.
 
-type: keyword
+type: array
 
 --
 
@@ -9996,7 +9996,7 @@ type: keyword
 --
 Chain of trust for the client certificate.
 
-type: keyword
+type: array
 
 --
 
