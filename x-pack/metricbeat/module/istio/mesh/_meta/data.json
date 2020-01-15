@@ -1,73 +1,78 @@
 {
-    "@timestamp": "2020-01-14T14:15:49.951Z",
+    "@timestamp": "2020-01-15T09:44:51.095Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
+    "event": {
+        "dataset": "istio.mesh",
+        "module": "istio",
+        "duration": 63667069
+    },
+    "metricset": {
+        "name": "mesh",
+        "period": 10000
+    },
+    "istio": {
+        "mesh": {
+            "destination": {
+                "version": "v1",
+                "app": "ratings",
+                "workload_namespace": "default",
+                "service": {
+                    "name": "ratings",
+                    "namespace": "default",
+                    "path": "ratings.default.svc.cluster.local"
+                }
+            },
+            "response_code": "200",
+            "reporter": "destination",
+            "request_protocol": "http",
+            "connection_security_policy": "none",
+            "instance": "172.17.0.2:42422",
+            "job": "istio-mesh",
+            "bucket": {
+                "le": "10000",
+                "request": {
+                    "bytes": {
+                        "count": 14
+                    }
+                },
+                "response": {
+                    "bytes": {
+                        "count": 14
+                    }
+                }
+            }
+        }
+    },
     "ecs": {
         "version": "1.4.0"
     },
     "host": {
-        "name": "vm1.lan",
-        "architecture": "x86_64",
         "os": {
+            "version": "10.14.6",
+            "family": "centos",
+            "name": "centos",
             "kernel": "18.7.0",
             "build": "18G95",
-            "platform": "centos",
-            "version": "10.14.6",
-            "family": "darwin",
-            "name": "Mac OS X"
+            "platform": "centos"
         },
+        "name": "vm1.local",
         "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84",
-        "hostname": "vm1.lan"
+        "hostname": "Christoss-MacBook-Pro.local",
+        "architecture": "x86_64"
     },
     "agent": {
-        "hostname": "vm1.lan",
+        "ephemeral_id": "9a0f3fb7-362c-4502-aff8-3d68489978e3",
+        "hostname": "vm1.local",
         "id": "fbaf40e4-c9f2-4d9f-840f-b3d8de51b42c",
         "version": "8.0.0",
-        "type": "metricbeat",
-        "ephemeral_id": "68cb377a-e3a3-4a10-88ee-ed658cffcef2"
-    },
-    "event": {
-        "dataset": "istio.mesh",
-        "module": "istio",
-        "duration": 73591071
-    },
-    "istio": {
-        "mesh": {
-            "instance": "172.17.0.9:42422",
-            "request": {
-                "duration": {
-                    "bucket": {
-                        "count": 21
-                    }
-                }
-            },
-            "destination": {
-                "service": {
-                    "path": "reviews.default.svc.cluster.local",
-                    "namespace": "default",
-                    "name": "reviews"
-                },
-                "version": "v1",
-                "workload_namespace": "default",
-                "app": "reviews"
-            },
-            "request_protocol": "http",
-            "reporter": "source",
-            "job": "istio-mesh",
-            "le": "0.5",
-            "response_code": "200",
-            "connection_security_policy": "unknown"
-        }
-    },
-    "metricset": {
-        "period": 10000,
-        "name": "mesh"
+        "type": "metricbeat"
     },
     "service": {
-        "type": "istio",
-        "address": "localhost:9090"
+        "address": "localhost:9090",
+        "type": "istio"
     }
 }

@@ -26,7 +26,9 @@ var (
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
 		"istio_requests_total":                  prometheus.Metric("requests"),
-		"istio_request_duration_seconds_bucket": prometheus.Metric("request.duration.bucket.count"),
+		"istio_request_duration_seconds_bucket": prometheus.Metric("bucket.request.duration.count"),
+		"istio_request_bytes_bucket": prometheus.Metric("bucket.request.bytes.count"),
+		"istio_response_bytes_bucket": prometheus.Metric("bucket.response.bytes.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
@@ -38,7 +40,7 @@ var mapping = &prometheus.MetricsMapping{
 		"destination_service_name":      prometheus.KeyLabel("destination.service.name"),
 		"destination_service_namespace": prometheus.KeyLabel("destination.service.namespace"),
 		"destination_version":           prometheus.KeyLabel("destination.version"),
-		"le":                            prometheus.KeyLabel("le"),
+		"le":                            prometheus.KeyLabel("bucket.le"),
 
 		"destination_workload_namespace": prometheus.KeyLabel("destination.workload_namespace"),
 		"reporter":                       prometheus.KeyLabel("reporter"),
