@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"errors"
 	"net"
 	"time"
 
@@ -197,6 +198,9 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
+	if c.client == nil {
+		return errors.New("connection closed")
+	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
