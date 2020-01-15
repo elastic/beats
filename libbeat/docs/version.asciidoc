@@ -1,5 +1,5 @@
 :stack-version: 7.6.0
-:doc-branch: 7.x
+:doc-branch: 7.6
 :go-version: 1.13.6
 :release-state: unreleased
 :python: 2.7.9

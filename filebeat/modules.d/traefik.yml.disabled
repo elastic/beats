@@ -1,5 +1,5 @@
 # Module: traefik
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-traefik.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.6/filebeat-module-traefik.html
 
 - module: traefik
   # Access logs

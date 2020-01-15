@@ -1,5 +1,5 @@
 # Module: iptables
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-iptables.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.6/filebeat-module-iptables.html
 
 - module: iptables
   log:

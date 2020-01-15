@@ -1,5 +1,5 @@
 # Module: munin
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-munin.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.6/metricbeat-module-munin.html
 
 - module: munin
   #metricsets:
