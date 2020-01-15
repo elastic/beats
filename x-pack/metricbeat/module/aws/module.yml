@@ -6,3 +6,4 @@ metricsets:
   - billing
   - sns
   - lambda
+  - dynamodb

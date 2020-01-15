@@ -39,8 +39,8 @@ type eventStore struct {
 }
 
 const (
-	expectedClientHello = `{"client":{"ip":"192.168.0.1","port":6512},"destination":{"domain":"example.org","ip":"192.168.0.2","port":27017},"event":{"category":"network_traffic","dataset":"tls","kind":"event"},"network":{"community_id":"1:jKfewJN/czjTuEpVvsKdYXXiMzs=","protocol":"tls","transport":"tcp","type":"ipv4"},"server":{"domain":"example.org","ip":"192.168.0.2","port":27017},"source":{"ip":"192.168.0.1","port":6512},"status":"Error","tls":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"],"supported_compression_methods":["NULL"],"version":"3.3"},"fingerprints":{"ja3":{"hash":"94c485bca29d5392be53f2b8cf7f4304","str":"771,49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0"}},"handshake_completed":false,"resumed":false},"type":"tls"}`
-	expectedServerHello = `{"extensions":{"_unparsed_":["renegotiation_info","status_request"],"application_layer_protocol_negotiation":["h2"],"ec_points_formats":["uncompressed","ansiX962_compressed_prime","ansiX962_compressed_char2"],"session_ticket":""},"selected_cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","selected_compression_method":"NULL","version":"3.3"}`
+	expectedClientHello = `{"client":{"ip":"192.168.0.1","port":6512},"destination":{"domain":"example.org","ip":"192.168.0.2","port":27017},"event":{"category":"network_traffic","dataset":"tls","kind":"event"},"network":{"community_id":"1:jKfewJN/czjTuEpVvsKdYXXiMzs=","protocol":"tls","transport":"tcp","type":"ipv4"},"server":{"domain":"example.org","ip":"192.168.0.2","port":27017},"source":{"ip":"192.168.0.1","port":6512},"status":"Error","tls":{"client":{"ja3":"94c485bca29d5392be53f2b8cf7f4304","server_name":"example.org","supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"]},"detailed":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_compression_methods":["NULL"],"version":"3.3"},"version":"TLS 1.2"},"established":false,"resumed":false,"version":"1.2","version_protocol":"tls"},"type":"tls"}`
+	expectedServerHello = `{"extensions":{"_unparsed_":["renegotiation_info","status_request"],"application_layer_protocol_negotiation":["h2"],"ec_points_formats":["uncompressed","ansiX962_compressed_prime","ansiX962_compressed_char2"],"session_ticket":""},"selected_compression_method":"NULL","version":"3.3"}`
 	rawClientHello      = "16030100c2010000be03033367dfae0d46ec0651e49cca2ae47317e8989df710" +
 		"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 		"009c009d002f0035000a01000079dada0000ff0100010000000010000e00000b" +
@@ -128,10 +128,11 @@ func TestAlert(t *testing.T) {
 	event := results.events[0]
 	_, ok := event.Fields["tls"]
 	assert.True(t, ok)
-	tlsMap, ok := event.Fields["tls"].(common.MapStr)
-	assert.True(t, ok)
-
-	alerts, ok := tlsMap["alerts"].([]common.MapStr)
+	alertsIf, err := event.GetValue("tls.detailed.alerts")
+	if !assert.NoError(t, err) {
+		t.Fatal(err)
+	}
+	alerts := alertsIf.([]common.MapStr)
 	assert.True(t, ok)
 	assert.Len(t, alerts, 1)
 	severity, ok := alerts[0]["severity"]
@@ -198,7 +199,7 @@ func TestServerHello(t *testing.T) {
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
 
-	hello, err := event.GetValue("tls.server_hello")
+	hello, err := event.GetValue("tls.detailed.server_hello")
 	assert.Nil(t, err)
 	b, err := json.Marshal(hello)
 	assert.Nil(t, err)
@@ -295,11 +296,11 @@ func TestInterleavedRecords(t *testing.T) {
 	event := results.events[0]
 
 	// Event contains the client hello
-	_, err = event.GetValue("tls.client_hello")
+	_, err = event.GetValue("tls.detailed.client_hello")
 	assert.Nil(t, err)
 
 	// and the alert
-	alerts, err := event.GetValue("tls.alerts")
+	alerts, err := event.GetValue("tls.detailed.alerts")
 	assert.Nil(t, err)
 
 	assert.Len(t, alerts.([]common.MapStr), 2)
@@ -384,12 +385,15 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
 
-	iVersion, err := results.events[0].Fields.GetValue("tls.version")
-	assert.Nil(t, err)
-
-	version, ok := iVersion.(string)
-	assert.True(t, ok)
-	assert.Equal(t, "TLS 1.3", version)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.3",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.3",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.Nil(t, err)
+		assert.Equal(t, expected, version)
+	}
 }
 
 func TestLegacyVersionNegotiation(t *testing.T) {
@@ -420,10 +424,13 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
 
-	iVersion, err := results.events[0].Fields.GetValue("tls.version")
-	assert.Nil(t, err)
-
-	version, ok := iVersion.(string)
-	assert.True(t, ok)
-	assert.Equal(t, "TLS 1.2", version)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.2",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.2",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.Nil(t, err)
+		assert.Equal(t, expected, version)
+	}
 }

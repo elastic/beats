@@ -60,6 +60,9 @@ func TestFetch(t *testing.T) {
 		t.Fatal(err)
 	}
 	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
 	ms, ok := metricsets[0].(*MetricSet)

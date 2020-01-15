@@ -16,11 +16,12 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.12+| .12+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+.13+| .13+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
+|<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
-|<<metricbeat-metricset-aws-elb,elb>> beta[]  
+|<<metricbeat-metricset-aws-elb,elb>>   
 |<<metricbeat-metricset-aws-lambda,lambda>> beta[]  
 |<<metricbeat-metricset-aws-rds,rds>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
@@ -29,9 +30,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-sqs,sqs>>   
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
+.4+| .4+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
 |<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
+|<<metricbeat-metricset-azure-storage,storage>> beta[]  
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
@@ -190,7 +192,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-statsd,Statsd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>> beta[]  
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.16+| .16+|  |<<metricbeat-metricset-system-core,core>>   
+.17+| .17+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
 |<<metricbeat-metricset-system-entropy,entropy>>   
@@ -199,6 +201,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-load,load>>   
 |<<metricbeat-metricset-system-memory,memory>>   
 |<<metricbeat-metricset-system-network,network>>   
+|<<metricbeat-metricset-system-network_summary,network_summary>> beta[]  
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
 |<<metricbeat-metricset-system-raid,raid>>   
