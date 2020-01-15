@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -119,6 +121,11 @@ func TestEmitEvent_Service(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Service",
+		APIVersion: "v1",
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -136,6 +143,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -183,6 +191,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -205,6 +214,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					ClusterIP: clusterIP,
 				},
@@ -222,6 +232,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -266,10 +277,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
+			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil)
 
 			p := &Provider{
 				config:    defaultConfig(),

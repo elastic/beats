@@ -184,7 +184,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		if buf.Len() < int(length) {
 			return nil, io.EOF
 		}
-		if scopeLen == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
+		if (scopeLen+optsLen) == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
 			return nil, fmt.Errorf("bad length for options template. scope=%d options=%d", scopeLen, optsLen)
 		}
 		template, err := ReadFields(d, buf, (scopeLen+optsLen)/4)
@@ -193,6 +193,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		}
 		template.ID = tID
 		template.ScopeFields = scopeLen / 4
+		template.IsOptions = true
 		templates = append(templates, &template)
 	}
 	return templates, nil

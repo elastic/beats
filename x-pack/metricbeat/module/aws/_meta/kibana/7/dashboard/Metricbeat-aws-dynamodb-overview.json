@@ -1,0 +1,1856 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Overview of DynamoDB AWS Cloudwatch metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
+              "w": 7,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
+            "panelRefName": "panel_0",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
+              "w": 14,
+              "x": 7,
+              "y": 0
+            },
+            "panelIndex": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
+            "panelRefName": "panel_1",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "18810035-5e91-409a-98d7-c03166e1f9b3",
+              "w": 27,
+              "x": 21,
+              "y": 0
+            },
+            "panelIndex": "18810035-5e91-409a-98d7-c03166e1f9b3",
+            "panelRefName": "panel_2",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "60e6e6e4-3237-430e-80fc-63fe9b718a7e",
+              "w": 19,
+              "x": 0,
+              "y": 9
+            },
+            "panelIndex": "60e6e6e4-3237-430e-80fc-63fe9b718a7e",
+            "panelRefName": "panel_3",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "5e5d6509-2889-4383-bef4-9c2da0e759c6",
+              "w": 14,
+              "x": 19,
+              "y": 9
+            },
+            "panelIndex": "5e5d6509-2889-4383-bef4-9c2da0e759c6",
+            "panelRefName": "panel_4",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "2db371a7-20c5-460a-a2f7-06b5b03d7b34",
+              "w": 15,
+              "x": 33,
+              "y": 9
+            },
+            "panelIndex": "2db371a7-20c5-460a-a2f7-06b5b03d7b34",
+            "panelRefName": "panel_5",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1cd72292-ecba-4008-bb3c-e76c7fb6b4f4",
+              "w": 24,
+              "x": 0,
+              "y": 18
+            },
+            "panelIndex": "1cd72292-ecba-4008-bb3c-e76c7fb6b4f4",
+            "panelRefName": "panel_6",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "cea56791-2602-4079-977b-7d088727872c",
+              "w": 24,
+              "x": 24,
+              "y": 18
+            },
+            "panelIndex": "cea56791-2602-4079-977b-7d088727872c",
+            "panelRefName": "panel_7",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "fe509a4d-700b-4092-9aae-ce14e8de103e",
+              "w": 24,
+              "x": 0,
+              "y": 33
+            },
+            "panelIndex": "fe509a4d-700b-4092-9aae-ce14e8de103e",
+            "panelRefName": "panel_8",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3d6b1fa0-746f-40ed-8fcc-ae89013f632b",
+              "w": 24,
+              "x": 24,
+              "y": 33
+            },
+            "panelIndex": "3d6b1fa0-746f-40ed-8fcc-ae89013f632b",
+            "panelRefName": "panel_9",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "0f9a5223-3c63-405c-a5c4-ea15416bad4a",
+              "w": 24,
+              "x": 0,
+              "y": 48
+            },
+            "panelIndex": "0f9a5223-3c63-405c-a5c4-ea15416bad4a",
+            "panelRefName": "panel_10",
+            "version": "7.4.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] DynamoDB Overview",
+        "version": 1
+      },
+      "id": "68ba7bd0-20b6-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bc8bd8f0-31fd-11ea-bcbf-59cb7eefc1f0",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "9e012a20-20b4-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "6b789730-2002-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "5eaeaf50-20b4-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "494adfe0-20b3-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "8717f330-20b3-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "64b587a0-20b1-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "6d9c9fb0-20b2-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "08d696d0-20b2-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+          "name": "panel_10",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-01-08T10:05:43.286Z",
+      "version": "WzUxNzIsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Region/Account Filters [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.region",
+                "id": "1549397251041",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "region",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "cloud.account.name",
+                "id": "1549512126406",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "account name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "Region/Account Filters [Metricbeat AWS]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "bc8bd8f0-31fd-11ea-bcbf-59cb7eefc1f0",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-01-08T10:00:44.799Z",
+      "version": "WzUxNjcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ThrottleRequests [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ThrottleRequests",
+                "field": "aws.dynamodb.metrics.ThrottledRequests.sum"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-12-17T10:03:05.186Z",
+                    "min": "2019-12-17T09:48:05.185Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "ThrottleRequests"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "ThrottleRequests"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB ThrottleRequests [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "9e012a20-20b4-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:04:30.530Z",
+      "version": "WzUxMzAsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB Max Read/Write Limits [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "AccountMaxReads",
+                "field": "aws.dynamodb.metrics.AccountMaxReads.max"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "AccountMaxWrites",
+                "field": "aws.dynamodb.metrics.AccountMaxWrites.max"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "AccountMaxTableLevelReads",
+                "field": "aws.dynamodb.metrics.AccountMaxTableLevelReads.max"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "AccountMaxTableLevelWrites",
+                "field": "aws.dynamodb.metrics.AccountMaxTableLevelWrites.max"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                },
+                {
+                  "accessor": 1,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                },
+                {
+                  "accessor": 2,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "DynamoDB Max Read/Write Limits [Metricbeat AWS] ECS",
+          "type": "metric"
+        }
+      },
+      "id": "6b789730-2002-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:08:13.802Z",
+      "version": "WzUxMzYsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ReadThrottleEvents [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ReadThrottleEvents",
+                "field": "aws.dynamodb.metrics.ReadThrottleEvents.sum"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": null,
+              "y": [
+                {
+                  "accessor": 0,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "ReadThrottleEvents"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "ReadThrottleEvents"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB ReadThrottleEvents [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "5eaeaf50-20b4-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:02:44.292Z",
+      "version": "WzUxMjksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ConsumedReadCapacityUnits Gauge [Metricbeat AWS] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 50": "rgb(0,104,55)",
+              "50 - 75": "rgb(255,255,190)",
+              "75 - 100": "rgb(165,0,38)"
+            },
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ConsumedReadCapacityUnits",
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "dimensions": {
+              "x": null,
+              "y": [
+                {
+                  "accessor": 0,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "gauge": {
+              "alignment": "automatic",
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 50
+                },
+                {
+                  "from": 50,
+                  "to": 75
+                },
+                {
+                  "from": 75,
+                  "to": 100
+                }
+              ],
+              "extendRange": true,
+              "gaugeColorMode": "Labels",
+              "gaugeStyle": "Full",
+              "gaugeType": "Arc",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "rgba(105,112,125,0.2)",
+                "labels": false,
+                "show": true
+              },
+              "style": {
+                "bgColor": true,
+                "bgFill": "rgba(105,112,125,0.2)",
+                "bgMask": false,
+                "bgWidth": 0.9,
+                "fontSize": 60,
+                "mask": false,
+                "maskBars": 50,
+                "subText": "",
+                "width": 0.9
+              },
+              "type": "meter"
+            },
+            "isDisplayWarning": false,
+            "type": "gauge"
+          },
+          "title": "DynamoDB ConsumedReadCapacityUnits Gauge [Metricbeat AWS] ECS",
+          "type": "gauge"
+        }
+      },
+      "id": "494adfe0-20b3-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T09:54:58.910Z",
+      "version": "WzUxMjcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ConsumedWriteCapacityUnits Gauge [Metricbeat AWS] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 50": "rgb(0,104,55)",
+              "50 - 75": "rgb(255,255,190)",
+              "75 - 100": "rgb(165,0,38)"
+            },
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ConsumedWriteCapacityUnits",
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "dimensions": {
+              "x": null,
+              "y": [
+                {
+                  "accessor": 0,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "gauge": {
+              "alignment": "automatic",
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 50
+                },
+                {
+                  "from": 50,
+                  "to": 75
+                },
+                {
+                  "from": 75,
+                  "to": 100
+                }
+              ],
+              "extendRange": true,
+              "gaugeColorMode": "Labels",
+              "gaugeStyle": "Full",
+              "gaugeType": "Arc",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "rgba(105,112,125,0.2)",
+                "labels": false,
+                "show": true
+              },
+              "style": {
+                "bgColor": true,
+                "bgFill": "rgba(105,112,125,0.2)",
+                "bgMask": false,
+                "bgWidth": 0.9,
+                "fontSize": 60,
+                "mask": false,
+                "maskBars": 50,
+                "subText": "",
+                "width": 0.9
+              },
+              "type": "meter"
+            },
+            "isDisplayWarning": false,
+            "type": "gauge"
+          },
+          "title": "DynamoDB ConsumedWriteCapacityUnits Gauge [Metricbeat AWS] ECS",
+          "type": "gauge"
+        }
+      },
+      "id": "8717f330-20b3-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T09:56:42.595Z",
+      "version": "WzUxMjgsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB SuccessfulRequestLatency over Time [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "SuccessfulRequestLatency",
+                "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.avg"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "MAX SuccessfulRequestLatency",
+                "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.max"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-12-17T09:39:17.110Z",
+                    "min": "2019-12-17T09:24:17.110Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "avg",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "SuccessfulRequestLatency"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "MAX SuccessfulRequestLatency"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "SuccessfulRequestLatency"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB SuccessfulRequestLatency over Time [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "64b587a0-20b1-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:11:11.744Z",
+      "version": "WzUxMzcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB AccountProvisionedReadCapacityUtilization over Time [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "AccountProvisionedReadCapacityUtilization",
+                "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": null,
+              "y": [
+                {
+                  "accessor": 0,
+                  "aggType": "avg",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "AccountProvisionedReadCapacityUtilization"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "AccountProvisionedReadCapacityUtilization"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB AccountProvisionedReadCapacityUtilization over Time [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:06:24.190Z",
+      "version": "WzUxMzIsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ConsumedWriteCapacityUnits over Time [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ConsumedWriteCapacityUnits",
+                "field": "aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-12-17T09:46:17.065Z",
+                    "min": "2019-12-17T09:31:17.065Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "avg",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "ConsumedWriteCapacityUnits"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "ConsumedWriteCapacityUnits"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB ConsumedWriteCapacityUnits over Time [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "6d9c9fb0-20b2-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:07:48.698Z",
+      "version": "WzUxMzUsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB ConsumedReadCapacityUnits over Time [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "ConsumedReadCapacityUnits",
+                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": null,
+              "y": [
+                {
+                  "accessor": 0,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "ConsumedReadCapacityUnits"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "ConsumedReadCapacityUnits"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB ConsumedReadCapacityUnits over Time [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "08d696d0-20b2-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:07:24.903Z",
+      "version": "WzUxMzQsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "DynamoDB AccountProvisionedWriteCapacityUtilization over Time [Metricbeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "AccountProvisionedWriteCapacityUtilization",
+                "field": "aws.dynamodb.metrics.AccountProvisionedWriteCapacityUtilization.avg"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-12-16T12:53:49.577Z",
+                    "min": "2019-12-16T12:38:49.577Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "avg",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "AccountProvisionedWriteCapacityUtilization"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "AccountProvisionedWriteCapacityUtilization"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DynamoDB AccountProvisionedWriteCapacityUtilization over Time [Metricbeat AWS] ECS",
+          "type": "line"
+        }
+      },
+      "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-17T10:06:53.485Z",
+      "version": "WzUxMzMsMV0="
+    }
+  ],
+  "version": "7.4.0"
+}
