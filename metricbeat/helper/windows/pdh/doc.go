@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package perfmon implements a Metricbeat metricset for reading Windows
-// performance counters.
 package pdh
 
 //go:generate go run mkpdh_defs.go

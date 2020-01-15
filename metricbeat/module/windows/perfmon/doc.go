@@ -15,7 +15,4 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/*
-Package windows is a Metricbeat module that contains MetricSets.
-*/
-package windows
+package perfmon
