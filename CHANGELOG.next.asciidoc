@@ -24,7 +24,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Remove broken dashboard. {pull}15288[15288]
 
 *Metricbeat*
 
@@ -44,7 +43,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
-- Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
 
 *Auditbeat*
 
@@ -53,12 +51,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
-- Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
-- Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
-- netflow: Allow for options templates without scope fields. {pull}15449[15449]
-- netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
-- netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
-- Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 
 *Heartbeat*
 
@@ -72,12 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
-- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
-- Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
-- Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
-- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
-- Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 
 *Packetbeat*
 
@@ -92,7 +79,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 
 *Auditbeat*
 
@@ -101,7 +87,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
-- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
 
 *Heartbeat*
 
@@ -143,4 +128,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
