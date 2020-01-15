@@ -7,6 +7,9 @@ package application
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/x-pack/agent/pkg/config"
 )
 
 var (
@@ -17,6 +20,15 @@ var (
 func init() {
 	homePath = retrieveHomePath()
 	dataPath = retrieveDataPath()
+}
+
+func InjectAgentConfig(c *config.Config) error {
+	globalConfig := AgentGlobalConfig()
+	if err := c.Merge(globalConfig); err != nil {
+		return errors.New("failed to inject agent global config", err, errors.TypeConfig)
+	}
+
+	return nil
 }
 
 // AgentGlobalConfig gets global config used for resolution of variables inside configuration
@@ -38,7 +50,7 @@ func retrieveDataPath() string {
 		panic(err)
 	}
 
-	return filepath.Base(execPath)
+	return filepath.Dir(execPath)
 }
 
 // retrieveHomePath returns a home directory of current user
