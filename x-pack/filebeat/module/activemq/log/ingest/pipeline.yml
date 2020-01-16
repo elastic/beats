@@ -8,7 +8,7 @@ processors:
         NOPIPEGREEDYDATA: "((?! \\|).)*"
         THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.stack_trace}"
+        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}+\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.stack_trace}"
       ignore_missing: true
   - date:
       if: "ctx.event.timezone == null"
