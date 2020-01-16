@@ -9,10 +9,10 @@ After=network-online.target
 User={{ .BeatUser }}
 Group={{ .BeatUser }}
 {{- end }}
-Environment="BEAT_LOG_OPTS=-environment systemd"
+Environment="BEAT_LOG_OPTS="
 Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
 Environment="BEAT_PATH_OPTS=-path.home /usr/share/{{.BeatName}} -path.config /etc/{{.BeatName}} -path.data /var/lib/{{.BeatName}} -path.logs /var/log/{{.BeatName}}"
-ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} -environment systemd $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
 Restart=always
 
 [Install]
