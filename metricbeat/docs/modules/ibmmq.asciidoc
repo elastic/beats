@@ -56,6 +56,9 @@ metricbeat.modules:
   # the options for this metricset are also available here.
   metrics_path: /metrics
 
+  # The custom processor is responsible for filtering Prometheus metrics
+  # not stricly related to the IBM MQ domain, e.g. system load, process,
+  # metrics HTTP server.
   processors:
     - script:
         lang: javascript
