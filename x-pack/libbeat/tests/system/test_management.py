@@ -282,7 +282,7 @@ class TestManagement(BaseTest):
     def check_document_count(self, index, count):
         try:
             self.es.indices.refresh(index=index)
-            return self.es.search(index=index, body={"query": {"match_all": {}}})['hits']['total'] >= count
+            return self.es.search(index=index, body={"query": {"match_all": {}, "allow_partial_search_results": "true"}})['hits']['total'] >= count
         except:
             return False
 
