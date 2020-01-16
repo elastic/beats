@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Label</key>
+        <key>Label</key>
         <string>{{.identifier}}</string>
-	<key>ProgramArguments</key>
-	<array>
+        <key>ProgramArguments</key>
+        <array>
             <string>{{.install_path}}/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}</string>
-	    <string>-environment</string>
-	    <string>macOS_service</string>
+            <string>-environment</string>
+            <string>macOS_service</string>
             <string>-c</string>
             <string>/etc/{{.BeatName}}/{{.BeatName}}.yml</string>
             <string>--path.home</string>
@@ -20,7 +20,7 @@
             <string>--path.logs</string>
             <string>/var/log/{{.BeatName}}</string>
         </array>
-	<key>RunAtLoad</key>
+        <key>RunAtLoad</key>
         <true/>
 </dict>
 </plist>

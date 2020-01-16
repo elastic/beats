@@ -59,7 +59,7 @@ type FileConfig struct {
 func DefaultConfig(environment Environment) Config {
 	switch environment {
 	case SystemdEnvironment, ContainerEnvironment:
-		return defaultSystemdConfig()
+		return defaultToStderrConfig()
 
 	case MacOSServiceEnvironment, WindowsServiceEnvironment:
 		fallthrough
@@ -68,7 +68,7 @@ func DefaultConfig(environment Environment) Config {
 	}
 }
 
-func defaultSystemdConfig() Config {
+func defaultToStderrConfig() Config {
 	return Config{
 		Level:     InfoLevel,
 		ToStderr:  true,

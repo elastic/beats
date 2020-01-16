@@ -70,7 +70,7 @@ func ParseEnvironment(in string) Environment {
 		return DefaultEnvironment
 	case "systemd":
 		return SystemdEnvironment
-	case "docker", "container", "kubernetes", "k8s":
+	case "container":
 		return ContainerEnvironment
 	case "macos_service":
 		return MacOSServiceEnvironment
