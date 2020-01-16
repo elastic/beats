@@ -19,17 +19,31 @@ package logp
 
 import "strings"
 
+// Environment indicates the environment the logger is supped to be run in.
+// The default logger configuration may be different for different environments.
 type Environment int
 
 const (
+	// DefaultEnvironment is used if the environment the process runs in is not known.
 	DefaultEnvironment Environment = iota
+
+	// SystemdEnvironment indicates that the process is started and managed by systemd.
 	SystemdEnvironment
+
+	// ContainerEnvironment indicates that the process is running within a container (docker, k8s, rkt, ...).
 	ContainerEnvironment
+
+	// MacOSServiceEnvironment indicates that the process is running as a daemon on macOS (e.g. managed via launchctl).
 	MacOSServiceEnvironment
+
+	// WindowsServiceEnvironment indicates the the process is run as a windows service.
 	WindowsServiceEnvironment
+
+	// InvalidEnvironment indicates that the environment name given is unknown or invalid.
 	InvalidEnvironment
 )
 
+// String returns the string representation the configured environment
 func (v Environment) String() string {
 	switch v {
 	case DefaultEnvironment:
@@ -47,6 +61,9 @@ func (v Environment) String() string {
 	}
 }
 
+// ParseEnvironment returns the environment type by name.
+// The parse is case insensitive.
+// InvalidEnvironment is returned if the environment type is unknown.
 func ParseEnvironment(in string) Environment {
 	switch strings.ToLower(in) {
 	case "default":
