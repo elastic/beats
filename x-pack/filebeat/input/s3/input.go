@@ -171,6 +171,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
+		p.logger.Debugf("visibility timeout is set to %v seconds: ", visibilityTimeout)
+
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
 			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
@@ -503,13 +505,14 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 
 func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
 	// Create a context with a timeout that will abort the download if it takes
-	// more than the default timeout 1 minute.
-	timeout := time.Duration(1 * time.Minute)
+	// more than the default timeout 2 minute.
+	contextTimeout := p.config.ContextTimeout
+	p.logger.Debug("context timeout is set to: ", contextTimeout)
 	ctx := context.Background()
 
 	var cancelFn func()
-	if timeout > 0 {
-		ctx, cancelFn = context.WithTimeout(ctx, timeout)
+	if contextTimeout > 0 {
+		ctx, cancelFn = context.WithTimeout(ctx, contextTimeout)
 	}
 
 	// Ensure the context is canceled to prevent leaking.

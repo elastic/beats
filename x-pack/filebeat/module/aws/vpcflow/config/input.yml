@@ -3,6 +3,8 @@
 type: s3
 queue_url: {{ .queue_url }}
 credential_profile_name: {{ .credential_profile_name }}
+visibility_timeout: {{ .visibility_timeout }}
+context_timeout: {{ .context_timeout }}
 
 {{ else if eq .input "file" }}
 

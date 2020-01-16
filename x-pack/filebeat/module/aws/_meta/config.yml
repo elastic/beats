@@ -8,6 +8,14 @@
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
 
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before GetObject request will be interrupted by context
+    # Default to be 120s
+    #var.context_timeout: 120s
+
   elb:
     enabled: false
 
@@ -16,6 +24,14 @@
 
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before GetObject request will be interrupted by context
+    # Default to be 120s
+    #var.context_timeout: 120s
 
   vpcflow:
     enabled: false
@@ -26,6 +42,14 @@
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
 
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before GetObject request will be interrupted by context
+    # Default to be 120s
+    #var.context_timeout: 120s
+
   cloudtrail:
     enabled: false
 
@@ -34,3 +58,11 @@
 
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before GetObject request will be interrupted by context
+    # Default to be 120s
+    #var.context_timeout: 120s

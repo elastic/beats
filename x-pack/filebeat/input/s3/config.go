@@ -18,6 +18,7 @@ type config struct {
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
+	ContextTimeout            time.Duration       `config:"context_timeout"`
 }
 
 func defaultConfig() config {
@@ -26,6 +27,7 @@ func defaultConfig() config {
 			Type: "s3",
 		},
 		VisibilityTimeout: 300 * time.Second,
+		ContextTimeout:    120 * time.Second,
 	}
 }
 
@@ -33,6 +35,10 @@ func (c *config) Validate() error {
 	if c.VisibilityTimeout < 0 || c.VisibilityTimeout.Hours() > 12 {
 		return fmt.Errorf("visibility timeout %v is not within the "+
 			"required range 0s to 12h", c.VisibilityTimeout)
+	}
+	if c.ContextTimeout < 0 || c.ContextTimeout > c.VisibilityTimeout/2 {
+		return fmt.Errorf("context timeout %v needs to be larger than"+
+			" 0s and smaller than half of the visibility timeout", c.ContextTimeout)
 	}
 	return nil
 }
