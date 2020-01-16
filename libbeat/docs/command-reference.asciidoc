@@ -910,6 +910,13 @@ messages.
 *`-e, --e`*::
 Logs to stderr and disables syslog/file output.
 
+*`-environment`*::
+Tell {beatname_uc} the environment it runs into. If no log output is configured
+the Beat will select the default output based on the environment.
+Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`.
+{beatname_uc} will log to stdout and stderr by default if the `systemd` or
+`container` environment is configured.
+
 *`--path.config`*::
 Sets the path for configuration files. See the <<directory-layout>> section for
 details.
