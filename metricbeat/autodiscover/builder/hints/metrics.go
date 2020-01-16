@@ -47,6 +47,8 @@ const (
 	username    = "username"
 	password    = "password"
 
+	mcfgPassword = "password"
+
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
 )
@@ -60,8 +62,8 @@ type moduleCfg common.MapStr
 
 func (mcfg *moduleCfg) SecureString() string {
 	mcfgCopy := common.MapStr(*mcfg).Clone()
-	if exists, _ := mcfgCopy.HasKey("password"); exists {
-		mcfgCopy.Put("password", "******")
+	if exists, _ := mcfgCopy.HasKey(mcfgPassword); exists {
+		mcfgCopy.Put(mcfgPassword, "******")
 	}
 
 	return mcfgCopy.String()
@@ -149,7 +151,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["username"] = username
 	}
 	if password != "" {
-		moduleConfig["password"] = password
+		moduleConfig[mcfgPassword] = password
 	}
 
 	logp.Debug("hints.builder", "generated config: %v", moduleConfig.SecureString())
