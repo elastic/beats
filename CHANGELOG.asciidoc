@@ -3,11 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-// Use these for links to issue and pulls. Note issues and pulls redirect one to
-// each other on Github, so don't worry too much on using the right prefix.
-:issue: https://github.com/elastic/beats/issues/
-:pull: https://github.com/elastic/beats/pull/
-
 [[release-notes-7.5.1]]
 === Beats version 7.5.1
 https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
