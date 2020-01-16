@@ -58,7 +58,7 @@ type metricHints struct {
 
 type moduleCfg common.MapStr
 
-func (mcfg *moduleCfg) String() string {
+func (mcfg *moduleCfg) SecureString() string {
 	mcfgCopy := common.MapStr(*mcfg).Clone()
 	if exists, _ := mcfgCopy.HasKey("password"); exists {
 		mcfgCopy.Put("password", "******")
@@ -152,7 +152,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["password"] = password
 	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig.SecureString())
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
