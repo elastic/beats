@@ -289,12 +289,14 @@ var ciscoIOS = (function() {
                         switch (evt.Get('event.code')) {
                             case "PS_FAIL":
                                 setCategorization(evt,"alert","host","change","failure");
+                                break;
                             case "PS_STATUS":
                                 if (evt.Get('cisco.ios.power_supply.status') == "OK") {
                                     setCategorization(evt,"event","host","info","success");
                                 } else {
                                     setCategorization(evt,"event","host","info","failure");
                                 }
+                                break;
                         }
                         return;
                     }
