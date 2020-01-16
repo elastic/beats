@@ -56,6 +56,17 @@ type metricHints struct {
 	Registry *mb.Register
 }
 
+type moduleCfg common.MapStr
+
+func (mcfg *moduleCfg) String() string {
+	mcfgCopy := common.MapStr(*mcfg).Clone()
+	if exists, _ := mcfgCopy.HasKey("password"); exists {
+		mcfgCopy.Put("password", "******")
+	}
+
+	return mcfgCopy.String()
+}
+
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
@@ -117,7 +128,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	username := m.getUsername(hints)
 	password := m.getPassword(hints)
 
-	moduleConfig := common.MapStr{
+	moduleConfig := moduleCfg{
 		"module":     mod,
 		"metricsets": msets,
 		"hosts":      hosts,
