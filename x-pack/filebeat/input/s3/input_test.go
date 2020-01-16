@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -149,7 +150,11 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestNewS3BucketReader(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
+	configTest := config{
+		ContextTimeout: time.Duration(100 * time.Second),
+	}
+	p := &s3Input{context: &channelContext{}, config: configTest}
+
 	reader, err := p.newS3BucketReader(mockSvc, info)
 	assert.NoError(t, err)
 	for i := 0; i < 3; i++ {

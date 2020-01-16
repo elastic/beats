@@ -172,6 +172,7 @@ func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		p.logger.Debugf("visibility timeout is set to %v seconds: ", visibilityTimeout)
+		p.logger.Debugf("context timeout is set to %v: ", p.config.ContextTimeout)
 
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -507,7 +508,6 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	// Create a context with a timeout that will abort the download if it takes
 	// more than the default timeout 2 minute.
 	contextTimeout := p.config.ContextTimeout
-	p.logger.Debug("context timeout is set to: ", contextTimeout)
 	ctx := context.Background()
 
 	var cancelFn func()
