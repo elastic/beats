@@ -324,6 +324,16 @@ func TestGenerateHints(t *testing.T) {
 	}
 }
 
+func TestModuleCfg_SecureString(t *testing.T) {
+	testModuleCfg := moduleCfg{
+		"username": "foo",
+		"password": "SUPER_SECURE",
+	}
+	assert.Contains(t, testModuleCfg.SecureString(), `"username":"foo"`)
+	assert.Contains(t, testModuleCfg.SecureString(), `"password":"`)
+	assert.NotContains(t, testModuleCfg.SecureString(), "SUPER_SECURE")
+}
+
 type MockMetricSet struct {
 	mb.BaseMetricSet
 }
