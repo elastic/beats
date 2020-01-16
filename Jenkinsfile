@@ -24,6 +24,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
+    booleanParam(name: 'windowsTest', defaultValue: false, description: 'Allow to run all stages.')
   }
   stages {
     /**
@@ -106,7 +107,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false"
+              return env.BUILD_FILEBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -139,6 +140,12 @@ pipeline {
             stage('Heartbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
               steps {
                 mageTargetWin("Heartbeat oss Windows Unit test", "-d heartbeat goTestUnit")
               }
@@ -180,6 +187,12 @@ pipeline {
             stage('Auditbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
               steps {
                 mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
                 mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
@@ -303,7 +316,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false"
+              return env.BUILD_METRICBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -363,6 +376,12 @@ pipeline {
             stage('Winlogbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
               steps {
                 mageTargetWin("Winlogbeat Windows Unit test", "-d winlogbeat goUnitTest")
               }
@@ -394,6 +413,12 @@ pipeline {
             stage('Functionbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
               steps {
                 mageTargetWin("Functionbeat Windows Unit test", "-d x-pack/functionbeat goUnitTest")
               }
