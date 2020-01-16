@@ -7,7 +7,7 @@ input:
     perfmon.counters:
         - instance_label: ''
           measurement_label: network.total_bytes_recv_per_sec
-          query: '\Web Service(_Total)\Total Bytes Received'
+          query: '\Web Service(*)\Total Bytes Received'
 
 
 #"total_bytes_sent_per_sec": "\\Web Service(_Total)\\Total Bytes Sent",

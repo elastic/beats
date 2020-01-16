@@ -1,4 +1,3 @@
 name: iis
 metricsets:
 - webserver
-- website
