@@ -1,6 +1,6 @@
-Load Balancing Metricset to fetch metrics from https://cloud.google.com/load-balancing/[Load Balancing] in Google Cloud Platform.
+Load Balancing metricset to fetch metrics from https://cloud.google.com/load-balancing/[Load Balancing] in Google Cloud Platform.
 
-The `loadbalancing` Metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names have been left untouched for people already familiar with them.
+The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names have been left untouched for people already familiar with them.
 
 [float]
 === Fields
@@ -10,11 +10,6 @@ The `loadbalancing` Metricset contains all metrics exported from the https://clo
 - `loadbalancing.https.backend_request_count`: The number of requests served by backends of HTTP/S load balancer.
 - `loadbalancing.https.backend_response_bytes_count`: The number of bytes sent as responses from backends (or cache) to HTTP/S load balancer.
 - `loadbalancing.https.frontend_tcp_rtt`: A distribution of the RTT measured for each connection between client and proxy.
-- `loadbalancing.https.backend_latencies`: A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
-- `loadbalancing.https.request_bytes_count`: The number of bytes sent as requests from clients to HTTP/S load balancer.
-- `loadbalancing.https.request_count`: The number of requests served by HTTP/S load balancer.
-- `loadbalancing.https.response_bytes_count`: The number of bytes sent as responses from HTTP/S load balancer to clients.
-- `loadbalancing.https.total_latencies`: A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
 - `loadbalancing.https.request_bytes_count`: The number of bytes sent as requests from clients to HTTP/S load balancer.
 - `loadbalancing.https.request_count`: The number of requests served by HTTP/S load balancer.
 - `loadbalancing.https.response_bytes_count`: The number of bytes sent as responses from HTTP/S load balancer to clients.

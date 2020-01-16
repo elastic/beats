@@ -117,9 +117,7 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	service := serviceRegexp.ReplaceAllString(m, "${service}")
 
 	switch service {
-	case googlecloud.ServicePubsub:
-		return
-	case googlecloud.ServiceLoadBalancing:
+	case googlecloud.ServicePubsub, googlecloud.ServiceLoadBalancing:
 		return
 	default:
 		f = fmt.Sprintf(`%s AND resource.labels.zone = "%s"`, f, r.config.Zone)
