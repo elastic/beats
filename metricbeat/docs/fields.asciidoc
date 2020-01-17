@@ -1574,6 +1574,12 @@ Metrics that returned from Cloudwatch API query. - name: billing
       type: keyword
       description: >
         The namespace specified when query cloudwatch api.
+- name: dynamodb
+  type: group
+  description: >
+    `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
+  release: beta
+  fields:
 - name: ebs
   type: group
   description: >
