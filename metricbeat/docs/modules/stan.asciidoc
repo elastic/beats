@@ -23,6 +23,7 @@ Dashboards for topic message count and queue depth are included:
 
 image::./images/metricbeat-stan-overview.png[]
 
+
 [float]
 === Example configuration
 
