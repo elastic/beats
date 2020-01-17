@@ -16,6 +16,7 @@ env:
     - TRAVIS_GO_VERSION=$(cat .go-version)
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
+    - MACOSX_DEPLOYMENT_TARGET=10.15
     # Migration to Python 3
     - PYTHON_EXE=python3
 

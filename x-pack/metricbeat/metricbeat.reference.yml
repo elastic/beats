@@ -281,6 +281,16 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -492,6 +502,36 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+#-------------------------------- IBM MQ Module --------------------------------
+- module: ibmmq
+  metricsets: ['qmgr']
+  period: 10s
+  hosts: ['localhost:9157']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
+  # The custom processor is responsible for filtering Prometheus metrics
+  # not stricly related to the IBM MQ domain, e.g. system load, process,
+  # metrics HTTP server.
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var metrics = event.Get("prometheus.metrics");
+            Object.keys(metrics).forEach(function(key) {
+              if (!(key.match(/^ibmmq_.*$/))) {
+                event.Delete("prometheus.metrics." + key);
+              }
+            });
+            metrics = event.Get("prometheus.metrics");
+            if (Object.keys(metrics).length == 0) {
+              event.Cancel();
+            }
+          }
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

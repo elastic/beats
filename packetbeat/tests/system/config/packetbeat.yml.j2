@@ -130,6 +130,10 @@ packetbeat.protocols:
 
 - type: tls
   ports: [{{ tls_ports|default([443])|join(", ") }}]
+{% if tls_send_certificates is defined %}  send_certificates: {{tls_send_certificates}}{%- endif %}
+{% if tls_include_raw_certificates is defined  %}  include_raw_certificates: {{tls_include_raw_certificates}}{%- endif %}
+{% if tls_include_detailed_fields is defined %}  include_detailed_fields: {{tls_include_detailed_fields}}{%- endif %}
+{% if tls_fingerprints is defined %}  fingerprints: {{tls_fingerprints}}{%- endif %}
 
 - type: mongodb
   ports: [{{ mongodb_ports|default([27017])|join(", ") }}]

@@ -115,6 +115,8 @@ def has_license(folder):
         * The parent folder contains a LICENSE
         * The folder only contains subdirectories AND all these
           subdirectories contain a LICENSE
+        * The folder only contains subdirectories AND all these
+          subdirectories contain  subdirectories which contain a LICENSE (ex Azure folder)
     """
 
     if len(get_licenses(folder)) > 0:
@@ -125,8 +127,14 @@ def has_license(folder):
     for subdir in os.listdir(folder):
         if not os.path.isdir(os.path.join(folder, subdir)):
             return False, folder
-        if len(get_licenses(os.path.join(folder, subdir))) == 0:
-            return False, os.path.join(folder, subdir)
+        if len(get_licenses(os.path.join(folder, subdir))) > 0:
+            continue
+        for dir in os.listdir(os.path.join(folder, subdir)):
+            if not os.path.isdir(os.path.join(folder, subdir, dir)):
+                return False, subdir
+            if len(get_licenses(os.path.join(folder, subdir, dir))) == 0:
+                return False, os.path.join(folder, subdir, dir)
+
     return True, ""
 
 
