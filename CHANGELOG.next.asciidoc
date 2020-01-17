@@ -45,6 +45,7 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 *Filebeat*
 
+- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 
 *Heartbeat*
 
