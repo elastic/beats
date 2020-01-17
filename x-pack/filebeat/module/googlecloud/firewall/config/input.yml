@@ -20,7 +20,8 @@ exclude_files: [".gz$"]
 processors:
   - script:
       lang: javascript
-      id: googlecloud_vpcflow_script
-      file: ${path.home}/module/googlecloud/vpcflow/config/pipeline.js
+      id: googlecloud_firewall_script
       params:
+        debug: {{ .debug }}
         keep_original_message: {{ .keep_original_message }}
+      file: ${path.home}/module/googlecloud/firewall/config/pipeline.js
