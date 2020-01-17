@@ -64,9 +64,10 @@ pipeline {
           branch "v\\d?"
           tag "v\\d+\\.\\d+\\.\\d+*"
           allOf {
-            expression { return env.BEATS_UPDATED != "false" }
+            expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() }
             changeRequest()
           }
+
         }
       }
       steps {
