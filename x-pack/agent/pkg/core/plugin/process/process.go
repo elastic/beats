@@ -194,7 +194,10 @@ func pushCredentials(w io.Writer, c *Creds) error {
 		return err
 	}
 
-	<-time.After(1500 * time.Millisecond)
 	_, err = w.Write(credbytes)
+
+	// this gives beat with grpc a bit of time to spin up a goroutine and start a server.
+	// should be ok until we come up with more clever solution.
+	<-time.After(1500 * time.Millisecond)
 	return err
 }
