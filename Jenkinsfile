@@ -33,6 +33,7 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
