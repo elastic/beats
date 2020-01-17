@@ -206,8 +206,9 @@ endif::serverless[]
 ==== Grant privileges and roles needed for publishing
 
 Users who publish events to {es} need to create and write to {beatname_uc}
-indices. To minimize the privileges required by the writer role, you can use the
-<<privileges-to-setup-beats,setup role>> to pre-load dependencies.
+indices. To minimize the privileges required by the writer role, use the
+<<privileges-to-setup-beats,setup role>> to pre-load dependencies. This section
+assumes that you've pre-loaded dependencies. 
 
 ifndef::no_ilm[]
 When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
