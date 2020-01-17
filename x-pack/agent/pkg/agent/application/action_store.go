@@ -54,8 +54,14 @@ func newActionStore(log *logger.Logger, file string) (*actionStore, error) {
 // Add is only taking care of ActionPolicyChange for now and will only keep the last one it receive,
 // any other type of action will be silently ignored.
 func (s *actionStore) Add(a action) {
-	switch a.(type) {
+	switch v := a.(type) {
 	case *fleetapi.ActionPolicyChange:
+		// Only persist the action if the action is different.
+		if s.action != nil {
+			if s.action.ID() == v.ID() {
+				return
+			}
+		}
 		s.dirty = true
 		s.action = a
 	}
