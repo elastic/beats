@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/docker/go-units"
+
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/common"
 )
