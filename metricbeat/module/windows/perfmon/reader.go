@@ -85,7 +85,7 @@ func NewReader(config Config) (*Reader, error) {
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
 		}
 		for _, v := range childQueries {
-			if err := query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
+			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
 			r.instanceLabel[v] = counter.InstanceLabel
@@ -118,7 +118,7 @@ func (r *Reader) RefreshCounterPaths() error {
 		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
-				if err := r.query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
+				if err := r.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
 				}
 				r.instanceLabel[v] = counter.InstanceLabel

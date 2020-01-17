@@ -346,6 +346,8 @@ metricbeat.modules:
 - module: iis
   metricsets:
     - webserver
+    - website
+      hosts: ["local.test"]
   enabled: true
   period: 10s
 

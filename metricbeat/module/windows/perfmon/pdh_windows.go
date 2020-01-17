@@ -41,6 +41,7 @@ import (
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 //sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
+//sys _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) [failretval!=0] = pdh.PdhEnumObjectItemsW
 
 type PdhQueryHandle uintptr
 
@@ -49,6 +50,8 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+const PERF_DETAIL_WIZARD = 400
 
 // PdhCounterInfo struct contains the performance counter details
 type PdhCounterInfo struct {
@@ -245,6 +248,48 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	}
 
 	return nil
+}
+
+// PdhEnumObjectItems returns the counters and instance info for given object
+func PdhEnumObjectItems(objectName string) ([]uint16, []uint16, error) {
+	var (
+		cBuff     = make([]uint16, 1)
+		cBuffSize = uint32(0)
+		iBuff     = make([]uint16, 1)
+		iBuffSize = uint32(0)
+	)
+	obj := windows.StringToUTF16Ptr(objectName)
+	if err := _PdhEnumObjectItems(
+		0,
+		0,
+		obj,
+		&cBuff[0],
+		&cBuffSize,
+		&iBuff[0],
+		&iBuffSize,
+		PERF_DETAIL_WIZARD,
+		0); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, nil, PdhErrno(err.(syscall.Errno))
+		}
+		cBuff = make([]uint16, cBuffSize)
+		iBuff = make([]uint16, iBuffSize)
+
+		if err = _PdhEnumObjectItems(
+			0,
+			0,
+			obj,
+			&cBuff[0],
+			&cBuffSize,
+			&iBuff[0],
+			&iBuffSize,
+			PERF_DETAIL_WIZARD,
+			0); err != nil {
+			return nil, nil, err
+		}
+		return cBuff, iBuff, nil
+	}
+	return nil, nil, nil
 }
 
 // Error returns a more explicit error message.

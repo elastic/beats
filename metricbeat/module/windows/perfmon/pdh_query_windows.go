@@ -72,20 +72,20 @@ func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) 
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
+func (q *Query) AddCounter(counterPath string, instance string, format string, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
 		return nil
 	}
 	var err error
 	var instanceName string
 	// Extract the instance name from the counterPath.
-	if counter.InstanceName == "" || wildcard {
+	if instance == "" || wildcard {
 		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
 	} else {
-		instanceName = counter.InstanceName
+		instanceName = instance
 	}
 	h, err := PdhAddCounter(q.handle, counterPath, 0)
 	if err != nil {
@@ -95,7 +95,7 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 	q.counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
-		format:       getPDHFormat(counter.Format),
+		format:       getPDHFormat(format),
 	}
 	return nil
 }
@@ -176,6 +176,18 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 		rtn[path] = append(rtn[path], getCounterValue(counter))
 	}
 	return rtn, nil
+}
+
+// GetCountersAndInstances returns a list of counters and instances for a given object
+func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
+	counters, instances, err := PdhEnumObjectItems(objectName)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "Unable to retrieve counter and instance list for %s", objectName)
+	}
+	if len(counters) == 0 && len(instances) == 0 {
+		return nil, nil, errors.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+	}
+	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
 
 // ExpandWildCardPath  examines local computer and returns those counter paths that match the given counter path which contains wildcard characters.

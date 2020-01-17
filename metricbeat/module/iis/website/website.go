@@ -38,21 +38,26 @@ func init() {
 // MetricSet type defines all fields of the partition MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	log *logp.Logger
+	log    *logp.Logger
+	reader *Reader
 }
 
 // New creates a new instance of the website MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The perfmon metricset is beta")
+	cfgwarn.Beta("The website metricset is beta")
 
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
+	reader, err := NewReader(config)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		log:           logp.NewLogger("website"),
+		reader:        reader,
 	}, nil
 }
 
