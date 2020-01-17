@@ -68,9 +68,9 @@ output.elasticsearch:
 
 Notes about the previous example and client based PKI authentication:
 
-  - `ssl.certificate` and `ssl.key` are ONLY needed if Elasticsearch is configured to require client based PKI authentication (with `xpack.security.http.ssl.client_authentication: required` or `xpack.security.http.ssl.client_authentication: optional`).
-  - `ssl.certificate_authorities` need to include the CA used to sign the remote server certificate, not this client cert.
-  - If client PKI is used, the remote server (Elasticsearch) should include the CA used for signing the client cert in the list of `xpack.security.http.ssl.certificate_authorities: []` list.
+  - The `ssl.certificate` and `ssl.key` settings are ONLY needed if {es} is configured to require client based PKI authentication (with `xpack.security.http.ssl.client_authentication: required` or `xpack.security.http.ssl.client_authentication: optional`).
+  - The `ssl.certificate_authorities` setting needs to include the CA used to sign the remote server certificate, not the client cert.
+  - If client PKI is used, the remote server ({es}) should include the CA used for signing the client cert in the `xpack.security.http.ssl.certificate_authorities: []` list.
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
@@ -218,7 +218,7 @@ for more information about the environment variables.
 ===== `index`
 
 The index name to write events to. The default is
-+"{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"+ (for example,
++"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
@@ -236,7 +236,7 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%{[fields.log_type]}-%{[beat.version]}-%{+yyyy.MM.dd}" <1>
+  index: "%\{[fields.log_type]\}-%\{[beat.version]\}-%\{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
 
 <1> We recommend including `beat.version` in the name to avoid mapping issues
@@ -349,7 +349,7 @@ access any event field. For example, this configuration uses a custom field,
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  pipeline: "%{[fields.log_type]}_pipeline"
+  pipeline: "%\{[fields.log_type]\}_pipeline"
 ------------------------------------------------------------------------------
 
 
@@ -434,17 +434,21 @@ endif::[]
 
 ===== `max_retries`
 
-ifdef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
 endif::[]
 
-ifndef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
+
 endif::[]
 
 
@@ -706,17 +710,21 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== `max_retries`
 
-ifdef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
 endif::[]
 
-ifndef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
+
 endif::[]
 
 ===== `bulk_max_size`
@@ -932,17 +940,21 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 ===== `max_retries`
 
-ifdef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
 endif::[]
 
-ifndef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
+
 endif::[]
 
 ===== `bulk_max_size`
@@ -1146,19 +1158,19 @@ See <<configuration-output-codec>> for more information.
 
 ===== `host_topology`
 
-deprecated:[5.0.0]
+deprecated[5.0.0]
 
 The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
 ===== `password_topology`
 
-deprecated:[5.0.0]
+deprecated[5.0.0]
 
 The password to use for authenticating with the Redis topology server. The default is no authentication.
 
 ===== `db_topology`
 
-deprecated:[5.0.0]
+deprecated[5.0.0]
 
 The Redis database number where the topology information is stored. The default is 1.
 
@@ -1192,17 +1204,21 @@ Redis after a network error. The default is 60s.
 
 ===== `max_retries`
 
-ifdef::ignores_max_retries[]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
 endif::[]
 
-ifndef::ignores_max_retries[]
+ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
+
 endif::[]
 
 
