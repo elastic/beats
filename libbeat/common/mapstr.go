@@ -220,7 +220,7 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	}
 
 	debugM := m.Clone()
-	filterDebugObject(map[string]interface{}(debugM))
+	applyLoggingMask(map[string]interface{}(debugM))
 
 	keys := make([]string, 0, len(debugM))
 	for k := range debugM {
@@ -246,7 +246,7 @@ func (m MapStr) Format(f fmt.State, c rune) {
 	}
 
 	debugM := m.Clone()
-	filterDebugObject(map[string]interface{}(debugM))
+	applyLoggingMask(map[string]interface{}(debugM))
 
 	io.WriteString(f, debugM.String())
 }

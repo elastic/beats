@@ -357,7 +357,7 @@ func DebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -368,7 +368,7 @@ func DebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))

@@ -1,6 +1,6 @@
 package common
 
-var debugMasklist = MakeStringSet(
+var maskList = MakeStringSet(
 	"password",
 	"passphrase",
 	"key_passphrase",
@@ -12,11 +12,11 @@ var debugMasklist = MakeStringSet(
 	"hosts",
 )
 
-func filterDebugObject(c interface{}) {
+func applyLoggingMask(c interface{}) {
 	switch cfg := c.(type) {
 	case map[string]interface{}:
 		for k, v := range cfg {
-			if debugMasklist.Has(k) {
+			if maskList.Has(k) {
 				if arr, ok := v.([]interface{}); ok {
 					for i := range arr {
 						arr[i] = "xxxxx"
@@ -25,13 +25,13 @@ func filterDebugObject(c interface{}) {
 					cfg[k] = "xxxxx"
 				}
 			} else {
-				filterDebugObject(v)
+				applyLoggingMask(v)
 			}
 		}
 
 	case []interface{}:
 		for _, elem := range cfg {
-			filterDebugObject(elem)
+			applyLoggingMask(elem)
 		}
 	}
 }
