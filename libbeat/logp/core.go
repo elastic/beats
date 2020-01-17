@@ -98,7 +98,9 @@ func Configure(cfg Config) error {
 			selectors["*"] = struct{}{}
 		}
 
-		if _, enabled := selectors["stdlog"]; !enabled {
+		_, stdlogEnabled := selectors["stdlog"]
+		_, allEnabled := selectors["*"]
+		if !stdlogEnabled || !allEnabled {
 			// Disable standard logging by default (this is sometimes used by
 			// libraries and we don't want their spam).
 			golog.SetOutput(ioutil.Discard)
