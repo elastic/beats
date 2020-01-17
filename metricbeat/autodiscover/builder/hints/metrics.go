@@ -58,13 +58,6 @@ type metricHints struct {
 	Registry *mb.Register
 }
 
-type moduleCfg common.MapStr
-
-func (mcfg *moduleCfg) SecureString() string {
-	cfg := common.MustNewConfigFrom(mcfg)
-	return common.DebugString(cfg, true)
-}
-
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
@@ -126,7 +119,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	username := m.getUsername(hints)
 	password := m.getPassword(hints)
 
-	moduleConfig := moduleCfg{
+	moduleConfig := common.MapStr{
 		"module":     mod,
 		"metricsets": msets,
 		"hosts":      hosts,
@@ -150,14 +143,12 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig[mcfgPassword] = password
 	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.SecureString())
-
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: +%v", *cfg)
+	logp.Debug("hints.builder", "generated config: +%v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
