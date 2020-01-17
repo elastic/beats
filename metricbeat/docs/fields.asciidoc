@@ -1738,6 +1738,12 @@ Metrics that returned from Cloudwatch API query. - name: billing
     `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
   release: ga
   fields:
+- name: lambda
+  type: group
+  description: >
+    `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
+  release: beta
+  fields:
 - name: rds
   type: group
   description: >
