@@ -61,12 +61,8 @@ type metricHints struct {
 type moduleCfg common.MapStr
 
 func (mcfg *moduleCfg) SecureString() string {
-	mcfgCopy := common.MapStr(*mcfg).Clone()
-	if exists, _ := mcfgCopy.HasKey(mcfgPassword); exists {
-		mcfgCopy.Put(mcfgPassword, "******")
-	}
-
-	return mcfgCopy.String()
+	cfg := common.MustNewConfigFrom(mcfg)
+	return common.DebugString(cfg, true)
 }
 
 // NewMetricHints builds a new metrics builder based on hints

@@ -329,8 +329,8 @@ func TestModuleCfg_SecureString(t *testing.T) {
 		"username": "foo",
 		"password": "SUPER_SECURE",
 	}
-	assert.Contains(t, testModuleCfg.SecureString(), `"username":"foo"`)
-	assert.Contains(t, testModuleCfg.SecureString(), `"password":"`)
+	assert.Contains(t, testModuleCfg.SecureString(), `"username": "foo"`)
+	assert.Contains(t, testModuleCfg.SecureString(), `"password": "`)
 	assert.NotContains(t, testModuleCfg.SecureString(), "SUPER_SECURE")
 }
 
