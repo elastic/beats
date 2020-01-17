@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 - Add cloudtrail fileset to AWS module. {issue}14657[14657] {pull}15227[15227]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 
 *Heartbeat*
 
