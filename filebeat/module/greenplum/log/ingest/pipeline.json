@@ -6,7 +6,7 @@
         "field": "message",
         "ignore_missing": true,
         "patterns": [
-            "^%{DATETIME:greenplum.log.timestamp} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:greenplum.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{GREENPLUM_DB_NAME:greenplum.log.database}\\]|%{USERNAME:user.name}@%{GREENPLUM_DB_NAME:greenplum.log.database}) )?%{WORD:log.level}:  (?:%{NUMBER:greenplum.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  %{GREENPLUM_QUERY_STEP}: %{GREEDYDATA:greenplum.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})"
+            "^%{DATETIME:greenplum.log.timestamp},,,%{WORD:greenplum.log.process_id},th-%{WORD:greenplum.log.thread_id},,,%{DATETIME:greenplum.log.timestamp},%{NUMBER:greenplum.log.transaction_id},,,%{WORD:greenplum.log.gp_segment.type}-%{WORD:greenplum.log.gp_segment.id},,,,,\"%{WORD:greenplum.log.level}\",\"%{NUMBER:greenplum.log.state_code}\",\"%{GREEDYDATA:greenplum.log.message}\",,,,,,,%{NUMBER:greenplum.log.cursor_position},,\"%{GREEDYDATA:greenplum.log.file.name}\",%{NUMBER:greenplum.log.file.line},"
         ],
         "pattern_definitions": {
           "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",

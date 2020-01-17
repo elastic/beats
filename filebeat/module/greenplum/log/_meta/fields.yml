@@ -6,39 +6,57 @@
   - name: timestamp
     description: Please add description
     example: Please add example
-  - name: core_id
+  - name: process_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: thread_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: transaction_id
     description: Please add description
     example: Please add example
     type: long
-  - name: database
-    description: Please add description
-    example: Please add example
-  - name: error
+  - name: gp_segment
     description: Please add description
     example: Please add example
     type: group
     fields:
-    - name: code
+    - name: type
       description: Please add description
       example: Please add example
-      type: long
-  - name: query
+      type: keyword
+    - name: id
+      description: Please add description
+      example: Please add example
+      type: keyword
+  - name: level
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: state_code
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: message
     description: Please add description
     example: Please add example
     type: text
-- name: pid
-  description: Please add description
-  example: Please add example
-  type: long
-- name: name
-  description: Please add description
-  example: Please add example
-  type: keyword
-- name: level
-  description: Please add description
-  example: Please add example
-  type: keyword
-- name: message
-  description: Please add description
-  example: Please add example
-  type: text
+  - name: cursor_position
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: file
+    description: Please add description
+    example: Please add example
+    type: group
+    fields:
+    - name: name
+      description: Please add description
+      example: Please add example
+      type: text
+    - name: line
+      description: Please add description
+      example: Please add example
+      type: long
