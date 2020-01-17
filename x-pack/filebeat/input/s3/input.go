@@ -546,13 +546,13 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
-	// Make sure to close the body when done with it for S3 GetObject APIs or
-	// will leak connections.
-	defer resp.Body.Close()
-
 	if resp.Body == nil {
 		return nil, errors.New("s3 get object response body is empty")
 	}
+
+	// Make sure to close the body when done with it for S3 GetObject APIs or
+	// will leak connections.
+	defer resp.Body.Close()
 
 	// Check content-type
 	if resp.ContentType != nil {
