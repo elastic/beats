@@ -14,6 +14,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-googlecloud>>
+  * <<filebeat-module-greenplum>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
   * <<filebeat-module-icinga>>
@@ -55,6 +56,7 @@ include::modules/coredns.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/googlecloud.asciidoc[]
+include::modules/greenplum.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
 include::modules/icinga.asciidoc[]

@@ -28,6 +28,7 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-googlecloud>>
+* <<exported-fields-greenplum>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-ibmmq>>
@@ -12454,6 +12455,126 @@ Latency as measured (for TCP flows only) during the time interval. This is the t
 
 
 type: long
+
+--
+
+[[exported-fields-greenplum]]
+== greenplum fields
+
+greenplum Module
+
+
+
+[float]
+=== greenplum
+
+
+
+
+[float]
+=== log
+
+Please add description
+
+
+*`greenplum.log.timestamp`*::
++
+--
+Please add description
+
+example: Please add example
+
+--
+
+*`greenplum.log.core_id`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.database`*::
++
+--
+Please add description
+
+example: Please add example
+
+--
+
+[float]
+=== error
+
+Please add description
+
+
+*`greenplum.log.error.code`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.query`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.pid`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.name`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.level`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.message`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
 
 --
 

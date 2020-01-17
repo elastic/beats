@@ -1,0 +1,49 @@
+{
+  "description": "Pipeline for parsing Greenplum logs.",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "ignore_missing": true,
+        "patterns": [
+            "^%{DATETIME:greenplum.log.timestamp} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:greenplum.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{GREENPLUM_DB_NAME:greenplum.log.database}\\]|%{USERNAME:user.name}@%{GREENPLUM_DB_NAME:greenplum.log.database}) )?%{WORD:log.level}:  (?:%{NUMBER:greenplum.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  %{GREENPLUM_QUERY_STEP}: %{GREEDYDATA:greenplum.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})"
+        ],
+        "pattern_definitions": {
+          "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
+          "GREEDYDATA": "(.|\n|\t)*",
+          "GREENPLUM_DB_NAME": "[a-zA-Z0-9_]+[a-zA-Z0-9_\\$]*",
+          "GREENPLUM_QUERY_STEP": "%{WORD:greenplum.log.query_step}(?: <unnamed>| %{WORD:greenplum.log.query_name})?"
+        }
+      }
+    },
+    {
+      "date": {
+        "field": "greenplum.log.timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "yyyy-MM-dd HH:mm:ss.SSS zz", "yyyy-MM-dd HH:mm:ss zz"
+        ]
+      }
+    }, {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+        "params": { "scale": 1000000 },
+        "if": "ctx.temp?.duration != null"
+      }
+    }, {
+      "remove": {
+        "field": "temp.duration",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

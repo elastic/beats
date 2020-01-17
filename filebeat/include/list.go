@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/filebeat/module/apache"
 	_ "github.com/elastic/beats/filebeat/module/auditd"
 	_ "github.com/elastic/beats/filebeat/module/elasticsearch"
+	_ "github.com/elastic/beats/filebeat/module/greenplum"
 	_ "github.com/elastic/beats/filebeat/module/haproxy"
 	_ "github.com/elastic/beats/filebeat/module/icinga"
 	_ "github.com/elastic/beats/filebeat/module/iis"

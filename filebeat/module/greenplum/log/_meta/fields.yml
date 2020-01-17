@@ -1,0 +1,44 @@
+- name: log
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: timestamp
+    description: Please add description
+    example: Please add example
+  - name: core_id
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: database
+    description: Please add description
+    example: Please add example
+  - name: error
+    description: Please add description
+    example: Please add example
+    type: group
+    fields:
+    - name: code
+      description: Please add description
+      example: Please add example
+      type: long
+  - name: query
+    description: Please add description
+    example: Please add example
+    type: text
+- name: pid
+  description: Please add description
+  example: Please add example
+  type: long
+- name: name
+  description: Please add description
+  example: Please add example
+  type: keyword
+- name: level
+  description: Please add description
+  example: Please add example
+  type: keyword
+- name: message
+  description: Please add description
+  example: Please add example
+  type: text

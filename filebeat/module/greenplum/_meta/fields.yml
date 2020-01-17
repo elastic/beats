@@ -1,0 +1,9 @@
+- key: greenplum
+  title: "greenplum"
+  description: >
+    greenplum Module
+  fields:
+    - name: greenplum
+      type: group
+      description: >
+      fields:
