@@ -81,7 +81,7 @@
             }
           }
         },
-        "title": "STAN Channel Messages [Metricbeat ECS]",
+        "title": "[Metricbeat ECS] STAN Channel Messages",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -144,7 +144,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "STAN Channel Messages [Metricbeat ECS]",
+          "title": "[Metricbeat ECS] STAN Channel Messages",
           "type": "metrics"
         }
       },
@@ -169,7 +169,7 @@
             }
           }
         },
-        "title": "STAN Channel Queue Depth [Metricbeat ECS]",
+        "title": "[Metricbeat ECS] STAN Channel Queue Depth",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
