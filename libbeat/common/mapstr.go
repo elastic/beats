@@ -20,6 +20,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 
@@ -218,13 +219,16 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	keys := make([]string, 0, len(m))
-	for k := range m {
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	keys := make([]string, 0, len(debugM))
+	for k := range debugM {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		v := m[k]
+		v := debugM[k]
 		if inner, ok := tryToMapStr(v); ok {
 			enc.AddObject(k, inner)
 			continue
@@ -232,6 +236,19 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		zap.Any(k, v).AddTo(enc)
 	}
 	return nil
+}
+
+// Format implements fmt.Formatter
+func (m MapStr) Format(f fmt.State, c rune) {
+	if f.Flag('+') || f.Flag('#') {
+		io.WriteString(f, m.String())
+		return
+	}
+
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	io.WriteString(f, debugM.String())
 }
 
 // Flatten flattens the given MapStr and returns a flat MapStr.
