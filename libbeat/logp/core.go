@@ -37,7 +37,8 @@ import (
 )
 
 var (
-	_log unsafe.Pointer // Pointer to a coreLogger. Access via atomic.LoadPointer.
+	_log          unsafe.Pointer // Pointer to a coreLogger. Access via atomic.LoadPointer.
+	_defaultGoLog = golog.Writer()
 )
 
 func init() {
@@ -104,6 +105,8 @@ func Configure(cfg Config) error {
 			// Disable standard logging by default (this is sometimes used by
 			// libraries and we don't want their spam).
 			golog.SetOutput(ioutil.Discard)
+		} else {
+			golog.SetOutput(_defaultGoLog)
 		}
 
 		sink = selectiveWrapper(sink, selectors)

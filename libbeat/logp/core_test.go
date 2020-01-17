@@ -18,6 +18,8 @@
 package logp
 
 import (
+	"io/ioutil"
+	golog "log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,4 +117,15 @@ func TestL(t *testing.T) {
 		assert.Equal(t, loggerName, log.LoggerName)
 		assert.Equal(t, "warning 1", log.Message)
 	}
+}
+
+func TestAllStdoutDisablesDefaultGoLogger(t *testing.T) {
+	DevelopmentSetup(WithSelectors("*"))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("stdlog"))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("*", "stdlog"))
+	assert.NotEqual(t, ioutil.Discard, golog.Writer())
 }
