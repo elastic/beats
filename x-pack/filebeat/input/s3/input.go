@@ -201,7 +201,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 				continue
 			}
-			p.logger.Error("failed to receive message from SQS:", err)
+			p.logger.Error("failed to receive message from SQS: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
 		}
@@ -545,6 +545,10 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 		}
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
+
+	// Make sure to close the body when done with it for S3 GetObject APIs or
+	// will leak connections.
+	defer resp.Body.Close()
 
 	if resp.Body == nil {
 		return nil, errors.New("s3 get object response body is empty")
