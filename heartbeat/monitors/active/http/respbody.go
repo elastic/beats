@@ -18,11 +18,11 @@
 package http
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/docker/go-units"
 	"github.com/elastic/beats/heartbeat/reason"
@@ -96,7 +96,7 @@ func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodyS
 func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, prefix string, hashStr string, err error) {
 	hash := sha256.New()
 
-	var prefixBuf bytes.Buffer
+	var prefixBuf strings.Builder
 
 	chunk := make([]byte, 1024)
 	for {
