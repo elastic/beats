@@ -1,6 +1,6 @@
 package common
 
-var debugBlacklist = MakeStringSet(
+var debugMasklist = MakeStringSet(
 	"password",
 	"passphrase",
 	"key_passphrase",
@@ -16,7 +16,7 @@ func filterDebugObject(c interface{}) {
 	switch cfg := c.(type) {
 	case map[string]interface{}:
 		for k, v := range cfg {
-			if debugBlacklist.Has(k) {
+			if debugMasklist.Has(k) {
 				if arr, ok := v.([]interface{}); ok {
 					for i := range arr {
 						arr[i] = "xxxxx"
