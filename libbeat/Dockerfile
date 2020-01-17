@@ -10,7 +10,7 @@ RUN set -x && \
 
 ENV PYTHON_ENV=/tmp/python-env
 
-RUN test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+RUN test -d ${PYTHON_ENV} || virtualenv -p python3 ${PYTHON_ENV}
 COPY ./tests/system/requirements.txt /tmp/requirements.txt
 
 # Upgrade pip to make sure to have the most recent version
