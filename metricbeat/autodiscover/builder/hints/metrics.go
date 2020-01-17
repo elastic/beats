@@ -47,8 +47,6 @@ const (
 	username    = "username"
 	password    = "password"
 
-	mcfgPassword = "password"
-
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
 )
@@ -140,7 +138,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["username"] = username
 	}
 	if password != "" {
-		moduleConfig[mcfgPassword] = password
+		moduleConfig["password"] = password
 	}
 
 	// Create config object
