@@ -23,7 +23,6 @@ import (
 	"encoding/hex"
 	"io"
 	"net/http"
-	"unicode/utf8"
 
 	"github.com/docker/go-units"
 	"github.com/elastic/beats/heartbeat/reason"
@@ -124,10 +123,5 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 		}
 	}
 
-	// We discard the body if it is not valid UTF-8
-	prefixBytes := prefixBuf.Bytes()
-	if utf8.Valid(prefixBytes) {
-		prefix = string(prefixBytes)
-	}
-	return respSize, prefix, hex.EncodeToString(hash.Sum(nil)), nil
+	return respSize, prefixBuf.String(), hex.EncodeToString(hash.Sum(nil)), nil
 }
