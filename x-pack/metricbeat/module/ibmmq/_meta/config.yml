@@ -1,0 +1,28 @@
+- module: ibmmq
+  metricsets: ['qmgr']
+  period: 10s
+  hosts: ['localhost:9157']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
+  # The custom processor is responsible for filtering Prometheus metrics
+  # not stricly related to the IBM MQ domain, e.g. system load, process,
+  # metrics HTTP server.
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var metrics = event.Get("prometheus.metrics");
+            Object.keys(metrics).forEach(function(key) {
+              if (!(key.match(/^ibmmq_.*$/))) {
+                event.Delete("prometheus.metrics." + key);
+              }
+            });
+            metrics = event.Get("prometheus.metrics");
+            if (Object.keys(metrics).length == 0) {
+              event.Cancel();
+            }
+          }
