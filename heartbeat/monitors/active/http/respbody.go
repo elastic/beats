@@ -26,7 +26,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/docker/go-units"
-
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -109,7 +108,11 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 
 		prefixRemainingBytes := maxPrefixSize - prefixBuf.Len()
 		if prefixRemainingBytes > 0 {
-			prefixBuf.Write(chunk[:readSize])
+			if prefixRemainingBytes < readSize {
+				prefixBuf.Write(chunk[:prefixRemainingBytes])
+			} else {
+				prefixBuf.Write(chunk[:readSize])
+			}
 		}
 
 		if readErr == io.EOF {
