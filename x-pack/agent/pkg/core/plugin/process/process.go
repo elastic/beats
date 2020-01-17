@@ -198,6 +198,7 @@ func pushCredentials(w io.Writer, c *Creds) error {
 
 	// this gives beat with grpc a bit of time to spin up a goroutine and start a server.
 	// should be ok until we come up with more clever solution.
+	// Issue: https://github.com/elastic/beats/issues/15634
 	<-time.After(1500 * time.Millisecond)
 	return err
 }
