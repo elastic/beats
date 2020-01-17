@@ -6,11 +6,13 @@ var:
   - name: project_id
     default: SET_PROJECT_NAME
   - name: topic
-    default: stackdriver-vpcflow
+    default: stackdriver-firewall
   - name: subscription_name
-    default: filebeat-googlecloud-vpcflow
+    default: filebeat-googlecloud-firewall
   - name: credentials_file
-    default: googlecloud-vpcflow-reader-service-identity.json
+    default: googlecloud-firewall-reader-service-identity.json
+  - name: debug
+    default: false
   - name: keep_original_message
     default: false
 ingest_pipeline: ingest/pipeline.yml
