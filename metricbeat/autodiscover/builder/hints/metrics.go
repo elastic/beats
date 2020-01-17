@@ -141,6 +141,8 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["password"] = password
 	}
 
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
