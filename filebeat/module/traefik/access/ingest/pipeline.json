@@ -5,19 +5,21 @@
             "grok": {
                 "field": "traefik.access.message",
                 "patterns": [
-                    "(?:%{NUMBER:traefik.access.body_sent.bytes}|-)( \"%{DATA:traefik.access.referrer}\")?( \"%{DATA:traefik.access.agent}\")?(?:%{NUMBER:traefik.access.request_count}|-)?( \"%{DATA:traefik.access.frontend_name}\")?( \"%{DATA:traefik.access.backend_url}\")?"
+                    "(?:%{NUMBER:traefik.access.body_sent.bytes:int}|-)( (?:\"%{DATA:traefik.access.referrer}\"|-)?( (?:\"%{DATA:traefik.access.agent}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:int}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:traefik.access.duration:int}ms)?)?"
                 ],
                 "ignore_missing": true
             }
         },
         {
             "remove": {
-                "field": "message"
+                "field": "message",
+                "ignore_missing": true
             }
         },
         {
             "remove": {
-                "field": "traefik.access.message"
+                "field": "traefik.access.message",
+                "ignore_missing": true
             }
         },
         {
@@ -50,7 +52,8 @@
         {
             "rename": {
                 "field": "traefik.access.agent",
-                "target_field": "traefik.access.user_agent.original"
+                "target_field": "traefik.access.user_agent.original",
+                "ignore_failure": true
             }
         },
         {

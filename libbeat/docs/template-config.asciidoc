@@ -24,18 +24,12 @@ you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
-name, so the final name is +{beatname_lc}-%\{[beat.version]\}+.
-
-// Maintainers: a backslash character is required to escape curly braces and
-// asterisks in inline code examples that contain asciidoc attributes. You'll
-// note that a backslash does not appear before the asterisk
-// in +{beatname_lc}-%\{[beat.version]\}-*+. This is intentional and formats
-// the example as expected.
+name, so the final name is +{beatname_lc}-%{[beat.version]}+.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
 settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beat_default_index_prefix}-%\{[beat.version]\}-*+. The wildcard character `-*` is used to
++{beat_default_index_prefix}-%{[beat.version]}-*+. The wildcard character `-*` is used to
 match all daily indices.
 +
 Example:
@@ -68,6 +62,11 @@ setup.template.settings:
   index.number_of_shards: 1
   index.number_of_replicas: 1
 ----------------------------------------------------------------------
+
+NOTE: If you want to use {stack-ov}/xpack-ccr.html[{ccr}] to replicate {beatname_uc}
+indices to another cluster, you will need to add additional template settings to
+{stack-ov}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
+underlying indices.
 
 *`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
 please see the Elasticsearch {elasticsearch}/mapping-source-field.html[reference].

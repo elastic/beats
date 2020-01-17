@@ -62,20 +62,7 @@ endif::[]
 [[docker]]
 *docker:*
 
-ifeval::["{release-state}"=="unreleased"]
-
-Version {stack-version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source", "shell", subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
-
-endif::[]
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[mac]]
 *mac:*
@@ -92,6 +79,25 @@ ifeval::["{release-state}"!="unreleased"]
 ----------------------------------------------------------------------
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{version}-darwin-x86_64.tar.gz
 tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
+----------------------------------------------------------------------
+
+endif::[]
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{version}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{version}-linux-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 endif::[]
@@ -272,12 +278,12 @@ sudo service {beatname_lc} start
 docker run {dockerimage}
 ----------------------------------------------------------------------
 
-*mac:*
+*mac and linux:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root packetbeat.yml <1>
-sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+sudo ./packetbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See

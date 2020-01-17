@@ -363,6 +363,14 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "TsYe4THK6mTAH52LC3xVkq9VE0Q=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface/",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
 			"checksumSHA1": "wJrdYP7TyFYBwNPprzcA+ZdAjyo=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
@@ -1376,11 +1384,11 @@
 			"versionExact": "v1.5.0"
 		},
 		{
-			"checksumSHA1": "TmMTaJIWueXrKneUOKMOgq75fKE=",
+			"checksumSHA1": "4ZEyxKIsoeECu8pA7mK4mjiUvpw=",
 			"origin": "github.com/elastic/fsevents",
 			"path": "github.com/fsnotify/fsevents",
-			"revision": "4d5197691b054c220286f7c6ea167de9753d902d",
-			"revisionTime": "2018-05-02T14:11:16Z",
+			"revision": "e1d381a4d27063baac2e9d3c5887ceb4ab059287",
+			"revisionTime": "2018-10-29T22:35:31Z",
 			"tree": true
 		},
 		{

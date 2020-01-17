@@ -31,6 +31,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	watcher := mockWatcher{}
 	funcs := mockFuncs{}
 	resource := &mockResource{
+		uid:       "mockuid",
 		name:      "enrich",
 		namespace: "default",
 		labels: map[string]string{
@@ -59,6 +60,23 @@ func TestBuildMetadataEnricher(t *testing.T) {
 		{"name": "unknown"},
 		{
 			"name":    "enrich",
+			"_module": common.MapStr{"label": "value", "pod": common.MapStr{"name": "enrich", "uid": "mockuid"}},
+		},
+	}, events)
+
+	// Enrich a pod (metadata goes in root level)
+	events = []common.MapStr{
+		{"name": "unknown"},
+		{"name": "enrich"},
+	}
+	enricher.isPod = true
+	enricher.Enrich(events)
+
+	assert.Equal(t, []common.MapStr{
+		{"name": "unknown"},
+		{
+			"name":    "enrich",
+			"uid":     "mockuid",
 			"_module": common.MapStr{"label": "value"},
 		},
 	}, events)
@@ -87,7 +105,12 @@ type mockFuncs struct {
 
 func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) {
 	f.updated = obj
-	meta := common.MapStr{}
+	meta := common.MapStr{
+		"pod": common.MapStr{
+			"name": obj.GetMetadata().GetName(),
+			"uid":  obj.GetMetadata().GetUid(),
+		},
+	}
 	for k, v := range obj.GetMetadata().Labels {
 		meta[k] = v
 	}
@@ -105,12 +128,13 @@ func (f *mockFuncs) index(m common.MapStr) string {
 }
 
 type mockResource struct {
-	name, namespace string
-	labels          map[string]string
+	name, namespace, uid string
+	labels               map[string]string
 }
 
 func (r *mockResource) GetMetadata() *v1.ObjectMeta {
 	return &v1.ObjectMeta{
+		Uid:       &r.uid,
 		Name:      &r.name,
 		Namespace: &r.namespace,
 		Labels:    r.labels,

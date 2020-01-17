@@ -28,9 +28,23 @@
       "field": "iis.error.time"
     }
   }, {
-    "geoip": {
+    "grok": {
       "field": "iis.error.remote_ip",
+      "patterns": [
+        "%{NOZONEIP:iis.error.remote_ip_geoip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
+    "geoip": {
+      "field": "iis.error.remote_ip_geoip",
       "target_field": "iis.error.geoip"
+    }
+  }, {
+    "remove": {
+      "field": "iis.error.remote_ip_geoip"
     }
   }],
   "on_failure" : [{

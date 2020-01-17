@@ -12,19 +12,17 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestCodeKey(t *testing.T) {
+func TestChecksum(t *testing.T) {
 	t.Run("same bytes content return the same key", func(t *testing.T) {
-		name := "hello"
 		content, err := common.RandomBytes(100)
 		if !assert.NoError(t, err) {
 			return
 		}
 
-		assert.Equal(t, codeKey(name, content), codeKey(name, content))
+		assert.Equal(t, checksum(content), checksum(content))
 	})
 
 	t.Run("different bytes return a different key", func(t *testing.T) {
-		name := "hello"
 		content, err := common.RandomBytes(100)
 		if !assert.NoError(t, err) {
 			return
@@ -35,7 +33,7 @@ func TestCodeKey(t *testing.T) {
 			return
 		}
 
-		assert.NotEqual(t, codeKey(name, content), codeKey(name, other))
+		assert.NotEqual(t, checksum(content), checksum(other))
 	})
 }
 

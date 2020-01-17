@@ -33,7 +33,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
@@ -52,7 +52,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
@@ -105,9 +105,8 @@ events from CloudWatch Logs and forwards the events to {es}.
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:

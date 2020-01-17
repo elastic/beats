@@ -24,7 +24,11 @@ import (
 
 func makeLogstashEventEncoder(info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
 	enc := json.New(false, escapeHTML, info.Version)
-	return func(event interface{}) ([]byte, error) {
-		return enc.Encode(index, event.(*beat.Event))
+	return func(event interface{}) (d []byte, err error) {
+		d, err = enc.Encode(index, event.(*beat.Event))
+		if err != nil {
+			debugf("Failed to encode event: %v", event)
+		}
+		return
 	}
 }

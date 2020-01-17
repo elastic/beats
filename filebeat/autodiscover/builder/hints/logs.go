@@ -84,8 +84,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		hints, _ = hIface.(common.MapStr)
 	}
 
-	if builder.IsNoOp(hints, l.Key) == true {
-		return []*common.Config{config}
+	if builder.IsNoOp(hints, l.Key) {
+		logp.Debug("hints.builder", "disabled config in event: %+v", event)
+		return []*common.Config{}
 	}
 
 	inputConfig := l.getInputs(hints)

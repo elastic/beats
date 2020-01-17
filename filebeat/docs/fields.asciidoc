@@ -2965,7 +2965,7 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 +
 --
 
-deprecated[6.3]
+deprecated:[6.3]
 
 required: True
 
@@ -4993,12 +4993,32 @@ Client IP address.
 
 --
 
+*`traefik.access.duration`*::
++
+--
+type: long
+
+Duration of the access entry.
+
+
+--
+
 *`traefik.access.user_name`*::
 +
 --
 type: keyword
 
 The user name used when basic authentication is used.
+
+
+--
+
+*`traefik.access.user_identifier`*::
++
+--
+type: keyword
+
+Is the RFC 1413 identity of the client
 
 
 --
@@ -5090,6 +5110,16 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 type: keyword
 
 The name of the physical device.
+
+
+--
+
+*`traefik.access.user_agent.build`*::
++
+--
+type: keyword
+
+The build of the user agent.
 
 
 --

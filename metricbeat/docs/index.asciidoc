@@ -12,9 +12,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
+:has_central_config:
+:has_docker_label_ex:
+:has_modules_command:
 :deb_os:
 :rpm_os:
 :mac_os:
+:linux_os:
 :docker_platform:
 :win_os:
 

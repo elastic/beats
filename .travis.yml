@@ -13,7 +13,7 @@ env:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.11.1
-    - GO_VERSION="$(cat .go-version)"
+    - GO_VERSION="1.10.6"
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
 
@@ -22,114 +22,118 @@ jobs:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: check
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Auditbeat
     - os: linux
       env: TARGETS="-C auditbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: linux
       env: TARGETS="-C auditbeat crosscompile"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: linux
       env: STRESS_TEST_OPTIONS="-timeout=20m -race -v -parallel 1" TARGETS="-C libbeat stress-tests"
-      go: $GO_VERSION
+      go: 1.10.6
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/libbeat testsuite"
+      go: 1.10.6
       stage: test
 
     # Metricbeat
     - os: linux
       env: TARGETS="-C metricbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Journalbeat
     - os: linux
       env: TARGETS="-C journalbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Functionbeat
     - os: linux
       env: TARGETS="-C x-pack/functionbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
     - os: linux
       env: TARGETS="-C generator/beat test"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Docs
     - os: linux
       env: TARGETS="docs"
-      go: $GO_VERSION
+      go: 1.10.6
       stage: test
 
     # Kubernetes

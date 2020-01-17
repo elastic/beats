@@ -103,11 +103,16 @@ func (a *Autodiscover) Start() {
 	logp.Info("Starting autodiscover manager")
 	a.listener = a.bus.Subscribe(a.adapter.EventFilter()...)
 
+	// It is important to start the worker first before starting the producer.
+	// In hosts that have large number of workloads, it is easy to have an initial
+	// sync of workloads to have a count that is greater than 100 (which is the size
+	// of the bounded Go channel. Starting the providers before the consumer would
+	// result in the channel filling up and never allowing the worker to start up.
+	go a.worker()
+
 	for _, provider := range a.providers {
 		provider.Start()
 	}
-
-	go a.worker()
 }
 
 func (a *Autodiscover) worker() {

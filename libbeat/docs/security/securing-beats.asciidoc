@@ -2,6 +2,7 @@
 [[securing-beats]]
 == Configure {beatname_uc} to use {security}
 
+[subs="attributes"]
 ++++
 <titleabbrev>Use {security}</titleabbrev>
 ++++
@@ -45,19 +46,15 @@ For more information about {security}, see
 {xpack-ref}/xpack-security.html[Securing the {stack}].
 
 [float]
+[[feature-roles]]
 === {beatname_uc} features that require authorization
 
 After securing {beatname_uc}, make sure your users have the roles (or associated
 privileges) required to use these {beatname_uc} features. You must create the
 ++{beat_default_index_prefix}_writer++ and
 ++{beat_default_index_prefix}_reader++ roles (see <<beats-basic-auth>> and
-<<beats-user-access>>).
-ifdef::has_ml_jobs[]
-The `machine_learning_admin` and `kibana_user` roles are {xpack-ref}/built-in-roles.html[built-in].
-endif::[]
-ifndef::has_ml_jobs[]
-The `kibana_user` role is {xpack-ref}/built-in-roles.html[built-in].
-endif::[]
+<<beats-user-access>>). The other roles are
+{xpack-ref}/built-in-roles.html[built-in].
 
 [options="header"]
 |=======
@@ -76,6 +73,9 @@ endif::[]
 |Read indices created by {beatname_uc} | ++{beat_default_index_prefix}_reader++ 
 ifndef::no_dashboards[]
 |View {beatname_uc} dashboards in {kib} | `kibana_user`
+endif::[]
+ifdef::has_central_config[]
+|Store and manage configurations in a central location in {kib} | `beats_admin`
 endif::[]
 |=======
 

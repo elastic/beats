@@ -59,6 +59,7 @@ type enricher struct {
 	watcher            kubernetes.Watcher
 	watcherStarted     bool
 	watcherStartedLock sync.Mutex
+	isPod              bool
 }
 
 // GetWatcher initializes a kubernetes watcher with the given
@@ -157,6 +158,12 @@ func NewResourceMetadataEnricher(
 		},
 	)
 
+	// Configure the enricher for Pods, so pod specific metadata ends up in the right place when
+	// calling Enrich
+	if _, ok := res.(*kubernetes.Pod); ok {
+		enricher.isPod = true
+	}
+
 	return enricher
 }
 
@@ -243,7 +250,7 @@ func buildMetadataEnricher(
 	watcher kubernetes.Watcher,
 	update func(map[string]common.MapStr, kubernetes.Resource),
 	delete func(map[string]common.MapStr, kubernetes.Resource),
-	index func(e common.MapStr) string) Enricher {
+	index func(e common.MapStr) string) *enricher {
 
 	enricher := enricher{
 		metadata: map[string]common.MapStr{},
@@ -298,6 +305,17 @@ func (m *enricher) Enrich(events []common.MapStr) {
 	defer m.RUnlock()
 	for _, event := range events {
 		if meta := m.metadata[m.index(event)]; meta != nil {
+			if m.isPod {
+				// apply pod meta at metricset level
+				if podMeta, ok := meta["pod"].(common.MapStr); ok {
+					event.DeepUpdate(podMeta)
+				}
+
+				// don't apply pod metadata to module level
+				meta = meta.Clone()
+				delete(meta, "pod")
+			}
+
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: meta,
 			})

@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
@@ -21,12 +22,7 @@ const accessTokenKey = "management.accesstoken"
 
 // Enroll this beat to the given kibana
 // This will use Central Management API to enroll and retrieve an access key for config retrieval
-func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string, force bool) (bool, error) {
-	kibanaConfig, err := api.ConfigFromURL(kibanaURL)
-	if err != nil {
-		return false, err
-	}
-
+func Enroll(beat *instance.Beat, kibanaConfig *kibana.ClientConfig, enrollmentToken string, force bool) (bool, error) {
 	// Ignore kibana version to avoid permission errors
 	kibanaConfig.IgnoreVersion = true
 

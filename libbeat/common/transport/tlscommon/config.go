@@ -25,13 +25,13 @@ import (
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
-	Enabled          *bool                   `config:"enabled" yaml:"enabled"`
+	Enabled          *bool                   `config:"enabled" yaml:"enabled,omitempty"`
 	VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
-	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols"`
-	CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites"`
-	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities"`
+	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
+	CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
 	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
-	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types"`
+	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
 	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotation"`
 }
 

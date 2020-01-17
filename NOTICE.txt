@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2018 Elasticsearch BV
+Copyright 2014-2019 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -649,7 +649,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 4d5197691b054c220286f7c6ea167de9753d902d
+Revision: e1d381a4d27063baac2e9d3c5887ceb4ab059287
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------

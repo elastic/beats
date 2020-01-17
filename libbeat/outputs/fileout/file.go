@@ -126,6 +126,7 @@ func (out *fileOutput) Publish(
 			} else {
 				logp.Warn("Failed to serialize the event: %v", err)
 			}
+			logp.Debug("file", "Failed event: %v", event)
 
 			dropped++
 			continue

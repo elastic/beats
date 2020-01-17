@@ -17,7 +17,9 @@ The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
 See the {libbeat}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
-The following topics describe how to configure Metricbeat:
+include::../../libbeat/docs/shared-cm-tip.asciidoc[]
+
+The following topics describe how to configure {beatname_uc}:
 
 * <<configuration-metricbeat>>
 * <<configuration-general-options>>

@@ -41,7 +41,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 
@@ -64,7 +68,6 @@ collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
 collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
-For example:
 +
 [source,yaml]
 ------
@@ -81,6 +84,7 @@ Similarly, for {beatname_uc} modules, you can define processors under the
 `input` section of the module definition. 
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
++
 [source,yaml]
 ----
 - module: <module_name>
@@ -93,7 +97,6 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -107,7 +110,6 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -134,7 +136,6 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -148,7 +149,6 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -804,6 +804,9 @@ by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+metadata. If it is not set, the processor collects metadata from all namespaces.
+It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client.
 `default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in

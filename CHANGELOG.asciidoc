@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -29,11 +29,14 @@ https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 
 *Functionbeat*
 
+- The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
+- Enforce validation for the Central Management access token. {issue}9621[9621]
+- Start autodiscover consumers before producers. {pull}7926[7926]
 
 *Auditbeat*
 
@@ -44,9 +47,6 @@ https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 *Journalbeat*
 
 *Metricbeat*
-
-- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
-- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 
 *Packetbeat*
 
@@ -96,6 +96,60 @@ https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.5.4]]
+=== Beats version 6.5.4
+https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update Golang to 1.10.6. This fixes an issue in remote certificate validation CVE-2018-16875. {pull}9563[9563]
+
+*Filebeat*
+
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+
+==== Added
+
+*Filebeat*
+
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+
+
+[[release-notes-6.5.3]]
+=== Beats version 6.5.3
+https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
+
+*Filebeat*
+
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
+
+[[release-notes-6.5.2]]
+=== Beats version 6.5.2
+https://github.com/elastic/beats/compare/v6.5.1...v6.5.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
+
+*Metricbeat*
+
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 
 [[release-notes-6.5.1]]
 === Beats version 6.5.1

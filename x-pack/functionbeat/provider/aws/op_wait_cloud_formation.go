@@ -5,68 +5,139 @@
 package aws
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var periodicCheck = 10 * time.Second
+var periodicCheck = 2 * time.Second
 
-type opCloudWaitCloudFormation struct {
-	log       *logp.Logger
-	svc       *cloudformation.CloudFormation
-	stackName string
+type checkStatusFunc = func(*cloudformation.StackStatus) (bool, error)
+
+type opWaitCloudFormation struct {
+	log         *logp.Logger
+	svc         cloudformationiface.CloudFormationAPI
+	checkStatus checkStatusFunc
 }
 
 func newOpWaitCloudFormation(
 	log *logp.Logger,
-	cfg aws.Config,
-	stackName string,
-) *opCloudWaitCloudFormation {
-	return &opCloudWaitCloudFormation{
-		log:       log,
-		svc:       cloudformation.New(cfg),
-		stackName: stackName,
+	svc cloudformationiface.CloudFormationAPI,
+) *opWaitCloudFormation {
+	return &opWaitCloudFormation{
+		log:         log,
+		svc:         svc,
+		checkStatus: checkCreateStatus,
 	}
 }
 
-func (o *opCloudWaitCloudFormation) Execute() error {
-	o.log.Debug("Waiting for cloudformation confirmation")
-	status, reason, err := queryStackStatus(o.svc, o.stackName)
+func newWaitDeleteCloudFormation(
+	log *logp.Logger,
+	cfg aws.Config,
+) *opWaitCloudFormation {
+	return &opWaitCloudFormation{
+		log:         log,
+		svc:         cloudformation.New(cfg),
+		checkStatus: checkDeleteStatus,
+	}
+}
 
-	// List of States from the cloud formation API.
-	// https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_Stack.html
+func (o *opWaitCloudFormation) Execute(ctx executionContext) error {
+	c, ok := ctx.(*stackContext)
+	if !ok {
+		return errWrongContext
+	}
+
+	if c.ID == nil {
+		return errMissingStackID
+	}
+
+	eventStackPoller := makeEventStackPoller(o.log, o.svc, periodicCheck, c)
+	eventStackPoller.Start()
+	defer eventStackPoller.Stop()
+
 	for {
-		o.log.Debugf(
-			"Retrieving information on stack '%s' from cloudformation, current status: %v",
-			o.stackName,
-			*status,
-		)
-
+		status, _, err := queryStackStatus(o.svc, c.ID)
 		if err != nil {
 			return err
 		}
 
-		switch *status {
-		case cloudformation.StackStatusUpdateComplete: // OK
-			return nil
-		case cloudformation.StackStatusCreateComplete: // OK
-			return nil
-		case cloudformation.StackStatusCreateFailed:
-			return fmt.Errorf("failed to create the stack '%s', reason: %v", o.stackName, reason)
-		case cloudformation.StackStatusRollbackFailed:
-			return fmt.Errorf("failed to create and rollback the stack '%s', reason: %v", o.stackName, reason)
-		case cloudformation.StackStatusRollbackComplete:
-			return fmt.Errorf("failed to create the stack '%s', reason: %v", o.stackName, reason)
+		completed, err := o.checkStatus(status)
+		if err != nil {
+			return err
 		}
 
-		select {
-		case <-time.After(periodicCheck):
-			status, reason, err = queryStackStatus(o.svc, o.stackName)
+		if completed {
+			return nil
 		}
+
+		<-time.After(periodicCheck)
 	}
+}
+
+func checkCreateStatus(status *cloudformation.StackStatus) (bool, error) {
+	switch *status {
+	case cloudformation.StackStatusUpdateComplete: // OK
+		return true, nil
+	case cloudformation.StackStatusCreateComplete: // OK
+		return true, nil
+	case cloudformation.StackStatusRollbackFailed:
+		return true, errors.New("failed to create and rollback the stack")
+	case cloudformation.StackStatusRollbackComplete:
+		return true, errors.New("failed to create the stack")
+	}
+	return false, nil
+}
+
+func checkDeleteStatus(status *cloudformation.StackStatus) (bool, error) {
+	switch *status {
+	case cloudformation.StackStatusDeleteComplete: // OK
+		return true, nil
+	case cloudformation.StackStatusDeleteFailed:
+		return true, errors.New("failed to delete the stack")
+	case cloudformation.StackStatusRollbackFailed:
+		return true, errors.New("failed to delete and rollback the stack")
+	case cloudformation.StackStatusRollbackComplete:
+		return true, errors.New("failed to delete the stack")
+	}
+	return false, nil
+}
+
+func queryStack(
+	svc cloudformationiface.CloudFormationAPI,
+	stackID *string,
+) (*cloudformation.DescribeStacksOutput, error) {
+	input := &cloudformation.DescribeStacksInput{StackName: stackID}
+	req := svc.DescribeStacksRequest(input)
+	resp, err := req.Send()
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func queryStackStatus(
+	svc cloudformationiface.CloudFormationAPI,
+	stackID *string,
+) (*cloudformation.StackStatus, *string, error) {
+	resp, err := queryStack(svc, stackID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	stack := resp.Stacks[0]
+	return &stack.StackStatus, stack.StackStatusReason, nil
+}
+
+func queryStackID(svc cloudformationiface.CloudFormationAPI, stackName *string) (*string, error) {
+	resp, err := queryStack(svc, stackName)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Stacks[0].StackId, nil
 }

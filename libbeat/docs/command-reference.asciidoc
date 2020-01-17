@@ -19,25 +19,25 @@
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
-:package-command-short-desc: Packages the configuration and executable in a zip file
+:package-command-short-desc: Packages the configuration and executable into a zip file
 :remove-command-short-desc: Removes the specified function from your serverless environment
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
 ifndef::deprecate_dashboard_loading[]
 
 ifdef::has_ml_jobs[]
-:setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
+:setup-command-short-desc: Sets up the initial environment, including the index template, {kib} dashboards (when available), and machine learning jobs (when available)
 endif::[]
 
 ifndef::has_ml_jobs[]
-:setup-command-short-desc: Sets up the initial environment, including the index template and Kibana dashboards (when available)
+:setup-command-short-desc: Sets up the initial environment, including the index template and {kib} dashboards (when available)
 endif::[]
 
 endif::[]
 
 ifdef::deprecate_dashboard_loading[]
 
-:setup-command-short-desc: Sets up the initial environment, including the ES index template and Kibana dashboards (deprecated).
+:setup-command-short-desc: Sets up the initial environment, including the ES index template and {kib} dashboards (deprecated).
 
 endif::[]
 
@@ -67,7 +67,6 @@ The command-line also supports <<global-flags,global flags>>
 for controlling global behaviors.
 
 ifeval::["{beatname_lc}"!="winlogbeat"]
-
 [TIP]
 =========================
 Use `sudo` to run the following commands if:
@@ -76,29 +75,28 @@ Use `sudo` to run the following commands if:
 * {beatname_uc} is configured to capture data that requires `root` access
 
 =========================
-
 endif::[]
 
 [options="header"]
 |=======================
 |Commands |
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<deploy-command,`deploy`>> | {deploy-command-short-desc}.
 endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<package-command,`package`>> |{package-command-short-desc}.
 |<<remove-command,`remove`>> |{remove-command-short-desc}.
 endif::[]
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
+ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
 |<<run-command,`run`>> |{run-command-short-desc}.
 |<<setup-command,`setup`>> |{setup-command-short-desc}.
 |<<test-command,`test`>> |{test-command-short-desc}.
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<update-command,`update`>> |{update-command-short-desc}.
 endif::[]
 |<<version-command,`version`>> |{version-command-short-desc}.
@@ -106,12 +104,37 @@ endif::[]
 
 Also see <<global-flags,Global flags>>.
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[deploy-command]]
 ==== `deploy` command
 
-{deploy-command-short-desc}. 
+{deploy-command-short-desc}. Before deploying functions, make sure the user has
+the credentials required by your cloud service provider.
 
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} deploy FUNCTION_NAME [FLAGS]
+----
+
+*`FUNCTION_NAME`*::
+Specifies the name of the function to deploy.  
+
+*FLAGS*
+
+*`-h, --help`*::
+Shows help for the `deploy` command.
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} deploy cloudwatch
+{beatname_lc} deploy sqs
+-----
 endif::[]
 
 [[export-command]]
@@ -119,7 +142,7 @@ endif::[]
 
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
-template, or export a dashboard from Kibana.
+template, or export a dashboard from {kib}.
 
 *SYNOPSIS*
 
@@ -128,55 +151,55 @@ template, or export a dashboard from Kibana.
 {beatname_lc} export SUBCOMMAND [FLAGS]
 ----
 
-
 *SUBCOMMANDS*
 
 *`config`*::
 Exports the current configuration to stdout. If you use the `-c` flag, this
 command exports the configuration that's defined in the specified file.
 
-
-
-*`dashboard`*::
-Exporting a dashboard allows to store a dashboard on disk in a
-module and load it automatically. The following command can be used:
+[[dashboard-subcommand]]*`dashboard`*::
+Exports a dashboard. You can use this option to store a dashboard on disk in a
+module and load it automatically. For example, to export the dashboard to a JSON
+file, run:
 +
 ["source","shell",subs="attributes"]
 ----
-{beatname_lc} export dashboard --id="dashboard-id" > dashboard.json
+{beatname_lc} export dashboard --id="DASHBOARD_ID" > dashboard.json
 ----
 +
-The `dashboard-id` can be found in the Kibana URL. By default `export dashboard`
-will write the dashboard to stdout. Above it's written into `dashboard.json` so
-it can later imported again. The file contains the dashboard with all
-visualizations and searches. The index pattern is removed as it is
-expected to be loaded separately for {beatname_uc}.
+To find the `DASHBOARD_ID`, look at the URL for the dashboard in {kib}. By
+default, `export dashboard` writes the dashboard to stdout. The example shows
+how to write the dashboard to a JSON file so that you can import it later. The
+JSON file will contain the dashboard with all visualizations and searches. You
+must load the index pattern separately for {beatname_uc}.
 +
-The generated `dashboard.json` file can be copied into the `kibana/6/dashboard`
-directory of {beatname_lc} and next time +{beatname_lc} setup dashboards+ is
-run the dashboard will be imported.
+To load the dashboard, copy the generated `dashboard.json` file into the
+`kibana/6/dashboard` directory of {beatname_uc}, and run
++{beatname_lc} setup --dashboards+ to import the dashboard.
 +
-In case Kibana is not running on `localhost:5061` the {beatname_uc}
-configuration under `setup.kibana` must be adjusted.
+If {kib} is not running on `localhost:5061`, you must also adjust the
+{beatname_uc} configuration under `setup.kibana`.
 
-[[template-subcommand]]
-*`template`*::
+[[template-subcommand]]*`template`*::
 Exports the index template to stdout. You can specify the `--es.version` and
 `--index` flags to further define what gets exported.
 
 *FLAGS*
 
 *`--es.version VERSION`*::
-When specified along with <<template-subcommand,`template`>>, exports an index
+When used with <<template-subcommand,`template`>>, exports an index
 template that is compatible with the specified version.
 
 *`-h, --help`*::
 Shows help for the `export` command.
 
 *`--index BASE_NAME`*::
-When specified along with <<template-subcommand,`template`>>, sets the base name
-to use for the index template. If this flag is not specified, the default base
-name is +{beatname_lc}+.
+When used with <<template-subcommand,`template`>>, sets the base name to use for
+the index template. If this flag is not specified, the default base name is
++{beatname_lc}+.
+
+*`--id DASHBOARD_ID`*::
+When used with <<dashboard-subcommand,`dashboard`>>, specifies the dashboard ID.
 
 {global-flags}
 
@@ -186,6 +209,7 @@ name is +{beatname_lc}+.
 -----
 {beatname_lc} export config
 {beatname_lc} export template --es.version {stack-version} --index myindexname
+{beatname_lc} export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 -----
 
 
@@ -272,23 +296,71 @@ Shows help for the `keystore` command.
 {beatname_lc} keystore list
 -----
 
-see <<keystore>> for more examples.
+See <<keystore>> for more examples.
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
 
 {package-command-short-desc}. 
 
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} package [FLAGS]
+----
+
+*FLAGS*
+
+*`-h, --help`*::
+Shows help for the `package` command.
+
+*`-o, --output`*::
+Specifies the full path to the zip file that will contain the package.
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} package /path/to/file.zip
+-----
+
 [[remove-command]]
 ==== `remove` command
 
-{remove-command-short-desc}. 
+{remove-command-short-desc}. Before removing functions, make sure the user has
+the credentials required by your cloud service provider.
 
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} remove FUNCTION_NAME [FLAGS]
+----
+
+*`FUNCTION_NAME`*::
+Specifies the name of the function to remove.  
+
+*FLAGS*
+
+*`-h, --help`*::
+Shows help for the `remove` command.
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} remove cloudwatch
+{beatname_lc} remove sqs
+-----
 endif::[]
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
+ifdef::has_modules_command[]
 [[modules-command]]
 ==== `modules` command
 
@@ -330,26 +402,20 @@ Shows help for the `export` command.
 *EXAMPLES*
 
 ifeval::["{beatname_lc}"=="filebeat"]
-
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} modules list
 {beatname_lc} modules enable apache2 auditd mysql
 -----
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="metricbeat"]
-
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} modules list
 {beatname_lc} modules enable apache nginx system
 -----
-
-
 endif::[]
-
 endif::[]
 
 
@@ -375,7 +441,6 @@ Or:
 *FLAGS*
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-I, --I FILE`*::
 Reads packet data from the specified file instead of reading packets from the
 network. This option is useful only for testing {beatname_uc}.
@@ -384,19 +449,17 @@ network. This option is useful only for testing {beatname_uc}.
 -----
 {beatname_lc} run -I ~/pcaps/network_traffic.pcap
 -----
-
 endif::[]
 
-*`-N, --N`*::
-Disables the publishing of events to the defined output. This option is useful
-only for testing {beatname_uc}.
+*`-N, --N`*:: Disables publishing for testing purposes.
+ifndef::only-elasticsearch[]
+This option disables all outputs except the <<file-output,File output>>.
+endif::only-elasticsearch[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-O, --O`*::
 Read packets one by one by pressing _Enter_ after each. This option is useful
 only for testing {beatname_uc}.
-
 endif::[]
 
 *`--cpuprofile FILE`*::
@@ -404,18 +467,14 @@ Writes CPU profile data to the specified file. This option is useful for
 troubleshooting {beatname_uc}.
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-devices`*::
 Prints the list of devices that are available for sniffing and then exits.
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-dump FILE`*::
 Writes all captured packets to the specified file. This option is useful for
 troubleshooting {beatname_uc}.
-
 endif::[]
 
 *`-h, --help`*::
@@ -426,12 +485,10 @@ Starts an http server for profiling. This option is useful for troubleshooting
 and profiling {beatname_uc}.
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-l N`*::
 Reads the pcap file `N` number of times. The default is 1. Use this option in
 combination with the `-I` option. For an infinite loop, use _0_. The `-l`
 option is useful only for testing {beatname_uc}.
-
 endif::[]
 
 *`--memprofile FILE`*::
@@ -439,7 +496,6 @@ Writes memory profile data to the specified output file. This option is useful
 for troubleshooting {beatname_uc}.
 
 ifeval::["{beatname_lc}"=="filebeat"]
-
 *`--modules MODULE_LIST`*::
 Specifies a comma-separated list of modules to run. For example:
 +
@@ -452,18 +508,15 @@ Rather than specifying the list of modules every time you run {beatname_uc},
 you can use the <<modules-command,`modules`>> command to enable and disable
 specific modules. Then when you run {beatname_uc}, it will run any modules
 that are enabled.
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
-
 *`--once`*::
 When the `--once` flag is used, {beatname_uc} starts all configured harvesters
 and inputs, and runs each input until the harvesters are closed. If you set the
 `--once` flag, you should also set `close_eof` so the harvester is closed when
 the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
-
 endif::[]
 
 *`--setup`*::
@@ -472,31 +525,27 @@ deprecated[{deprecate_dashboard_loading}]
 endif::[]
 +
 ifdef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, Kibana index pattern,
-Kibana dashboards (when available), and Machine learning jobs.
+Loads the initial setup, including Elasticsearch template, {kib} index pattern,
+{kib} dashboards (when available), and Machine learning jobs.
 endif::[]
 ifndef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, Kibana index pattern, and Kibana dashboards (when available).
+Loads the initial setup, including Elasticsearch template, {kib} index pattern, and {kib} dashboards (when available).
 endif::[]
 If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
 
 
 ifeval::["{beatname_lc}"=="metricbeat"]
-
 *`--system.hostfs MOUNT_POINT`*::
 
 Specifies the mount point of the host's filesystem for use in monitoring a host
 from within a container.
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-
 *`-t`*::
 Reads packets from the pcap file as fast as possible without sleeping. Use this
 option in combination with the `-I` option. The `-t` option is useful only for
 testing Packetbeat.
-
 endif::[]
 
 {global-flags}
@@ -522,8 +571,8 @@ Or:
 
 * The index template ensures that fields are mapped correctly in Elasticsearch.
 
-* The Kibana dashboards make it easier for you to visualize {beatname_uc} data
-in Kibana.
+* The {kib} dashboards make it easier for you to visualize {beatname_uc} data
+in {kib}.
 
 ifdef::has_ml_jobs[]
 * The machine learning jobs contain the configuration information and metadata
@@ -545,7 +594,7 @@ environment without actually running {beatname_uc} and ingesting data.
 
 ifndef::deprecate_dashboard_loading[]
 *`--dashboards`*::
-Sets up the Kibana dashboards (when available). This option loads the dashboards
+Sets up the {kib} dashboards (when available). This option loads the dashboards
 from the {beatname_uc} package. For more options, such as loading customized
 dashboards, see {beatsdevguide}/import-dashboards.html[Importing Existing Beat
 Dashboards] in the _Beats Developer Guide_.
@@ -556,28 +605,27 @@ ifdef::deprecate_dashboard_loading[]
 
 deprecated[{deprecate_dashboard_loading}]
 +
-Sets up the Kibana dashboards only.
+Sets up the {kib} dashboards only.
 endif::[]
 
 *`-h, --help`*::
 Shows help for the `setup` command.
 
 ifdef::has_ml_jobs[]
-
 *`--machine-learning`*::
 Sets up machine learning job configurations only.
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
-
 *`--modules MODULE_LIST`*::
 Specifies a comma-separated list of modules. Use this flag to avoid errors when
 there are no modules defined in the +{beatname_lc}.yml+ file.
 
 *`--pipelines`*::
-Sets up ingest pipelines for configured filesets.
-
+Sets up ingest pipelines for configured filesets. {beatname_uc} looks for
+enabled modules in the +{beatname_lc}.yml+ file. If you used the
+<<modules-command,`modules`>> command to enable modules in the `modules.d`
+directory, also specify the `--modules` flag.
 endif::[]
 
 *`--template`*::
@@ -585,13 +633,30 @@ Sets up the index template only.
 
 {global-flags}
 
-*EXAMPLE*
+*EXAMPLES*
 
+ifeval::["{beatname_lc}"=="filebeat"]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --pipelines
+{beatname_lc} setup --pipelines --modules system,nginx,mysql <1>
+{beatname_lc} setup --template
 -----
+<1> If you used the <<modules-command,`modules`>> command to enable modules in
+the `modules.d` directory, also specify the `--modules` flag to indicate which
+modules to load pipelines for.
+endif::[]
 
+ifeval::["{beatname_lc}"!="filebeat"]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} setup --dashboards
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --template
+-----
+endif::[]
 
 [[test-command]]
 ==== `test` command
@@ -611,14 +676,12 @@ Sets up the index template only.
 Tests the configuration settings.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
-
 *`modules [MODULE_NAME] [METRICSET_NAME]`*::
 Tests module settings for all configured modules. When you run this command,
 {beatname_uc} does a test run that applies the current settings, retrieves the
 metrics, and shows them as output. To test the settings for a specific module,
 specify `MODULE_NAME`. To test the settings for a specific metricset in the
 module, also specify `METRICSET_NAME`.
-
 endif::[]
 
 *`output`*::
@@ -632,18 +695,15 @@ current settings.
 {global-flags}
 
 ifeval::["{beatname_lc}"!="metricbeat"]
-
 *EXAMPLE*
 
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} test config
 -----
-
 endif::[]
 
 ifeval::["{beatname_lc}"=="metricbeat"]
-
 *EXAMPLES*
 
 ["source","sh",subs="attributes"]
@@ -651,15 +711,39 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 {beatname_lc} test config
 {beatname_lc} test modules system cpu
 -----
-
 endif::[]
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[update-command]]
 ==== `update` command
 
-{update-command-short-desc}. 
+{update-command-short-desc}. Before updating functions, make sure the user has
+the credentials required by your cloud service provider.
 
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} update FUNCTION_NAME [FLAGS]
+----
+
+*`FUNCTION_NAME`*::
+Specifies the name of the function to update.  
+
+*FLAGS*
+
+*`-h, --help`*::
+Shows help for the `update` command.
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} update cloudwatch
+{beatname_lc} update sqs
+-----
 endif::[]
 
 [[version-command]]
@@ -686,7 +770,7 @@ endif::[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} version
-----
+-----
 
 
 [float]
@@ -708,7 +792,6 @@ This setting is applied to the currently running {beatname_uc} process.
 The {beatname_uc} configuration file is not changed.
 
 ifeval::["{beatname_lc}"=="filebeat"]
-
 *`-M, --M "VAR_NAME=VALUE"`*:: Overrides the default configuration for a
 {beatname_uc} module. You can specify multiple variable overrides. For example:
 +
@@ -716,7 +799,6 @@ ifeval::["{beatname_lc}"=="filebeat"]
 ----------------------------------------------------------------------
 {beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
-
 endif::[]
 
 *`-c, --c FILE`*::

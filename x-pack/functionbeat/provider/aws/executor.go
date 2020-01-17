@@ -16,6 +16,8 @@ var (
 	errAlreadyExecuted = errors.New("executor already executed")
 )
 
+type executionContext interface{}
+
 type executor struct {
 	operations []doer
 	undos      []undoer
@@ -24,11 +26,11 @@ type executor struct {
 }
 
 type doer interface {
-	Execute() error
+	Execute(executionContext) error
 }
 
 type undoer interface {
-	Rollback() error
+	Rollback(executionContext) error
 }
 
 func newExecutor(log *logp.Logger) *executor {
@@ -40,13 +42,13 @@ func newExecutor(log *logp.Logger) *executor {
 	return &executor{log: log}
 }
 
-func (e *executor) Execute() (err error) {
+func (e *executor) Execute(ctx executionContext) (err error) {
 	e.log.Debugf("The executor is executing '%d' operations for converging state", len(e.operations))
 	if e.IsCompleted() {
 		return errAlreadyExecuted
 	}
 	for _, operation := range e.operations {
-		err = operation.Execute()
+		err = operation.Execute(ctx)
 		if err != nil {
 			break
 		}
@@ -62,14 +64,14 @@ func (e *executor) Execute() (err error) {
 	return err
 }
 
-func (e *executor) Rollback() (err error) {
+func (e *executor) Rollback(ctx executionContext) (err error) {
 	e.log.Debugf("The executor is rolling back previous execution, '%d' operations to rollback", len(e.undos))
 	if !e.IsCompleted() {
 		return errNeverRun
 	}
 	for i := len(e.undos) - 1; i >= 0; i-- {
 		operation := e.undos[i]
-		err = operation.Rollback()
+		err = operation.Rollback(ctx)
 		if err != nil {
 			break
 		}

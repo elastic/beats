@@ -75,23 +75,34 @@ tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-[[docker]]
-*docker:*
+[[linux]]
+*linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-docker pull {dockerimage}
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-linux-x86_64.tar.gz
+tar xzvf filebeat-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
 endif::[]
+
+[[docker]]
+*docker:*
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
+
+[[kubernetes]]
+*kubernetes:*
+
+See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
 
 [[win]]
 *win:*
@@ -183,6 +194,8 @@ include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
+include::../../libbeat/docs/shared-cm-tip.asciidoc[]
+
 [[config-filebeat-logstash]]
 === Step 3: Configure Filebeat to use Logstash
 
@@ -223,12 +236,12 @@ sudo service {beatname_lc} start
 docker run {dockerimage}
 ----------------------------------------------------------------------
 
-*mac:*
+*mac and linux:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root filebeat.yml <1>
-sudo ./filebeat -e -c filebeat.yml -d "publish"
+sudo ./filebeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Filebeat as root, so you need to change ownership
 of the configuration file, or run Filebeat with `--strict.perms=false`

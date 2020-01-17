@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/awslabs/goformation/cloudformation"
 	merrors "github.com/pkg/errors"
 
@@ -66,7 +67,7 @@ func (c *CLIManager) findFunction(name string) (installer, error) {
 	return function, nil
 }
 
-func (c *CLIManager) template(function installer, name, templateLoc string) *cloudformation.Template {
+func (c *CLIManager) template(function installer, name, codeLoc string) *cloudformation.Template {
 	lambdaConfig := function.LambdaConfig()
 
 	prefix := func(s string) string {
@@ -136,7 +137,7 @@ func (c *CLIManager) template(function installer, name, templateLoc string) *clo
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
 				S3Bucket: c.bucket(),
-				S3Key:    templateLoc,
+				S3Key:    codeLoc,
 			},
 			Description: lambdaConfig.Description,
 			Environment: &cloudformation.AWSLambdaFunction_Environment{
@@ -186,9 +187,10 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	codeLoc := codeKey(name, content)
+	zipChecksum := checksum(content)
+	codeKey := "functionbeat-deployment/" + name + "/" + zipChecksum + "/functionbeat.zip"
 
-	to := c.template(function, name, codeLoc)
+	to := c.template(function, name, codeKey)
 	if err := mergeTemplate(to, fnTemplate); err != nil {
 		return err
 	}
@@ -198,39 +200,51 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		return err
 	}
 
+	templateChecksum := checksum(json)
+	templateKey := "functionbeat-deployment/" + name + "/" + templateChecksum + "/cloudformation-template-create.json"
+	templateURL := "https://s3.amazonaws.com/" + c.bucket() + "/" + templateKey
+
 	c.log.Debugf("Using cloudformation template:\n%s", json)
+	svcCF := cf.New(c.awsCfg)
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
-	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, c.bucket(), codeLoc, content))
 	executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
 		c.bucket(),
-		"functionbeat-deployment/"+name+"/cloudformation-template-create.json",
+		codeKey,
+		content,
+	))
+	executer.Add(newOpUploadToBucket(
+		c.log,
+		c.awsCfg,
+		c.bucket(),
+		templateKey,
 		json,
 	))
 	if update {
 		executer.Add(newOpUpdateCloudFormation(
 			c.log,
-			c.awsCfg,
-			"https://s3.amazonaws.com/"+c.bucket()+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
+			svcCF,
+			templateURL,
 			c.stackName(name),
 		))
 	} else {
 		executer.Add(newOpCreateCloudFormation(
 			c.log,
-			c.awsCfg,
-			"https://s3.amazonaws.com/"+c.bucket()+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
+			svcCF,
+			templateURL,
 			c.stackName(name),
 		))
 	}
 
-	executer.Add(newOpWaitCloudFormation(c.log, c.awsCfg, c.stackName(name)))
-	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), codeLoc))
+	executer.Add(newOpWaitCloudFormation(c.log, cf.New(c.awsCfg)))
+	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), codeKey))
 
-	if err := executer.Execute(); err != nil {
-		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+	ctx := newStackContext()
+	if err := executer.Execute(ctx); err != nil {
+		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
 			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
 		}
 		return err
@@ -259,7 +273,7 @@ func (c *CLIManager) Update(name string) error {
 		return err
 	}
 
-	c.log.Debugf("Successfully updated function: '%s'")
+	c.log.Debugf("Successfully updated function: '%s'", name)
 	return nil
 }
 
@@ -268,12 +282,14 @@ func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("Removing function: %s", name)
 	defer c.log.Debugf("Removal of function '%s' complete", name)
 
+	svc := cf.New(c.awsCfg)
 	executer := newExecutor(c.log)
-	executer.Add(newOpDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
-	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
+	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
+	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
 
-	if err := executer.Execute(); err != nil {
-		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+	ctx := newStackContext()
+	if err := executer.Execute(ctx); err != nil {
+		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
 			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
 		}
 		return err
@@ -305,7 +321,7 @@ func NewCLI(
 		config:   config,
 		provider: provider,
 		awsCfg:   awsCfg,
-		log:      logp.NewLogger("aws lambda cli"),
+		log:      logp.NewLogger("aws"),
 	}, nil
 }
 
@@ -353,8 +369,7 @@ func normalizeResourceName(s string) string {
 	return common.RemoveChars(s, invalidChars)
 }
 
-func codeKey(name string, content []byte) string {
-	sha := sha256.Sum256(content)
-	checksum := base64.RawURLEncoding.EncodeToString(sha[:])
-	return "functionbeat-deployment/" + name + "-" + checksum + "/functionbeat.zip"
+func checksum(data []byte) string {
+	sha := sha256.Sum256(data)
+	return base64.RawURLEncoding.EncodeToString(sha[:])
 }

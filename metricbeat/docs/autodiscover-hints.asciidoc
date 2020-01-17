@@ -134,5 +134,5 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
-The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
-of the Docker container every 1 minute.
+The above labels would allow {beatname_uc} to spin up a NGINX stubstatus metricset and to poll it from port `80`
+of the Docker container every 10 seconds.

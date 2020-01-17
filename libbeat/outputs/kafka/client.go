@@ -179,6 +179,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
+		logp.Debug("kafka", "Failed event: %v", event)
 		return nil, err
 	}
 

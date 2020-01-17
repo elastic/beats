@@ -75,8 +75,8 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-[[docker]]
-*docker:*
+[[linux]]
+*linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
@@ -86,12 +86,18 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes"]
 ------------------------------------------------
-docker pull {dockerimage}
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
 endif::[]
+
+[[docker]]
+*docker:*
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
 *win:*
@@ -206,12 +212,12 @@ start {beatname_uc} in the foreground.
 sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
 need to change ownership of the configuration file, or run {beatname_uc} with

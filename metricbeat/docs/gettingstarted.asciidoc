@@ -84,8 +84,8 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-[[docker]]
-*docker:*
+[[linux]]
+*linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
@@ -95,12 +95,23 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes"]
 ------------------------------------------------
-docker pull {dockerimage}
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
 endif::[]
+
+[[docker]]
+*docker:*
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
+
+[[kubernetes]]
+*kubernetes:*
+
+See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
 
 [[win]]
 *win:*
@@ -178,7 +189,7 @@ The following examples enable the `apache` and `mysql` configs in the
 {beatname_lc} modules enable apache mysql
 ----
 +
-*mac:*
+*mac and linux:*
 +
 ["source","sh",subs="attributes"]
 ----
@@ -210,6 +221,8 @@ include::../../libbeat/docs/step-configure-credentials.asciidoc[]
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
+
+include::../../libbeat/docs/shared-cm-tip.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
@@ -243,13 +256,13 @@ sudo service {beatname_lc} start
 
 See <<running-on-docker>>.
 
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
 sudo chown root modules.d/system.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
 configuration file and any configurations enabled in the `modules.d` directory,

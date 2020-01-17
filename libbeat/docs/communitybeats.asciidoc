@@ -28,7 +28,6 @@ https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache H
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
 https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consumer lag for Burrow V1.0.0(API V3).
-https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
@@ -40,6 +39,7 @@ https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
+https://github.com/berfinsari/envoyproxybeat[envoyproxybeat]:: Reads stats from the Envoy Proxy and indexes them into Elasticsearch.
 https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
@@ -64,7 +64,9 @@ https://github.com/arkady-emelyanov/kafkabeat[kafkabeat2]:: Reads data (json or 
 https://github.com/PPACI/krakenbeat[krakenbeat]:: Collect information on each transaction on the Kraken crypto platform.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
+https://github.com/bozdag/macwifibeat[macwifibeat]:: Reads various indicators for a MacBook's WiFi Signal Strength
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
+https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
@@ -90,6 +92,8 @@ https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticse
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
 https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
+https://github.com/philkra/springboot2beat[springboot2beat]:: Query and accumulate all metrics endpoints of a Spring Boot 2 web app via the web channel, leveraging the http://micrometer.io/[mircometer.io] metrics facade.
+https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github.com/etsy/statsd/wiki[statsd] events from a statsd client.
 https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
 https://github.com/gravitational/udpbeat[udpbeat]:: Ships structured logs via UDP.

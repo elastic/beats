@@ -38,6 +38,8 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+var logger = logp.NewLogger("vsphere")
+
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "host", New,
 		mb.DefaultMetricSet(),
@@ -111,40 +113,27 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	for _, hs := range hst {
-		totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-		freeCPU := int64(totalCPU) - int64(hs.Summary.QuickStats.OverallCpuUsage)
-		freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024)
 
-		event := common.MapStr{
-			"name": hs.Summary.Config.Name,
-			"cpu": common.MapStr{
-				"used": common.MapStr{
-					"mhz": hs.Summary.QuickStats.OverallCpuUsage,
-				},
-				"total": common.MapStr{
-					"mhz": totalCPU,
-				},
-				"free": common.MapStr{
-					"mhz": freeCPU,
-				},
-			},
-			"memory": common.MapStr{
-				"used": common.MapStr{
-					"bytes": (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024),
-				},
-				"total": common.MapStr{
-					"bytes": hs.Summary.Hardware.MemorySize,
-				},
-				"free": common.MapStr{
-					"bytes": freeMemory,
-				},
-			},
+		event := common.MapStr{}
+
+		event["name"] = hs.Summary.Config.Name
+		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
+		event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
+
+		if hs.Summary.Hardware != nil {
+			totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+			event.Put("cpu.total.mhz", totalCPU)
+			event.Put("cpu.free.mhz", int64(totalCPU)-int64(hs.Summary.QuickStats.OverallCpuUsage))
+			event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
+			event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
+		} else {
+			logger.Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 		}
 
 		if hs.Summary.Host != nil {
 			networkNames, err := getNetworkNames(ctx, c, hs.Summary.Host.Reference())
 			if err != nil {
-				logp.Debug("vsphere", err.Error())
+				logger.Debugf("error trying to get network names: %s", err.Error())
 			} else {
 				if len(networkNames) > 0 {
 					event["network_names"] = networkNames

@@ -2,10 +2,6 @@
 [role="xpack"]
 = {beats} central management
 
-++++
-<titleabbrev>Central management</titleabbrev>
-++++
-
 [partintro]
 --
 
@@ -41,6 +37,8 @@ include::shared-license-statement.asciidoc[]
 [[how-central-managment-works]]
 [role="xpack"]
 == How central management works
+
+beta[]
 
 {beats} central management uses a mechanism called configuration tags to group
 related configurations. You define configuration tags in the {cm-ui} UI in {kib}
@@ -105,6 +103,8 @@ the Beat to troubleshoot the problem.
 [role="xpack"]
 == Enroll {beats} in central management
 
+beta[]
+
 You need to enroll {beats} to register them in
 <<configuration-central-management,central management>> and establish
 trust. Enrolled {beats} will have the credentials needed to retrieve
@@ -117,7 +117,7 @@ During the enrollment process:
  for configuration polling
  . The enroll command creates a backup of your configuration and then
  **overwrites the current settings** so they can be managed centrally
- 
+
 To enroll {beats}, use either <<token-based-enrollment,token-based>>
 or <<username-password-enrollment,username and password-based>> enrollment.
 
@@ -135,6 +135,16 @@ ensure that only users with sufficient privileges are able to access {beats}
 configurations. 
 * Assign the `beats_admin` role to any users who need to enroll {beats} or
 manage configuration settings in central management.
+ifndef::no_dashboards[]
+* If you plan to use the sample {kib} dashboards provided with {beatname_uc},
+<<load-kibana-dashboards,load the dashboards>> before enrolling the
+Beat.
+endif::[]
+ifeval::["{beatname_lc}"=="filebeat"]
+* If you plan to define module configurations in central management, set up the
+ingest pipelines before enrolling the Beat. For more information, see
+<<load-ingest-pipelines>>.
+endif::[]
 
 [float]
 [[token-based-enrollment]]

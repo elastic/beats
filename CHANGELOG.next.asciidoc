@@ -1,0 +1,101 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+=== Beats version HEAD
+https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+- The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix config appender registration. {pull}9873[9873]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+
+*Auditbeat*
+
+*Filebeat*
+
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10030[10030]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Heartbeat*
+
+*Functionbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
