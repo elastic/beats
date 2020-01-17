@@ -16,7 +16,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A process has exited.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1610636575-2290000098-1654242922-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT\n\tLogon ID:\t\t0x274A2\n\nProcess Information:\n\tProcess ID:\t0x1524\n\tProcess Name:\tC:\\Windows\\System32\\wevtutil.exe\n\tExit Status:\t0x0",
     "process": {
       "executable": "C:\\Windows\\System32\\wevtutil.exe",
       "name": "wevtutil.exe",
@@ -72,7 +71,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A process has exited.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1610636575-2290000098-1654242922-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT\n\tLogon ID:\t\t0x274F1\n\nProcess Information:\n\tProcess ID:\t0xf94\n\tProcess Name:\tC:\\Windows\\System32\\taskhostw.exe\n\tExit Status:\t0x0",
     "process": {
       "executable": "C:\\Windows\\System32\\taskhostw.exe",
       "name": "taskhostw.exe",
@@ -128,7 +126,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A process has exited.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1610636575-2290000098-1654242922-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT\n\tLogon ID:\t\t0x274A2\n\nProcess Information:\n\tProcess ID:\t0xac8\n\tProcess Name:\tC:\\Windows\\System32\\wevtutil.exe\n\tExit Status:\t0x0",
     "process": {
       "executable": "C:\\Windows\\System32\\wevtutil.exe",
       "name": "wevtutil.exe",

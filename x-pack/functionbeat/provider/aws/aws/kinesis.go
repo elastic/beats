@@ -12,8 +12,10 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/cloudformation"
+	lambdarunner "github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
@@ -131,7 +133,7 @@ func KinesisDetails() *feature.Details {
 
 // Run starts the lambda function and wait for web triggers.
 func (k *Kinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(k.createHandler(client))
+	lambdarunner.Start(k.createHandler(client))
 	return nil
 }
 
@@ -169,7 +171,7 @@ func (k *Kinesis) Template() *cloudformation.Template {
 
 	for _, trigger := range k.config.Triggers {
 		resourceName := prefix(k.Name() + trigger.EventSourceArn)
-		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
+		template.Resources[resourceName] = &lambda.EventSourceMapping{
 			BatchSize:        trigger.BatchSize,
 			EventSourceArn:   trigger.EventSourceArn,
 			FunctionName:     cloudformation.GetAtt(prefix(""), "Arn"),
@@ -181,7 +183,7 @@ func (k *Kinesis) Template() *cloudformation.Template {
 }
 
 // Policies returns a slice of policy to add to the lambda role.
-func (k *Kinesis) Policies() []cloudformation.AWSIAMRole_Policy {
+func (k *Kinesis) Policies() []iam.Role_Policy {
 	resources := make([]string, len(k.config.Triggers))
 	for idx, trigger := range k.config.Triggers {
 		resources[idx] = trigger.EventSourceArn
@@ -191,8 +193,8 @@ func (k *Kinesis) Policies() []cloudformation.AWSIAMRole_Policy {
 	// to help with updates.
 	sort.Strings(resources)
 
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
+	policies := []iam.Role_Policy{
+		iam.Role_Policy{
 			PolicyName: cloudformation.Join("-", []string{"fnb", "kinesis", k.config.Name}),
 			PolicyDocument: map[string]interface{}{
 				"Statement": []map[string]interface{}{

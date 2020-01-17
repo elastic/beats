@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemock"
 )
 
 func TestPipeReader(t *testing.T) {

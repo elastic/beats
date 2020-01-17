@@ -173,11 +173,6 @@ shared:
     extra_vars:
       repository: 'docker.elastic.co/beats'
 
-  - &docker_ubi_spec
-    extra_vars:
-      image_name: '{{.BeatName}}-ubi7'
-      from: 'registry.access.redhat.com/ubi7/ubi:7.7'
-
   #
   # License modifiers for Apache 2.0
   #
@@ -343,14 +338,6 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
-    - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *docker_ubi_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-
   # Elastic Beat with Elastic License and binary taken from the x-pack dir.
   elastic_beat_xpack_separate_binaries:
     ###
@@ -406,17 +393,6 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *docker_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:

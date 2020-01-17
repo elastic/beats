@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/autodiscover/builder"

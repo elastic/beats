@@ -36,6 +36,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-golang>>
+* <<exported-fields-googlecloud>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -1543,1305 +1544,579 @@ type: keyword
 
 --
 
-[float]
-=== billing
-
-`billing` contains the estimated charges for your AWS account in Cloudwatch.
-
-
-[float]
-=== cloudwatch
-
-`cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
-
-
-
-*`aws.cloudwatch.namespace`*::
+*`aws.dimensions.*`*::
 +
 --
-The namespace specified when query cloudwatch api.
-
-
-type: keyword
-
---
-
-*`aws.cloudwatch.metrics.*.*`*::
-+
---
-Metrics that returned from Cloudwatch api query.
+Metric dimensions.
 
 
 type: object
 
 --
 
-*`aws.cloudwatch.dimensions.*`*::
+*`aws.*.metrics.*.*`*::
 +
 --
-Cloudwatch metric dimensions.
+Metrics that returned from Cloudwatch API query. - name: billing
+  type: group
+  description: >
+    `billing` contains the estimated charges for your AWS account in Cloudwatch.
+  release: beta
+  fields:
+- name: cloudwatch
+  type: group
+  description: >
+    `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
+  release: ga
+  fields:
+    - name: namespace
+      type: keyword
+      description: >
+        The namespace specified when query cloudwatch api.
+- name: ebs
+  type: group
+  description: >
+    `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+  release: ga
+  fields:
+- name: ec2
+  type: group
+  description: >
+    `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+  release: ga
+  fields:
+    - name: cpu.total.pct
+      type: scaled_float
+      description: >
+        The percentage of allocated EC2 compute units that are currently in use on the instance.
+    - name: cpu.credit_usage
+      type: long
+      description: >
+        The number of CPU credits spent by the instance for CPU utilization.
+    - name: cpu.credit_balance
+      type: long
+      description: >
+        The number of earned CPU credits that an instance has accrued since it was launched or started.
+    - name: cpu.surplus_credit_balance
+      type: long
+      description: >
+        The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
+    - name: cpu.surplus_credits_charged
+      type: long
+      description: >
+        The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
+    - name: network.in.packets
+      type: long
+      description: >
+        The number of packets received on all network interfaces by the instance.
+    - name: network.in.packets_per_sec
+      type: long
+      description: >
+        The number of packets per second sent out on all network interfaces by the instance.
+    - name: network.out.packets
+      type: long
+      description: >
+        The number of packets sent out on all network interfaces by the instance.
+    - name: network.out.packets_per_sec
+      type: long
+      description: >
+        The number of packets per second sent out on all network interfaces by the instance.
+    - name: network.in.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes received on all network interfaces by the instance.
+    - name: network.in.bytes_per_sec
+      type: long
+      description: >
+        The number of bytes per second received on all network interfaces by the instance.
+    - name: network.out.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes sent out on all network interfaces by the instance.
+    - name: network.out.bytes_per_sec
+      type: long
+      description: >
+        The number of bytes per second sent out on all network interfaces by the instance.
+    - name: diskio.read.bytes
+      type: long
+      format: bytes
+      description: >
+        Bytes read from all instance store volumes available to the instance.
+    - name: diskio.read.bytes_per_sec
+      type: long
+      description: >
+        Bytes read per second from all instance store volumes available to the instance.
+    - name: diskio.write.bytes
+      type: long
+      format: bytes
+      description: >
+        Bytes written to all instance store volumes available to the instance.
+    - name: diskio.write.bytes_per_sec
+      type: long
+      description: >
+        Bytes written per second to all instance store volumes available to the instance.
+    - name: diskio.read.ops
+      type: long
+      description: >
+        Completed read operations from all instance store volumes available to the instance in a specified period of time.
+    - name: diskio.read.ops_per_sec
+      type: long
+      description: >
+        Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
+    - name: diskio.write.ops
+      type: long
+      description: >
+        Completed write operations to all instance store volumes available to the instance in a specified period of time.
+    - name: diskio.write.ops_per_sec
+      type: long
+      description: >
+        Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
+    - name: status.check_failed
+      type: long
+      description: >
+        Reports whether the instance has passed both the instance status check and the system status check in the last minute.
+    - name: status.check_failed_system
+      type: long
+      description: >
+        Reports whether the instance has passed the system status check in the last minute.
+    - name: status.check_failed_instance
+      type: long
+      description: >
+        Reports whether the instance has passed the instance status check in the last minute.
+    - name: instance.core.count
+      type: integer
+      description: >
+        The number of CPU cores for the instance.
+    - name: instance.image.id
+      type: keyword
+      description: >
+        The ID of the image used to launch the instance.
+    - name: instance.monitoring.state
+      type: keyword
+      description: >
+        Indicates whether detailed monitoring is enabled.
+    - name: instance.private.dns_name
+      type: keyword
+      description: >
+        The private DNS name of the network interface.
+    - name: instance.private.ip
+      type: ip
+      description: >
+        The private IPv4 address associated with the network interface.
+    - name: instance.public.dns_name
+      type: keyword
+      description: >
+        The public DNS name of the instance.
+    - name: instance.public.ip
+      type: ip
+      description: >
+        The address of the Elastic IP address (IPv4) bound to the network interface.
+    - name: instance.state.code
+      type: integer
+      description: >
+        The state of the instance, as a 16-bit unsigned integer.
+    - name: instance.state.name
+      type: keyword
+      description: >
+        The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+    - name: instance.threads_per_core
+      type: integer
+      description: >
+        The number of threads per CPU core.
+- name: elb
+  type: group
+  description: >
+    `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
+  release: beta
+  fields:
+- name: rds
+  type: group
+  description: >
+    `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
+  release: ga
+  fields:
+    - name: cpu.total.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU utilization.
+    - name: cpu.credit_usage
+      type: long
+      description: >
+        The number of CPU credits spent by the instance for CPU utilization.
+    - name: cpu.credit_balance
+      type: long
+      description: >
+        The number of earned CPU credits that an instance has accrued since it was launched or started.
+    - name: database_connections
+      type: long
+      description: >
+        The number of database connections in use.
+    - name: db_instance.arn
+      type: keyword
+      description: >
+        Amazon Resource Name(ARN) for each rds.
+    - name: db_instance.class
+      type: keyword
+      description: >
+        Contains the name of the compute and memory capacity class of the DB instance.
+    - name: db_instance.identifier
+      type: keyword
+      description: >
+        Contains a user-supplied database identifier. This identifier is the unique key that identifies a DB instance.
+    - name: db_instance.status
+      type: keyword
+      description: >
+        Specifies the current state of this database.
+    - name: disk_queue_depth
+      type: float
+      description: >
+        The number of outstanding IOs (read/write requests) waiting to access the disk.
+    - name: failed_sql_server_agent_jobs
+      type: long
+      description: >
+        The number of failed SQL Server Agent jobs during the last minute.
+    - name: freeable_memory.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of available random access memory.
+    - name: free_storage.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of available storage space.
+    - name: maximum_used_transaction_ids
+      type: long
+      description: >
+        The maximum transaction ID that has been used. Applies to PostgreSQL.
+    - name: oldest_replication_slot_lag.mb
+      type: long
+      description: >
+        The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
+    - name: read_io.ops_per_sec
+      type: float
+      description: >
+        The average number of disk read I/O operations per second.
+    - name: replica_lag.sec
+      type: long
+      format: duration
+      description: >
+        The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
+    - name: swap_usage.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of swap space used on the DB instance. This metric is not available for SQL Server.
+    - name: transaction_logs_generation
+      type: long
+      description: >
+        The disk space used by transaction logs. Applies to PostgreSQL.
+    - name: write_io.ops_per_sec
+      type: float
+      description: >
+        The average number of disk write I/O operations per second.
+    - name: queries
+      type: long
+      description: >
+        The average number of queries executed per second.
+    - name: deadlocks
+      type: long
+      description: >
+        The average number of deadlocks in the database per second.
+    - name: volume_used.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of storage used by your Aurora DB instance, in bytes.
+    - name: free_local_storage.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of storage available for temporary tables and logs, in bytes.
+    - name: login_failures
+      type: long
+      description: >
+        The average number of failed login attempts per second.
+    - name: throughput.commit
+      type: float
+      description: >
+        The average number of commit operations per second.
+    - name: throughput.delete
+      type: float
+      description: >
+        The average number of delete queries per second.
+    - name: throughput.ddl
+      type: float
+      description: >
+        The average number of DDL requests per second.
+    - name: throughput.dml
+      type: float
+      description: >
+        The average number of inserts, updates, and deletes per second.
+    - name: throughput.insert
+      type: float
+      description: >
+        The average number of insert queries per second.
+    - name: throughput.network
+      type: float
+      description: >
+        The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
+    - name: throughput.network_receive
+      type: float
+      description: >
+        The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+    - name: throughput.network_transmit
+      type: float
+      description: >
+        The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+    - name: throughput.read
+      type: float
+      description: >
+        The average amount of time taken per disk I/O operation.
+    - name: throughput.select
+      type: float
+      description: >
+        The average number of select queries per second.
+    - name: throughput.update
+      type: float
+      description: >
+        The average number of update queries per second.
+    - name: throughput.write
+      type: float
+      description: >
+        The average number of bytes written to disk per second.
+    - name: latency.commit
+      type: float
+      format: duration
+      description: >
+        The amount of latency for commit operations, in milliseconds.
+    - name: latency.ddl
+      type: float
+      format: duration
+      description: >
+        The amount of latency for data definition language (DDL) requests, in milliseconds.
+    - name: latency.dml
+      type: float
+      format: duration
+      description: >
+        The amount of latency for inserts, updates, and deletes, in milliseconds.
+    - name: latency.insert
+      type: float
+      format: duration
+      description: >
+        The amount of latency for insert queries, in milliseconds.
+    - name: latency.read
+      type: float
+      format: duration
+      description: >
+        The average amount of time taken per disk I/O operation.
+    - name: latency.select
+      type: float
+      format: duration
+      description: >
+        The amount of latency for select queries, in milliseconds.
+    - name: latency.update
+      type: float
+      format: duration
+      description: >
+        The amount of latency for update queries, in milliseconds.
+    - name: latency.write
+      type: float
+      format: duration
+      description: >
+        The average amount of time taken per disk I/O operation.
+    - name: disk_usage.bin_log.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
+    - name: disk_usage.replication_slot.mb
+      type: long
+      description: >
+        The disk space used by replication slot files. Applies to PostgreSQL.
+    - name: disk_usage.transaction_logs.mb
+      type: long
+      description: >
+        The disk space used by transaction logs. Applies to PostgreSQL.
+    - name: transactions.active
+      type: long
+      description: >
+        The average number of current transactions executing on an Aurora database instance per second.
+    - name: transactions.blocked
+      type: long
+      description: >
+        The average number of transactions in the database that are blocked per second.
+    - name: db_instance.db_cluster_identifier
+      type: keyword
+      description: >
+        This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+    - name: db_instance.role
+      type: keyword
+      description: >
+        DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+    - name: db_instance.engine_name
+      type: keyword
+      description: >
+        Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+- name: s3_daily_storage
+  type: group
+  description: >
+    `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+  release: ga
+  fields:
+    - name: bucket.size.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of data in bytes stored in a bucket.
+    - name: number_of_objects
+      type: long
+      description: >
+        The total number of objects stored in a bucket for all storage classes.
+- name: s3_request
+  type: group
+  description: >
+    `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+  release: ga
+  fields:
+    - name: requests.total
+      type: long
+      description: >
+        The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
+    - name: requests.get
+      type: long
+      description: >
+        The number of HTTP GET requests made for objects in an Amazon S3 bucket.
+    - name: requests.put
+      type: long
+      description: >
+        The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
+    - name: requests.delete
+      type: long
+      description: >
+        The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
+    - name: requests.head
+      type: long
+      description: >
+        The number of HTTP HEAD requests made to an Amazon S3 bucket.
+    - name: requests.post
+      type: long
+      description: >
+        The number of HTTP POST requests made to an Amazon S3 bucket.
+    - name: requests.select
+      type: long
+      description: >
+        The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
+    - name: requests.select_scanned.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+    - name: requests.select_returned.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+    - name: requests.list
+      type: long
+      description: >
+        The number of HTTP requests that list the contents of a bucket.
+    - name: downloaded.bytes
+      type: long
+      format: bytes
+      description: >
+        The number bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
+    - name: uploaded.bytes
+      type: long
+      format: bytes
+      description: >
+        The number bytes uploaded that contain a request body, made to an Amazon S3 bucket.
+    - name: errors.4xx
+      type: long
+      description: >
+        The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+    - name: errors.5xx
+      type: long
+      description: >
+        The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+    - name: latency.first_byte.ms
+      type: long
+      format: duration
+      description: >
+        The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
+    - name: latency.total_request.ms
+      type: long
+      format: duration
+      description: >
+        The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
+- name: sns
+  type: group
+  description: >
+    `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+  release: beta
+  fields:
+- name: sqs
+  type: group
+  description: >
+    `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
+  release: ga
+  fields:
+    - name: oldest_message_age.sec
+      type: long
+      format: duration
+      description: >
+        The approximate age of the oldest non-deleted message in the queue.
+    - name: messages.delayed
+      type: long
+      description: >
+        TThe number of messages in the queue that are delayed and not available for reading immediately.
+    - name: messages.not_visible
+      type: long
+      description: >
+        The number of messages that are in flight.
+    - name: messages.visible
+      type: long
+      description: >
+        The number of messages available for retrieval from the queue.
+    - name: messages.deleted
+      type: long
+      description: >
+        The number of messages deleted from the queue.
+    - name: messages.received
+      type: long
+      description: >
+        The number of messages returned by calls to the ReceiveMessage action.
+    - name: messages.sent
+      type: long
+      description: >
+        The number of messages added to a queue.
+    - name: empty_receives
+      type: long
+      description: >
+        The number of ReceiveMessage API calls that did not return a message.
+    - name: sent_message_size.bytes
+      type: long
+      format: bytes
+      description: >
+        The size of messages added to a queue.
+    - name: queue.name
+      type: keyword
+      description: >
+        SQS queue name
+- name: usage
+  type: group
+  description: >
+    `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+  release: beta
+  fields:
 
 
 type: object
 
 --
-
-[float]
-=== ebs
-
-`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
-
-
-[float]
-=== ec2
-
-`ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
-
-
-
-*`aws.ec2.cpu.total.pct`*::
-+
---
-The percentage of allocated EC2 compute units that are currently in use on the instance.
-
-
-type: scaled_float
-
---
-
-*`aws.ec2.cpu.credit_usage`*::
-+
---
-The number of CPU credits spent by the instance for CPU utilization.
-
-
-type: long
-
---
-
-*`aws.ec2.cpu.credit_balance`*::
-+
---
-The number of earned CPU credits that an instance has accrued since it was launched or started.
-
-
-type: long
-
---
-
-*`aws.ec2.cpu.surplus_credit_balance`*::
-+
---
-The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
-
-
-type: long
-
---
-
-*`aws.ec2.cpu.surplus_credits_charged`*::
-+
---
-The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
-
-
-type: long
-
---
-
-*`aws.ec2.network.in.packets`*::
-+
---
-The number of packets received on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.network.in.packets_per_sec`*::
-+
---
-The number of packets per second sent out on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.network.out.packets`*::
-+
---
-The number of packets sent out on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.network.out.packets_per_sec`*::
-+
---
-The number of packets per second sent out on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.network.in.bytes`*::
-+
---
-The number of bytes received on all network interfaces by the instance.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.ec2.network.in.bytes_per_sec`*::
-+
---
-The number of bytes per second received on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.network.out.bytes`*::
-+
---
-The number of bytes sent out on all network interfaces by the instance.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.ec2.network.out.bytes_per_sec`*::
-+
---
-The number of bytes per second sent out on all network interfaces by the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.read.bytes`*::
-+
---
-Bytes read from all instance store volumes available to the instance.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.ec2.diskio.read.bytes_per_sec`*::
-+
---
-Bytes read per second from all instance store volumes available to the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.write.bytes`*::
-+
---
-Bytes written to all instance store volumes available to the instance.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.ec2.diskio.write.bytes_per_sec`*::
-+
---
-Bytes written per second to all instance store volumes available to the instance.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.read.ops`*::
-+
---
-Completed read operations from all instance store volumes available to the instance in a specified period of time.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.read.ops_per_sec`*::
-+
---
-Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.write.ops`*::
-+
---
-Completed write operations to all instance store volumes available to the instance in a specified period of time.
-
-
-type: long
-
---
-
-*`aws.ec2.diskio.write.ops_per_sec`*::
-+
---
-Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
-
-
-type: long
-
---
-
-*`aws.ec2.status.check_failed`*::
-+
---
-Reports whether the instance has passed both the instance status check and the system status check in the last minute.
-
-
-type: long
-
---
-
-*`aws.ec2.status.check_failed_system`*::
-+
---
-Reports whether the instance has passed the system status check in the last minute.
-
-
-type: long
-
---
-
-*`aws.ec2.status.check_failed_instance`*::
-+
---
-Reports whether the instance has passed the instance status check in the last minute.
-
-
-type: long
-
---
-
-*`aws.ec2.instance.core.count`*::
-+
---
-The number of CPU cores for the instance.
-
-
-type: integer
-
---
-
-*`aws.ec2.instance.image.id`*::
-+
---
-The ID of the image used to launch the instance.
-
-
-type: keyword
-
---
-
-*`aws.ec2.instance.monitoring.state`*::
-+
---
-Indicates whether detailed monitoring is enabled.
-
-
-type: keyword
-
---
-
-*`aws.ec2.instance.private.dns_name`*::
-+
---
-The private DNS name of the network interface.
-
-
-type: keyword
-
---
-
-*`aws.ec2.instance.private.ip`*::
-+
---
-The private IPv4 address associated with the network interface.
-
-
-type: ip
-
---
-
-*`aws.ec2.instance.public.dns_name`*::
-+
---
-The public DNS name of the instance.
-
-
-type: keyword
-
---
-
-*`aws.ec2.instance.public.ip`*::
-+
---
-The address of the Elastic IP address (IPv4) bound to the network interface.
-
-
-type: ip
-
---
-
-*`aws.ec2.instance.state.code`*::
-+
---
-The state of the instance, as a 16-bit unsigned integer.
-
-
-type: integer
-
---
-
-*`aws.ec2.instance.state.name`*::
-+
---
-The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
-
-
-type: keyword
-
---
-
-*`aws.ec2.instance.threads_per_core`*::
-+
---
-The number of threads per CPU core.
-
-
-type: integer
-
---
-
-[float]
-=== elb
-
-`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
-
-
-[float]
-=== rds
-
-`rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
-
-
-
-*`aws.rds.cpu.total.pct`*::
-+
---
-The percentage of CPU utilization.
-
-
-type: scaled_float
-
-format: percent
-
---
-
-*`aws.rds.cpu.credit_usage`*::
-+
---
-The number of CPU credits spent by the instance for CPU utilization.
-
-
-type: long
-
---
-
-*`aws.rds.cpu.credit_balance`*::
-+
---
-The number of earned CPU credits that an instance has accrued since it was launched or started.
-
-
-type: long
-
---
-
-*`aws.rds.database_connections`*::
-+
---
-The number of database connections in use.
-
-
-type: long
-
---
-
-*`aws.rds.db_instance.arn`*::
-+
---
-Amazon Resource Name(ARN) for each rds.
-
-
-type: keyword
-
---
-
-*`aws.rds.db_instance.class`*::
-+
---
-Contains the name of the compute and memory capacity class of the DB instance.
-
-
-type: keyword
-
---
-
-*`aws.rds.db_instance.identifier`*::
-+
---
-Contains a user-supplied database identifier. This identifier is the unique key that identifies a DB instance.
-
-
-type: keyword
-
---
-
-*`aws.rds.db_instance.status`*::
-+
---
-Specifies the current state of this database.
-
-
-type: keyword
-
---
-
-*`aws.rds.disk_queue_depth`*::
-+
---
-The number of outstanding IOs (read/write requests) waiting to access the disk.
-
-
-type: float
-
---
-
-*`aws.rds.failed_sql_server_agent_jobs`*::
-+
---
-The number of failed SQL Server Agent jobs during the last minute.
-
-
-type: long
-
---
-
-*`aws.rds.freeable_memory.bytes`*::
-+
---
-The amount of available random access memory.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.free_storage.bytes`*::
-+
---
-The amount of available storage space.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.maximum_used_transaction_ids`*::
-+
---
-The maximum transaction ID that has been used. Applies to PostgreSQL.
-
-
-type: long
-
---
-
-*`aws.rds.oldest_replication_slot_lag.mb`*::
-+
---
-The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
-
-
-type: long
-
---
-
-*`aws.rds.read_io.ops_per_sec`*::
-+
---
-The average number of disk read I/O operations per second.
-
-
-type: float
-
---
-
-*`aws.rds.replica_lag.sec`*::
-+
---
-The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
-
-
-type: long
-
-format: duration
-
---
-
-*`aws.rds.swap_usage.bytes`*::
-+
---
-The amount of swap space used on the DB instance. This metric is not available for SQL Server.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.transaction_logs_generation`*::
-+
---
-The disk space used by transaction logs. Applies to PostgreSQL.
-
-
-type: long
-
---
-
-*`aws.rds.write_io.ops_per_sec`*::
-+
---
-The average number of disk write I/O operations per second.
-
-
-type: float
-
---
-
-*`aws.rds.queries`*::
-+
---
-The average number of queries executed per second.
-
-
-type: long
-
---
-
-*`aws.rds.deadlocks`*::
-+
---
-The average number of deadlocks in the database per second.
-
-
-type: long
-
---
-
-*`aws.rds.volume_used.bytes`*::
-+
---
-The amount of storage used by your Aurora DB instance, in bytes.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.free_local_storage.bytes`*::
-+
---
-The amount of storage available for temporary tables and logs, in bytes.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.login_failures`*::
-+
---
-The average number of failed login attempts per second.
-
-
-type: long
-
---
-
-*`aws.rds.throughput.commit`*::
-+
---
-The average number of commit operations per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.delete`*::
-+
---
-The average number of delete queries per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.ddl`*::
-+
---
-The average number of DDL requests per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.dml`*::
-+
---
-The average number of inserts, updates, and deletes per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.insert`*::
-+
---
-The average number of insert queries per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.network`*::
-+
---
-The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.network_receive`*::
-+
---
-The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.network_transmit`*::
-+
---
-The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.read`*::
-+
---
-The average amount of time taken per disk I/O operation.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.select`*::
-+
---
-The average number of select queries per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.update`*::
-+
---
-The average number of update queries per second.
-
-
-type: float
-
---
-
-*`aws.rds.throughput.write`*::
-+
---
-The average number of bytes written to disk per second.
-
-
-type: float
-
---
-
-*`aws.rds.latency.commit`*::
-+
---
-The amount of latency for commit operations, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.ddl`*::
-+
---
-The amount of latency for data definition language (DDL) requests, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.dml`*::
-+
---
-The amount of latency for inserts, updates, and deletes, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.insert`*::
-+
---
-The amount of latency for insert queries, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.read`*::
-+
---
-The average amount of time taken per disk I/O operation.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.select`*::
-+
---
-The amount of latency for select queries, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.update`*::
-+
---
-The amount of latency for update queries, in milliseconds.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.latency.write`*::
-+
---
-The average amount of time taken per disk I/O operation.
-
-
-type: float
-
-format: duration
-
---
-
-*`aws.rds.disk_usage.bin_log.bytes`*::
-+
---
-The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.rds.disk_usage.replication_slot.mb`*::
-+
---
-The disk space used by replication slot files. Applies to PostgreSQL.
-
-
-type: long
-
---
-
-*`aws.rds.disk_usage.transaction_logs.mb`*::
-+
---
-The disk space used by transaction logs. Applies to PostgreSQL.
-
-
-type: long
-
---
-
-*`aws.rds.transactions.active`*::
-+
---
-The average number of current transactions executing on an Aurora database instance per second.
-
-
-type: long
-
---
-
-*`aws.rds.transactions.blocked`*::
-+
---
-The average number of transactions in the database that are blocked per second.
-
-
-type: long
-
---
-
-*`aws.rds.db_instance.db_cluster_identifier`*::
-+
---
-This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
-
-
-type: keyword
-
---
-
-*`aws.rds.db_instance.role`*::
-+
---
-DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
-
-
-type: keyword
-
---
-
-*`aws.rds.db_instance.engine_name`*::
-+
---
-Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
-
-
-type: keyword
-
---
-
-[float]
-=== s3_daily_storage
-
-`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
-
-
-
-*`aws.s3_daily_storage.bucket.size.bytes`*::
-+
---
-The amount of data in bytes stored in a bucket.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.s3_daily_storage.number_of_objects`*::
-+
---
-The total number of objects stored in a bucket for all storage classes.
-
-
-type: long
-
---
-
-[float]
-=== s3_request
-
-`s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
-
-
-
-*`aws.s3_request.requests.total`*::
-+
---
-The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.get`*::
-+
---
-The number of HTTP GET requests made for objects in an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.put`*::
-+
---
-The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.delete`*::
-+
---
-The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.head`*::
-+
---
-The number of HTTP HEAD requests made to an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.post`*::
-+
---
-The number of HTTP POST requests made to an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.select`*::
-+
---
-The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.requests.select_scanned.bytes`*::
-+
---
-The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.s3_request.requests.select_returned.bytes`*::
-+
---
-The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.s3_request.requests.list`*::
-+
---
-The number of HTTP requests that list the contents of a bucket.
-
-
-type: long
-
---
-
-*`aws.s3_request.downloaded.bytes`*::
-+
---
-The number bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.s3_request.uploaded.bytes`*::
-+
---
-The number bytes uploaded that contain a request body, made to an Amazon S3 bucket.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.s3_request.errors.4xx`*::
-+
---
-The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
-
-
-type: long
-
---
-
-*`aws.s3_request.errors.5xx`*::
-+
---
-The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
-
-
-type: long
-
---
-
-*`aws.s3_request.latency.first_byte.ms`*::
-+
---
-The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
-
-
-type: long
-
-format: duration
-
---
-
-*`aws.s3_request.latency.total_request.ms`*::
-+
---
-The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
-
-
-type: long
-
-format: duration
-
---
-
-[float]
-=== sns
-
-`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
-
-
-[float]
-=== sqs
-
-`sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
-
-
-
-*`aws.sqs.oldest_message_age.sec`*::
-+
---
-The approximate age of the oldest non-deleted message in the queue.
-
-
-type: long
-
-format: duration
-
---
-
-*`aws.sqs.messages.delayed`*::
-+
---
-TThe number of messages in the queue that are delayed and not available for reading immediately.
-
-
-type: long
-
---
-
-*`aws.sqs.messages.not_visible`*::
-+
---
-The number of messages that are in flight.
-
-
-type: long
-
---
-
-*`aws.sqs.messages.visible`*::
-+
---
-The number of messages available for retrieval from the queue.
-
-
-type: long
-
---
-
-*`aws.sqs.messages.deleted`*::
-+
---
-The number of messages deleted from the queue.
-
-
-type: long
-
---
-
-*`aws.sqs.messages.received`*::
-+
---
-The number of messages returned by calls to the ReceiveMessage action.
-
-
-type: long
-
---
-
-*`aws.sqs.messages.sent`*::
-+
---
-The number of messages added to a queue.
-
-
-type: long
-
---
-
-*`aws.sqs.empty_receives`*::
-+
---
-The number of ReceiveMessage API calls that did not return a message.
-
-
-type: long
-
---
-
-*`aws.sqs.sent_message_size.bytes`*::
-+
---
-The size of messages added to a queue.
-
-
-type: long
-
-format: bytes
-
---
-
-*`aws.sqs.queue.name`*::
-+
---
-SQS queue name
-
-
-type: keyword
-
---
-
-[float]
-=== usage
-
-`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
-
 
 [[exported-fields-azure]]
 == azure fields
@@ -13922,6 +13197,20 @@ Bytes in non-idle span.
 type: long
 
 format: bytes
+
+--
+
+[[exported-fields-googlecloud]]
+== Google Cloud Platform fields
+
+GCP module
+
+
+
+*`googlecloud.labels`*::
++
+--
+type: object
 
 --
 
@@ -31029,7 +30318,7 @@ format: bytes
 *`system.memory.actual.free`*::
 +
 --
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
 
 type: long

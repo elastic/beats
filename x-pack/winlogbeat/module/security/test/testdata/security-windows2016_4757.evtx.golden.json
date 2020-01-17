@@ -12,10 +12,12 @@
       "domain": "WLBEAT",
       "name": "Test_group3v2"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A member was removed from a security-enabled universal group.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nMember:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tCN=Administrator,CN=Users,DC=wlbeat,DC=local\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1113\n\tGroup Name:\t\tTest_group3v2\n\tGroup Domain:\t\tWLBEAT\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "process": {
       "name": "null"
     },

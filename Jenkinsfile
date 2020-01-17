@@ -424,14 +424,14 @@ pipeline {
             stage('Generators Metricbeat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
+                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test test-package")
                 }
               }
             }
             stage('Generators Beat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Beat Linux", "-C generator/beat test")
+                  makeTarget("Generators Beat Linux", "-C generator/beat test test-package")
                 }
               }
             }

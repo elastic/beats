@@ -10573,6 +10573,218 @@ type: keyword
 --
 
 [float]
+=== audit
+
+Fields for Google Cloud audit logs.
+
+
+
+*`googlecloud.audit.type`*::
++
+--
+Type property.
+
+
+type: keyword
+
+--
+
+[float]
+=== authentication_info
+
+Authentication information. 
+
+
+
+*`googlecloud.audit.authentication_info.principal_email`*::
++
+--
+The email address of the authenticated user making the request. 
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.authentication_info.authority_selector`*::
++
+--
+The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.authorization_info`*::
++
+--
+Authorization information for the operation.
+
+
+type: array
+
+--
+
+*`googlecloud.audit.method_name`*::
++
+--
+The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.num_response_items`*::
++
+--
+The number of items returned from a List or Query API method, if applicable.
+
+
+type: long
+
+--
+
+[float]
+=== request
+
+The operation request.
+
+
+
+*`googlecloud.audit.request.proto_name`*::
++
+--
+Type property of the request.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.request.filter`*::
++
+--
+Filter of the request.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.request.name`*::
++
+--
+Name of the request. 
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.request.resource_name`*::
++
+--
+Name of the request resource. 
+
+
+type: keyword
+
+--
+
+[float]
+=== request_metadata
+
+Metadata about the request.
+
+
+
+*`googlecloud.audit.request_metadata.caller_ip`*::
++
+--
+The IP address of the caller. 
+
+
+type: ip
+
+--
+
+*`googlecloud.audit.request_metadata.caller_supplied_user_agent`*::
++
+--
+The user agent of the caller. This information is not authenticated and  should be treated accordingly.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.resource_name`*::
++
+--
+The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
+
+
+type: keyword
+
+--
+
+[float]
+=== resource_location
+
+The location of the resource.
+
+
+
+*`googlecloud.audit.resource_location.current_locations`*::
++
+--
+Current locations of the resource.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.service_name`*::
++
+--
+The name of the API service performing the operation.  For example, datastore.googleapis.com.
+
+
+type: keyword
+
+--
+
+[float]
+=== status
+
+The status of the overall operation. 
+
+
+
+*`googlecloud.audit.status.code`*::
++
+--
+The status code, which should be an enum value of google.rpc.Code. 
+
+
+type: integer
+
+--
+
+*`googlecloud.audit.status.message`*::
++
+--
+A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
+
+
+type: keyword
+
+--
+
+[float]
 === firewall
 
 Fields for Google Cloud Firewall logs.

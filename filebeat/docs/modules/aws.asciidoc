@@ -24,13 +24,14 @@ from network interfaces in AWS VPC.
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard for `s3access` fileset:
+This module comes with several predefined dashboards. For example, here is the
+dashboard for `s3access` fileset:
 
 [role="screenshot"]
 image::./images/filebeat-aws-s3access-overview.png[]
 
 [float]
-==== `s3access` fileset settings
+=== Module configuration
 
 Example config:
 
@@ -38,9 +39,31 @@ Example config:
 ----
 - module: aws
   s3access:
-    enabled: true
-    var.queue_url: https://sqs.us-west-1.amazonaws.com/123/queue-name
-    var.credential_profile_name: fb-aws
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  vpcflow:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
 ----
 
 *`var.queue_url`*::

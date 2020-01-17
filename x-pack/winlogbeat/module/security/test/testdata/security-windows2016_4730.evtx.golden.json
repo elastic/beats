@@ -12,10 +12,12 @@
       "domain": "WLBEAT",
       "name": "test_group2v2"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A security-enabled global group was deleted.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nDeleted Group:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1112\n\tGroup Name:\t\ttest_group2v2\n\tGroup Domain:\t\tWLBEAT\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "process": {
       "name": "null"
     },
