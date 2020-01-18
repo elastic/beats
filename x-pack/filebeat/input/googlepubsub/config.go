@@ -5,7 +5,8 @@
 package googlepubsub
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"os"
 )
 
 type config struct {
@@ -31,8 +32,10 @@ type config struct {
 }
 
 func (c *config) Validate() error {
-	if c.CredentialsFile == "" && len(c.CredentialsJSON) == 0 {
-		return errors.New("credentials_file or credentials_json is required for pubsub input")
+	if c.CredentialsFile != "" {
+		if _, err := os.Stat(c.CredentialsFile); os.IsNotExist(err) {
+			return fmt.Errorf("cannot find the credentials_file %q", c.CredentialsFile)
+		}
 	}
 	return nil
 }
