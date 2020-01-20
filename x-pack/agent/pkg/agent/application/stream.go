@@ -45,7 +45,7 @@ type operatorStream struct {
 }
 
 func (b *operatorStream) Close() error {
-	return nil
+	return b.configHandler.HandleConfig(&configRequest{})
 }
 
 func (b *operatorStream) Execute(cfg *configRequest) error {

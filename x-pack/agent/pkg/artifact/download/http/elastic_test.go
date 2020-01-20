@@ -21,7 +21,7 @@ import (
 
 const (
 	beatName      = "filebeat"
-	version       = "7.1.1"
+	version       = "7.5.1"
 	sourcePattern = "/downloads/beats/filebeat/"
 	source        = "http://artifacts.elastic.co/downloads/beats/"
 )
@@ -151,15 +151,15 @@ func getRandomTestCases() []testCase {
 
 func getElasticCoClient() http.Client {
 	correctValues := map[string]struct{}{
-		fmt.Sprintf("%s-%s-%s", beatName, version, "i386.deb"):            struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "amd64.deb"):           struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "i686.rpm"):            struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "x86_64.rpm"):          struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86.tar.gz"):    struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86_64.tar.gz"): struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86.zip"):     struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86_64.zip"):  struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "darwin-x86.tar.gz"):   struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "i386.deb"):             struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "amd64.deb"):            struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "i686.rpm"):             struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "x86_64.rpm"):           struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86.tar.gz"):     struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86_64.tar.gz"):  struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86.zip"):      struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86_64.zip"):   struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatName, version, "darwin-x86_64.tar.gz"): struct{}{},
 	}
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

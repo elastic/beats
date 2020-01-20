@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	mrand "math/rand"
 	"net"
 	"os"
 	"path/filepath"
@@ -154,6 +155,12 @@ func getGrpcTCPAddress(minPort, maxPort int) (string, error) {
 		maxPort = DefaultMaxPort
 	}
 
+	jitter := (maxPort - minPort) / 3
+	if jitter > 0 {
+		mrand.Seed(time.Now().UnixNano())
+		minPort += mrand.Intn(jitter)
+	}
+
 	for port := minPort; port <= maxPort; port++ {
 		desiredAddress := fmt.Sprintf("127.0.0.1:%d", port)
 		listener, _ := net.Listen("tcp", desiredAddress)
@@ -188,5 +195,10 @@ func pushCredentials(w io.Writer, c *Creds) error {
 	}
 
 	_, err = w.Write(credbytes)
+
+	// this gives beat with grpc a bit of time to spin up a goroutine and start a server.
+	// should be ok until we come up with more clever solution.
+	// Issue: https://github.com/elastic/beats/issues/15634
+	<-time.After(1500 * time.Millisecond)
 	return err
 }
