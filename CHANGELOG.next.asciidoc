@@ -44,7 +44,7 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 
 *Filebeat*
-
+Remove "add_locale" processor on Nginx access Metricset {pull}15674[15674]
 
 *Heartbeat*
 
