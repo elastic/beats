@@ -41,8 +41,8 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
-* <<exported-fields-istio>>
 * <<exported-fields-ibmmq>>
+* <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -15854,6 +15854,14 @@ json metricset
 server
 
 
+[[exported-fields-ibmmq]]
+== IBM MQ fields
+
+IBM MQ module
+
+
+
+
 [[exported-fields-istio]]
 == istio fields
 
@@ -16166,14 +16174,6 @@ This identifies the service authentication policy of the request. It is set to m
 type: keyword
 
 --
-=======
-[[exported-fields-ibmmq]]
-== IBM MQ fields
-
-IBM MQ module
-
-
-
 
 [[exported-fields-jolokia]]
 == Jolokia fields
@@ -25940,7 +25940,7 @@ type: long
 *`mysql.status.handler.read.last`*::
 +
 --
-The number of requests to read the last key in an index.
+The number of requests to read the last key in an index. 
 
 
 type: long
@@ -25970,7 +25970,7 @@ type: long
 *`mysql.status.handler.read.rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position.
+The number of requests to read a row based on a fixed position. 
 
 
 type: long
@@ -25980,7 +25980,7 @@ type: long
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-The number of requests to read the next row in the data file.
+The number of requests to read the next row in the data file. 
 
 
 type: long
@@ -26078,7 +26078,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-The total number of bytes in the InnoDB buffer pool containing data.
+The total number of bytes in the InnoDB buffer pool containing data. 
 
 
 type: long
@@ -29336,7 +29336,7 @@ format: bytes
 *`redis.info.memory.used.lua`*::
 +
 --
-Used memory by the Lua engine.
+Used memory by the Lua engine.        
 
 
 type: long
@@ -29348,7 +29348,7 @@ format: bytes
 *`redis.info.memory.used.dataset`*::
 +
 --
-The size in bytes of the dataset
+The size in bytes of the dataset 
 
 
 type: long
@@ -29593,7 +29593,7 @@ format: duration
 *`redis.info.persistence.rdb.copy_on_write.last_size`*::
 +
 --
-The size in bytes of copy-on-write allocations during the last RBD save operation
+The size in bytes of copy-on-write allocations during the last RBD save operation                
 
 
 type: long
@@ -29722,7 +29722,7 @@ format: bytes
 *`redis.info.persistence.aof.size.current`*::
 +
 --
-AOF current file size
+AOF current file size             
 
 
 type: long
@@ -29828,7 +29828,7 @@ format: bytes
 *`redis.info.replication.backlog.first_byte_offset`*::
 +
 --
-The master offset of the replication backlog buffer
+The master offset of the replication backlog buffer          
 
 
 type: long
@@ -30473,7 +30473,7 @@ sql module
 [float]
 === sql
 
-`sql` fetches metrics from a SQL database
+`sql` fetches metrics from a SQL database 
 
 
 
@@ -33420,7 +33420,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant
+Current sync action, if the RAID array is redundant 
 
 
 type: keyword
@@ -33843,7 +33843,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
 
 
 type: integer
@@ -33989,7 +33989,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
 
 
 type: integer

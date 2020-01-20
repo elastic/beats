@@ -503,12 +503,6 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
-#-------------------------------- Istio Module --------------------------------
-- module: istio
-  metricsets: ["mesh"]
-  period: 10s
-  hosts: ["localhost:42422"]
-
 #-------------------------------- IBM MQ Module --------------------------------
 - module: ibmmq
   metricsets: ['qmgr']
@@ -538,6 +532,12 @@ metricbeat.modules:
               event.Cancel();
             }
           }
+
+#-------------------------------- Istio Module --------------------------------
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  hosts: ["localhost:42422"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
