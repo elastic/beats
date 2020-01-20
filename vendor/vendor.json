@@ -3449,10 +3449,11 @@
 			"revisionTime": "2019-09-30T11:59:46Z"
 		},
 		{
-			"checksumSHA1": "MTPV3du5HyMX4DlXUcngA+vb3Vo=",
+			"checksumSHA1": "fW8mQy9XfBOcO8dwudie7NHXC5o=",
 			"path": "github.com/godror/godror",
 			"revision": "446a29355d2967f04604e8e015a3343917860adf",
 			"revisionTime": "2019-12-12T16:49:28Z",
+			"tree": true,
 			"version": "v0.9.0",
 			"versionExact": "v0.9.0"
 		},
