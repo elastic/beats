@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +25,9 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("sql", "query", New)
+	mb.Registry.MustAddMetricSet("sql", "query", New,
+		mb.WithHostParser(parse.PassThruHostParser),
+	)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -33,9 +36,10 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver     string
-	Datasource string
-	Query      string
+	Driver string
+	Query  string
+
+	db *sqlx.DB
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -44,9 +48,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
 	config := struct {
-		Driver     string `config:"driver"`
-		Datasource string `config:"datasource"`
-		Query      string `config:"sql_query"`
+		Driver string `config:"driver"`
+		Query  string `config:"sql_query"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -56,7 +59,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		Driver:        config.Driver,
-		Datasource:    config.Datasource,
 		Query:         config.Query,
 	}, nil
 }
@@ -65,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	db, err := sqlx.Open(m.Driver, m.Datasource)
+	db, err := sqlx.Open(m.Driver, m.HostData().URI)
 	if err != nil {
 		return errors.Wrap(err, "error opening connection")
 	}
