@@ -57,10 +57,8 @@ func (s *actionStore) Add(a action) {
 	switch v := a.(type) {
 	case *fleetapi.ActionPolicyChange:
 		// Only persist the action if the action is different.
-		if s.action != nil {
-			if s.action.ID() == v.ID() {
-				return
-			}
+		if s.action != nil && s.action.ID() == v.ID() {
+			return
 		}
 		s.dirty = true
 		s.action = a
@@ -134,14 +132,11 @@ func (a *actionStoreAcker) Ack(action fleetapi.Action) error {
 		return err
 	}
 	a.store.Add(action)
-	return nil
+	return a.store.Save()
 }
 
 func (a *actionStoreAcker) Commit() error {
-	if err := a.acker.Commit(); err != nil {
-		return err
-	}
-	return a.store.Save()
+	return nil
 }
 
 func newActionStoreAcker(acker fleetAcker, store *actionStore) *actionStoreAcker {
