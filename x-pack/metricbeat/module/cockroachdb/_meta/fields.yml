@@ -1,6 +1,6 @@
 - key: cockroachdb
   title: 'CockroachDB'
-  release: beta
+  release: ga
   description: >
     CockroachDB module
   settings: ["ssl", "http"]

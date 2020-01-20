@@ -147,6 +147,7 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add Oracle overview dashboard {pull}14021[14021]
+- Release CockroachDB module as GA. {pull}14301[14301]
 - Release CoreDNS module as GA. {pull}14308[14308]
 - Release CouchDB module as GA. {pull}14300[14300]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
