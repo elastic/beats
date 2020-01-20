@@ -533,6 +533,12 @@ metricbeat.modules:
             }
           }
 
+#-------------------------------- Istio Module --------------------------------
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  hosts: ["localhost:42422"]
+
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
