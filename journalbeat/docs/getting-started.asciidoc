@@ -196,9 +196,9 @@ in the _Beats Platform Reference_.
 [[view-kibana-dashboards]]
 === Step 6: Explore your data in {kib}
 
-To start exploring your data, go to the Discover application in {kib}. From
-there, you can submit search queries, filter the search results, and view
-document data.
+The {beatname_uc} dashboard is currently broken. To start exploring your data,
+go to the Discover application in {kib}. From there, you can submit search
+queries, filter the search results, and view document data.
 
 To learn how to build visualizations and dashboards to view your data, see the
 _{kibana-ref}/index.html[{kib} User Guide]_.

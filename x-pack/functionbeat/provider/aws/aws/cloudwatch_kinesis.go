@@ -8,14 +8,16 @@ import (
 	"context"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/cloudformation"
+	lambdarunner "github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -68,8 +70,10 @@ func CloudwatchKinesisDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(c.createHandler(client))
+func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
+	lambdarunner.Start(c.createHandler(client))
 	return nil
 }
 
@@ -108,6 +112,6 @@ func (c *CloudwatchKinesis) Template() *cloudformation.Template {
 }
 
 // Policies returns a slice of policy to add to the lambda role.
-func (c *CloudwatchKinesis) Policies() []cloudformation.AWSIAMRole_Policy {
+func (c *CloudwatchKinesis) Policies() []iam.Role_Policy {
 	return c.Kinesis.Policies()
 }

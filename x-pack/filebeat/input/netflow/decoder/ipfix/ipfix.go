@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/protocol"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"
+	v9 "github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 const (

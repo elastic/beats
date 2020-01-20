@@ -10,12 +10,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/awslabs/goformation/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation/logs"
+	"github.com/awslabs/goformation/v4/cloudformation/tags"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
 	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
 )
 
@@ -44,6 +49,12 @@ type defaultTemplateBuilder struct {
 
 const (
 	keyPrefix = "functionbeat-deployment/"
+
+	// Package size limits for AWS, we should be a lot under this limit but
+	// adding a check to make sure we never go over.
+	// Ref: https://docs.aws.amazon.com/lambda/latest/dg/limits.html
+	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
+	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 )
 
 func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provider) (provider.TemplateBuilder, error) {
@@ -77,7 +88,8 @@ func (d *defaultTemplateBuilder) findFunction(name string) (installer, error) {
 // execute generates a template
 func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 	d.log.Debug("Compressing all assets into an artifact")
-	content, err := core.MakeZip("aws")
+
+	content, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, zipResources())
 	if err != nil {
 		return templateData{}, err
 	}
@@ -149,41 +161,41 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 	}
 
 	// Configure the Dead letter, any failed events will be send to the configured amazon resource name.
-	var dlc *cloudformation.AWSLambdaFunction_DeadLetterConfig
+	var dlc *lambda.Function_DeadLetterConfig
 	if lambdaConfig.DeadLetterConfig != nil && len(lambdaConfig.DeadLetterConfig.TargetArn) != 0 {
-		dlc = &cloudformation.AWSLambdaFunction_DeadLetterConfig{
+		dlc = &lambda.Function_DeadLetterConfig{
 			TargetArn: lambdaConfig.DeadLetterConfig.TargetArn,
 		}
 	}
 
 	// Configure VPC
-	var vcpConf *cloudformation.AWSLambdaFunction_VpcConfig
+	var vcpConf *lambda.Function_VpcConfig
 	if lambdaConfig.VPCConfig != nil && len(lambdaConfig.VPCConfig.SecurityGroupIDs) != 0 && len(lambdaConfig.VPCConfig.SubnetIDs) != 0 {
-		vcpConf = &cloudformation.AWSLambdaFunction_VpcConfig{
+		vcpConf = &lambda.Function_VpcConfig{
 			SecurityGroupIds: lambdaConfig.VPCConfig.SecurityGroupIDs,
 			SubnetIds:        lambdaConfig.VPCConfig.SubnetIDs,
 		}
 	}
 
-	var tags []cloudformation.Tag
+	var ts []tags.Tag
 	for name, val := range lambdaConfig.Tags {
-		tag := cloudformation.Tag{
+		tag := tags.Tag{
 			Key:   name,
 			Value: val,
 		}
-		tags = append(tags, tag)
+		ts = append(ts, tag)
 	}
 
 	// Create the lambda
 	// Doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
 	template.Resources[prefix("")] = &AWSLambdaFunction{
-		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
-			Code: &cloudformation.AWSLambdaFunction_Code{
+		Function: &lambda.Function{
+			Code: &lambda.Function_Code{
 				S3Bucket: d.bucket,
 				S3Key:    codeLoc,
 			},
 			Description: lambdaConfig.Description,
-			Environment: &cloudformation.AWSLambdaFunction_Environment{
+			Environment: &lambda.Function_Environment{
 				// Configure which function need to be run by the lambda function.
 				Variables: map[string]string{
 					"BEAT_STRICT_PERMS": "false", // Disable any check on disk, we are running with really differents permission on lambda.
@@ -199,23 +211,23 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
 			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
 			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
-			Tags:                         tags,
+			Tags:                         ts,
 		},
 		DependsOn: dependsOn,
 	}
 
 	// Create the log group for the specific function lambda.
-	template.Resources[prefix("LogGroup")] = &cloudformation.AWSLogsLogGroup{
+	template.Resources[prefix("LogGroup")] = &logs.LogGroup{
 		LogGroupName: "/aws/lambda/" + name,
 	}
 
 	return template
 }
 
-func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *cloudformation.AWSIAMRole {
+func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *iam.Role {
 	// Default policies to writes logs from the Lambda.
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
+	policies := []iam.Role_Policy{
+		iam.Role_Policy{
 			PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
 			PolicyDocument: map[string]interface{}{
 				"Statement": []map[string]interface{}{
@@ -236,7 +248,7 @@ func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *
 
 	// Create the roles for the lambda.
 	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
-	return &cloudformation.AWSIAMRole{
+	return &iam.Role{
 		AssumeRolePolicyDocument: map[string]interface{}{
 			"Statement": []interface{}{
 				map[string]interface{}{
@@ -292,9 +304,11 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 		return err
 	}
 
-	err = merge(to.Resources, from.Resources)
-	if err != nil {
-		return err
+	for k, v := range from.Resources {
+		if _, ok := to.Resources[k]; ok {
+			return fmt.Errorf("key %s already exist in the template map", k)
+		}
+		to.Resources[k] = v
 	}
 
 	err = merge(to.Outputs, from.Outputs)
@@ -308,4 +322,10 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 func checksum(data []byte) string {
 	sha := sha256.Sum256(data)
 	return base64.RawURLEncoding.EncodeToString(sha[:])
+}
+
+func zipResources() []bundle.Resource {
+	return []bundle.Resource{
+		&bundle.LocalFile{Path: "pkg/functionbeat-aws", FileMode: 0755},
+	}
 }
