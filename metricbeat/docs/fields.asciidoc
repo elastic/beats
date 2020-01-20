@@ -20255,15 +20255,6 @@ type: ip
 
 --
 
-*`kubernetes.service.labels.*`*::
-+
---
-Labels for service
-
-type: object
-
---
-
 *`kubernetes.service.created`*::
 +
 --
