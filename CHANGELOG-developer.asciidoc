@@ -12,6 +12,79 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+=== Beats version 7.5.1
+https://github.com/elastic/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
+
+=== Beats version 7.5.0
+https://github.com/elastic/beats/compare/v7.4.1..v7.5.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
+- Need to register new processors to be used in the JS processor in their `init` functions. {pull}13509[13509]
+
+==== Added
+
+- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
+
+=== Beats version 7.4.1
+https://github.com/elastic/beats/compare/v7.4.0..v7.4.1[Check the HEAD diff]
+
+=== Beats version 7.4.0
+https://github.com/elastic/beats/compare/v7.3.1..v7.4.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
+
+==== Added
+
+- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
+- Introduce beat.OutputChooses publisher mode. {pull}12996[12996]
+- Ensure that beat.Processor, beat.ProcessorList, and processors.ProcessorList are compatible and can be composed more easily. {pull}12996[12996]
+- Add support to close beat.Client via beat.CloseRef (a subset of context.Context). {pull}13031[13031]
+- Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
+- Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
+
+=== Beats version 7.3.2
+https://github.com/elastic/beats/compare/v7.3.1..v7.3.2[Check the HEAD diff]
+
+=== Beats version 7.3.1
+https://github.com/elastic/beats/compare/v7.3.0..v7.3.1[Check the HEAD diff]
+
+=== Beats version 7.3.0
+https://github.com/elastic/beats/compare/v7.2.1..v7.3.0[Check the HEAD diff]
+
+==== Added
+
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+
+=== Beats version 7.2.1
+https://github.com/elastic/beats/compare/v7.2.0..v7.2.1[Check the HEAD diff]
+
+=== Beats version 7.2.0
+https://github.com/elastic/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
+
+==== Added
+
+- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
+- Support for Logger in the Metricset base instance. {pull}11106[11106]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
+- Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
+- Update Jinja2 version to 2.10.1. {pull}11817[11817]
+- Reduce idxmgmt.Supporter interface and rework export commands to reuse logic. {pull}11777[11777],{pull}12065[12065],{pull}12067[12067],{pull}12160[12160]
+- Update urllib3 version to 1.24.2 {pull}11930[11930]
+- Add libbeat/common/cleanup package. {pull}12134[12134]
+- Only Load minimal template if no fields are provided. {pull}12103[12103]
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+- Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
+
 === Beats version 7.1.1
 https://github.com/elastic/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
 

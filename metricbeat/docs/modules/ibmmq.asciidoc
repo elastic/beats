@@ -1,0 +1,90 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-ibmmq]]
+[role="xpack"]
+== IBM MQ module
+
+beta[]
+
+This module periodically fetches metrics from a containerized distribution of IBM MQ.
+
+[float]
+=== Compatibility
+
+The ibmmq `qmgr` metricset is compatible with a containerized distribution of IBM MQ (since version 9.1.0).
+The Docker image starts the `runmqserver` process, which spawns the HTTP server exposing metrics in Prometheus
+format ([source code](https://github.com/ibm-messaging/mq-container/blob/9.1.0/internal/metrics/metrics.go)).
+
+The Docker container lifecycle, including metrics collection, has been described in the [Internals](https://github.com/ibm-messaging/mq-container/blob/9.1.0/docs/internals.md)
+document.
+
+The image provides an option to easily enable metrics exporter using an environment
+variable:
+
+`MQ_ENABLE_METRICS` - Set this to `true` to generate Prometheus metrics for the Queue Manager.
+
+[float]
+=== Dashboard
+
+The ibmmq module includes predefined dashboards with overview information
+of the monitored Queue Manager, including subscriptions, calls and messages.
+
+image::./images/metricbeat-ibmmq-calls.png[]
+
+image::./images/metricbeat-ibmmq-messages.png[]
+
+image::./images/metricbeat-ibmmq-subscriptions.png[]
+
+
+[float]
+=== Example configuration
+
+The IBM MQ module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: ibmmq
+  metricsets: ['qmgr']
+  period: 10s
+  hosts: ['localhost:9157']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
+  # The custom processor is responsible for filtering Prometheus metrics
+  # not stricly related to the IBM MQ domain, e.g. system load, process,
+  # metrics HTTP server.
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var metrics = event.Get("prometheus.metrics");
+            Object.keys(metrics).forEach(function(key) {
+              if (!(key.match(/^ibmmq_.*$/))) {
+                event.Delete("prometheus.metrics." + key);
+              }
+            });
+            metrics = event.Get("prometheus.metrics");
+            if (Object.keys(metrics).length == 0) {
+              event.Cancel();
+            }
+          }
+----
+
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-ibmmq-qmgr,qmgr>>
+
+include::ibmmq/qmgr.asciidoc[]
+

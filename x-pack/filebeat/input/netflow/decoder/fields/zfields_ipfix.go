@@ -59,7 +59,7 @@ var IpfixFields = FieldDict{
 	Key{EnterpriseID: 0, FieldID: 48}: {Name: "samplerId", Decoder: Unsigned8},
 	Key{EnterpriseID: 0, FieldID: 49}: {Name: "samplerMode", Decoder: Unsigned8},
 	Key{EnterpriseID: 0, FieldID: 50}: {Name: "samplerRandomInterval", Decoder: Unsigned32},
-	Key{EnterpriseID: 0, FieldID: 51}: {Name: "classId", Decoder: Unsigned8},
+	Key{EnterpriseID: 0, FieldID: 51}: {Name: "classId", Decoder: Unsigned32},
 	Key{EnterpriseID: 0, FieldID: 52}: {Name: "minimumTTL", Decoder: Unsigned8},
 	Key{EnterpriseID: 0, FieldID: 53}: {Name: "maximumTTL", Decoder: Unsigned8},
 	Key{EnterpriseID: 0, FieldID: 54}: {Name: "fragmentIdentification", Decoder: Unsigned32},
