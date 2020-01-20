@@ -30,12 +30,10 @@ func (h *handlerPolicyChange) Handle(a action, acker fleetAcker) error {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}
 
-	h.log.Debug("HandlerPolicyChange: emit configuration")
-
-	// ACK config
-	if err := acker.Ack(action); err != nil {
+	h.log.Debugf("HandlerPolicyChange: emit configuration for action %+v", a)
+	if err := h.emitter(c); err != nil {
 		return err
 	}
 
-	return h.emitter(c)
+	return acker.Ack(action)
 }

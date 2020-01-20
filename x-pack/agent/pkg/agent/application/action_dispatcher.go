@@ -11,9 +11,10 @@ import (
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
 
-type action interface{}
+type action = fleetapi.Action
 
 type actionHandler interface {
 	Handle(a action, acker fleetAcker) error
