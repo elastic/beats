@@ -7,8 +7,3 @@ The default metricset is `mesh`.
 === Compatibility
 
 The Istio module is tested with Istio 1.4
-
-
-[float]
-=== Dashboard
-

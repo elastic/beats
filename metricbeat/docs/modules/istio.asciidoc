@@ -20,11 +20,6 @@ The Istio module is tested with Istio 1.4
 
 
 [float]
-=== Dashboard
-
-
-
-[float]
 === Example configuration
 
 The istio module supports the standard configuration options that are described
