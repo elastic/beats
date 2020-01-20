@@ -18,7 +18,7 @@ var (
 )
 
 func init() {
-	homePath = retrieveHomePath()
+	homePath = retrieveExecutablePath()
 	dataPath = retrieveDataPath()
 }
 
@@ -43,9 +43,9 @@ func AgentGlobalConfig() map[string]interface{} {
 	}
 }
 
-// retrieveDataPath returns a directory where binary lives
+// retrieveExecutablePath returns a directory where binary lives
 // Executable is not supported on nacl.
-func retrieveDataPath() string {
+func retrieveExecutablePath() string {
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -55,12 +55,6 @@ func retrieveDataPath() string {
 }
 
 // retrieveHomePath returns a home directory of current user
-func retrieveHomePath() string {
-	// this fails usually for not common OSes
-	h, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-
-	return h
+func retrieveDataPath() string {
+	return filepath.Join(retrieveExecutablePath(), "data")
 }
