@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
+- Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 
 *Auditbeat*
 
@@ -176,6 +177,7 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 - Add DynamoDB AWS Metricbeat light module {pull}15097[15097]
 - Release elb module as GA. {pull}15485[15485]
 - Add a `system/network_summary` metricset {pull}15196[15196]
+- Add mesh metricset for Istio Metricbeat module{pull}15535[15535]
 
 *Packetbeat*
 
