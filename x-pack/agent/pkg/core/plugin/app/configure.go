@@ -79,10 +79,5 @@ func (a *Application) Configure(config map[string]interface{}) (err error) {
 		return retry.ErrorMakeFatal(err)
 	}
 
-	// retry config in case process is not warmed up
-	if backoffClient, ok := a.grpcClient.(backoffClient); ok {
-		return retry.DoWithBackoff(a.retryConfig, backoffClient.Backoff(), retryFn)
-	}
-
 	return retry.Do(a.retryConfig, retryFn)
 }

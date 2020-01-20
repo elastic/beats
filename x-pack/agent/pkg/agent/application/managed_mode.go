@@ -26,6 +26,10 @@ import (
 var gatewaySettings = &fleetGatewaySettings{
 	Duration: 2 * time.Second,
 	Jitter:   1 * time.Second,
+	Backoff: backoffSettings{
+		Init: 1 * time.Second,
+		Max:  10 * time.Second,
+	},
 }
 
 type apiClient interface {

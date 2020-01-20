@@ -1,6 +1,6 @@
 name: Filebeat
 cmd: filebeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false"]
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
 - map:
