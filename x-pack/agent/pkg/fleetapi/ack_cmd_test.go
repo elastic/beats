@@ -51,10 +51,8 @@ func TestAck(t *testing.T) {
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
 			action := &ActionPolicyChange{
-				ActionBase: &ActionBase{
-					ActionID:   "my-id",
-					ActionType: "POLICY_CHANGE",
-				},
+				ActionID:   "my-id",
+				ActionType: "POLICY_CHANGE",
 				Policy: map[string]interface{}{
 					"id": "policy_id",
 				},
