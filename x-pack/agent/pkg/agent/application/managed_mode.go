@@ -126,7 +126,7 @@ func newManaged(
 	batchedAcker := newLazyAcker(acker)
 
 	// Create the action store that will persist the last good policy change on disk.
-	actionStore, err := newActionStore(log, fleetActionStoreFile())
+	actionStore, err := newActionStore(log, storage.NewDiskStore(fleetActionStoreFile()))
 	if err != nil {
 		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", fleetActionStoreFile()))
 	}

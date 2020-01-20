@@ -24,6 +24,11 @@ type store interface {
 	Save(io.Reader) error
 }
 
+type storeLoad interface {
+	store
+	Load() (io.ReadCloser, error)
+}
+
 type clienter interface {
 	Send(
 		method string,

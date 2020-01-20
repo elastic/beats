@@ -12,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
@@ -30,7 +31,8 @@ func TestActionStore(t *testing.T) {
 
 	t.Run("action returns empty when no action is saved on disk",
 		withFile(func(t *testing.T, file string) {
-			store, err := newActionStore(log, file)
+			s := storage.NewDiskStore(file)
+			store, err := newActionStore(log, s)
 			require.NoError(t, err)
 			require.Equal(t, 0, len(store.Actions()))
 		}))
@@ -41,7 +43,8 @@ func TestActionStore(t *testing.T) {
 				ActionID: "abc123",
 			}
 
-			store, err := newActionStore(log, file)
+			s := storage.NewDiskStore(file)
+			store, err := newActionStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -61,7 +64,8 @@ func TestActionStore(t *testing.T) {
 				},
 			}
 
-			store, err := newActionStore(log, file)
+			s := storage.NewDiskStore(file)
+			store, err := newActionStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -70,7 +74,8 @@ func TestActionStore(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, 1, len(store.Actions()))
 
-			store1, err := newActionStore(log, file)
+			s = storage.NewDiskStore(file)
+			store1, err := newActionStore(log, s)
 			require.NoError(t, err)
 
 			actions := store1.Actions()
@@ -85,7 +90,8 @@ func TestActionStore(t *testing.T) {
 				ActionID: "abc123",
 			}
 
-			store, err := newActionStore(log, file)
+			s := storage.NewDiskStore(file)
+			store, err := newActionStore(log, s)
 			require.NoError(t, err)
 
 			acker := newActionStoreAcker(&testAcker{}, store)

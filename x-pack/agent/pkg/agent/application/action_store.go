@@ -9,7 +9,6 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
@@ -20,14 +19,12 @@ import (
 // Fleet. The store is not threadsafe.
 type actionStore struct {
 	log    *logger.Logger
-	store  store
+	store  storeLoad
 	dirty  bool
 	action action
 }
 
-func newActionStore(log *logger.Logger, file string) (*actionStore, error) {
-	store := storage.NewDiskStore(file)
-
+func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	// If the store exists we will read it, if any errors is returned we assume we do not have anything
 	// persisted and we return an empty store.
 	reader, err := store.Load()
