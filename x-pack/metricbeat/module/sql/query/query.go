@@ -63,6 +63,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Host returns the host string that will be stored in the events, as the
+// module is generic, the value in `hosts` can contain passwords in different
+// places, so mask the whole value.
+func (m *MetricSet) Host() string {
+	// TODO: Return something more meaningful
+	return "xxxxx"
+}
+
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().

@@ -26,8 +26,7 @@ import (
 
 // Fetcher is an interface implemented by all fetchers for testing purpouses
 type Fetcher interface {
-	Module() mb.Module
-	Name() string
+	mb.MetricSet
 
 	FetchEvents() ([]mb.Event, []error)
 	WriteEvents(testing.TB, string)
