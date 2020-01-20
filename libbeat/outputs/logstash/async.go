@@ -18,7 +18,9 @@
 package logstash
 
 import (
+	"errors"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -37,6 +39,8 @@ type asyncClient struct {
 	win      *window
 
 	connect func() error
+
+	mutex sync.Mutex
 }
 
 type msgRef struct {
@@ -113,7 +117,11 @@ func (c *asyncClient) Connect() error {
 }
 
 func (c *asyncClient) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	logp.Debug("logstash", "close connection")
+
 	if c.client != nil {
 		err := c.client.Close()
 		c.client = nil
@@ -197,12 +205,23 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
+	client := c.getClient()
+	if client == nil {
+		return errors.New("connection closed")
+	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}
 	ref.count.Inc()
-	return c.client.Send(ref.callback, window)
+	return client.Send(ref.callback, window)
+}
+
+func (c *asyncClient) getClient() *v2.AsyncClient {
+	c.mutex.Lock()
+	client := c.client
+	c.mutex.Unlock()
+	return client
 }
 
 func (r *msgRef) callback(seq uint32, err error) {
