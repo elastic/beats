@@ -32,7 +32,7 @@
             "panelIndex": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
             "panelRefName": "panel_0",
             "title": "AWS Account Filter",
-            "version": "7.5.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "26670498-b079-4447-bbc8-e4ca8215898c",
             "panelRefName": "panel_1",
             "title": "Estimated Billing Chart",
-            "version": "7.5.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "221aab02-2747-4d84-9dde-028ccd51bdce",
             "panelRefName": "panel_2",
             "title": "Total Estimated Charges",
-            "version": "7.5.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "21e91e6b-0ff0-42ba-9132-6f30c5c6bbb7",
             "panelRefName": "panel_3",
             "title": "Top 5 Estimated Billing Per Service Name",
-            "version": "7.5.0"
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -480,5 +480,5 @@
       "version": "WzU2LDFd"
     }
   ],
-  "version": "7.5.0"
+  "version": "7.4.0"
 }
