@@ -25,16 +25,24 @@ type testFetchConfig struct {
 	Host   string
 }
 
-func TestFetchMySQL(t *testing.T) {
+func TestMySQL(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
-	testFetch(t, testFetchConfig{
+	config := testFetchConfig{
 		Driver: "mysql",
 		Query:  "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
 		Host:   mysql.GetMySQLEnvDSN(service.Host()),
+	}
+
+	t.Run("fetch", func(t *testing.T) {
+		testFetch(t, config)
+	})
+
+	t.Run("data", func(t *testing.T) {
+		testData(t, config, "")
 	})
 }
 
-func TestFetchPostgreSQL(t *testing.T) {
+func TestPostgreSQL(t *testing.T) {
 	service := compose.EnsureUp(t, "postgresql")
 	host, port, err := net.SplitHostPort(service.Host())
 	require.NoError(t, err)
@@ -42,10 +50,18 @@ func TestFetchPostgreSQL(t *testing.T) {
 	user := postgresql.GetEnvUsername()
 	password := postgresql.GetEnvPassword()
 
-	testFetch(t, testFetchConfig{
+	config := testFetchConfig{
 		Driver: "postgres",
-		Query:  "select now()",
+		Query:  "select * from pg_stat_database",
 		Host:   fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
+	}
+
+	t.Run("fetch", func(t *testing.T) {
+		testFetch(t, config)
+	})
+
+	t.Run("data", func(t *testing.T) {
+		testData(t, config, "./_meta/data_postgres.json")
 	})
 }
 
@@ -57,15 +73,9 @@ func testFetch(t *testing.T, cfg testFetchConfig) {
 	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
 }
 
-func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "mysql")
-	cfg := getConfig(testFetchConfig{
-		Driver: "mysql",
-		Query:  "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
-		Host:   mysql.GetMySQLEnvDSN(service.Host()),
-	})
-	m := mbtest.NewFetcher(t, cfg)
-	m.WriteEvents(t, "")
+func testData(t *testing.T, cfg testFetchConfig, postfix string) {
+	m := mbtest.NewFetcher(t, getConfig(cfg))
+	m.WriteEvents(t, postfix)
 }
 
 func getConfig(cfg testFetchConfig) map[string]interface{} {
