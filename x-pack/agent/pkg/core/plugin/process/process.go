@@ -106,7 +106,7 @@ func Stop(logger *logger.Logger, pid int) error {
 		return nil
 	}
 
-	return proc.Kill()
+	return proc.Signal(os.Interrupt)
 }
 
 // Attach assumes caller knows all the details about the process
