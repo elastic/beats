@@ -217,3 +217,56 @@ You can label Docker containers with useful info to decode logs structured as JS
   co.elastic.logs/json.add_error_key: true
   co.elastic.logs/json.message_key: log
 -----
+
+
+
+[float]
+==== Nomad
+
+Nomad autodiscover provider supports hints using the https://www.nomadproject.io/docs/job-specification/meta.html[`meta` stanza]. To enable it just set `hints.enabled`:
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      hints.enabled: true
+-----
+
+You can configure the default config that will be launched when a new job is seen, like this:
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      hints.enabled: true
+      hints.default_config:
+        type: nomad
+        paths:
+          - /var/lib/nomad/alloc/${data.meta.alloc_id}/alloc/logs/${data.meta.task.name}.*
+-----
+
+You can also disable default settings entirely, so only Jobs annotated like `co.elastic.logs/enabled: true`
+will be retrieved:
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      hints.enabled: true
+      hints.default_config.enabled: false
+-----
+
+You can annotate Nomad Jobs using the `meta` stanza with useful info to spin up {beatname_uc} inputs
+or modules:
+
+[source,hcl]
+-----
+meta {
+  "co.elastic.logs/multiline.pattern" = "^\["
+  "co.elastic.logs/multiline.negate"  = true
+  "co.elastic.logs/multiline.match"   = after
+}
+-----

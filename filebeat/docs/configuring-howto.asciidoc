@@ -86,7 +86,9 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 
 :autodiscoverJolokia:
 :autodiscoverHints:
+:autodiscoverNomad:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
+:autodiscoverNomad!:
 
 :standalone:
 include::{libbeat-dir}/yaml.asciidoc[]

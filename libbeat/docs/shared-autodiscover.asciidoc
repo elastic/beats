@@ -310,6 +310,103 @@ include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
+ifdef::autodiscoverNomad[]
+[float]
+===== Nomad
+
+*Note: This provider is experimental*
+
+The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
+
+These are the available fields during within config templating. The `meta.*` fields will be available
+on each emitted event.
+
+* host
+* id
+* meta.name
+* meta.job
+* meta.namespace
+* meta.datacenters
+* meta.region
+* meta.type
+* meta.alloc_id
+* meta.status
+* meta.task.name
+* meta.task.service.name
+* meta.task.service.tags
+* meta.task.service.canary_tags
+
+If the `include_labels` config is added to the provider config, then the list of labels present in
+the config will be added to the event.
+
+If the `exclude_labels` config is added to the provider config, then the list of labels present in
+the config will be excluded from the event.
+
+if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be
+replaced with `_`.
+
+For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  ...
+  "region": "europe",
+  "type": "service",
+  "alloc_id": "35eba07f-e5e4-20ac-6def-85117bee6efb",
+  "datacenters": [
+    "europe-west4"
+  ],
+  "namespace": "default",
+  "name": "coffeshop.api[0]",
+  "job": "coffeshop"
+  "task": {
+    "service": {
+      "name": [
+        "coffeshop"
+      ],
+      "tags": [
+        "coffeshop",
+        "nginx"
+      ],
+      "canary_tags": [
+        "coffeshop"
+      ]
+    },
+    "name": "api"
+  },
+  ...
+}
+-------------------------------------------------------------------------------------
+
+The configuration of templates and conditions is similar to that of the Docker provider.
+Configuration templates can contain variables from the autodiscover event. They can be accessed under
+`data` namespace.
+
+The `nomad` autodiscover provider has the following configuration settings:
+
+`address`:: (Optional) Specify the address of the Nomad agent. By default it will try to talk to a
+  Nomad agent running locally (`http://127.0.0.1:4646`).
+
+`region`:: (Optional) Region to use. If not provided, the default agent region is used.
+
+`namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
+
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad.
+
+`host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+  cannot be accurately detected, as when running {beatname_lc} in host network
+  mode.
+
+`wait_time`:: (Optional) Limits how long a Watch will block. If not specified (or set to `0`) the
+  default configuration from the agent will be used.
+
+`allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
+  means that the local node where filebeat is allocated will service filebeat's requests.
+
+include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
+
+endif::autodiscoverNomad[]
 
 ifdef::autodiscoverHints[]
 [[configuration-autodiscover-hints]]

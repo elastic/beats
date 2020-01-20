@@ -1,0 +1,47 @@
+Filebeat supports templates for inputs and modules.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      host: nomad1
+      hints.enabled: true
+      allow_stale: true
+      templates:
+        - condition:
+            equals:
+              meta.namespace: web
+          config:
+            - type: log
+              paths:
+                - /var/lib/nomad/alloc/${data.meta.alloc_id}/alloc/logs/${data.meta.task.name}.stderr.[0-9]*
+              exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
+-------------------------------------------------------------------------------------
+
+This configuration launches a `log` input for all jobs under the `web` Nomad namespace.
+
+If you are using modules, you can override the default input and customize it to read from the
+`${data.meta.task.name}.stdout` and/or `${data.meta.task.name}.stderr` files.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: nomad
+      templates:
+        - condition:
+            equals:
+              meta.task.service.tags: "redis"
+          config:
+            - module: redis
+              log:
+                input:
+                  type: log
+                  paths:
+                    - /var/lib/nomad/alloc/${data.meta.alloc_id}/alloc/logs/${data.meta.task.name}.*
+-------------------------------------------------------------------------------------
+
+WARNING: The `docker` input is currently not supported. Nomad doesn't expose the container id
+associated with the allocation. Without the container id, there is no way of generating the proper
+path for reading the container's logs.
