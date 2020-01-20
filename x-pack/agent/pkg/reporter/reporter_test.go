@@ -46,15 +46,14 @@ func TestTypes(t *testing.T) {
 	}
 
 	// test stopping
-	// TODO: [michal] re-enable when https://github.com/elastic/kibana/issues/55155 is fixed
-	// rep.OnStopping("a3")
-	// if r := result.Type(); r != EventTypeState {
-	// 	t.Errorf("OnStopping: expected record type '%v', got '%v'", EventTypeState, r)
-	// }
+	rep.OnStopping("a3")
+	if r := result.Type(); r != EventTypeState {
+		t.Errorf("OnStopping: expected record type '%v', got '%v'", EventTypeState, r)
+	}
 
-	// if r := result.SubType(); r != EventSubTypeStopping {
-	// 	t.Errorf("OnStopping: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	// }
+	if r := result.SubType(); r != EventSubTypeStopping {
+		t.Errorf("OnStopping: expected event type '%v', got '%v'", EventSubTypeStarting, r)
+	}
 
 	// test stopped
 	rep.OnStopped("a4")
