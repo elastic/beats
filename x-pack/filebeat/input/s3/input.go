@@ -550,19 +550,8 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 func (p *s3Input) getS3ObjectResponse(svc s3iface.ClientAPI, s3Info s3Info) (*s3.GetObjectResponse, error) {
 	// Create a context with a timeout that will abort the download if it takes
 	// more than the default timeout 2 minute.
-	contextTimeout := p.config.ContextTimeout
 	ctx := context.Background()
-
-	var cancelFn func()
-	if contextTimeout > 0 {
-		ctx, cancelFn = context.WithTimeout(ctx, contextTimeout)
-	}
-
-	// Ensure the context is canceled to prevent leaking.
-	// See context package for more information, https://golang.org/pkg/context/
-	if cancelFn != nil {
-		defer cancelFn()
-	}
+	ctx, _ = context.WithTimeout(ctx, p.config.ContextTimeout)
 
 	// Download the S3 object using GetObjectRequest. The Context will interrupt
 	// the request if the timeout expires.
