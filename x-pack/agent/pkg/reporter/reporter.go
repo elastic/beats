@@ -86,10 +86,9 @@ func (r *Reporter) OnFailing(application string, err error) {
 
 // OnStopping reports application stopped event.
 func (r *Reporter) OnStopping(application string) {
-	// TODO: [michal] re-enable when https://github.com/elastic/kibana/issues/55155 is fixed
-	// msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPING", application, r.info.AgentID())
-	// rec := generateRecord(EventTypeState, EventSubTypeStopping, msg)
-	// r.report(rec)
+	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPING", application, r.info.AgentID())
+	rec := generateRecord(EventTypeState, EventSubTypeStopping, msg)
+	r.report(rec)
 }
 
 // OnStopped reports application stopped event.
