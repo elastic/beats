@@ -10,7 +10,7 @@
         "period": 10000
     },
     "service": {
-        "address": "xxxxx",
+        "address": "172.22.0.3:3306",
         "type": "sql"
     },
     "sql": {

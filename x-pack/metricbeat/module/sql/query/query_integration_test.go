@@ -40,7 +40,7 @@ func TestMySQL(t *testing.T) {
 		Driver:    "mysql",
 		Query:     "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
 		Host:      mysql.GetMySQLEnvDSN(service.Host()),
-		Assertion: assertFieldNotContains("service.address", "root:test@"),
+		Assertion: assertFieldNotContains("service.address", ":test@"),
 	}
 
 	t.Run("fetch", func(t *testing.T) {
@@ -68,6 +68,17 @@ func TestPostgreSQL(t *testing.T) {
 	}
 
 	t.Run("fetch", func(t *testing.T) {
+		testFetch(t, config)
+	})
+
+	config = testFetchConfig{
+		Driver:    "postgres",
+		Query:     "select * from pg_stat_database",
+		Host:      fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+		Assertion: assertFieldNotContains("service.address", ":"+password+"@"),
+	}
+
+	t.Run("fetch with URL", func(t *testing.T) {
 		testFetch(t, config)
 	})
 

@@ -10,14 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"github.com/jmoiron/sqlx"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -26,7 +24,7 @@ import (
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
 	mb.Registry.MustAddMetricSet("sql", "query", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(ParseDSN),
 	)
 }
 
@@ -38,8 +36,6 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	Driver string
 	Query  string
-
-	db *sqlx.DB
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -61,14 +57,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Driver:        config.Driver,
 		Query:         config.Query,
 	}, nil
-}
-
-// Host returns the host string that will be stored in the events, as the
-// module is generic, the value in `hosts` can contain passwords in different
-// places, so mask the whole value.
-func (m *MetricSet) Host() string {
-	// TODO: Return something more meaningful
-	return "xxxxx"
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
