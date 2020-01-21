@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-var vpcflow = (function () {
+function VPCFlow(keep_original_message) {
     var processor = require("processor");
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
@@ -21,6 +21,16 @@ var vpcflow = (function () {
         ignore_missing: true,
     });
 
+    var saveOriginalMessage = function(evt) {};
+    if (keep_original_message) {
+        saveOriginalMessage = new processor.Convert({
+            fields: [
+                {from: "message", to: "event.original"}
+            ],
+            mode: "rename"
+        });
+    }
+
     var dropPubSubFields = function(evt) {
         evt.Delete("message");
         evt.Delete("labels");
@@ -32,6 +42,14 @@ var vpcflow = (function () {
             category: "network_traffic",
             type: "flow",
         },
+    });
+
+
+    var saveMetadata = new processor.Convert({
+        fields: [
+            {from: "json.logName", to: "log.logger"},
+        ],
+        ignore_missing: true
     });
 
     // Use the LogEntry object's timestamp. VPC flow logs are structured so the
@@ -76,10 +94,10 @@ var vpcflow = (function () {
             {from: "json.src_location.region", to: "source.geo.region_name"},
             {from: "json.src_location.city", to: "source.geo.city_name"},
 
-            {from: "json.dest_instance", to: "json.destination.instance"},
-            {from: "json.dest_vpc", to: "json.destination.vpc"},
-            {from: "json.src_instance", to: "json.source.instance"},
-            {from: "json.src_vpc", to: "json.source.vpc"},
+            {from: "json.dest_instance", to: "googlecloud.destination.instance"},
+            {from: "json.dest_vpc", to: "googlecloud.destination.vpc"},
+            {from: "json.src_instance", to: "googlecloud.source.instance"},
+            {from: "json.src_vpc", to: "googlecloud.source.vpc"},
 
             {from: "json.rtt_msec", to: "json.rtt.ms", type: "long"},
             {from: "json", to: "googlecloud.vpcflow"},
@@ -107,22 +125,22 @@ var vpcflow = (function () {
 
     var setCloudFromDestInstance = new processor.Convert({
         fields: [
-            {from: "googlecloud.vpcflow.destination.instance.project_id", to: "cloud.project.id"},
-            {from: "googlecloud.vpcflow.destination.instance.vm_name", to: "cloud.instance.name"},
-            {from: "googlecloud.vpcflow.destination.instance.region", to: "cloud.region"},
-            {from: "googlecloud.vpcflow.destination.instance.zone", to: "cloud.availability_zone"},
-            {from: "googlecloud.vpcflow.destination.vpc.subnetwork_name", to: "network.name"},
+            {from: "googlecloud.destination.instance.project_id", to: "cloud.project.id"},
+            {from: "googlecloud.destination.instance.vm_name", to: "cloud.instance.name"},
+            {from: "googlecloud.destination.instance.region", to: "cloud.region"},
+            {from: "googlecloud.destination.instance.zone", to: "cloud.availability_zone"},
+            {from: "googlecloud.destination.vpc.subnetwork_name", to: "network.name"},
         ],
         ignore_missing: true,
     });
 
     var setCloudFromSrcInstance = new processor.Convert({
         fields: [
-            {from: "googlecloud.vpcflow.source.instance.project_id", to: "cloud.project.id"},
-            {from: "googlecloud.vpcflow.source.instance.vm_name", to: "cloud.instance.name"},
-            {from: "googlecloud.vpcflow.source.instance.region", to: "cloud.region"},
-            {from: "googlecloud.vpcflow.source.instance.zone", to: "cloud.availability_zone"},
-            {from: "googlecloud.vpcflow.source.vpc.subnetwork_name", to: "network.name"},
+            {from: "googlecloud.source.instance.project_id", to: "cloud.project.id"},
+            {from: "googlecloud.source.instance.vm_name", to: "cloud.instance.name"},
+            {from: "googlecloud.source.instance.region", to: "cloud.region"},
+            {from: "googlecloud.source.instance.zone", to: "cloud.availability_zone"},
+            {from: "googlecloud.source.vpc.subnetwork_name", to: "network.name"},
         ],
         ignore_missing: true,
     });
@@ -170,8 +188,8 @@ var vpcflow = (function () {
     };
 
     var setNetworkDirection = function(event) {
-        var srcInstance = event.Get("googlecloud.vpcflow.source.instance");
-        var destInstance = event.Get("googlecloud.vpcflow.destination.instance");
+        var srcInstance = event.Get("googlecloud.source.instance");
+        var destInstance = event.Get("googlecloud.destination.instance");
         var direction = "unknown";
 
         if (srcInstance && destInstance) {
@@ -205,8 +223,10 @@ var vpcflow = (function () {
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
+        .Add(saveOriginalMessage)
         .Add(dropPubSubFields)
         .Add(categorizeEvent)
+        .Add(saveMetadata)
         .Add(convertLogEntry)
         .Add(convertJsonPayload)
         .Add(dropEmptyObjects)
@@ -223,7 +243,14 @@ var vpcflow = (function () {
     return {
         process: pipeline.Run,
     };
-})();
+}
+
+var vpcflow;
+
+// Register params from configuration.
+function register(params) {
+    vpcflow = new VPCFlow(params.keep_original_message);
+}
 
 function process(evt) {
     return vpcflow.process(evt);

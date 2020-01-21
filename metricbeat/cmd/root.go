@@ -30,6 +30,9 @@ import (
 	// import modules
 	_ "github.com/elastic/beats/metricbeat/include"
 	_ "github.com/elastic/beats/metricbeat/include/fields"
+
+	// Import processors.
+	_ "github.com/elastic/beats/libbeat/processors/script"
 )
 
 // Name of this beat

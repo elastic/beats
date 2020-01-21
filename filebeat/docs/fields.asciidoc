@@ -11953,6 +11953,154 @@ Fields from Google Cloud logs.
 
 
 [float]
+=== destination.instance
+
+If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
+
+
+*`googlecloud.destination.instance.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.destination.instance.region`*::
++
+--
+Region of the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.destination.instance.zone`*::
++
+--
+Zone of the VM.
+
+
+type: keyword
+
+--
+
+[float]
+=== destination.vpc
+
+If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
+
+
+*`googlecloud.destination.vpc.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.destination.vpc.vpc_name`*::
++
+--
+VPC on which the VM is operating.
+
+
+type: keyword
+
+--
+
+*`googlecloud.destination.vpc.subnetwork_name`*::
++
+--
+Subnetwork on which the VM is operating.
+
+
+type: keyword
+
+--
+
+[float]
+=== source.instance
+
+If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
+
+
+*`googlecloud.source.instance.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.source.instance.region`*::
++
+--
+Region of the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.source.instance.zone`*::
++
+--
+Zone of the VM.
+
+
+type: keyword
+
+--
+
+[float]
+=== source.vpc
+
+If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
+
+
+*`googlecloud.source.vpc.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.source.vpc.vpc_name`*::
++
+--
+VPC on which the VM is operating.
+
+
+type: keyword
+
+--
+
+*`googlecloud.source.vpc.subnetwork_name`*::
++
+--
+Subnetwork on which the VM is operating.
+
+
+type: keyword
+
+--
+
+[float]
 === audit
 
 Fields for Google Cloud audit logs.
@@ -12165,6 +12313,124 @@ type: keyword
 --
 
 [float]
+=== firewall
+
+Fields for Google Cloud Firewall logs.
+
+
+
+[float]
+=== rule_details
+
+Description of the firewall rule that matched this connection.
+
+
+
+*`googlecloud.firewall.rule_details.priority`*::
++
+--
+The priority for the firewall rule.
+
+type: long
+
+--
+
+*`googlecloud.firewall.rule_details.action`*::
++
+--
+Action that the rule performs on match.
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.direction`*::
++
+--
+Direction of traffic that matches this rule.
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.reference`*::
++
+--
+Reference to the firewall rule.
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.source_range`*::
++
+--
+List of source ranges that the firewall rule applies to.
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.destination_range`*::
++
+--
+List of destination ranges that the firewall applies to.
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.source_tag`*::
++
+--
+List of all the source tags that the firewall rule applies to.
+
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.target_tag`*::
++
+--
+List of all the target tags that the firewall rule applies to.
+
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.ip_port_info`*::
++
+--
+List of ip protocols and applicable port ranges for rules.
+
+
+type: array
+
+--
+
+*`googlecloud.firewall.rule_details.source_service_account`*::
++
+--
+List of all the source service accounts that the firewall rule applies to.
+
+
+type: keyword
+
+--
+
+*`googlecloud.firewall.rule_details.target_service_account`*::
++
+--
+List of all the target service accounts that the firewall rule applies to.
+
+
+type: keyword
+
+--
+
+[float]
 === vpcflow
 
 Fields for Google Cloud VPC flow logs.
@@ -12188,154 +12454,6 @@ Latency as measured (for TCP flows only) during the time interval. This is the t
 
 
 type: long
-
---
-
-[float]
-=== destination.instance
-
-If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
-
-
-
-*`googlecloud.vpcflow.destination.instance.project_id`*::
-+
---
-ID of the project containing the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.destination.instance.region`*::
-+
---
-Region of the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.destination.instance.zone`*::
-+
---
-Zone of the VM.
-
-
-type: keyword
-
---
-
-[float]
-=== destination.vpc
-
-If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
-
-
-
-*`googlecloud.vpcflow.destination.vpc.project_id`*::
-+
---
-ID of the project containing the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.destination.vpc.vpc_name`*::
-+
---
-VPC on which the VM is operating.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.destination.vpc.subnetwork_name`*::
-+
---
-Subnetwork on which the VM is operating.
-
-
-type: keyword
-
---
-
-[float]
-=== source.instance
-
-If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
-
-
-
-*`googlecloud.vpcflow.source.instance.project_id`*::
-+
---
-ID of the project containing the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.source.instance.region`*::
-+
---
-Region of the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.source.instance.zone`*::
-+
---
-Zone of the VM.
-
-
-type: keyword
-
---
-
-[float]
-=== source.vpc
-
-If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
-
-
-
-*`googlecloud.vpcflow.source.vpc.project_id`*::
-+
---
-ID of the project containing the VM.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.source.vpc.vpc_name`*::
-+
---
-VPC on which the VM is operating.
-
-
-type: keyword
-
---
-
-*`googlecloud.vpcflow.source.vpc.subnetwork_name`*::
-+
---
-Subnetwork on which the VM is operating.
-
-
-type: keyword
 
 --
 
