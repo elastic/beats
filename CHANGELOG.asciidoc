@@ -11,14 +11,10 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 
 *Affecting all Beats*
 
-- Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
-- Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
-- Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
-- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
-- Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
-- Update to ECS 1.4.0. {pull}14844[14844]
+- Libbeat: Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
+- Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
 
 *Filebeat*
 
@@ -80,8 +76,10 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Add `add_id` processor. {pull}14524[14524]
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
-- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
+- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
+- Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
+- Update to ECS 1.4.0. {pull}14844[14844]
 
 *Filebeat*
 
@@ -95,6 +93,12 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 - Add cloudtrail fileset to AWS module. {issue}14657[14657] {pull}15227[15227]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
+
+*Heartbeat*
+
+- google-pubsub input: ACK pub/sub message when acknowledged by publisher. {issue}13346[13346] {pull}14715[14715]
+- Remove Beta label from google-pubsub input. {issue}13346[13346] {pull}14715[14715]
 
 *Metricbeat*
 
@@ -103,6 +107,8 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Add cost warnings for the azure module. {pull}15356[15356]
 - Release elb module as GA. {pull}15485[15485]
 - Add a `system/network_summary` metricset {pull}15196[15196]
+- Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
+- Enable script processor. {pull}14711[14711]
 
 *Functionbeat*
 
