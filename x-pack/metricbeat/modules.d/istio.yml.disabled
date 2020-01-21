@@ -1,5 +1,5 @@
 # Module: istio
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-istio.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-istio.html
 
 - module: istio
   metricsets: ["mesh"]
