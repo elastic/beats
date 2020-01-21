@@ -170,6 +170,7 @@ def main():
             base + "/issues/{}/labels".format(new_pr["number"]), json=labels)
 
         if not args.keep_backport_label:
+            # remove needs backport label from the original PR
             session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
 
         # get version and set a version label on the original PR
