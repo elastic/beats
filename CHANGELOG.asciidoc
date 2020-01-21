@@ -94,11 +94,10 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
 - Add cloudtrail fileset to AWS module. {issue}14657[14657] {pull}15227[15227]
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
-
-*Heartbeat*
-
 - google-pubsub input: ACK pub/sub message when acknowledged by publisher. {issue}13346[13346] {pull}14715[14715]
 - Remove Beta label from google-pubsub input. {issue}13346[13346] {pull}14715[14715]
+
+*Heartbeat*
 
 *Metricbeat*
 
