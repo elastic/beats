@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package perfmon
+package pdh
 
 import (
 	"syscall"
@@ -38,8 +38,7 @@ func TestAddCounterInvalidArgWhenQueryClosed(t *testing.T) {
 	queryPath, err := q.GetCounterPaths(validQuery)
 	// if windows os language is ENG then err will be nil, else the GetCounterPaths will execute the AddCounter
 	if assert.NoError(t, err) {
-		counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-		err = q.AddCounter(queryPath[0], counter, false)
+		err = q.AddCounter(queryPath[0], "TestInstanceName", "float", false)
 		assert.Error(t, err, PDH_INVALID_HANDLE)
 	} else {
 		assert.Error(t, err, PDH_INVALID_ARGUMENT)
@@ -70,12 +69,11 @@ func TestSuccessfulQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer q.Close()
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
 	queryPath, err := q.GetCounterPaths(validQuery)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = q.AddCounter(queryPath[0], counter, false)
+	err = q.AddCounter(queryPath[0], "TestInstanceName", "floar", false)
 	if err != nil {
 		t.Fatal(err)
 	}
