@@ -21,7 +21,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/vmware/govmomi/vim25/methods"
 	"github.com/vmware/govmomi/vim25/mo"
@@ -97,58 +96,6 @@ func (s *searchDatastore) addFile(file os.FileInfo, res *types.HostDatastoreBrow
 	res.File = append(res.File, finfo)
 }
 
-func (s *searchDatastore) queryMatch(file os.FileInfo) bool {
-	if len(s.SearchSpec.Query) == 0 {
-		return true
-	}
-
-	name := file.Name()
-	ext := path.Ext(name)
-
-	for _, q := range s.SearchSpec.Query {
-		switch q.(type) {
-		case *types.FileQuery:
-			return true
-		case *types.FolderFileQuery:
-			if file.IsDir() {
-				return true
-			}
-		case *types.FloppyImageFileQuery:
-			if ext == ".img" {
-				return true
-			}
-		case *types.IsoImageFileQuery:
-			if ext == ".iso" {
-				return true
-			}
-		case *types.VmConfigFileQuery:
-			if ext == ".vmx" {
-				// TODO: check Filter and Details fields
-				return true
-			}
-		case *types.VmDiskFileQuery:
-			if ext == ".vmdk" {
-				// TODO: check Filter and Details fields
-				return !strings.HasSuffix(name, "-flat.vmdk")
-			}
-		case *types.VmLogFileQuery:
-			if ext == ".log" {
-				return strings.HasPrefix(name, "vmware")
-			}
-		case *types.VmNvramFileQuery:
-			if ext == ".nvram" {
-				return true
-			}
-		case *types.VmSnapshotFileQuery:
-			if ext == ".vmsn" {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func (s *searchDatastore) search(ds *types.ManagedObjectReference, folder string, dir string) error {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -164,12 +111,10 @@ func (s *searchDatastore) search(ds *types.ManagedObjectReference, folder string
 	for _, file := range files {
 		name := file.Name()
 
-		if s.queryMatch(file) {
-			for _, m := range s.SearchSpec.MatchPattern {
-				if ok, _ := path.Match(m, name); ok {
-					s.addFile(file, &res)
-					break
-				}
+		for _, m := range s.SearchSpec.MatchPattern {
+			if ok, _ := path.Match(m, name); ok {
+				s.addFile(file, &res)
+				break
 			}
 		}
 
@@ -183,7 +128,7 @@ func (s *searchDatastore) search(ds *types.ManagedObjectReference, folder string
 	return nil
 }
 
-func (s *searchDatastore) Run(task *Task) (types.AnyType, types.BaseMethodFault) {
+func (s *searchDatastore) Run(Task *Task) (types.AnyType, types.BaseMethodFault) {
 	p, fault := parseDatastorePath(s.DatastorePath)
 	if fault != nil {
 		return nil, fault
@@ -195,8 +140,6 @@ func (s *searchDatastore) Run(task *Task) (types.AnyType, types.BaseMethodFault)
 	}
 
 	ds := ref.(*Datastore)
-	task.Info.Entity = &ds.Self // TODO: CreateTask() should require mo.Entity, rather than mo.Reference
-	task.Info.EntityName = ds.Name
 
 	dir := path.Join(ds.Info.GetDatastoreInfo().Url, p.Path)
 
@@ -229,9 +172,11 @@ func (b *HostDatastoreBrowser) SearchDatastoreTask(s *types.SearchDatastore_Task
 		SearchSpec:           s.SearchSpec,
 	})
 
+	task.Run()
+
 	return &methods.SearchDatastore_TaskBody{
 		Res: &types.SearchDatastore_TaskResponse{
-			Returnval: task.Run(),
+			Returnval: task.Self,
 		},
 	}
 }
@@ -244,9 +189,11 @@ func (b *HostDatastoreBrowser) SearchDatastoreSubFoldersTask(s *types.SearchData
 		recurse:              true,
 	})
 
+	task.Run()
+
 	return &methods.SearchDatastoreSubFolders_TaskBody{
 		Res: &types.SearchDatastoreSubFolders_TaskResponse{
-			Returnval: task.Run(),
+			Returnval: task.Self,
 		},
 	}
 }

@@ -1,6 +1,1 @@
 secrets.yml
-dist/
-.idea/
-
-# Ignore editor temp files
-*~

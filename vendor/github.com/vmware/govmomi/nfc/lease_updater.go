@@ -47,20 +47,11 @@ func (o FileItem) Sink() chan<- progress.Report {
 	return o.ch
 }
 
-// File converts the FileItem.OvfFileItem to an OvfFile
-func (o FileItem) File() types.OvfFile {
-	return types.OvfFile{
-		DeviceId: o.DeviceId,
-		Path:     o.Path,
-		Size:     o.Size,
-	}
-}
-
 type LeaseUpdater struct {
-	pos   int64 // Number of bytes (keep first to ensure 64 bit alignment)
-	total int64 // Total number of bytes (keep first to ensure 64 bit alignment)
-
 	lease *Lease
+
+	pos   int64 // Number of bytes
+	total int64 // Total number of bytes
 
 	done chan struct{} // When lease updater should stop
 

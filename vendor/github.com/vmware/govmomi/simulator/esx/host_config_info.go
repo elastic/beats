@@ -18,9 +18,6 @@ package esx
 
 import "github.com/vmware/govmomi/vim25/types"
 
-// HostConfigInfo is the default template for the HostSystem config property.
-// Capture method:
-//   govc object.collect -s -dump HostSystem:ha-host config
 var HostConfigInfo = types.HostConfigInfo{
 	Host: types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},
 	Product: types.AboutInfo{
@@ -49,7 +46,7 @@ var HostConfigInfo = types.HostConfigInfo{
 	},
 	ConsoleReservation:        (*types.ServiceConsoleReservationInfo)(nil),
 	VirtualMachineReservation: (*types.VirtualMachineMemoryReservationInfo)(nil),
-	StorageDevice:             &HostStorageDeviceInfo,
+	StorageDevice:             nil,
 	SystemFile:                nil,
 	Network: &types.HostNetworkInfo{
 		Vswitch: []types.HostVirtualSwitch{
@@ -355,7 +352,7 @@ var HostConfigInfo = types.HostConfigInfo{
 						SubnetMask: "255.0.0.0",
 						IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 					},
-					Mac:                    "00:0c:29:81:d8:a0",
+					Mac: "00:0c:29:81:d8:a0",
 					DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 					Portgroup:              "Management Network",
 					Mtu:                    1500,
@@ -489,7 +486,7 @@ var HostConfigInfo = types.HostConfigInfo{
 							SubnetMask: "255.0.0.0",
 							IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 						},
-						Mac:                    "00:0c:29:81:d8:a0",
+						Mac: "00:0c:29:81:d8:a0",
 						DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 						Portgroup:              "Management Network",
 						Mtu:                    1500,
@@ -524,7 +521,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -555,7 +552,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -586,7 +583,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -617,7 +614,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -648,7 +645,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -679,7 +676,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -710,7 +707,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,
@@ -741,7 +738,7 @@ var HostConfigInfo = types.HostConfigInfo{
 								SubnetMask: "255.0.0.0",
 								IpV6Config: (*types.HostIpConfigIpV6AddressConfiguration)(nil),
 							},
-							Mac:                    "00:0c:29:81:d8:a0",
+							Mac: "00:0c:29:81:d8:a0",
 							DistributedVirtualPort: (*types.DistributedVirtualSwitchPortConnection)(nil),
 							Portgroup:              "Management Network",
 							Mtu:                    1500,

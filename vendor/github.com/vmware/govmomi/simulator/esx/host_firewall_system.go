@@ -18,9 +18,6 @@ package esx
 
 import "github.com/vmware/govmomi/vim25/types"
 
-// HostFirewallInfo is the default template for the HostSystem config.firewall property.
-// Capture method:
-//   govc object.collect -s -dump HostSystem:ha-host config.firewall
 var HostFirewallInfo = types.HostFirewallInfo{
 	DynamicData: types.DynamicData{},
 	DefaultPolicy: types.HostFirewallDefaultPolicy{

@@ -657,18 +657,16 @@ github.com/urso/magetools/ctrl
 github.com/urso/magetools/fs
 github.com/urso/magetools/gotool
 github.com/urso/magetools/mgenv
-# github.com/vmware/govmomi v0.21.0
+# github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 github.com/vmware/govmomi
 github.com/vmware/govmomi/find
 github.com/vmware/govmomi/list
 github.com/vmware/govmomi/nfc
 github.com/vmware/govmomi/object
-github.com/vmware/govmomi/ovf
 github.com/vmware/govmomi/property
 github.com/vmware/govmomi/session
 github.com/vmware/govmomi/simulator
 github.com/vmware/govmomi/simulator/esx
-github.com/vmware/govmomi/simulator/internal
 github.com/vmware/govmomi/simulator/vpx
 github.com/vmware/govmomi/task
 github.com/vmware/govmomi/view

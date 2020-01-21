@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 /*
-Package vpx contains SOAP responses from a vCenter server, captured using `govc ... -dump`.
+Package vpx contains SOAP responses from a vCenter server, captured using `govc ... -debug`.
 */
 package vpx

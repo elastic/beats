@@ -17,15 +17,16 @@ limitations under the License.
 package object
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"math/rand"
-	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"strings"
+
+	"context"
+	"net/http"
+	"net/url"
 
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/session"
@@ -68,11 +69,6 @@ func NewDatastore(c *vim25.Client, ref types.ManagedObjectReference) *Datastore 
 }
 
 func (d Datastore) Path(path string) string {
-	var p DatastorePath
-	if p.FromString(path) {
-		return p.String() // already in "[datastore] path" format
-	}
-
 	return (&DatastorePath{
 		Datastore: d.Name(),
 		Path:      path,
@@ -288,7 +284,7 @@ func (d Datastore) Upload(ctx context.Context, f io.Reader, path string, param *
 	if err != nil {
 		return err
 	}
-	return d.Client().Upload(ctx, f, u, p)
+	return d.Client().Upload(f, u, p)
 }
 
 // UploadFile via soap.Upload with an http service ticket
@@ -297,7 +293,7 @@ func (d Datastore) UploadFile(ctx context.Context, file string, path string, par
 	if err != nil {
 		return err
 	}
-	return d.Client().UploadFile(ctx, file, u, p)
+	return d.Client().UploadFile(file, u, p)
 }
 
 // Download via soap.Download with an http service ticket
@@ -306,7 +302,7 @@ func (d Datastore) Download(ctx context.Context, path string, param *soap.Downlo
 	if err != nil {
 		return nil, 0, err
 	}
-	return d.Client().Download(ctx, u, p)
+	return d.Client().Download(u, p)
 }
 
 // DownloadFile via soap.Download with an http service ticket
@@ -315,7 +311,7 @@ func (d Datastore) DownloadFile(ctx context.Context, path string, file string, p
 	if err != nil {
 		return err
 	}
-	return d.Client().DownloadFile(ctx, file, u, p)
+	return d.Client().DownloadFile(file, u, p)
 }
 
 // AttachedHosts returns hosts that have this Datastore attached, accessible and writable.
@@ -410,9 +406,12 @@ func (d Datastore) Stat(ctx context.Context, file string) (types.BaseFileInfo, e
 
 	info, err := task.WaitForResult(ctx, nil)
 	if err != nil {
-		if types.IsFileNotFound(err) {
-			// FileNotFound means the base path doesn't exist.
-			return nil, DatastoreNoSuchDirectoryError{"stat", dsPath}
+		if info == nil || info.Error != nil {
+			_, ok := info.Error.Fault.(*types.FileNotFound)
+			if ok {
+				// FileNotFound means the base path doesn't exist.
+				return nil, DatastoreNoSuchDirectoryError{"stat", dsPath}
+			}
 		}
 
 		return nil, err

@@ -4533,7 +4533,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi
-Version: v0.21.0
+Revision: 2cad15190b41
 License type (autodetected): Apache-2.0
 ./vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
