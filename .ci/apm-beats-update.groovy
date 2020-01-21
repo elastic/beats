@@ -82,7 +82,10 @@ pipeline {
             reference: "/var/lib/jenkins/.git-references/${REPO}.git"
           )
           dir("${BASE_DIR}"){
-            sh(label: 'Update Beats script', script: './ci/script/apm-server-update-beats.sh')
+            sh(label: 'Update Beats script', script: """
+              export BEATS_VERSION=${env.GIT_BASE_COMMIT}
+              ./ci/script/apm-server-update-beats.sh
+            """)
           }
         }
       }
