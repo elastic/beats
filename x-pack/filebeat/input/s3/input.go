@@ -171,8 +171,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
-		p.logger.Debugf("visibility timeout is set to %v seconds: ", visibilityTimeout)
-		p.logger.Debugf("context timeout is set to %v: ", p.config.ContextTimeout)
+		p.logger.Infof("visibility timeout is set to %v seconds: ", visibilityTimeout)
+		p.logger.Infof("context timeout is set to %v: ", p.config.ContextTimeout)
 
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -275,7 +275,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 			return
 		case err := <-errC:
 			if err != nil {
-				p.logger.Warnf("Processing message failed: %v", err)
+				p.logger.Warn("Processing message failed, updating visibility timeout")
 				err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
@@ -375,15 +375,49 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		objectHash := s3ObjectHash(s3Info)
 
 		// read from s3 object
-		reader, err := p.newS3BucketReader(svc, s3Info)
+		resp, err := p.getS3ObjectResponse(svc, s3Info)
 		if err != nil {
 			err = errors.Wrap(err, "newS3BucketReader failed")
+			p.logger.Error(err)
 			s3Context.setError(err)
 			return err
 		}
 
-		if reader == nil {
-			continue
+		if resp == nil {
+			resp.Body.Close()
+			return nil
+		}
+
+		reader := bufio.NewReader(resp.Body)
+		// Check content-type
+		if resp.ContentType != nil {
+			switch *resp.ContentType {
+			case "application/x-gzip":
+				gzipReader, err := gzip.NewReader(resp.Body)
+				if err != nil {
+					err = errors.Wrapf(err, "Failed to decompress application/x-gzip file %v", s3Info.key)
+					p.logger.Error(err)
+					s3Context.setError(err)
+					resp.Body.Close()
+					return err
+				}
+				reader = bufio.NewReader(gzipReader)
+				gzipReader.Close()
+			default:
+				reader = bufio.NewReader(resp.Body)
+			}
+		} else if strings.HasSuffix(s3Info.key, ".gz") {
+			// If there is no content-type, check file name instead.
+			gzipReader, err := gzip.NewReader(resp.Body)
+			if err != nil {
+				err = errors.Wrapf(err, "Failed to decompress file with .gz suffix %v", s3Info.key)
+				p.logger.Error(err)
+				s3Context.setError(err)
+				resp.Body.Close()
+				return err
+			}
+			reader = bufio.NewReader(gzipReader)
+			gzipReader.Close()
 		}
 
 		// Decode JSON documents when expand_event_list_from_field is given in config
@@ -392,9 +426,12 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
 			if err != nil {
 				err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
+				p.logger.Error(err)
 				s3Context.setError(err)
+				resp.Body.Close()
 				return err
 			}
+			resp.Body.Close()
 			return nil
 		}
 
@@ -413,13 +450,18 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				err = p.forwardEvent(event)
 				if err != nil {
 					err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+					p.logger.Error(err)
 					s3Context.setError(err)
+					resp.Body.Close()
 					return err
 				}
+				resp.Body.Close()
 				return nil
 			} else if err != nil {
 				err = errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
+				p.logger.Error(err)
 				s3Context.setError(err)
+				resp.Body.Close()
 				return err
 			}
 
@@ -429,12 +471,13 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			err = p.forwardEvent(event)
 			if err != nil {
 				err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+				p.logger.Error(err)
 				s3Context.setError(err)
+				resp.Body.Close()
 				return err
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -504,7 +547,7 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 	return nil
 }
 
-func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
+func (p *s3Input) getS3ObjectResponse(svc s3iface.ClientAPI, s3Info s3Info) (*s3.GetObjectResponse, error) {
 	// Create a context with a timeout that will abort the download if it takes
 	// more than the default timeout 2 minute.
 	contextTimeout := p.config.ContextTimeout
@@ -535,7 +578,9 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				return nil, errors.Wrapf(err, "GetObject of s3 file with key %v failed due to timeout", s3Info.key)
+				err = errors.Wrapf(err, "GetObject of s3 file with key %v failed due to timeout", s3Info.key)
+				p.logger.Error(err)
+				return nil, err
 			}
 
 			if awsErr.Code() == "NoSuchKey" {
@@ -545,38 +590,7 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 		}
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
-
-	if resp.Body == nil {
-		return nil, errors.New("s3 get object response body is empty")
-	}
-
-	// Make sure to close the body when done with it for S3 GetObject APIs or
-	// will leak connections.
-	defer resp.Body.Close()
-
-	// Check content-type
-	if resp.ContentType != nil {
-		switch *resp.ContentType {
-		case "application/x-gzip":
-			reader, err := gzip.NewReader(resp.Body)
-			if err != nil {
-				return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
-			}
-			return bufio.NewReader(reader), nil
-		default:
-			return bufio.NewReader(resp.Body), nil
-		}
-	}
-
-	// If there is no content-type, check file name instead.
-	if strings.HasSuffix(s3Info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
-		}
-		return bufio.NewReader(gzipReader), nil
-	}
-	return bufio.NewReader(resp.Body), nil
+	return resp, nil
 }
 
 func (p *s3Input) forwardEvent(event beat.Event) error {
@@ -594,7 +608,8 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 	}
 
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
-	_, err := req.Send(p.context)
+	ctx := context.Background()
+	_, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 			return nil

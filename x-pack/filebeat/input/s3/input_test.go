@@ -5,6 +5,7 @@
 package s3
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -13,13 +14,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/beat"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -149,13 +150,14 @@ func TestHandleMessage(t *testing.T) {
 
 }
 
-func TestNewS3BucketReader(t *testing.T) {
+func TestGetS3ObjectResponse(t *testing.T) {
 	configTest := config{
 		ContextTimeout: time.Duration(100 * time.Second),
 	}
 	p := &s3Input{context: &channelContext{}, config: configTest}
 
-	reader, err := p.newS3BucketReader(mockSvc, info)
+	resp, err := p.getS3ObjectResponse(mockSvc, info)
+	reader := bufio.NewReader(resp.Body)
 	assert.NoError(t, err)
 	for i := 0; i < 3; i++ {
 		switch i {
@@ -175,13 +177,6 @@ func TestNewS3BucketReader(t *testing.T) {
 	}
 }
 
-func TestNewS3BucketReaderErr(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
-	reader, err := p.newS3BucketReader(mockSvcErr, info)
-	assert.Error(t, err, "s3 get object response body is empty")
-	assert.Nil(t, reader)
-}
-
 func TestCreateEvent(t *testing.T) {
 	p := &s3Input{context: &channelContext{}}
 	errC := make(chan error)
@@ -199,7 +194,8 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	reader, err := p.newS3BucketReader(mockSvc, s3Info)
+	resp, err := p.getS3ObjectResponse(mockSvc, s3Info)
+	reader := bufio.NewReader(resp.Body)
 	assert.NoError(t, err)
 	var events []beat.Event
 	for {
