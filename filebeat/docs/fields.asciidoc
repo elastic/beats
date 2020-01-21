@@ -12486,66 +12486,46 @@ example: Please add example
 
 --
 
-*`greenplum.log.core_id`*::
+*`greenplum.log.process_id`*::
 +
 --
 Please add description
 
-type: long
+type: keyword
 
 example: Please add example
 
 --
 
-*`greenplum.log.database`*::
+*`greenplum.log.thread_id`*::
 +
 --
 Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.transaction_id`*::
++
+--
+Please add description
+
+type: long
 
 example: Please add example
 
 --
 
 [float]
-=== error
+=== gp_segment
 
 Please add description
 
 
-*`greenplum.log.error.code`*::
-+
---
-Please add description
-
-type: long
-
-example: Please add example
-
---
-
-*`greenplum.log.query`*::
-+
---
-Please add description
-
-type: text
-
-example: Please add example
-
---
-
-*`greenplum.pid`*::
-+
---
-Please add description
-
-type: long
-
-example: Please add example
-
---
-
-*`greenplum.name`*::
+*`greenplum.log.gp_segment.type`*::
 +
 --
 Please add description
@@ -12556,7 +12536,7 @@ example: Please add example
 
 --
 
-*`greenplum.level`*::
+*`greenplum.log.gp_segment.id`*::
 +
 --
 Please add description
@@ -12567,12 +12547,73 @@ example: Please add example
 
 --
 
-*`greenplum.message`*::
+*`greenplum.log.level`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.state_code`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.message`*::
 +
 --
 Please add description
 
 type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.cursor_position`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+[float]
+=== file
+
+Please add description
+
+
+*`greenplum.log.file.name`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.file.line`*::
++
+--
+Please add description
+
+type: long
 
 example: Please add example
 

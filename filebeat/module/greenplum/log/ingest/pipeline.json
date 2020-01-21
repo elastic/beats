@@ -10,9 +10,7 @@
         ],
         "pattern_definitions": {
           "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
-          "GREEDYDATA": "(.|\n|\t)*",
-          "GREENPLUM_DB_NAME": "[a-zA-Z0-9_]+[a-zA-Z0-9_\\$]*",
-          "GREENPLUM_QUERY_STEP": "%{WORD:greenplum.log.query_step}(?: <unnamed>| %{WORD:greenplum.log.query_name})?"
+          "GREEDYDATA": "(.|\n|\t)*"
         }
       }
     },
