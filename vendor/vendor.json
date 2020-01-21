@@ -3454,6 +3454,15 @@
 			"revisionTime": "2019-09-30T11:59:46Z"
 		},
 		{
+			"checksumSHA1": "fW8mQy9XfBOcO8dwudie7NHXC5o=",
+			"path": "github.com/godror/godror",
+			"revision": "446a29355d2967f04604e8e015a3343917860adf",
+			"revisionTime": "2019-12-12T16:49:28Z",
+			"tree": true,
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "MlaWEe1K+Kpb9wDF88qPoqO1uro=",
 			"path": "github.com/gofrs/flock",
 			"revision": "5135e617513b1e6e205a3a89b042249dee6730c8",
@@ -5641,6 +5650,18 @@
 			"versionExact": "release-branch.go1.13"
 		},
 		{
+			"checksumSHA1": "uIgpefsunMZTr8uZTJKcevvU/yg=",
+			"path": "golang.org/x/xerrors",
+			"revision": "9bdfabe68543c54f90421aeb9a60ef8061b5b544",
+			"revisionTime": "2019-07-19T19:12:34Z"
+		},
+		{
+			"checksumSHA1": "LnzK4nslUNXBIfAt9PbXCJCvMdA=",
+			"path": "golang.org/x/xerrors/internal",
+			"revision": "9bdfabe68543c54f90421aeb9a60ef8061b5b544",
+			"revisionTime": "2019-07-19T19:12:34Z"
+		},
+		{
 			"checksumSHA1": "xzYkHGnGgOHW4QNWLR4jbx+81P0=",
 			"path": "google.golang.org/api/cloudfunctions/v1",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
@@ -5693,6 +5714,12 @@
 			"path": "google.golang.org/api/internal",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
 			"revisionTime": "2019-06-24T17:16:18Z",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
 			"version": "v0.7.0",
 			"versionExact": "v0.7.0"
 		},
@@ -6362,12 +6389,6 @@
 			"revisionTime": "2019-11-08T18:22:05Z",
 			"version": "v1.25.1",
 			"versionExact": "v1.25.1"
-		},
-		{
-			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
-			"path": "gopkg.in/goracle.v2",
-			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
-			"revisionTime": "2019-05-30T18:40:54Z"
 		},
 		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
