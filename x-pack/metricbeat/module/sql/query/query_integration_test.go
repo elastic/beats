@@ -96,7 +96,7 @@ func testFetch(t *testing.T, cfg testFetchConfig) {
 
 	if cfg.Assertion != nil {
 		for _, event := range events {
-			cfg.Assertion(t, mbtest.StandardizeEvent(m, event, mb.AddMetricSetInfo))
+			cfg.Assertion(t, m.StandardizeEvent(event, mb.AddMetricSetInfo))
 		}
 	}
 }
