@@ -74,7 +74,7 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status      uint16               `config:"status" verify:"min=0, max=699"`
+	Status      []uint16             `config:"status"`
 	RecvHeaders map[string]string    `config:"headers"`
 	RecvBody    []match.Matcher      `config:"body"`
 	RecvJSON    []*jsonResponseCheck `config:"json"`
@@ -105,7 +105,6 @@ var defaultConfig = Config{
 			SendBody:    "",
 		},
 		Response: responseParameters{
-			Status:      0,
 			RecvHeaders: nil,
 			RecvBody:    []match.Matcher{},
 			RecvJSON:    nil,
