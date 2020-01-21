@@ -1,0 +1,84 @@
+- name: pilot
+  type: group
+  description: >
+    Contains statistics related to the Istio pilot service
+  release: beta
+  fields:
+    - name: xds.count
+      type: integer
+      description: >
+        Count of concurrent xDS client connections for Pilot.
+    - name: xds.pushes
+      type: integer
+      description: >
+        Count of xDS messages sent, as well as errors building or sending xDS messages
+        for lds, rds, cds and eds.
+    - name: xds.push.time.sec
+      type: long
+      description: >
+        Total time in seconds Pilot takes to push lds, rds, cds and eds.
+    - name: xds.eds.instances
+      type: object
+      description: >
+        Instances for each cluster, as of last push. Zero instances is an error.
+    - name: xds.push.context.errors
+      type: integer
+      description: >
+        Number of errors (timeouts) initiating push context.
+    - name: xds.internal.errors
+      type: integer
+      description: >
+        Total number of internal XDS errors in pilot.
+    - name: conflict.inbound.listener
+      type: integer
+      description: >
+        Number of conflicting inbound listeners.
+    - name: conflict.outbound.listener.http.over.current.tcp
+      type: integer
+      description: >
+        Number of conflicting wildcard http listeners with current wildcard tcp listener.
+    - name: conflict.outbound.listener.http.over.https
+      type: integer
+      description: >
+        Number of conflicting HTTP listeners with well known HTTPS ports.
+    - name: conflict.outbound.listener.tcp.over.current.http
+      type: integer
+      description: >
+        Number of conflicting wildcard tcp listeners with current wildcard http listener.
+    - name: conflict.outbound.listener.tcp.over.current.tcp
+      type: integer
+      description: >
+        Number of conflicting tcp listeners with current tcp listener.
+    - name: proxy.conv.ms.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Time needed by Pilot to push Envoy configurations, histogram buckets in milliseconds.
+    - name: proxy.conv.ms.sum
+      type: long
+      description: >
+        Time needed by Pilot to push Envoy configurations, histogram sum of times in milliseconds.
+    - name: services
+      type: integer
+      description: >
+        Total services known to pilot.
+    - name: virt.services
+      type: integer
+      description: >
+        Total virtual services known to pilot.
+    - name: proxy.conv.ms.count
+      type: long
+      description: >
+        Time needed by Pilot to push Envoy configurations, histogram count of times.
+    - name: no.ip
+      type: object
+      description: >
+        Pods not found in the endpoint table, possibly invalid.
+    - name: cluster
+      type: text
+      description: >
+        The instance FQDN.
+    - name: type
+      type: text
+      description: >
+        The Envoy proxy configuration type.

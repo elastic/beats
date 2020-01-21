@@ -1,7 +1,7 @@
 This is the Istio module. The Istio module collects metrics from the
 Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
-The default metricset is `mesh`.
+The default metricsets are `mesh`, `pilot`.
 
 [float]
 === Compatibility

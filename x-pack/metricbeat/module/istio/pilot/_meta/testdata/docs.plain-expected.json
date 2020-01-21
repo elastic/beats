@@ -1,0 +1,2347 @@
+[
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15031_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15004||istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15032||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15014_._.istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9153_._.kube-dns.kube-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 2
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|31400||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|14267||jaeger-collector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15014_._.istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15014||istio-citadel.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15010_._.istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15443||istio-egressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15014_._.istio-citadel.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9091||istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.3000_._.grafana.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15004_._.istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15014_._.istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9901_._.istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9091_._.istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|443||kubernetes.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9090||prometheus.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.443_._.istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15020||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15014||istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9080||reviews.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 3
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15011||istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|443||istio-egressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|16686||jaeger-query.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15443_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.31400_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9080_._.reviews.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 3
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|20001||kiali.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9411_._.zipkin.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.20001_._.kiali.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.8080_._.istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.443_._.kubernetes.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "lds_senderr",
+                "xds": {
+                    "pushes": 2
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15029||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.42422_._.istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|443||istio-sidecar-injector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|443||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15011_._.istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|3000||grafana.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "lds",
+                "xds": {
+                    "pushes": 248
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9080_._.ratings.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9080_._.details.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15010||istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "eds",
+                "xds": {
+                    "pushes": 309
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|42422||istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.8060_._.istio-citadel.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.80_._.istio-egressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.14267_._.jaeger-collector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9153||kube-dns.kube-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 2
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.443_._.istio-sidecar-injector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9080||ratings.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15014||istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|80||tracing.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9411||zipkin.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.16686_._.jaeger-query.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9090_._.prometheus.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15014||istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9080_._.productpage.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9080||productpage.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.80_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15443_._.istio-egressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15032_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "conflict": {
+                    "inbound": {
+                        "listener": 0
+                    },
+                    "outbound": {
+                        "listener": {
+                            "http": {
+                                "over": {
+                                    "current": {
+                                        "tcp": 0
+                                    }
+                                }
+                            },
+                            "tcp": {
+                                "over": {
+                                    "current": {
+                                        "http": 0,
+                                        "tcp": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "no": {
+                    "ip": 0
+                },
+                "proxy": {
+                    "conv": {
+                        "ms": {
+                            "bucket": {
+                                "+Inf": 29,
+                                "1000": 9,
+                                "10000": 27,
+                                "100000": 29,
+                                "20000": 29,
+                                "3000": 13,
+                                "30000": 29,
+                                "5000": 24,
+                                "50000": 29
+                            },
+                            "count": 29,
+                            "sum": 103057.56475999998
+                        }
+                    }
+                },
+                "services": 27,
+                "virt": {
+                    "services": 0
+                },
+                "xds": {
+                    "count": 12,
+                    "internal": {
+                        "errors": 0
+                    },
+                    "push": {
+                        "context": {
+                            "errors": 0
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.14268_._.jaeger-collector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "rds",
+                "xds": {
+                    "pushes": 181
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15014_._.istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.80_._.httpbin.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|443||istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15443||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.443_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "cds",
+                "xds": {
+                    "pushes": 250
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15004_._.istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15020_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15031||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15030||istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9901||istio-galley.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9091||istio-policy.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.53_._.kube-dns.kube-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 2
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|9080||details.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15029_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.15030_._.istio-ingressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.443_._.istio-egressgateway.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.80_._.default-http-backend.kube-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.80_._.tracing.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|14268||jaeger-collector.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.9091_._.istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound_.5432_._.postgresql.default.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15014||istio-pilot.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "cluster": "outbound|15004||istio-telemetry.istio-system.svc.cluster.local",
+                "xds": {
+                    "eds": {
+                        "instances": 1
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    }
+]
