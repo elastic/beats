@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2020-01-06T15:19:50.000Z",
+        "aws.cloudtrail.event_type": "AwsApiCall",
+        "aws.cloudtrail.event_version": "1.05",
+        "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_parameters": "{groupName=Admin, userName=Bob}",
+        "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",
+        "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",
+        "aws.cloudtrail.user_identity.invoked_by": "signin.amazonaws.com",
+        "aws.cloudtrail.user_identity.session_context.creation_date": "2020-01-06T14:36:28.000Z",
+        "aws.cloudtrail.user_identity.session_context.mfa_authenticated": "true",
+        "aws.cloudtrail.user_identity.type": "IAMUser",
+        "cloud.account.id": "0123456789012",
+        "cloud.region": "us-east-1",
+        "event.action": "RemoveUserFromGroup",
+        "event.dataset": "aws.cloudtrail",
+        "event.id": "EXAMPLE-6e8b-431a-94f4-EXAMPLE",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-06T14:36:28Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-06T15:19:50Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"RemoveUserFromGroup\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"groupName\":\"Admin\",\"userName\":\"Bob\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-0bf0-47be-bc80-EXAMPLE\",\"eventID\":\"EXAMPLE-6e8b-431a-94f4-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
+        "event.outcome": "success",
+        "event.provider": "iam.amazonaws.com",
+        "event.type": "info",
+        "fileset.name": "cloudtrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.user": [
+            "Bob"
+        ],
+        "service.type": "aws",
+        "source.address": "127.0.0.1",
+        "user.id": "EXAMPLE_ID",
+        "user.name": "Alice",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "signin.amazonaws.com"
+    }
+]

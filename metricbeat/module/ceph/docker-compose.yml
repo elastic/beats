@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   ceph:
-    image: docker.elastic.co/observability-ci/beats-integration-ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}-1
+    image: docker.elastic.co/integrations-ci/beats-ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}-1
     build:
       context: ./_meta
       args:

@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
 	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
 )
 
@@ -48,6 +49,12 @@ type defaultTemplateBuilder struct {
 
 const (
 	keyPrefix = "functionbeat-deployment/"
+
+	// Package size limits for AWS, we should be a lot under this limit but
+	// adding a check to make sure we never go over.
+	// Ref: https://docs.aws.amazon.com/lambda/latest/dg/limits.html
+	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
+	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 )
 
 func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provider) (provider.TemplateBuilder, error) {
@@ -81,7 +88,8 @@ func (d *defaultTemplateBuilder) findFunction(name string) (installer, error) {
 // execute generates a template
 func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 	d.log.Debug("Compressing all assets into an artifact")
-	content, err := core.MakeZip("aws")
+
+	content, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, zipResources())
 	if err != nil {
 		return templateData{}, err
 	}
@@ -314,4 +322,10 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 func checksum(data []byte) string {
 	sha := sha256.Sum256(data)
 	return base64.RawURLEncoding.EncodeToString(sha[:])
+}
+
+func zipResources() []bundle.Resource {
+	return []bundle.Resource{
+		&bundle.LocalFile{Path: "pkg/functionbeat-aws", FileMode: 0755},
+	}
 }

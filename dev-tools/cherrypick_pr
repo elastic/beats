@@ -62,6 +62,10 @@ def main():
                         "(requires token in ~/.elastic/github.token)")
     parser.add_argument("--diff", action="store_true",
                         help="Display the diff before pushing the PR")
+    parser.add_argument("--remote", default="",
+                        help="Which remote to push the backport branch to")
+    parser.add_argument("--zube-team", default="",
+                        help="Team the PR belongs to")
     args = parser.parse_args()
 
     print(args)
@@ -109,7 +113,10 @@ def main():
             return 1
 
     print("Ready to push branch.")
-    remote = raw_input("To which remote should I push? (your fork): ")
+
+    remote = args.remote
+    if not remote:
+        remote = raw_input("To which remote should I push? (your fork): ")
     call("git push {} :{} > /dev/null".format(remote, tmp_branch),
          shell=True)
     check_call("git push --set-upstream {} {}"
@@ -145,8 +152,20 @@ def main():
         new_pr = request.json()
 
         # add labels
+        labels = ["backport"]
+
+        if args.zube_team:
+            resp = session.get(base + "/labels/Team:"+args.zube_team)
+            if resp.status_code != 200:
+                print("Cannot find team label", resp.text)
+                sys.exit(1)
+            labels.append("Team:"+args.zube_team)
+            labels.append("[zube]: In Review")
+        else:
+            labels.append("review")
+
         session.post(
-            base + "/issues/{}/labels".format(new_pr["number"]), json=["backport", "review"])
+            base + "/issues/{}/labels".format(new_pr["number"]), json=labels)
 
         # remove needs backport label from the original PR
         session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
