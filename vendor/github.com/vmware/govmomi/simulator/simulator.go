@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017 VMware, Inc. All Rights Reserved.
+Copyright (c) 2017-2018 VMware, Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,24 +21,28 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
+	"net"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"os"
 	"path"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/object"
+	"github.com/vmware/govmomi/simulator/internal"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/soap"
@@ -51,24 +55,31 @@ var Trace = false
 
 // Method encapsulates a decoded SOAP client request
 type Method struct {
-	Name string
-	This types.ManagedObjectReference
-	Body types.AnyType
+	Name   string
+	This   types.ManagedObjectReference
+	Header soap.Header
+	Body   types.AnyType
 }
 
 // Service decodes incoming requests and dispatches to a Handler
 type Service struct {
 	client *vim25.Client
+	sm     *SessionManager
+	sdk    map[string]*Registry
+	delay  *DelayConfig
 
 	readAll func(io.Reader) ([]byte, error)
 
-	TLS *tls.Config
+	Listen   *url.URL
+	TLS      *tls.Config
+	ServeMux *http.ServeMux
 }
 
 // Server provides a simulator Service over HTTP
 type Server struct {
-	*httptest.Server
-	URL *url.URL
+	*internal.Server
+	URL    *url.URL
+	Tunnel int
 
 	caFile string
 }
@@ -77,6 +88,8 @@ type Server struct {
 func New(instance *ServiceInstance) *Service {
 	s := &Service{
 		readAll: ioutil.ReadAll,
+		sm:      Map.SessionManager(),
+		sdk:     make(map[string]*Registry),
 	}
 
 	s.client, _ = vim25.NewClient(context.Background(), s)
@@ -106,8 +119,29 @@ func Fault(msg string, fault types.BaseMethodFault) *soap.Fault {
 	return f
 }
 
-func (s *Service) call(method *Method) soap.HasFault {
-	handler := Map.Get(method.This)
+func (s *Service) call(ctx *Context, method *Method) soap.HasFault {
+	handler := ctx.Map.Get(method.This)
+	session := ctx.Session
+
+	if session == nil {
+		switch method.Name {
+		case "RetrieveServiceContent", "PbmRetrieveServiceContent", "Fetch", "List", "Login", "LoginByToken", "LoginExtensionByCertificate", "RetrieveProperties", "RetrievePropertiesEx", "CloneSession":
+			// ok for now, TODO: authz
+		default:
+			fault := &types.NotAuthenticated{
+				NoPermission: types.NoPermission{
+					Object:      method.This,
+					PrivilegeId: "System.View",
+				},
+			}
+			return &serverFaultBody{Reason: Fault("", fault)}
+		}
+	} else {
+		// Prefer the Session.Registry, ServiceContent.PropertyCollector filter field for example is per-session
+		if h := session.Get(method.This); h != nil {
+			handler = h
+		}
+	}
 
 	if handler == nil {
 		msg := fmt.Sprintf("managed object not found: %s", method.This)
@@ -116,7 +150,8 @@ func (s *Service) call(method *Method) soap.HasFault {
 		return &serverFaultBody{Reason: Fault(msg, fault)}
 	}
 
-	name := method.Name
+	// Lowercase methods can't be accessed outside their package
+	name := strings.Title(method.Name)
 
 	if strings.HasSuffix(name, vTaskSuffix) {
 		// Make golint happy renaming "Foo_Task" -> "FooTask"
@@ -141,7 +176,33 @@ func (s *Service) call(method *Method) soap.HasFault {
 		}
 	}
 
-	res := m.Call([]reflect.Value{reflect.ValueOf(method.Body)})
+	// We have a valid call. Introduce a delay if requested
+	//
+	if s.delay != nil {
+		d := 0
+		if s.delay.Delay > 0 {
+			d = s.delay.Delay
+		}
+		if md, ok := s.delay.MethodDelay[method.Name]; ok {
+			d += md
+		}
+		if s.delay.DelayJitter > 0 {
+			d += int(rand.NormFloat64() * s.delay.DelayJitter * float64(d))
+		}
+		if d > 0 {
+			//fmt.Printf("Delaying method %s %d ms\n", name, d)
+			time.Sleep(time.Duration(d) * time.Millisecond)
+		}
+	}
+
+	var args, res []reflect.Value
+	if m.Type().NumIn() == 2 {
+		args = append(args, reflect.ValueOf(ctx))
+	}
+	args = append(args, reflect.ValueOf(method.Body))
+	ctx.Map.WithLock(handler, func() {
+		res = m.Call(args)
+	})
 
 	return res[0].Interface().(soap.HasFault)
 }
@@ -165,7 +226,11 @@ func (s *Service) RoundTrip(ctx context.Context, request, response soap.HasFault
 		Body: req.Interface(),
 	}
 
-	res := s.call(method)
+	res := s.call(&Context{
+		Map:     Map,
+		Context: ctx,
+		Session: internalContext.Session,
+	}, method)
 
 	if err := res.Fault(); err != nil {
 		return soap.WrapSoapFault(err)
@@ -186,6 +251,66 @@ type soapEnvelope struct {
 	XSD     string      `xml:"xmlns:xsd,attr"`
 	XSI     string      `xml:"xmlns:xsi,attr"`
 	Body    interface{} `xml:"soapenv:Body"`
+}
+
+type faultDetail struct {
+	Fault types.AnyType
+}
+
+// soapFault is a copy of soap.Fault, with the same changes as soapEnvelope
+type soapFault struct {
+	XMLName xml.Name `xml:"soapenv:Fault"`
+	Code    string   `xml:"faultcode"`
+	String  string   `xml:"faultstring"`
+	Detail  struct {
+		Fault *faultDetail
+	} `xml:"detail"`
+}
+
+// MarshalXML renames the start element from "Fault" to "${Type}Fault"
+func (d *faultDetail) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	kind := reflect.TypeOf(d.Fault).Elem().Name()
+	start.Name.Local = kind + "Fault"
+	start.Attr = append(start.Attr,
+		xml.Attr{
+			Name:  xml.Name{Local: "xmlns"},
+			Value: "urn:" + vim25.Namespace,
+		},
+		xml.Attr{
+			Name:  xml.Name{Local: "xsi:type"},
+			Value: kind,
+		})
+	return e.EncodeElement(d.Fault, start)
+}
+
+// response sets xml.Name.Space when encoding Body.
+// Note that namespace is intentionally omitted in the vim25/methods/methods.go Body.Res field tags.
+type response struct {
+	Namespace string
+	Body      soap.HasFault
+}
+
+func (r *response) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	val := reflect.ValueOf(r.Body).Elem().FieldByName("Res")
+	if !val.IsValid() {
+		return fmt.Errorf("%T: invalid response type (missing 'Res' field)", r.Body)
+	}
+	if val.IsNil() {
+		return fmt.Errorf("%T: invalid response (nil 'Res' field)", r.Body)
+	}
+	res := xml.StartElement{
+		Name: xml.Name{
+			Space: "urn:" + r.Namespace,
+			Local: val.Elem().Type().Name(),
+		},
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	if err := e.EncodeElement(val.Interface(), res); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
 }
 
 // About generates some info about the simulator.
@@ -216,7 +341,11 @@ func (s *Service) About(w http.ResponseWriter, r *http.Request) {
 			}
 			seen[m.Name] = true
 
-			if m.Type.NumIn() != 2 || m.Type.NumOut() != 1 || m.Type.Out(0) != f {
+			in := m.Type.NumIn()
+			if in < 2 || in > 3 { // at least 2 params (receiver and request), optionally a 3rd param (context)
+				continue
+			}
+			if m.Type.NumOut() != 1 || m.Type.Out(0) != f { // all methods return soap.HasFault
 				continue
 			}
 
@@ -233,9 +362,29 @@ func (s *Service) About(w http.ResponseWriter, r *http.Request) {
 	_ = enc.Encode(&about)
 }
 
+// Handle registers the handler for the given pattern with Service.ServeMux.
+func (s *Service) Handle(pattern string, handler http.Handler) {
+	s.ServeMux.Handle(pattern, handler)
+	// Not ideal, but avoids having to add yet another registration mechanism
+	// so we can optionally use vapi/simulator internally.
+	if m, ok := handler.(tagManager); ok {
+		s.sdk[vim25.Path].tagManager = m
+	}
+}
+
+// RegisterSDK adds an HTTP handler for the Registry's Path and Namespace.
+func (s *Service) RegisterSDK(r *Registry) {
+	if s.ServeMux == nil {
+		s.ServeMux = http.NewServeMux()
+	}
+
+	s.sdk[r.Path] = r
+	s.ServeMux.HandleFunc(r.Path, s.ServeSDK)
+}
+
 // ServeSDK implements the http.Handler interface
 func (s *Service) ServeSDK(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -252,19 +401,51 @@ func (s *Service) ServeSDK(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(os.Stderr, "Request: %s\n", string(body))
 	}
 
-	var res soap.HasFault
+	ctx := &Context{
+		req: r,
+		res: w,
+		svc: s,
 
-	method, err := UnmarshalBody(body)
+		Map:     s.sdk[r.URL.Path],
+		Context: context.Background(),
+	}
+	ctx.Map.WithLock(s.sm, ctx.mapSession)
+
+	var res soap.HasFault
+	var soapBody interface{}
+
+	method, err := UnmarshalBody(ctx.Map.typeFunc, body)
 	if err != nil {
 		res = serverFault(err.Error())
 	} else {
-		res = s.call(method)
+		ctx.Header = method.Header
+		if method.Name == "Fetch" {
+			// Redirect any Fetch method calls to the PropertyCollector singleton
+			method.This = ctx.Map.content().PropertyCollector
+		}
+		res = s.call(ctx, method)
 	}
 
-	if res.Fault() == nil {
-		w.WriteHeader(http.StatusOK)
-	} else {
+	if f := res.Fault(); f != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
+		// the generated method/*Body structs use the '*soap.Fault' type,
+		// so we need our own Body type to use the modified '*soapFault' type.
+		soapBody = struct {
+			Fault *soapFault
+		}{
+			&soapFault{
+				Code:   f.Code,
+				String: f.String,
+				Detail: struct {
+					Fault *faultDetail
+				}{&faultDetail{f.Detail.Fault}},
+			},
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
+
+		soapBody = &response{ctx.Map.Namespace, res}
 	}
 
 	var out bytes.Buffer
@@ -276,7 +457,7 @@ func (s *Service) ServeSDK(w http.ResponseWriter, r *http.Request) {
 		Env:  "http://schemas.xmlsoap.org/soap/envelope/",
 		XSD:  "http://www.w3.org/2001/XMLSchema",
 		XSI:  "http://www.w3.org/2001/XMLSchema-instance",
-		Body: res,
+		Body: soapBody,
 	})
 	if err == nil {
 		err = e.Flush()
@@ -298,7 +479,7 @@ func (s *Service) findDatastore(query url.Values) (*Datastore, error) {
 	ctx := context.Background()
 
 	finder := find.NewFinder(s.client, false)
-	dc, err := finder.DatacenterOrDefault(ctx, query.Get("dcName"))
+	dc, err := finder.DatacenterOrDefault(ctx, query.Get("dcPath"))
 	if err != nil {
 		return nil, err
 	}
@@ -324,21 +505,11 @@ func (s *Service) ServeDatastore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file := strings.TrimPrefix(r.URL.Path, folderPrefix)
-	p := path.Join(ds.Info.GetDatastoreInfo().Url, file)
+	r.URL.Path = strings.TrimPrefix(r.URL.Path, folderPrefix)
+	p := path.Join(ds.Info.GetDatastoreInfo().Url, r.URL.Path)
 
 	switch r.Method {
-	case "GET":
-		f, err := os.Open(p)
-		if err != nil {
-			log.Printf("failed to %s '%s': %s", r.Method, p, err)
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		defer f.Close()
-
-		_, _ = io.Copy(w, f)
-	case "POST":
+	case http.MethodPost:
 		_, err := os.Stat(p)
 		if err == nil {
 			// File exists
@@ -348,7 +519,10 @@ func (s *Service) ServeDatastore(w http.ResponseWriter, r *http.Request) {
 
 		// File does not exist, fallthrough to create via PUT logic
 		fallthrough
-	case "PUT":
+	case http.MethodPut:
+		dir := path.Dir(p)
+		_ = os.MkdirAll(dir, 0700)
+
 		f, err := os.Create(p)
 		if err != nil {
 			log.Printf("failed to %s '%s': %s", r.Method, p, err)
@@ -359,18 +533,18 @@ func (s *Service) ServeDatastore(w http.ResponseWriter, r *http.Request) {
 
 		_, _ = io.Copy(f, r.Body)
 	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		fs := http.FileServer(http.Dir(ds.Info.GetDatastoreInfo().Url))
+
+		fs.ServeHTTP(w, r)
 	}
 }
 
 // ServiceVersions handler for the /sdk/vimServiceVersions.xml path.
-func (*Service) ServiceVersions(w http.ResponseWriter, r *http.Request) {
-	// pyvmomi depends on this
-
+func (s *Service) ServiceVersions(w http.ResponseWriter, r *http.Request) {
 	const versions = xml.Header + `<namespaces version="1.0">
  <namespace>
   <name>urn:vim25</name>
-  <version>6.5</version>
+  <version>%s</version>
   <priorVersions>
    <version>6.0</version>
    <version>5.5</version>
@@ -378,44 +552,94 @@ func (*Service) ServiceVersions(w http.ResponseWriter, r *http.Request) {
  </namespace>
 </namespaces>
 `
-	fmt.Fprint(w, versions)
+	fmt.Fprintf(w, versions, s.client.ServiceContent.About.ApiVersion)
+}
+
+// defaultIP returns addr.IP if specified, otherwise attempts to find a non-loopback ipv4 IP
+func defaultIP(addr *net.TCPAddr) string {
+	if !addr.IP.IsUnspecified() {
+		return addr.IP.String()
+	}
+
+	nics, err := net.Interfaces()
+	if err != nil {
+		return addr.IP.String()
+	}
+
+	for _, nic := range nics {
+		if nic.Name == "docker0" || strings.HasPrefix(nic.Name, "vmnet") {
+			continue
+		}
+		addrs, aerr := nic.Addrs()
+		if aerr != nil {
+			continue
+		}
+		for _, addr := range addrs {
+			if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
+				if ip.IP.To4() != nil {
+					return ip.IP.String()
+				}
+			}
+		}
+	}
+
+	return addr.IP.String()
 }
 
 // NewServer returns an http Server instance for the given service
 func (s *Service) NewServer() *Server {
-	mux := http.NewServeMux()
-	path := "/sdk"
+	s.RegisterSDK(Map)
 
-	mux.HandleFunc(path, s.ServeSDK)
-	mux.HandleFunc(path+"/vimServiceVersions.xml", s.ServiceVersions)
+	mux := s.ServeMux
+	vim := Map.Path + "/vimService"
+	s.sdk[vim] = s.sdk[vim25.Path]
+	mux.HandleFunc(vim, s.ServeSDK)
+	mux.HandleFunc(Map.Path+"/vimServiceVersions.xml", s.ServiceVersions)
 	mux.HandleFunc(folderPrefix, s.ServeDatastore)
+	mux.HandleFunc(nfcPrefix, ServeNFC)
 	mux.HandleFunc("/about", s.About)
 
-	// Using NewUnstartedServer() instead of NewServer(),
-	// for use in main.go, where Start() blocks, we can still set ServiceHostName
-	ts := httptest.NewUnstartedServer(mux)
-
+	if s.Listen == nil {
+		s.Listen = new(url.URL)
+	}
+	ts := internal.NewUnstartedServer(mux, s.Listen.Host)
+	addr := ts.Listener.Addr().(*net.TCPAddr)
+	port := strconv.Itoa(addr.Port)
 	u := &url.URL{
 		Scheme: "http",
-		Host:   ts.Listener.Addr().String(),
-		Path:   path,
-		User:   url.UserPassword("user", "pass"),
+		Host:   net.JoinHostPort(defaultIP(addr), port),
+		Path:   Map.Path,
+	}
+	if s.TLS != nil {
+		u.Scheme += "s"
 	}
 
 	// Redirect clients to this http server, rather than HostSystem.Name
-	Map.Get(*s.client.ServiceContent.SessionManager).(*SessionManager).ServiceHostName = u.Host
+	Map.SessionManager().ServiceHostName = u.Host
 
-	if f := flag.Lookup("httptest.serve"); f != nil {
-		// Avoid the blocking behaviour of httptest.Server.Start() when this flag is set
-		_ = f.Value.Set("")
+	// Add vcsim config to OptionManager for use by SDK handlers (see lookup/simulator for example)
+	m := Map.OptionManager()
+	m.Setting = append(m.Setting,
+		&types.OptionValue{
+			Key:   "vcsim.server.url",
+			Value: u.String(),
+		},
+	)
+
+	u.User = s.Listen.User
+	if u.User == nil {
+		u.User = url.UserPassword("user", "pass")
 	}
 
-	if s.TLS == nil {
-		ts.Start()
-	} else {
+	if s.TLS != nil {
 		ts.TLS = s.TLS
+		ts.TLS.ClientAuth = tls.RequestClientCert // Used by SessionManager.LoginExtensionByCertificate
+		Map.SessionManager().TLSCert = func() string {
+			return base64.StdEncoding.EncodeToString(ts.TLS.Certificates[0].Certificate[0])
+		}
 		ts.StartTLS()
-		u.Scheme += "s"
+	} else {
+		ts.Start()
 	}
 
 	return &Server{
@@ -457,6 +681,60 @@ func (s *Server) CertificateFile() (string, error) {
 	return s.caFile, pem.Encode(f, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 }
 
+// proxy tunnels SDK requests
+func (s *Server) proxy(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodConnect {
+		http.Error(w, "", http.StatusMethodNotAllowed)
+		return
+	}
+
+	dst, err := net.Dial("tcp", s.URL.Host)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
+	src, _, err := w.(http.Hijacker).Hijack()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	go io.Copy(src, dst)
+	go func() {
+		_, _ = io.Copy(dst, src)
+		_ = dst.Close()
+		_ = src.Close()
+	}()
+}
+
+// StartTunnel runs an HTTP proxy for tunneling SDK requests that require TLS client certificate authentication.
+func (s *Server) StartTunnel() error {
+	tunnel := &http.Server{
+		Addr:    fmt.Sprintf("%s:%d", s.URL.Hostname(), s.Tunnel),
+		Handler: http.HandlerFunc(s.proxy),
+	}
+
+	l, err := net.Listen("tcp", tunnel.Addr)
+	if err != nil {
+		return err
+	}
+
+	if s.Tunnel == 0 {
+		s.Tunnel = l.Addr().(*net.TCPAddr).Port
+	}
+
+	// Set client proxy port (defaults to vCenter host port 80 in real life)
+	q := s.URL.Query()
+	q.Set("GOVMOMI_TUNNEL_PROXY_PORT", strconv.Itoa(s.Tunnel))
+	s.URL.RawQuery = q.Encode()
+
+	go tunnel.Serve(l)
+
+	return nil
+}
+
 // Close shuts down the server and blocks until all outstanding
 // requests on this server have completed.
 func (s *Server) Close() {
@@ -466,16 +744,56 @@ func (s *Server) Close() {
 	}
 }
 
-var typeFunc = types.TypeFunc()
+var (
+	vim25MapType = types.TypeFunc()
+)
+
+func defaultMapType(name string) (reflect.Type, bool) {
+	typ, ok := vim25MapType(name)
+	if !ok {
+		// See TestIssue945, in which case Go does not resolve the namespace and name == "ns1:TraversalSpec"
+		// Without this hack, the SelectSet would be all nil's
+		kind := strings.SplitN(name, ":", 2)
+		if len(kind) == 2 {
+			typ, ok = vim25MapType(kind[1])
+		}
+	}
+	return typ, ok
+}
+
+// Element can be used to defer decoding of an XML node.
+type Element struct {
+	start xml.StartElement
+	inner struct {
+		Content string `xml:",innerxml"`
+	}
+	typeFunc func(string) (reflect.Type, bool)
+}
+
+func (e *Element) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	e.start = start
+
+	return d.DecodeElement(&e.inner, &start)
+}
+
+func (e *Element) decoder() *xml.Decoder {
+	decoder := xml.NewDecoder(strings.NewReader(e.inner.Content))
+	decoder.TypeFunc = e.typeFunc // required to decode interface types
+	return decoder
+}
+
+func (e *Element) Decode(val interface{}) error {
+	return e.decoder().DecodeElement(val, &e.start)
+}
 
 // UnmarshalBody extracts the Body from a soap.Envelope and unmarshals to the corresponding govmomi type
-func UnmarshalBody(data []byte) (*Method, error) {
-	body := struct {
-		Content string `xml:",innerxml"`
-	}{}
-
+func UnmarshalBody(typeFunc func(string) (reflect.Type, bool), data []byte) (*Method, error) {
+	body := &Element{typeFunc: typeFunc}
 	req := soap.Envelope{
-		Body: &body,
+		Header: &soap.Header{
+			Security: new(Element),
+		},
+		Body: body,
 	}
 
 	err := xml.Unmarshal(data, &req)
@@ -483,40 +801,38 @@ func UnmarshalBody(data []byte) (*Method, error) {
 		return nil, fmt.Errorf("xml.Unmarshal: %s", err)
 	}
 
-	decoder := xml.NewDecoder(bytes.NewReader([]byte(body.Content)))
-	decoder.TypeFunc = typeFunc // required to decode interface types
-
-	var start *xml.StartElement
+	var start xml.StartElement
+	var ok bool
+	decoder := body.decoder()
 
 	for {
 		tok, derr := decoder.Token()
 		if derr != nil {
-			return nil, fmt.Errorf("decoding body: %s", err)
+			return nil, fmt.Errorf("decoding: %s", derr)
 		}
-		if t, ok := tok.(xml.StartElement); ok {
-			start = &t
+		if start, ok = tok.(xml.StartElement); ok {
 			break
 		}
 	}
 
-	kind := start.Name.Local
+	if !ok {
+		return nil, fmt.Errorf("decoding: method token not found")
+	}
 
+	kind := start.Name.Local
 	rtype, ok := typeFunc(kind)
 	if !ok {
 		return nil, fmt.Errorf("no vmomi type defined for '%s'", kind)
 	}
 
-	var val interface{}
-	if rtype != nil {
-		val = reflect.New(rtype).Interface()
-	}
+	val := reflect.New(rtype).Interface()
 
-	err = decoder.DecodeElement(val, start)
+	err = decoder.DecodeElement(val, &start)
 	if err != nil {
 		return nil, fmt.Errorf("decoding %s: %s", kind, err)
 	}
 
-	method := &Method{Name: kind, Body: val}
+	method := &Method{Name: kind, Header: *req.Header, Body: val}
 
 	field := reflect.ValueOf(val).Elem().FieldByName("This")
 

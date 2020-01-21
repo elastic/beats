@@ -172,7 +172,7 @@ func (f *DatastoreFile) Stat() (os.FileInfo, error) {
 		return nil, err
 	}
 
-	res, err := f.d.Client().DownloadRequest(u, p)
+	res, err := f.d.Client().DownloadRequest(f.ctx, u, p)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (f *DatastoreFile) get() (io.Reader, error) {
 		}
 	}
 
-	res, err := f.d.Client().DownloadRequest(u, p)
+	res, err := f.d.Client().DownloadRequest(f.ctx, u, p)
 	if err != nil {
 		return nil, err
 	}
@@ -297,10 +297,8 @@ func (f *DatastoreFile) TailFunc(lines int, include func(line int, message strin
 
 			nread = bsize + remain
 			eof = true
-		} else {
-			if pos, err = f.Seek(offset, io.SeekEnd); err != nil {
-				return err
-			}
+		} else if pos, err = f.Seek(offset, io.SeekEnd); err != nil {
+			return err
 		}
 
 		if _, err = io.CopyN(buf, f, nread); err != nil {

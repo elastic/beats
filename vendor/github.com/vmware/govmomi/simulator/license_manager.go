@@ -77,6 +77,79 @@ func NewLicenseManager(ref types.ManagedObjectReference) object.Reference {
 	return m
 }
 
+func (m *LicenseManager) AddLicense(req *types.AddLicense) soap.HasFault {
+	body := &methods.AddLicenseBody{
+		Res: &types.AddLicenseResponse{},
+	}
+
+	for _, license := range m.Licenses {
+		if license.LicenseKey == req.LicenseKey {
+			body.Res.Returnval = licenseInfo(license.LicenseKey, license.Labels)
+			return body
+		}
+	}
+
+	m.Licenses = append(m.Licenses, types.LicenseManagerLicenseInfo{
+		LicenseKey: req.LicenseKey,
+		Labels:     req.Labels,
+	})
+
+	body.Res.Returnval = licenseInfo(req.LicenseKey, req.Labels)
+
+	return body
+}
+
+func (m *LicenseManager) RemoveLicense(req *types.RemoveLicense) soap.HasFault {
+	body := &methods.RemoveLicenseBody{
+		Res: &types.RemoveLicenseResponse{},
+	}
+
+	for i, license := range m.Licenses {
+		if req.LicenseKey == license.LicenseKey {
+			m.Licenses = append(m.Licenses[:i], m.Licenses[i+1:]...)
+			return body
+		}
+	}
+	return body
+}
+
+func (m *LicenseManager) UpdateLicenseLabel(req *types.UpdateLicenseLabel) soap.HasFault {
+	body := &methods.UpdateLicenseLabelBody{}
+
+	for i := range m.Licenses {
+		license := &m.Licenses[i]
+
+		if req.LicenseKey != license.LicenseKey {
+			continue
+		}
+
+		body.Res = new(types.UpdateLicenseLabelResponse)
+
+		for j := range license.Labels {
+			label := &license.Labels[j]
+
+			if label.Key == req.LabelKey {
+				if req.LabelValue == "" {
+					license.Labels = append(license.Labels[:i], license.Labels[i+1:]...)
+				} else {
+					label.Value = req.LabelValue
+				}
+				return body
+			}
+		}
+
+		license.Labels = append(license.Labels, types.KeyValue{
+			Key:   req.LabelKey,
+			Value: req.LabelValue,
+		})
+
+		return body
+	}
+
+	body.Fault_ = Fault("", &types.InvalidArgument{InvalidProperty: "licenseKey"})
+	return body
+}
+
 type LicenseAssignmentManager struct {
 	mo.LicenseAssignmentManager
 }
@@ -108,4 +181,13 @@ func (m *LicenseAssignmentManager) QueryAssignedLicenses(req *types.QueryAssigne
 	}
 
 	return body
+}
+
+func licenseInfo(key string, labels []types.KeyValue) types.LicenseManagerLicenseInfo {
+	info := EvalLicense
+
+	info.LicenseKey = key
+	info.Labels = labels
+
+	return info
 }

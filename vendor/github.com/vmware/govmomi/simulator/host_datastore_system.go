@@ -59,7 +59,7 @@ func (dss *HostDatastoreSystem) add(ds *Datastore) *soap.Fault {
 	}
 
 	folder := Map.getEntityFolder(dss.Host, "datastore")
-	ds.Self.Type = TypeName(ds)
+	ds.Self.Type = typeName(ds)
 	// Datastore is the only type where create methods do not include the parent (Folder in this case),
 	// but we need the moref to be unique per DC/datastoreFolder, but not per-HostSystem.
 	ds.Self.Value += "@" + folder.Self.Value
@@ -68,11 +68,20 @@ func (dss *HostDatastoreSystem) add(ds *Datastore) *soap.Fault {
 	ds.Summary.Datastore = &ds.Self
 	ds.Summary.Name = ds.Name
 	ds.Summary.Url = info.Url
+	ds.Capability = types.DatastoreCapability{
+		DirectoryHierarchySupported:      true,
+		RawDiskMappingsSupported:         false,
+		PerFileThinProvisioningSupported: true,
+		StorageIORMSupported:             types.NewBool(true),
+		NativeSnapshotSupported:          types.NewBool(false),
+		TopLevelDirectoryCreateSupported: types.NewBool(true),
+		SeSparseSupported:                types.NewBool(true),
+	}
 
 	dss.Datastore = append(dss.Datastore, ds.Self)
 	dss.Host.Datastore = dss.Datastore
 	parent := hostParent(dss.Host)
-	parent.Datastore = AddReference(ds.Self, parent.Datastore)
+	Map.AddReference(parent, &parent.Datastore, ds.Self)
 
 	browser := &HostDatastoreBrowser{}
 	browser.Datastore = dss.Datastore
@@ -98,7 +107,9 @@ func (dss *HostDatastoreSystem) CreateLocalDatastore(c *types.CreateLocalDatasto
 		Path: c.Path,
 	}
 
-	ds.Summary.Type = "local"
+	ds.Summary.Type = string(types.HostFileSystemVolumeFileSystemTypeOTHER)
+	ds.Summary.MaintenanceMode = string(types.DatastoreSummaryMaintenanceModeStateNormal)
+	ds.Summary.Accessible = true
 
 	if err := dss.add(ds); err != nil {
 		r.Fault_ = err
@@ -145,6 +156,8 @@ func (dss *HostDatastoreSystem) CreateNasDatastore(c *types.CreateNasDatastore) 
 	}
 
 	ds.Summary.Type = c.Spec.Type
+	ds.Summary.MaintenanceMode = string(types.DatastoreSummaryMaintenanceModeStateNormal)
+	ds.Summary.Accessible = true
 
 	if err := dss.add(ds); err != nil {
 		r.Fault_ = err

@@ -26,6 +26,11 @@ func init() {
 func main() {
 	flag.Parse()
 
+	if flag.NArg() != 0 {
+		fmt.Println("go-junit-report does not accept positional arguments")
+		os.Exit(1)
+	}
+
 	// Read input
 	report, err := parser.Parse(os.Stdin, packageName)
 	if err != nil {

@@ -33,16 +33,14 @@ func RenameTask(e mo.Entity, r *types.Rename_Task) soap.HasFault {
 			}
 		}
 
-		obj.Name = r.NewName
+		Map.Update(e, []types.PropertyChange{{Name: "name", Val: r.NewName}})
 
 		return nil, nil
 	})
 
-	task.Run()
-
 	return &methods.Rename_TaskBody{
 		Res: &types.Rename_TaskResponse{
-			Returnval: task.Self,
+			Returnval: task.Run(),
 		},
 	}
 }

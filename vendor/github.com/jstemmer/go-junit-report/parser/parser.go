@@ -43,6 +43,8 @@ type Test struct {
 	Result   Result
 	Output   []string
 
+	SubtestIndent string
+
 	// Time is deprecated, use Duration instead.
 	Time int // in milliseconds
 }
@@ -59,6 +61,7 @@ type Benchmark struct {
 
 var (
 	regexStatus   = regexp.MustCompile(`--- (PASS|FAIL|SKIP): (.+) \((\d+\.\d+)(?: seconds|s)\)`)
+	regexIndent   = regexp.MustCompile(`^([ \t]+)---`)
 	regexCoverage = regexp.MustCompile(`^coverage:\s+(\d+\.\d+)%\s+of\s+statements(?:\sin\s.+)?$`)
 	regexResult   = regexp.MustCompile(`^(ok|FAIL)\s+([^ ]+)\s+(?:(\d+\.\d+)s|\(cached\)|(\[\w+ failed]))(?:\s+coverage:\s+(\d+\.\d+)%\sof\sstatements(?:\sin\s.+)?)?$`)
 	// regexBenchmark captures 3-5 groups: benchmark name, number of times ran, ns/op (with or without decimal), B/op (optional), and allocs/op (optional).
@@ -195,6 +198,11 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 			} else {
 				test.Result = FAIL
 			}
+
+			if matches := regexIndent.FindStringSubmatch(line); len(matches) == 2 {
+				test.SubtestIndent = matches[1]
+			}
+
 			test.Output = buffers[cur]
 
 			test.Name = matches[2]
@@ -225,6 +233,14 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 		} else if !seenSummary {
 			// buffer anything else that we didn't recognize
 			buffers[cur] = append(buffers[cur], line)
+
+			// if we have a current test, also append to its output
+			test := findTest(tests, cur)
+			if test != nil {
+				if strings.HasPrefix(line, test.SubtestIndent+"    ") {
+					test.Output = append(test.Output, strings.TrimPrefix(line, test.SubtestIndent+"    "))
+				}
+			}
 		}
 	}
 

@@ -21,6 +21,9 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+// Datacenter is the default template for Datacenter properties.
+// Capture method:
+//   govc datacenter.info -dump
 var Datacenter = mo.Datacenter{
 	ManagedEntity: mo.ManagedEntity{
 		ExtensibleManagedObject: mo.ExtensibleManagedObject{

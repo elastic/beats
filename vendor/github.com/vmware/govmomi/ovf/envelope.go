@@ -135,7 +135,7 @@ type VirtualDiskDesc struct {
 type OperatingSystemSection struct {
 	Section
 
-	ID      uint16  `xml:"id,attr"`
+	ID      int16   `xml:"id,attr"`
 	Version *string `xml:"version,attr"`
 	OSType  *string `xml:"osType,attr"`
 

@@ -19,6 +19,9 @@ package esx
 import "github.com/vmware/govmomi/vim25/types"
 
 // VirtualDevice is the default set of VirtualDevice types created for a VirtualMachine
+// Capture method:
+//   govc vm.create foo
+//   govc object.collect -s -dump vm/foo config.hardware.device
 var VirtualDevice = []types.BaseVirtualDevice{
 	&types.VirtualIDEController{
 		VirtualController: types.VirtualController{
@@ -133,7 +136,7 @@ var VirtualDevice = []types.BaseVirtualDevice{
 			Connectable:   (*types.VirtualDeviceConnectInfo)(nil),
 			SlotInfo:      nil,
 			ControllerKey: 300,
-			UnitNumber:    newInt32(0),
+			UnitNumber:    types.NewInt32(0),
 		},
 	},
 	&types.VirtualPointingDevice{
@@ -156,7 +159,7 @@ var VirtualDevice = []types.BaseVirtualDevice{
 			Connectable:   (*types.VirtualDeviceConnectInfo)(nil),
 			SlotInfo:      nil,
 			ControllerKey: 300,
-			UnitNumber:    newInt32(1),
+			UnitNumber:    types.NewInt32(1),
 		},
 	},
 	&types.VirtualMachineVideoCard{
@@ -172,7 +175,7 @@ var VirtualDevice = []types.BaseVirtualDevice{
 			Connectable:   (*types.VirtualDeviceConnectInfo)(nil),
 			SlotInfo:      nil,
 			ControllerKey: 100,
-			UnitNumber:    newInt32(0),
+			UnitNumber:    types.NewInt32(0),
 		},
 		VideoRamSizeInKB:       4096,
 		NumDisplays:            1,
@@ -194,9 +197,9 @@ var VirtualDevice = []types.BaseVirtualDevice{
 			Connectable:   (*types.VirtualDeviceConnectInfo)(nil),
 			SlotInfo:      nil,
 			ControllerKey: 100,
-			UnitNumber:    newInt32(17),
+			UnitNumber:    types.NewInt32(17),
 		},
-		Id: -1,
+		Id:                             -1,
 		AllowUnrestrictedCommunication: types.NewBool(false),
 		FilterEnable:                   types.NewBool(true),
 		FilterInfo:                     (*types.VirtualMachineVMCIDeviceFilterInfo)(nil),
@@ -230,14 +233,10 @@ var EthernetCard = types.VirtualE1000{
 				PciSlotNumber:            32,
 			},
 			ControllerKey: 100,
-			UnitNumber:    newInt32(7),
+			UnitNumber:    types.NewInt32(7),
 		},
 		AddressType:      "generated",
 		MacAddress:       "",
 		WakeOnLanEnabled: types.NewBool(true),
 	},
-}
-
-func newInt32(n int32) *int32 {
-	return &n
 }

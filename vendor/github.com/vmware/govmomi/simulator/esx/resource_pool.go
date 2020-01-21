@@ -23,6 +23,9 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+// ResourcePool is the default template for ResourcePool properties.
+// Capture method:
+//   govc pool.info "*" -dump
 var ResourcePool = mo.ResourcePool{
 	ManagedEntity: mo.ManagedEntity{
 		ExtensibleManagedObject: mo.ExtensibleManagedObject{
@@ -53,29 +56,29 @@ var ResourcePool = mo.ResourcePool{
 			Entity:        &types.ManagedObjectReference{Type: "ResourcePool", Value: "ha-root-pool"},
 			ChangeVersion: "",
 			LastModified:  (*time.Time)(nil),
-			CpuAllocation: &types.ResourceAllocationInfo{
+			CpuAllocation: types.ResourceAllocationInfo{
 				DynamicData:           types.DynamicData{},
-				Reservation:           4121,
+				Reservation:           types.NewInt64(4121),
 				ExpandableReservation: types.NewBool(false),
-				Limit: 4121,
+				Limit:                 types.NewInt64(4121),
 				Shares: &types.SharesInfo{
 					DynamicData: types.DynamicData{},
 					Shares:      9000,
 					Level:       "custom",
 				},
-				OverheadLimit: 0,
+				OverheadLimit: nil,
 			},
-			MemoryAllocation: &types.ResourceAllocationInfo{
+			MemoryAllocation: types.ResourceAllocationInfo{
 				DynamicData:           types.DynamicData{},
-				Reservation:           961,
+				Reservation:           types.NewInt64(961),
 				ExpandableReservation: types.NewBool(false),
-				Limit: 961,
+				Limit:                 types.NewInt64(961),
 				Shares: &types.SharesInfo{
 					DynamicData: types.DynamicData{},
 					Shares:      9000,
 					Level:       "custom",
 				},
-				OverheadLimit: 0,
+				OverheadLimit: nil,
 			},
 		},
 		Runtime: types.ResourcePoolRuntimeInfo{
@@ -133,29 +136,29 @@ var ResourcePool = mo.ResourcePool{
 		Entity:        &types.ManagedObjectReference{Type: "ResourcePool", Value: "ha-root-pool"},
 		ChangeVersion: "",
 		LastModified:  (*time.Time)(nil),
-		CpuAllocation: &types.ResourceAllocationInfo{
+		CpuAllocation: types.ResourceAllocationInfo{
 			DynamicData:           types.DynamicData{},
-			Reservation:           4121,
+			Reservation:           types.NewInt64(4121),
 			ExpandableReservation: types.NewBool(false),
-			Limit: 4121,
+			Limit:                 types.NewInt64(4121),
 			Shares: &types.SharesInfo{
 				DynamicData: types.DynamicData{},
 				Shares:      9000,
 				Level:       "custom",
 			},
-			OverheadLimit: 0,
+			OverheadLimit: nil,
 		},
-		MemoryAllocation: &types.ResourceAllocationInfo{
+		MemoryAllocation: types.ResourceAllocationInfo{
 			DynamicData:           types.DynamicData{},
-			Reservation:           961,
+			Reservation:           types.NewInt64(961),
 			ExpandableReservation: types.NewBool(false),
-			Limit: 961,
+			Limit:                 types.NewInt64(961),
 			Shares: &types.SharesInfo{
 				DynamicData: types.DynamicData{},
 				Shares:      9000,
 				Level:       "custom",
 			},
-			OverheadLimit: 0,
+			OverheadLimit: nil,
 		},
 	},
 	ChildConfiguration: nil,

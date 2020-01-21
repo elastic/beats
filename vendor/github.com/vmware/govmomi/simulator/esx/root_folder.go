@@ -21,6 +21,9 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+// RootFolder is the default template for the ServiceContent rootFolder property.
+// Capture method:
+//   govc folder.info -dump /
 var RootFolder = mo.Folder{
 	ManagedEntity: mo.ManagedEntity{
 		ExtensibleManagedObject: mo.ExtensibleManagedObject{

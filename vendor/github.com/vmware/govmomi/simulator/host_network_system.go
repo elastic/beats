@@ -40,6 +40,7 @@ func NewHostNetworkSystem(host *mo.HostSystem) *HostNetworkSystem {
 						Portgroup: []string{"VM Network"},
 					},
 				},
+				Portgroup: host.Config.Network.Portgroup,
 			},
 		},
 	}
@@ -127,6 +128,13 @@ func (s *HostNetworkSystem) AddPortGroup(c *types.AddPortGroup) soap.HasFault {
 	folder.putChild(network)
 
 	vswitch.Portgroup = append(vswitch.Portgroup, c.Portgrp.Name)
+
+	s.NetworkInfo.Portgroup = append(s.NetworkInfo.Portgroup, types.HostPortGroup{
+		Key:  "key-vim.host.PortGroup-" + c.Portgrp.Name,
+		Port: nil,
+		Spec: c.Portgrp,
+	})
+
 	r.Res = &types.AddPortGroupResponse{}
 
 	return r
@@ -155,7 +163,24 @@ func (s *HostNetworkSystem) RemovePortGroup(c *types.RemovePortGroup) soap.HasFa
 	e := Map.FindByName(c.PgName, folder.ChildEntity)
 	folder.removeChild(e.Reference())
 
+	for i, pg := range s.NetworkInfo.Portgroup {
+		if pg.Spec.Name == c.PgName {
+			var portgroup = s.NetworkInfo.Portgroup
+			s.NetworkInfo.Portgroup = append(portgroup[:i], portgroup[i+1:]...)
+		}
+	}
+
 	r.Res = &types.RemovePortGroupResponse{}
 
 	return r
+}
+
+func (s *HostNetworkSystem) UpdateNetworkConfig(req *types.UpdateNetworkConfig) soap.HasFault {
+	s.NetworkConfig = &req.Config
+
+	return &methods.UpdateNetworkConfigBody{
+		Res: &types.UpdateNetworkConfigResponse{
+			Returnval: types.HostNetworkConfigResult{},
+		},
+	}
 }
