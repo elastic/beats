@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -37,7 +39,7 @@ var (
 
 // Reader will contain the config options
 type Reader struct {
-	query         Query             // PDH Query
+	query         pdh.Query         // PDH Query
 	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
 	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
 	executed      bool              // Indicates if the query has been executed.
@@ -47,7 +49,7 @@ type Reader struct {
 
 // NewReader creates a new instance of Reader.
 func NewReader(config Config) (*Reader, error) {
-	var query Query
+	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
@@ -63,8 +65,8 @@ func NewReader(config Config) (*Reader, error) {
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
+					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					r.log.Infow("Ignoring non existent counter", "error", err,
 						logp.Namespace("perfmon"), "query", counter.Query)
 					continue
@@ -104,8 +106,8 @@ func (r *Reader) RefreshCounterPaths() error {
 		if err != nil {
 			if r.config.IgnoreNECounters {
 				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
+					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					r.log.Infow("Ignoring non existent counter", "error", err,
 						logp.Namespace("perfmon"), "query", counter.Query)
 					continue
