@@ -24,8 +24,8 @@ import (
 	p "path"
 	"strings"
 
-	"github.com/elastic/beats/metricbeat/helper/dialer"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 )
@@ -212,7 +212,7 @@ func getURL(
 		u.Scheme = "http"
 		u.Host = "unix"
 	case "http+npipe":
-		p := strings.Replace(u.Path, "/pipe", `\\.pipe`, 1)
+		p := strings.Replace(u.Path, "/pipe", `\\.\pipe`, 1)
 		p = strings.Replace(p, "/", "\\", -1)
 		t = dialer.NewNpipeDialerBuilder(p)
 		u.Path = ""

@@ -10,11 +10,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 // Create a new pipeline client based on the function configuration.
@@ -93,6 +93,38 @@ func IsAvailable(name string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+// ListFunctions returns the list of enabled function names.
+func ListFunctions(provider string) ([]string, error) {
+	functions, err := feature.GlobalRegistry().LookupAll(getNamespace(provider))
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, len(functions))
+	for i, f := range functions {
+		names[i] = f.Name()
+	}
+	return names, nil
+}
+
+// Create returns the provider from a configuration.
+func Create(cfg *common.Config) (Provider, error) {
+	providers, err := List()
+	if err != nil {
+		return nil, err
+	}
+	if len(providers) != 1 {
+		return nil, fmt.Errorf("too many providers are available, expected one, got: %s", providers)
+	}
+
+	providerCfg, err := cfg.Child(providers[0], -1)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewProvider(providers[0], providerCfg)
 }
 
 // List returns the list of available providers.

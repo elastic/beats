@@ -4,7 +4,9 @@ BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
-VIRTUALENV_PARAMS?=
+PYTHON_EXE?=python3
+PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
+VENV_PARAMS?=
 FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
@@ -21,7 +23,7 @@ PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
 # remove this and treat all sub-projects the same.
-PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG)
+PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
 
 #
 # Includes
@@ -79,20 +81,15 @@ clean: mage
 	@$(MAKE) -C generator clean
 	@-mage -clean
 
-# Cleans up the vendor directory from unnecessary files
-# This should always be run after updating the dependencies
-.PHONY: clean-vendor
-clean-vendor:
-	@sh script/clean_vendor.sh
-
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@# Checks also python files which are not part of the beats
-	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
+	go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
@@ -136,13 +133,13 @@ docs:
 .PHONY: notice
 notice: python-env
 	@echo "Generating NOTICE"
-	@$(PYTHON_ENV)/bin/python dev-tools/generate_notice.py .
+	@${PYTHON_ENV_EXE} dev-tools/generate_notice.py .
 
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env:
-	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 six
+	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==2.4.4
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 

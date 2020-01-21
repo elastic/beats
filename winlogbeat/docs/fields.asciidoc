@@ -254,7 +254,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 
@@ -6961,6 +6961,20 @@ type: keyword
 --
 
 *`winlog.event_data.MaximumPerformancePercent`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.MemberName`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.MemberSid`*::
 +
 --
 type: keyword

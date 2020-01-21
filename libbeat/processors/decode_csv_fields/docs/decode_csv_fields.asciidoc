@@ -1,6 +1,10 @@
 [[decode-csv-fields]]
 === Decode CSV fields
 
+++++
+<titleabbrev>decode_csv_fields</titleabbrev>
+++++
+
 experimental[]
 
 The `decode_csv_fields` processor decodes fields containing records in
@@ -13,7 +17,7 @@ processors:
  - decode_csv_fields:
      fields:
         message: decoded.csv
-     separator: ,
+     separator: ","
      ignore_missing: false
      overwrite_keys: true
      trim_leading_space: false

@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 // CPU metric types.
@@ -62,5 +62,5 @@ func (c Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	Metrics: []string{percentages},
+	Metrics: []string{percentages, normalizedPercentages},
 }

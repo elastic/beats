@@ -22,15 +22,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -64,6 +64,8 @@ type enricher struct {
 	isPod              bool
 }
 
+const selector = "kubernetes"
+
 // GetWatcher initializes a kubernetes watcher with the given
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
@@ -89,12 +91,14 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		SyncTimeout: config.SyncPeriod,
 	}
 
+	log := logp.NewLogger(selector)
+
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		options.Node = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
-	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %v", config.Host)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
 
 	return kubernetes.NewWatcher(client, resource, options, nil)
 }

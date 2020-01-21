@@ -20,15 +20,17 @@ package prometheus
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Prometheus helper retrieves prometheus formatted metrics
@@ -43,6 +45,7 @@ type Prometheus interface {
 
 type prometheus struct {
 	httpfetcher
+	logger *logp.Logger
 }
 
 type httpfetcher interface {
@@ -52,10 +55,11 @@ type httpfetcher interface {
 // NewPrometheusClient creates new prometheus helper
 func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	http, err := helper.NewHTTP(base)
+
 	if err != nil {
 		return nil, err
 	}
-	return &prometheus{http}, nil
+	return &prometheus{http, base.Logger()}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
@@ -65,6 +69,14 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode > 399 {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err == nil {
+			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
+		}
+		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
+	}
 
 	format := expfmt.ResponseFormat(resp.Header)
 	if format == "" {

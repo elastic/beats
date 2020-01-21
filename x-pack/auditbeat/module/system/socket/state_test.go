@@ -16,10 +16,11 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 type logWrapper testing.T
@@ -148,11 +149,9 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 			Sock:     sock,
 			Size:     123,
 			LAddr:    lAddr,
-			RAddr:    rAddr,
-			AltRAddr: 0,
+			AltRAddr: rAddr,
 			LPort:    lPort,
-			RPort:    rPort,
-			AltRPort: 0,
+			AltRPort: rPort,
 		},
 		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
 		&doExit{Meta: meta(1234, 1234, 18)},
@@ -291,6 +290,14 @@ func ipv4(ip string) uint32 {
 		panic("bad ip")
 	}
 	return tracing.MachineEndian.Uint32(netIP)
+}
+
+func ipv6(ip string) (hi uint64, lo uint64) {
+	netIP := net.ParseIP(ip).To16()
+	if netIP == nil {
+		panic("bad ip")
+	}
+	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
 }
 
 func feedEvents(evs []event, st *state, t *testing.T) error {
@@ -514,4 +521,63 @@ func TestDNSTracker(t *testing.T) {
 			{true, proc2, "192.0.2.12", "example.com"},
 		}.Run(t)
 	})
+}
+
+func TestUDPSendMsgAltLogic(t *testing.T) {
+	const expectedIPv4 = "6 probe=0 pid=1234 tid=1235 udp_sendmsg(sock=0x0, size=0, 10.11.12.13:1010 -> 10.20.30.40:1234)"
+	const expectedIPv6 = "6 probe=0 pid=1234 tid=1235 udpv6_sendmsg(sock=0x0, size=0, [fddd::bebe]:1010 -> [fddd::cafe]:1234)"
+	t.Run("ipv4 non-connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("10.20.30.40"),
+			RPort:    be16(1234),
+			AltRAddr: ipv4("192.168.255.255"),
+			AltRPort: be16(555),
+			SIPtr:    0x7fffffff,
+			SIAF:     unix.AF_INET,
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv4 connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("192.168.255.255"),
+			RPort:    be16(555),
+			AltRAddr: ipv4("10.20.30.40"),
+			AltRPort: be16(1234),
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv6 non-connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(1234),
+			AltRPort: be16(555),
+			SI6Ptr:   0x7fffffff,
+			SI6AF:    unix.AF_INET6,
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::cafe")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::bad:bad")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
+	t.Run("ipv6 connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(555),
+			AltRPort: be16(1234),
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::bad:bad")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
 }

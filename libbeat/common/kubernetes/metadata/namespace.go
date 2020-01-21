@@ -20,8 +20,8 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 const resource = "namespace"
@@ -60,16 +60,17 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 		return nil
 	}
 
-	if obj, ok, _ := n.store.GetByKey(name); ok {
-		no, ok := obj.(*kubernetes.Namespace)
-		if !ok {
-			return nil
-		}
-
-		return n.Generate(no, opts...)
-	} else {
+	obj, ok, _ := n.store.GetByKey(name)
+	if !ok {
 		return nil
 	}
+
+	no, ok := obj.(*kubernetes.Namespace)
+	if !ok {
+		return nil
+	}
+
+	return n.Generate(no, opts...)
 }
 
 func flattenMetadata(in common.MapStr) common.MapStr {

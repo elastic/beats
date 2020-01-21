@@ -6,6 +6,9 @@ package aws
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -15,11 +18,12 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 	merrors "github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/executor"
-	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
+	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
 )
 
 const (
@@ -110,7 +114,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	return nil
 }
 
-// Deploy delegate deploy to the actual function implementation.
+// Deploy uploads the function to AWS.
 func (c *CLIManager) Deploy(name string) error {
 	c.log.Debugf("Deploying function: %s", name)
 	defer c.log.Debugf("Deploy finish for function '%s'", name)
@@ -152,6 +156,36 @@ func (c *CLIManager) Remove(name string) error {
 		}
 		return err
 	}
+	return nil
+}
+
+// Export prints the exported function data.
+func (c *CLIManager) Export(name string) error {
+	tmpl, err := c.templateBuilder.RawTemplate(name)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(tmpl)
+
+	return nil
+}
+
+// Package packages functions for AWS.
+func (c *CLIManager) Package(outputPattern string) error {
+	resource := zipResources()
+	content, err := core.MakeZip(packageUncompressedLimit, packageCompressedLimit, resource)
+	if err != nil {
+		return err
+	}
+
+	output := strings.ReplaceAll(outputPattern, "{{.Provider}}", "aws")
+	err = ioutil.WriteFile(output, content, 0644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
 	return nil
 }
 

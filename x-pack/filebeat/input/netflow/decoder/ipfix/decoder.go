@@ -13,9 +13,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
-	v9 "github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 const (
@@ -108,6 +108,7 @@ func (d DecoderIPFIX) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates [
 		}
 		template.ID = tID
 		template.ScopeFields = scopeCount
+		template.IsOptions = true
 		templates = append(templates, &template)
 	}
 	return templates, nil

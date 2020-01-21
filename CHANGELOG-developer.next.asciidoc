@@ -28,6 +28,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
 - Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
+- Python 3 is required now to run python tests and tools. {pull}14798[14798]
+- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
+- `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
 
 ==== Bugfixes
 
@@ -64,3 +67,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Added a `default_field` option to fields in fields.yml to offer a way to exclude fields from the default_field list. {issue}14262[14262] {pull}14341[14341]
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
 - Fix dropped errors in the tests for the metricbeat Azure module. {pull}13773[13773]
+- New mage target for Functionbeat: generate pkg folder to make manager easier. {pull}15580[15880]

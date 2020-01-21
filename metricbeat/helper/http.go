@@ -28,10 +28,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/metricbeat/helper/dialer"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
@@ -96,9 +96,10 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		hostData: hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
-				Dial:    dialer.Dial,
-				DialTLS: tlsDialer.Dial,
-				Proxy:   http.ProxyFromEnvironment,
+				Dial:            dialer.Dial,
+				DialTLS:         tlsDialer.Dial,
+				TLSClientConfig: tlsConfig.ToConfig(),
+				Proxy:           http.ProxyFromEnvironment,
 			},
 			Timeout: config.Timeout,
 		},

@@ -9,3 +9,9 @@
 
     # URL of the MISP REST API
     #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }

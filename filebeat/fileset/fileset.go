@@ -34,12 +34,14 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/elastic/go-ucfg"
+
 	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -355,20 +357,21 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
-		cfg, err = common.MergeConfigs(cfg, overrides)
+		cfg, err = common.MergeConfigsWithOptions([]*common.Config{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
 		if err != nil {
 			return nil, fmt.Errorf("Error applying config overrides: %v", err)
 		}
 	}
 
-	// force our pipeline ID
-	rootPipelineID := ""
-	if len(fs.pipelineIDs) > 0 {
-		rootPipelineID = fs.pipelineIDs[0]
-	}
-	err = cfg.SetString("pipeline", -1, rootPipelineID)
-	if err != nil {
-		return nil, fmt.Errorf("Error setting the pipeline ID in the input config: %v", err)
+	const pipelineField = "pipeline"
+	if !cfg.HasField(pipelineField) {
+		rootPipelineID := ""
+		if len(fs.pipelineIDs) > 0 {
+			rootPipelineID = fs.pipelineIDs[0]
+		}
+		if err := cfg.SetString(pipelineField, -1, rootPipelineID); err != nil {
+			return nil, errw.Wrap(err, "error setting the fileset pipeline ID in config")
+		}
 	}
 
 	// force our the module/fileset name

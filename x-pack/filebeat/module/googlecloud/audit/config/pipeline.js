@@ -38,6 +38,7 @@ function Audit(keep_original_message) {
     var saveMetadata = new processor.Convert({
         fields: [
             {from: "json.logName", to: "log.logger"},
+            {from: "json.insertId", to: "event.id"},
         ],
         ignore_missing: true
     });
@@ -103,6 +104,7 @@ function Audit(keep_original_message) {
             {from: "googlecloud.audit.authentication_info.principal_email", to: "user.email"},
             {from: "googlecloud.audit.service_name", to: "service.name"},
             {from: "googlecloud.audit.request_metadata.caller_supplied_user_agent", to: "user_agent.original"},
+            {from: "googlecloud.audit.method_name", to: "event.action"},
         ],
         fail_on_error: false,
     });
@@ -118,9 +120,32 @@ function Audit(keep_original_message) {
     var RenameNestedFields = function(evt) {
         var arr = evt.Get("googlecloud.audit.authorization_info");
         for (var i = 0; i < arr.length; i++) {
-          arr[i].resource_attributes = arr[i].resourceAttributes;
-          delete arr[i].resourceAttributes;
+            arr[i].resource_attributes = arr[i].resourceAttributes;
+            delete arr[i].resourceAttributes;
         }
+    };
+
+    // Set ECS categorization fields.
+    var setECSCategorization = function(evt) {
+        if (evt.Get("googlecloud.audit.status.code") == null) {
+            var authorization_info = evt.Get("googlecloud.audit.authorization_info");
+            if (authorization_info.length === 1) {
+                if (authorization_info[0].granted == null) {
+                    evt.Put("event.outcome", "unknown");
+                } else if (authorization_info[0].granted === true) {
+                    evt.Put("event.outcome", "success");
+                } else {
+                    evt.Put("event.outcome", "failure");
+                }
+            } else {
+                evt.Put("event.outcome", "unknown");
+            } 
+        } else if (evt.Get("googlecloud.audit.status.code") === 0) {
+            evt.Put("event.outcome", "success");
+        } else {
+            evt.Put("event.outcome", "failure");
+        }
+        evt.Put("event.kind", "event");
     };
 
     var pipeline = new processor.Chain()
@@ -135,6 +160,7 @@ function Audit(keep_original_message) {
         .Add(copyFields)
         .Add(dropExtraFields)
         .Add(RenameNestedFields)
+        .Add(setECSCategorization)
         .Build();
 
     return {

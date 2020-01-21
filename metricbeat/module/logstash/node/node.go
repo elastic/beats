@@ -18,9 +18,9 @@
 package node
 
 import (
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/logstash"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 )
 
 // init registers the MetricSet with the central registry.
@@ -74,13 +74,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return eventMapping(r, content)
 	}
 
-	pipelinesContent, err := logstash.GetPipelines(m.MetricSet)
+	pipelinesContent, overrideClusterUUID, err := logstash.GetPipelines(m.MetricSet)
 	if err != nil {
 		m.Logger().Error(err)
 		return nil
 	}
 
-	err = eventMappingXPack(r, m, pipelinesContent)
+	err = eventMappingXPack(r, m, pipelinesContent, overrideClusterUUID)
 	if err != nil {
 		m.Logger().Error(err)
 	}

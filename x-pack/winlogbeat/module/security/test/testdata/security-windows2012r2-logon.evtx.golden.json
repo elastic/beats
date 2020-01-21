@@ -22,6 +22,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -96,6 +99,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -169,6 +175,9 @@
       "executable": "C:\\Windows\\System32\\winlogon.exe",
       "name": "winlogon.exe",
       "pid": 448
+    },
+    "related": {
+      "user": "vagrant"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -247,6 +256,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -320,6 +332,9 @@
       "executable": "-",
       "name": "-",
       "pid": 0
+    },
+    "related": {
+      "user": "ANONYMOUS LOGON"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -395,6 +410,9 @@
       "name": "-",
       "pid": 0
     },
+    "related": {
+      "user": "vagrant"
+    },
     "user": {
       "domain": "VAGRANT-2012-R2",
       "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
@@ -468,6 +486,9 @@
       "executable": "-",
       "name": "-",
       "pid": 0
+    },
+    "related": {
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
@@ -543,6 +564,9 @@
       "name": "-",
       "pid": 0
     },
+    "related": {
+      "user": "vagrant"
+    },
     "user": {
       "domain": "VAGRANT-2012-R2",
       "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
@@ -616,6 +640,9 @@
       "executable": "-",
       "name": "-",
       "pid": 0
+    },
+    "related": {
+      "user": "vagrant"
     },
     "source": {
       "domain": "127.0.0.1"
@@ -694,6 +721,9 @@
       "name": "winlogon.exe",
       "pid": 2812
     },
+    "related": {
+      "user": "DWM-2"
+    },
     "user": {
       "domain": "Window Manager",
       "id": "S-1-5-90-2",
@@ -767,6 +797,9 @@
       "executable": "C:\\Windows\\System32\\winlogon.exe",
       "name": "winlogon.exe",
       "pid": 2812
+    },
+    "related": {
+      "user": "vagrant"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -845,6 +878,9 @@
       "name": "winlogon.exe",
       "pid": 2188
     },
+    "related": {
+      "user": "DWM-3"
+    },
     "user": {
       "domain": "Window Manager",
       "id": "S-1-5-90-3",
@@ -918,6 +954,9 @@
       "executable": "C:\\Windows\\System32\\services.exe",
       "name": "services.exe",
       "pid": 508
+    },
+    "related": {
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -993,6 +1032,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -1066,6 +1108,9 @@
       "executable": "C:\\Windows\\System32\\services.exe",
       "name": "services.exe",
       "pid": 508
+    },
+    "related": {
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1141,6 +1186,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -1215,6 +1263,9 @@
       "name": "services.exe",
       "pid": 508
     },
+    "related": {
+      "user": "SYSTEM"
+    },
     "user": {
       "domain": "NT AUTHORITY",
       "id": "S-1-5-18",
@@ -1288,6 +1339,9 @@
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 836
+    },
+    "related": {
+      "user": "bosch"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
