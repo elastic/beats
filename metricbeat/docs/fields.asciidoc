@@ -16175,6 +16175,243 @@ type: keyword
 
 --
 
+[float]
+=== mixer
+
+Contains statistics related to the Istio mixer service
+
+
+
+*`istio.mixer.istio.mcp.request.acks`*::
++
+--
+The number of request acks received by the source.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.errors.config`*::
++
+--
+The number of errors encountered during processing of the adapter info configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.configs`*::
++
+--
+The number of known adapters in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.attributes`*::
++
+--
+The number of known attributes in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.configs`*::
++
+--
+The number of known handlers in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.errors.validation`*::
++
+--
+The number of errors encountered because handler validation returned error.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.errors.config`*::
++
+--
+The number of errors encountered during processing of the instance configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.configs`*::
++
+--
+The number of known instances in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.config`*::
++
+--
+The number of errors encountered during processing of the rule configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.match`*::
++
+--
+The number of rule conditions that was not parseable.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.configs`*::
++
+--
+The number of known rules in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.errors.config`*::
++
+--
+The number of errors encountered during processing of the template configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.configs`*::
++
+--
+The number of known templates in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.unsatisfied.action_handler`*::
++
+--
+The number of actions that failed due to handlers being unavailable.
+
+
+type: long
+
+--
+
+*`istio.mixer.dispatcher_destinations_per_variety_total`*::
++
+--
+The number of Mixer adapter destinations by template variety type.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.closed`*::
++
+--
+The number of handlers that were closed during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.daemons`*::
++
+--
+The current number of active daemon routines in a given adapter environment.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.build`*::
++
+--
+The number of handlers that failed creation during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.close`*::
++
+--
+The number of errors encountered while closing handlers during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.new`*::
++
+--
+The number of handlers that were newly created during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.reused`*::
++
+--
+The number of handlers that were re-used during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler`*::
++
+--
+The name of the daemon  handler
+
+
+type: long
+
+--
+
+*`istio.mixer.variety`*::
++
+--
+The name of the variety
+
+
+type: long
+
+--
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
