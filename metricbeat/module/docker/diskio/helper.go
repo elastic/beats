@@ -22,7 +22,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
@@ -178,8 +177,7 @@ func calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 
 
 	timeSec := duration.Seconds()
 	if timeSec == 0 {
-		logp.Err("duration is zero when calculating per-second values")
-		return -1
+		return 0
 	}
 
 	return value / timeSec
