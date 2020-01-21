@@ -113,7 +113,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:7.5.1
+        image: docker.elastic.co/beats/metricbeat:7.5.2
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -256,7 +256,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:7.5.1
+        image: docker.elastic.co/beats/metricbeat:7.5.2
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
