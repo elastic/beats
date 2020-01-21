@@ -42,7 +42,7 @@ func NewReader(config Config) (*Reader, error) {
 	}
 	reader := &Reader{
 		query: query,
-		log:   logp.NewLogger("perfmon"),
+		log:   logp.NewLogger("website"),
 	}
 	if err := reader.InitCounters(config.Hosts); err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (this *Reader) InitCounters(hosts []string) error {
 	}
 	this.hosts = filterOnInstances(hosts, instances)
 	var newQueries []string
-	for _, instance := range instances {
+	for _, instance := range this.hosts {
 		for _, value := range webserverCounters {
 			value = strings.Replace(value, "*", instance, 1)
 			if err := this.query.AddCounter(value, "", "float", true); err != nil {
