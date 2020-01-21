@@ -131,7 +131,7 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
+      env: TARGETS="CGO_ENABLED=0 TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
