@@ -99,30 +99,17 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 
 	var prefixBuf strings.Builder
 
-	chunk := make([]byte, 1024)
-	for {
-		readSize, readErr := body.Read(chunk)
-
-		respSize += readSize
-		hash.Write(chunk[:readSize])
-
-		prefixRemainingBytes := maxPrefixSize - prefixBuf.Len()
-		if prefixRemainingBytes > 0 {
-			if prefixRemainingBytes < readSize {
-				prefixBuf.Write(chunk[:prefixRemainingBytes])
-			} else {
-				prefixBuf.Write(chunk[:readSize])
-			}
-		}
-
-		if readErr == io.EOF {
-			break
-		}
-
-		if readErr != nil {
-			return 0, "", "", readErr
-		}
+	n, err := io.Copy(&prefixBuf, io.TeeReader(io.LimitReader(body, int64(maxPrefixSize)), hash))
+	if err == nil {
+		// finish streaming into hash if the body has not been fully consumed yet
+		var m int64
+		m, err = io.Copy(hash, body)
+		n += m
 	}
 
-	return respSize, prefixBuf.String(), hex.EncodeToString(hash.Sum(nil)), nil
+	if err != nil {
+		return 0, "", "", err
+	}
+
+	return int(n), prefixBuf.String(), hex.EncodeToString(hash.Sum(nil)), nil
 }
