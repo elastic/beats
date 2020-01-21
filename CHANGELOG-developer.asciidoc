@@ -12,6 +12,9 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+=== Beats version 7.6.0
+https://github.com/elastic/beats/compare/v7.5.1..v7.6.0[Check the HEAD diff]
+
 === Beats version 7.5.1
 https://github.com/elastic/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
 
