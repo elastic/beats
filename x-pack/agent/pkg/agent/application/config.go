@@ -21,6 +21,11 @@ func fleetAgentConfigPath() string {
 	return info.AgentConfigFile
 }
 
+// TODO(ph) correctly setup with global path.
+func fleetActionStoreFile() string {
+	return info.AgentActionStoreFile
+}
+
 // Config define the configuration of the Agent.
 type Config struct {
 	Management *config.Config `config:"management"`

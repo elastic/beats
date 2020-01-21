@@ -18,14 +18,8 @@ import (
 )
 
 func TestAcker(t *testing.T) {
-	type serializedEvent struct {
-		Type     string `json:"type"`
-		Subtype  string `json:"subtype"`
-		ActionID string `json:"action_id"`
-	}
-
 	type ackRequest struct {
-		Events []serializedEvent `json:"events"`
+		Actions []string `json:"action_ids"`
 	}
 
 	log, _ := logger.New()
@@ -41,7 +35,7 @@ func TestAcker(t *testing.T) {
 	}
 
 	testID := "ack-test-action-id"
-	testAction := &fleetapi.ActionUnknown{ActionBase: &fleetapi.ActionBase{ActionID: testID}}
+	testAction := &fleetapi.ActionUnknown{ActionID: testID}
 
 	ch := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 		content, err := ioutil.ReadAll(body)
@@ -50,12 +44,8 @@ func TestAcker(t *testing.T) {
 		err = json.Unmarshal(content, &cr)
 		assert.NoError(t, err)
 
-		assert.EqualValues(t, 1, len(cr.Events))
-		ae := cr.Events[0]
-
-		assert.EqualValues(t, "ACTION", ae.Type)
-		assert.EqualValues(t, "ACKNOWLEDGED", ae.Subtype)
-		assert.EqualValues(t, testID, ae.ActionID)
+		assert.EqualValues(t, 1, len(cr.Actions))
+		assert.EqualValues(t, testID, cr.Actions[0])
 
 		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 		return resp, nil

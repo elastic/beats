@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,76 +22,6 @@ func (*agentinfo) AgentID() string { return "id" }
 func TestCheckin(t *testing.T) {
 	const withAPIKey = "secret"
 	agentInfo := &agentinfo{}
-
-	t.Run("Send back status of actions", withServerWithAuthClient(
-		func(t *testing.T) *http.ServeMux {
-			raw := `
-{
-    "actions": [],
-    "success": true
-}
-`
-			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
-			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-
-				type E struct {
-					ActionID  string    `json:"action_id"`
-					Type      string    `json:"type"`
-					SubType   string    `json:"subtype"`
-					Message   string    `json:"message"`
-					Timestamp time.Time `json:"timestamp"`
-				}
-
-				responses := struct {
-					Events []E `json:"events"`
-				}{}
-
-				decoder := json.NewDecoder(r.Body)
-				defer r.Body.Close()
-
-				err := decoder.Decode(&responses)
-				require.NoError(t, err)
-
-				require.Equal(t, 1, len(responses.Events))
-
-				e := responses.Events[0]
-				require.Equal(t, "my-id", e.ActionID)
-				require.Equal(t, "ACTION", e.Type)
-				require.Equal(t, "ACKNOWLEDGED", e.SubType)
-				require.Equal(t, "Acknowledge action my-id", e.Message)
-
-				fmt.Fprintf(w, raw)
-			}, withAPIKey))
-			return mux
-		}, withAPIKey,
-		func(t *testing.T, client clienter) {
-			action := &ActionPolicyChange{
-				ActionBase: &ActionBase{
-					ActionID:   "my-id",
-					ActionType: "POLICY_CHANGE",
-				},
-				Policy: map[string]interface{}{
-					"id": "policy_id",
-				},
-			}
-
-			cmd := NewCheckinCmd(&agentinfo{}, client)
-
-			request := CheckinRequest{
-				Events: []SerializableEvent{
-					Ack(action),
-				},
-			}
-
-			r, err := cmd.Execute(&request)
-			require.NoError(t, err)
-			require.True(t, r.Success)
-
-			require.Equal(t, 0, len(r.Actions))
-		},
-	))
 
 	t.Run("Propagate any errors from the server", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {

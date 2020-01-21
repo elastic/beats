@@ -18,6 +18,10 @@ type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program
 
 func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) emitterFunc {
 	return func(c *config.Config) error {
+		if err := InjectAgentConfig(c); err != nil {
+			return err
+		}
+
 		log.Debug("Transforming configuration into a tree")
 		m, err := c.ToMapStr()
 		if err != nil {

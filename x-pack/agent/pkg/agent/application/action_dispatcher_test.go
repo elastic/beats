@@ -23,8 +23,22 @@ func (h *mockHandler) Handle(a action, acker fleetAcker) error {
 }
 
 type mockAction struct{}
+
+func (m *mockAction) ID() string     { return "mockAction" }
+func (m *mockAction) Type() string   { return "mockAction" }
+func (m *mockAction) String() string { return "mockAction" }
+
 type mockActionUnknown struct{}
+
+func (m *mockActionUnknown) ID() string     { return "mockActionUnknown" }
+func (m *mockActionUnknown) Type() string   { return "mockActionUnknown" }
+func (m *mockActionUnknown) String() string { return "mockActionUnknown" }
+
 type mockActionOther struct{}
+
+func (m *mockActionOther) ID() string     { return "mockActionOther" }
+func (m *mockActionOther) Type() string   { return "mockActionOther" }
+func (m *mockActionOther) String() string { return "mockActionOther" }
 
 func TestActionDispatcher(t *testing.T) {
 	ack := newNoopAcker()
@@ -62,20 +76,11 @@ func TestActionDispatcher(t *testing.T) {
 		d, err := newActionDispatcher(nil, def)
 		require.NoError(t, err)
 
-		success := &mockHandler{}
-		d.Dispatch(ack, mockAction{}, success)
-
 		action := &mockActionUnknown{}
 		err = d.Dispatch(ack, action)
 
-		require.NoError(t, err)
-		require.False(t, success.called)
-
 		require.True(t, def.called)
 		require.Equal(t, action, def.received)
-
-		require.False(t, success.called)
-		require.Nil(t, success.received)
 	})
 
 	t.Run("Could not register two handlers on the same action", func(t *testing.T) {

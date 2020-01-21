@@ -28,6 +28,10 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 		return nil, err
 	}
 
+	if err := InjectAgentConfig(config); err != nil {
+		return nil, err
+	}
+
 	return createApplication(log, pathConfigFile, config)
 }
 
