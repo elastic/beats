@@ -1,0 +1,15 @@
+[[log-driver-usage-examples]]
+== {log-driver} usage examples
+
+++++
+<titleabbrev>Usage examples</titleabbrev>
+++++
+
+experimental[]
+
+TODO: Add examples that show commands and daemon file. Some possibilities: 
+
+* ES output with SSL
+* ES output with custom HTTP headers
+* ES output with pipeline - uses format string to select pipeline?
+* LS output with proxy_url and proxy_use_local_resolver

@@ -1,0 +1,109 @@
+[[log-driver-installation]]
+== Install and configure the {log-driver}
+
+++++
+<titleabbrev>Install and configure</titleabbrev>
+++++
+
+experimental[]
+
+[float]
+=== Before you begin
+
+Make sure your system meets the following prerequisites:
+
+* Docker: {docker-version}
+* {stack}: Version 7.6.0 and later
+
+//REVIEWERS: Are there any other prereqs?
+//REVIEWERS: Do we want to add a step for setting up a cloud trial? 
+
+[float]
+=== Step 1: Install the {log-driver} plugin
+
+// REVIEWERS: Will the plugin be available on docker hub when 7.6 ships, or will
+// users need to build from source? These instructions assume that the driver
+// will be available at the initial release. If it's not, we can add the steps
+// for building from source.
+
+// Related question: Do we want to document how to build/install from source
+// too?
+
+// The commands shown here are a guess because of course I couldn't test them.
+
+1. Install the plugin from the Docker store:
++
+["source","sh",subs="attributes"]
+----
+docker plugin install store/elastic/elastic-logging-driver:{version} --alias elastic-logging-driver
+----
+
+2. If necessary, enable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin enable elastic/elastic-logging-driver:{version}
+----
+
+3. Verify that the plugin is installed and enabled:
++
+[source,shell]
+----
+docker plugin ls
+----
++
+The output should say something like:
++
+["source","sh",subs="attributes"]
+----
+ID                  NAME                                   DESCRIPTION              ENABLED
+c2ff9d2cf090        elastic/{log-driver-alias}:{version}   A beat for docker logs   true
+----
+
+[float]
+=== Step 2: Configure the {log-driver}
+
+You can set configuration options for a single container, or for all containers
+running on the host. See <<log-driver-configuration>> for a list of
+supported configuration options.
+
+* To configure a single container, pass configuration options at run time
+when you start the container. For example:
++
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version}
+           --log-opt output.elasticsearch.hosts="192.0.2.0:9200"
+           --log-opt output.elasticsearch.username="myusername"
+           --log-opt output.elasticsearch.password="myusername"
+           --log-opt output.elasticsearch.index="myindex" -it debian /bin/bash
+----
+
+* To configure all containers running on the host, set configuration options
+in the `daemon.json` file. For example:
++
+[source,json,subs="attributes"]
+----
+{
+  "log-driver": "elastic/{log-driver-alias}:{version}",
+  "log-opts": {
+    "output.elasticsearch.hosts": "192.0.2.0:9200",
+    "output.elasticsearch.username": "myusername",
+    "output.elasticsearch.password": "mypassword",
+    "output.elasticsearch.index": "myindex"
+  }
+}
+----
++
+Then run the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version}
+           --config-file=/etc/docker/daemon.json <1>
+----
+<1> The default location of the configuration file varies by platform. To
+specify a different location, set the `--config-file` flag. For more
+information about the Docker daemon configuration file, see the
+https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file[Docker docs].
+ 

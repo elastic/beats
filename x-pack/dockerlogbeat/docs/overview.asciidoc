@@ -1,0 +1,16 @@
+// I thought it might be useful to put the descriptions we want to use in into variables.
+
+:shortdesc: {log-driver} is a Docker logging plugin for shipping container logs to the {stack}.
+
+[[log-driver-overview]]
+== {log-driver} overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+experimental[]
+
+{shortdesc}
+
+TODO: Add more detail here.
