@@ -123,6 +123,28 @@ function Audit(keep_original_message) {
         }
     };
 
+    // Set event.outcome based on authenticatio_info and status 
+    var setEventOutcome = function(evt) {
+        if (evt.Get("googlecloud.audit.status.code") == null) {
+            var authorization_info = evt.Get("googlecloud.audit.authorization_info");
+            if (authorization_info.length == 1) {
+                if (authorization_info[0].granted == null) {
+                    evt.Put("event.outcome", "unknown");
+                } else if (authorization_info[0].granted == true) {
+                    evt.Put("event.outcome", "success");
+                } else {
+                    evt.Put("event.outcome", "failure");
+                }
+            } else {
+                evt.Put("event.outcome", "unknown");
+            } 
+        } else if (evt.Get("googlecloud.audit.status.code") == 0) {
+           evt.Put("event.outcome", "success");
+        } else {
+           evt.Put("event.outcome", "failure");
+        }
+    };
+
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
@@ -135,6 +157,7 @@ function Audit(keep_original_message) {
         .Add(copyFields)
         .Add(dropExtraFields)
         .Add(RenameNestedFields)
+        .Add(setEventOutcome)
         .Build();
 
     return {
