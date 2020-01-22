@@ -37,6 +37,11 @@ const (
 )
 
 var (
+	// pythonExe points to the python executable to use. It defaults to python3
+	// so this must be on the PATH. The PYTHON_EXE environment can be used to
+	// modify the executable used.
+	pythonExe = EnvOr("PYTHON_EXE", "python3")
+
 	// VirtualenvReqs specifies a list of virtualenv requirements files to be
 	// used when calling PythonVirtualenv(). It defaults to the libbeat
 	// requirements.txt file.
@@ -167,17 +172,9 @@ func PythonVirtualenv() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
-	// If set use PYTHON_EXE env var as the python interpreter.
-	var args []string
-	if pythonExe := os.Getenv("PYTHON_EXE"); pythonExe != "" {
-		args = append(args, "-p", pythonExe)
-	}
-	args = append(args, ve)
-
-	// Execute virtualenv.
+	// Create a virtual environment only if the dir does not exist.
 	if _, err := os.Stat(ve); err != nil {
-		// Run virtualenv if the dir does not exist.
-		if err := sh.Run("virtualenv", args...); err != nil {
+		if err := sh.Run(pythonExe, "-m", "venv", ve); err != nil {
 			return "", err
 		}
 	}
@@ -188,7 +185,7 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
-	args = []string{"install"}
+	args := []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}

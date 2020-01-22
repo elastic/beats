@@ -93,7 +93,7 @@ GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
 PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
-VIRTUALENV_PARAMS?=
+VENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
@@ -250,7 +250,7 @@ load-tests: ## @testing Runs load tests
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -e ${PYTHON_ENV}/bin/activate || virtualenv $(if ${PYTHON_EXE},-p ${PYTHON_EXE}) ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
+	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
