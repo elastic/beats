@@ -30470,6 +30470,7 @@ sql module
 
 
 
+
 *`sql.driver`*::
 +
 --
@@ -30503,7 +30504,7 @@ type: object
 *`sql.metrics.string.*`*::
 +
 --
-Non-numeric values collected. - release: beta
+Non-numeric values collected.
 
 
 type: object

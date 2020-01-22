@@ -4,21 +4,24 @@
   description: >
     sql module
   fields:
-    - name: sql.driver
-      type: keyword
-      description: >
-        Driver used to execute the query.
-    - name: sql.query
-      type: keyword
-      description: >
-        Query executed to collect metrics.
-    - name: sql.metrics.numeric.*
-      type: object
-      object_type: double
-      description: >
-        Numeric metrics collected.
-    - name: sql.metrics.string.*
-      type: object
-      object_type: keyword
-      description: >
-        Non-numeric values collected.
+    - name: sql
+      type: group
+      fields:
+        - name: driver
+          type: keyword
+          description: >
+            Driver used to execute the query.
+        - name: query
+          type: keyword
+          description: >
+            Query executed to collect metrics.
+        - name: metrics.numeric.*
+          type: object
+          object_type: double
+          description: >
+            Numeric metrics collected.
+        - name: metrics.string.*
+          type: object
+          object_type: keyword
+          description: >
+            Non-numeric values collected.
