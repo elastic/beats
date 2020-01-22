@@ -73,6 +73,7 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
@@ -130,6 +131,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
@@ -532,6 +536,12 @@ metricbeat.modules:
               event.Cancel();
             }
           }
+
+#-------------------------------- Istio Module --------------------------------
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  hosts: ["localhost:42422"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -965,10 +975,9 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
 
 
@@ -2267,6 +2276,14 @@ logging.files:
 
   #metrics.period: 10s
   #state.period: 1m
+
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

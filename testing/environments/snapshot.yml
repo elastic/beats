@@ -17,7 +17,7 @@ services:
     - "indices.id_field_data.enabled=true"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.0.0-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
