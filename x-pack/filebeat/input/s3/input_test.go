@@ -7,20 +7,20 @@ package s3
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"time"
-
-	"github.com/elastic/beats/libbeat/beat"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -151,11 +151,7 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestGetS3ObjectResponse(t *testing.T) {
-	configTest := config{
-		ContextTimeout: time.Duration(100 * time.Second),
-	}
-	p := &s3Input{context: &channelContext{}, config: configTest}
-
+	p := &s3Input{inputCtx: context.Background()}
 	resp, err := p.getS3ObjectResponse(mockSvc, info)
 	reader := bufio.NewReader(resp.Body)
 	assert.NoError(t, err)
@@ -178,7 +174,7 @@ func TestGetS3ObjectResponse(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
+	p := &s3Input{inputCtx: context.Background()}
 	errC := make(chan error)
 	s3Context := &s3Context{
 		refs: 1,
