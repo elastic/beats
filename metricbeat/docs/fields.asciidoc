@@ -25466,6 +25466,7 @@ Stats scraped from a Prometheus endpoint.
 
 
 
+
 *`prometheus.labels.*`*::
 +
 --
@@ -25479,7 +25480,7 @@ type: object
 *`prometheus.metrics.*`*::
 +
 --
-Prometheus metric - release: ga
+Prometheus metric
 
 
 type: object
@@ -27756,6 +27757,7 @@ Statsd module
 
 
 
+
 *`statsd.*.count`*::
 +
 --
@@ -27769,7 +27771,7 @@ type: object
 *`statsd.*.*`*::
 +
 --
-Statsd metrics - release: beta
+Statsd metrics
 
 
 type: object
