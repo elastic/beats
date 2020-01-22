@@ -41,6 +41,8 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
+* <<exported-fields-ibmmq>>
+* <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -1738,6 +1740,12 @@ Metrics that returned from Cloudwatch API query. - name: billing
     `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
   release: ga
   fields:
+- name: lambda
+  type: group
+  description: >
+    `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
+  release: beta
+  fields:
 - name: rds
   type: group
   description: >
@@ -2319,15 +2327,6 @@ alias to: agent.hostname
 +
 --
 Time series instance id
-
-type: keyword
-
---
-
-*`webiks`*::
-+
---
-check test idan ben webiks bla bla 
 
 type: keyword
 
@@ -15855,6 +15854,327 @@ json metricset
 
 server
 
+
+[[exported-fields-ibmmq]]
+== IBM MQ fields
+
+IBM MQ module
+
+
+
+
+[[exported-fields-istio]]
+== istio fields
+
+istio Module
+
+
+
+[float]
+=== istio
+
+`istio` contains statistics that were read from Istio
+
+
+
+[float]
+=== mesh
+
+Contains statistics related to the Istio mesh service
+
+
+
+*`istio.mesh.instance`*::
++
+--
+The prometheus instance
+
+
+type: text
+
+--
+
+*`istio.mesh.job`*::
++
+--
+The prometheus job
+
+
+type: keyword
+
+--
+
+*`istio.mesh.requests`*::
++
+--
+Total requests handled by an Istio proxy
+
+
+type: long
+
+--
+
+*`istio.mesh.request.duration.ms.bucket.*`*::
++
+--
+Request duration histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.mesh.request.duration.ms.sum`*::
++
+--
+Requests duration, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.mesh.request.duration.ms.count`*::
++
+--
+Requests duration, number of requests
+
+
+type: long
+
+--
+
+*`istio.mesh.request.size.bytes.bucket.*`*::
++
+--
+Request Size histogram buckets
+
+
+type: object
+
+--
+
+*`istio.mesh.request.size.bytes.sum`*::
++
+--
+Request Size histogram sum
+
+
+type: long
+
+--
+
+*`istio.mesh.request.size.bytes.count`*::
++
+--
+Request Size histogram count
+
+
+type: long
+
+--
+
+*`istio.mesh.response.size.bytes.bucket.*`*::
++
+--
+Request Size histogram buckets
+
+
+type: object
+
+--
+
+*`istio.mesh.response.size.bytes.sum`*::
++
+--
+Request Size histogram sum
+
+
+type: long
+
+--
+
+*`istio.mesh.response.size.bytes.count`*::
++
+--
+Request Size histogram count
+
+
+type: long
+
+--
+
+*`istio.mesh.reporter`*::
++
+--
+Reporter identifies the reporter of the request. It is set to destination if report is from a server Istio proxy and source if report is from a client Istio proxy.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.workload.name`*::
++
+--
+This identifies the name of source workload which controls the source.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.workload.namespace`*::
++
+--
+This identifies the namespace of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.principal`*::
++
+--
+This identifies the peer principal of the traffic source. It is set when peer authentication is used.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.app`*::
++
+--
+This identifies the source app based on app label of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.version`*::
++
+--
+This identifies the version of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.workload.name`*::
++
+--
+This identifies the name of destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.workload.namespace`*::
++
+--
+This identifies the namespace of the destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.principal`*::
++
+--
+This identifies the peer principal of the traffic destination. It is set when peer authentication is used.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.app`*::
++
+--
+This identifies the destination app based on app label of the destination workload..
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.version`*::
++
+--
+This identifies the version of the destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.host`*::
++
+--
+This identifies destination service host responsible for an incoming request.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.name`*::
++
+--
+This identifies the destination service name.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.namespace`*::
++
+--
+This identifies the namespace of destination service.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.request.protocol`*::
++
+--
+This identifies the protocol of the request. It is set to API protocol if provided, otherwise request or connection protocol.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.response.code`*::
++
+--
+This identifies the response code of the request. This label is present only on HTTP metrics.
+
+
+type: long
+
+--
+
+*`istio.mesh.connection.security.policy`*::
++
+--
+This identifies the service authentication policy of the request. It is set to mutual_tls when Istio is used to make communication secure and report is from destination. It is set to unknown when report is from source since security policy cannot be properly populated.
+
+
+type: keyword
+
+--
 
 [[exported-fields-jolokia]]
 == Jolokia fields
@@ -30156,25 +30476,12 @@ type: long
 [[exported-fields-sql]]
 == sql fields
 
-sql module
+SQL module fetches metrics from a SQL database
 
 
 
-[float]
-=== sql
 
-`sql` fetches metrics from a SQL database 
-
-
-
-[float]
-=== query
-
-query
-
-
-
-*`sql.query.driver`*::
+*`sql.driver`*::
 +
 --
 Driver used to execute the query.
@@ -30184,7 +30491,7 @@ type: keyword
 
 --
 
-*`sql.query.query`*::
+*`sql.query`*::
 +
 --
 Query executed to collect metrics.
@@ -30194,7 +30501,7 @@ type: keyword
 
 --
 
-*`sql.query.metrics.numeric.*`*::
+*`sql.metrics.numeric.*`*::
 +
 --
 Numeric metrics collected.
@@ -30204,7 +30511,7 @@ type: object
 
 --
 
-*`sql.query.metrics.string.*`*::
+*`sql.metrics.string.*`*::
 +
 --
 Non-numeric values collected.
