@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed default user-agent to be `Elastic-Heartbeat/VERSION (PLATFORM_INFO)` as the current default `Go-http-client/1.1` is often blacklisted. {pull}14291[14291]
 - JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[pull]
 - Heartbeat now starts monitors scheduled with the '@every X' syntax instantaneously on startup, rather than waiting for the given interval to pass before running them. {pull}14890[14890]
+* Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Journalbeat*
 
