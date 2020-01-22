@@ -30,14 +30,43 @@ Example config:
 ----
 - module: aws
   s3access:
-    enabled: true
-    var.queue_url: https://sqs.us-west-1.amazonaws.com/123/queue-name
-    var.credential_profile_name: fb-aws
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
 ----
 
 *`var.queue_url`*::
 
 AWS SQS queue url.
+
+*`var.shared_credential_file`*::
+
+Filename of AWS credential file.
 
 *`var.credential_profile_name`*::
 
