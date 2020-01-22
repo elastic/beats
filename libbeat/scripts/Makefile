@@ -23,7 +23,6 @@ SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
 MAGE_IMPORT_PATH?=github.com/elastic/beats/vendor/github.com/magefile/mage
-PYTHON_EXE?=python3
 export MAGE_IMPORT_PATH
 
 space:=$() #
@@ -90,7 +89,9 @@ DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
+PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
+PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
 VENV_PARAMS?=
@@ -215,7 +216,7 @@ integration-tests-environment: prepare-tests build-image
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
@@ -308,8 +309,8 @@ testsuite: clean update
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
-coverage-report:
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
+coverage-report: python-env
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
 	go tool cover -html=${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 	test ! -s ${COVERAGE_DIR}/integration.cov   || go tool cover -html=${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
 	test ! -s ${COVERAGE_DIR}/system.cov || go tool cover -html=${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
@@ -337,7 +338,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
@@ -346,7 +347,7 @@ endif
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
 	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 endif
 
 .PHONY: docs
@@ -423,10 +424,10 @@ get_version: ## @packaging get the version of the beat.
 	@${ES_BEATS}/dev-tools/get_version
 
 help: ## @help Show this help.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
 
 help_variables: ## @help Show Makefile customizable variables.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
 
 # Generates a seccomp whitelist policy for the binary pointed to by
 # SECCOMP_BINARY.
