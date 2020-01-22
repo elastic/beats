@@ -77,7 +77,7 @@ func (r *Reporter) Report(e reporter.Event) error {
 		Ts:        fleetapi.Time(e.Time()),
 		SubType:   e.SubType(),
 		Msg:       e.Message(),
-		Payload:   injectAgentId(e.Payload(), r.info),
+		Payload:   injectAgentID(e.Payload(), r.info),
 		Data:      e.Data(),
 	})
 
@@ -176,7 +176,7 @@ func (r *Reporter) dropFirst() {
 	r.queue = r.queue[1:]
 }
 
-func injectAgentId(payload map[string]interface{}, info agentInfo) map[string]interface{} {
+func injectAgentID(payload map[string]interface{}, info agentInfo) map[string]interface{} {
 	if info == nil {
 		return payload
 	}
