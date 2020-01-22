@@ -96,10 +96,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		vals[i] = new(interface{})
 	}
 
-	numericValue := common.MapStr{}
-
-	stringValue := common.MapStr{}
-
 	for rows.Next() {
 		err = rows.Scan(vals...)
 		if err != nil {
@@ -107,30 +103,32 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		data := common.MapStr{
-			"metrics": common.MapStr{},
-		}
-		data.Put("driver", m.Driver)
-		data.Put("query", m.Query)
+		numericMetrics := common.MapStr{}
+		stringMetrics := common.MapStr{}
 
 		for i := 0; i < len(vals); i++ {
-			dataMetrics := data["metrics"].(common.MapStr)
-
 			value := getValue(vals[i].(*interface{}))
-
 			num, err := strconv.ParseFloat(value, 64)
 			if err == nil {
-				numericValue.Put(cols[i], num)
-				dataMetrics.Put("numeric", numericValue)
+				numericMetrics[cols[i]] = num
 			} else {
-				stringValue.Put(cols[i], value)
-				dataMetrics.Put("string", stringValue)
+				stringMetrics[cols[i]] = value
 			}
 
-			report.Event(mb.Event{
-				RootFields: common.MapStr{"sql": data},
-			})
 		}
+
+		report.Event(mb.Event{
+			RootFields: common.MapStr{
+				"sql": common.MapStr{
+					"driver": m.Driver,
+					"query":  m.Query,
+					"metrics": common.MapStr{
+						"numeric": numericMetrics,
+						"string":  stringMetrics,
+					},
+				},
+			},
+		})
 	}
 
 	if rows.Err() != nil {
