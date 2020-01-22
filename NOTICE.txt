@@ -2101,8 +2101,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/godror/godror
-Version: v0.9.0
-Revision: 446a29355d2967f04604e8e015a3343917860adf
+Version: v0.10.4
+Revision: 0123d49bd73e1bed106ac8b6af67f943fbbf06e2
 License type (autodetected): Apache-2.0
 ./vendor/github.com/godror/godror/LICENSE.md:
 --------------------------------------------------------------------
