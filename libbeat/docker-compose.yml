@@ -36,6 +36,7 @@ services:
     depends_on:
       elasticsearch:            { condition: service_healthy }
       elasticsearch_monitoring: { condition: service_healthy }
+      elasticsearch_ssl:        { condition: service_healthy }
       logstash:                 { condition: service_healthy }
       kafka:                    { condition: service_healthy }
       redis:                    { condition: service_healthy }
@@ -56,6 +57,33 @@ services:
       service: elasticsearch
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
+
+  elasticsearch_ssl:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:9200", "--insecure"]
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=true"
+      - "indices.id_field_data.enabled=true"
+      - "xpack.license.self_generated.type=trial"
+      - "xpack.security.http.ssl.enabled=true"
+      - "xpack.security.http.ssl.key=/usr/share/elasticsearch/config/pki/localhost/localhost.key"
+      - "xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/pki/localhost/localhost.crt"
+      - "xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/pki/ca/ca.crt"
+      # Do no used indices as the storage for credentials, using file based allow Elasticsearch
+      # to be online and green much quicker.
+      - "xpack.security.authc.realms.file.file1.order=0"
+    volumes:
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/pki:/usr/share/elasticsearch/config/pki:ro
+    ports:
+      - "9205:9200"
+    command: bash -c "bin/elasticsearch-users useradd admin -r superuser -p changeme | /usr/local/bin/docker-entrypoint.sh eswrapper"
 
   # This host name is static because of the certificate.
   logstash:

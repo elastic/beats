@@ -40,6 +40,8 @@ ES_HOST?=elasticsearch
 ES_PORT?=9200
 ES_USER?=beats
 ES_PASS?=testing
+ES_HOST_SSL?=elasticsearch_ssl
+ES_PORT_SSL?=9205
 KIBANA_HOST?=kibana
 KIBANA_PORT?=5601
 # Kibana's Elaticsearch user
@@ -398,6 +400,8 @@ write-environment:
 	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
 	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_HOST_SSL=${ES_HOST_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT_SSL=${ES_PORT_SSL}" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
 	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
