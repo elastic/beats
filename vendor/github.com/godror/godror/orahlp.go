@@ -13,11 +13,210 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"io"
+	"math"
+	"strconv"
 	"sync"
 	"time"
 
 	errors "golang.org/x/xerrors"
 )
+
+// Number as string
+type Number string
+
+var (
+	// Int64 for converting to-from int64.
+	Int64 = intType{}
+	// Float64 for converting to-from float64.
+	Float64 = floatType{}
+	// Num for converting to-from Number (string)
+	Num = numType{}
+)
+
+type intType struct{}
+
+func (intType) String() string { return "Int64" }
+func (intType) ConvertValue(v interface{}) (driver.Value, error) {
+	if Log != nil {
+		Log("ConvertValue", "Int64", "value", v)
+	}
+	switch x := v.(type) {
+	case int8:
+		return int64(x), nil
+	case int16:
+		return int64(x), nil
+	case int32:
+		return int64(x), nil
+	case int64:
+		return x, nil
+	case uint16:
+		return int64(x), nil
+	case uint32:
+		return int64(x), nil
+	case uint64:
+		return int64(x), nil
+	case float32:
+		if _, f := math.Modf(float64(x)); f != 0 {
+			return int64(x), errors.Errorf("non-zero fractional part: %f", f)
+		}
+		return int64(x), nil
+	case float64:
+		if _, f := math.Modf(x); f != 0 {
+			return int64(x), errors.Errorf("non-zero fractional part: %f", f)
+		}
+		return int64(x), nil
+	case string:
+		if x == "" {
+			return 0, nil
+		}
+		return strconv.ParseInt(x, 10, 64)
+	case Number:
+		if x == "" {
+			return 0, nil
+		}
+		return strconv.ParseInt(string(x), 10, 64)
+	default:
+		return nil, errors.Errorf("unknown type %T", v)
+	}
+}
+
+type floatType struct{}
+
+func (floatType) String() string { return "Float64" }
+func (floatType) ConvertValue(v interface{}) (driver.Value, error) {
+	if Log != nil {
+		Log("ConvertValue", "Float64", "value", v)
+	}
+	switch x := v.(type) {
+	case int8:
+		return float64(x), nil
+	case int16:
+		return float64(x), nil
+	case int32:
+		return float64(x), nil
+	case uint16:
+		return float64(x), nil
+	case uint32:
+		return float64(x), nil
+	case int64:
+		return float64(x), nil
+	case uint64:
+		return float64(x), nil
+	case float32:
+		return float64(x), nil
+	case float64:
+		return x, nil
+	case string:
+		if x == "" {
+			return 0, nil
+		}
+		return strconv.ParseFloat(x, 64)
+	case Number:
+		if x == "" {
+			return 0, nil
+		}
+		return strconv.ParseFloat(string(x), 64)
+	default:
+		return nil, errors.Errorf("unknown type %T", v)
+	}
+}
+
+type numType struct{}
+
+func (numType) String() string { return "Num" }
+func (numType) ConvertValue(v interface{}) (driver.Value, error) {
+	if Log != nil {
+		Log("ConvertValue", "Num", "value", v)
+	}
+	switch x := v.(type) {
+	case string:
+		if x == "" {
+			return 0, nil
+		}
+		return x, nil
+	case Number:
+		if x == "" {
+			return 0, nil
+		}
+		return string(x), nil
+	case int8, int16, int32, int64, uint16, uint32, uint64:
+		return fmt.Sprintf("%d", x), nil
+	case float32, float64:
+		return fmt.Sprintf("%f", x), nil
+	default:
+		return nil, errors.Errorf("unknown type %T", v)
+	}
+}
+func (n Number) String() string { return string(n) }
+
+// Value returns the Number as driver.Value
+func (n Number) Value() (driver.Value, error) {
+	return string(n), nil
+}
+
+// Scan into the Number from a driver.Value.
+func (n *Number) Scan(v interface{}) error {
+	if v == nil {
+		*n = ""
+		return nil
+	}
+	switch x := v.(type) {
+	case string:
+		*n = Number(x)
+	case Number:
+		*n = x
+	case int8, int16, int32, int64, uint16, uint32, uint64:
+		*n = Number(fmt.Sprintf("%d", x))
+	case float32, float64:
+		*n = Number(fmt.Sprintf("%f", x))
+	default:
+		return errors.Errorf("unknown type %T", v)
+	}
+	return nil
+}
+
+// MarshalText marshals a Number to text.
+func (n Number) MarshalText() ([]byte, error) { return []byte(n), nil }
+
+// UnmarshalText parses text into a Number.
+func (n *Number) UnmarshalText(p []byte) error {
+	var dotNum int
+	for i, c := range p {
+		if !(c == '-' && i == 0 || '0' <= c && c <= '9') {
+			if c == '.' {
+				dotNum++
+				if dotNum == 1 {
+					continue
+				}
+			}
+			return errors.Errorf("unknown char %c in %q", c, p)
+		}
+	}
+	*n = Number(p)
+	return nil
+}
+
+// MarshalJSON marshals a Number into a JSON string.
+func (n Number) MarshalJSON() ([]byte, error) {
+	b, err := n.MarshalText()
+	b2 := make([]byte, 1, 1+len(b)+1)
+	b2[0] = '"'
+	b2 = append(b2, b...)
+	b2 = append(b2, '"')
+	return b2, err
+}
+
+// UnmarshalJSON parses a JSON string into the Number.
+func (n *Number) UnmarshalJSON(p []byte) error {
+	*n = Number("")
+	if len(p) == 0 {
+		return nil
+	}
+	if len(p) > 2 && p[0] == '"' && p[len(p)-1] == '"' {
+		p = p[1 : len(p)-1]
+	}
+	return n.UnmarshalText(p)
+}
 
 // QueryColumn is the described column.
 type QueryColumn struct {
