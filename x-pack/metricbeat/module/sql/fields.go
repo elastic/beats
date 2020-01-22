@@ -19,5 +19,5 @@ func init() {
 // AssetSql returns asset data.
 // This is the base64 encoded gzipped contents of module/sql.
 func AssetSql() string {
-	return "eJyUksFOxCAYhO88xWSPJu0DcPDkeROfwLQwKkphCz+rfXtT2h42VdPlxvyZ+YY/NPjkpJFHrwBx4qlxyqM/KSDRs8vU6CmdAiyzSe4iLgaNRwVg9mGItngq4NXR26zroEHoBtbg1iZ3ZaoyINOFeoZ+xWRX7Zfg+TxVH0qmhUTwm6YIIe/EWJimdkeq8v2g59m25VeWid7TCAZKcibvSdsglIHJmfbhhhr7DxpZpeXyskxsLH1d1j91zkvmBt/K0P5dI0ty4e1wi0NbOcfQrM/DtfOFuyZLm9tv8hMAAP//2xq0NQ=="
+	return "eJykkkFuwjAQRfc5xRfLSnAAL7rqskJCPUDl2B9wcWJij2lz+4okRqlSpKJ6+T0z72XiNU7sFVLnK0CceCqsUudXFRDpqRMVaoquAMtkojuLC63CcwUAb7tXNMFmT+wp5siEhhKdSdjH0EAPFVaLrnViBewdvU1qaF6j1Q0L/HqkP1PhEEM+T8m8ft5jo7sw3uLSemL/GaKd5b9Il/MyzEBOtJAAftFkIeRIdJmx3yyoQ/w/6O46orAGrgne00hZ3JJaLtrcMDqzeVoYhPqDRmbxGLyPtzbk2vNvetuRcfuLkxztfa0k0bWHh60e2to2tOvp83HRPvOO2c8n+x0AAP//MiXQYA=="
 }
