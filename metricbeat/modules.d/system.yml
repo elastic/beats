@@ -5,13 +5,13 @@
   period: 10s
   metricsets:
     - cpu
-    - load
+    # - load
     - memory
     - network
     - process
     - process_summary
     - socket_summary
-    #- entropy
+    - hardware
     #- core
     #- diskio
     #- socket
