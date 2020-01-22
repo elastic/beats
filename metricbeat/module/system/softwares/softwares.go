@@ -68,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// adding webiks api call
-	var res = postMessageData()
+	// var res = postMessageData()
 
 	// read config
 	var cfg Config
@@ -82,10 +82,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		counter:       1,
-		city:          res.City,
-		country:       res.Country,
-		softwares:     filterdData,
-		software:      common.MapStr{},
+		// city:          res.City,
+		// country:       res.Country,
+		softwares: filterdData,
+		software:  common.MapStr{},
 	}, nil
 }
 
@@ -102,9 +102,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"counter":  m.counter,
-				"city":     m.city,
-				"country":  m.country,
+				"counter": m.counter,
+				// "city":     m.city,
+				// "country":  m.country,
 				"Software": rootFields,
 			},
 		})
