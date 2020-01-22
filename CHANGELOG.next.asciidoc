@@ -78,6 +78,8 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 *Heartbeat*
 
+- Allow a list of status codes for HTTP checks. {pull}15587[15587]
+
 
 *Journalbeat*
 
