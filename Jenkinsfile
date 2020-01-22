@@ -37,7 +37,7 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}")
         dir("${BASE_DIR}"){
           script {
-            env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
+            env.GO_VERSION = readFile(".go-version").trim()
             env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
             env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
             env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
