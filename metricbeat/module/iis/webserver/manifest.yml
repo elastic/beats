@@ -5,6 +5,7 @@ input:
   defaults:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
+    perfmon.group_all_counter: true
     perfmon.counters:
     #network
         - instance_label: ''
@@ -120,6 +121,3 @@ input:
         - instance_label: ''
           measurement_label: process.io_write_operations_per_sec
           query: '\Process(w3wp*)\IO Write Operations/sec'
-        - instance_label: ''
-          measurement_label: process.virtual_bytes
-          query: '\Process(w3wp*)\Virtual Bytes'

@@ -20,6 +20,7 @@
 package perfmon
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -43,6 +44,7 @@ type Config struct {
 	IgnoreNECounters  bool            `config:"perfmon.ignore_non_existent_counters"`
 	GroupMeasurements bool            `config:"perfmon.group_measurements_by_instance"`
 	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
+	GroupAllCounters  bool            `config:"perfmon.group_all_counter"` // only available for the iis/webserver metricset at the moment
 }
 
 const metricsetName = "perfmon"
@@ -116,14 +118,28 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
-
-	for _, event := range events {
-		isOpen := report.Event(event)
-		if !isOpen {
-			break
+	if m.reader.config.GroupAllCounters {
+		event := groupAllEvents(events)
+		report.Event(event)
+	} else {
+		for _, event := range events {
+			isOpen := report.Event(event)
+			if !isOpen {
+				break
+			}
 		}
 	}
 	return nil
+}
+
+func groupAllEvents(events []mb.Event) mb.Event {
+	ev := mb.Event{
+		MetricSetFields: common.MapStr{},
+	}
+	for _, event := range events {
+		ev.MetricSetFields.Update(event.MetricSetFields)
+	}
+	return ev
 }
 
 // Close will be called when metricbeat is stopped, should close the query.

@@ -21,14 +21,14 @@ package website
 
 import (
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/module/windows/perfmon"
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
 	"github.com/pkg/errors"
 	"strings"
 )
 
 // Reader will contain the config options
 type Reader struct {
-	query perfmon.Query // PDH Query
+	query pdh.Query // PDH Query
 	hosts []string      // Mapping of counter path to key used for the label (e.g. processor.name)
 	log   *logp.Logger  // logger
 	hasRun bool         // will check if the reader has run a first time
@@ -36,7 +36,7 @@ type Reader struct {
 
 // NewReader creates a new instance of Reader.
 func NewReader(config Config) (*Reader, error) {
-	var query perfmon.Query
+	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
