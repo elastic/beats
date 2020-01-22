@@ -15,6 +15,7 @@ import (
 
 const (
 	defaultThreshold = 1000
+	agentIDKey       = "elastic.agent.id"
 )
 
 type ackFn func()
@@ -42,6 +43,7 @@ func (e *event) Message() string {
 
 // Reporter is a reporter without any effects, serves just as a showcase for further implementations.
 type Reporter struct {
+	info      agentInfo
 	logger    *logger.Logger
 	queue     []fleetapi.SerializableEvent
 	qlock     sync.Mutex
@@ -56,6 +58,7 @@ type agentInfo interface {
 // NewReporter creates a new fleet reporter.
 func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig) (*Reporter, error) {
 	r := &Reporter{
+		info:      agentInfo,
 		queue:     make([]fleetapi.SerializableEvent, 0),
 		logger:    l,
 		threshold: c.Threshold,
@@ -74,7 +77,7 @@ func (r *Reporter) Report(e reporter.Event) error {
 		Ts:        fleetapi.Time(e.Time()),
 		SubType:   e.SubType(),
 		Msg:       e.Message(),
-		Payload:   e.Payload(),
+		Payload:   injectAgentId(e.Payload(), r.info),
 		Data:      e.Data(),
 	})
 
@@ -171,6 +174,19 @@ func (r *Reporter) dropFirst() {
 	first := r.queue[0]
 	r.logger.Infof("fleet reporter dropped event because threshold[%d] was reached: %v", r.threshold, first)
 	r.queue = r.queue[1:]
+}
+
+func injectAgentId(payload map[string]interface{}, info agentInfo) map[string]interface{} {
+	if info == nil {
+		return payload
+	}
+
+	if payload == nil {
+		payload = make(map[string]interface{})
+	}
+
+	payload[agentIDKey] = info.AgentID()
+	return payload
 }
 
 // Check it is reporter.Backend.

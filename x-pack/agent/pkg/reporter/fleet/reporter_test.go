@@ -13,6 +13,47 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
 )
 
+func TestEventsHaveAgentID(t *testing.T) {
+	// setup client
+	threshold := 10
+	r := newTestReporter(1*time.Second, threshold)
+
+	// report events
+	firstBatchSize := 5
+	ee := getEvents(firstBatchSize)
+	for _, e := range ee {
+		r.Report(e)
+	}
+
+	// check after delay for output
+	reportedEvents, _ := r.Events()
+	if reportedCount := len(reportedEvents); reportedCount != firstBatchSize {
+		t.Fatalf("expected %v events got %v", firstBatchSize, reportedCount)
+	}
+
+	for _, e := range reportedEvents {
+		re, ok := e.(*event)
+
+		if !ok {
+			t.Fatal("reported event is not an event")
+		}
+
+		if re.Payload == nil {
+			t.Fatal("reported event is without payload")
+		}
+
+		id, found := re.Payload[agentIDKey]
+		if !found {
+			t.Fatal("reported event payload is without agent id")
+		}
+
+		if id != "agentID" {
+			t.Fatalf("reported event id incorrect, expected: 'agentID', got: '%v'", id)
+		}
+	}
+
+}
+
 func TestReporting(t *testing.T) {
 	// setup client
 	threshold := 10
@@ -178,6 +219,7 @@ func getEvents(count int) []reporter.Event {
 func newTestReporter(frequency time.Duration, threshold int) *Reporter {
 	log, _ := logger.New()
 	r := &Reporter{
+		info:      &testInfo{},
 		queue:     make([]fleetapi.SerializableEvent, 0),
 		logger:    log,
 		threshold: threshold,
@@ -185,6 +227,10 @@ func newTestReporter(frequency time.Duration, threshold int) *Reporter {
 
 	return r
 }
+
+type testInfo struct{}
+
+func (*testInfo) AgentID() string { return "agentID" }
 
 type testStateEvent struct{}
 
