@@ -18,9 +18,17 @@ import "C"
 import (
 	"log"
 	"strings"
+	"sync"
 	"unsafe"
 
 	errors "golang.org/x/xerrors"
+)
+
+// Cannot pass *Subscription to C, so pass an uint64 that points to this map entry
+var (
+	subscriptionsMu sync.Mutex
+	subscriptions   = make(map[uint64]*Subscription)
+	subscriptionsID uint64
 )
 
 // CallbackSubscr is the callback for C code on subscription event.
@@ -30,7 +38,9 @@ func CallbackSubscr(ctx unsafe.Pointer, message *C.dpiSubscrMessage) {
 	if ctx == nil {
 		return
 	}
-	subscr := (*Subscription)(ctx)
+	subscriptionsMu.Lock()
+	subscr := subscriptions[*((*uint64)(ctx))]
+	subscriptionsMu.Unlock()
 
 	getRows := func(rws *C.dpiSubscrMessageRow, rwsNum C.uint32_t) []RowEvent {
 		if rwsNum == 0 {
@@ -124,6 +134,7 @@ type Subscription struct {
 	conn      *conn
 	dpiSubscr *C.dpiSubscr
 	callback  func(Event)
+	ID        uint64
 }
 
 func (s *Subscription) getError() error { return s.conn.getError() }
@@ -140,7 +151,7 @@ func (c *conn) NewSubscription(name string, cb func(Event)) (*Subscription, erro
 	subscr := Subscription{conn: c, callback: cb}
 	params := (*C.dpiSubscrCreateParams)(C.malloc(C.sizeof_dpiSubscrCreateParams))
 	//defer func() { C.free(unsafe.Pointer(params)) }()
-	C.dpiContext_initSubscrCreateParams(c.dpiContext, params)
+	C.dpiContext_initSubscrCreateParams(c.drv.dpiContext, params)
 	params.subscrNamespace = C.DPI_SUBSCR_NAMESPACE_DBCHANGE
 	params.protocol = C.DPI_SUBSCR_PROTO_CALLBACK
 	params.qos = C.DPI_SUBSCR_QOS_BEST_EFFORT | C.DPI_SUBSCR_QOS_QUERY | C.DPI_SUBSCR_QOS_ROWIDS
@@ -151,7 +162,15 @@ func (c *conn) NewSubscription(name string, cb func(Event)) (*Subscription, erro
 	}
 	// typedef void (*dpiSubscrCallback)(void* context, dpiSubscrMessage *message);
 	params.callback = C.dpiSubscrCallback(C.CallbackSubscrDebug)
-	params.callbackContext = unsafe.Pointer(&subscr)
+	// cannot pass &subscr to C, so pass indirectly
+	subscriptionsMu.Lock()
+	subscriptionsID++
+	subscr.ID = subscriptionsID
+	subscriptions[subscr.ID] = &subscr
+	subscriptionsMu.Unlock()
+	subscrID := (*C.uint64_t)(C.malloc(8))
+	*subscrID = C.uint64_t(subscriptionsID)
+	params.callbackContext = unsafe.Pointer(subscrID)
 
 	dpiSubscr := (*C.dpiSubscr)(C.malloc(C.sizeof_void))
 
@@ -204,6 +223,9 @@ func (s *Subscription) Register(qry string, params ...interface{}) error {
 //
 // This code is EXPERIMENTAL yet!
 func (s *Subscription) Close() error {
+	subscriptionsMu.Lock()
+	delete(subscriptions, s.ID)
+	subscriptionsMu.Unlock()
 	dpiSubscr := s.dpiSubscr
 	conn := s.conn
 	s.conn = nil
