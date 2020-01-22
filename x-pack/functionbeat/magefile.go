@@ -59,6 +59,7 @@ func Build() error {
 		params.InputFiles = []string{inputFiles}
 		params.Name = devtools.BeatName + "-" + provider.Name
 		params.OutputDir = filepath.Join("provider", provider.Name)
+		params.CGO = false
 		params.Env = make(map[string]string)
 		if provider.GOOS != "" {
 			params.Env["GOOS"] = provider.GOOS
