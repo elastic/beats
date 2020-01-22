@@ -30456,25 +30456,12 @@ type: long
 [[exported-fields-sql]]
 == sql fields
 
-sql module
+SQL module fetches metrics from a SQL database
 
 
 
-[float]
-=== sql
 
-`sql` fetches metrics from a SQL database 
-
-
-
-[float]
-=== query
-
-query
-
-
-
-*`sql.query.driver`*::
+*`sql.driver`*::
 +
 --
 Driver used to execute the query.
@@ -30484,7 +30471,7 @@ type: keyword
 
 --
 
-*`sql.query.query`*::
+*`sql.query`*::
 +
 --
 Query executed to collect metrics.
@@ -30494,7 +30481,7 @@ type: keyword
 
 --
 
-*`sql.query.metrics.numeric.*`*::
+*`sql.metrics.numeric.*`*::
 +
 --
 Numeric metrics collected.
@@ -30504,7 +30491,7 @@ type: object
 
 --
 
-*`sql.query.metrics.string.*`*::
+*`sql.metrics.string.*`*::
 +
 --
 Non-numeric values collected.
