@@ -73,12 +73,13 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
@@ -130,6 +131,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
@@ -502,6 +506,42 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+#-------------------------------- IBM MQ Module --------------------------------
+- module: ibmmq
+  metricsets: ['qmgr']
+  period: 10s
+  hosts: ['localhost:9157']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
+  # The custom processor is responsible for filtering Prometheus metrics
+  # not stricly related to the IBM MQ domain, e.g. system load, process,
+  # metrics HTTP server.
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var metrics = event.Get("prometheus.metrics");
+            Object.keys(metrics).forEach(function(key) {
+              if (!(key.match(/^ibmmq_.*$/))) {
+                event.Delete("prometheus.metrics." + key);
+              }
+            });
+            metrics = event.Get("prometheus.metrics");
+            if (Object.keys(metrics).length == 0) {
+              event.Cancel();
+            }
+          }
+
+#-------------------------------- Istio Module --------------------------------
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  hosts: ["localhost:42422"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -935,10 +975,9 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
 
 
@@ -2237,6 +2276,14 @@ logging.files:
 
   #metrics.period: 10s
   #state.period: 1m
+
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

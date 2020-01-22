@@ -29,7 +29,7 @@
             },
             "panelIndex": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
             "panelRefName": "panel_0",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -42,7 +42,7 @@
             },
             "panelIndex": "03807c37-c9dc-4b41-80ce-e28a13eb66e2",
             "panelRefName": "panel_1",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -55,7 +55,7 @@
             },
             "panelIndex": "18810035-5e91-409a-98d7-c03166e1f9b3",
             "panelRefName": "panel_2",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -68,7 +68,7 @@
             },
             "panelIndex": "60e6e6e4-3237-430e-80fc-63fe9b718a7e",
             "panelRefName": "panel_3",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -81,7 +81,7 @@
             },
             "panelIndex": "5e5d6509-2889-4383-bef4-9c2da0e759c6",
             "panelRefName": "panel_4",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -94,7 +94,7 @@
             },
             "panelIndex": "2db371a7-20c5-460a-a2f7-06b5b03d7b34",
             "panelRefName": "panel_5",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -107,7 +107,7 @@
             },
             "panelIndex": "1cd72292-ecba-4008-bb3c-e76c7fb6b4f4",
             "panelRefName": "panel_6",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -120,7 +120,7 @@
             },
             "panelIndex": "cea56791-2602-4079-977b-7d088727872c",
             "panelRefName": "panel_7",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -133,7 +133,7 @@
             },
             "panelIndex": "fe509a4d-700b-4092-9aae-ce14e8de103e",
             "panelRefName": "panel_8",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -146,7 +146,7 @@
             },
             "panelIndex": "3d6b1fa0-746f-40ed-8fcc-ae89013f632b",
             "panelRefName": "panel_9",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -159,7 +159,7 @@
             },
             "panelIndex": "0f9a5223-3c63-405c-a5c4-ea15416bad4a",
             "panelRefName": "panel_10",
-            "version": "7.4.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -1852,5 +1852,5 @@
       "version": "WzUxMzMsMV0="
     }
   ],
-  "version": "7.4.0"
+  "version": "7.3.0"
 }

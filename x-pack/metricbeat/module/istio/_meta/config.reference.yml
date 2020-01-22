@@ -1,0 +1,4 @@
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  hosts: ["localhost:42422"]
