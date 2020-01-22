@@ -49,12 +49,6 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 *Heartbeat*
 
-- Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
-- Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
-- Fix integer comparison on JSON responses. {pull}13348[13348]
-- Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
-- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
-- The heartbeat scheduler no longer drops scheduled items when under very high load causing missed deadlines. {pull}14890[14890]
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Journalbeat*
