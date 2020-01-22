@@ -107,7 +107,7 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 		n += m
 	}
 
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return 0, "", "", err
 	}
 
