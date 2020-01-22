@@ -30466,7 +30466,7 @@ type: long
 [[exported-fields-sql]]
 == sql fields
 
-sql module
+SQL module fetches metrics from a SQL database
 
 
 
