@@ -44,8 +44,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
 	config := struct {
-		Driver string `config:"driver"`
-		Query  string `config:"sql_query"`
+		Driver string `config:"driver" validate:"nonzero,required"`
+		Query  string `config:"sql_query" validate:"nonzero,required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {

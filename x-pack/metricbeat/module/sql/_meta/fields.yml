@@ -4,8 +4,21 @@
   description: >
     sql module
   fields:
-    - name: sql
-      type: group
+    - name: sql.driver
+      type: keyword
       description: >
-        `sql` fetches metrics from a SQL database 
-      fields:
+        Driver used to execute the query.
+    - name: sql.query
+      type: keyword
+      description: >
+        Query executed to collect metrics.
+    - name: sql.metrics.numeric.*
+      type: object
+      object_type: double
+      description: >
+        Numeric metrics collected.
+    - name: sql.metrics.string.*
+      type: object
+      object_type: keyword
+      description: >
+        Non-numeric values collected.
