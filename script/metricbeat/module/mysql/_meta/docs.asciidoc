@@ -1,0 +1,40 @@
+This module periodically fetches metrics from https://www.mysql.com/[MySQL]
+servers.
+
+The default metricset is `status`.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
+of the following format:
+
+----
+[username[:password]@][protocol[(address)]]/
+----
+
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the DSN take
+precedence over those specified in the `username` and `password` config options.
+
+----
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(127.0.0.1:3306)/"]
+  username: root
+  password: secret
+----
+
+[float]
+=== Compatibility
+
+The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expected
+to work with all versions >= 5.7.0.
+It is also tested with MariaDB 10.2, 10.3 and 10.4.
+
+[float]
+=== Dashboard
+
+The mysql module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-mysql.png[]

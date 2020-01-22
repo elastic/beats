@@ -1,0 +1,13 @@
+version: '2.3'
+
+services:
+  haproxy:
+    image: docker.elastic.co/integrations-ci/beats-haproxy:${HAPROXY_VERSION:-1.8.22}-1
+    build: 
+      context: ./_meta
+      args:
+        HAPROXY_VERSION: ${HAPROXY_VERSION:-1.8.22}
+    ports:
+      - 14567
+      - 14568
+      - 14569

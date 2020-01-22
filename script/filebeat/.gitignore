@@ -1,0 +1,11 @@
+/_meta/filebeat.dev.yml
+.vagrant
+/docs/html_docs
+
+filebeat
+
+build
+_meta/module.generated
+_meta/beat.yml
+_meta/beat.reference.yml
+/tests/load/logs

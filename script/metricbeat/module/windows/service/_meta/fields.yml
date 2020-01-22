@@ -1,0 +1,69 @@
+- name: service
+  type: group
+  description: >
+    `service` contains the status for Windows services.
+  release: ga
+  fields:
+    - name: id
+      type: keyword
+      example: hW3NJFc1Ap
+      description: >
+        A unique ID for the service. It is a hash of the machine's GUID and the
+        service name.
+
+    - name: name
+      type: keyword
+      example: Wecsvc
+      description: >
+        The service name.
+
+    - name: display_name
+      type: keyword
+      example: Windows Event Collector
+      description: >
+        The display name of the service.
+
+    - name: start_type
+      type: keyword
+      description: >
+        The startup type of the service. The possible values are `Automatic`,
+        `Boot`, `Disabled`, `Manual`, and `System`.
+
+    - name: start_name
+      type: keyword
+      example: NT AUTHORITY\LocalService
+      description: >
+        Account name under which a service runs.
+
+    - name: path_name
+      type: keyword
+      example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
+      description: >
+        Fully qualified path to the file that implements the service,
+        including arguments.
+
+    - name: state
+      type: keyword
+      description: >
+        The actual state of the service. The possible values are `Continuing`,
+        `Pausing`, `Paused`, `Running`, `Starting`, `Stopping`, and `Stopped`.
+
+    - name: exit_code
+      type: keyword
+      description: >
+        For `Stopped` services this is the error code that service reports
+        when starting to stopping. This will be the generic Windows service
+        error code unless the service provides a service-specific error code.
+
+    - name: pid
+      type: long
+      example: 1092
+      description: >
+        For `Running` services this is the associated process PID.
+
+    - name: uptime.ms
+      type: long
+      format: duration
+      input_format: milliseconds
+      description: >
+        The service's uptime specified in milliseconds.

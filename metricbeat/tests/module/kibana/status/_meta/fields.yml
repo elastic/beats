@@ -1,0 +1,48 @@
+- name: status
+  type: group
+  description: >
+    Status fields
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Kibana instance name.
+    - name: uuid
+      type: alias
+      path: service.id
+      migration: true
+      description: >
+        Kibana instance uuid.
+    - name: version.number
+      type: alias
+      description: >
+        Kibana version number.
+      path: service.version
+      migration: true
+    - name: status.overall.state
+      type: keyword
+      description: >
+        Kibana overall state.
+    - name: metrics
+      type: group
+      description: >
+        Metrics fields
+      fields:
+        - name: concurrent_connections
+          type: long
+          description: >
+            Current concurrent connections.
+        - name: requests
+          type: group
+          description: >
+            Request statistics.
+          fields:
+            - name: disconnects
+              type: long
+              description: >
+                Total number of disconnected connections.
+            - name: total
+              type: long
+              description: >
+                Total number of connections.

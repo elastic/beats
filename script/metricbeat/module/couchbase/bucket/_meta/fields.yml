@@ -1,0 +1,51 @@
+- name: bucket
+  type: group
+  description: >
+    Couchbase bucket metrics.
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Name of the bucket.
+    - name: type
+      type: keyword
+      description: >
+        Type of the bucket.
+    - name: data.used.bytes
+      format: bytes
+      type: long
+      description: >
+        Size of user data within buckets of the specified state that are resident in RAM.
+    - name: disk.fetches
+      type: long
+      description: >
+        Number of disk fetches.
+    - name: disk.used.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of disk used (bytes).
+    - name: memory.used.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of memory used by the bucket (bytes).
+    - name: quota.ram.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of RAM used by the bucket (bytes).
+    - name: quota.use.pct
+      format: percent
+      type: scaled_float
+      description: >
+        Percentage of RAM used (for active objects) against the configured bucket size (%).
+    - name: ops_per_sec
+      type: long
+      description: >
+        Number of operations per second.
+    - name: item_count
+      type: long
+      description: >
+        Number of items associated with the bucket.

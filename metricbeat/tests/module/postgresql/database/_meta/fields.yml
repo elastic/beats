@@ -1,0 +1,95 @@
+- name: database
+  type: group
+  description: >
+    One row per database, showing database-wide statistics. Collected by querying
+    pg_stat_database
+  release: ga
+  fields:
+    - name: oid
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: name
+      type: keyword
+      description: >
+        Name of the database this backend is connected to.
+    - name: number_of_backends
+      type: long
+      description: >
+        Number of backends currently connected to this database.
+    - name: transactions.commit
+      type: long
+      description: >
+        Number of transactions in this database that have been committed.
+    - name: transactions.rollback
+      type: long
+      description: >
+        Number of transactions in this database that have been rolled back.
+    - name: blocks.read
+      type: long
+      description: >
+        Number of disk blocks read in this database.
+    - name: blocks.hit
+      type: long
+      description: >
+        Number of times disk blocks were found already in the buffer cache, so
+        that a read was not necessary (this only includes hits in the PostgreSQL
+        buffer cache, not the operating system's file system cache).
+    - name: blocks.time.read.ms
+      type: long
+      description: >
+        Time spent reading data file blocks by backends in this database, in
+        milliseconds.
+    - name: blocks.time.write.ms
+      type: long
+      description: >
+        Time spent writing data file blocks by backends in this database, in
+        milliseconds.
+    - name: rows.returned
+      type: long
+      description: >
+        Number of rows returned by queries in this database.
+    - name: rows.fetched
+      type: long
+      description: >
+        Number of rows fetched by queries in this database.
+    - name: rows.inserted
+      type: long
+      description: >
+        Number of rows inserted by queries in this database.
+    - name: rows.updated
+      type: long
+      description: >
+        Number of rows updated by queries in this database.
+    - name: rows.deleted
+      type: long
+      description: >
+        Number of rows deleted by queries in this database.
+    - name: conflicts
+      type: long
+      description: >
+        Number of queries canceled due to conflicts with recovery in this
+        database.
+    - name: temporary.files
+      type: long
+      description: >
+        Number of temporary files created by queries in this database. All
+        temporary files are counted, regardless of why the temporary file was
+        created (e.g., sorting or hashing), and regardless of the log_temp_files
+        setting.
+    - name: temporary.bytes
+      type: long
+      description: >
+        Total amount of data written to temporary files by queries in this
+        database. All temporary files are counted, regardless of why the
+        temporary file was created, and regardless of the log_temp_files
+        setting.
+    - name: deadlocks
+      type: long
+      description: >
+        Number of deadlocks detected in this database.
+    - name: stats_reset
+      type: date
+      description: >
+        Time at which these statistics were last reset.
+

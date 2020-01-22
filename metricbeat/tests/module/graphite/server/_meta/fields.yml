@@ -1,0 +1,10 @@
+- name: server
+  type: group
+  description: >
+    server
+  release: ga
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

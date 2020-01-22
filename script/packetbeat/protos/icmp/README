@@ -1,0 +1,16 @@
+also see other ICMP implementations
+http://godoc.org/golang.org/x/net/icmp
+http://godoc.org/golang.org/x/net/ipv4#ICMPType
+http://godoc.org/golang.org/x/net/ipv6#ICMPType
+
+see
+libbeat/CONTRIBUTING.md
+libbeat/common/endpoint.go
+libbeat/common/tuples.go
+SUPPORT_PROTOCOL.md
+docs/new_protocol.asciidoc
+etc/fields.yml
+
+requirements
+- transaction: single message or message pair
+- correlation key: ip: src, dst; icmp: id, seq

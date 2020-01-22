@@ -1,0 +1,236 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/setup-repositories.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[setup-repositories]]
+=== Repositories for APT and YUM
+
+We have repositories available for APT and YUM-based distributions. Note that we
+provide binary packages, but no source packages.
+
+We use the PGP key https://pgp.mit.edu/pks/lookup?op=vindex&search=0xD27D666CD88E42B4[D88E42B4],
+Elasticsearch Signing Key, with fingerprint
+
+    4609 5ACC 8548 582C 1A26 99A9 D27D 666C D88E 42B4
+
+to sign all our packages. It is available from https://pgp.mit.edu.
+
+[float]
+==== APT
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {repo} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+To add the {repo} repository for APT:
+
+. Download and install the Public Signing Key:
++
+[source,sh]
+--------------------------------------------------
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+--------------------------------------------------
+
+. You may need to install the `apt-transport-https` package on Debian before proceeding:
++
+[source,sh]
+--------------------------------------------------
+sudo apt-get install apt-transport-https
+--------------------------------------------------
+
+ifeval::["{release-state}"=="prerelease"]
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}-prerelease.list+:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
+--------------------------------------------------
++
+endif::[]
+ifeval::["{release-state}"=="released"]
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}.list+:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
+--------------------------------------------------
++
+endif::[]
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following sources list:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
+--------------------------------------------------
+
+endif::[]
+
+==================================================
++
+[WARNING]
+==================================================
+To add the Elastic repository, make sure that you use the `echo` method  shown
+in the example. Do not use `add-apt-repository` because it will add a `deb-src`
+entry, but we do not provide a source package.
+
+If you have added the `deb-src` entry by mistake, you will see an error like
+the following:
+
+    Unable to find expected entry 'main/source/Sources' in Release file (Wrong sources.list entry or malformed file)
+
+Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the installation should work as expected.
+==================================================
+
+. Run `apt-get update`, and the repository is ready for use. For example, you can
+install {beatname_uc} by running:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo apt-get update && sudo apt-get install {beatname_pkg}
+--------------------------------------------------
+
+. To configure {beatname_uc} to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo update-rc.d {beatname_pkg} defaults 95 10
+--------------------------------------------------
+
+endif::[]
+
+[float]
+==== YUM
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {repo} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+To add the {repo} repository for YUM:
+
+. Download and install the public signing key:
++
+[source,sh]
+--------------------------------------------------
+sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+--------------------------------------------------
+
+. Create a file with a `.repo` extension (for example, `elastic.repo`) in
+your `/etc/yum.repos.d/` directory and add the following lines:
++
+ifeval::["{release-state}"=="prerelease"]
+["source","sh",subs="attributes"]
+--------------------------------------------------
+[elastic-{major-version}-prerelease]
+name=Elastic repository for {major-version} prerelease packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}-prerelease/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+--------------------------------------------------
+endif::[]
+ifeval::["{release-state}"=="released"]
+["source","sh",subs="attributes"]
+--------------------------------------------------
+[elastic-{major-version}]
+name=Elastic repository for {major-version} packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+--------------------------------------------------
+endif::[]
++
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following `baseurl` in your
+`.repo` file:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/yum
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}/yum
+--------------------------------------------------
+
+endif::[]
+
+==================================================
++
+Your repository is ready to use. For example, you can install {beatname_uc} by
+running:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo yum install {beatname_pkg}
+--------------------------------------------------
+
+. To configure {beatname_uc} to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo chkconfig --add {beatname_pkg}
+--------------------------------------------------
+
+endif::[]
+

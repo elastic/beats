@@ -1,0 +1,44 @@
+filebeat:
+  inputs:
+    - type: log
+      paths:
+        - /Users/ruflin/Dev/gopath/src/github.com/elastic/filebeat/tests/load/logs/*
+
+      #fields:
+      #  level: debug
+      #  review: 1
+      ignore_older: 0
+      close_inactive: 5m
+      scan_frequency: 0s
+      harvester_buffer_size: 1000000
+
+  spool_size: 4096
+  idle_timeout: 5s
+  registry_file: registry
+  registry_file_permissions: 0600
+
+############################# Output ##########################################
+
+# Configure what outputs to use when sending the data collected by filebeat.
+# You can enable one or multiple outputs by setting enabled option to true.
+output:
+
+  ## File as output
+  file:
+    # Path to the directory where to save the generated files. The option is mandatory.
+    path: "/tmp/filebeat"
+    filename: filebeat
+    rotate_every_kb: 10000
+    number_of_files: 100
+
+
+
+logging:
+  to_files: true
+  #selectors: ["*"]
+  level: info
+
+  files:
+    path: /tmp/log/beat
+    name: filebeat
+    rotateeverybytes: 10485760 # = 10MB

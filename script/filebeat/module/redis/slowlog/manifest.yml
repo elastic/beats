@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: hosts
+    default:
+      - "localhost:6379"
+  - name: password
+    default: ""
+
+ingest_pipeline: ingest/pipeline.json
+input: config/slowlog.yml

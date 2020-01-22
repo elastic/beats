@@ -1,0 +1,12 @@
+. If you plan to use the sample {kib} dashboards provided with {beatname_uc},
+configure the {kib} endpoint. You can skip this step if {kib} is running on
+the same host as {es}.
++
+[source,yaml]
+----------------------------------------------------------------------
+setup.kibana:
+  host: "mykibanahost:5601" <1>
+----------------------------------------------------------------------
+<1> The hostname and port of the machine where {kib} is running,
+for example, `mykibanahost:5601`. If you specify a path after the port number,
+include the scheme and port: `http://mykibanahost:5601/path`.

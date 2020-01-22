@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "docker": {
+        "info": {
+            "containers": {
+                "paused": 0,
+                "running": 2,
+                "stopped": 12,
+                "total": 14
+            },
+            "id": "VF5E:SKD6:YFIG:VDGO:JU3M:ZT2N:4E6B:7IOL:5QOS:M3HT:EM7E:VL22",
+            "images": 425
+        }
+    },
+    "event": {
+        "dataset": "docker.info",
+        "duration": 115000,
+        "module": "docker"
+    },
+    "metricset": {
+        "name": "info",
+        "period": 10000
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
+    }
+}

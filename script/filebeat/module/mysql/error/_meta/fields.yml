@@ -1,0 +1,17 @@
+- name: error
+  type: group
+  description: >
+    Contains fields from the MySQL error logs.
+  fields:
+    - name: thread_id
+      type: alias
+      path: mysql.thread_id
+      migration: true
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true

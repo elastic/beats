@@ -1,0 +1,26 @@
+[
+    {
+        "@timestamp": "2017-10-09T16:45:00.423Z",
+        "destination.address": "192.168.10.10",
+        "destination.ip": "192.168.10.10",
+        "destination.port": 445,
+        "event.dataset": "zeek.dpd",
+        "event.id": "CRrT7S1ccw9H6hzCR",
+        "event.module": "zeek",
+        "fileset.name": "dpd",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:b+Szw+ia464igf5e+MwW1WUzw9Y=",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.10.31",
+        "source.ip": "192.168.10.31",
+        "source.port": 49285,
+        "tags": [
+            "zeek.dpd"
+        ],
+        "zeek.dpd.analyzer": "DCE_RPC",
+        "zeek.dpd.failure_reason": "Binpac exception: binpac exception: &enforce violation : DCE_RPC_Header:rpc_vers",
+        "zeek.session_id": "CRrT7S1ccw9H6hzCR"
+    }
+]

@@ -1,0 +1,69 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "envoyproxy": {
+        "server": {
+            "cluster_manager": {
+                "active_clusters": 1,
+                "cluster_added": 1,
+                "cluster_modified": 0,
+                "cluster_removed": 0,
+                "warming_clusters": 0
+            },
+            "filesystem": {
+                "flushed_by_timer": 9,
+                "reopen_failed": 0,
+                "write_buffered": 85,
+                "write_completed": 18,
+                "write_total_buffered": 1306
+            },
+            "http2": {},
+            "listener_manager": {
+                "listener_added": 1,
+                "listener_create_failure": 0,
+                "listener_create_success": 12,
+                "listener_modified": 0,
+                "listener_removed": 0,
+                "total_listeners_active": 1,
+                "total_listeners_draining": 0,
+                "total_listeners_warming": 0
+            },
+            "runtime": {
+                "admin_overrides_active": 0,
+                "load_error": 0,
+                "load_success": 0,
+                "num_keys": 0,
+                "override_dir_exists": 0,
+                "override_dir_not_exists": 0
+            },
+            "server": {
+                "days_until_first_cert_expiring": 2147483647,
+                "hot_restart_epoch": 0,
+                "live": 1,
+                "memory_allocated": 3299760,
+                "memory_heap_size": 4194304,
+                "parent_connections": 0,
+                "total_connections": 0,
+                "uptime": 95,
+                "version": 4151803,
+                "watchdog_mega_miss": 0,
+                "watchdog_miss": 0
+            },
+            "stats": {
+                "overflow": 0
+            }
+        }
+    },
+    "event": {
+        "dataset": "envoyproxy.server",
+        "duration": 115000,
+        "module": "envoyproxy"
+    },
+    "metricset": {
+        "name": "server",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.18.0.2:9901",
+        "type": "envoyproxy"
+    }
+}

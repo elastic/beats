@@ -1,0 +1,20 @@
+# Module: redis
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-redis.html
+
+- module: redis
+  #metricsets:
+  #  - info
+  #  - keyspace
+  period: 10s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
+
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
+
+  # Redis AUTH password. Empty by default.
+  #password: foobared

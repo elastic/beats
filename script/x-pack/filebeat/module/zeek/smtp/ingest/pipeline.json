@@ -1,0 +1,55 @@
+{
+  "description": "Pipeline for normalizing Zeek smtp.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smtp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.smtp.ts"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smtp.date",
+        "target_field": "zeek.smtp.date",
+        "formats": ["EEE, d MMM yyyy HH:mm:ss Z"],
+        "if": "ctx.zeek.smtp.date != null"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

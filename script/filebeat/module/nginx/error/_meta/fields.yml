@@ -1,0 +1,26 @@
+- name: error
+  type: group
+  description: >
+    Contains fields for the Nginx error logs.
+  fields:
+    - name: connection_id
+      type: long
+      description: >
+        Connection identifier.
+
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: pid
+      type: alias
+      path: process.pid
+      migration: true
+    - name: tid
+      type: alias
+      path: process.thread.id
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true

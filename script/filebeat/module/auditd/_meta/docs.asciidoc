@@ -1,0 +1,69 @@
+:modulename: auditd
+:has-dashboards: true
+
+== Auditd module
+
+The +{modulename}+ module collects and parses logs from the audit daemon
+(`auditd`).
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from `auditd` on OSes like CentOS
+6 and CentOS 7.
+
+This module is not available for Windows.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing an overview of the audit log
+data. You can build more specific dashboards that are tailored to the audit
+rules that you use on your systems.
+
+[role="screenshot"]
+image::./images/kibana-audit-auditd.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: auditd
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/audit/audit.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
+-----
+
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

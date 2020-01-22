@@ -1,0 +1,15 @@
+- key: mysql
+  title: "MySQL"
+  description: >
+    Module for parsing the MySQL log files.
+  short_config: true
+  fields:
+    - name: mysql
+      type: group
+      description: >
+        Fields from the MySQL log files.
+      fields:
+        - name: thread_id
+          type: long
+          description: >
+            The connection or thread ID for the query.

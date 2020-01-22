@@ -1,0 +1,6 @@
+- name: server
+  type: group
+  description: >
+    server
+  release: ga
+  fields:

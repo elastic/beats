@@ -1,0 +1,43 @@
+ifndef::has_module_steps[]
+ifndef::no-output-logstash[]
+. Configure the output. {beatname_uc} supports a variety of
+<<configuring-output,outputs>>, but typically you'll either send events directly
+to {es}, or to {ls} for additional processing.
++
+To send output directly to {es} (without using {ls}), set the location of the
+{es} installation:
++
+endif::[]
+ifdef::no-output-logstash[]
+. Configure the {es} output by setting the location of the {es} installation:
++
+endif::[]
+endif::has_module_steps[]
+* If you're running our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
+on {ecloud}, specify your <<configure-cloud-id,Cloud ID>>. For example:
++
+[source,yaml]
+----------------------------------------------------------------------
+cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
+----------------------------------------------------------------------
+
+* If you're running {es} on your own hardware, set the host and port where
+{beatname_uc} can find the {es} installation. For example:
++
+[source,yaml]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["myEShost:9200"]
+----------------------------------------------------------------------
+ifndef::has_module_steps[]
++
+ifndef::no-output-logstash[]
+To send output to {ls}, 
+<<logstash-output,Configure the {ls} output>> instead. For all other
+outputs, see <<configuring-output>>.
+endif::[]
+ifdef::no-output-logstash[]
+For more information, see <<configuring-output>>.
+endif::[]
+endif::has_module_steps[]

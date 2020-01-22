@@ -1,0 +1,13 @@
+- key: mongodb
+  title: "MongoDB"
+  description: >
+    Metrics collected from MongoDB servers.
+  short_config: false
+  release: ga
+  settings: ["ssl"]
+  fields:
+    - name: mongodb
+      type: group
+      description: >
+        MongoDB metrics.
+      fields:

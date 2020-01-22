@@ -1,0 +1,10 @@
+- key: uwsgi
+  title: "uwsgi"
+  description: >
+    uwsgi module
+  release: ga
+  fields:
+    - name: uwsgi
+      type: group
+      description: >
+      fields:

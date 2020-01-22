@@ -1,0 +1,55 @@
+- name: virtualmachine
+  type: group
+  description: >
+    virtualmachine
+  release: beta
+  fields:
+    - name: host.id
+      type: keyword
+      description: >
+        Host id
+    - name: host.hostname
+      type: keyword
+      description: >
+        Host name of the host
+    - name: name
+      type: keyword
+      description: >
+        Virtual Machine name
+    - name: os
+      type: keyword
+      description: >
+        Virtual Machine Operating System name
+    - name: cpu.used.mhz
+      type: long
+      description: >
+        Used CPU in Mhz
+    - name: memory.used.guest.bytes
+      type: long
+      description: >
+        Used Memory of Guest in bytes
+      format: bytes
+    - name: memory.used.host.bytes
+      type: long
+      description: >
+        Used Memory of Host in bytes
+      format: bytes
+    - name: memory.total.guest.bytes
+      type: long
+      description: >
+        Total Memory of Guest in bytes
+      format: bytes
+    - name: memory.free.guest.bytes
+      type: long
+      description: >
+        Free Memory of Guest in bytes
+      format: bytes
+    - name: custom_fields
+      type: object
+      object_type: keyword
+      description: >
+        Custom fields
+    - name: network_names
+      type: keyword
+      description: >
+        Network names

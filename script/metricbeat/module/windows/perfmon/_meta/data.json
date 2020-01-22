@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "windows",
+        "name": "perfmon",
+        "rtt": 115
+    },
+    "windows": {
+        "perfmon": {
+            "processor": {
+                "name": "_Total",
+                "time": {
+                    "total": {
+                        "pct": 1.4663385364361736
+                    }
+                }
+            }
+        }
+    }
+}

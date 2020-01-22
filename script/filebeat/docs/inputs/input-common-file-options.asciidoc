@@ -1,0 +1,399 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the input
+//// to process files on disk (includes options for managing physical files)
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
+
+[float]
+[id="{beatname_lc}-input-{type}-exclude-files"]
+===== `exclude_files`
+
+A list of regular expressions to match the files that you want {beatname_uc} to
+ignore. By default no files are excluded.
+
+The following example configures {beatname_uc} to ignore all the files that have
+a `gz` extension:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  exclude_files: ['\.gz$']
+----
+
+See <<regexp-support>> for a list of supported regexp patterns.
+
+[float]
+[id="{beatname_lc}-input-{type}-ignore-older"]
+===== `ignore_older`
+
+If this option is enabled, {beatname_uc} ignores any files that were modified
+before the specified timespan. Configuring `ignore_older` can be especially
+useful if you keep log files for a long time. For example, if you want to start
+{beatname_uc}, but only want to send the newest files and files from last week,
+you can configure this option.
+
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0,
+which disables the setting. Commenting out the config has the same effect as
+setting it to 0.
+
+IMPORTANT: You must set `ignore_older` to be greater than `close_inactive`.
+
+The files affected by this setting fall into two categories:
+
+* Files that were never harvested
+* Files that were harvested but weren't updated for longer than `ignore_older`
+
+For files which were never seen before, the offset state is set to the end of
+the file. If a state already exist, the offset is not changed. In case a file is
+updated again later, reading continues at the set offset position.
+
+The `ignore_older` setting relies on the modification time of the file to
+determine if a file is ignored. If the modification time of the file is not
+updated when lines are written to a file (which can happen on Windows), the
+`ignore_older` setting may cause {beatname_uc} to ignore files even though
+content was added at a later time.
+
+To remove the state of previously harvested files from the registry file, use
+the `clean_inactive` configuration option.
+
+Before a file can be ignored by {beatname_uc}, the file must be closed. To
+ensure a file is no longer being harvested when it is ignored, you must set
+`ignore_older` to a longer duration than `close_inactive`.
+
+If a file that's currently being harvested falls under `ignore_older`, the
+harvester will first finish reading the file and close it after `close_inactive`
+is reached. Then, after that, the file will be ignored.
+
+[float]
+[id="{beatname_lc}-input-{type}-close-options"]
+===== `close_*`
+
+The `close_*` configuration options are used to close the harvester after a
+certain criteria or time. Closing the harvester means closing the file handler.
+If a file is updated after the harvester is closed, the file will be picked up
+again after `scan_frequency` has elapsed. However, if the file is moved or
+deleted while the harvester is closed, {beatname_uc} will not be able to pick up
+the file again, and any data that the harvester hasn't read will be lost. 
+The `close_*` settings are applied synchronously when {beatname_uc} attempts 
+to read from a file, meaning that if {beatname_uc} is in a blocked state
+due to blocked output, full queue or other issue, a file that would 
+otherwise be closed remains open until {beatname_uc} once again attempts to read from the file.
+
+
+[float]
+[id="{beatname_lc}-input-{type}-close-inactive"]
+===== `close_inactive`
+
+When this option is enabled, {beatname_uc} closes the file handle if a file has
+not been harvested for the specified duration. The counter for the defined
+period starts when the last log line was read by the harvester. It is not based
+on the modification time of the file. If the closed file changes again, a new
+harvester is started and the latest changes will be picked up after
+`scan_frequency` has elapsed.
+
+We recommended that you set `close_inactive` to a value that is larger than the
+least frequent updates to your log files. For example, if your log files get
+updated every few seconds, you can safely set `close_inactive` to `1m`. If there
+are log files with very different update rates, you can use multiple
+configurations with different values.
+
+Setting `close_inactive` to a lower value means that file handles are closed
+sooner. However this has the side effect that new log lines are not sent in near
+real time if the harvester is closed.
+
+The timestamp for closing a file does not depend on the modification time of the
+file. Instead, {beatname_uc} uses an internal timestamp that reflects when the
+file was last harvested. For example, if `close_inactive` is set to 5 minutes,
+the countdown for the 5 minutes starts after the harvester reads the last line
+of the file.
+
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is
+5m.
+
+[float]
+[id="{beatname_lc}-input-{type}-close-renamed"]
+===== `close_renamed`
+
+WARNING: Only use this option if you understand that data loss is a potential
+side effect.
+
+When this option is enabled, {beatname_uc} closes the file handler when a file
+is renamed. This happens, for example, when rotating files. By default, the
+harvester stays open and keeps reading the file because the file handler does
+not depend on the file name. If the `close_renamed` option is enabled and the
+file is renamed or moved in such a way that it's no longer matched by the file
+patterns specified for the , the file will not be picked up again.
+{beatname_uc} will not finish reading the file.
+
+WINDOWS: If your Windows log rotation system shows errors because it can't
+rotate the files, you should enable this option.
+
+[float]
+[id="{beatname_lc}-input-{type}-close-removed"]
+===== `close_removed`
+
+When this option is enabled, {beatname_uc} closes the harvester when a file is
+removed. Normally a file should only be removed after it's inactive for the
+duration specified by `close_inactive`. However, if a file is removed early and
+you don't enable `close_removed`, {beatname_uc} keeps the file open to make sure
+the harvester has completed. If this setting results in files that are not
+completely read because they are removed from disk too early, disable this
+option.
+
+This option is enabled by default. If you disable this option, you must also
+disable `clean_removed`.
+
+WINDOWS: If your Windows log rotation system shows errors because it can't
+rotate files, make sure this option is enabled.
+
+[float]
+[id="{beatname_lc}-input-{type}-close-eof"]
+===== `close_eof`
+
+WARNING: Only use this option if you understand that data loss is a potential
+side effect.
+
+When this option is enabled, {beatname_uc} closes a file as soon as the end of a
+file is reached. This is useful when your files are only written once and not
+updated from time to time. For example, this happens when you are writing every
+single log event to a new file. This option is disabled by default.
+
+[float]
+[id="{beatname_lc}-input-{type}-close-timeout"]
+===== `close_timeout`
+
+WARNING: Only use this option if you understand that data loss is a potential
+side effect. Another side effect is that multiline events might not be
+completely sent before the timeout expires.
+
+When this option is enabled, {beatname_uc} gives every harvester a predefined
+lifetime. Regardless of where the reader is in the file, reading will stop after
+the `close_timeout` period has elapsed. This option can be useful for older log
+files when you want to spend only a predefined amount of time on the files.
+While `close_timeout` will close the file after the predefined timeout, if the
+file is still being updated, {beatname_uc} will start a new harvester again per
+the defined `scan_frequency`. And the close_timeout for this harvester will
+start again with the countdown for the timeout.
+
+This option is particularly useful in case the output is blocked, which makes
+{beatname_uc} keep open file handlers even for files that were deleted from the
+disk. Setting `close_timeout` to `5m` ensures that the files are periodically
+closed so they can be freed up by the operating system.
+
+If you set `close_timeout` to equal `ignore_older`, the file will not be picked
+up if it's modified while the harvester is closed. This combination of settings
+normally leads to data loss, and the complete file is not sent.
+
+When you use `close_timeout` for logs that contain multiline events, the
+harvester might stop in the middle of a multiline event, which means that only
+parts of the event will be sent. If the harvester is started again and the file
+still exists, only the second part of the event will be sent.
+
+This option is set to 0 by default which means it is disabled.
+
+
+[float]
+[id="{beatname_lc}-input-{type}-clean-options"]
+===== `clean_*`
+
+The `clean_*` options are used to clean up the state entries in the registry
+file. These settings help to reduce the size of the registry file and can
+prevent a potential <<inode-reuse-issue,inode reuse issue>>.
+
+[float]
+[id="{beatname_lc}-input-{type}-clean-inactive"]
+===== `clean_inactive`
+
+WARNING: Only use this option if you understand that data loss is a potential
+side effect.
+
+When this option is enabled, {beatname_uc} removes the state of a file after the
+specified period of inactivity has elapsed. The  state can only be removed if
+the file is already ignored by {beatname_uc} (the file is older than
+`ignore_older`). The `clean_inactive` setting must be greater than `ignore_older +
+scan_frequency` to make sure that no states are removed while a file is still
+being harvested. Otherwise, the setting could result in {beatname_uc} resending
+the full content constantly because  `clean_inactive` removes state for files
+that are still detected by {beatname_uc}. If a file is updated or appears
+again, the file is read from the beginning.
+
+The `clean_inactive` configuration option is useful to reduce the size of the
+registry file, especially if a large amount of new files are generated every
+day.
+
+This config option is also useful to prevent {beatname_uc} problems resulting
+from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
+
+NOTE: Every time a file is renamed, the file state is updated and the counter
+for `clean_inactive` starts at 0 again.
+
+TIP: During testing, you might notice that the registry contains state entries
+that should be removed based on the `clean_inactive` setting. This happens
+because {beatname_uc} doesn't remove the entries until it opens the registry
+again to read a different file. If you are testing the `clean_inactive` setting,
+make sure {beatname_uc} is configured to read from more than one file, or the
+file state will never be removed from the registry. 
+
+[float]
+[id="{beatname_lc}-input-{type}-clean-removed"]
+===== `clean_removed`
+
+When this option is enabled, {beatname_uc} cleans files from the registry if
+they cannot be found on disk anymore under the last known name. This means also
+files which were renamed after the harvester was finished will be removed. This
+option is enabled by default.
+
+If a shared drive disappears for a short period and appears again, all files
+will be read again from the beginning because the states were removed from the
+registry file. In such cases, we recommend that you disable the `clean_removed`
+option.
+
+You must disable this option if you also disable `close_removed`.
+
+[float]
+[id="{beatname_lc}-input-{type}-scan-frequency"]
+===== `scan_frequency`
+
+How often {beatname_uc} checks for new files in the paths that are specified
+for harvesting. For example, if you specify a glob like `/var/log/*`, the
+directory is scanned for files using the frequency specified by
+`scan_frequency`. Specify 1s to scan the directory as frequently as possible
+without causing {beatname_uc} to scan too frequently. We do not recommend to set
+this value `<1s`.
+
+If you require log lines to be sent in near real time do not use a very low
+`scan_frequency` but adjust `close_inactive` so the file handler stays open and
+constantly polls your files.
+
+The default setting is 10s.
+
+[float]
+[id="{beatname_lc}-input-{type}-scan-sort"]
+===== `scan.sort`
+
+experimental[]
+
+If you specify a value other than the empty string for this setting you can
+determine whether to use ascending or descending order using `scan.order`.
+Possible values are `modtime` and `filename`. To sort by file modification time,
+use `modtime`, otherwise use `filename`. Leave this option empty to disable it.
+
+If you specify a value for this setting, you can use `scan.order` to configure
+whether files are scanned in ascending or descending order.
+
+The default setting is disabled.
+
+[float]
+[id="{beatname_lc}-input-{type}-scan-order"]
+===== `scan.order`
+
+experimental[]
+
+Specifies whether to use ascending or descending order when `scan.sort` is set to a value other than none. Possible values are `asc` or `desc`.
+
+The default setting is `asc`.
+
+[float]
+===== `tail_files`
+
+If this option is set to true, {beatname_uc} starts reading new files at the end
+of each file instead of the beginning. When this option is used in combination
+with log rotation, it's possible that the first log entries in a new file might
+be skipped. The default setting is false.
+
+This option applies to files that {beatname_uc} has not already processed. If
+you ran {beatname_uc} previously and the state of the file was already
+persisted, `tail_files` will not apply. Harvesting will continue at the previous
+offset. To apply `tail_files` to all files, you must stop {beatname_uc} and
+remove the registry file. Be aware that doing this removes ALL previous states.
+
+NOTE: You can use this setting to avoid indexing old log lines when you run
+{beatname_uc} on a set of log files for the first time. After the first run, we
+recommend disabling this option, or you risk losing lines during file rotation.
+
+[float]
+===== `symlinks`
+
+The `symlinks` option allows {beatname_uc} to harvest symlinks in addition to
+regular files. When harvesting symlinks, {beatname_uc} opens and reads the
+original file even though it reports the path of the symlink.
+
+When you configure a symlink for harvesting, make sure the original path is
+excluded. If a single input is configured to harvest both the symlink and
+the original file, {beatname_uc} will detect the problem and only process the
+first file it finds. However, if two different inputs are configured (one
+to read the symlink and the other the original path), both paths will be
+harvested, causing {beatname_uc} to send duplicate data and the inputs to
+overwrite each other's state.
+
+The `symlinks` option can be useful if symlinks to the log files have additional
+metadata in the file name, and you want to process the metadata in Logstash.
+This is, for example, the case for Kubernetes log files.
+
+Because this option may lead to data loss, it is disabled by default.
+
+[float]
+===== `backoff`
+
+The backoff options specify how aggressively {beatname_uc} crawls open files for
+updates. You can use the default values in most cases.
+
+The `backoff` option defines how long {beatname_uc} waits before checking a file
+again after EOF is reached. The default is 1s, which means the file is checked
+every second if new lines were added. This enables near real-time crawling.
+Every time a new line appears in the file, the `backoff` value is reset to the
+initial value. The default is 1s.
+
+[float]
+===== `max_backoff`
+
+The maximum time for {beatname_uc} to wait before checking a file again after
+EOF is reached. After having backed off multiple times from checking the file,
+the wait time will never exceed `max_backoff` regardless of what is specified
+for  `backoff_factor`. Because it takes a maximum of 10s to read a new line,
+specifying 10s for `max_backoff` means that, at the worst, a new line could be
+added to the log file if {beatname_uc} has backed off multiple times. The
+default is 10s.
+
+Requirement: Set `max_backoff` to be greater than or equal to `backoff` and
+less than or equal to `scan_frequency` (`backoff <= max_backoff <= scan_frequency`).
+If `max_backoff` needs to be higher, it is recommended to close the file handler
+instead and let {beatname_uc} pick up the file again.
+
+[float]
+===== `backoff_factor`
+
+This option specifies how fast the waiting time is increased. The bigger the
+backoff factor, the faster the `max_backoff` value is reached. The backoff
+factor increments exponentially. The minimum value allowed is 1. If this value
+is set to 1, the backoff algorithm is disabled, and the `backoff` value is used
+for waiting for new lines. The `backoff` value will be multiplied each time with
+the `backoff_factor` until `max_backoff` is reached. The default is 2.
+
+[float]
+[id="{beatname_lc}-input-{type}-harvester-limit"]
+===== `harvester_limit`
+
+The `harvester_limit` option limits the number of harvesters that are started in
+parallel for one input. This directly relates to the maximum number of file
+handlers that are opened. The default for `harvester_limit` is 0, which means
+there is no limit. This configuration is useful if the number of files to be
+harvested exceeds the open file handler limit of the operating system.
+
+Setting a limit on the number of harvesters means that potentially not all files
+are opened in parallel. Therefore we recommended that you use this option in
+combination with the `close_*` options to make sure harvesters are stopped more
+often so that new files can be picked up.
+
+Currently if a new harvester can be started again, the harvester is picked
+randomly. This means it's possible that the harvester for a file that was just
+closed and then updated again might be started instead of the harvester for a
+file that hasn't been harvested for a longer period of time.
+
+This configuration option applies per input. You can use this option to
+indirectly set higher priorities on certain inputs by assigning a higher
+limit of harvesters.

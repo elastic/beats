@@ -1,0 +1,39 @@
+[[load-balancing]]
+== Load balance the output hosts
+
+Filebeat provides configuration options that you can use to fine
+tune load balancing when sending events to multiple hosts.
+
+To enable load balancing, you specify `loadbalance: true` when you configure
+the output. For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+-------------------------------------------------------------------------------
+
+The `loadbalance` option is available for Redis, Logstash, and Elasticsearch
+outputs. The Kafka output handles load balancing internally.
+
+The load balancer also supports multiple workers per host. The default is
+`worker: 1`. If you increase the number of workers, additional network
+connections will be used.  The total number of workers participating
+in load balancing is `number of hosts * workers`.
+
+Example:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+filebeat.inputs:
+- type: log
+  paths:
+    - /var/log/*.log
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+  worker: 2
+-------------------------------------------------------------------------------
+
+In this example, there are 4 workers participating in load balancing.

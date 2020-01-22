@@ -1,0 +1,35 @@
+- name: log
+  title: "Logstash"
+  type: group
+  description: >
+    Fields from the Logstash logs.
+  fields:
+    - name: module
+      type: keyword
+      description: >
+        The module or class where the event originate.
+    - name: thread
+      type: keyword
+      description: >
+        Information about the running thread where the log originate.
+      multi_fields:
+        - name: text
+          type: text
+    - name: log_event
+      type: object
+      description: >
+        key and value debugging information.
+    - name: pipeline_id
+      type: keyword
+      example: main
+      description: >
+        The ID of the pipeline.
+
+    - name: message
+      type: alias
+      path: message
+      migration: true
+    - name: level
+      type: alias
+      path: log.level
+      migration: true

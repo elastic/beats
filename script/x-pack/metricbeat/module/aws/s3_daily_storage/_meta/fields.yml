@@ -1,0 +1,15 @@
+- name: s3_daily_storage
+  type: group
+  description: >
+    `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+  release: ga
+  fields:
+    - name: bucket.size.bytes
+      type: long
+      format: bytes
+      description: >
+        The amount of data in bytes stored in a bucket.
+    - name: number_of_objects
+      type: long
+      description: >
+        The total number of objects stored in a bucket for all storage classes.

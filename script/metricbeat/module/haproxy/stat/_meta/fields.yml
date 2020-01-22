@@ -1,0 +1,426 @@
+- name: stat
+  type: group
+  description: >
+    Stats collected from HAProxy processes.
+  release: ga
+  fields:
+
+    - name: status
+      type: keyword
+      description: >
+        Status (UP, DOWN, NOLB, MAINT, or MAINT(via)...).
+
+    - name: weight
+      type: long
+      description: >
+        Total weight (for backends), or server weight (for servers).
+
+    - name: downtime
+      type: long
+      description: >
+        Total downtime (in seconds). For backends, this value is the downtime
+        for the whole backend, not the sum of the downtime for the servers.
+
+    - name: component_type
+      type: integer
+      description: >
+        Component type (0=frontend, 1=backend, 2=server, or 3=socket/listener).
+
+    - name: process_id
+      type: alias
+      path: process.pid
+      migration: true
+      description: >
+        Process ID (0 for first instance, 1 for second, and so on).
+
+    - name: service_name
+      type: keyword
+      description: >
+        Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
+
+    - name: in.bytes
+      type: long
+      format: bytes
+      description: >
+        Bytes in.
+
+    - name: out.bytes
+      type: long
+      format: bytes
+      description: >
+        Bytes out.
+
+    - name: last_change
+      type: integer
+      description: >
+        Number of seconds since the last UP->DOWN or DOWN->UP transition.
+
+    - name: throttle.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Current throttle percentage for the server when slowstart
+        is active, or no value if slowstart is inactive.
+
+    - name: selected.total
+      type: long
+      description: >
+        Total number of times a server was selected, either for new
+        sessions, or when re-dispatching. For servers, this field reports the
+        the number of times the server was selected.
+
+    - name: tracked.id
+      type: long
+      description: >
+        ID of the proxy/server if tracking is enabled.
+
+    - name: connection
+      type: group
+      fields:
+
+        - name: total
+          type: long
+          description: >
+            Cumulative number of connections.
+
+        - name: retried
+          type: long
+          description: >
+            Number of times a connection to a server was retried.
+
+        - name: time.avg
+          type: long
+          description: >
+            Average connect time in ms over the last 1024 requests.
+
+    - name: request
+      type: group
+      fields:
+
+        - name: denied
+          type: long
+          description: >
+            Requests denied because of security concerns.
+
+              * For TCP this is because of a matched tcp-request content rule.
+              * For HTTP this is because of a matched http-request or tarpit rule.
+
+        - name: queued.current
+          type: long
+          description: >
+            Current queued requests. For backends, this field reports the number
+            of requests queued without a server assigned.
+
+        - name: queued.max
+          type: long
+          description: >
+            Maximum value of queued.current.
+
+        - name: errors
+          type: long
+          description: >
+            Request errors. Some of the possible causes are:
+
+              * early termination from the client, before the request has been sent
+              * read error from the client
+              * client timeout
+              * client closed connection
+              * various bad requests from the client.
+              * request was tarpitted.
+
+        - name: redispatched
+          type: long
+          description: >
+            Number of times a request was redispatched to another server. For
+            servers, this field reports the number of times the server was
+            switched away from.
+
+        - name: connection.errors
+          type: long
+          description: >
+            Number of requests that encountered an error trying to
+            connect to a server. For backends, this field reports the sum of
+            the stat for all backend servers, plus any connection errors not
+            associated with a particular server (such as the backend having no
+            active servers).
+
+        - name: rate
+          type: group
+          description: >
+          fields:
+            - name: value
+              type: long
+              description: >
+                Number of HTTP requests per second over the last elapsed second.
+            - name: max
+              type: long
+              description: >
+                Maximum number of HTTP requests per second.
+
+        - name: total
+          type: long
+          description: >
+            Total number of HTTP requests received.
+
+
+    - name: response
+      type: group
+      fields:
+
+        - name: errors
+          type: long
+          description: >
+            Number of response errors. This value includes the number of data
+            transfers aborted by the server (haproxy.stat.server.aborted).
+            Some other errors are:
+
+            * write errors on the client socket (won't be counted for the server stat)
+            * failure applying filters to the response
+
+
+        - name: time.avg
+          type: long
+          description: >
+            Average response time in ms over the last 1024 requests (0 for TCP).
+
+        - name: denied
+          type: integer
+          description: >
+            Responses denied because of security concerns. For HTTP this is
+            because of a matched http-request rule, or "option checkcache".
+
+        - name: http
+          type: group
+          description: >
+
+          fields:
+            - name: 1xx
+              type: long
+              description: >
+                HTTP responses with 1xx code.
+
+            - name: 2xx
+              type: long
+              description: >
+                HTTP responses with 2xx code.
+
+            - name: 3xx
+              type: long
+              description: >
+                HTTP responses with 3xx code.
+
+            - name: 4xx
+              type: long
+              description: >
+                HTTP responses with 4xx code.
+
+            - name: 5xx
+              type: long
+              description: >
+                HTTP responses with 5xx code.
+
+            - name: other
+              type: long
+              description: >
+                HTTP responses with other codes (protocol error).
+
+
+    - name: session
+      type: group
+      fields:
+
+        - name: current
+          type: long
+          description: >
+            Number of current sessions.
+
+        - name: max
+          type: long
+          description: >
+            Maximum number of sessions.
+
+        - name: limit
+          type: long
+          description: >
+            Configured session limit.
+
+        - name: rate
+          type: group
+          fields:
+            - name: value
+              type: integer
+              description: >
+                Number of sessions per second over the last elapsed second.
+
+            - name: limit
+              type: integer
+              description: >
+                Configured limit on new sessions per second.
+
+            - name: max
+              type: integer
+              description: >
+                Maximum number of new sessions per second.
+
+
+    - name: check
+      type: group
+      description: >
+
+      fields:
+        - name: status
+          type: keyword
+          description: >
+            Status of the last health check. One of:
+
+              UNK     -> unknown
+              INI     -> initializing
+              SOCKERR -> socket error
+              L4OK    -> check passed on layer 4, no upper layers testing enabled
+              L4TOUT  -> layer 1-4 timeout
+              L4CON   -> layer 1-4 connection problem, for example
+                        "Connection refused" (tcp rst) or "No route to host" (icmp)
+              L6OK    -> check passed on layer 6
+              L6TOUT  -> layer 6 (SSL) timeout
+              L6RSP   -> layer 6 invalid response - protocol error
+              L7OK    -> check passed on layer 7
+              L7OKC   -> check conditionally passed on layer 7, for example 404 with
+                        disable-on-404
+              L7TOUT  -> layer 7 (HTTP/SMTP) timeout
+              L7RSP   -> layer 7 invalid response - protocol error
+              L7STS   -> layer 7 response error, for example HTTP 5xx
+
+        - name: code
+          type: long
+          description: >
+            Layer 5-7 code, if available.
+
+        - name: duration
+          type: long
+          description: >
+            Time in ms that it took to finish the last health check.
+
+        - name: health.last
+          type: keyword
+          description: >
+            The result of the last health check.
+
+        - name: health.fail
+          type: long
+          description: >
+            Number of failed checks.
+
+        - name: agent.last
+          type: integer
+          description: >
+
+        - name: failed
+          type: long
+          description: >
+            Number of checks that failed while the server was up.
+
+        - name: down
+          type: long
+          description: >
+            Number of UP->DOWN transitions. For backends, this value is the
+            number of transitions to the whole backend being down, rather than
+            the sum of the transitions for each server.
+
+    - name: client.aborted
+      type: integer
+      description: >
+        Number of data transfers aborted by the client.
+
+
+    - name: server
+      type: group
+      description: >
+      fields:
+
+        - name: id
+          type: integer
+          description: >
+            Server ID (unique inside a proxy).
+
+        - name: aborted
+          type: integer
+          description: >
+            Number of data transfers aborted by the server. This value is
+            included in haproxy.stat.response.errors.
+
+        - name: active
+          type: integer
+          description: >
+            Number of backend servers that are active, meaning that they are
+            healthy and can receive requests from the load balancer.
+
+        - name: backup
+          type: integer
+          description: >
+            Number of backend servers that are backup servers.
+
+
+    - name: compressor
+      type: group
+      description: >
+
+      fields:
+        - name: in.bytes
+          type: long
+          format: bytes
+          description: >
+            Number of HTTP response bytes fed to the compressor.
+
+        - name: out.bytes
+          type: integer
+          format: bytes
+          description: >
+            Number of HTTP response bytes emitted by the compressor.
+
+        - name: bypassed.bytes
+          type: long
+          format: bytes
+          description: >
+            Number of bytes that bypassed the HTTP compressor (CPU/BW limit).
+
+        - name: response.bytes
+          type: long
+          format: bytes
+          description: >
+            Number of HTTP responses that were compressed.
+
+    - name: proxy
+      type: group
+      description: >
+
+      fields:
+        - name: id
+          type: integer
+          description: >
+            Unique proxy ID.
+
+        - name: name
+          type: keyword
+          description: >
+            Proxy name.
+
+
+    - name: queue
+      type: group
+      description: >
+
+      fields:
+        - name: limit
+          type: integer
+          description: >
+            Configured queue limit (maxqueue) for the server, or nothing if the
+            value of maxqueue is 0 (meaning no limit).
+
+        - name: time.avg
+          type: integer
+          description: >
+            The average queue time in ms over the last 1024 requests.
+
+
+
+

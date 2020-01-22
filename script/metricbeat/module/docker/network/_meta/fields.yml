@@ -1,0 +1,101 @@
+- name: network
+  type: group
+  description: >
+    Network metrics.
+  release: ga
+  fields:
+
+    - name: interface
+      type: keyword
+      description: >
+        Network interface name.
+    - name: in
+      type: group
+      deprecated: 6.4
+      description: >
+        Incoming network stats per second.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Total number of incoming bytes.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Total number of dropped incoming packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on incoming packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of incoming packets.
+    - name: out
+      type: group
+      deprecated: 6.4
+      description: >
+        Outgoing network stats per second.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Total number of outgoing bytes.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Total number of dropped outgoing packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on outgoing packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of outgoing packets.
+    - name: inbound
+      type: group
+      description: >
+        Incoming network stats since the container started.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Total number of incoming bytes.
+        - name: dropped
+          type: long
+          description: >
+            Total number of dropped incoming packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on incoming packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of incoming packets.
+    - name: outbound
+      type: group
+      description: >
+        Outgoing network stats since the container started.
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Total number of outgoing bytes.
+        - name: dropped
+          type: long
+          description: >
+            Total number of dropped outgoing packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on outgoing packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of outgoing packets.

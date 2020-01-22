@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.load",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "load"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "load": {
+            "1": 2.33,
+            "15": 2.03,
+            "5": 1.93,
+            "cores": 4,
+            "norm": {
+                "1": 0.5825,
+                "15": 0.5075,
+                "5": 0.4825
+            }
+        }
+    }
+}

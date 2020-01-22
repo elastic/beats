@@ -1,0 +1,58 @@
+This module periodically fetches metrics from
+https://www.postgresql.org/[PostgreSQL] servers.
+
+Default metricsets are `activity`, `bgwriter` and `database`.
+
+
+[float]
+=== Dashboard
+
+The PostgreSQL module comes with a predefined dashboard showing databse related metrics. For example:
+
+image::./images/metricbeat-postgresql-overview.png[]
+
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use Postgres URLs of the following
+format:
+
+-----------------------------------
+[postgres://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost:40001?sslmode=disable", "postgres://otherhost:40001"]
+----------------------------------------------------------------------
+
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the URL take
+precedence over those specified in the `username` and `password` config options.
+
+[source,yaml]
+----
+- module: postgresql
+  metricsets: ["status"]
+  hosts: ["postgres://localhost:5432"]
+  username: root
+  password: test
+----
+
+[float]
+=== Compatibility
+
+This module was tested with PostgreSQL 9.5.3 and is expected to work with all
+versions >= 9.

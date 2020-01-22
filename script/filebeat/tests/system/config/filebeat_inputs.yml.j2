@@ -1,0 +1,35 @@
+filebeat.inputs:
+{% for input in inputs %}
+- paths:
+    - {{input.path}}
+  scan_frequency: 0.5s
+  encoding: {{input.encoding | default("plain") }}
+{% endfor %}
+
+{% if not skip_registry_config %}
+filebeat.registry:
+  path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}
+  file_permissions: {{ registry_file_permissions|default("0600") }}
+  {% if registry_migrate_file %}
+  migrate_file: {{ beat.working_dir + '/' + registry_migrate_file }}
+  {% endif %}
+{%endif%}
+
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  policy_name: libbeat-test-default-policy
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
+
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("filebeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7

@@ -1,0 +1,31 @@
+[[getting-started]]
+== Getting started with {beats}
+
+Each Beat is a separately installable product. Before installing Beats, you need
+to install and configure the {stack}. To learn how to get up and running
+quickly, see {stack-gs}/get-started-elastic-stack.html[Getting started with the
+{stack}].
+
+[TIP]
+==============
+You can skip having to install {es} and {kib} by using our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}. The {ess} is available on AWS, GCP, and Azure.
+https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {ess}
+for free].
+==============
+
+After installing the {stack}, see the {beats} getting started guides:
+
+* {auditbeat-ref}/auditbeat-getting-started.html[Auditbeat]
+* {filebeat-ref}/filebeat-getting-started.html[Filebeat]
+* {functionbeat-ref}/functionbeat-getting-started.html[Functionbeat]
+* {heartbeat-ref}/heartbeat-getting-started.html[Heartbeat]
+* {journalbeat-ref}/journalbeat-getting-started.html[Journalbeat]
+* {metricbeat-ref}/metricbeat-getting-started.html[Metricbeat]
+* {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
+* {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
+
+If you're planning to use the Metrics app or the Logs app in {kib},
+also see the {metrics-guide}[Metrics Monitoring Guide]
+and the {logs-guide}[Logs Monitoring Guide].

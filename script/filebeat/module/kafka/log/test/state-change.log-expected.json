@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2017-08-04T10:48:21.428-02:00",
+        "event.dataset": "kafka.log",
+        "event.module": "kafka",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kafka.log.class": "state.change.logger",
+        "kafka.log.component": "unknown",
+        "log.level": "TRACE",
+        "log.offset": 0,
+        "message": "Controller 0 epoch 1 received response {error_code=0} for a request sent to broker baldur:9092 (id: 0 rack: null)",
+        "service.type": "kafka"
+    }
+]

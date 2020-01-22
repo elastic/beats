@@ -1,0 +1,322 @@
+{
+  "_nodes" : {
+    "total" : 1,
+    "successful" : 1,
+    "failed" : 0
+  },
+  "cluster_name" : "elasticsearch",
+  "nodes" : {
+    "x6_Rm157RqilNEqtdgcNrA" : {
+      "name" : "x6_Rm15",
+      "transport_address" : "127.0.0.1:9300",
+      "host" : "127.0.0.1",
+      "ip" : "127.0.0.1",
+      "version" : "5.2.2",
+      "build_hash" : "f9d9b74",
+      "total_indexing_buffer" : 51943833,
+      "roles" : [
+        "master",
+        "data",
+        "ingest"
+      ],
+      "settings" : {
+        "client" : {
+          "type" : "node"
+        },
+        "cluster" : {
+          "name" : "elasticsearch"
+        },
+        "http" : {
+          "compression" : "true",
+          "host" : "0.0.0.0",
+          "type" : {
+            "default" : "netty4"
+          }
+        },
+        "node" : {
+          "name" : "x6_Rm15"
+        },
+        "path" : {
+          "logs" : "/usr/share/elasticsearch/logs",
+          "home" : "/usr/share/elasticsearch"
+        },
+        "transport" : {
+          "host" : "127.0.0.1",
+          "type" : {
+            "default" : "netty4"
+          }
+        }
+      },
+      "os" : {
+        "refresh_interval_in_millis" : 1000,
+        "name" : "Linux",
+        "arch" : "amd64",
+        "version" : "4.9.18-moby",
+        "available_processors" : 2,
+        "allocated_processors" : 2
+      },
+      "process" : {
+        "refresh_interval_in_millis" : 1000,
+        "id" : 1,
+        "mlockall" : false
+      },
+      "thread_pool" : {
+        "force_merge" : {
+          "type" : "fixed",
+          "min" : 1,
+          "max" : 1,
+          "queue_size" : -1
+        },
+        "fetch_shard_started" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 4,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "listener" : {
+          "type" : "fixed",
+          "min" : 1,
+          "max" : 1,
+          "queue_size" : -1
+        },
+        "index" : {
+          "type" : "fixed",
+          "min" : 2,
+          "max" : 2,
+          "queue_size" : 200
+        },
+        "refresh" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 1,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "generic" : {
+          "type" : "scaling",
+          "min" : 4,
+          "max" : 128,
+          "keep_alive" : "30s",
+          "queue_size" : -1
+        },
+        "warmer" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 1,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "search" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 1000
+        },
+        "flush" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 1,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "fetch_shard_store" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 4,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "management" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 5,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "get" : {
+          "type" : "fixed",
+          "min" : 2,
+          "max" : 2,
+          "queue_size" : 1000
+        },
+        "bulk" : {
+          "type" : "fixed",
+          "min" : 2,
+          "max" : 2,
+          "queue_size" : 50
+        },
+        "snapshot" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 1,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        }
+      },
+      "transport" : {
+        "bound_address" : [
+          "127.0.0.1:9300"
+        ],
+        "publish_address" : "127.0.0.1:9300",
+        "profiles" : { }
+      },
+      "http" : {
+        "bound_address" : [
+          "0.0.0.0:9200"
+        ],
+        "publish_address" : "172.18.0.2:9200",
+        "max_content_length_in_bytes" : 104857600
+      },
+      "plugins" : [
+        {
+          "name" : "ingest-geoip",
+          "version" : "5.2.2",
+          "description" : "Ingest processor that uses looksup geo data based on ip addresses using the Maxmind geo database",
+          "classname" : "org.elasticsearch.ingest.geoip.IngestGeoIpPlugin"
+        },
+        {
+          "name" : "ingest-user-agent",
+          "version" : "5.2.2",
+          "description" : "Ingest processor that extracts information from a user agent",
+          "classname" : "org.elasticsearch.ingest.useragent.IngestUserAgentPlugin"
+        }
+      ],
+      "modules" : [
+        {
+          "name" : "aggs-matrix-stats",
+          "version" : "5.2.2",
+          "description" : "Adds aggregations whose input are a list of numeric fields and output includes a matrix.",
+          "classname" : "org.elasticsearch.search.aggregations.matrix.MatrixAggregationPlugin"
+        },
+        {
+          "name" : "ingest-common",
+          "version" : "5.2.2",
+          "description" : "Module for ingest processors that do not require additional security permissions or have large dependencies and resources",
+          "classname" : "org.elasticsearch.ingest.common.IngestCommonPlugin"
+        },
+        {
+          "name" : "lang-expression",
+          "version" : "5.2.2",
+          "description" : "Lucene expressions integration for Elasticsearch",
+          "classname" : "org.elasticsearch.script.expression.ExpressionPlugin"
+        },
+        {
+          "name" : "lang-groovy",
+          "version" : "5.2.2",
+          "description" : "Groovy scripting integration for Elasticsearch",
+          "classname" : "org.elasticsearch.script.groovy.GroovyPlugin"
+        },
+        {
+          "name" : "lang-mustache",
+          "version" : "5.2.2",
+          "description" : "Mustache scripting integration for Elasticsearch",
+          "classname" : "org.elasticsearch.script.mustache.MustachePlugin"
+        },
+        {
+          "name" : "lang-painless",
+          "version" : "5.2.2",
+          "description" : "An easy, safe and fast scripting language for Elasticsearch",
+          "classname" : "org.elasticsearch.painless.PainlessPlugin"
+        },
+        {
+          "name" : "percolator",
+          "version" : "5.2.2",
+          "description" : "Percolator module adds capability to index queries and query these queries by specifying documents",
+          "classname" : "org.elasticsearch.percolator.PercolatorPlugin"
+        },
+        {
+          "name" : "reindex",
+          "version" : "5.2.2",
+          "description" : "The Reindex module adds APIs to reindex from one index to another or update documents in place.",
+          "classname" : "org.elasticsearch.index.reindex.ReindexPlugin"
+        },
+        {
+          "name" : "transport-netty3",
+          "version" : "5.2.2",
+          "description" : "Netty 3 based transport implementation",
+          "classname" : "org.elasticsearch.transport.Netty3Plugin"
+        },
+        {
+          "name" : "transport-netty4",
+          "version" : "5.2.2",
+          "description" : "Netty 4 based transport implementation",
+          "classname" : "org.elasticsearch.transport.Netty4Plugin"
+        }
+      ],
+      "ingest" : {
+        "processors" : [
+          {
+            "type" : "append"
+          },
+          {
+            "type" : "convert"
+          },
+          {
+            "type" : "date"
+          },
+          {
+            "type" : "date_index_name"
+          },
+          {
+            "type" : "dot_expander"
+          },
+          {
+            "type" : "fail"
+          },
+          {
+            "type" : "foreach"
+          },
+          {
+            "type" : "geoip"
+          },
+          {
+            "type" : "grok"
+          },
+          {
+            "type" : "gsub"
+          },
+          {
+            "type" : "join"
+          },
+          {
+            "type" : "json"
+          },
+          {
+            "type" : "kv"
+          },
+          {
+            "type" : "lowercase"
+          },
+          {
+            "type" : "remove"
+          },
+          {
+            "type" : "rename"
+          },
+          {
+            "type" : "script"
+          },
+          {
+            "type" : "set"
+          },
+          {
+            "type" : "sort"
+          },
+          {
+            "type" : "split"
+          },
+          {
+            "type" : "trim"
+          },
+          {
+            "type" : "uppercase"
+          },
+          {
+            "type" : "user_agent"
+          }
+        ]
+      }
+    }
+  }
+}

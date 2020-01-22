@@ -1,0 +1,147 @@
+- name: auth
+  type: group
+  description: >
+    Fields from the Linux authorization logs.
+  fields:
+    - name: timestamp
+      type: alias
+      path: '@timestamp'
+      migration: true
+    - name: hostname
+      type: alias
+      path: host.hostname
+      migration: true
+    - name: program
+      type: alias
+      path: process.name
+      migration: true
+    - name: pid
+      type: alias
+      path: process.pid
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true
+    - name: user
+      type: alias
+      path: user.name
+      migration: true
+
+    - name: ssh
+      type: group
+      fields:
+      - name: method
+        description: >
+          The SSH authentication method. Can be one of "password" or "publickey".
+      - name: signature
+        description: >
+          The signature of the client public key.
+      - name: dropped_ip
+        type: ip
+        description: >
+          The client IP from SSH connections that are open and immediately dropped.
+
+      - name: event
+        example: Accepted
+        description: >
+          The SSH event as found in the logs (Accepted, Invalid, Failed, etc.)
+
+      - name: ip
+        type: alias
+        path: source.ip
+        migration: true
+      - name: port
+        type: alias
+        path: source.port
+        migration: true
+
+      - name: geoip
+        type: group
+        fields:
+          - name: continent_name
+            type: alias
+            path: source.geo.continent_name
+            migration: true
+          - name: country_iso_code
+            type: alias
+            path: source.geo.country_iso_code
+            migration: true
+          - name: location
+            type: alias
+            path: source.geo.location
+            migration: true
+          - name: region_name
+            type: alias
+            path: source.geo.region_name
+            migration: true
+          - name: city_name
+            type: alias
+            path: source.geo.city_name
+            migration: true
+          - name: region_iso_code
+            type: alias
+            path: source.geo.region_iso_code
+            migration: true
+
+    - name: sudo
+      type: group
+      description: >
+        Fields specific to events created by the `sudo` command.
+      fields:
+      - name: error
+        example: user NOT in sudoers
+        description: >
+          The error message in case the sudo command failed.
+      - name: tty
+        description: >
+          The TTY where the sudo command is executed.
+      - name: pwd
+        description: >
+          The current directory where the sudo command is executed.
+      - name: user
+        example: root
+        description: >
+          The target user to which the sudo command is switching.
+      - name: command
+        description: >
+          The command executed via sudo.
+
+    - name: useradd
+      type: group
+      description: >
+        Fields specific to events created by the `useradd` command.
+      fields:
+      - name: home
+        description:
+          The home folder for the new user.
+      - name: shell
+        description:
+          The default shell for the new user.
+
+      - name: name
+        type: alias
+        path: user.name
+        migration: true
+      - name: uid
+        type: alias
+        path: user.id
+        migration: true
+      - name: gid
+        type: alias
+        path: group.id
+        migration: true
+
+    - name: groupadd
+      type: group
+      description: >
+        Fields specific to events created by the `groupadd` command.
+      fields:
+      - name: name
+        type: alias
+        path: group.name
+        migration: true
+      - name: gid
+        type: alias
+        path: group.id
+        migration: true

@@ -1,0 +1,209 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the input
+//// but do not process files (the options for managing files
+//// on disk are not relevant)
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
+
+[float]
+===== `encoding`
+
+The file encoding to use for reading data that contains international
+characters. See the encoding names http://www.w3.org/TR/encoding/[recommended by
+the W3C for use in HTML5].
+
+Valid encodings:
+
+	* `plain`: plain ASCII encoding
+	* `utf-8` or `utf8`: UTF-8 encoding
+	* `gbk`: simplified Chinese charaters
+	* `iso8859-6e`: ISO8859-6E, Latin/Arabic
+	* `iso8859-6i`: ISO8859-6I, Latin/Arabic
+	* `iso8859-8e`: ISO8859-8E, Latin/Hebrew
+	* `iso8859-8i`: ISO8859-8I, Latin/Hebrew
+	* `iso8859-1`: ISO8859-1, Latin-1
+	* `iso8859-2`: ISO8859-2, Latin-2
+	* `iso8859-3`: ISO8859-3, Latin-3
+	* `iso8859-4`: ISO8859-4, Latin-4
+	* `iso8859-5`: ISO8859-5, Latin/Cyrillic
+	* `iso8859-6`: ISO8859-6, Latin/Arabic
+	* `iso8859-7`: ISO8859-7, Latin/Greek
+	* `iso8859-8`: ISO8859-8, Latin/Hebrew
+	* `iso8859-9`: ISO8859-9, Latin-5
+	* `iso8859-10`: ISO8859-10, Latin-6
+	* `iso8859-13`: ISO8859-13, Latin-7
+	* `iso8859-14`: ISO8859-14, Latin-8
+	* `iso8859-15`: ISO8859-15, Latin-9
+	* `iso8859-16`: ISO8859-16, Latin-10
+	* `cp437`: IBM CodePage 437
+	* `cp850`: IBM CodePage 850
+	* `cp852`: IBM CodePage 852
+	* `cp855`: IBM CodePage 855
+	* `cp858`: IBM CodePage 858
+	* `cp860`: IBM CodePage 860
+	* `cp862`: IBM CodePage 862
+	* `cp863`: IBM CodePage 863
+	* `cp865`: IBM CodePage 865
+	* `cp866`: IBM CodePage 866
+	* `ebcdic-037`: IBM CodePage 037
+	* `ebcdic-1040`: IBM CodePage 1140
+	* `ebcdic-1047`: IBM CodePage 1047
+	* `koi8r`: KOI8-R, Russian (Cyrillic)
+	* `koi8u`: KOI8-U, Ukranian (Cyrillic)
+	* `macintosh`: Macintosh encoding
+	* `macintosh-cyrillic`: Macintosh Cyrillic encoding
+	* `windows1250`: Windows1250, Central and Eastern European
+	* `windows1251`: Windows1251, Russian, Serbian (Cyrillic)
+	* `windows1252`: Windows1252, Legacy
+	* `windows1253`: Windows1253, Modern Greek
+	* `windows1254`: Windows1254, Turkish
+	* `windows1255`: Windows1255, Hebrew
+	* `windows1256`: Windows1256, Arabic
+	* `windows1257`: Windows1257, Estonian, Latvian, Lithuanian
+	* `windows1258`: Windows1258, Vietnamese
+	* `windows874`:  Windows874, ISO/IEC 8859-11, Latin/Thai
+	* `utf-16-bom`: UTF-16 with required BOM
+	* `utf-16be-bom`: big endian UTF-16 with required BOM
+	* `utf-16le-bom`: little endian UTF-16 with required BOM
+
+The `plain` encoding is special, because it does not validate or transform any input.
+
+[float]
+[id="{beatname_lc}-input-{type}-exclude-lines"]
+===== `exclude_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to
+exclude. {beatname_uc} drops any lines that match a regular expression in the
+list. By default, no lines are dropped. Empty lines are ignored.
+
+If <<multiline,multiline>> settings are also specified, each multiline message
+is combined into a single line before the lines are filtered by `exclude_lines`.
+
+The following example configures {beatname_uc} to drop any lines that start with
+`DBG`.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  exclude_lines: ['^DBG']
+----
+
+See <<regexp-support>> for a list of supported regexp patterns.
+
+[float]
+[id="{beatname_lc}-input-{type}-include-lines"]
+===== `include_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to
+include. {beatname_uc} exports only the lines that match a regular expression in
+the list. By default, all lines are exported. Empty lines are ignored.
+
+If <<multiline,multiline>> settings also specified, each multiline message is
+combined into a single line before the lines are filtered by `include_lines`.
+
+The following example configures {beatname_uc} to export any lines that start
+with `ERR` or `WARN`:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  include_lines: ['^ERR', '^WARN']
+----
+
+NOTE: If both `include_lines` and `exclude_lines` are defined, {beatname_uc}
+executes `include_lines` first and then executes `exclude_lines`. The order in
+which the two options are defined doesn't matter. The `include_lines` option
+will always be executed before the `exclude_lines` option, even if
+`exclude_lines` appears before `include_lines` in the config file.
+
+The following example exports all log lines that contain `sometext`,
+except for lines that begin with `DBG` (debug messages):
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  include_lines: ['sometext']
+  exclude_lines: ['^DBG']
+----
+
+See <<regexp-support>> for a list of supported regexp patterns.
+
+[float]
+===== `harvester_buffer_size`
+
+The size in bytes of the buffer that each harvester uses when fetching a file.
+The default is 16384.
+
+[float]
+===== `max_bytes`
+
+The maximum number of bytes that a single log message can have. All bytes after
+`max_bytes` are discarded and not sent. This setting is especially useful for
+multiline log messages, which can get large. The default is 10MB (10485760).
+
+[float]
+[id="{beatname_lc}-input-{type}-config-json"]
+===== `json`
+These options make it possible for {beatname_uc} to decode logs structured as
+JSON messages. {beatname_uc} processes the logs line by line, so the JSON
+decoding only works if there is one JSON object per line.
+
+The decoding happens before line filtering and multiline. You can combine JSON
+decoding with filtering and multiline if you set the `message_key` option. This
+can be helpful in situations where the application logs are wrapped in JSON
+objects, as with like it happens for example with Docker.
+
+Example configuration:
+
+[source,yaml]
+----
+json.keys_under_root: true
+json.add_error_key: true
+json.message_key: log
+----
+
+You must specify at least one of the following settings to enable JSON parsing
+mode:
+
+*`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
+in the output document. If you enable this setting, the keys are copied top
+level in the output document. The default is false.
+
+*`overwrite_keys`*:: If `keys_under_root` and this setting are enabled, then the
+values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts.
+
+*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds a
+"error.message" and "error.type: json" key in case of JSON unmarshalling errors
+or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the key
+must be at the top level in the JSON object and the value associated with the
+key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+json document and stored in `@metadata.id`
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if
+JSON decoding errors should be logged or not. If set to true, errors will not
+be logged. The default is false.
+
+[float]
+===== `multiline`
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
+
+

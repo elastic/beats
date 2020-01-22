@@ -1,0 +1,8 @@
+# Module: munin
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-munin.html
+
+- module: munin
+  #metricsets:
+  #  - node
+  period: 10s
+  hosts: ["localhost:4949"]

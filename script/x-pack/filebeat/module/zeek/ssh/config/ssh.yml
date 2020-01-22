@@ -1,0 +1,66 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: ssh
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.ssh"
+
+        - from: "zeek.ssh.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.ssh.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.ssh.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.ssh.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.ssh.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.ssh.auth_attempts"
+          to: "zeek.ssh.auth.attempts"
+
+        - from: "zeek.ssh.auth_success"
+          to: "zeek.ssh.auth.success"
+
+        - from: "zeek.ssh.cipher_alg"
+          to: "zeek.ssh.algorithm.cipher"
+
+        - from: "zeek.ssh.mac_alg"
+          to: "zeek.ssh.algorithm.mac"
+
+        - from: "zeek.ssh.compression_alg"
+          to: "zeek.ssh.algorithm.compression"
+
+        - from: "zeek.ssh.kex_alg"
+          to: "zeek.ssh.algorithm.key_exchange"
+
+        - from: "zeek.ssh.host_key_alg"
+          to: "zeek.ssh.algorithm.host_key"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

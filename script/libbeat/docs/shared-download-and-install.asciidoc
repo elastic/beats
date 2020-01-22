@@ -1,0 +1,21 @@
+
+*Before you begin*: If you haven't installed the {stack}, do that now. See
+{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+
+To download and install {beatname_uc}, use the commands that work with your
+system.
+
+ifeval::["{release-state}"!="unreleased"]
+
+ifndef::no_repos[]
+[NOTE]
+==================================================
+If you use Apt or Yum, you can <<setup-repositories,install {beatname_uc} from our
+repositories>> to update to the newest version more easily.
+
+See our https://www.elastic.co/downloads/beats/{beatname_lc}[download page] for
+other installation options, such as 32-bit images.
+==================================================
+endif::no_repos[]
+
+endif::[]

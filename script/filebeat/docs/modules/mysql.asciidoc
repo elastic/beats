@@ -1,0 +1,88 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-mysql]]
+:modulename: mysql
+:has-dashboards: true
+
+== MySQL module
+
+The +{modulename}+ module collects and parses the slow logs and error logs
+created by https://www.mysql.com/[MySQL].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The  +{modulename}+ module was tested with logs from MySQL 5.5, 5.7 and 8.0,
+MariaDB 10.1, 10.2 and 10.3, and Percona 5.7 and 8.0.
+
+On Windows, the module was tested with MySQL installed from the Chocolatey
+repository.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-mysql.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for slow logs and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: mysql
+  error:
+    enabled: true
+    var.paths: ["/path/to/log/mysql/error.log*"]
+  slowlog:
+    enabled: true
+    var.paths: ["/path/to/log/mysql/mysql-slow.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
+-----
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: error
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `error` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `slowlog` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mysql,exported fields>> section.
+

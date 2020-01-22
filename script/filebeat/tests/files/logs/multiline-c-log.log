@@ -1,0 +1,6 @@
+The following are log messages
+This is a C style log\\
+file which is on multiple\\
+lines
+In addition it has normal lines
+The total should be 4 lines covered

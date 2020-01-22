@@ -1,0 +1,64 @@
+- name: container
+  type: group
+  description: >
+    kubernetes container metrics
+  release: ga
+  fields:
+    - name: id
+      type: keyword
+      description:
+        Container id
+    - name: status
+      type: group
+      fields:
+        - name: phase
+          type: keyword
+          description: >
+                Container phase (running, waiting, terminated)
+        - name: ready
+          type: boolean
+          description: >
+            Container ready status
+        - name: restarts
+          type: integer
+          description: >
+            Container restarts count
+        - name: reason
+          type: keyword
+          description: >
+            Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff)
+            or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+    - name: cpu
+      type: group
+      fields:
+        - name: limit.cores
+          type: float
+          description: >
+            Container CPU cores limit
+        - name: request.cores
+          type: float
+          description: >
+            Container CPU requested cores
+        - name: limit.nanocores
+          type: long
+          deprecated: 6.4
+          description: >
+            Container CPU nanocores limit
+        - name: request.nanocores
+          deprecated: 6.4
+          type: long
+          description: >
+            Container CPU requested nanocores
+    - name: memory
+      type: group
+      fields:
+        - name: limit.bytes
+          type: long
+          format: bytes
+          description: >
+            Container memory limit in bytes
+        - name: request.bytes
+          type: long
+          format: bytes
+          description: >
+            Container requested memory in bytes

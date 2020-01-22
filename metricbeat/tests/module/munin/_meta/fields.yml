@@ -1,0 +1,19 @@
+- key: munin
+  title: "Munin"
+  description: >
+    Munin node metrics exporter
+  release: ga
+  fields:
+    - name: munin.metrics.*
+      type: object
+      object_type: double
+      object_type_mapping_type: '*'
+      description: >
+        Metrics exposed by a plugin of a munin node agent.
+    - name: munin.plugin.name
+      type: keyword
+      description: >
+        Name of the plugin collecting these metrics.
+    - name: munin
+      type: group
+      fields:

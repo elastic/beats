@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/icinga2/startup.log
+    os.darwin:
+      - /usr/local/icinga2/var/log/icinga2/startup.log
+    os.windows:
+      - c:/programdata/icinga2/var/log/icinga2/startup.log
+
+ingest_pipeline: ingest/pipeline.json
+input: config/startup.yml

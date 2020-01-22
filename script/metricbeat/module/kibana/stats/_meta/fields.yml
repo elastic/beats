@@ -1,0 +1,107 @@
+- name: stats
+  type: group
+  description: >
+    Kibana stats and run-time metrics.
+  release: ga
+  fields:
+    - name: uuid
+      type: alias
+      path: service.id
+      migration: true
+      description: >
+        Kibana instance UUID
+    - name: name
+      type: keyword
+      description: >
+        Kibana instance name
+    - name: index
+      type: keyword
+      description: >
+        Name of Kibana's internal index
+    - name: host.name
+      type: keyword
+      description: >
+        Kibana instance hostname
+    - name: transport_address
+      type: alias
+      path: service.address
+      migration: true
+      description: >
+        Kibana server's hostname and port
+    - name: version
+      type: alias
+      description: >
+        Kibana version
+      path: service.version
+      migration: true
+    - name: snapshot
+      type: boolean
+      description: >
+        Whether the Kibana build is a snapshot build
+    - name: status
+      type: keyword
+      description: >
+        Kibana instance's health status
+    - name: concurrent_connections
+      type: long
+      description: >
+        Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
+    - name: process
+      type: group
+      description: >
+        Process metrics
+      fields:
+      - name: event_loop_delay.ms
+        type: scaled_float
+        description: >
+          Event loop delay in milliseconds
+      - name: memory.heap
+        type: group
+        description: >
+          Process heap metrics
+        fields:
+        - name: total.bytes
+          type: long
+          format: bytes
+          description: >
+            Total heap allocated to process in bytes
+        - name: used.bytes
+          type: long
+          format: bytes
+          description: >
+            Heap used by process in bytes
+        - name: size_limit.bytes
+          type: long
+          format: bytes
+          description: >
+            Max. old space size allocated to Node.js process, in bytes
+        - name: uptime.ms
+          type: long
+          description: >
+            Uptime of process in milliseconds
+    - name: request
+      type: group
+      description: >
+          Request count metrics
+      fields:
+        - name: disconnects
+          type: long
+          description: >
+            Number of requests that were disconnected
+        - name: total
+          type: long
+          description: >
+            Total number of requests
+    - name: response_time
+      type: group
+      description: >
+        Response times metrics
+      fields:
+        - name: avg.ms
+          type: long
+          description: >
+            Average response time in milliseconds
+        - name: max.ms
+          type: long
+          description: >
+            Maximum response time in milliseconds

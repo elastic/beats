@@ -1,0 +1,47 @@
+[[visualizing-data-packetbeat]]
+= Visualizing Packetbeat data in Kibana
+
+[partintro]
+--
+
+Before trying to visualize Packetbeat data in Kibana, we recommend that you
+<<load-kibana-dashboards,set up the example Kibana dashboards>>. Then read the
+topics in this section to learn how to work with Packetbeat data in Kibana:
+
+* <<customizing-discover>>
+* <<kibana-queries-filters>>
+
+Also see the {kibana-ref}/index.html[Kibana User Guide].
+--
+
+[[customizing-discover]]
+== Customize the Discover page
+
+To make it easier for you to search and discover Packetbeat data in Kibana, the
+sample dashboards contain predefined searches. These searches are not default
+views on the *Discover* page. To use these searches, make sure you've
+<<load-kibana-dashboards,set up the example Kibana dashboards>>. Then go to the
+*Discover* page and click *Open*.
+
+Type `Packetbeat` in the Search field to filter the list of searches.
+
+[role="screenshot"]
+image::./images/saved-packetbeat-searches.png[Saved Packetbeat Searches]
+
+You can use the predefined searches to customize the columns in the Discover
+table. For example, select the *Packetbeat Search* to customize the columns in
+the Discover table:
+
+[role="screenshot"]
+image::./images/discovery-packetbeat-transactions.png[Packetbeat Search]
+
+Select the *Packetbeat Flows Search* to display the most important information
+for Packetbeat flows:
+
+[role="screenshot"]
+image::./images/discovery-packetbeat-flows.png[Packetbeat Flows Search]
+
+
+
+
+

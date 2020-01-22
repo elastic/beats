@@ -1,0 +1,48 @@
+- key: test
+  title: Test fields.yml
+  kibana:
+    source_filters:
+      - user.name
+      - url.*
+  fields:
+    - name: group_disabled
+      type: group
+      enabled: false
+      fields:
+        - name: message
+          type: text
+
+    - name: long
+      type: long
+      format: url
+      input_format: string
+      output_format: float
+      output_precision: 5
+      label_template: "long template"
+      url_template:
+        - min_version: 5.0.0
+          value: "_a=(query:(query_string:(analyze_wildcard:!t,query:'error.grouping_key:%22{{value}}%22')))"
+        - min_version: 6.0.0
+          value: "_a=(query:(language:kuery,query:'context.app.name:\"{{value}}\"'))"
+
+    - name: alias
+      type: alias
+      path: long
+
+- key: with source filter
+  title: Test
+  kibana:
+    source_filters:
+      - user.email
+  fields:
+    - name: multifield_field
+      type: text
+      index: true
+      multi_fields:
+        - name: keyword
+          type: keyword
+
+    - name: blob
+      type: binary
+      description: >
+        Some binary blob.

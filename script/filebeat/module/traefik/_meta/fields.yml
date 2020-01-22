@@ -1,0 +1,10 @@
+- key: traefik
+  title: "Traefik"
+  description: >
+    Module for parsing the Traefik log files.
+  fields:
+    - name: traefik
+      type: group
+      description: >
+        Fields from the Traefik log files.
+      fields:

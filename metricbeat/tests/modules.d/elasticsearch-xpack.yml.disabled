@@ -1,0 +1,20 @@
+# Module: elasticsearch
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-elasticsearch.html
+
+- module: elasticsearch
+  metricsets:
+    - ccr
+    - cluster_stats
+    - enrich
+    - index
+    - index_recovery
+    - index_summary
+    - ml_job
+    - node_stats
+    - shard
+  period: 10s
+  hosts: ["http://localhost:9200"]
+  #username: "user"
+  #password: "secret"
+  xpack.enabled: true
+

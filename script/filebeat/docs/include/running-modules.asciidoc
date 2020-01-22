@@ -1,0 +1,43 @@
+:has_module_steps:
+
+[float]
+[id="running-{modulename}-modules"]
+=== Set up and run the module
+
+Before doing these steps, verify that {es} and {kib} are running and
+that {es} is ready to receive data from {beatname_uc}.
+
+If you're running our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}, or you've enabled security in {es} and {kib}, you need to specify
+additional connection information before setting up and running the module. See
+<<filebeat-modules-quickstart>> for the complete setup.
+
+To set up and run the module:
+
+. Enable the module:
++
+include::./enable-modules-command.asciidoc[]
++
+This command enables the module config defined in the `modules.d` directory. See
+<<configuration-{beatname_lc}-modules>> for other ways to enable modules.
++
+To see a list of enabled and disabled modules, run:
++
+include::./list-modules-command.asciidoc[]
+
+. Set up the initial environment:
++
+include::./setup-command.asciidoc[]
+
+. Run {beatname_uc}.
++
+If your logs aren't in the default location, see
+<<configuring-{modulename}-module>>, then run {beatname_uc} after you've
+set the paths variable.
++
+include::./run-command.asciidoc[]
+
+include::./visualize-data.asciidoc[]
+
+:has_module_steps!:

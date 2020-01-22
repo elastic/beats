@@ -1,0 +1,73 @@
+{{ if .Reference -}}
+# The system module collects security related information about a host.
+# All datasets send both periodic state information (e.g. all currently
+# running processes) and real-time changes (e.g. when a new process starts
+# or stops).
+{{ end -}}
+- module: system
+  datasets:
+    - host    # General host information, e.g. uptime, IPs
+    {{- if eq .GOOS "linux" }}
+    - login   # User logins, logouts, and system boots.
+    {{- end -}}
+    {{- if ne .GOOS "windows" }}
+    - package # Installed, updated, and removed packages
+    {{- end }}
+    - process # Started and stopped processes
+    {{- if eq .GOOS "linux" }}
+    - socket  # Opened and closed sockets
+    - user    # User information
+    {{- end }}
+
+  # How often datasets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
+  state.period: 12h
+
+{{- if .Reference }}
+
+  # The state.period can be overridden for any dataset.
+  # host.state.period: 12h
+  {{- if ne .GOOS "windows" }}
+  # package.state.period: 12h
+  {{- end }}
+  # process.state.period: 12h
+  {{- if eq .GOOS "linux" }}
+  # socket.state.period: 12h
+  # user.state.period: 12h
+  {{- end }}
+
+  # Average file read rate for hashing of the process executable. Default is "50 MiB".
+  process.hash.scan_rate_per_sec: 50 MiB
+
+  # Limit on the size of the process executable that will be hashed. Default is "100 MiB".
+  process.hash.max_file_size: 100 MiB
+
+  # Hash types to compute of the process executable. Supported types are
+  # blake2b_256, blake2b_384, blake2b_512, md5, sha1, sha224, sha256, sha384,
+  # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
+  # Default is sha1.
+  process.hash.hash_types: [sha1]
+{{- end -}}
+{{- if eq .GOOS "linux" -}}
+
+{{- if .Reference }}
+
+  # Disabled by default. If enabled, the socket dataset will
+  # report sockets to and from localhost.
+  # socket.include_localhost: false
+{{- end }}
+
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+
+  # File patterns of the login record files.
+{{- if .Reference }}
+  # wtmp: History of successful logins, logouts, and system shutdowns and boots.
+  # btmp: Failed login attempts.
+{{- end }}
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
+  {{- end }}

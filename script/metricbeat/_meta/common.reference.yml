@@ -1,0 +1,54 @@
+########################## Metricbeat Configuration ###########################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see metricbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
+
+#============================  Config Reloading ===============================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.config.modules:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/modules.d/*.yml
+
+  # Period on which files under path should be checked for changes
+  reload.period: 10s
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# disable startup delay.
+metricbeat.max_start_delay: 10s
+
+#============================== Autodiscover ===================================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# as they happen.
+
+#metricbeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: etcd
+#          config:
+#            - module: etcd
+#              metricsets: ["leader", "self", "store"]
+#              period: 10s
+#              hosts: ["${host}:2379"]
+
+#=========================== Timeseries instance ===============================
+
+# Enabling this will add a `timeseries.instance` keyword field to all metric
+# events. For a given metricset, this field will be unique for every single item
+# being monitored.
+# This setting is experimental.
+
+#timeseries.enabled: false

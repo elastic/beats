@@ -1,0 +1,92 @@
+- name: queue
+  type: group
+  description: >
+    queue
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the queue with non-ASCII characters escaped as in C.
+    - name: vhost
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
+      description: >
+        Virtual host name with non-ASCII characters escaped as in C.
+    - name: durable
+      type: boolean
+      description: >
+        Whether or not the queue survives server restarts.
+    - name: auto_delete
+      type: boolean
+      description: >
+        Whether the queue will be deleted automatically when no longer used.
+    - name: exclusive
+      type: boolean
+      description: >
+        Whether the queue is exclusive (i.e. has owner_pid).
+    - name: node
+      type: alias
+      path: rabbitmq.node.name
+      migration: true
+      description: >
+        Node name.
+    - name: state
+      type: keyword
+      description: >
+        The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
+    - name: arguments.max_priority
+      type: long
+      description: >
+        Maximum number of priority levels for the queue to support.
+    - name: consumers.count
+      type: long
+      description: >
+        Number of consumers.
+    - name: consumers.utilisation.pct
+      type: long
+      format: percent
+      description: >
+        Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
+    - name: messages.total.count
+      type: long
+      description: >
+        Sum of ready and unacknowledged messages (queue depth).
+    - name: messages.total.details.rate
+      type: float
+      description: >
+        How much the queue depth has changed per second in the most recent sampling interval.
+    - name: messages.ready.count
+      type: long
+      description: >
+        Number of messages ready to be delivered to clients.
+    - name: messages.ready.details.rate
+      type: float
+      description: >
+        How much the count of messages ready has changed per second in the most recent sampling interval.
+    - name: messages.unacknowledged.count
+      type: long
+      description: >
+        Number of messages delivered to clients but not yet acknowledged.
+    - name: messages.unacknowledged.details.rate
+      type: float
+      description: >
+        How much the count of unacknowledged messages has changed per second in the most recent sampling interval.
+    - name: messages.persistent.count
+      type: long
+      description: >
+        Total number of persistent messages in the queue (will always be 0 for transient queues).
+    - name: memory.bytes
+      type: long
+      format: bytes
+      description: >
+        Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
+    - name: disk.reads.count
+      type: long
+      description: >
+        Total number of times messages have been read from disk by this queue since it started.
+    - name: disk.writes.count
+      type: long
+      description: >
+        Total number of times messages have been written to disk by this queue since it started.

@@ -1,0 +1,76 @@
+[
+    {
+        "@timestamp": "2018-05-09T10:57:55.000Z",
+        "event.dataset": "kibana.log",
+        "event.duration": 26000000,
+        "event.module": "kibana",
+        "fileset.name": "log",
+        "http.request.method": "get",
+        "http.request.referrer": "http://localhost:5601/app/kibana",
+        "http.response.body.bytes": 9,
+        "http.response.status_code": 304,
+        "input.type": "log",
+        "kibana.log.meta.req.headers.accept": "*/*",
+        "kibana.log.meta.req.headers.accept-encoding": "gzip, deflate, br",
+        "kibana.log.meta.req.headers.accept-language": "en-US,en;q=0.9,de;q=0.8",
+        "kibana.log.meta.req.headers.connection": "keep-alive",
+        "kibana.log.meta.req.headers.host": "localhost:5601",
+        "kibana.log.meta.req.headers.if-modified-since": "Thu, 03 May 2018 09:45:28 GMT",
+        "kibana.log.meta.req.headers.if-none-match": "\"24234c1c81b3948758c1a0be8e5a65386ca94c52\"",
+        "kibana.log.meta.req.headers.origin": "http://localhost:5601",
+        "kibana.log.meta.req.userAgent": "127.0.0.1",
+        "kibana.log.meta.type": "response",
+        "kibana.log.tags": [],
+        "log.offset": 0,
+        "message": "GET /ui/fonts/open_sans/open_sans_v15_latin_600.woff2 304 26ms - 9.0B",
+        "process.pid": 69410,
+        "service.name": [
+            "kibana"
+        ],
+        "service.type": "kibana",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "url.original": "/ui/fonts/open_sans/open_sans_v15_latin_600.woff2",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36"
+    },
+    {
+        "@timestamp": "2018-05-09T10:59:12.000Z",
+        "event.dataset": "kibana.log",
+        "event.module": "kibana",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kibana.log.meta.type": "log",
+        "kibana.log.tags": [
+            "debug",
+            "monitoring-ui",
+            "kibana-monitoring"
+        ],
+        "log.offset": 920,
+        "message": "Fetching data from kibana_stats collector",
+        "process.pid": 69776,
+        "service.name": [
+            "kibana"
+        ],
+        "service.type": "kibana"
+    },
+    {
+        "@timestamp": "2018-05-09T10:59:12.000Z",
+        "event.dataset": "kibana.log",
+        "event.module": "kibana",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kibana.log.meta.type": "log",
+        "kibana.log.tags": [
+            "reporting",
+            "debug",
+            "exportTypes"
+        ],
+        "log.offset": 1090,
+        "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js",
+        "process.pid": 69776,
+        "service.name": [
+            "kibana"
+        ],
+        "service.type": "kibana"
+    }
+]

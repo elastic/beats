@@ -1,0 +1,41 @@
+- name: host
+  type: group
+  description: >
+    host
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Host name
+    - name: cpu.used.mhz
+      type: long
+      description: >
+        Used CPU in Mhz
+    - name: cpu.total.mhz
+      type: long
+      description: >
+        Total CPU in Mhz
+    - name: cpu.free.mhz
+      type: long
+      description: >
+        Free CPU in Mhz
+    - name: memory.used.bytes
+      type: long
+      description: >
+        Used Memory in bytes
+      format: bytes
+    - name: memory.total.bytes
+      type: long
+      description: >
+        Total Memory in bytes
+      format: bytes
+    - name: memory.free.bytes
+      type: long
+      description: >
+        Free Memory in bytes
+      format: bytes
+    - name: network_names
+      type: keyword
+      description: >
+        Network names

@@ -1,0 +1,41 @@
+[
+    {
+        "@timestamp": "2017-04-04T09:16:34.000Z",
+        "event.dataset": "icinga.main",
+        "event.module": "icinga",
+        "fileset.name": "main",
+        "icinga.main.facility": "Notification",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 0,
+        "message": "Sending 'Recovery' notification 'demo!load!mail-icingaadmin for user 'on-call'",
+        "service.type": "icinga"
+    },
+    {
+        "@timestamp": "2017-04-04T09:16:34.000Z",
+        "event.dataset": "icinga.main",
+        "event.module": "icinga",
+        "fileset.name": "main",
+        "icinga.main.facility": "PluginNotificationTask",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "warning",
+        "log.offset": 133,
+        "message": "Notification command for object 'demo!load' (PID: 19401, arguments: '/etc/icinga2/scripts/mail-service-notification.sh') terminated with exit code 127, output: /etc/icinga2/scripts/mail-service-notification.sh: 20: /etc/icinga2/scripts/mail-service-notification.sh: mail: not found\n/usr/bin/printf: write error: Broken pipe\n",
+        "service.type": "icinga"
+    },
+    {
+        "@timestamp": "2017-04-04T09:16:48.000Z",
+        "event.dataset": "icinga.main",
+        "event.module": "icinga",
+        "fileset.name": "main",
+        "icinga.main.facility": "IdoMysqlConnection",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 518,
+        "message": "Query queue items: 0, query rate: 5.38333/s (323/min 1610/5min 4778/15min);",
+        "service.type": "icinga"
+    }
+]

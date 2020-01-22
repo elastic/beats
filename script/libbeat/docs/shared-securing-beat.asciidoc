@@ -1,0 +1,53 @@
+[id="securing-{beatname_lc}"]
+= Securing {beatname_uc}
+
+[partintro]
+
+--
+The following topics provide information about securing the {beatname_uc}
+process and securing communication between {beatname_uc} and other products in
+the Elastic stack:
+
+ifdef::apm-server[]
+* <<secure-communication-agents>>
+endif::[]
+* <<securing-communication-elasticsearch>>
+ifndef::no-output-logstash[]
+* <<configuring-ssl-logstash>>
+endif::[]
+* <<securing-beats>>
+ifndef::serverless[]
+* <<linux-seccomp>>
+endif::[]
+
+ifdef::beat-specific-security[]
+include::{beat-specific-security}[]
+endif::[]
+
+--
+
+ifdef::apm-server[]
+include::../secure-communication-agents.asciidoc[]
+endif::[]
+
+//sets block macro for https.asciidoc included in next section
+
+[[securing-communication-elasticsearch]]
+== Secure communication with Elasticsearch
+
+include::./https.asciidoc[]
+
+//sets block macro for shared-ssl-logstash-config.asciidoc included in next section
+
+ifndef::no-output-logstash[]
+[[configuring-ssl-logstash]]
+== Secure communication with Logstash
+
+include::./shared-ssl-logstash-config.asciidoc[]
+endif::[]
+
+include::./security/securing-beats.asciidoc[]
+
+ifndef::serverless[]
+include::./security/linux-seccomp.asciidoc[]
+endif::[]

@@ -1,0 +1,5 @@
+pipeline.queue.mem:
+  events: 4096
+  flush:
+    min_events: 2048
+    timeout: 1s

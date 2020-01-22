@@ -1,0 +1,93 @@
+{
+    "description": "Pipeline for parsing logstash slowlogs",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "json": {
+                "field": "message",
+                "target_field": "logstash.slowlog"
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "convert": {
+                "field": "logstash.slowlog.timeMillis",
+                "type": "string"
+            }
+        },
+        {
+            "date": {
+                "field": "logstash.slowlog.timeMillis",
+                "formats": [
+                    "UNIX_MS"
+                ],
+                "target_field": "@timestamp"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.loggerName",
+                "target_field": "logstash.slowlog.module"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.logEvent.took_in_millis",
+                "target_field": "logstash.slowlog.took_in_millis"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.logEvent.took_in_nanos",
+                "target_field": "event.duration"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.logEvent.event",
+                "target_field": "logstash.slowlog.event"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.logEvent.plugin_params",
+                "target_field": "logstash.slowlog.plugin_params_object"
+            }
+        },
+        {
+            "grok": {
+                "field": "logstash.slowlog.module",
+                "patterns": [
+                    "slowlog.logstash.%{WORD:logstash.slowlog.plugin_type}.%{WORD:logstash.slowlog.plugin_name}"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "message",
+                    "logstash.slowlog.timeMillis",
+                    "logstash.slowlog.logEvent"
+                ]
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.level",
+                "target_field": "log.level"
+            }
+        }
+    ]
+}

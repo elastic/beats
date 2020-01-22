@@ -1,0 +1,18 @@
+[[add-id]]
+=== Generate an ID for an event
+
+The `add_id` processor generates a unique ID for an event.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - add_id: ~
+-----------------------------------------------------
+
+The following settings are supported:
+
+`target_field`:: (Optional) Field where the generated ID will be stored. Default is `@metadata.id`.
+
+`type`:: (Optional) Type of ID to generate. Currently only `elasticsearch` is supported and is the default.
+The `elasticsearch` type generates IDs using the same algorithm that Elasticsearch uses for auto-generating
+document IDs.

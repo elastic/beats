@@ -1,0 +1,71 @@
+{
+  "license": {
+    "uid": "743f4bee-e69c-419a-a54e-083611ab5e68",
+    "type": "enterprise",
+    "issue_date_in_millis": 1576000000000,
+    "start_date_in_millis": 1576000000000,
+    "expiry_date_in_millis": 1590000000000,
+    "max_resource_units": 100,
+    "issued_to": "Elastic - INTERNAL",
+    "issuer": "Fabio Busatto",
+    "signature": "AAAA...123",
+    "cluster_licenses": [
+      {
+        "license": {
+          "uid": "bf610b02-470e-d453-0b75-d2f7dfead89f",
+          "type": "enterprise",
+          "issue_date_in_millis": 1576000000000,
+          "start_date_in_millis": 1576000000000,
+          "expiry_date_in_millis": 1590000000000,
+          "max_resource_units": 100,
+          "issued_to": "Elastic - INTERNAL",
+          "issuer": "Fabio Busatto",
+          "signature": "AAAA...xyz"
+        }
+      },
+      {
+        "license": {
+          "uid": "304d04fe-c2d2-8774-cd34-7a71a4cc8c4d",
+          "type": "platinum",
+          "issue_date_in_millis": 1576000000000,
+          "start_date_in_millis": 1576000000000,
+          "expiry_date_in_millis": 1590000000000,
+          "max_nodes": 100,
+          "issued_to": "Elastic - INTERNAL",
+          "issuer": "Fabio Busatto",
+          "signature": "AAAA...uvw"
+        }
+      }
+    ]
+  },
+  "features": {
+    "graph": {
+      "available": false,
+      "enabled": true
+    },
+    "logstash": {
+      "available": false,
+      "enabled": true
+    },
+    "ml": {
+      "available": false,
+      "enabled": true
+    },
+    "monitoring": {
+      "available": true,
+      "enabled": true
+    },
+    "rollup": {
+      "available": true,
+      "enabled": true
+    },
+    "security": {
+      "available": false,
+      "enabled": true
+    },
+    "watcher": {
+      "available": false,
+      "enabled": true
+    }
+  }
+}

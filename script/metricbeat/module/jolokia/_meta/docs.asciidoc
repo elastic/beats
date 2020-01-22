@@ -1,0 +1,13 @@
+This module collects metrics from
+https://jolokia.org/reference/html/agents.html[Jolokia agents] running on a
+target JMX server or dedicated proxy server. The default metricset is `jmx`.
+
+To collect metrics, {beatname_uc} communicates with a Jolokia HTTP/REST
+endpoint that exposes the JMX metrics over HTTP/REST/JSON.
+
+[float]
+=== Compatibility
+
+The Jolokia module is tested with Jolokia 1.5.0. It should work with version
+1.2.2 and later.
+

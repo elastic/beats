@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "etcd": {
+        "api_version": "2",
+        "leader": {
+            "followers": {},
+            "leader": "8e9e05c52164694d"
+        }
+    },
+    "event": {
+        "dataset": "etcd.leader",
+        "duration": 115000,
+        "module": "etcd"
+    },
+    "metricset": {
+        "name": "leader"
+    },
+    "service": {
+        "address": "127.0.0.1:2379",
+        "type": "etcd"
+    }
+}

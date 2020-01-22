@@ -1,0 +1,35 @@
+- name: log
+  type: group
+  description: >
+    Kafka log lines.
+  fields:
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true
+
+    - name: component
+      type: keyword
+      description: >
+        Component the log is coming from.
+    - name: class
+      type: keyword
+      description: >
+        Java class the log is coming from.
+    - name: trace
+      type: group
+      description: >
+          Trace in the log line.
+      fields:
+        - name: class
+          type: keyword
+          description: >
+            Java class the trace is coming from.
+        - name: message
+          type: text
+          description: >
+              Message part of the trace.

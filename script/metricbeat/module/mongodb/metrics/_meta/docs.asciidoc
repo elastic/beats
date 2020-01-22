@@ -1,0 +1,5 @@
+This is the `metrics` metricset of the MongoDB module.
+
+It requires the following privileges, which is covered by the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role]:
+
+- https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]

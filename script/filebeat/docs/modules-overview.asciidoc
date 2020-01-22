@@ -1,0 +1,38 @@
+[[filebeat-modules-overview]]
+== Modules overview
+
+{beatname_uc} modules simplify the collection, parsing, and visualization of common
+log formats.
+
+A typical module (say, for the Nginx logs) is composed of one or
+more filesets (in the case of Nginx, `access` and `error`). A fileset contains
+the following:
+
+* {beatname_uc} input configurations, which contain the default paths where to
+  look for the log files. These default paths depend on the operating system.
+  The {beatname_uc} configuration is also responsible with stitching together
+  multiline events when needed.
+
+* Elasticsearch {ref}/ingest.html[Ingest Node] pipeline definition,
+  which is used to parse the log lines.
+
+* Fields definitions, which are used to configure Elasticsearch with the
+  correct types for each field. They also contain short descriptions for each
+  of the fields.
+
+* Sample Kibana dashboards, when available, that can be used to visualize the
+log files.
+
+{beatname_uc} automatically adjusts these configurations based on your environment
+and loads them to the respective Elastic stack components.
+
+{beatname_uc} modules require Elasticsearch 5.2 or later.
+
+[float]
+=== Get started
+
+To learn how to configure and run {beatname_uc} modules:
+
+* Get started by reading <<filebeat-modules-quickstart>>.
+* Learn about the different ways to enable modules in <<configuration-filebeat-modules>>.
+* Dive into the documentation for each module.

@@ -1,0 +1,10 @@
+- key: envoyproxy
+  title: "envoyproxy"
+  description: >
+    envoyproxy module
+  release: ga
+  fields:
+    - name: envoyproxy
+      type: group
+      description: >
+      fields:

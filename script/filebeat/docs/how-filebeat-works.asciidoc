@@ -1,0 +1,81 @@
+[id="how-{beatname_lc}-works"]
+== How {beatname_uc} works
+
+//TODO: Make this topic more generic and move harvester-specific content to
+//the topic about the log input
+
+In this topic, you learn about the key building blocks of {beatname_uc} and how they work together. Understanding these concepts will help you make informed decisions about configuring {beatname_uc} for specific use cases.
+
+{beatname_uc} consists of two main components: <<input,inputs>> and <<harvester,harvesters>>. These components work together to tail files and send event data to the output that you specify.
+
+
+[float]
+[[harvester]]
+=== What is a harvester?
+
+A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, {beatname_uc} continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, {beatname_uc} keeps the file open until <<{beatname_lc}-input-log-close-inactive,`close_inactive`>> is reached.
+
+Closing a harvester has the following consequences:
+
+* The file handler is closed, freeing up the underlying resources if the file was deleted while the harvester was still reading the file.
+* The harvesting of the file will only be started again after <<{beatname_lc}-input-log-scan-frequency,`scan_frequency`>> has elapsed.
+* If the file is moved or removed while the harvester is closed, harvesting of the file will not continue.
+
+To control when a harvester is closed, use the <<{beatname_lc}-input-log-close-options,`close_*`>> configuration options.
+
+[float]
+[[input]]
+=== What is an input?
+
+An input is responsible for managing the harvesters and finding all sources to read from.
+
+If the input type is `log`, the input finds all files on the drive that match the defined glob paths and starts a harvester for each file. Each input runs in its own Go routine.
+
+The following example configures {beatname_uc} to harvest lines from all log files that match the specified glob patterns:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+{beatname_lc}.inputs:
+- type: log
+  paths:
+    - /var/log/*.log
+    - /var/path2/*.log
+-------------------------------------------------------------------------------------
+
+{beatname_uc} currently supports <<{beatname_lc}-input-types,several `input` types>>. Each input type can be defined multiple times. The `log` input checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>). New lines are only picked up if the size of the file has changed since the harvester was closed.
+
+[float]
+=== How does {beatname_uc} keep the state of files?
+
+{beatname_uc} keeps the state of each file and frequently flushes the state to disk in the registry file. The state is used to remember the last offset a harvester was reading from and to ensure all log lines are sent. If the output, such as Elasticsearch or Logstash, is not reachable, {beatname_uc} keeps track of the last lines sent and will continue reading the files as soon as the output becomes available again. While {beatname_uc} is running, the state information is also kept in memory for each input. When {beatname_uc} is restarted, data from the registry file is used to rebuild the state, and {beatname_uc} continues each harvester at the last known position.
+
+For each input, {beatname_uc} keeps a state of each file it finds. Because files can be renamed or moved, the filename and path are not enough to identify a file. For each file, {beatname_uc} stores unique identifiers to detect whether a file was harvested previously.
+
+If your use case involves creating a large number of new files every day, you might find that the registry file grows to be too large. See <<reduce-registry-size>> for details about configuration options that you can set to resolve this issue.
+
+[float]
+[[at-least-once-delivery]]
+=== How does {beatname_uc} ensure at-least-once delivery?
+
+{beatname_uc} guarantees that events will be delivered to the configured output at
+least once and with no data loss. {beatname_uc} is able to achieve this behavior
+because it stores the delivery state of each event in the registry file.
+
+In situations where the defined output is blocked and has not confirmed all
+events, {beatname_uc} will keep trying to send events until the output acknowledges
+that it has received the events.
+
+If {beatname_uc} shuts down while it's in the process of sending events, it does not
+wait for the output to acknowledge all events before shutting down. Any events
+that are sent to the output, but not acknowledged before {beatname_uc} shuts down,
+are sent again when {beatname_uc} is restarted. This ensures that each event is sent
+at least once, but you can end up with duplicate events being sent to the
+output. You can configure {beatname_uc} to wait a specific amount of time before
+shutting down by setting the <<shutdown-timeout,`shutdown_timeout`>> option.
+
+NOTE: There is a limitation to {beatname_uc}'s at-least-once delivery guarantee
+involving log rotation and the deletion of old files. If log files are written
+to disk and rotated faster than they can be processed by {beatname_uc}, or if files
+are deleted while the output is unavailable, data might be lost. On Linux, it's
+also possible for {beatname_uc} to skip lines as the result of inode reuse. See
+<<faq>> for more details about the inode reuse issue.

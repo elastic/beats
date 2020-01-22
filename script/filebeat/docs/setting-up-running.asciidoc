@@ -1,0 +1,42 @@
+/////
+// NOTE:
+// Each beat has its own setup overview to allow for the addition of content
+// that is unique to each beat.
+/////
+
+[[setting-up-and-running]]
+== Setting up and running {beatname_uc}
+
+Before reading this section, see the
+<<{beatname_lc}-getting-started,getting started documentation>> for basic
+installation instructions to get you started.
+
+This section includes additional information on how to set up and run
+{beatname_uc}, including:
+
+* <<directory-layout>>
+
+* <<command-line-options>>
+
+* <<running-on-docker>>
+
+* <<running-on-kubernetes>>
+
+* <<running-with-systemd>>
+
+
+//MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
+
+include::{libbeat-dir}/shared-directory-layout.asciidoc[]
+
+include::{libbeat-dir}/keystore.asciidoc[]
+
+include::{libbeat-dir}/command-reference.asciidoc[]
+
+include::./running-on-docker.asciidoc[]
+
+include::./running-on-kubernetes.asciidoc[]
+
+include::{libbeat-dir}/shared-systemd.asciidoc[]
+
+include::{libbeat-dir}/shared-shutdown.asciidoc[]

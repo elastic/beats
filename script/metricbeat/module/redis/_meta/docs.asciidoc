@@ -1,0 +1,30 @@
+This module periodically fetches metrics from http://redis.io/[Redis] servers.
+
+The defaut metricsets are `info` and `keyspace`.
+
+[float]
+=== Module-specific configuration notes
+
+The Redis module has these additional config options:
+
+*`hosts`*:: URLs that are used to connect to Redis.
+URL format:
+redis://[:password@]host[:port][/db-number][?option=value]
+redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
+*`password`*:: The password to authenticate, by default it's empty.
+*`idle_timeout`*:: The duration to remain idle before closing connections. If
+  the value is zero, then idle connections are not closed. The default value
+  is 2 times the module period to allow a connection to be reused across
+  fetches. The `idle_timeout` should be set to less than the server's connection
+  timeout.
+*`network`*:: The network type to be used for the Redis connection. The default value is
+  `tcp`.
+*`maxconn`*:: The maximum number of concurrent connections to Redis. The default value
+  is 10.
+
+
+[float]
+=== Compatibility
+
+The Redis metricsets were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4,  and are expected
+to work with all versions >= 3.0.

@@ -1,0 +1,14 @@
+version: '2.3'
+
+services:
+  kafka:
+    image: docker.elastic.co/integrations-ci/beats-kafka:${KAFKA_VERSION:-2.1.1}-2
+    build:
+      context: ./_meta
+      args:
+        KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
+    ports:
+      - 9092
+      - 8779
+      - 8775
+      - 8774

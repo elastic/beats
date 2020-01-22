@@ -1,0 +1,38 @@
+[
+    {
+        "@timestamp": "2017-04-04T11:43:09.000Z",
+        "event.dataset": "icinga.debug",
+        "event.module": "icinga",
+        "fileset.name": "debug",
+        "icinga.debug.facility": "GraphiteWriter",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "message": "Add to metric list:'icinga2.demo.services.procs.procs.perfdata.procs.warn 250 1491306189'.",
+        "service.type": "icinga"
+    },
+    {
+        "@timestamp": "2017-04-04T11:43:09.000Z",
+        "event.dataset": "icinga.debug",
+        "event.module": "icinga",
+        "fileset.name": "debug",
+        "icinga.debug.facility": "IdoMysqlConnection",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 141,
+        "message": "Query: UPDATE icinga_servicestatus SET acknowledgement_type = '0',  active_checks_enabled = '1',  check_command = 'mysql_health',  check_source = 'demo',  check_type = '0',  current_check_attempt = '1',  current_notification_number = '180',  current_state = '2',  endpoint_object_id = 242,  event_handler = '',  event_handler_enabled = '1',  execution_time = '0.355594',  flap_detection_enabled = '0',  has_been_checked = '1',  instance_id = 1,  is_flapping = '0',  is_reachable = '1',  last_check = FROM_UNIXTIME(1491306189),  last_hard_state = '2',  last_hard_state_change = FROM_UNIXTIME(1491290599),  last_notification = FROM_UNIXTIME(1491304989),  last_state_change = FROM_UNIXTIME(1491290599),  last_time_critical = FROM_UNIXTIME(1491306189),  last_time_unknown = FROM_UNIXTIME(1491290589),  latency = '0.001466',  long_output = '',  max_check_attempts = '5',  next_check = FROM_UNIXTIME(1491306198),  next_notification = FROM_UNIXTIME(1491306789),  normal_check_interval = '0.166667',  notifications_enabled = '1',  original_attributes = 'null',  output = 'CRITICAL - cannot connect to information_schema. Access denied for user \\'test1\\'@\\'blerims-mbp.int.netways.de\\' (using password: YES)',  passive_checks_enabled = '1',  percent_state_change = '0',  perfdata = '',  problem_has_been_acknowledged = '0',  process_performance_data = '1',  retry_check_interval = '0.166667',  scheduled_downtime_depth = '0',  service_object_id = 333,  should_be_scheduled = '1',  state_type = '1',  status_update_time = FROM_UNIXTIME(1491306189) WHERE service_object_id = 333",
+        "service.type": "icinga"
+    },
+    {
+        "@timestamp": "2017-04-04T11:43:11.000Z",
+        "event.dataset": "icinga.debug",
+        "event.module": "icinga",
+        "fileset.name": "debug",
+        "icinga.debug.facility": "Process",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 1763,
+        "message": "Running command '/usr/lib/nagios/plugins/check_ping' '-H' 'mysql.icinga.com' '-c' '5000,100%' '-w' '3000,80%': PID 8288",
+        "service.type": "icinga"
+    }
+]

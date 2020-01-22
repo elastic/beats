@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "osd_df": {
+            "available.byte": 0,
+            "device_class": "",
+            "id": 0,
+            "name": "osd.0",
+            "pg_num": 0,
+            "total.byte": 0,
+            "used.byte": 0
+        }
+    },
+    "event": {
+        "dataset": "ceph.osd_df",
+        "duration": 115000,
+        "module": "ceph"
+    },
+    "metricset": {
+        "name": "osd_df"
+    },
+    "service": {
+        "address": "127.0.0.1:5000",
+        "type": "ceph"
+    }
+}

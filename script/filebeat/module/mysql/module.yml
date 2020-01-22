@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-MySQL-Dashboard
+  file: Filebeat-mysql.json

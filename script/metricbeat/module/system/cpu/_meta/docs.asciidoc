@@ -1,0 +1,25 @@
+The System `cpu` metricset provides CPU statistics.
+
+This metricset is available on:
+
+- FreeBSD
+- Linux
+- macOS
+- OpenBSD
+- Windows
+
+[float]
+=== Configuration
+
+*`cpu.metrics`*:: This option controls what CPU metrics are reported. The value
+is a list and three metric types are supported - `percentages`,
+`normalized_percentages`, and `ticks`. The default value is
+`cpu.metrics: [percentages]`.
++
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: [cpu]
+  cpu.metrics: [percentages, normalized_percentages, ticks]
+----

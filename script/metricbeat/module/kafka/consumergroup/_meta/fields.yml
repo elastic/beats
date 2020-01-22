@@ -1,0 +1,70 @@
+- name: consumergroup
+  type: group
+  description: >
+    consumergroup
+  release: ga
+  fields:
+    - name: broker
+      type: group
+      deprecated: 6.5
+      description: >
+        Broker Consumer Group Information have been read from (Broker handling
+        the consumer group).
+      fields:
+        - name: id
+          type: long
+          description: >
+            Broker id
+
+        - name: address
+          type: keyword
+          description: >
+            Broker address
+
+    - name: id
+      type: keyword
+      description: Consumer Group ID
+
+    - name: topic
+      type: keyword
+      deprecated: 6.5
+      description: Topic name
+
+    - name: partition
+      type: long
+      deprecated: 6.5
+      description: Partition ID
+
+    - name: offset
+      type: long
+      description: consumer offset into partition being read
+
+    - name: meta
+      type: keyword
+      description: custom consumer meta data string
+
+    - name: consumer_lag
+      type: long
+      description: consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
+    - name: error.code
+      type: long
+      description: >
+        kafka consumer/partition error code.
+
+    - name: client
+      type: group
+      description: >
+        Assigned client reading events from partition
+      fields:
+        - name: id
+          type: keyword
+          description: Client ID (kafka setting client.id)
+
+        - name: host
+          type: keyword
+          description: Client host
+
+        - name: member_id
+          type: keyword
+          description: internal consumer group member ID

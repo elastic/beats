@@ -1,0 +1,44 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the TCP inputsource
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
+[float]
+[id="{beatname_lc}-input-{type}-tcp-max-message-size"]
+==== `max_message_size`
+
+The maximum size of the message received over TCP. The default is `20MiB`.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-host"]
+==== `host`
+
+The host and TCP port to listen on for event streams.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-line-delimiter"]
+==== `line_delimiter`
+
+Specify the characters used to split the incoming events. The default is '\n'.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-max-connections"]
+==== `max_connections`
+
+The at most number of connections to accept at any given point in time.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-timeout"]
+==== `timeout`
+
+The number of seconds of inactivity before a remote connection is closed. The default is `300s`.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-ssl"]
+===== `ssl`
+
+Configuration options for SSL parameters like the certificate, key and the certificate authorities
+to use.
+
+See <<configuration-ssl>> for more information.

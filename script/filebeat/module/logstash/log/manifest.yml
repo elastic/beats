@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: format
+    default: plain
+  - name: paths
+    default:
+      - /var/log/logstash/logstash-{{.format}}*.log
+    os.windows:
+      - c:/programdata/logstash/logs/logstash-{{.format}}*.log
+
+ingest_pipeline: ingest/pipeline-{{.format}}.json
+input: config/log.yml

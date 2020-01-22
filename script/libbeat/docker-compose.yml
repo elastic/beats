@@ -1,0 +1,99 @@
+version: '2.3'
+services:
+  beat:
+    build: ${PWD}/.
+    depends_on:
+      - proxy_dep
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SREDIS_HOST=sredis
+      - SREDIS_PORT=6380
+      - LS_HOST=logstash
+      - LS_TCP_PORT=5044
+      - LS_TLS_PORT=5055
+      # Setup work environment
+      - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
+      - ES_MONITORING_HOST=elasticsearch_monitoring
+      - ES_MONITORING_PORT=9200
+    env_file:
+      - ${PWD}/build/test.env
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # Used for docker integration tests:
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /go/src/github.com/elastic/beats/libbeat
+    command: make
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch:            { condition: service_healthy }
+      elasticsearch_monitoring: { condition: service_healthy }
+      logstash:                 { condition: service_healthy }
+      kafka:                    { condition: service_healthy }
+      redis:                    { condition: service_healthy }
+      sredis:                   { condition: service_healthy }
+      kibana:                   { condition: service_healthy }
+    healthcheck:
+      interval: 1s
+      retries: 1200
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+
+  elasticsearch_monitoring:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+
+  # This host name is static because of the certificate.
+  logstash:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: logstash
+    env_file:
+      - ${PWD}/build/test.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  redis:
+    build: ${ES_BEATS}/testing/environments/docker/redis
+
+  # This host name is static because of the certificate.
+  sredis: # stunnel proxy for redis
+    build: ${ES_BEATS}/testing/environments/docker/sredis
+    expose:
+      - 6380
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ${PWD}/build/test.env
+
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    expose:
+      - 9092
+      - 2181
+    environment:
+      - ADVERTISED_HOST=kafka
+
+  kibana:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana

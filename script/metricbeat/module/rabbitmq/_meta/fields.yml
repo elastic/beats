@@ -1,0 +1,15 @@
+- key: rabbitmq
+  title: "RabbitMQ"
+  description: >
+    RabbitMQ module
+  release: ga
+  settings: ["ssl", "http"]
+  fields:
+    - name: rabbitmq
+      type: group
+      description: >
+      fields:
+        - name: vhost
+          type: keyword
+          description: >
+            Virtual host name with non-ASCII characters escaped as in C.

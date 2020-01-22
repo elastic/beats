@@ -1,0 +1,12 @@
+161209 13:08:33 mysqld_safe Starting mysqld daemon with databases from /usr/local/var/mysql
+2016-12-09T12:08:33.335060Z 0 [Warning] TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).
+2016-12-09T12:08:33.335892Z 0 [Warning] Insecure configuration for --secure-file-priv: Current value does not restrict location of generated files. Consider setting it to a valid, non-empty path.
+2016-12-09T12:08:33.336610Z 0 [Note] /usr/local/Cellar/mysql/5.7.10/bin/mysqld (mysqld 5.7.10) starting as process 61571 ...
+2016-12-09T12:08:33.345527Z 0 [Warning] Setting lower_case_table_names=2 because file system for /usr/local/var/mysql/ is case insensitive
+2016-12-09T12:08:33.351596Z 0 [Note] InnoDB: Mutexes and rw_locks use GCC atomic builtins
+2016-12-09T12:08:33.784722Z 0 [Note] /usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.
+Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew
+2016-12-09T22:21:02.443689Z 0 [Note] InnoDB: page_cleaner: 1000ms intended loop took 772568ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)
+161209 14:18:50 [Warning] Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.
+161209 14:18:50 [Note] Plugin 'FEDERATED' is disabled.
+161209 14:18:50 InnoDB: The InnoDB memory heap is disabled

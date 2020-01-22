@@ -1,0 +1,32 @@
+[
+    {
+        "event.dataset": "haproxy.log",
+        "event.duration": 1000000,
+        "event.module": "haproxy",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "haproxy.backend_name": "app",
+        "haproxy.backend_queue": 0,
+        "haproxy.bytes_read": 212,
+        "haproxy.connection_wait_time_ms": -1,
+        "haproxy.connections.active": 1,
+        "haproxy.connections.backend": 0,
+        "haproxy.connections.frontend": 1,
+        "haproxy.connections.retries": 0,
+        "haproxy.connections.server": 0,
+        "haproxy.frontend_name": "main",
+        "haproxy.server_name": "<NOSRV>",
+        "haproxy.server_queue": 0,
+        "haproxy.source": "127.0.0.1",
+        "haproxy.termination_state": "SC",
+        "haproxy.total_waiting_time_ms": -1,
+        "input.type": "log",
+        "log.offset": 0,
+        "process.name": "haproxy",
+        "process.pid": 25457,
+        "service.type": "haproxy",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "source.port": 40962
+    }
+]

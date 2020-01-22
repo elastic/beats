@@ -1,0 +1,361 @@
+{
+  "test_name": "IPFIX VMware virtual distributed switch",
+  "events": [
+    {
+      "Timestamp": "2016-12-22T12:17:52Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.211",
+          "locality": "private",
+          "port": 5985
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:52Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "-Sv1di8xiKE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.18.65.211",
+          "destination_transport_port": 5985,
+          "egress_interface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-22T12:17:52Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_direction": 1,
+          "flow_end_milliseconds": "2016-12-22T12:17:37Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-22T12:17:37Z",
+          "ingress_interface": 3,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "maximum_ttl": 128,
+          "octet_delta_count": 100,
+          "packet_delta_count": 2,
+          "padding_octets": "AA==",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.18.65.21",
+          "source_transport_port": 61209,
+          "tcp_control_bits": 2,
+          "type": "netflow_flow",
+          "vmware_egress_interface_attr": 2,
+          "vmware_ingress_interface_attr": 1,
+          "vmware_vxlan_export_role": 0
+        },
+        "network": {
+          "bytes": 100,
+          "community_id": "1:N7jRolYdcCZxQlKUzhCPw7zSQS0=",
+          "direction": "outbound",
+          "iana_number": 6,
+          "packets": 2,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 100,
+          "ip": "172.18.65.21",
+          "locality": "private",
+          "packets": 2,
+          "port": 61209
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-22T12:17:56Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.255",
+          "locality": "private",
+          "port": 138
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:56Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "OQCLJ5IN83c",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.18.65.255",
+          "destination_transport_port": 138,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-22T12:17:56Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_direction": 1,
+          "flow_end_milliseconds": "2016-12-22T12:17:42Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-22T12:17:42Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "maximum_ttl": 128,
+          "octet_delta_count": 229,
+          "packet_delta_count": 1,
+          "padding_octets": "AA==",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.18.65.91",
+          "source_transport_port": 138,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow",
+          "vmware_egress_interface_attr": 2,
+          "vmware_ingress_interface_attr": 1,
+          "vmware_vxlan_export_role": 0
+        },
+        "network": {
+          "bytes": 229,
+          "community_id": "1:yfsv6D0WSefvSi1u8ktASD/D4MU=",
+          "direction": "outbound",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 229,
+          "ip": "172.18.65.91",
+          "locality": "private",
+          "packets": 1,
+          "port": 138
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-22T12:17:56Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.255",
+          "locality": "private",
+          "port": 138
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:56Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "OQCLJ5IN83c",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.18.65.255",
+          "destination_transport_port": 138,
+          "egress_interface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-22T12:17:56Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_direction": 1,
+          "flow_end_milliseconds": "2016-12-22T12:17:42Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-22T12:17:42Z",
+          "ingress_interface": 3,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "maximum_ttl": 128,
+          "octet_delta_count": 229,
+          "packet_delta_count": 1,
+          "padding_octets": "AA==",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.18.65.91",
+          "source_transport_port": 138,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow",
+          "vmware_egress_interface_attr": 2,
+          "vmware_ingress_interface_attr": 1,
+          "vmware_vxlan_export_role": 0
+        },
+        "network": {
+          "bytes": 229,
+          "community_id": "1:yfsv6D0WSefvSi1u8ktASD/D4MU=",
+          "direction": "outbound",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 229,
+          "ip": "172.18.65.91",
+          "locality": "private",
+          "packets": 1,
+          "port": 138
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-22T12:26:04Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "224.0.0.252",
+          "locality": "private",
+          "port": 5355
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:26:04Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "xcyYrM-QBl0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "224.0.0.252",
+          "destination_transport_port": 5355,
+          "egress_interface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-22T12:26:04Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_direction": 1,
+          "flow_end_milliseconds": "2016-12-22T12:25:49Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-22T12:25:49Z",
+          "ingress_interface": 3,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "maximum_ttl": 1,
+          "octet_delta_count": 104,
+          "packet_delta_count": 2,
+          "padding_octets": "AA==",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.18.65.21",
+          "source_transport_port": 61329,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow",
+          "vmware_egress_interface_attr": 2,
+          "vmware_ingress_interface_attr": 1,
+          "vmware_vxlan_export_role": 0
+        },
+        "network": {
+          "bytes": 104,
+          "community_id": "1:LDWJP/qvMM9zo06ETUUG64DZWhY=",
+          "direction": "outbound",
+          "iana_number": 17,
+          "packets": 2,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 104,
+          "ip": "172.18.65.21",
+          "locality": "private",
+          "packets": 2,
+          "port": 61329
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-22T12:26:04Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "port": 5355
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:26:04Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "y_Vml2vPNtw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv6_address": "ff02::1:3",
+          "destination_transport_port": 5355,
+          "egress_interface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-22T12:26:04Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_direction": 1,
+          "flow_end_milliseconds": "2016-12-22T12:25:49Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-22T12:25:49Z",
+          "ingress_interface": 3,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "maximum_ttl": 1,
+          "octet_delta_count": 144,
+          "packet_delta_count": 2,
+          "padding_octets": "AA==",
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::5187:5cd8:d750:cdc9",
+          "source_transport_port": 61329,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow",
+          "vmware_egress_interface_attr": 2,
+          "vmware_ingress_interface_attr": 1,
+          "vmware_vxlan_export_role": 0
+        },
+        "network": {
+          "bytes": 144,
+          "community_id": "1:Nl0K3f1AqKrkGYEhoNHcgFAr/EY=",
+          "direction": "outbound",
+          "iana_number": 17,
+          "packets": 2,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 144,
+          "packets": 2,
+          "port": 61329
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

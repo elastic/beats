@@ -1,0 +1,9 @@
+- module: couchbase
+  #metricsets:
+  #  - bucket
+  #  - cluster
+  #  - node
+  period: 10s
+  hosts: ["localhost:8091"]
+  #username: "user"
+  #password: "secret"

@@ -1,0 +1,11 @@
+- key: windows
+  title: "Windows"
+  description: >
+    Module for Windows
+  short_config: false
+  release: ga
+  fields:
+    - name: windows
+      type: group
+      description: >
+      fields:

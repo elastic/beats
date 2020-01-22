@@ -1,0 +1,9 @@
+output:
+  elasticsearch:
+    enabled: true
+    port: 9200
+    host: localhost
+
+env:
+  test_key: ${TEST_KEY}
+  default: ${NON_EXISTENT:default}

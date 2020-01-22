@@ -1,0 +1,470 @@
+[[defining-processors]]
+=== Define processors
+
+You can use processors to filter and enhance data before sending it to the
+configured output. To define a processor, you specify the processor name, an
+optional condition, and a set of parameters:
+
+[source,yaml]
+------
+processors:
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
+
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
+
+...
+------
+
+Where:
+
+* `<processor_name>` specifies a <<processors,processor>> that performs some kind
+of action, such as selecting the fields that are exported or adding metadata to
+the event.
+* `<condition>` specifies an optional <<conditions,condition>>. If the
+condition is present, then the action is executed only if the condition is
+fulfilled. If no condition is passed, then the action is always executed.
+* `<parameters>` is the list of parameters to pass to the processor.
+
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
+
+[[where-valid]]
+==== Where are processors valid?
+
+// TODO: ANY NEW BEATS THAT RE-USE THIS TOPIC NEED TO DEFINE processor-scope.
+
+ifeval::["{beatname_lc}"=="filebeat"]
+:processor-scope: input
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+:processor-scope: protocol
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+:processor-scope: monitor
+endif::[]
+
+ifeval::["{beatname_lc}"=="winlogbeat"]
+:processor-scope: event log shipper
+endif::[]
+
+Processors are valid:
+
+* At the top-level in the configuration. The processor is applied to all data
+collected by {beatname_uc}.
+* Under a specific {processor-scope}. The processor is applied to the data
+collected for that {processor-scope}.
+ifeval::["{beatname_lc}"=="filebeat"]
++
+[source,yaml]
+------
+- type: <input_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+...
+------
++
+Similarly, for {beatname_uc} modules, you can define processors under the
+`input` section of the module definition.
+endif::[]
+ifeval::["{beatname_lc}"=="metricbeat"]
++
+[source,yaml]
+----
+- module: <module_name>
+  metricsets: ["<metricset_name>"]
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="auditbeat"]
++
+[source,yaml]
+----
+auditbeat.modules:
+- module: <module_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="packetbeat"]
++
+[source,yaml]
+----
+packetbeat.protocols:
+- type: <protocol_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+
+* Under `packetbeat.flows`. The processor is applied to the data in
+<<configuration-flows,network flows>>:
++
+[source,yaml]
+----
+packetbeat.flows:
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="heartbeat"]
++
+[source,yaml]
+----
+heartbeat.monitors:
+- type: <monitor_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="winlogbeat"]
++
+[source,yaml]
+----
+winlogbeat.event_logs:
+- name: <network_shipper_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+
+
+[[processors]]
+==== Processors
+
+The supported processors are:
+
+include::processors-list.asciidoc[tag=processors-list]
+
+[[conditions]]
+==== Conditions
+
+Each condition receives a field to compare. You can specify multiple fields
+under the same condition by using `AND` between the fields (for example,
+`field1 AND field2`).
+
+For each field, you can specify a simple field name or a nested map, for example
+`dns.question.name`.
+
+See <<exported-fields>> for a list of all the fields that are exported by
+{beatname_uc}.
+
+The supported conditions are:
+
+* <<condition-equals,`equals`>>
+* <<condition-contains,`contains`>>
+* <<condition-regexp,`regexp`>>
+* <<condition-range, `range`>>
+* <<condition-network, `network`>>
+* <<condition-has_fields, `has_fields`>>
+* <<condition-or, `or`>>
+* <<condition-and, `and`>>
+* <<condition-not, `not`>>
+
+
+[float]
+[[condition-equals]]
+===== `equals`
+
+With the `equals` condition, you can compare if a field has a certain value.
+The condition accepts only an integer or a string value.
+
+For example, the following condition checks if the response code of the HTTP
+transaction is 200:
+
+[source,yaml]
+-------
+equals:
+  http.response.code: 200
+-------
+
+[float]
+[[condition-contains]]
+===== `contains`
+
+The `contains` condition checks if a value is part of a field. The field can be
+a string or an array of strings. The condition accepts only a string value.
+
+For example, the following condition checks if an error is part of the
+transaction status:
+
+[source,yaml]
+------
+contains:
+  status: "Specific error"
+------
+
+[float]
+[[condition-regexp]]
+===== `regexp`
+
+The `regexp` condition checks the field against a regular expression. The
+condition accepts only strings.
+
+For example, the following condition checks if the process name starts with
+`foo`:
+
+[source,yaml]
+-----
+regexp:
+  system.process.name: "foo.*"
+-----
+
+[float]
+[[condition-range]]
+===== `range`
+
+The `range` condition checks if the field is in a certain range of values. The
+condition supports `lt`, `lte`, `gt` and `gte`. The condition accepts only
+integer or float values.
+
+For example, the following condition checks for failed HTTP transactions by
+comparing the `http.response.code` field with 400.
+
+
+[source,yaml]
+------
+range:
+    http.response.code:
+        gte: 400
+------
+
+This can also be written as:
+
+[source,yaml]
+----
+range:
+    http.response.code.gte: 400
+----
+
+The following condition checks if the CPU usage in percentage has a value
+between 0.5 and 0.8.
+
+[source,yaml]
+------
+range:
+    system.cpu.user.pct.gte: 0.5
+    system.cpu.user.pct.lt: 0.8
+------
+
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if all the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
+------
+
+
+[float]
+[[condition-or]]
+===== `or`
+
+The `or` operator receives a list of conditions.
+
+[source,yaml]
+-------
+or:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example, to configure the condition
+`http.response.code = 304 OR http.response.code = 404`:
+
+[source,yaml]
+------
+or:
+  - equals:
+      http.response.code: 304
+  - equals:
+      http.response.code: 404
+------
+
+[float]
+[[condition-and]]
+===== `and`
+
+The `and` operator receives a list of conditions.
+
+[source,yaml]
+-------
+and:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example, to configure the condition
+`http.response.code = 200 AND status = OK`:
+
+[source,yaml]
+------
+and:
+  - equals:
+      http.response.code: 200
+  - equals:
+      status: OK
+------
+
+To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
+
+[source,yaml]
+------
+or:
+ - <condition1>
+ - and:
+    - <condition2>
+    - <condition3>
+
+------
+
+[float]
+[[condition-not]]
+===== `not`
+
+The `not` operator receives the condition to negate.
+
+[source,yaml]
+-------
+not:
+  <condition>
+
+-------
+
+For example, to configure the condition `NOT status = OK`:
+
+[source,yaml]
+------
+not:
+  equals:
+    status: OK
+------
+
+include::processors-list.asciidoc[tag=processors-include]

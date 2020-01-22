@@ -1,0 +1,82 @@
+- name: partition
+  type: group
+  description: >
+    partition
+  release: ga
+  fields:
+    - name: offset
+      type: group
+      description: >
+        Available offsets of the given partition.
+      fields:
+        - name: newest
+          type: long
+          description: >
+            Newest offset of the partition.
+        - name: oldest
+          type: long
+          description: >
+            Oldest offset of the partition.
+
+    - name: partition
+      type: group
+      description: >
+        Partition data.
+      fields:
+        - name: id
+          type: long
+          deprecated: 6.5
+          description: >
+            Partition id.
+
+        - name: leader
+          type: long
+          description: >
+            Leader id (broker).
+        - name: isr
+          type: keyword
+          description: >
+            List of isr ids.
+        - name: replica
+          type: long
+          description: >
+            Replica id (broker).
+
+        - name: insync_replica
+          type: boolean
+          description: >
+            Indicates if replica is included in the in-sync replicate set (ISR).
+
+        - name: is_leader
+          type: boolean
+          description: >
+            Indicates if replica is the leader
+
+        - name: error.code
+          type: long
+          description: >
+            Error code from fetching partition.
+
+    - name: topic.error.code
+      type: long
+      deprecated: 6.5
+      description: >
+        topic error code.
+    - name: topic.name
+      type: keyword
+      deprecated: 6.5
+      description: >
+        Topic name
+
+    - name: broker.id
+      type: long
+      deprecated: 6.5
+      description: >
+        Broker id
+    - name: broker.address
+      type: keyword
+      deprecated: 6.5
+      description: >
+        Broker address
+
+

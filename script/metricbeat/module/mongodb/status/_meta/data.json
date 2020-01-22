@@ -1,0 +1,209 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mongodb.status",
+        "duration": 115000,
+        "module": "mongodb"
+    },
+    "metricset": {
+        "name": "status"
+    },
+    "mongodb": {
+        "status": {
+            "asserts": {
+                "msg": 0,
+                "regular": 0,
+                "rollovers": 0,
+                "user": 0,
+                "warning": 0
+            },
+            "connections": {
+                "available": 838859,
+                "current": 1,
+                "total_created": 69
+            },
+            "extra_info": {
+                "heap_usage": {},
+                "page_faults": 0
+            },
+            "global_lock": {
+                "active_clients": {
+                    "readers": 0,
+                    "total": 7,
+                    "writers": 0
+                },
+                "current_queue": {
+                    "readers": 0,
+                    "total": 0,
+                    "writers": 0
+                },
+                "total_time": {
+                    "us": 68634000
+                }
+            },
+            "local_time": "2019-01-29T13:47:39.864Z",
+            "locks": {
+                "collection": {
+                    "acquire": {
+                        "count": {
+                            "r": 42,
+                            "w": 2
+                        }
+                    },
+                    "deadlock": {},
+                    "wait": {}
+                },
+                "database": {
+                    "acquire": {
+                        "count": {
+                            "R": 1,
+                            "W": 7,
+                            "r": 42
+                        }
+                    },
+                    "deadlock": {},
+                    "wait": {}
+                },
+                "global": {
+                    "acquire": {
+                        "count": {
+                            "W": 3,
+                            "r": 176,
+                            "w": 7
+                        }
+                    },
+                    "deadlock": {},
+                    "wait": {}
+                },
+                "meta_data": {
+                    "acquire": {
+                        "count": {
+                            "w": 1
+                        }
+                    },
+                    "deadlock": {},
+                    "wait": {}
+                }
+            },
+            "memory": {
+                "bits": 64,
+                "mapped": {
+                    "mb": 0
+                },
+                "mapped_with_journal": {
+                    "mb": 0
+                },
+                "resident": {
+                    "mb": 59
+                },
+                "virtual": {
+                    "mb": 928
+                }
+            },
+            "network": {
+                "in": {
+                    "bytes": 1624
+                },
+                "out": {
+                    "bytes": 143648
+                },
+                "requests": 55
+            },
+            "ops": {
+                "counters": {
+                    "command": 28,
+                    "delete": 0,
+                    "getmore": 0,
+                    "insert": 0,
+                    "query": 1,
+                    "update": 0
+                },
+                "latencies": {
+                    "commands": {
+                        "count": 27,
+                        "latency": 2834
+                    },
+                    "reads": {
+                        "count": 0,
+                        "latency": 0
+                    },
+                    "writes": {
+                        "count": 0,
+                        "latency": 0
+                    }
+                },
+                "replicated": {
+                    "command": 0,
+                    "delete": 0,
+                    "getmore": 0,
+                    "insert": 0,
+                    "query": 0,
+                    "update": 0
+                }
+            },
+            "storage_engine": {
+                "name": "wiredTiger"
+            },
+            "uptime": {
+                "ms": 68626
+            },
+            "wired_tiger": {
+                "cache": {
+                    "dirty": {
+                        "bytes": 19336
+                    },
+                    "maximum": {
+                        "bytes": 2585788416
+                    },
+                    "pages": {
+                        "evicted": 0,
+                        "read": 0,
+                        "write": 14
+                    },
+                    "used": {
+                        "bytes": 29316
+                    }
+                },
+                "concurrent_transactions": {
+                    "read": {
+                        "available": 128,
+                        "out": 0,
+                        "total_tickets": 128
+                    },
+                    "write": {
+                        "available": 128,
+                        "out": 0,
+                        "total_tickets": 128
+                    }
+                },
+                "log": {
+                    "flushes": 683,
+                    "max_file_size": {
+                        "bytes": 104857600
+                    },
+                    "scans": 0,
+                    "size": {
+                        "bytes": 33554432
+                    },
+                    "syncs": 13,
+                    "write": {
+                        "bytes": 16640
+                    },
+                    "writes": 42
+                }
+            }
+        }
+    },
+    "process": {
+        "name": "mongod"
+    },
+    "service": {
+        "address": "127.0.0.1:27017",
+        "type": "mongodb",
+        "version": "3.4.19"
+    }
+}

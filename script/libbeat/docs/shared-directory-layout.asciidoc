@@ -1,0 +1,122 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[directory-layout]]
+=== Directory layout
+
+The directory layout of an installation is as follows:
+
+[cols="<h,<,<m,<m",options="header",]
+|=======================================================================
+| Type   | Description | Default Location | Config Option
+| home   | Home of the {beatname_uc} installation. | | path.home
+| bin    | The location for the binary files. | {path.home}/bin |
+| config | The location for configuration files. | {path.home} | path.config
+| data   | The location for persistent data files. | {path.home}/data| path.data
+| logs   | The location for the logs created by {beatname_uc}. | {path.home}/logs | path.logs
+|=======================================================================
+
+ifndef::serverless[]
+You can change these settings by using CLI flags or setting
+<<configuration-path,path options>> in the configuration file.
+endif::serverless[]
+
+==== Default paths
+
+{beatname_uc} uses the following default paths unless you explicitly change them.
+
+ifdef::deb_os,rpm_os[]
+[float]
+===== deb and rpm
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type   | Description | Location
+| home   | Home of the {beatname_uc} installation. | /usr/share/{beatname_lc}
+| bin    | The location for the binary files. | /usr/share/{beatname_lc}/bin
+| config | The location for configuration files. | /etc/{beatname_lc}
+| data   | The location for persistent data files. | /var/lib/{beatname_lc}
+| logs   | The location for the logs created by {beatname_uc}. | /var/log/{beatname_lc}
+|=======================================================================
+
+For the deb and rpm distributions, these paths are set in the init script or in
+the systemd unit file.  Make sure that you start the {beatname_uc} service by using
+the preferred operating system method (init scripts or `systemctl`).
+Otherwise the paths might be set incorrectly.
+
+endif::deb_os,rpm_os[]
+
+ifdef::docker_platform[]
+[float]
+===== docker
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type   | Description | Location
+| home   | Home of the {beatname_uc} installation. | /usr/share/{beatname_lc}
+| bin    | The location for the binary files. | /usr/share/{beatname_lc}
+| config | The location for configuration files. | /usr/share/{beatname_lc}
+| data   | The location for persistent data files. | /usr/share/{beatname_lc}/data
+| logs   | The location for the logs created by {beatname_uc}. | /usr/share/{beatname_lc}/logs
+|=======================================================================
+
+endif::docker_platform[]
+
+ifdef::mac_os,win_os[]
+[float]
+===== zip, tar.gz, or tgz
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type   | Description | Location
+| home   | Home of the {beatname_uc} installation. | {extract.path}
+| bin    | The location for the binary files. | {extract.path}
+| config | The location for configuration files. | {extract.path}
+| data   | The location for persistent data files. | {extract.path}/data
+| logs   | The location for the logs created by {beatname_uc}. | {extract.path}/logs
+ifdef::serverless[]
+| pkg    | The location for the binary uploaded to your serverless provider. | {extract.path}/pkg
+endif::serverless[]
+|=======================================================================
+
+For the zip, tar.gz, or tgz distributions, these paths are based on the location
+of the extracted binary file. This means that if you start {beatname_uc} with
+the following simple command, all paths are set correctly:
+
+endif::mac_os,win_os[]
+
+ifndef::win_only[]
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc}
+----------------------------------------------------------------------
+
+endif::win_only[]
+
+ifdef::mac_os[]
+===== brew
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type   | Description | Location
+| home   | Home of the {beatname_uc} installation. | /usr/local/var/homebrew/linked/{beatname_lc}-full
+| bin    | The location for the binary files. | /usr/local/var/homebrew/linked/{beatname_lc}-full/bin
+| config | The location for configuration files. | /usr/local/etc/{beatname_lc}
+| data   | The location for persistent data files. | /usr/local/var/lib/{beatname_lc}
+| logs   | The location for the logs created by {beatname_uc}. | /usr/local/var/log/{beatname_lc}
+|=======================================================================
+endif::mac_os[]
+
+ifdef::win_only[]
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+Start-Service {beatname_lc}
+----------------------------------------------------------------------
+
+endif::win_only[]

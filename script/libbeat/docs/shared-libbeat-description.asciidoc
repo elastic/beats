@@ -1,0 +1,3 @@
+{beatname_uc} is an Elastic https://www.elastic.co/products/beats[Beat]. It's
+based on the `libbeat` framework. For more information, see the
+{beats-ref}/index.html[{libbeat-docs}]. 

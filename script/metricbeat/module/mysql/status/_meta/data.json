@@ -1,0 +1,116 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "mysql.status",
+        "duration": 115000,
+        "module": "mysql"
+    },
+    "metricset": {
+        "name": "status"
+    },
+    "mysql": {
+        "status": {
+            "aborted": {
+                "clients": 3,
+                "connects": 4
+            },
+            "binlog": {
+                "cache": {
+                    "disk_use": 0,
+                    "use": 0
+                }
+            },
+            "bytes": {
+                "received": 1272,
+                "sent": 47735
+            },
+            "command": {
+                "delete": 0,
+                "insert": 0,
+                "select": 1,
+                "update": 0
+            },
+            "connections": 12,
+            "created": {
+                "tmp": {
+                    "disk_tables": 0,
+                    "files": 5,
+                    "tables": 6
+                }
+            },
+            "delayed": {
+                "errors": 0,
+                "insert_threads": 0,
+                "writes": 0
+            },
+            "flush_commands": 1,
+            "handler": {
+                "commit": 0,
+                "delete": 0,
+                "external_lock": 140,
+                "mrr_init": 0,
+                "prepare": 0,
+                "read": {
+                    "first": 3,
+                    "key": 2,
+                    "last": 0,
+                    "next": 32,
+                    "prev": 0,
+                    "rnd": 0,
+                    "rnd_next": 1728
+                },
+                "rollback": 0,
+                "savepoint": 0,
+                "savepoint_rollback": 0,
+                "update": 0,
+                "write": 1705
+            },
+            "innodb": {
+                "buffer_pool": {
+                    "bytes": {
+                        "data": 6914048,
+                        "dirty": 0
+                    },
+                    "pages": {
+                        "data": 422,
+                        "dirty": 0,
+                        "flushed": 207,
+                        "free": 7768,
+                        "misc": 1,
+                        "total": 8191
+                    },
+                    "pool": {
+                        "reads": 423,
+                        "wait_free": 0
+                    },
+                    "read": {
+                        "ahead": 0,
+                        "ahead_evicted": 0,
+                        "ahead_rnd": 0,
+                        "requests": 14198
+                    },
+                    "write_requests": 207
+                }
+            },
+            "max_used_connections": 3,
+            "open": {
+                "files": 16,
+                "streams": 0,
+                "tables": 60
+            },
+            "opened_tables": 67,
+            "queries": 10,
+            "questions": 9,
+            "threads": {
+                "cached": 0,
+                "connected": 3,
+                "created": 3,
+                "running": 1
+            }
+        }
+    },
+    "service": {
+        "address": "127.0.0.1:3306",
+        "type": "mysql"
+    }
+}

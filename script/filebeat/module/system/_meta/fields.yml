@@ -1,0 +1,11 @@
+- key: system
+  title: "System"
+  description: >
+    Module for parsing system log files.
+  short_config: true
+  fields:
+    - name: system
+      type: group
+      description: >
+        Fields from the system log files.
+      fields:

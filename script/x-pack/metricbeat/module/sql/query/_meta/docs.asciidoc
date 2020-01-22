@@ -1,0 +1,4 @@
+The sql `query` metricset collect rows returned by a query. 
+
+Fields names (columns) will be returned as lowercase.
+Values will be returned as numeric or string.

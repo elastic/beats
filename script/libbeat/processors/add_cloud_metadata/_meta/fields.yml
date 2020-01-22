@@ -1,0 +1,53 @@
+- key: cloud
+  title: Cloud provider metadata
+  description: >
+    Metadata from cloud providers added by the add_cloud_metadata processor.
+  fields:
+
+    - name: cloud.project.id
+      example: project-x
+      description: >
+        Name of the project in Google Cloud.
+    
+    - name: cloud.image.id
+      example: ami-abcd1234
+      description: >
+        Image ID for the cloud instance.
+
+    # Alias for old fields
+    - name: meta.cloud.provider
+      type: alias
+      path: cloud.provider
+      migration: true
+
+    - name: meta.cloud.instance_id
+      type: alias
+      path: cloud.instance.id
+      migration: true
+
+    - name: meta.cloud.instance_name
+      type: alias
+      path: cloud.instance.name
+      migration: true
+
+    - name: meta.cloud.machine_type
+      type: alias
+      path: cloud.machine.type
+      migration: true
+
+    - name: meta.cloud.availability_zone
+      type: alias
+      path: cloud.availability_zone
+      migration: true
+
+    - name: meta.cloud.project_id
+      type: alias
+      path: cloud.project.id
+      migration: true
+
+    - name: meta.cloud.region
+      type: alias
+      path: cloud.region
+      migration: true
+
+    

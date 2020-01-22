@@ -1,0 +1,169 @@
+[[running-on-kubernetes]]
+=== Running Metricbeat on Kubernetes
+
+You can use {beatname_uc} <<running-on-docker,Docker images>> on Kubernetes to
+retrieve cluster metrics.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+
+[float]
+==== Kubernetes deploy manifests
+
+You deploy {beatname_uc} in two different ways at the same time:
+
+* As a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
+to ensure that there's a running instance on each node of the cluster. These
+instances are used to retrieve most metrics from the host, such as system
+metrics, Docker stats, and metrics from all the services running on top of
+Kubernetes.
+
+* As a single {beatname_uc} instance created using a https://kubernetes.io/docs/concepts/workloads/controllers/Deployment/[Deployment].
+This instance is used to retrieve metrics that are unique for the whole
+cluster, such as Kubernetes events or
+https://github.com/kubernetes/kube-state-metrics[kube-state-metrics].
+
+Everything is deployed under the `kube-system` namespace by default. To change
+the namespace, modify the manifest file.
+
+To download the manifest file, run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/metricbeat-kubernetes.yaml
+------------------------------------------------
+
+[WARNING]
+=======================================
+*If you are using Kubernetes 1.7 or earlier:* {beatname_uc} uses a hostPath volume to persist internal data. It's located
+under +/var/lib/{beatname_lc}-data+. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in
+Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest and create the host folder yourself.
+=======================================
+
+[float]
+==== Settings
+
+By default, {beatname_uc} sends events to an existing Elasticsearch deployment,
+if present. To specify a different destination, change the following parameters
+in the manifest file:
+
+[source,yaml]
+------------------------------------------------
+- name: ELASTICSEARCH_HOST
+  value: elasticsearch
+- name: ELASTICSEARCH_PORT
+  value: "9200"
+- name: ELASTICSEARCH_USERNAME
+  value: elastic
+- name: ELASTICSEARCH_PASSWORD
+  value: changeme
+------------------------------------------------
+
+[float]
+===== Running {beatname_uc} on master nodes
+
+Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+update the Daemonset spec to include proper tolerations:
+
+[source,yaml]
+------------------------------------------------
+spec:
+ tolerations:
+ - key: node-role.kubernetes.io/master
+   effect: NoSchedule
+------------------------------------------------
+
+[float]
+===== Red Hat OpenShift configuration
+
+If you are using Red Hat OpenShift, you need to specify additional settings in
+the manifest file and enable the container to run as privileged.
+
+. In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
+specify the following settings under `kubernetes.yml` in the `data` section:
++
+[source,yaml]
+-----
+  kubernetes.yml: |-
+    - module: kubernetes
+      metricsets:
+        - node
+        - system
+        - pod
+        - container
+        - volume
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["https://${HOSTNAME}:10250"]
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.certificate_authorities:
+        - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+-----
+
+. Under the `metricbeat` ClusterRole, add the following resources:
++
+[source,yaml]
+-----
+  - nodes/metrics
+  - nodes/stats
+-----
+
+. Grant the `metricbeat` service account access to the privileged SCC:
++
+[source,shell]
+-----
+oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:metricbeat
+-----
++
+This command enables the container to be privileged as an administrator for
+OpenShift.
+
+. Override the default node selector for the `kube-system` namespace (or your
+custom namespace) to allow for scheduling on any node:
++
+[source,shell]
+----
+oc patch namespace kube-system -p \
+'{"metadata": {"annotations": {"openshift.io/node-selector": ""}}}'
+----
++
+This command sets the node selector for the project to an empty string. If you
+don't run this command, the default node selector will skip master nodes.  
+
+[float]
+==== Deploy
+
+Metricbeat gets some metrics from https://github.com/kubernetes/kube-state-metrics#usage[kube-state-metrics].
+If `kube-state-metrics` is not already running, deploy it now (see the
+https://github.com/kubernetes/kube-state-metrics#kubernetes-deployment[Kubernetes
+deployment] docs).
+
+To deploy {beatname_uc} to Kubernetes, run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl create -f metricbeat-kubernetes.yaml
+------------------------------------------------
+
+To check the status, run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+$ kubectl --namespace=kube-system  get ds/metricbeat
+
+NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
+metricbeat   32        32        0         32           0           <none>          1m
+
+$ kubectl --namespace=kube-system  get deploy/metricbeat
+
+NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+metricbeat                1         1         1            1           1m
+------------------------------------------------
+
+Metrics should start flowing to Elasticsearch.

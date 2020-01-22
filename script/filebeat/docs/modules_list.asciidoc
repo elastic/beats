@@ -1,0 +1,82 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+  * <<filebeat-modules-overview>>
+  * <<filebeat-module-activemq>>
+  * <<filebeat-module-apache>>
+  * <<filebeat-module-auditd>>
+  * <<filebeat-module-aws>>
+  * <<filebeat-module-azure>>
+  * <<filebeat-module-cef>>
+  * <<filebeat-module-cisco>>
+  * <<filebeat-module-coredns>>
+  * <<filebeat-module-elasticsearch>>
+  * <<filebeat-module-envoyproxy>>
+  * <<filebeat-module-googlecloud>>
+  * <<filebeat-module-haproxy>>
+  * <<filebeat-module-ibmmq>>
+  * <<filebeat-module-icinga>>
+  * <<filebeat-module-iis>>
+  * <<filebeat-module-iptables>>
+  * <<filebeat-module-kafka>>
+  * <<filebeat-module-kibana>>
+  * <<filebeat-module-logstash>>
+  * <<filebeat-module-misp>>
+  * <<filebeat-module-mongodb>>
+  * <<filebeat-module-mssql>>
+  * <<filebeat-module-mysql>>
+  * <<filebeat-module-nats>>
+  * <<filebeat-module-netflow>>
+  * <<filebeat-module-nginx>>
+  * <<filebeat-module-osquery>>
+  * <<filebeat-module-panw>>
+  * <<filebeat-module-postgresql>>
+  * <<filebeat-module-rabbitmq>>
+  * <<filebeat-module-redis>>
+  * <<filebeat-module-santa>>
+  * <<filebeat-module-suricata>>
+  * <<filebeat-module-system>>
+  * <<filebeat-module-traefik>>
+  * <<filebeat-module-zeek>>
+
+
+--
+
+include::modules-overview.asciidoc[]
+include::modules/activemq.asciidoc[]
+include::modules/apache.asciidoc[]
+include::modules/auditd.asciidoc[]
+include::modules/aws.asciidoc[]
+include::modules/azure.asciidoc[]
+include::modules/cef.asciidoc[]
+include::modules/cisco.asciidoc[]
+include::modules/coredns.asciidoc[]
+include::modules/elasticsearch.asciidoc[]
+include::modules/envoyproxy.asciidoc[]
+include::modules/googlecloud.asciidoc[]
+include::modules/haproxy.asciidoc[]
+include::modules/ibmmq.asciidoc[]
+include::modules/icinga.asciidoc[]
+include::modules/iis.asciidoc[]
+include::modules/iptables.asciidoc[]
+include::modules/kafka.asciidoc[]
+include::modules/kibana.asciidoc[]
+include::modules/logstash.asciidoc[]
+include::modules/misp.asciidoc[]
+include::modules/mongodb.asciidoc[]
+include::modules/mssql.asciidoc[]
+include::modules/mysql.asciidoc[]
+include::modules/nats.asciidoc[]
+include::modules/netflow.asciidoc[]
+include::modules/nginx.asciidoc[]
+include::modules/osquery.asciidoc[]
+include::modules/panw.asciidoc[]
+include::modules/postgresql.asciidoc[]
+include::modules/rabbitmq.asciidoc[]
+include::modules/redis.asciidoc[]
+include::modules/santa.asciidoc[]
+include::modules/suricata.asciidoc[]
+include::modules/system.asciidoc[]
+include::modules/traefik.asciidoc[]
+include::modules/zeek.asciidoc[]

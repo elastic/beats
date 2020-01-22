@@ -1,0 +1,116 @@
+[role="xpack"]
+[[beats-api-keys]]
+=== Grant access using API keys
+
+Instead of using usernames and passwords, you can use API keys to grant
+access to {es} resources. You can set API keys to expire at a certain time,
+and you can explicitly invalidate them. Any user with the `manage_api_key`
+or `manage_own_api_key` cluster privilege can create API keys.
+
+See the {es} API key documentation for more information:
+
+* {ref}/security-api-create-api-key.html[Create API key]
+* {ref}/security-api-get-api-key.html[Get API key information]
+* {ref}/security-api-invalidate-api-key.html[Invalidate API key]
+
+{beatname_uc} instances typically send both collected data and monitoring
+information to {es}. If you are sending both to the same cluster, you can use the same
+API key. For different clusters, you need to use an API key per cluster.
+
+NOTE: For security reasons, we recommend using a unique API key per Beat instance.
+You can create as many API keys per user as necessary.
+
+[[beats-api-key-publish]]
+==== Create an API key for publishing
+To create an API key to use for writing data to {es}, use the
+{ref}/security-api-create-api-key.html[Create API key API], for example:
+
+[source,console,subs="attributes,callouts"]
+------------------------------------------------------------
+POST /_security/api_key
+{
+  "name": "{beat_default_index_prefix}_host001", <1>
+  "role_descriptors": {
+    "{beat_default_index_prefix}_writer": { <2>
+      "cluster": ["monitor", "read_ilm"],
+      "index": [
+        {
+          "names": ["{beat_default_index_prefix}-*"],
+          "privileges": ["view_index_metadata", "create_doc"]
+        }
+      ]
+    }
+  }
+}
+------------------------------------------------------------
+<1> Name of the API key
+<2> Granted privileges, see <<feature-roles>>
+
+The return value will look something like this:
+
+[source,console-result,subs="attributes,callouts"]
+--------------------------------------------------
+{
+  "id":"TiNAGG4BaaMdaH1tRfuU", <1>
+  "name":"{beat_default_index_prefix}_host001",
+  "api_key":"KnR6yE41RrSowb0kQ0HWoA" <2>
+}
+--------------------------------------------------
+<1> Unique id for this API key
+<2> Generated API key
+
+You can now use this API key in your +{beatname_lc}.yml+ configuration file like this:
+["source","yaml"]
+--------------------
+output.elasticsearch:
+  api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
+--------------------
+<1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
+
+[[beats-api-key-monitor]]
+==== Create an API key for monitoring
+To create an API key to use for sending monitoring data to {es}, use the
+{ref}/security-api-create-api-key.html[Create API key API], for example:
+
+[source,console,subs="attributes,callouts"]
+------------------------------------------------------------
+POST /_security/api_key
+{
+  "name": "{beat_default_index_prefix}_host001", <1>
+  "role_descriptors": {
+    "{beat_default_index_prefix}_monitoring": { <2>
+      "cluster": ["monitor"],
+      "index": [
+        {
+          "names": [".monitoring-beats-*"],
+          "privileges": ["create_index", "create"]
+        }
+      ]
+    }
+  }
+}
+------------------------------------------------------------
+<1> Name of the API key
+<2> Granted privileges, see <<feature-roles>>
+
+The return value will look something like this:
+
+[source,console-result,subs="attributes,callouts"]
+--------------------------------------------------
+{
+  "id":"TiNAGG4BaaMdaH1tRfuU", <1>
+  "name":"{beat_default_index_prefix}_host001",
+  "api_key":"KnR6yE41RrSowb0kQ0HWoA" <2>
+}
+--------------------------------------------------
+<1> Unique id for this API key
+<2> Generated API key
+
+You can now use this API key in your +{beatname_lc}.yml+ configuration file like this:
+["source","yml",subs="attributes"]
+--------------------
+monitoring.elasticsearch:
+  api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
+--------------------
+<1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
+

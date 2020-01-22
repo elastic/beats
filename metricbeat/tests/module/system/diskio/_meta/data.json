@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.diskio",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "diskio"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "diskio": {
+            "io": {
+                "time": 656
+            },
+            "iostat": {
+                "await": 0,
+                "busy": 0,
+                "queue": {
+                    "avg_size": 0
+                },
+                "read": {
+                    "await": 0,
+                    "per_sec": {
+                        "bytes": 0
+                    },
+                    "request": {
+                        "merges_per_sec": 0,
+                        "per_sec": 0
+                    }
+                },
+                "request": {
+                    "avg_size": 0
+                },
+                "service_time": 0,
+                "write": {
+                    "await": 0,
+                    "per_sec": {
+                        "bytes": 0
+                    },
+                    "request": {
+                        "merges_per_sec": 0,
+                        "per_sec": 0
+                    }
+                }
+            },
+            "name": "nvme0n1p1",
+            "read": {
+                "bytes": 8028160,
+                "count": 3290,
+                "time": 130016
+            },
+            "write": {
+                "bytes": 5120,
+                "count": 3,
+                "time": 12
+            }
+        }
+    }
+}

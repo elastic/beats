@@ -1,0 +1,12 @@
+# Module: php_fpm
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-php_fpm.html
+
+- module: php_fpm
+  #metricsets:
+  #  - pool
+  #  - process
+  period: 10s
+  hosts: ["localhost:8080"]
+  status_path: "/status"
+  #username: "user"
+  #password: "secret"

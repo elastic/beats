@@ -1,0 +1,14 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/mysql/mysql-slow.log*
+      - /var/lib/mysql/{{.builtin.hostname}}-slow.log
+    os.darwin:
+      - /usr/local/var/mysql/{{.builtin.hostname}}-slow.log*
+    os.windows:
+      - "c:/programdata/MySQL/MySQL Server*/mysql-slow.log*"
+
+ingest_pipeline: ingest/pipeline.json
+input: config/slowlog.yml

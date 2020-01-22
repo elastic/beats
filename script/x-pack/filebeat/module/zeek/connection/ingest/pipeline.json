@@ -1,0 +1,160 @@
+{
+  "description": "Pipeline for normalizing Zeek conn.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.connection.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.connection.ts"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+        "params": {
+          "scale": 1000000000
+        },
+        "if": "ctx.temp?.duration != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "temp.duration",
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx.zeek.connection.local_orig) ctx.tags.add(\"local_orig\");",
+        "if": "ctx.zeek.connection.local_orig != null"
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx.zeek.connection.local_resp) ctx.tags.add(\"local_resp\");",
+        "if": "ctx.zeek.connection.local_resp != null"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.network.packets = ctx.source.packets + ctx.destination.packets",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"internal\"} else if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == false) {ctx.network.direction = \"outbound\"} else if (ctx.zeek.connection.local_orig == false && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"inbound\"} else {ctx.network.direction = \"external\"}"
+      }
+    },
+    {
+      "geoip": {
+        "field": "destination.ip",
+        "target_field": "destination.geo"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "source.as.asn",
+        "target_field": "source.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx.zeek.connection.state == \"S0\") {ctx.zeek.connection.state_message = \"Connection attempt seen, no reply.\"} else if (ctx.zeek.connection.state == \"S1\") {ctx.zeek.connection.state_message = \"Connection established, not terminated.\"} else if (ctx.zeek.connection.state == \"SF\") {ctx.zeek.connection.state_message = \"Normal establishment and termination.\"} else if (ctx.zeek.connection.state == \"REJ\") {ctx.zeek.connection.state_message = \"Connection attempt rejected.\"} else if (ctx.zeek.connection.state == \"S2\") {ctx.zeek.connection.state_message = \" Connection established and close attempt by originator seen (but no reply from responder).\"} else if (ctx.zeek.connection.state == \"S3\") {ctx.zeek.connection.state_message = \"Connection established and close attempt by responder seen (but no reply from originator).\"} else if (ctx.zeek.connection.state == \"RSTO\") {ctx.zeek.connection.state_message = \"Connection established, originator aborted (sent a RST).\"} else if (ctx.zeek.connection.state == \"RSTR\") {ctx.zeek.connection.state_message = \"Responder sent a RST.\"} else if (ctx.zeek.connection.state == \"RSTOS0\") {ctx.zeek.connection.state_message = \"Originator sent a SYN followed by a RST, we never saw a SYN-ACK from the responder.\"} else if (ctx.zeek.connection.state == \"RSTRH\") {ctx.zeek.connection.state_message = \"Responder sent a SYN ACK followed by a RST, we never saw a SYN from the (purported) originator.\"} else if (ctx.zeek.connection.state == \"SH\") {ctx.zeek.connection.state_message = \"Originator sent a SYN followed by a FIN, we never saw a SYN ACK from the responder (hence the connection was 'half' open).\"} else if (ctx.zeek.connection.state == \"SHR\") {ctx.zeek.connection.state_message = \"Responder sent a SYN ACK followed by a FIN, we never saw a SYN from the originator.\"} else if (ctx.zeek.connection.state == \"OTH\") {ctx.zeek.connection.state_message = \"No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).\"}"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

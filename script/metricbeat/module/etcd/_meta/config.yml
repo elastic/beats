@@ -1,0 +1,10 @@
+- module: etcd
+  #metricsets:
+  #  - leader
+  #  - self
+  #  - store
+  #  - metrics
+  period: 10s
+  hosts: ["localhost:2379"]
+  #username: "user"
+  #password: "secret"

@@ -1,0 +1,1000 @@
+Feb  9 21:19:40 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:19:40 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lhspyyxxlfzpytwsebjoegenjxyjombo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675177.72-26828938879074/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675177.72-26828938879074/ >/dev/null 2>&1
+Feb  9 21:19:40 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:19:41 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:19:41 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:19:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xspkubktopzqiwiofvdhqaglconkrgwp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675181.24-158548606882799/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675181.24-158548606882799/ >/dev/null 2>&1
+Feb  9 21:19:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:19:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:02 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:03 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vxcrqvczsrjrrsjcokculalhrgfsxqzl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675202.4-199750250589919/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675202.4-199750250589919/ >/dev/null 2>&1
+Feb  9 21:20:03 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:03 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:03 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:03 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-gruorqbeefuuhfprfoqzsftalatgwwvf; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675203.3-59927285912173/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675203.3-59927285912173/ >/dev/null 2>&1
+Feb  9 21:20:03 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:03 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:05 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fnthqelgspkbnpnxlsknzcbyxbqqxpmt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675204.07-135388534337396/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675204.07-135388534337396/ >/dev/null 2>&1
+Feb  9 21:20:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:05 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:06 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:08  sshd[8317]: last message repeated 2 times
+Feb  9 21:20:08 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wagdvfiuqxtryvmyrqlfcwoxeqqrxejt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/async_wrapper 321853834469 45 /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/command /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675206.28-198308747142204/ >/dev/null 2>&1
+Feb  9 21:20:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:09 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:12 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:12 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lkgydmrwiywdfvxfoxmgntufiumtzpmq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675212.66-81790186240643/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675212.66-81790186240643/ >/dev/null 2>&1
+Feb  9 21:20:12 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:13 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:19 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:19 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mjsapklbglujaoktlsyytirwygexdily; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675218.96-234174787135180/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675218.96-234174787135180/ >/dev/null 2>&1
+Feb  9 21:20:19 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:19 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:19 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:19 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-kvmafqtdnnvnyfyqlnoovickcavkqwdy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675219.83-99205535237718/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675219.83-99205535237718/ >/dev/null 2>&1
+Feb  9 21:20:19 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:20 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:24 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:24 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-nhrnwbdpypmsmvcstuihfqfbcvpxrmys; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675224.58-12467498973476/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675224.58-12467498973476/ >/dev/null 2>&1
+Feb  9 21:20:24 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:25 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:28 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:28 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-buzartmsbrirxgcoibjpsqjkldihhexh; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675228.25-195852789001210/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675228.25-195852789001210/ >/dev/null 2>&1
+Feb  9 21:20:28 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:31 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:47 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:47 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-swwkpvmnxhcuduxerfbgclhsmgbhwzie; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675247.78-128146395950020/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675247.78-128146395950020/ >/dev/null 2>&1
+Feb  9 21:20:47 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:50 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:50 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-raffykohamlcbnpxzipksbvfpjbfpagy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675250.82-190689706060358/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675250.82-190689706060358/ >/dev/null 2>&1
+Feb  9 21:20:50 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:51 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:20:51 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:20:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dfoxiractbmtavfiwfnhzfkftipjumph; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675251.6-137767038423665/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675251.6-137767038423665/ >/dev/null 2>&1
+Feb  9 21:20:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:20:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:01 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:01 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-jveaoynmhsmeodakzfhhaodihyroxobu; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675261.29-208287411335817/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675261.29-208287411335817/ >/dev/null 2>&1
+Feb  9 21:21:01 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:01 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:02 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lwzhcvorajmjyxsrqydafzapoeescwaf; rc=flag; [ -r /etc/metricbeat/metricbeat.yml ] || rc=2; [ -f /etc/metricbeat/metricbeat.yml ] || rc=1; [ -d /etc/metricbeat/metricbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/metricbeat/metricbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/metricbeat/metricbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/metricbeat/metricbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 
+Feb  9 21:21:02 precise32 sudo:  vagrant : (command continued) '/etc/metricbeat/metricbeat.yml)
+Feb  9 21:21:02 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:02 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:02 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:02 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:02 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-yesyhegdrhiolusidthffdemrxphqdfm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675262.15-83340738940485/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675262.15-83340738940485/ >/dev/null 2>&1
+Feb  9 21:21:02 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:02 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:03 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:03 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vqbyiylfjufyxlwvxcwusklrtmiekpia; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675263.16-15325827909434/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675263.16-15325827909434/ >/dev/null 2>&1
+Feb  9 21:21:03 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:03 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:04 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-osrbplljwskuafamtjuanhwfxqdxmfbj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675264.47-179299683847940/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675264.47-179299683847940/ >/dev/null 2>&1
+Feb  9 21:21:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:05 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:05 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xqypdfdxashhaekghbfnpdlcgsmfarmy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675265.39-273766954542007/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675265.39-273766954542007/ >/dev/null 2>&1
+Feb  9 21:21:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:05 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:06 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:06 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ktkmpxhjivossxngupfgrqfobhopruzp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675266.58-47565152594552/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675266.58-47565152594552/ >/dev/null 2>&1
+Feb  9 21:21:06 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:15 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:15 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-erpqyqrmifxazcclvbqytjwxgdplhtpy; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675275.74-155140815824587/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675275.74-155140815824587/ >/dev/null 2>&1
+Feb  9 21:21:15 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:15 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:16 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:16 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-cfqjebskszjdqpksprlbjpbttastwzyp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675276.62-248748589735433/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675276.62-248748589735433/ >/dev/null 2>&1
+Feb  9 21:21:16 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:17 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:20 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:30 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-oxbowrzvfhsebemuiblilqwvdxvnwztv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675280.28-272460786101534/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675280.28-272460786101534/ >/dev/null 2>&1
+Feb  9 21:21:30 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:33 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:42 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:42 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ohlhhhazvtawqawluadjlxglowwenmyc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675302.51-201837201796085/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675302.51-201837201796085/ >/dev/null 2>&1
+Feb  9 21:21:42 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:42 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:43 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fxkkbzmbdrxgbhejuievvukihnyxxqru; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675303.65-64589423443234/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675303.65-64589423443234/ >/dev/null 2>&1
+Feb  9 21:21:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:43 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:46 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:46 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-teszjmcjmewxckcimdrpzexuffcbqxao; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675304.47-137831346757512/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675304.47-137831346757512/ >/dev/null 2>&1
+Feb  9 21:21:46 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:46 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:46 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:47  sshd[8317]: last message repeated 2 times
+Feb  9 21:21:47 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pcgidnbwkzuhorearmbjkeyqhxbtoryr; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675306.84-180653352879797/async_wrapper 40788874474 45 /home/vagrant/.ansible/tmp/ansible-tmp-1486675306.84-180653352879797/command /home/vagrant/.ansible/tmp/ansible-tmp-1486675306.84-180653352879797/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675306.84-180653352879797/ >/dev/null 2>&1
+Feb  9 21:21:47 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:52 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:52 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-uiafyjflnjoezymltalnhkurjonjaxsb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675312.77-162101214367573/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675312.77-162101214367573/ >/dev/null 2>&1
+Feb  9 21:21:52 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:21:58 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:21:59 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-awdbaonvfappmyhngzuxzbnrgrvmxxmq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675318.92-83212533004754/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675318.92-83212533004754/ >/dev/null 2>&1
+Feb  9 21:21:59 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:21:59 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:00 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:00 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-epglqzpqtvukjkntkhcypzqakykknrhq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675319.97-182898557012273/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675319.97-182898557012273/ >/dev/null 2>&1
+Feb  9 21:22:00 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:00 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:01 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:01 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-adsulhhhqeihfgdctumfajchfpykjanw; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675320.85-143796414377457/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675320.85-143796414377457/ >/dev/null 2>&1
+Feb  9 21:22:01 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:02 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:06 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:07 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ikwqsmlxlzbtrcfoklcfexlshzphvbqf; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675326.05-203247712855500/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675326.05-203247712855500/ >/dev/null 2>&1
+Feb  9 21:22:07 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:07 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:09 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:09 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xhyimrwqolspqnrwuvixgrnmbeceaozk; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675329.7-68540523481235/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675329.7-68540523481235/ >/dev/null 2>&1
+Feb  9 21:22:09 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:13 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:29 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:29 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dlbnvyqsiivzagpchvvbtwvxmwqxphun; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675349.52-51181422479289/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675349.52-51181422479289/ >/dev/null 2>&1
+Feb  9 21:22:29 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:29 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:32 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:32 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mpdyxmjmnedlqsbagcvkhcqtilemaxnj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675352.75-31376555221975/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675352.75-31376555221975/ >/dev/null 2>&1
+Feb  9 21:22:32 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:33 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:33 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:34 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fjfnzqcwaxwyrarfaquhblztpezkynfm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675353.58-232202092763250/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675353.58-232202092763250/ >/dev/null 2>&1
+Feb  9 21:22:34 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:43 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hjkoqjulpizhatgojelxjvwmqmeqebpo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675362.92-74451552200205/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675362.92-74451552200205/ >/dev/null 2>&1
+Feb  9 21:22:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:43 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:44 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-qlixydmzekacecpiurdomusznjsqtvvp; rc=flag; [ -r /etc/heartbeat/heartbeat.yml ] || rc=2; [ -f /etc/heartbeat/heartbeat.yml ] || rc=1; [ -d /etc/heartbeat/heartbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/heartbeat/heartbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/heartbeat/heartbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/heartbeat/heartbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 
+Feb  9 21:22:44 precise32 sudo:  vagrant : (command continued) '/etc/heartbeat/heartbeat.yml)
+Feb  9 21:22:44 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:44 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:44 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:44 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:44 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ajqomrxbnhudtprtcsrbntwrkcjeibxi; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675364.45-217362589658234/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675364.45-217362589658234/ >/dev/null 2>&1
+Feb  9 21:22:44 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:44 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:45 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:45 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-acvwapcldjqoeakolbpynaqpoldxbjxn; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675365.11-82479565966466/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675365.11-82479565966466/ >/dev/null 2>&1
+Feb  9 21:22:45 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:45 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:46 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:46 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ovavtenadmsuwjadjpdzgnzkzcrdtcrl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675366.39-91454860430660/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675366.39-91454860430660/ >/dev/null 2>&1
+Feb  9 21:22:46 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:47 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:48 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lcouezrlyawlsxyxqtteptekjflkxgvl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675368.21-115041673323332/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675368.21-115041673323332/ >/dev/null 2>&1
+Feb  9 21:22:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:49 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dlvojyckxrrunoxvzdtrrjnasqwvhrir; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675369.58-23315001061866/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675369.58-23315001061866/ >/dev/null 2>&1
+Feb  9 21:22:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:52 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:58 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:58 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-yiotgcbibvnhentlusjejfibawiojokv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675378.05-28330678876735/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675378.05-28330678876735/ >/dev/null 2>&1
+Feb  9 21:22:58 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:58 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:22:59 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:22:59 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-cujnxfaprouklabmdpyojwiswgtknxyr; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675379.11-115543127564480/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675379.11-115543127564480/ >/dev/null 2>&1
+Feb  9 21:22:59 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:22:59 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:02 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:02 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lbfdybsgwoexbttukdvmqdqeihvyivds; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675382.79-175899445627464/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675382.79-175899445627464/ >/dev/null 2>&1
+Feb  9 21:23:02 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:06 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:22 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:22 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-htlyhfgwucqsaucceyrodskdpmmkdste; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675401.72-28086953836565/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675401.72-28086953836565/ >/dev/null 2>&1
+Feb  9 21:23:22 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:22 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:22 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:22 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dcfnygpdavffrbrogmsybfxkhccsnqqw; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675402.55-52286886998725/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675402.55-52286886998725/ >/dev/null 2>&1
+Feb  9 21:23:22 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:22 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:23 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:23 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ggpdimpxsyacqevtqfkprmzbmlzzrkan; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675403.27-231673287482858/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675403.27-231673287482858/ >/dev/null 2>&1
+Feb  9 21:23:23 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:23 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:25 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:25  sshd[8317]: last message repeated 2 times
+Feb  9 21:23:25 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fumdsdwhnsyqdpxdtlguuplqfqgcsayx; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675405.35-15951944312742/async_wrapper 669982207445 45 /home/vagrant/.ansible/tmp/ansible-tmp-1486675405.35-15951944312742/command /home/vagrant/.ansible/tmp/ansible-tmp-1486675405.35-15951944312742/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675405.35-15951944312742/ >/dev/null 2>&1
+Feb  9 21:23:25 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:26 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:31 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:34 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-jiaetvfxpwjlomrcorahxgplhvzrubfa; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675411.21-151981974783794/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675411.21-151981974783794/ >/dev/null 2>&1
+Feb  9 21:23:34 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:35 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:23:37 precise32 sshd[8317]: subsystem request for sftp by user vagrant
+Feb  9 21:23:37 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mguewlrhhlvqjpdmsutqaqmchdrsuidz; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1486675417.39-200931953942031/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1486675417.39-200931953942031/ >/dev/null 2>&1
+Feb  9 21:23:37 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb  9 21:23:37 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb  9 21:24:37 precise32 sshd[8317]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb  9 21:24:37 precise32 sshd[8302]: pam_unix(sshd:session): session closed for user vagrant
+Feb  9 22:17:01 precise32 CRON[9966]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb  9 22:17:01 precise32 CRON[9966]: pam_unix(cron:session): session closed for user root
+Feb  9 23:17:01 precise32 CRON[9979]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb  9 23:17:01 precise32 CRON[9979]: pam_unix(cron:session): session closed for user root
+Feb 10 08:29:29 precise32 sshd[9987]: Accepted publickey for vagrant from 10.0.2.2 port 52776 ssh2
+Feb 10 08:29:29 precise32 sshd[9987]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 10 08:29:40 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/apt/sources.list
+Feb 10 08:29:40 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:29:43 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:29:56 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/apt/sources.list.d/elastic
+Feb 10 08:29:56 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:30:07 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:30:11 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get update
+Feb 10 08:30:11 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:30:18 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:30:40 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/mv /etc/apt/sources.list.d/elastic /etc/apt/sources.list.d/elastic.list
+Feb 10 08:30:40 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:30:40 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:30:41 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get update
+Feb 10 08:30:41 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:30:52 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:31:03 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install filebeat
+Feb 10 08:31:03 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:31:19 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:31:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install filebeat=5.2.0
+Feb 10 08:31:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:31:43 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:31:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install metricbeat=5.2.0
+Feb 10 08:31:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:31:51 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:37:00 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install metricbeat
+Feb 10 08:37:00 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 10 08:37:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 10 08:37:09 precise32 sshd[10002]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 10 08:37:09 precise32 sshd[9987]: pam_unix(sshd:session): session closed for user vagrant
+Feb 10 09:17:01 precise32 CRON[10439]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 09:17:01 precise32 CRON[10439]: pam_unix(cron:session): session closed for user root
+Feb 10 10:17:01 precise32 CRON[10454]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 10:17:01 precise32 CRON[10454]: pam_unix(cron:session): session closed for user root
+Feb 10 11:17:01 precise32 CRON[10469]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 11:17:01 precise32 CRON[10469]: pam_unix(cron:session): session closed for user root
+Feb 10 12:17:01 precise32 CRON[10488]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 12:17:01 precise32 CRON[10488]: pam_unix(cron:session): session closed for user root
+Feb 10 13:17:01 precise32 CRON[10503]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 13:17:01 precise32 CRON[10503]: pam_unix(cron:session): session closed for user root
+Feb 10 14:17:01 precise32 CRON[10537]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 14:17:01 precise32 CRON[10537]: pam_unix(cron:session): session closed for user root
+Feb 10 17:17:01 precise32 CRON[10553]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 17:17:01 precise32 CRON[10553]: pam_unix(cron:session): session closed for user root
+Feb 10 18:17:01 precise32 CRON[10570]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 18:17:01 precise32 CRON[10570]: pam_unix(cron:session): session closed for user root
+Feb 10 19:17:01 precise32 CRON[10588]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 19:17:01 precise32 CRON[10588]: pam_unix(cron:session): session closed for user root
+Feb 10 20:17:01 precise32 CRON[10606]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 20:17:01 precise32 CRON[10606]: pam_unix(cron:session): session closed for user root
+Feb 10 21:17:01 precise32 CRON[10623]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 10 21:17:01 precise32 CRON[10623]: pam_unix(cron:session): session closed for user root
+Feb 11 09:17:01 precise32 CRON[10641]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 09:17:01 precise32 CRON[10641]: pam_unix(cron:session): session closed for user root
+Feb 11 10:17:01 precise32 CRON[10658]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 10:17:01 precise32 CRON[10658]: pam_unix(cron:session): session closed for user root
+Feb 11 11:17:01 precise32 CRON[10673]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 11:17:01 precise32 CRON[10673]: pam_unix(cron:session): session closed for user root
+Feb 11 12:17:01 precise32 CRON[10693]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 12:17:01 precise32 CRON[10693]: pam_unix(cron:session): session closed for user root
+Feb 11 13:17:01 precise32 CRON[10711]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 13:17:01 precise32 CRON[10711]: pam_unix(cron:session): session closed for user root
+Feb 11 14:17:01 precise32 CRON[10807]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 14:17:01 precise32 CRON[10807]: pam_unix(cron:session): session closed for user root
+Feb 11 15:17:01 precise32 CRON[10825]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 15:17:01 precise32 CRON[10825]: pam_unix(cron:session): session closed for user root
+Feb 11 16:17:01 precise32 CRON[10841]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 16:17:01 precise32 CRON[10841]: pam_unix(cron:session): session closed for user root
+Feb 11 17:17:01 precise32 CRON[10858]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 17:17:01 precise32 CRON[10858]: pam_unix(cron:session): session closed for user root
+Feb 11 18:17:01 precise32 CRON[10875]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 18:17:01 precise32 CRON[10875]: pam_unix(cron:session): session closed for user root
+Feb 11 19:17:01 precise32 CRON[10893]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 19:17:01 precise32 CRON[10893]: pam_unix(cron:session): session closed for user root
+Feb 11 20:17:01 precise32 CRON[10909]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 20:17:01 precise32 CRON[10909]: pam_unix(cron:session): session closed for user root
+Feb 11 21:17:01 precise32 CRON[10923]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 21:17:01 precise32 CRON[10923]: pam_unix(cron:session): session closed for user root
+Feb 11 22:17:01 precise32 CRON[10941]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 11 22:17:01 precise32 CRON[10941]: pam_unix(cron:session): session closed for user root
+Feb 12 16:17:01 precise32 CRON[10952]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 16:17:01 precise32 CRON[10952]: pam_unix(cron:session): session closed for user root
+Feb 12 17:17:01 precise32 CRON[10971]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 17:17:01 precise32 CRON[10971]: pam_unix(cron:session): session closed for user root
+Feb 12 18:17:01 precise32 CRON[11064]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 18:17:01 precise32 CRON[11064]: pam_unix(cron:session): session closed for user root
+Feb 12 19:17:01 precise32 CRON[11082]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 19:17:01 precise32 CRON[11082]: pam_unix(cron:session): session closed for user root
+Feb 12 20:17:01 precise32 CRON[11101]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 20:17:01 precise32 CRON[11101]: pam_unix(cron:session): session closed for user root
+Feb 12 21:17:01 precise32 CRON[11118]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 21:17:01 precise32 CRON[11118]: pam_unix(cron:session): session closed for user root
+Feb 12 22:17:01 precise32 CRON[11137]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 12 22:17:01 precise32 CRON[11137]: pam_unix(cron:session): session closed for user root
+Feb 13 08:17:01 precise32 CRON[11153]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 08:17:01 precise32 CRON[11153]: pam_unix(cron:session): session closed for user root
+Feb 13 09:17:01 precise32 CRON[11170]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 09:17:01 precise32 CRON[11170]: pam_unix(cron:session): session closed for user root
+Feb 13 10:17:01 precise32 CRON[11185]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 10:17:01 precise32 CRON[11185]: pam_unix(cron:session): session closed for user root
+Feb 13 11:17:01 precise32 CRON[11199]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 11:17:01 precise32 CRON[11199]: pam_unix(cron:session): session closed for user root
+Feb 13 12:17:01 precise32 CRON[11214]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 12:17:01 precise32 CRON[11214]: pam_unix(cron:session): session closed for user root
+Feb 13 13:17:01 precise32 CRON[11228]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 13:17:01 precise32 CRON[11228]: pam_unix(cron:session): session closed for user root
+Feb 13 14:17:01 precise32 CRON[11262]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 14:17:01 precise32 CRON[11262]: pam_unix(cron:session): session closed for user root
+Feb 13 15:17:01 precise32 CRON[11276]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 15:17:01 precise32 CRON[11276]: pam_unix(cron:session): session closed for user root
+Feb 13 16:17:01 precise32 CRON[11283]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 16:17:01 precise32 CRON[11283]: pam_unix(cron:session): session closed for user root
+Feb 13 17:17:01 precise32 CRON[11295]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 17:17:01 precise32 CRON[11295]: pam_unix(cron:session): session closed for user root
+Feb 13 18:17:01 precise32 CRON[11308]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 18:17:01 precise32 CRON[11308]: pam_unix(cron:session): session closed for user root
+Feb 13 19:17:01 precise32 CRON[11326]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 19:17:01 precise32 CRON[11326]: pam_unix(cron:session): session closed for user root
+Feb 13 20:17:01 precise32 CRON[11341]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 20:17:01 precise32 CRON[11341]: pam_unix(cron:session): session closed for user root
+Feb 13 21:17:01 precise32 CRON[11359]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 21:17:01 precise32 CRON[11359]: pam_unix(cron:session): session closed for user root
+Feb 13 22:17:01 precise32 CRON[11375]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 13 22:17:01 precise32 CRON[11375]: pam_unix(cron:session): session closed for user root
+Feb 14 07:17:01 precise32 CRON[11385]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 07:17:01 precise32 CRON[11385]: pam_unix(cron:session): session closed for user root
+Feb 14 08:17:01 precise32 CRON[11401]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 08:17:01 precise32 CRON[11401]: pam_unix(cron:session): session closed for user root
+Feb 14 09:17:01 precise32 CRON[11417]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 09:17:01 precise32 CRON[11417]: pam_unix(cron:session): session closed for user root
+Feb 14 10:17:01 precise32 CRON[11453]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 10:17:01 precise32 CRON[11453]: pam_unix(cron:session): session closed for user root
+Feb 14 11:17:01 precise32 CRON[11466]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 11:17:01 precise32 CRON[11466]: pam_unix(cron:session): session closed for user root
+Feb 14 12:17:01 precise32 CRON[11480]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 12:17:01 precise32 CRON[11480]: pam_unix(cron:session): session closed for user root
+Feb 14 13:17:01 precise32 CRON[11495]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 13:17:01 precise32 CRON[11495]: pam_unix(cron:session): session closed for user root
+Feb 14 14:17:01 precise32 CRON[11510]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 14:17:02 precise32 CRON[11510]: pam_unix(cron:session): session closed for user root
+Feb 14 15:17:01 precise32 CRON[11527]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 15:17:01 precise32 CRON[11527]: pam_unix(cron:session): session closed for user root
+Feb 14 16:17:01 precise32 CRON[11542]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 16:17:01 precise32 CRON[11542]: pam_unix(cron:session): session closed for user root
+Feb 14 17:17:01 precise32 CRON[11558]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 17:17:01 precise32 CRON[11558]: pam_unix(cron:session): session closed for user root
+Feb 14 18:17:01 precise32 CRON[11574]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 18:17:01 precise32 CRON[11574]: pam_unix(cron:session): session closed for user root
+Feb 14 19:17:01 precise32 CRON[11586]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 14 19:17:01 precise32 CRON[11586]: pam_unix(cron:session): session closed for user root
+Feb 15 09:17:01 precise32 CRON[11627]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 09:17:01 precise32 CRON[11627]: pam_unix(cron:session): session closed for user root
+Feb 15 10:17:01 precise32 CRON[11639]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 10:17:01 precise32 CRON[11639]: pam_unix(cron:session): session closed for user root
+Feb 15 11:17:01 precise32 CRON[11656]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 11:17:01 precise32 CRON[11656]: pam_unix(cron:session): session closed for user root
+Feb 15 12:17:01 precise32 CRON[11671]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 12:17:01 precise32 CRON[11671]: pam_unix(cron:session): session closed for user root
+Feb 15 13:17:01 precise32 CRON[11685]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 13:17:01 precise32 CRON[11685]: pam_unix(cron:session): session closed for user root
+Feb 15 14:17:01 precise32 CRON[11700]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 14:17:01 precise32 CRON[11700]: pam_unix(cron:session): session closed for user root
+Feb 15 15:17:01 precise32 CRON[11713]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 15:17:01 precise32 CRON[11713]: pam_unix(cron:session): session closed for user root
+Feb 15 16:17:01 precise32 CRON[11728]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 16:17:01 precise32 CRON[11728]: pam_unix(cron:session): session closed for user root
+Feb 15 17:17:01 precise32 CRON[11743]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 17:17:01 precise32 CRON[11743]: pam_unix(cron:session): session closed for user root
+Feb 15 18:17:01 precise32 CRON[11784]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 18:17:01 precise32 CRON[11784]: pam_unix(cron:session): session closed for user root
+Feb 15 19:17:01 precise32 CRON[11797]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 19:17:01 precise32 CRON[11797]: pam_unix(cron:session): session closed for user root
+Feb 15 20:17:01 precise32 CRON[11838]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 15 20:17:01 precise32 CRON[11838]: pam_unix(cron:session): session closed for user root
+Feb 16 06:04:36 precise32 sshd[11846]: Accepted publickey for vagrant from 10.0.2.2 port 57698 ssh2
+Feb 16 06:04:36 precise32 sshd[11846]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 16 06:04:36 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 16 06:04:36 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 16 06:04:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:53:59 precise32 sshd[524]: Received signal 15; terminating.
+Feb 21 20:53:59 precise32 sshd[786]: Server listening on 0.0.0.0 port 22.
+Feb 21 20:53:59 precise32 sshd[786]: Server listening on :: port 22.
+Feb 21 20:54:05 precise32 sshd[1049]: Accepted publickey for vagrant from 10.0.2.2 port 63645 ssh2
+Feb 21 20:54:05 precise32 sshd[1049]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 21 20:54:07 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:07 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:07 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:07 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:07 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:07 precise32 sshd[786]: Received signal 15; terminating.
+Feb 21 20:54:07 precise32 sshd[1173]: Server listening on 0.0.0.0 port 22.
+Feb 21 20:54:07 precise32 sshd[1173]: Server listening on :: port 22.
+Feb 21 20:54:07 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:08 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:08 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:08 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:08 precise32 sudo:  vagrant : TTY=unknown ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash -l
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)
+Feb 21 20:54:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 21 20:54:08 precise32 sshd[1049]: pam_unix(sshd:session): session closed for user vagrant
+Feb 21 20:54:10 precise32 sshd[1235]: Did not receive identification string from 10.0.2.2
+Feb 21 21:17:01 precise32 CRON[1264]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 21 21:17:01 precise32 CRON[1264]: pam_unix(cron:session): session closed for user root
+Feb 21 22:17:01 precise32 CRON[1278]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 21 22:17:01 precise32 CRON[1278]: pam_unix(cron:session): session closed for user root
+Feb 22 09:17:01 precise32 CRON[1298]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 09:17:01 precise32 CRON[1298]: pam_unix(cron:session): session closed for user root
+Feb 22 10:17:01 precise32 CRON[1313]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 10:17:01 precise32 CRON[1313]: pam_unix(cron:session): session closed for user root
+Feb 22 10:17:35 precise32 sshd[1317]: Accepted publickey for vagrant from 10.0.2.2 port 50649 ssh2
+Feb 22 10:17:35 precise32 sshd[1317]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 22 10:17:36 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:17:36 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xssosunoadzrupbslukboshizrdrioxa; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758643.54-191473960698523/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758643.54-191473960698523/ >/dev/null 2>&1
+Feb 22 10:17:36 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:17:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:17:37 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:17:37 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hxipbwbkxeioyitdwspukfecshzmmznq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758657.4-158751358978750/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758657.4-158751358978750/ >/dev/null 2>&1
+Feb 22 10:17:37 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:17:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:17:57 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:17:57 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-emhyhjenolvqmuddzjsrvdrlshuozvbt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758673.45-1328499317378/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758673.45-1328499317378/ >/dev/null 2>&1
+Feb 22 10:17:57 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:02 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:07 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:07 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-tnuospsrbdizfiuhbtlkwjlthrsmjllm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758687.19-221944793882694/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758687.19-221944793882694/ >/dev/null 2>&1
+Feb 22 10:18:07 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:07 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:14 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:15 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-glkfubgvldbatmtdrtbyjplvhybyetdi; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758694.65-96114020740224/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758694.65-96114020740224/ >/dev/null 2>&1
+Feb 22 10:18:15 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:15 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:15 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:15 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ijzrnnvvtrdgpaulzxwvpwlvokztvosi; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758695.82-89251362907242/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758695.82-89251362907242/ >/dev/null 2>&1
+Feb 22 10:18:15 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:17 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:37 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:37 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pogpznvhgeqrtzlcudaddelhakmqzyvc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758717.06-179621344002611/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758717.06-179621344002611/ >/dev/null 2>&1
+Feb 22 10:18:37 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:37 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:38 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-cgnuoyhpluwhkezwnsqvydawomlfskny; rc=flag; [ -r /etc/packetbeat/packetbeat.yml ] || rc=2; [ -f /etc/packetbeat/packetbeat.yml ] || rc=1; [ -d /etc/packetbeat/packetbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/packetbeat/packetbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/packetbeat/packetbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/packetbeat/packetbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 
+Feb 22 10:18:38 precise32 sudo:  vagrant : (command continued) '/etc/packetbeat/packetbeat.yml)
+Feb 22 10:18:38 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:38 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:38 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:38 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vxlqeahufmmmbvyqklrzqgkjctmdkgus; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758717.91-56384930409930/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758717.91-56384930409930/ >/dev/null 2>&1
+Feb 22 10:18:38 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:39 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:39 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xakfsqpdonqkzaedehbsdzszbbyertxw; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758719.2-243819058722243/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758719.2-243819058722243/ >/dev/null 2>&1
+Feb 22 10:18:39 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:40 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:46 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:46 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dytuqoopxigowdsexoxljahexcrgrusl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758721.63-238019605938202/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758721.63-238019605938202/ >/dev/null 2>&1
+Feb 22 10:18:46 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:47 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:47 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-yyxjqzypwilthsoesuioieestjumujju; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758727.59-206889470588032/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758727.59-206889470588032/ >/dev/null 2>&1
+Feb 22 10:18:47 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:50 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:50 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ntvmfwclgszgjkggyrefquijrpduwmgb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758730.11-121092091456552/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758730.11-121092091456552/ >/dev/null 2>&1
+Feb 22 10:18:50 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:50 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:51 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ibplwyrudxqiewtnazajakyxfkkcptyq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758731.03-34005853522249/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758731.03-34005853522249/ >/dev/null 2>&1
+Feb 22 10:18:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:52 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:18:55 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:18:55 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dgeumohveckrnbwermrtgsjoarogauts; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758735.15-203882260553837/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758735.15-203882260553837/ >/dev/null 2>&1
+Feb 22 10:18:55 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:18:57 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:04 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ojjhntgihxndnhavcctzukxgjofssmzd; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758744.84-77760196415518/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758744.84-77760196415518/ >/dev/null 2>&1
+Feb 22 10:19:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:05 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:05 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pmqqiowsxeslareuueooxspvwjhjemfb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758745.72-98459850115685/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758745.72-98459850115685/ >/dev/null 2>&1
+Feb 22 10:19:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:06 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:10 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:14 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-qwihjodhuysbsmpziijlzwshyltrzcyq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758750.05-149759005698820/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758750.05-149759005698820/ >/dev/null 2>&1
+Feb 22 10:19:14 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:18 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:29 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:30 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-yvxsufrhkjpmpjrppduubympcvtrkvaj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758769.71-145821006475810/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758769.71-145821006475810/ >/dev/null 2>&1
+Feb 22 10:19:30 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:30 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:30 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:31 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-aiqgiatpajrwljvsshlnkgevpbpsklww; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758770.86-179475170836781/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758770.86-179475170836781/ >/dev/null 2>&1
+Feb 22 10:19:31 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:31 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:33 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:33 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pgdnhbifitnqwakjzgmcvkqmnzsrpfco; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758771.76-102255502158149/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758771.76-102255502158149/ >/dev/null 2>&1
+Feb 22 10:19:33 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:34 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:34 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:34  sshd[1332]: last message repeated 2 times
+Feb 22 10:19:34 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xgucwwayjxcvonkbqpgxmfyjenwzyeoe; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758774.27-3510546063127/async_wrapper 237258794263 45 /home/vagrant/.ansible/tmp/ansible-tmp-1487758774.27-3510546063127/command /home/vagrant/.ansible/tmp/ansible-tmp-1487758774.27-3510546063127/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758774.27-3510546063127/ >/dev/null 2>&1
+Feb 22 10:19:34 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:35 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:40 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:41 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-qaweqylanyknzgjbwefkqyrvqyqoxndl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758780.79-49892349010220/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758780.79-49892349010220/ >/dev/null 2>&1
+Feb 22 10:19:41 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:42 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-khughpifzkpjcrntbljswmyirtsjrxvi; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758787.81-128455052873531/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758787.81-128455052873531/ >/dev/null 2>&1
+Feb 22 10:19:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:51 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mzzvwtfwbwzduvdadylfesruqyisjvbn; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758790.9-209098267326353/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758790.9-209098267326353/ >/dev/null 2>&1
+Feb 22 10:19:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:51 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:52 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:53 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mrirjjotfyalxyssrfyxzwlvqgfsxwif; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758792.57-141403876569108/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758792.57-141403876569108/ >/dev/null 2>&1
+Feb 22 10:19:53 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:54 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:19:55 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:19:55 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mgndoeogsbwbiiyommokxzrgcviyurzn; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758795.11-164059807202479/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758795.11-164059807202479/ >/dev/null 2>&1
+Feb 22 10:19:55 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:19:56 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:01 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:02 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-nqcissdyplqbywhbdgliygpmcvsntqyr; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758801.05-59435378275017/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758801.05-59435378275017/ >/dev/null 2>&1
+Feb 22 10:20:02 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:03 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:12 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:16 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-chgutesiryamamuplkzptdzlruibkljn; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758805.06-177283137429784/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758805.06-177283137429784/ >/dev/null 2>&1
+Feb 22 10:20:16 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:24 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:28 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:28 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xsijqxjrtjsvhsdapgoggsglqpduyjsl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758828.17-30183388747526/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758828.17-30183388747526/ >/dev/null 2>&1
+Feb 22 10:20:28 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:28 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:33 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:33 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-heeyxwtdvgnuzqrqrjbklxakhrzdqivd; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758832.98-8399030937476/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758832.98-8399030937476/ >/dev/null 2>&1
+Feb 22 10:20:33 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:35 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:35 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:36 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fjjvrhktdnfgkbduajrjfghkenlxixng; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758835.24-68380542949187/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758835.24-68380542949187/ >/dev/null 2>&1
+Feb 22 10:20:36 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:37 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:45 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:46 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pekyfcnfxapysvffjjsmdqlzamplbxjl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758845.87-75931053700416/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758845.87-75931053700416/ >/dev/null 2>&1
+Feb 22 10:20:46 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:46 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:46 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-jzemhvdzpkifymfzmttbqlyjwovpxren; rc=flag; [ -r /etc/filebeat/filebeat.yml ] || rc=2; [ -f /etc/filebeat/filebeat.yml ] || rc=1; [ -d /etc/filebeat/filebeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/filebeat/filebeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/filebeat/filebeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/filebeat/filebeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0  '/etc/filebeat/filebeat.yml)
+Feb 22 10:20:46 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:47 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:47 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-kfdqplikbqzasatjrfslxlhvxtweqxmu; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758846.86-111987636158347/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758846.86-111987636158347/ >/dev/null 2>&1
+Feb 22 10:20:47 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:47 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:48 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hvjvjngqzsnarkdzeeyddqgydgglplgl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758848.05-64229506558727/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758848.05-64229506558727/ >/dev/null 2>&1
+Feb 22 10:20:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:49 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:20:49 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-awoeidxghevopktwtjfwfmwtaubmgrtn; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758849.45-216653274395348/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758849.45-216653274395348/ >/dev/null 2>&1
+Feb 22 10:20:49 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:20:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:20:50 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-gpodhiipyobwmtxzmxkandqienviezld; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758850.57-165808785745658/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758850.57-165808785745658/ >/dev/null 2>&1
+Feb 22 10:21:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:05 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:06 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:06 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dshvmkemikwrmprtjacyfujniswtlwqg; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758865.79-222508069804943/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758865.79-222508069804943/ >/dev/null 2>&1
+Feb 22 10:21:06 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:06 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:07 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:07 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mjkqieqkbjnymontbyhkepipbfaghuid; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758866.98-253775251408361/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758866.98-253775251408361/ >/dev/null 2>&1
+Feb 22 10:21:07 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:16 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:16 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hjteklymrhtjicprfxpjqlvxlhxxyymg; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758875.97-141490377689356/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758875.97-141490377689356/ >/dev/null 2>&1
+Feb 22 10:21:16 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:16 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:16 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:18 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-csrtpqzzmibovgmwoajbfboolghcicgv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758876.86-158843529685187/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758876.86-158843529685187/ >/dev/null 2>&1
+Feb 22 10:21:18 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:19 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:31 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:35 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-kymwttnnegazqcmshnjhsnxvaqtrgcpp; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758880.63-176357803389666/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758880.63-176357803389666/ >/dev/null 2>&1
+Feb 22 10:21:35 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:38 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:38 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mxfzdolrqsdlmbcwaifuskpzfjruulee; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758898.33-12314181836482/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758898.33-12314181836482/ >/dev/null 2>&1
+Feb 22 10:21:38 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:39 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:39 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-umsywgtorqzclqkpsvatkxyykcxkdkgs; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758899.33-192709141415230/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758899.33-192709141415230/ >/dev/null 2>&1
+Feb 22 10:21:39 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:39 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:40 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:42 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-eakxsbfxjrmdsismhvfyyvvztecejoyc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758900.34-189990522471438/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758900.34-189990522471438/ >/dev/null 2>&1
+Feb 22 10:21:42 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:42 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:42 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:43  sshd[1332]: last message repeated 2 times
+Feb 22 10:21:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dgadmykrlzraqgkcmnphakuguadntfsl; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758902.74-199509623193790/async_wrapper 816499674548 45 /home/vagrant/.ansible/tmp/ansible-tmp-1487758902.74-199509623193790/command /home/vagrant/.ansible/tmp/ansible-tmp-1487758902.74-199509623193790/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758902.74-199509623193790/ >/dev/null 2>&1
+Feb 22 10:21:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:44 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:49 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:53 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vwfooorrnflwboszxctmeqzeclcqwqzb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758908.96-210248164703691/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758908.96-210248164703691/ >/dev/null 2>&1
+Feb 22 10:21:53 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:54 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:56 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:56 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-nnyixufntvdqvskhwuonusiivtsvojgh; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758915.44-145306896810131/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758915.44-145306896810131/ >/dev/null 2>&1
+Feb 22 10:21:56 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:56 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:21:57 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:21:58 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mrcsndxoihslbpebrbhcnfgjqwsmlhpe; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758916.36-254700287237800/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758916.36-254700287237800/ >/dev/null 2>&1
+Feb 22 10:21:58 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:21:58 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:01 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:01 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dwxuhfbnbmpewdwihojqgkaxemyudefv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758921.44-15417091956419/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758921.44-15417091956419/ >/dev/null 2>&1
+Feb 22 10:22:01 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:02 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:06 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:06 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vorqpnjghsoyipiylridtecbdkjbjggj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758926.16-63625452155831/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758926.16-63625452155831/ >/dev/null 2>&1
+Feb 22 10:22:06 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:11 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:28 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:28 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-sjnzdfvhlkhghuekfrjxtciyfkfofhbw; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758948.07-151612679899505/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758948.07-151612679899505/ >/dev/null 2>&1
+Feb 22 10:22:28 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:29 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:31 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:31 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-bqghhittgonzjreztgtrovtgvjuthyll; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758951.62-253778658902595/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758951.62-253778658902595/ >/dev/null 2>&1
+Feb 22 10:22:31 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:33 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:34 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:35 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-zzdubdcrvzdozuqntajprljngcjihspk; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758954.0-200796609083801/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758954.0-200796609083801/ >/dev/null 2>&1
+Feb 22 10:22:35 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:47 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-nkaglrldajapqdielsancxfiszgsoljk; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758966.88-266261809895740/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758966.88-266261809895740/ >/dev/null 2>&1
+Feb 22 10:22:47 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:47 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hkcqwojfpwljfelfdpzhmyvrudplkhav; rc=flag; [ -r /etc/metricbeat/metricbeat.yml ] || rc=2; [ -f /etc/metricbeat/metricbeat.yml ] || rc=1; [ -d /etc/metricbeat/metricbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/metricbeat/metricbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/metricbeat/metricbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/metricbeat/metricbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 
+Feb 22 10:22:48 precise32 sudo:  vagrant : (command continued) '/etc/metricbeat/metricbeat.yml)
+Feb 22 10:22:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:48 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:48 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-qeeogyaubusemwuivumoknkyllgqifqc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758967.93-2413198329354/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758967.93-2413198329354/ >/dev/null 2>&1
+Feb 22 10:22:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:49 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:49 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wleytkdmeuzrrfocyjqnlnrnhvvmqnhj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758969.36-189021904374208/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758969.36-189021904374208/ >/dev/null 2>&1
+Feb 22 10:22:49 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:51 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:52 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xzgycnxdoiaxjliycnakgwtiediaqskc; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758971.32-235095819876869/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758971.32-235095819876869/ >/dev/null 2>&1
+Feb 22 10:22:52 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:52 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:52 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:52 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-upihslyxhlhsmolzjezjcbfgfdyudqea; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758972.67-153306624674709/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758972.67-153306624674709/ >/dev/null 2>&1
+Feb 22 10:22:52 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:22:54 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:22:54 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mezdvjkbyixfajeijestjexjbusaqrhb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758974.47-274076590596000/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758974.47-274076590596000/ >/dev/null 2>&1
+Feb 22 10:22:54 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:22:56 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:08 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:08 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wycmwfzcoiymnuhdymorxjysksrmjqcd; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758988.59-114925555291248/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758988.59-114925555291248/ >/dev/null 2>&1
+Feb 22 10:23:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:09 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:11 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-uuaaiyzwzwvpgjxsrvpuldxursddupwu; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758989.68-236755099981530/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758989.68-236755099981530/ >/dev/null 2>&1
+Feb 22 10:23:11 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:12 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:13 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:29 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fdkxeotnfawfmixnoetubimwvktnuney; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487758993.69-243714943255957/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487758993.69-243714943255957/ >/dev/null 2>&1
+Feb 22 10:23:29 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:32 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:33 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:33 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pzligihucshudlaypravoqhwbyszpwzm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759013.13-207637999650885/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759013.13-207637999650885/ >/dev/null 2>&1
+Feb 22 10:23:33 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:34 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:34 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:34 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-sapsykckcxjjfkdyewlufthenwbjlreq; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759014.33-250741217844628/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759014.33-250741217844628/ >/dev/null 2>&1
+Feb 22 10:23:34 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:34 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:35 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:36 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ujkefpwcuprdzgvxmqsttcaduitzpreb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759015.32-255004096786183/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759015.32-255004096786183/ >/dev/null 2>&1
+Feb 22 10:23:36 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:37 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:38 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:38  sshd[1332]: last message repeated 2 times
+Feb 22 10:23:38 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wzvgaupyzevaqpewfanpzwbbjbrgjyxa; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759018.34-224146594813589/async_wrapper 410374908727 45 /home/vagrant/.ansible/tmp/ansible-tmp-1487759018.34-224146594813589/command /home/vagrant/.ansible/tmp/ansible-tmp-1487759018.34-224146594813589/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759018.34-224146594813589/ >/dev/null 2>&1
+Feb 22 10:23:38 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:39 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:44 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:44 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wsxswpmqlawotxhiuihospylbndtqluo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759024.5-136675909330225/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759024.5-136675909330225/ >/dev/null 2>&1
+Feb 22 10:23:44 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:45 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:51 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vorifscmganfsjedaedjhlnokfdqyuyt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759031.38-273404504950212/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759031.38-273404504950212/ >/dev/null 2>&1
+Feb 22 10:23:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:51 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:53 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:53 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-dfyhnziutzyjkxvgaszqbncngwzfmbkj; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759032.63-195213430058226/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759032.63-195213430058226/ >/dev/null 2>&1
+Feb 22 10:23:53 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:23:53 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:23:54 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-oshlszshpobiexosodofiliquogpcrch; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759033.86-259824119157880/setup; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759033.86-259824119157880/ >/dev/null 2>&1
+Feb 22 10:23:54 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:23:54 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:03 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-bnsprfojytndjkrmmatjbhdmhmknbjcw; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759043.64-230997147212314/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759043.64-230997147212314/ >/dev/null 2>&1
+Feb 22 10:24:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:06 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:07 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:15 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-zjgvfvohclzccihbhkjmgsceoysdgsuk; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759047.85-178830207294016/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759047.85-178830207294016/ >/dev/null 2>&1
+Feb 22 10:24:15 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:20 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:29 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:30 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-tzhedkhxrmostbfutqxrioqpnhfxbfov; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759069.42-32472306062955/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759069.42-32472306062955/ >/dev/null 2>&1
+Feb 22 10:24:30 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:30 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:33 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:34 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-eeszonjwbylnqtvgspsxyxozxljkepff; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759073.89-12256629657244/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759073.89-12256629657244/ >/dev/null 2>&1
+Feb 22 10:24:34 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:34 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:35 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:35 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pawilqhuoycqyksktjsmxumuwbmuywvr; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759074.92-98763948895300/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759074.92-98763948895300/ >/dev/null 2>&1
+Feb 22 10:24:35 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:48 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fpcrlnvrjfuuwjvlqbvjknuguatdrkdt; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759088.08-95836653427652/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759088.08-95836653427652/ >/dev/null 2>&1
+Feb 22 10:24:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:49 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ippzqmywwjlstxlqlpyxbnzzgeigarma; rc=flag; [ -r /etc/heartbeat/heartbeat.yml ] || rc=2; [ -f /etc/heartbeat/heartbeat.yml ] || rc=1; [ -d /etc/heartbeat/heartbeat.yml ] && rc=3; python -V 2>/dev/null || rc=4; [ x"$rc" != "xflag" ] && echo "${rc}  "/etc/heartbeat/heartbeat.yml && exit 0; (python -c 'import hashlib; BLOCKSIZE = 65536; hasher = hashlib.sha1();#012afile = open("'/etc/heartbeat/heartbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (python -c 'import sha; BLOCKSIZE = 65536; hasher = sha.sha();#012afile = open("'/etc/heartbeat/heartbeat.yml'", "rb")#012buf = afile.read(BLOCKSIZE)#012while len(buf) > 0:#012#011hasher.update(buf)#012#011buf = afile.read(BLOCKSIZE)#012afile.close()#012print(hasher.hexdigest())' 2>/dev/null) || (echo '0 
+Feb 22 10:24:49 precise32 sudo:  vagrant : (command continued) '/etc/heartbeat/heartbeat.yml)
+Feb 22 10:24:49 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:49 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:49 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:50 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lmkcndbwyqwirrupuyaoxvjpcgqrspjv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759089.25-13919817848020/copy; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759089.25-13919817848020/ >/dev/null 2>&1
+Feb 22 10:24:50 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:50 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:50 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:51 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-lmimwtwvnahmfimdjcpxecnaxkikqzkb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759090.54-208394951526157/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759090.54-208394951526157/ >/dev/null 2>&1
+Feb 22 10:24:51 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:51 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:52 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:53 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hnjbwpwylotrkdvltxlvqwqjnzenlieh; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759092.2-167518908535129/wait_for; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759092.2-167518908535129/ >/dev/null 2>&1
+Feb 22 10:24:53 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:54 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:54 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:54 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wlhgjrshdmicpsqhmvnzqsoekdwxwfao; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759094.19-57829294311136/service; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759094.19-57829294311136/ >/dev/null 2>&1
+Feb 22 10:24:54 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:24:54 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:24:55 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:24:57 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-czztgxumavfzugnaxrzgsdrxilpkbflz; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759095.85-211164222926167/apt; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759095.85-211164222926167/ >/dev/null 2>&1
+Feb 22 10:24:57 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:00 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:07 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:08 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-hkjwhgysjpvjcknmpwicwmnijuwmxafv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759107.52-210302790044830/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759107.52-210302790044830/ >/dev/null 2>&1
+Feb 22 10:25:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:08 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:08 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-tfvrkyzdcfjxhusybnzxkcmuwxblfoti; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759108.49-234130386314936/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759108.49-234130386314936/ >/dev/null 2>&1
+Feb 22 10:25:08 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:09 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:13 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:13 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-gnjtaevjcrhacnacvsvihakgsyhqcwod; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759113.81-179783319147604/get_url; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759113.81-179783319147604/ >/dev/null 2>&1
+Feb 22 10:25:13 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:18 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:35 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:35 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-bahevnlzztjypsgntszgstmvovuabxfg; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759135.03-159695980315135/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759135.03-159695980315135/ >/dev/null 2>&1
+Feb 22 10:25:35 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:35 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:36 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:36 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-obuzxrxcfsypdbeutjpxvvbpmqcadysb; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759135.97-154168175733053/file; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759135.97-154168175733053/ >/dev/null 2>&1
+Feb 22 10:25:36 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:36 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:36 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:37 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-rfqorfecrhqenaiihbafxqgzxukylnmv; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759136.82-129523565034232/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759136.82-129523565034232/ >/dev/null 2>&1
+Feb 22 10:25:37 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:38 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:39 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:43  sshd[1332]: last message repeated 2 times
+Feb 22 10:25:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-zjvdsaammnhugthzrjdbretryqmrvulm; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759139.04-250524005502190/async_wrapper 442060242590 45 /home/vagrant/.ansible/tmp/ansible-tmp-1487759139.04-250524005502190/command /home/vagrant/.ansible/tmp/ansible-tmp-1487759139.04-250524005502190/arguments; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759139.04-250524005502190/ >/dev/null 2>&1
+Feb 22 10:25:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:44 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:47 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:48 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-igtduwziazbzcigerpdstpbubtijpoha; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759145.15-69304479737447/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759145.15-69304479737447/ >/dev/null 2>&1
+Feb 22 10:25:48 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:49 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:25:51 precise32 sshd[1332]: subsystem request for sftp by user vagrant
+Feb 22 10:25:52 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-fwvsibdnrdsafikdwkihqdaavmthawfo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/vagrant/.ansible/tmp/ansible-tmp-1487759151.73-135710032587634/command; rm -rf /home/vagrant/.ansible/tmp/ansible-tmp-1487759151.73-135710032587634/ >/dev/null 2>&1
+Feb 22 10:25:52 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:25:52 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:26:52 precise32 sshd[1332]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 22 10:26:52 precise32 sshd[1317]: pam_unix(sshd:session): session closed for user vagrant
+Feb 22 10:49:54 precise32 sshd[3007]: Accepted publickey for vagrant from 10.0.2.2 port 52059 ssh2
+Feb 22 10:49:54 precise32 sshd[3007]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 22 10:50:01 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/apt/sources.list.d/elastic.list
+Feb 22 10:50:01 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:50:14 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:50:17 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get update
+Feb 22 10:50:17 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:50:28 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:50:42 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install filebeat
+Feb 22 10:50:42 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:50:50 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:51:05 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/filebeat/filebeat.yml
+Feb 22 10:51:05 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:51:26 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:51:31 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/etc/init.d/filebeat start
+Feb 22 10:51:31 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:51:31 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:51:35 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/filebeat/filebeat.yml
+Feb 22 10:51:35 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:51:39 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 10:51:40 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/etc/init.d/filebeat start
+Feb 22 10:51:40 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 10:51:40 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 11:04:28 precise32 sshd[3403]: Accepted publickey for vagrant from 10.0.2.2 port 52321 ssh2
+Feb 22 11:04:28 precise32 sshd[3403]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 22 11:04:32 precise32 sshd[3418]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 22 11:04:32 precise32 sshd[3403]: pam_unix(sshd:session): session closed for user vagrant
+Feb 22 11:17:01 precise32 CRON[3448]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 11:17:01 precise32 CRON[3448]: pam_unix(cron:session): session closed for user root
+Feb 22 11:21:21 precise32 sshd[3452]: Accepted publickey for vagrant from 10.0.2.2 port 52747 ssh2
+Feb 22 11:21:21 precise32 sshd[3452]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 22 11:21:24 precise32 sshd[3467]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 22 11:21:24 precise32 sshd[3452]: pam_unix(sshd:session): session closed for user vagrant
+Feb 22 11:24:38 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/apt/sources.list
+Feb 22 11:24:38 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 11:24:39 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 11:24:43 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/vi /etc/filebeat/filebeat.full.yml
+Feb 22 11:24:43 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 22 12:17:01 precise32 CRON[3561]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 12:17:01 precise32 CRON[3561]: pam_unix(cron:session): session closed for user root
+Feb 22 13:17:01 precise32 CRON[3578]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 13:17:01 precise32 CRON[3578]: pam_unix(cron:session): session closed for user root
+Feb 22 14:17:01 precise32 CRON[3594]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 14:17:01 precise32 CRON[3594]: pam_unix(cron:session): session closed for user root
+Feb 22 15:17:01 precise32 CRON[3610]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 15:17:01 precise32 CRON[3610]: pam_unix(cron:session): session closed for user root
+Feb 22 16:17:01 precise32 CRON[3648]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 16:17:01 precise32 CRON[3648]: pam_unix(cron:session): session closed for user root
+Feb 22 17:17:01 precise32 CRON[3663]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 17:17:01 precise32 CRON[3663]: pam_unix(cron:session): session closed for user root
+Feb 22 18:17:01 precise32 CRON[3679]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 18:17:01 precise32 CRON[3679]: pam_unix(cron:session): session closed for user root
+Feb 22 19:17:01 precise32 CRON[3697]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 19:17:01 precise32 CRON[3697]: pam_unix(cron:session): session closed for user root
+Feb 22 20:17:01 precise32 CRON[3712]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 20:17:01 precise32 CRON[3712]: pam_unix(cron:session): session closed for user root
+Feb 22 21:17:01 precise32 CRON[3729]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 21:17:01 precise32 CRON[3729]: pam_unix(cron:session): session closed for user root
+Feb 22 22:17:01 precise32 CRON[3744]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 22:17:01 precise32 CRON[3744]: pam_unix(cron:session): session closed for user root
+Feb 22 23:17:01 precise32 CRON[3760]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 22 23:17:01 precise32 CRON[3760]: pam_unix(cron:session): session closed for user root
+Feb 22 23:29:50 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 22 23:29:50 precise32 sshd[3007]: pam_unix(sshd:session): session closed for user vagrant
+Feb 23 09:17:02 precise32 CRON[3779]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 09:17:02 precise32 CRON[3779]: pam_unix(cron:session): session closed for user root
+Feb 23 10:17:01 precise32 CRON[3815]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 10:17:01 precise32 CRON[3815]: pam_unix(cron:session): session closed for user root
+Feb 23 11:17:01 precise32 CRON[3828]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 11:17:01 precise32 CRON[3828]: pam_unix(cron:session): session closed for user root
+Feb 23 12:17:01 precise32 CRON[3845]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 12:17:01 precise32 CRON[3845]: pam_unix(cron:session): session closed for user root
+Feb 23 13:17:01 precise32 CRON[3860]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 13:17:01 precise32 CRON[3860]: pam_unix(cron:session): session closed for user root
+Feb 23 14:17:01 precise32 CRON[3875]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 14:17:01 precise32 CRON[3875]: pam_unix(cron:session): session closed for user root
+Feb 23 15:17:01 precise32 CRON[3890]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 15:17:01 precise32 CRON[3890]: pam_unix(cron:session): session closed for user root
+Feb 23 17:17:01 precise32 CRON[3908]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 17:17:01 precise32 CRON[3908]: pam_unix(cron:session): session closed for user root
+Feb 23 18:17:01 precise32 CRON[3923]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 18:17:01 precise32 CRON[3923]: pam_unix(cron:session): session closed for user root
+Feb 23 19:17:01 precise32 CRON[3938]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 19:17:01 precise32 CRON[3938]: pam_unix(cron:session): session closed for user root
+Feb 23 19:26:35 precise32 sshd[3945]: Accepted publickey for vagrant from 10.0.2.2 port 58363 ssh2
+Feb 23 19:26:35 precise32 sshd[3945]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 23 20:05:18 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/less /var/log/auth.log
+Feb 23 20:05:18 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 23 20:15:04 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 23 20:15:09 precise32 sshd[3960]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 23 20:15:09 precise32 sshd[3945]: pam_unix(sshd:session): session closed for user vagrant
+Feb 23 20:17:01 precise32 CRON[4104]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 20:17:01 precise32 CRON[4104]: pam_unix(cron:session): session closed for user root
+Feb 23 21:17:01 precise32 CRON[4140]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 21:17:01 precise32 CRON[4140]: pam_unix(cron:session): session closed for user root
+Feb 23 22:17:01 precise32 CRON[4155]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 22:17:01 precise32 CRON[4155]: pam_unix(cron:session): session closed for user root
+Feb 23 23:17:01 precise32 CRON[4170]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 23 23:17:01 precise32 CRON[4170]: pam_unix(cron:session): session closed for user root
+Feb 24 00:11:15 precise32 sshd[4185]: Accepted publickey for vagrant from 10.0.2.2 port 60839 ssh2
+Feb 24 00:11:15 precise32 sshd[4185]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 24 00:11:24 precise32 sshd[4302]: Accepted publickey for vagrant from 10.0.2.2 port 60840 ssh2
+Feb 24 00:11:24 precise32 sshd[4302]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 24 00:11:26 precise32 sudo:  vagrant : TTY=pts/1 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/bash
+Feb 24 00:11:26 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 00:12:02 precise32 groupadd[4480]: group added to /etc/group: name=tsg, GID=1003
+Feb 24 00:12:02 precise32 groupadd[4480]: group added to /etc/gshadow: name=tsg
+Feb 24 00:12:02 precise32 groupadd[4480]: new group: name=tsg, GID=1003
+Feb 24 00:12:02 precise32 useradd[4484]: new user: name=tsg, UID=1001, GID=1003, home=/home/tsg, shell=/bin/bash
+Feb 24 00:12:07 precise32 passwd[4491]: pam_unix(passwd:chauthtok): password changed for tsg
+Feb 24 00:12:10 precise32 chfn[4492]: changed user 'tsg' information
+Feb 24 00:12:14 precise32 su[4496]: Successful su for tsg by root
+Feb 24 00:12:14 precise32 su[4496]: + /dev/pts/1 root:tsg
+Feb 24 00:12:14 precise32 su[4496]: pam_unix(su:session): session opened for user tsg by vagrant(uid=0)
+Feb 24 00:12:20 precise32 sudo: pam_unix(sudo:auth): authentication failure; logname=vagrant uid=1001 euid=0 tty=/dev/pts/1 ruser=tsg rhost=  user=tsg
+Feb 24 00:12:37 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 00:12:37 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 00:12:37 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 00:12:42 precise32 sudo:      tsg : 3 incorrect password attempts ; TTY=pts/1 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/ls
+Feb 24 00:12:42 precise32 sudo: unable to execute /usr/sbin/sendmail: No such file or directory
+Feb 24 00:12:50 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 00:12:50 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 00:12:50 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 00:13:02 precise32 sudo:      tsg : user NOT in sudoers ; TTY=pts/1 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/ls
+Feb 24 00:13:02 precise32 sudo: unable to execute /usr/sbin/sendmail: No such file or directory
+Feb 24 00:13:06 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 00:13:06 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 00:13:06 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 00:17:01 precise32 CRON[4588]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 24 00:17:01 precise32 CRON[4588]: pam_unix(cron:session): session closed for user root
+Feb 24 00:45:47 precise32 su[4496]: pam_unix(su:session): session closed for user tsg
+Feb 24 00:45:48 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 00:45:49 precise32 sshd[4317]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 24 00:45:49 precise32 sshd[4302]: pam_unix(sshd:session): session closed for user vagrant
+Feb 24 00:46:32 precise32 sshd[4598]: Accepted publickey for vagrant from 10.0.2.2 port 61852 ssh2
+Feb 24 00:46:32 precise32 sshd[4598]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 24 00:46:32 precise32 sshd[4613]: Received disconnect from 10.0.2.2: 11: disconnected by user
+Feb 24 00:46:32 precise32 sshd[4598]: pam_unix(sshd:session): session closed for user vagrant
+Feb 24 01:05:42 precise32 sshd[4185]: pam_unix(sshd:session): session closed for user vagrant
+Feb 24 08:17:01 precise32 CRON[4626]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 24 08:17:01 precise32 CRON[4626]: pam_unix(cron:session): session closed for user root
+Feb 24 09:17:01 precise32 CRON[4642]: pam_unix(cron:session): session opened for user root by (uid=0)
+Feb 24 09:17:01 precise32 CRON[4642]: pam_unix(cron:session): session closed for user root
+Feb 24 09:18:35 precise32 sshd[4645]: Accepted publickey for vagrant from 10.0.2.2 port 53513 ssh2
+Feb 24 09:18:35 precise32 sshd[4645]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Feb 24 09:18:40 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install nginx
+Feb 24 09:18:40 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:18:46 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:18:53 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 09:18:53 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:18:53 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:19:04 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 09:19:04 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:19:04 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:19:09 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 09:19:09 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:19:09 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:19:29 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/apt-get install mysql-server
+Feb 24 09:19:29 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:19:55 precise32 groupadd[7996]: group added to /etc/group: name=mysql, GID=111
+Feb 24 09:19:55 precise32 groupadd[7996]: group added to /etc/gshadow: name=mysql
+Feb 24 09:19:55 precise32 groupadd[7996]: new group: name=mysql, GID=111
+Feb 24 09:19:55 precise32 useradd[8002]: new user: name=mysql, UID=106, GID=111, home=/nonexistent, shell=/bin/false
+Feb 24 09:19:55 precise32 chage[8007]: changed password expiry for mysql
+Feb 24 09:19:55 precise32 chfn[8010]: changed user 'mysql' information
+Feb 24 09:20:08 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:20:10 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 09:20:10 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:20:10 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:26:29 precise32 sudo:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
+Feb 24 09:26:29 precise32 sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)
+Feb 24 09:26:29 precise32 sudo: pam_unix(sudo:session): session closed for user root
+Feb 24 09:26:59 precise32 sshd[10535]: Accepted publickey for vagrant from 10.0.2.2 port 58988 ssh2
+Feb 24 09:26:59 precise32 sshd[10535]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)

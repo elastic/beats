@@ -1,0 +1,134 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "rabbitmq.node",
+        "duration": 115000,
+        "module": "rabbitmq"
+    },
+    "metricset": {
+        "name": "node"
+    },
+    "rabbitmq": {
+        "node": {
+            "disk": {
+                "free": {
+                    "bytes": 485213712384,
+                    "limit": {
+                        "bytes": 50000000
+                    }
+                }
+            },
+            "fd": {
+                "total": 1048576,
+                "used": 54
+            },
+            "gc": {
+                "num": {
+                    "count": 5724
+                },
+                "reclaimed": {
+                    "bytes": 294021640
+                }
+            },
+            "io": {
+                "file_handle": {
+                    "open_attempt": {
+                        "avg": {
+                            "ms": 0
+                        },
+                        "count": 10
+                    }
+                },
+                "read": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "bytes": 1,
+                    "count": 1
+                },
+                "reopen": {
+                    "count": 1
+                },
+                "seek": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "count": 0
+                },
+                "sync": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "count": 0
+                },
+                "write": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "bytes": 0,
+                    "count": 0
+                }
+            },
+            "mem": {
+                "limit": {
+                    "bytes": 13340778496
+                },
+                "used": {
+                    "bytes": 71448312
+                }
+            },
+            "mnesia": {
+                "disk": {
+                    "tx": {
+                        "count": 0
+                    }
+                },
+                "ram": {
+                    "tx": {
+                        "count": 43
+                    }
+                }
+            },
+            "msg": {
+                "store_read": {
+                    "count": 0
+                },
+                "store_write": {
+                    "count": 0
+                }
+            },
+            "name": "rabbit@my-rabbit",
+            "proc": {
+                "total": 1048576,
+                "used": 234
+            },
+            "processors": 12,
+            "queue": {
+                "index": {
+                    "journal_write": {
+                        "count": 0
+                    },
+                    "read": {
+                        "count": 0
+                    },
+                    "write": {
+                        "count": 0
+                    }
+                }
+            },
+            "run": {
+                "queue": 0
+            },
+            "socket": {
+                "total": 943626,
+                "used": 0
+            },
+            "type": "disc",
+            "uptime": 155275
+        }
+    },
+    "service": {
+        "address": "172.17.0.2:15672",
+        "type": "rabbitmq"
+    }
+}

@@ -1,0 +1,123 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1"
+        },
+        "node": {
+            "id": "FMRmkE3HTU6xxxoFK-06Ww",
+            "name": "es1_1",
+            "stats": {
+                "fs": {
+                    "summary": {
+                        "available": {
+                            "bytes": 350828584960
+                        },
+                        "free": {
+                            "bytes": 354770468864
+                        },
+                        "total": {
+                            "bytes": 499963170816
+                        }
+                    }
+                },
+                "indices": {
+                    "docs": {
+                        "count": 30880,
+                        "deleted": 124
+                    },
+                    "segments": {
+                        "count": 39,
+                        "memory": {
+                            "bytes": 300797
+                        }
+                    },
+                    "store": {
+                        "size": {
+                            "bytes": 15205991
+                        }
+                    }
+                },
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection": {
+                                    "count": 3,
+                                    "ms": 219
+                                }
+                            },
+                            "young": {
+                                "collection": {
+                                    "count": 505,
+                                    "ms": 2439
+                                }
+                            }
+                        }
+                    },
+                    "mem": {
+                        "pools": {
+                            "old": {
+                                "max": {
+                                    "bytes": 715849728
+                                },
+                                "peak": {
+                                    "bytes": 543519960
+                                },
+                                "peak_max": {
+                                    "bytes": 715849728
+                                },
+                                "used": {
+                                    "bytes": 382281744
+                                }
+                            },
+                            "survivor": {
+                                "max": {
+                                    "bytes": 35782656
+                                },
+                                "peak": {
+                                    "bytes": 35782656
+                                },
+                                "peak_max": {
+                                    "bytes": 35782656
+                                },
+                                "used": {
+                                    "bytes": 6418816
+                                }
+                            },
+                            "young": {
+                                "max": {
+                                    "bytes": 286326784
+                                },
+                                "peak": {
+                                    "bytes": 286326784
+                                },
+                                "peak_max": {
+                                    "bytes": 286326784
+                                },
+                                "used": {
+                                    "bytes": 118870448
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "node_stats",
+        "namespace": "elasticsearch.node.stats",
+        "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
+    }
+}

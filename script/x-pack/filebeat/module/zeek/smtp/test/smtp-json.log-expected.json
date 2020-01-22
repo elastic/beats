@@ -1,0 +1,34 @@
+[
+    {
+        "@timestamp": "2018-12-03T22:59:47.381Z",
+        "destination.address": "192.168.1.9",
+        "destination.ip": "192.168.1.9",
+        "destination.port": 25,
+        "event.dataset": "zeek.smtp",
+        "event.id": "CWWzPB3RjqhFf528c",
+        "event.module": "zeek",
+        "fileset.name": "smtp",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:38H0puTqOoHT/5r2bKFUVSXifQw=",
+        "network.protocol": "smtp",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.1.10",
+        "source.ip": "192.168.1.10",
+        "source.port": 33782,
+        "tags": [
+            "zeek.smtp"
+        ],
+        "zeek.session_id": "CWWzPB3RjqhFf528c",
+        "zeek.smtp.fuids": [],
+        "zeek.smtp.helo": "EXAMPLE.COM",
+        "zeek.smtp.is_webmail": false,
+        "zeek.smtp.last_reply": "220 2.0.0 SMTP server ready",
+        "zeek.smtp.path": [
+            "192.168.1.9"
+        ],
+        "zeek.smtp.tls": true,
+        "zeek.smtp.transaction_depth": 1
+    }
+]

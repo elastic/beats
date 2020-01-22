@@ -1,0 +1,60 @@
+:modulename: traefik
+:has-dashboards: true
+
+== Traefik module
+
+The +{modulename}+ module parses access logs created by
+https://traefik.io/[Træfik].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-traefik.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Træfik logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: traefik
+  access:
+    enabled: true
+    var.paths: ["/usr/local/traefik/access.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: access
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `access` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

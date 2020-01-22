@@ -1,0 +1,11 @@
+10.0.0.2, 10.0.0.1, 127.0.0.1 - - [07/Dec/2016:11:05:07 +0100] "GET /ocelot HTTP/1.1" 200 571 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0"
+172.17.0.1 - - [29/May/2017:19:02:48 +0000] "GET /stringpatch HTTP/1.1" 404 612 "-" "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2" "-"
+10.0.0.2, 10.0.0.1, 85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] "GET /ocelot HTTP/1.1" 200 571 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0"
+85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] "GET /ocelot HTTP/1.1" 200 571 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36"
+"10.5.102.222, 199.96.1.1, 204.246.1.1" 10.2.1.185 - - [22/Jan/2016:13:18:29 +0000] "GET /assets/xxxx?q=100 HTTP/1.1" 200 25507 "-" "Amazon CloudFront"
+2a03:0000:10ff:f00f:0000:0000:0:8000, 10.225.192.17 10.2.2.121 - - [30/Dec/2016:06:47:09 +0000] "GET /test.html HTTP/1.1" 404 8571 "-" "Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)"
+127.0.0.1 - - [12/Apr/2018:09:48:40 +0200] "" 400 0 "-" "-"
+unix: - - [26/Feb/2019:15:39:42 +0100] "hello" 400 173 "-" "-"
+localhost - - [29/May/2017:19:02:48 +0000] "GET /test2 HTTP/1.1" 200 612 "-" "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2" "-"
+localhost, localhost - - [29/May/2017:19:02:48 +0000] "GET /test2 HTTP/1.1" 200 612 "-" "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2" "-"
+

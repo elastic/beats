@@ -1,0 +1,14 @@
+The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics. The default metricset is `namespace`.
+
+[float]
+=== Compatibility
+
+The Aerospike metricsets were tested with Aerospike 3.9 and are expected to work with all versions >= 3.9.
+
+
+[float]
+=== Dashboard
+
+The Aerospike module comes with a predefined dashboard for Aerospike namespace, node specific stats. For example:
+
+image::./images/metricbeat-aerospike-overview.png[]

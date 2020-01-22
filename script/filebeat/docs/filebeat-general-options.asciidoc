@@ -1,0 +1,146 @@
+[[configuration-general-options]]
+== Specify general settings
+
+You can specify settings in the +{beatname_lc}.yml+ config file to control the
+general behavior of {beatname_uc}. This includes:
+
+* <<configuration-global-options,Global options>> that control things like
+publisher behavior and the location of some files.
+
+* <<configuration-general,General options>> that are supported by all Elastic
+Beats.
+
+[float]
+[[configuration-global-options]]
+=== Global Filebeat configuration options
+
+These options are in the `filebeat` namespace.
+
+[float]
+==== `registry.path`
+
+The root path of the registry.  If a relative path is used, it is considered
+relative to the data path. See the <<directory-layout>> section for details.
+The default is `${path.data}/registry`.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry.path: registry
+-------------------------------------------------------------------------------------
+
+NOTE: The registry is only updated when new events are flushed and not on a predefined period.
+That means in case there are some states where the TTL expired, these are only removed when new event are processed.
+
+NOTE: The registry stores it's data in the subdirectory filebeat/data.json. It
+also contains a meta data file named filebeat/meta.json. The meta file contains
+the file format version number.
+
+NOTE: The content stored in filebeat/data.json is compatible to the old registry file data format.
+
+[float]
+==== `registry.file_permissions`
+
+The permissions mask to apply on registry data file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
+
+The most permissive mask allowed is 0640. If a higher permissions mask is
+specified via this setting, it will be subject to a umask of 0027.
+
+This option is not supported on Windows.
+
+Examples:
+
+    0640: give read and write access to the file owner, and read access to members of the group associated with the file.
+    0600: give read and write access to the file owner, and no access to all others.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry.file_permissions: 0600
+-------------------------------------------------------------------------------------
+
+[float]
+==== `registry.flush`
+
+
+The timeout value that controls when registry entries are written to disk
+(flushed). When an unwritten update exceeds this value, it triggers a write to
+disk. When `registry.flush` is set to 0s, the registry is written to disk after
+each batch of events has been published successfully. The default value is 0s.
+
+NOTE: The registry is always updated when Filebeat shuts down normally. After an
+abnormal shutdown, the registry will not be up-to-date if the `registry.flush`
+value is >0s. Filebeat will send published events again (depending on values in
+the last updated registry file).
+
+NOTE: Filtering out a huge number of logs can cause many registry updates, slowing
+down processing. Setting `registry.flush` to a value >0s reduces write operations,
+helping Filebeat process more events.
+
+[float]
+==== `registry.migrate_file`
+
+Prior to Filebeat 7.0 the registry is stored in a single file. When you upgrade
+to 7.0, Filebeat will automatically migrate the old Filebeat 6.x registry file
+to use the new directory format. Filebeat looks for the file in the location
+specified by `filebeat.registry.path`. If you changed the path while upgrading,
+set `filebeat.registry.migrate_file` to point to the old registry file.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry.path: ${path.data}/registry
+filebeat.registry.migrate_file: /path/to/old/registry_file
+-------------------------------------------------------------------------------------
+
+The registry will be migrated to the new location only if a registry using the
+directory format does not already exist.
+
+
+[float]
+==== `config_dir`
+
+deprecated:[6.0.0, Use <<load-input-config>> instead.]
+
+The full path to the directory that contains additional input configuration files.
+Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
+config hierarchy even though only the `inputs` part of each file is processed. All global
+options, such as `registry_file`, are ignored.
+
+The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
+
+If the specified path is not absolute, it is considered relative to the configuration path. See the
+<<directory-layout>> section for details.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.config_dir: path/to/configs
+-------------------------------------------------------------------------------------
+
+[float]
+[[shutdown-timeout]]
+==== `shutdown_timeout`
+
+How long Filebeat waits on shutdown for the publisher to finish sending events
+before Filebeat shuts down.
+
+By default, this option is disabled, and Filebeat does not wait for the
+publisher to finish sending events before shutting down. This means that any
+events sent to the output, but not acknowledged before Filebeat shuts down,
+are sent again when you restart Filebeat. For more details about how this
+works, see <<at-least-once-delivery>>.
+
+You can configure the `shutdown_timeout` option to specify the maximum amount
+of time that Filebeat waits for the publisher to finish sending events before
+shutting down. If all events are acknowledged before `shutdown_timeout` is
+reached, Filebeat will shut down.
+
+There is no recommended setting for this option because determining the correct
+value for `shutdown_timeout` depends heavily on the environment in which
+Filebeat is running and the current state of the output.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
+
+include::{libbeat-dir}/generalconfig.asciidoc[]

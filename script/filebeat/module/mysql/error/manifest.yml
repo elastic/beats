@@ -1,0 +1,14 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/mysql/error.log*
+      - /var/log/mysqld.log*
+    os.darwin:
+      - /usr/local/var/mysql/{{.builtin.hostname}}.{{.builtin.domain}}.err*
+    os.windows:
+      - "c:/programdata/MySQL/MySQL Server*/error.log*"
+
+ingest_pipeline: ingest/pipeline.json
+input: config/error.yml

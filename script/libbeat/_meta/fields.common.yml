@@ -1,0 +1,39 @@
+- key: beat
+  anchor: beat-common
+  title: Beat
+  description: >
+    Contains common beat fields available in all event types.
+  fields:
+    - name: agent.hostname
+      type: keyword
+      description: Hostname of the agent.
+
+    - name: beat.timezone
+      type: alias
+      path: event.timezone
+      migration: true
+
+    - name: fields
+      type: object
+      object_type: keyword
+      description: >
+        Contains user configurable fields.
+
+    - name: beat.name
+      type: alias
+      path: host.name
+      migration: true
+
+    - name: beat.hostname
+      type: alias
+      path: agent.hostname
+      migration: true
+
+    - name: timeseries.instance
+      type: keyword
+      description: Time series instance id
+
+    - name: webiks
+      type: keyword
+      description: "check test idan ben webiks bla bla "
+      

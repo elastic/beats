@@ -1,0 +1,42 @@
+This module fetches metrics from Kubernetes several components:
+
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/[kubelet]
+- https://github.com/kubernetes/kube-state-metrics[kube-state-metrics]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/[apiserver]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/[controller-manager]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[scheduler]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[proxy]
+
+All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
+service within the cluster, while the rest should be pointed to kubelet service. Check the
+example configuration on how to do it.
+
+The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
+
+[float]
+=== Compatibility
+
+The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
+
+[float]
+=== Dashboard
+
+Kubernetes module is shipped including default dashboards for `apiserver`, `controllermanager`, `scheduler` and `proxy`.
+
+If you are using HA for those components, be aware that when gathering data from all instances the dashboard will usually show and average of the metrics. For those scenarios filtering by hosts or service address is possible.
+
+Dashboards for `controllermanager` `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
+
+Kubernetes controller manager example:
+
+image::./images/metricbeat-kubernetes-controllermanager.png[]
+
+
+Kubernetes scheduler example:
+
+image::./images/metricbeat_kubernetes_scheduler.png[]
+
+
+Kubernetes proxy example:
+
+image::./images/metricbeat-kubernetes-proxy.png[]

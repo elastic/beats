@@ -1,0 +1,19 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/nginx/access.log*
+    os.darwin:
+      - /usr/local/var/log/nginx/access.log*
+    os.windows:
+      - c:/programdata/nginx/logs/*access.log*
+
+ingest_pipeline: ingest/default.json
+input: config/nginx-access.yml
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip

@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "client": {
+        "ip": "172.17.0.1",
+        "port": 47728
+    },
+    "event": {
+        "dataset": "zookeeper.connection",
+        "duration": 115000,
+        "module": "zookeeper"
+    },
+    "metricset": {
+        "name": "connection"
+    },
+    "service": {
+        "address": "localhost:2181",
+        "type": "zookeeper"
+    },
+    "zookeeper": {
+        "connection": {
+            "interest_ops": 0,
+            "queued": 0,
+            "received": 1,
+            "sent": 0
+        }
+    }
+}

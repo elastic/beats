@@ -1,0 +1,132 @@
+[[filebeat-configuration-reloading]]
+== Load external configuration files
+
+{beatname_uc} can load external configuration files for inputs and modules,
+allowing you to separate your configuration into multiple smaller
+configuration files. See the <<load-input-config>> and the
+<<load-module-config>> sections for details.
+
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
+
+[float]
+[[load-input-config]]
+=== Input config
+
+For input configurations, you specify the `path` option in the
++{beatname_lc}.config.inputs+ section of the +{beatname_lc}.yml+ file. For
+example:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------------------------------------
+{beatname_lc}.config.inputs:
+  enabled: true
+  path: inputs.d/*.yml
+------------------------------------------------------------------------------
+
+
+Each file found by the `path` Glob must contain a list of one or more input
+definitions. 
+ 
+TIP: The first line of each external configuration file must be an input
+definition that starts with `- type`. Make sure you omit the line
++{beatname_lc}.config.inputs+ from this file.
+ 
+For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+- type: log
+  paths:
+    - /var/log/mysql.log
+  scan_frequency: 10s
+
+- type: log
+  paths:
+    - /var/log/apache.log
+  scan_frequency: 5s
+------------------------------------------------------------------------------
+
+
+WARNING: It is critical that two running inputs DO NOT have overlapping
+file paths defined. If more than one input harvests the same file at the
+same time, it can lead to unexpected behavior.
+
+[float]
+[[load-module-config]]
+=== Module config
+
+For module configurations, you specify the `path` option in the
++{beatname_lc}.config.modules+ section of the +{beatname_lc}.yml+ file. By default,
+{beatname_uc} loads the module configurations enabled in the
+<<enable-modules-d-configs,`modules.d`>> directory. For example:
+
+["source","sh",subs="attributes"]
+------------------------------------------------------------------------------
+{beatname_lc}.config.modules:
+  enabled: true
+  path: ${path.config}/modules.d/*.yml
+------------------------------------------------------------------------------
+
+
+The `path` setting must point to the `modules.d` directory if you want to use
+the <<modules-command,`modules`>> command to enable and disable module
+configurations.
+
+Each file found by the Glob must contain a list of one or more module
+definitions. 
+ 
+TIP: The first line of each external configuration file must be a module
+definition that starts with `- module`. Make sure you omit the line
++{beatname_lc}.config.modules+ from this file.
+
+For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+- module: apache
+  access:
+    enabled: true
+    var.paths: [/var/log/apache2/access.log*]
+  error:
+    enabled: true
+    var.paths: [/var/log/apache2/error.log*]
+------------------------------------------------------------------------------
+
+
+=== Live reloading
+
+You can configure {beatname_uc} to dynamically reload external configuration files
+when there are changes. This feature is available for input and module
+configurations that are loaded as
+<<{beatname_lc}-configuration-reloading,external configuration files>>. You cannot
+use this feature to reload the main +{beatname_lc}.yml+ configuration file.
+
+To configure this feature, you specify a path
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for configuration
+changes. When the files found by the Glob change, new inputs and/or
+modules are started and stopped according to changes in the configuration files.
+
+This feature is especially useful in container environments where one container
+is used to tail logs for services running in other containers on the same host.
+
+To enable dynamic config reloading, you specify the `path` and `reload` options
+under +{beatname_lc}.config.inputs+ or +{beatname_lc}.config.modules+ sections.
+For example:
+
+["source","sh",subs="attributes"]
+------------------------------------------------------------------------------
+{beatname_lc}.config.inputs:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+`path`:: A Glob that defines the files to check for changes.
+`reload.enabled`:: When set to `true`, enables dynamic config reload.
+`reload.period`:: Specifies how often the files are checked for changes. Do not
+set the `period` to less than 1s because the modification time of files is often
+stored in seconds. Setting the `period` to less than 1s will result in
+unnecessary overhead.
+
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]

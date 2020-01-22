@@ -1,0 +1,185 @@
+- key: log
+  title: Log file content
+  description: >
+    Contains log file lines.
+  fields:
+
+    - name: log.file.path
+      type: keyword
+      required: false
+      description: >
+        The file from which the line was read. This field contains the absolute path to the file.
+        For example: `/var/log/system.log`.
+
+    - name: log.source.address
+      type: keyword
+      required: false
+      description: >
+        Source address from which the log event was read / sent from.
+
+    - name: log.offset
+      type: long
+      required: false
+      description: >
+        The file offset the reported line starts at.
+
+    - name: stream
+      type: keyword
+      required: false
+      description: >
+        Log stream when reading container logs, can be 'stdout' or 'stderr'
+
+    - name: input.type
+      required: true
+      description: >
+        The input type from which the event was generated. This field is set to the value specified
+        for the `type` option in the input section of the Filebeat config file.
+
+    - name: syslog.facility
+      type: long
+      required: false
+      description: >
+        The facility extracted from the priority.
+
+    - name: syslog.priority
+      type: long
+      required: false
+      description: >
+        The priority of the syslog event.
+
+    - name: syslog.severity_label
+      type: keyword
+      required: false
+      description: >
+        The human readable severity.
+
+    - name: syslog.facility_label
+      type: keyword
+      required: false
+      description: >
+        The human readable facility.
+
+    - name: process.program
+      type: keyword
+      required: false
+      description: >
+        The name of the program.
+
+    - name: log.flags
+      description: >
+        This field contains the flags of the event.
+
+    - name: http.response.content_length
+      type: alias
+      path: http.response.body.bytes
+      migration: true
+
+    - name: user_agent
+      type: group
+      fields:
+      - name: os
+        type: group
+        fields:
+        - name: full_name
+          type: keyword
+
+    - name: fileset.name
+      type: keyword
+      description: >
+        The Filebeat fileset that generated this event.
+
+    - name: fileset.module
+      type: alias
+      path: event.module
+      migration: true
+
+    - name: read_timestamp
+      type: alias
+      path: event.created
+      migration: true
+
+    - name: docker.attrs
+      type: object
+      object_type: keyword
+      description: >
+        docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
+        These fields are only available when they are configured in the logging driver options.
+
+    - name: icmp.code
+      type: keyword
+      description: >
+        ICMP code.
+
+    - name: icmp.type
+      type: keyword
+      description: >
+        ICMP type.
+
+    - name: igmp.type
+      type: keyword
+      description: >
+        IGMP type.
+
+
+    - name: azure
+      type: group
+      fields:
+        - name: eventhub
+          type: keyword
+          description: >
+            Name of the eventhub.
+        - name: offset
+          type: long
+          description: >
+            The offset.
+        - name: enqueued_time
+          type: date
+          description: >
+            The enqueued time.
+        - name: partition_id
+          type: long
+          description: >
+            The partition id.
+        - name: consumer_group
+          type: keyword
+          description: >
+            The consumer group.
+        - name: sequence_number
+          type: long
+          description: >
+            The sequence number.
+
+
+    - name: kafka
+      type: group
+      fields:
+        - name: topic
+          type: keyword
+          description: >
+            Kafka topic
+
+        - name: partition
+          type: long
+          description: >
+            Kafka partition number
+
+        - name: offset
+          type: long
+          description: >
+            Kafka offset of this message
+
+        - name: key
+          type: keyword
+          description: >
+            Kafka key, corresponding to the Kafka value stored in the message
+
+        - name: block_timestamp
+          type: date
+          description: >
+            Kafka outer (compressed) block timestamp
+
+        - name: headers
+          type: array
+          description: >
+            An array of Kafka header strings for this message, in the form
+            "<key>: <value>".

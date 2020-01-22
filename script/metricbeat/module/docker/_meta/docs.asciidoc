@@ -1,0 +1,17 @@
+This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
+
+[float]
+=== Compatibility
+
+The Docker module is currently tested on Linux and Mac with the community
+edition engine, versions 1.11 and 17.09.0-ce. It is not tested on Windows,
+but it should also work there.
+
+[float]
+=== Module-specific configuration notes
+
+It is strongly recommended that you run Docker metricsets with a
+<<metricset-period,`period`>> that is 3 seconds or longer. The request to the
+Docker API already takes up to 2 seconds. Specifying less than 3 seconds will
+result in requests that timeout, and no data will be reported for those
+requests.

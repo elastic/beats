@@ -1,0 +1,9 @@
+followup:
+---------
+- make broker configurable
+- elasticsearch output update:
+  - replace json reader with go-structform on struct
+- move package pipeline go files to libbeat/publisher if possible
+- '@metadata' accessor from within fmtstr
+- remove publisher/bc package
+- register some pipeline metrics for consumption

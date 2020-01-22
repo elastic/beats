@@ -1,0 +1,20 @@
+{
+  "name": "testindex",
+  "total": {
+    "docs": {
+      "count": 1,
+      "deleted": 0
+    },
+    "segments": {
+      "count": 1,
+      "memory": {
+        "bytes": 2588
+      }
+    },
+    "store": {
+      "size": {
+        "bytes": 260
+      }
+    }
+  }
+}

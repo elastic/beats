@@ -1,0 +1,241 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "count": 5719,
+                                "percentile": {
+                                    "50": 3724.635,
+                                    "90": 6009.016,
+                                    "99": 15081.009
+                                },
+                                "sum": 21201441.986
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "count": 5719,
+                                "percentile": {
+                                    "50": 86,
+                                    "90": 86,
+                                    "99": 86
+                                },
+                                "sum": 491766
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "count": 5719,
+                                "percentile": {
+                                    "50": 2965,
+                                    "90": 2970,
+                                    "99": 2973
+                                },
+                                "sum": 16977903
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "client": {
+                    "request": {
+                        "count": 356
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "client": {
+                    "request": {
+                        "count": 1
+                    }
+                },
+                "code": "201",
+                "host": "192.168.205.10:6443",
+                "method": "POST"
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "code": "200",
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "count": 5719
+                    }
+                },
+                "method": "get"
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "process": {
+                    "cpu": {
+                        "sec": 121
+                    },
+                    "fds": {
+                        "open": {
+                            "count": 15
+                        }
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 37040128
+                        },
+                        "virtual": {
+                            "bytes": 142323712
+                        }
+                    },
+                    "started": {
+                        "sec": 1559230373.91
+                    }
+                },
+                "sync": {
+                    "networkprogramming": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2,
+                                    "1000": 0,
+                                    "1024000": 0,
+                                    "128000": 0,
+                                    "131072000": 0,
+                                    "16000": 0,
+                                    "16384000": 0,
+                                    "2000": 0,
+                                    "2048000": 0,
+                                    "256000": 0,
+                                    "262144000": 0,
+                                    "32000": 0,
+                                    "32768000": 0,
+                                    "4000": 0,
+                                    "4096000": 0,
+                                    "512000": 0,
+                                    "524288000": 0,
+                                    "64000": 0,
+                                    "65536000": 0,
+                                    "8000": 0,
+                                    "8192000": 0
+                                },
+                                "count": 2,
+                                "sum": 6274751245.21
+                            }
+                        }
+                    },
+                    "rules": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2654,
+                                    "1000": 1,
+                                    "1024000": 2651,
+                                    "128000": 2651,
+                                    "16000": 1,
+                                    "16384000": 2654,
+                                    "2000": 1,
+                                    "2048000": 2654,
+                                    "256000": 2651,
+                                    "32000": 339,
+                                    "4000": 1,
+                                    "4096000": 2654,
+                                    "512000": 2651,
+                                    "64000": 1931,
+                                    "8000": 1,
+                                    "8192000": 2654
+                                },
+                                "count": 2654,
+                                "sum": 149421694.93599978
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

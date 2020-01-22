@@ -1,0 +1,1 @@
+{"commands":{"count":0,"time":0},"getmore":{"count":0,"time":0},"insert":{"count":0,"time":0},"queries":{"count":1,"time":23},"readLock":{"count":1,"time":23},"remove":{"count":0,"time":0},"total":{"count":1,"time":23},"update":{"count":0,"time":0},"writeLock":{"count":0,"time":0}}

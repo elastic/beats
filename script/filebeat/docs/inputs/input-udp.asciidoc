@@ -1,0 +1,33 @@
+:type: udp
+
+[id="{beatname_lc}-input-{type}"]
+=== UDP input
+
+++++
+<titleabbrev>UDP</titleabbrev>
+++++
+
+Use the `udp` input to read events over UDP.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: udp
+  max_message_size: 10KiB
+  host: "localhost:8080"
+----
+
+
+==== Configuration options
+
+The `udp` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+include::../inputs/input-common-udp-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

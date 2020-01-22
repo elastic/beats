@@ -1,0 +1,30 @@
+- key: docker
+  title: Docker
+  description: >
+    Docker stats collected from Docker.
+  short_config: false
+  anchor: docker-processor
+  fields:
+    - name: docker
+      type: group
+      fields:
+        - name: container.id
+          type: alias
+          path: container.id
+          migration: true
+
+        - name: container.image
+          type: alias
+          path: container.image.name
+          migration: true
+
+        - name: container.name
+          type: alias
+          path: container.name
+          migration: true
+
+        - name: container.labels  # TODO: How to map these?
+          type: object
+          object_type: keyword
+          description: >
+            Image labels.

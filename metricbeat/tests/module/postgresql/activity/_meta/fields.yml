@@ -1,0 +1,82 @@
+- name: activity
+  type: group
+  description: >
+    One document per server process, showing information related to the current
+    activity of that process, such as state and current query. Collected by
+    querying pg_stat_activity.
+  release: ga
+  fields:
+    - name: database.oid
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: database.name
+      type: keyword
+      description: >
+        Name of the database this backend is connected to.
+    - name: pid
+      type: long
+      description: >
+        Process ID of this backend.
+    - name: user.id
+      type: long
+      description: >
+        OID of the user logged into this backend.
+    - name: user.name
+      description: >
+        Name of the user logged into this backend.
+    - name: application_name
+      description: >
+        Name of the application that is connected to this backend.
+    - name: client.address
+      description: >
+        IP address of the client connected to this backend.
+    - name: client.hostname
+      description: >
+        Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+    - name: client.port
+      type: long
+      description: >
+        TCP port number that the client is using for communication with this
+        backend, or -1 if a Unix socket is used.
+    - name: backend_start
+      type: date
+      description: >
+        Time when this process was started, i.e., when the client connected to
+        the server.
+    - name: transaction_start
+      type: date
+      description: >
+        Time when this process' current transaction was started.
+    - name: query_start
+      type: date
+      description: >
+        Time when the currently active query was started, or if state is not
+        active, when the last query was started.
+    - name: state_change
+      type: date
+      description: >
+        Time when the state was last changed.
+    - name: waiting
+      type: boolean
+      description: >
+        True if this backend is currently waiting on a lock.
+    - name: state
+      description: >
+        Current overall state of this backend. Possible values are:
+
+          * active: The backend is executing a query.
+          * idle: The backend is waiting for a new client command.
+          * idle in transaction: The backend is in a transaction, but is not
+            currently executing a query.
+          * idle in transaction (aborted): This state is similar to idle in
+            transaction, except one of the statements in the transaction caused
+            an error.
+          * fastpath function call: The backend is executing a fast-path function.
+          * disabled: This state is reported if track_activities is disabled in this backend.
+    - name: query
+      description: >
+        Text of this backend's most recent query. If state is active this field
+        shows the currently executing query. In all other states, it shows the
+        last query that was executed.
+

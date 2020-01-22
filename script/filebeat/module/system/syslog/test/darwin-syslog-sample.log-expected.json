@@ -1,0 +1,41 @@
+[
+    {
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "a-mac-with-esc-key",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "message": "2016-12-13 11:35:28.420 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSAgentApp updateProductWithProductID:usingEngine:] Checking for updates for \"All Products\" using engine <KSUpdateEngine:0x100341a00\n\t\tticketStore=<KSPersistentTicketStore:0x100204520 store=<KSKeyedPersistentStore:0x100213290\n\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore\"\n\t\t\tlockFile=<KSLockFile:0x1002160e0\n\t\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore.lock\"\n\t\t\t\tlocked=NO\n\t\t\t>\n\t\t>>\n\t\tprocessor=<KSActionProcessor:0x1003bb5f0\n\t\t\tdelegate=<KSUpdateEngine:0x100341a00>\n\t\t\tisProcessing=NO actionsCompleted=0 progress=0.00\n\t\t\terrors=0 currentActionErrors=0\n\t\t\tevents=0 currentActionEvents=0\n\t\t\tactionQueue=( )\n\t\t>\n\t\tdelegate=(null)\n\t\tserverInfoStore=(null)\n\t\terrors=0\n\t>",
+        "process.name": "GoogleSoftwareUpdateAgent",
+        "process.pid": 21412,
+        "service.type": "system"
+    },
+    {
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "a-mac-with-esc-key",
+        "input.type": "log",
+        "log.offset": 907,
+        "message": "2016-12-13 11:35:28.421 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSUpdateEngine updateAllExceptProduct:] KSUpdateEngine updating all installed products, except:'com.google.Keystone'.",
+        "process.name": "GoogleSoftwareUpdateAgent",
+        "process.pid": 21412,
+        "service.type": "system"
+    },
+    {
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "input.type": "log",
+        "log.offset": 1176,
+        "message": "--- last message repeated 1 time ---",
+        "service.type": "system"
+    }
+]

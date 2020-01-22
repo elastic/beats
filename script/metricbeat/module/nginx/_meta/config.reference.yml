@@ -1,0 +1,10 @@
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+
+  # Nginx hosts
+  hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default nginx_status
+  server_status_path: "nginx_status"

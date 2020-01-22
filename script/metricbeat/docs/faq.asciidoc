@@ -1,0 +1,27 @@
+[[faq]]
+== Common problems
+
+This section describes common problems you might encounter with
+{beatname_uc}. Also check out the
+https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
+
+[[freebsd-no-such-file]]
+=== "open /compat/linux/proc: no such file or directory" error on FreeBSD
+
+The system metricsets rely on a Linux compatibility layer to retrieve metrics on
+FreeBSD. You need to mount the Linux procfs filesystem using the following
+commands. You may want to add these filesystems to your `/etc/fstab` so they are
+mounted automatically.
+
+[source,sh]
+----
+sudo mount -t procfs proc /proc
+sudo mkdir -p /compat/linux/proc
+sudo mount -t linprocfs /dev/null /compat/linux/proc
+----
+
+include::faq-unexpected-metrics.asciidoc[]
+
+include::{libbeat-dir}/faq-limit-bandwidth.asciidoc[]
+
+include::{libbeat-dir}/shared-faq.asciidoc[]

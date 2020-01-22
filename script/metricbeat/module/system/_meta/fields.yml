@@ -1,0 +1,12 @@
+- key: system
+  title: "System"
+  description: >
+    System status metrics, like CPU and memory usage, that are collected from the operating system.
+  short_config: true
+  release: ga
+  fields:
+    - name: system
+      type: group
+      description: >
+        `system` contains local system metrics.
+      fields:

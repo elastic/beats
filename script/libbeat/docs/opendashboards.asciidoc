@@ -1,0 +1,31 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/opendashboards.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+To open the dashboards, launch the {kib} web interface by pointing your browser
+to port 5601. For example, http://localhost:5601[http://localhost:5601].
+Replace `localhost` with the name of the {kib} host.  If you're using an
+https://cloud.elastic.co/[{ecloud}] instance, log in to your cloud account,
+then navigate to the {kib} endpoint in your deployment.
+
+On the *Discover* page, make sure that the predefined +{beatname_lc}-*+ index
+pattern is selected to see {beatname_uc} data.
+
+[role="screenshot"]
+image::./images/kibana-created-indexes.png[Discover tab with index selected]
+
+TIP: If you don’t see data in {kib}, try changing the date range to a larger
+range. By default, {kib} shows the last 15 minutes.
+
+Go to the *Dashboard* page and select the dashboard that you want to open.
+
+[role="screenshot"]
+image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+

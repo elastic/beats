@@ -1,0 +1,5 @@
+[2017-04-04 11:16:34 +0200] information/Notification: Sending 'Recovery' notification 'demo!load!mail-icingaadmin for user 'on-call'
+[2017-04-04 11:16:34 +0200] warning/PluginNotificationTask: Notification command for object 'demo!load' (PID: 19401, arguments: '/etc/icinga2/scripts/mail-service-notification.sh') terminated with exit code 127, output: /etc/icinga2/scripts/mail-service-notification.sh: 20: /etc/icinga2/scripts/mail-service-notification.sh: mail: not found
+/usr/bin/printf: write error: Broken pipe
+
+[2017-04-04 11:16:48 +0200] information/IdoMysqlConnection: Query queue items: 0, query rate: 5.38333/s (323/min 1610/5min 4778/15min);

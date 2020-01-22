@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/osquery/osqueryd.results.log*
+    os.darwin:
+      - /var/log/osquery/osqueryd.results.log*
+      - /private/var/log/osquery/osqueryd.results.log*
+    os.windows:
+      - C:/ProgramData/osquery/log/osqueryd.results.log*
+  - name: use_namespace
+    default: true
+
+
+ingest_pipeline: ingest/pipeline.json
+input: config/result.yml

@@ -1,0 +1,43 @@
+The Prometheus `collector` metricset scrapes data from https://prometheus.io/docs/instrumenting/exporters/[prometheus exporters].
+
+
+[float]
+=== Scraping from a Prometheus exporter
+
+To scrape metrics from a Prometheus exporter, configure the `hosts` field to it. The path
+to retrieve the metrics from (`/metrics` by default) can be configured with `metrics_path`.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["node:9100"]
+  metrics_path: /metrics
+
+  #username: "user"
+  #password: "secret"
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+-------------------------------------------------------------------------------------
+
+
+[float]
+=== Scraping all metrics from a Prometheus server
+
+This module can scrape all metrics stored in a Prometheus server, by using the
+https://prometheus.io/docs/prometheus/latest/federation/[federation API]. By pointing this
+config to the Prometheus server:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+metricbeat.modules:
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: '/federate'
+  query:
+    'match[]': '{__name__!=""}'
+-------------------------------------------------------------------------------------

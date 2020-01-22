@@ -1,0 +1,44 @@
+- name: load
+  type: group
+  description: >
+    CPU load averages.
+  release: ga
+  fields:
+    - name: "1"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load average for the last minute.
+    - name: "5"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load average for the last 5 minutes.
+    - name: "15"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load average for the last 15 minutes.
+
+    - name: "norm.1"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load for the last minute divided by the number of cores.
+
+    - name: "norm.5"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load for the last 5 minutes divided by the number of cores.
+
+    - name: "norm.15"
+      type: scaled_float
+      scaling_factor: 100
+      description: >
+        Load for the last 15 minutes divided by the number of cores.
+
+    - name: "cores"
+      type: long
+      description: >
+        The number of CPU cores present on the host.

@@ -1,0 +1,36 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "system.raid",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "raid"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "raid": {
+            "blocks": {
+                "synced": 0,
+                "total": 4189184
+            },
+            "disks": {
+                "active": 2,
+                "failed": 0,
+                "spare": 1,
+                "states": {
+                    "in_sync": 2,
+                    "spare": 1
+                },
+                "total": 3
+            },
+            "level": "raid1",
+            "name": "md0",
+            "status": "clean",
+            "sync_action": "repair"
+        }
+    }
+}

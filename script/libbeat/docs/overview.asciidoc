@@ -1,0 +1,46 @@
+[[beats-reference]]
+== Beats overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+{beats} are open source data shippers that you install as agents on your
+servers to send operational data to
+https://www.elastic.co/products/elasticsearch[{es}]. Elastic provides {beats}
+for capturing:
+
+[horizontal]
+Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
+Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
+Cloud data:: https://www.elastic.co/products/beats/functionbeat[Functionbeat]
+Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
+Systemd journals:: https://www.elastic.co/downloads/beats/journalbeat[Journalbeat]
+Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat]
+Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat]
+Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat]
+
+{beats} can send data directly to {es} or via
+https://www.elastic.co/products/logstash[{ls}], where you can further process
+and enhance the data, before visualizing it in
+https://www.elastic.co/products/logstash[{kib}].
+
+image::./images/beats-platform.png[Beats Platform]
+
+To get started, see <<getting-started>>.
+
+Want to get up and running quickly with infrastructure metrics monitoring and
+centralized log analytics?
+Try out the Metrics app and the Logs app in {kib}.
+For more details, see the {metrics-guide}[Metrics Monitoring Guide]
+and the {logs-guide}[Logs Monitoring Guide].
+
+[float]
+=== Need to capture other kinds of data?
+
+If you have a specific use case to solve, we encourage you to create a
+<<community-beats,community Beat>>. We've created an infrastructure to simplify
+the process. The _libbeat_ library, written entirely in Go, offers the API
+that all Beats use to ship data to Elasticsearch, configure the input options,
+implement logging, and more. To learn how to create a new Beat, see the
+{beatsdevguide}/index.html[Beats Developer Guide].

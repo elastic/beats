@@ -1,0 +1,12 @@
+- key: haproxy
+  title: "HAProxy"
+  description: >
+    HAProxy Module
+  short_config: false
+  release: ga
+  fields:
+    - name: haproxy
+      type: group
+      description: >
+        HAProxy metrics.
+      fields:

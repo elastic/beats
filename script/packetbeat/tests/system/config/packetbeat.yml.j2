@@ -1,0 +1,230 @@
+#################### Packetbeat Configuration Template #########################
+
+# Select the network interfaces to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
+packetbeat.interfaces.device: {{ iface_device|default("any") }}
+
+{% if bpf_filter %}
+packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
+{% endif %}
+
+{% if flows %}
+#================================== Flows =====================================
+# Set network flow timeout. Flow is killed if no packet is received before being
+# timed out.
+packetbeat.flows.timeout: 2s
+
+# Configure reporting period. If set to -1, only killed flows will be reported
+packetbeat.flows.period: -1s
+{% endif %}
+
+packetbeat.protocols:
+# Configure which protocols to monitor and the ports where they are
+# running. You can disable a given protocol by commenting out its
+# configuration.
+- type: icmp
+  enabled: true
+{% if icmp_send_request %}  send_request: true{%- endif %}
+{% if icmp_send_response %}  send_response: true{%- endif %}
+
+- type: dhcpv4
+  ports: [{{ dhcp_ports|default([67, 68])|join(", ") }}]
+
+- type: dns
+  ports: [{{ dns_ports|default([53])|join(", ") }}]
+{% if dns_include_authorities %}  include_authorities: true{%- endif %}
+{% if dns_include_additionals %}  include_additionals: true{%- endif %}
+{% if dns_send_request %}  send_request: true{%- endif %}
+{% if dns_send_response %}  send_response: true{%- endif %}
+
+- type: amqp
+  ports: [{{ amqp_ports|default([5672])|join(", ") }}]
+{% if amqp_send_request %}  send_request: true{%- endif %}
+{% if amqp_send_response %}  send_response: true{%- endif %}
+
+- type: cassandra
+  ports: [{{ cassandra_ports|default([9042])|join(", ") }}]
+{% if cassandra_send_request %}  send_request: true{%endif %}
+{% if cassandra_send_response %}  send_response: true{% endif %}
+{% if cassandra_send_request_header %}  send_request_header: true{% endif %}
+{% if cassandra_send_response_header %}  send_response_header: true{% endif %}
+{% if cassandra_ignored_ops %}  ignored_ops: {{cassandra_ignored_ops}}{% endif %}
+{% if cassandra_compressor %}  compressor: {{cassandra_compressor}}{% endif %}
+
+- type: http
+  ports: [{{ http_ports|default([80])|join(", ") }}]
+{% if http_send_request %}  send_request: true{%- endif %}
+{% if http_send_response %}  send_response: true{%- endif %}
+{% if http_send_all_headers %}  send_all_headers: true{%- endif %}
+{% if http_split_cookie %}  split_cookie: true{%- endif %}
+{% if http_send_headers %}
+  send_headers: [
+      {%- for hdr in http_send_headers -%}
+                 "{{ hdr }}"
+                 {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
+{% if http_real_ip_header %}  real_ip_header: "{{ http_real_ip_header }}"{% endif %}
+{%- if http_include_body_for %}
+  include_body_for: [
+      {%- for ct in http_include_body_for -%}
+                     "{{ ct }}"
+                     {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
+{% if http_redact_authorization %}  redact_authorization: true{% endif %}
+{%- if http_hide_keywords %}
+  hide_keywords: [
+      {%- for keyword in http_hide_keywords -%}
+                  "{{keyword}}"
+                  {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
+{%- if http_max_message_size %}  max_message_size: {{ http_max_message_size }} {%- endif %}
+{%- if http_transaction_timeout %}  transaction_timeout: {{ http_transaction_timeout }} {%- endif %}
+
+- type: memcache
+  ports: [{{ memcache_ports|default([11211])|join(", ") }}]
+{% if memcache_send_request %}  send_request: true{%- endif %}
+{% if memcache_send_response %}  send_response: true{%- endif %}
+{% if memcache_parse_unknown %}  parseunknown: true{%- endif %}
+{% if memcache_max_values %}  maxvalues: {{ memcache_max_values }}{%- endif %}
+{% if memcache_udp_transaction_timeout %}  udptransactiontimeout: {{ memcache_udp_transaction_timeout}}ms {%- endif %}
+
+- type: mysql
+  ports: [{{ mysql_ports|default([3306])|join(", ") }}]
+{% if mysql_max_rows %}  max_rows: {{mysql_max_rows}}{%- endif %}
+{% if mysql_max_row_length %}  max_row_length: {{mysql_max_row_length}}{%- endif %}
+{% if mysql_send_request %}  send_request: true{%- endif %}
+{% if mysql_send_response %}  send_response: true{%- endif %}
+
+- type: pgsql
+  ports: [{{ pgsql_ports|default([5432])|join(", ") }}]
+{% if pgsql_max_rows %}  max_rows: {{pgsql_max_rows}}{%- endif %}
+{% if pgsql_max_row_length %}  max_row_length: {{pgsql_max_row_length}}{%- endif %}
+{% if pgsql_send_request %}  send_request: true{%- endif %}
+{% if pgsql_send_response %}  send_response: true{%- endif %}
+
+- type: redis
+  ports: [{{ redis_ports|default([6379])|join(", ") }}]
+{% if redis_send_request %}  send_request: true{% endif %}
+{% if redis_send_response %}  send_response: true{% endif %}
+
+- type: nfs
+  ports: [{{ nfs_ports|default([2049])|join(", ") }}]
+
+- type: thrift
+  ports: [{{ thrift_ports|default([9090])|join(", ") }}]
+  transport_type: "{{ thrift_transport_type|default('socket') }}"
+{% if thrift_idl_files %}
+  idl_files:
+  {%- for file in thrift_idl_files %}
+  - '{{ beat.working_dir + '/' + file }}'
+  {%- endfor -%}
+{%- endif %}
+{% if thrift_send_request %}  send_request: true{%- endif %}
+{% if thrift_send_response %}  send_response: true{%- endif %}
+
+- type: tls
+  ports: [{{ tls_ports|default([443])|join(", ") }}]
+{% if tls_send_certificates is defined %}  send_certificates: {{tls_send_certificates}}{%- endif %}
+{% if tls_include_raw_certificates is defined  %}  include_raw_certificates: {{tls_include_raw_certificates}}{%- endif %}
+{% if tls_include_detailed_fields is defined %}  include_detailed_fields: {{tls_include_detailed_fields}}{%- endif %}
+{% if tls_fingerprints is defined %}  fingerprints: {{tls_fingerprints}}{%- endif %}
+
+- type: mongodb
+  ports: [{{ mongodb_ports|default([27017])|join(", ") }}]
+{% if mongodb_send_request %}  send_request: true{%endif %}
+{% if mongodb_send_response %}  send_response: true{% endif %}
+{% if mongodb_max_docs is not none %}  max_docs: {{mongodb_max_docs}}{% endif %}
+{% if mongodb_max_doc_length is not none %}  max_doc_length: {{mongodb_max_doc_length}}{% endif %}
+
+
+{% if procs_enabled %}
+#=========================== Monitored processes ==============================
+packetbeat.procs:
+  enabled: true
+  monitored:
+    - process: mysqld
+      cmdline_grep: mysqld
+
+    - process: pgsql
+      cmdline_grep: postgres
+
+    - process: nginx
+      cmdline_grep: nginx
+
+    - process: app
+      cmdline_grep: gunicorn
+
+    - process: memcache
+      cmdline_grep: memcached
+{% endif %}
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+name: {{shipperName}}
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+tags: [
+  {%- if agent_tags -%}
+      {%- for tag in agent_tags -%}
+          "{{ tag }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  {%- endif -%}
+]
+
+packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
+
+{%- if processors %}
+
+#================================ Filters =====================================
+
+processors:
+{%- for processor in processors %}
+{%- for name, settings in processor.items() %}
+- {{name}}:
+  {%- if settings %}
+  {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+  {%- endfor %}
+  {%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+{%- endif %}
+
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
+
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+{%- if elasticsearch %}
+#------------------------------- Elasticsearch output ----------------------------
+output.elasticsearch:
+  hosts: ["{{ elasticsearch.host }}"]
+{%- else %}
+#------------------------------- File output ----------------------------------
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("packetbeat") }}"
+  rotate_every_kb: {{ rotate_every_kb | default(1000) }}
+  #number_of_files: 7
+{%- endif %}

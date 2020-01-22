@@ -1,0 +1,37 @@
+filebeat:
+  inputs:
+    -
+      # Paths that should be crawled and fetched
+      paths:
+        - /var/log/app*.log
+        - /var/log/s*.log
+      # Input: This must be either log or stdin
+      input: log
+      # Optional additional fields
+      fields:
+        level: debug
+        review: 1
+        type: log
+      ignore_older: 0
+      close_inactive: 5m
+      scan_frequency: 10s
+      harvester_buffer_size: 5000
+      tail_files: false
+    -
+      fields:
+      paths:
+        - /var/log/test.log
+      input: log
+    -
+      fields:
+      input: stdin
+      # Paths is not required
+  spool_size: 2048
+  idle_timeout: 5s
+  config_dir: "/prospectorConfigs/"
+
+# Additional stuff we should be ignore
+output:
+  elasticsearch:
+    enabled: true
+    hosts: ["192.168.99.100:9200"]

@@ -1,0 +1,13 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+multiline:
+  pattern: '^\d{4}\/\d{2}\/\d{2} '
+  negate: true
+  match: after
+
+processors:
+- add_locale: ~

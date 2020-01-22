@@ -1,0 +1,14 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/redis/redis-server.log*
+    os.darwin:
+      - /usr/local/var/log/redis/redis-server.log*
+      - /usr/local/var/db/redis/redis-server.log*
+    os.windows:
+      - "c:/program files/Redis/logs/redis.log*"
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

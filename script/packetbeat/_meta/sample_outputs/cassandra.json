@@ -1,0 +1,64 @@
+{
+    "@timestamp": "2016-06-28T09:16:17.891Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
+    },
+    "bytes_in": 110,
+    "server": {
+        "domain": "host.example.com",
+        "ip": "127.0.0.1",
+        "port": 9042
+    },
+    "bytes_out": 871,
+    "host": {
+        "name": "host.example.com"
+    },
+    "cassandra": {
+        "request": {
+            "query": "SELECT * FROM system_schema.tables WHERE keyspace_name = 'mykeyspace' AND table_name = 'users'",
+            "headers": {
+                "version": "4",
+                "flags": "Default",
+                "stream": 52,
+                "op": "QUERY",
+                "length": 101
+            }
+        },
+        "response": {
+            "headers": {
+                "version": "4",
+                "flags": "Default",
+                "stream": 52,
+                "op": "RESULT",
+                "length": 862
+            },
+            "result": {
+                "type": "rows",
+                "rows": {
+                    "meta": {
+                        "col_count": 19,
+                        "keyspace": "system_schema",
+                        "table": "tables",
+                        "flags": "GlobalTableSpec"
+                    },
+                    "num_rows": 879461
+                }
+            }
+        }
+    },
+    "status": "OK",
+    "responsetime": 5,
+    "client": {
+        "port": 52749,
+        "domain": "host.example.com",
+        "ip": "127.0.0.1"
+    },
+    "agent": {
+        "type": "packetbeat",
+        "hostname": "host.example.com",
+        "version": "7.0.0"
+    },
+    "type": "cassandra"
+}

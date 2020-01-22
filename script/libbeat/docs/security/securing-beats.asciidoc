@@ -1,0 +1,41 @@
+[role="xpack"]
+[[securing-beats]]
+== Configure {beatname_uc} to use {security-features}
+
+[subs="attributes"]
+++++
+<titleabbrev>Use {security-features}</titleabbrev>
+++++
+
+If you want {beatname_uc} to connect to a cluster that has
+{security-features} enabled, there are extra configuration steps:
+
+. <<feature-roles>>.
++
+You can use role-based access control to grant {beatname_uc} users access to
+secured resources.
+
+. <<beats-api-keys>>.
++
+You can use API keys to grant access to {es} more securely.
+
+. <<beats-basic-auth>>.
++
+To interact with a secured cluster, {beatname_uc} must either provide basic
+authentication credentials or present a client certificate.
+
+. <<beats-tls>>.
++
+If encryption is enabled on the cluster, you need to enable HTTPS in the
+{beatname_uc} configuration.
+
+For more information about {security-features}, see
+{ref}/secure-cluster.html[Secure a cluster].
+
+include::users.asciidoc[]
+
+include::api-keys.asciidoc[]
+
+include::basic-auth.asciidoc[]
+
+include::tls.asciidoc[]

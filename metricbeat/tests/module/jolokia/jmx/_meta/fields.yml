@@ -1,0 +1,6 @@
+- key: jmx
+  type: group
+  description: >
+    Jolokia jmx metricset
+  release: ga
+  fields:

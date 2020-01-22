@@ -1,0 +1,31 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+libbeat
+
+# Folders
+_obj
+_test
+_output
+/docs/html_docs
+.vagrant
+build
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+# IDE / OS specific files
+.idea
+.jenkins
+
+/libbeat.yml
+/libbeat.reference.yml
+/docs/fields.asciidoc
+_meta/kibana

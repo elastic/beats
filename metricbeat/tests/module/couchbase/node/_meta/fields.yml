@@ -1,0 +1,101 @@
+- name: node
+  type: group
+  description: >
+    Couchbase node metrics.
+  release: ga
+  fields:
+    - name: cmd_get
+      type: long
+      description: >
+        Number of get commands
+    - name: couch.docs.disk_size.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of disk space used by Couch docs (bytes).
+    - name: couch.docs.data_size.bytes
+      format: bytes
+      type: long
+      description: >
+        Data size of Couch docs associated with a node (bytes).
+    - name: couch.spatial.data_size.bytes
+      type: long
+      description: >
+        Size of object data for spatial views (bytes).
+    - name: couch.spatial.disk_size.bytes
+      type: long
+      description: >
+        Amount of disk space used by spatial views (bytes).
+    - name: couch.views.disk_size.bytes
+      type: long
+      description: >
+        Amount of disk space used by Couch views (bytes).
+    - name: couch.views.data_size.bytes
+      type: long
+      description: >
+        Size of object data for Couch views (bytes).
+    - name: cpu_utilization_rate.pct
+      type: scaled_float
+      description: >
+        The CPU utilization rate (%).
+    - name: current_items.value
+      type: long
+      description: >
+        Number of current items.
+    - name: current_items.total
+      type: long
+      description: >
+        Total number of items associated with the node.
+    - name: ep_bg_fetched
+      type: long
+      description: >
+        Number of disk fetches performed since the server was started.
+    - name: get_hits
+      type: long
+      description: >
+        Number of get hits.
+    - name: hostname
+      type: keyword
+      description: >
+        The hostname of the node.
+    - name: mcd_memory.allocated.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of memcached memory allocated (bytes).
+    - name: mcd_memory.reserved.bytes
+      type: long
+      description: >
+        Amount of memcached memory reserved (bytes).
+    - name: memory.free.bytes
+      type: long
+      description: >
+        Amount of memory free for the node (bytes).
+    - name: memory.total.bytes
+      type: long
+      description: >
+        Total memory available to the node (bytes).
+    - name: memory.used.bytes
+      type: long
+      description: >
+        Memory used by the node (bytes).
+    - name: ops
+      type: long
+      description: >
+        Number of operations performed on Couchbase.
+    - name: swap.total.bytes
+      type: long
+      description: >
+        Total swap size allocated (bytes).
+    - name: swap.used.bytes
+      type: long
+      description: >
+        Amount of swap space used (bytes).
+    - name: uptime.sec
+      type: long
+      description: >
+        Time during which the node was in operation (sec).
+    - name: vb_replica_curr_items
+      type: long
+      description: >
+        Number of items/documents that are replicas.

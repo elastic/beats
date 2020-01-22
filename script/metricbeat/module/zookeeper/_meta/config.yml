@@ -1,0 +1,6 @@
+- module: zookeeper
+  #metricsets:
+  #  - mntr
+  #  - server
+  period: 10s
+  hosts: ["localhost:2181"]

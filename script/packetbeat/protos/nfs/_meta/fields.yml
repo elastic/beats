@@ -1,0 +1,69 @@
+- key: nfs
+  title: "NFS"
+  description: NFS v4/3 specific event fields.
+  fields:
+    - name: nfs
+      type: group
+      fields:
+        - name: version
+          type: long
+          description: NFS protocol version number.
+
+        - name: minor_version
+          type: long
+          description: NFS protocol minor version number.
+
+        - name: tag
+          description: NFS v4 COMPOUND operation tag.
+
+        - name: opcode
+          description: >
+            NFS operation name, or main operation name, in case of COMPOUND
+            calls.
+
+        - name: status
+          description: NFS operation reply status.
+
+    - name: rpc
+      type: group
+      description: ONC RPC specific event fields.
+      fields:
+        - name: xid
+          description: RPC message transaction identifier.
+
+        - name: status
+          description: RPC message reply status.
+
+        - name: auth_flavor
+          description: RPC authentication flavor.
+
+        - name: cred.uid
+          type: long
+          description: RPC caller's user id, in case of auth-unix.
+
+        - name: cred.gid
+          type: long
+          description: RPC caller's group id, in case of auth-unix.
+
+        - name: cred.gids
+          description: RPC caller's secondary group ids, in case of auth-unix.
+
+        - name: cred.stamp
+          type: long
+          description: Arbitrary ID which the caller machine may generate.
+
+        - name: cred.machinename
+          description: The name of the caller's machine.
+
+        # Aliases
+        - name: call_size
+          type: alias
+          path: source.bytes
+          migration: true
+          description: RPC call size with argument.
+
+        - name: reply_size
+          type: alias
+          path: destination.bytes
+          migration: true
+          description: RPC reply size with argument.

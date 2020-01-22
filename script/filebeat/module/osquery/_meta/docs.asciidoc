@@ -1,0 +1,76 @@
+:modulename: osquery
+:has-dashboards: true
+
+== Osquery module
+
+The +{modulename}+ module collects and decodes the result logs written by
+https://osquery.readthedocs.io/en/latest/introduction/using-osqueryd/[osqueryd]
+in the JSON format. To set up osqueryd follow the osquery installation
+instructions for your operating system and configure the `filesystem` logging
+driver (the default). Make sure UTC timestamps are enabled.
+
+include::../include/what-happens.asciidoc[]
+
+
+[float]
+=== Compatibility
+
+The  +{modulename}+ module was tested with logs from osquery version 2.10.2.
+Since the results are written in the JSON format, it is likely that this module
+works with any version of osquery.
+
+This module is available on Linux, macOS, and Windows.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for visualizing the data collected by
+the "compliance" pack. To collect this data, enable the `id-compliance` pack in
+the osquery configuration file.
+
+[role="screenshot"]
+image::./images/kibana-osquery-compatibility.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for the syslog and authorization logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: osquery
+  result:
+    enabled: true
+    var.paths: ["/path/to/osqueryd.results.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "osquery.result.var.paths=[/path/to/osqueryd.results.log*]"
+-----
+
+//set the fileset name used in the included example
+:fileset_ex: result
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `result` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.use_namespace`*::
+
+If true, all fields exported by this module are prefixed with `osquery.result`.
+Set to false to copy the fields in the root of the document. If enabled, this
+setting also disables the renaming of some fields (e.g. `hostIdentifier` to
+`host_identifier`).  Note that if you set this to false, the sample dashboards
+coming with this module won't work correctly. The default is true.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

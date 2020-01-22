@@ -1,0 +1,5 @@
+[2017-10-23T14:20:12,046][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/usr/share/logstash/modules/fb_apache/configuration"}
+[2017-11-20T03:55:00,318][INFO ][logstash.inputs.jdbc     ] (0.058950s) Select Name as [person.name]
+, Address as [person.address]
+from people
+

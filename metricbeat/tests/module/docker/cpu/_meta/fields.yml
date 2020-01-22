@@ -1,0 +1,75 @@
+- name: cpu
+  type: group
+  description: >
+    Runtime CPU metrics.
+  release: ga
+  fields:
+    - name: kernel.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in kernel space.
+    - name: kernel.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in kernel space normalized by the number of CPU cores.
+    - name: kernel.ticks
+      type: long
+      description: >
+        CPU ticks in kernel space.
+    - name: system.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of total CPU time in the system.
+    - name: system.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of total CPU time in the system normalized by the number of CPU cores.
+    - name: system.ticks
+      type: long
+      description: >
+        CPU system ticks.
+    - name: user.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in user space.
+    - name: user.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in user space normalized by the number of CPU cores.
+    - name: user.ticks
+      type: long
+      description: >
+        CPU ticks in user space.
+    - name: total.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total CPU usage.
+    - name: total.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total CPU usage normalized by the number of CPU cores.
+    - name: core.*.pct
+      type: object
+      object_type: scaled_float
+      format: percent
+      description: >
+        Percentage of CPU time in this core.
+    - name: core.*.norm.pct
+      type: object
+      object_type: scaled_float
+      format: percent
+      description: >
+        Percentage of CPU time in this core, normalized by the number of CPU cores.
+    - name: core.*.ticks
+      type: object
+      object_type: long
+      description: >
+        Number of CPU ticks in this core.

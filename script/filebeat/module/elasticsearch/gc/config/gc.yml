@@ -1,0 +1,11 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+exclude_lines: ["^(OpenJDK|Java HotSpot).* Server VM ", "^CommandLine flags: ", "^Memory: "] # exclude JVM8 banner
+multiline:
+  pattern: '^\[?[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  negate: true
+  match: after

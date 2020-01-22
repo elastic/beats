@@ -1,0 +1,63 @@
+#========================== Filebeat autodiscover ==============================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# or inputs as they happen.
+
+#filebeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: busybox
+#          config:
+#            - type: container
+#              paths:
+#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+
+#========================= Filebeat global options ============================
+
+# Registry data path. If a relative path is used, it is considered relative to the
+# data path.
+#filebeat.registry.path: ${path.data}/registry
+
+# The permissions mask to apply on registry data, and meta files. The default
+# value is 0600.  Must be a valid Unix-style file permissions mask expressed in
+# octal notation.  This option is not supported on Windows.
+#filebeat.registry.file_permissions: 0600
+
+# The timeout value that controls when registry entries are written to disk
+# (flushed). When an unwritten update exceeds this value, it triggers a write
+# to disk. When flush is set to 0s, the registry is written to disk after each
+# batch of events has been published successfully. The default value is 0s.
+#filebeat.registry.flush: 0s
+
+
+# Starting with Filebeat 7.0, the registry uses a new directory format to store
+# Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
+# registry file to use the new directory format. If you changed
+# filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
+# point to the old registry file.
+#filebeat.registry.migrate_file: ${path.data}/registry
+
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Filebeat overwrites pipelines
+# everytime a new Elasticsearch connection is established.
+#filebeat.overwrite_pipelines: false
+
+# How long filebeat waits on shutdown for the publisher to finish.
+# Default is 0, not waiting.
+#filebeat.shutdown_timeout: 0
+
+# Enable filebeat config reloading
+#filebeat.config:
+  #inputs:
+    #enabled: false
+    #path: inputs.d/*.yml
+    #reload.enabled: true
+    #reload.period: 10s
+  #modules:
+    #enabled: false
+    #path: modules.d/*.yml
+    #reload.enabled: true
+    #reload.period: 10s

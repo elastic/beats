@@ -1,0 +1,61 @@
+[role="xpack"]
+[[beats-basic-auth]]
+=== Configure authentication credentials
+
+When sending data to a secured cluster through the `elasticsearch`
+output, {beatname_uc} must either provide basic authentication credentials
+or present a client certificate.
+
+*Before you begin:* <<feature-roles>>.
+
+You specify authentication credentials in the {beatname_uc} configuration
+file: 
+
+* To use basic authentication, specify the `username` and `password` settings
+under `output.elasticsearch`. For example: 
++
+--
+["source","yaml",subs="attributes,callouts"]
+----
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  username: "{beat_default_index_prefix}_writer" <1>
+  password: "{pwd}" <2>
+----
+<1> Let's assume this user has the privileges required to publish events to
+{es}.
+<2> The example shows a hard-coded password, but you should store sensitive
+values in the <<keystore,secrets keystore>>.
+--
+ifndef::apm-server[]
++
+If you've configured the {kib} endpoint, also specify credentials for
+authenticating with {kib}. For example:
++
+["source","yaml",subs="attributes,callouts"]
+----
+setup.kibana:
+  host: "mykibanahost:5601"
+  username: "{beat_default_index_prefix}_setup" <1>
+  password: "{pwd}" 
+----
+<1> Let's assume this user has the privileges required to set up dashboards.
+endif::apm-server[]
+
+* To use Public Key Infrastructure (PKI) certificates to authenticate users,
+configure the `certificate` and `key` settings. These settings assume that the
+distinguished name (DN) in the certificate is mapped to the appropriate roles in
+the `role_mapping.yml` file on each node in the {es} cluster. For more
+information, see {ref}/mapping-roles.html#mapping-roles-file[Using role
+mapping files].
++
+["source","yaml",subs="attributes,callouts"]
+--------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  ssl.certificate: "/etc/pki/client/cert.pem"
+  ssl.key: "/etc/pki/client/cert.key"
+--------------------------------------------------
+
+To learn more about {stack} security features and other types of
+authentication, see {ref}/secure-cluster.html[Secure a cluster].

@@ -1,0 +1,24 @@
+#- module: mysql
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Input configuration (advanced). Any input configuration option
+    # can be added under this section.
+    #input:
+
+  # Slow logs
+  #slowlog:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Input configuration (advanced). Any input configuration option
+    # can be added under this section.
+    #input:

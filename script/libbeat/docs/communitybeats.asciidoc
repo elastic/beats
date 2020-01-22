@@ -1,0 +1,126 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content appears in both the Beats Platform Reference and the
+//// Beats Developer Guide.
+//////////////////////////////////////////////////////////////////////////
+
+[[community-beats]]
+== Community Beats
+
+The open source community has been hard at work developing new Beats. You can check
+out some of them here.
+
+Have a question about a community Beat? You can post questions and discuss issues in the
+https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
+
+Have you created a Beat that's not listed? Add the name and description of your Beat to the source document for
+https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
+discussion forum.
+
+ifndef::dev-guide[]
+Want to contribute? See <<contributing-to-beats>>.
+endif::[]
+
+NOTE: Elastic provides no warranty or support for community-sourced Beats.
+
+[horizontal]
+https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
+https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
+https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
+https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consumer lag for Burrow V1.0.0(API V3).
+https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
+https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
+https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
+https://github.com/narmitech/cloudwatchmetricbeat[cloudwatchmetricbeat]::  A beat for Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#other-aws-resource-monitoring[CloudWatch Metrics].
+https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log events from Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#log-monitoring[CloudWatch Logs].
+https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
+https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
+https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
+https://github.com/hellmouthengine/discobeat[discobeat]:: Reads messages from Discord and indexes them in Elasticsearch
+https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
+statistics and indexes them in Elasticsearch.
+https://github.com/radoondas/earthquakebeat[earthquakebeat]:: Pulls data from https://earthquake.usgs.gov/fdsnws/event/1/[USGS] earthquake API.
+https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
+https://github.com/berfinsari/envoyproxybeat[envoyproxybeat]:: Reads stats from the Envoy Proxy and indexes them into Elasticsearch.
+https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
+https://gitlab.com/hatricker/etherbeat[etherbeat]:: Reads blocks from Ethereum compatible blockchain and indexes them into Elasticsearch.
+https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
+Logstash or Elasticsearch.
+https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
+https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodically gather internet download speed from  https://fast.com[fast.com].
+https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
+https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
+https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
+https://github.com/GoogleCloudPlatform/gcsbeat[gcsbeat]:: Reads data from https://cloud.google.com/storage/[Google Cloud Storage] buckets.
+https://github.com/threatstack/gelfbeat[gelfbeat]:: Collects and parses GELF-encoded UDP messages.
+https://github.com/josephlewis42/githubbeat[githubbeat]:: Easily monitors GitHub repository activity.
+https://github.com/hpcugent/gpfsbeat[gpfsbeat]:: Collects GPFS metric and quota information.
+https://github.com/ullaakut/hackerbeat[hackerbeat]:: Indexes the top stories of HackerNews into an ElasticSearch instance.
+https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
+https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
+Logstash or Elasticsearch. Supports all HTTP methods and proxies.
+https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
+https://github.com/icinga/icingabeat[icingabeat]:: Icingabeat ships events and states from Icinga 2 to Elasticsearch or Logstash.
+https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/diskstats on Linux.
+https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
+https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
+https://github.com/justsocialapps/kafkabeat[kafkabeat]:: Reads data from Kafka topics.
+https://github.com/arkady-emelyanov/kafkabeat[kafkabeat2]:: Reads data (json or plain) from Kafka topics.
+https://github.com/PPACI/krakenbeat[krakenbeat]:: Collect information on each transaction on the Kraken crypto platform.
+https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
+https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
+https://github.com/bozdag/macwifibeat[macwifibeat]:: Reads various indicators for a MacBook's WiFi Signal Strength
+https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
+https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
+https://github.com/berfinsari/mesosbeat[mesosbeat]:: Reads stats from the Mesos API and indexes them into Elasticsearch.
+https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
+https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
+https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
+https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
+https://github.com/nfvsap/natsbeat[natsbeat]:: Collects data from NATS monitoring endpoints
+https://github.com/radoondas/netatmobeat[netatmobeat]:: Reads data from Netatmo weather station.
+https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
+https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
+https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.
+https://github.com/eBay/nvidiagpubeat[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
+https://github.com/counteractive/o365beat[o365beat]:: Ships Office 365 logs from the O365 Management Activities API
+https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
+https://github.com/radoondas/owmbeat[owmbeat]:: Open Weather Map beat to pull weather data from all around the world and store and visualize them in Elastic Stack
+https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
+managers.
+https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance metrics on the AIX operating system.
+https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
+https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
+of targets and stores the round trip time (RTT) in Elasticsearch.
+https://github.com/kckecheng/powermaxbeat[powermaxbeat]:: Collects performance metrics from Dell EMC PowerMax storage array.
+https://github.com/pawankt/processbeat[processbeat]:: Collects process health status and performance.
+https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
+https://github.com/infonova/prometheusbeat[prometheusbeat]:: Send Prometheus metrics to Elasticsearch via the remote write feature.
+https://github.com/hartfordfive/protologbeat[protologbeat]:: Accepts structured and unstructured logs via UDP or TCP.  Can also be used to receive syslog messages or GELF formatted messages. (To be used as a successor to udplogbeat)
+https://github.com/GoogleCloudPlatform/pubsubbeat[pubsubbeat]:: Reads data from https://cloud.google.com/pubsub/[Google Cloud Pub/Sub].
+https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
+https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
+https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
+https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and analyze by Kibana.
+https://github.com/radoondas/safecastbeat[safecastbeat]:: Pulls data from Safecast API and store them in Elasticsearch.
+https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
+https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
+https://github.com/Corwind/servicebeat[servicebeat]:: Send services status to Elasticsearch
+https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
+https://github.com/philkra/springboot2beat[springboot2beat]:: Query and accumulate all metrics endpoints of a Spring Boot 2 web app via the web channel, leveraging the http://micrometer.io/[mircometer.io] metrics facade.
+https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github.com/etsy/statsd/wiki[statsd] events from a statsd client.
+https://github.com/Corwind/supervisorctlbeat.git[supervisorctlbeat]:: This beat aims to parse the supervisorctl status command output and send it to elasticsearch for indexation
+https://github.com/live-wire/terminalbeat[terminalbeat]:: Runs an external command and forwards the https://www.computerhope.com/jargon/s/stdout.htm[stdout] for the same to Elasticsearch/Logstash.
+https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
+https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
+https://github.com/gravitational/udpbeat[udpbeat]:: Ships structured logs via UDP.
+https://github.com/hartfordfive/udplogbeat[udplogbeat]:: Accept events via local UDP socket (in plain-text or JSON with ability to enforce schemas).  Can also be used for applications only supporting syslog logging.
+https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unified2 binary files generated by
+network intrusion detection software and indexes the records in Elasticsearch.
+https://github.com/kckecheng/unitybeat[unitybeat]:: Collects performance metrics from Dell EMC Unity storage array.
+https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
+https://github.com/phenomenes/varnishlogbeat[varnishlogbeat]:: Reads log data from a Varnish instance and ships it to Elasticsearch.
+https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats data from a Varnish instance and ships it to Elasticsearch.
+https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
+https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
+https://github.com/IBM/yarnbeat[yarnbeat]:: Polls YARN and MapReduce APIs for cluster and application metrics.
+https://github.com/maireanu/zfsbeat[zfsbeat]:: Querying ZFS Storage and Pool Status

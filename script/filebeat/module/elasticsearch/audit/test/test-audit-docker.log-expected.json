@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2019-06-11T15:03:32.102Z",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "pkduyMB5Tly6xgmkYbZi-A",
+        "elasticsearch.node.id": "Xaq2BFVcQ1OhyMrjL8gNOg",
+        "event.action": "anonymous_access_denied",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "http.request.method": "GET",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"type\": \"audit\", \"timestamp\":\"2019-06-11T15:03:32,102+0000\", \"node.id\":\"Xaq2BFVcQ1OhyMrjL8gNOg\", \"event.type\":\"rest\", \"event.action\":\"anonymous_access_denied\", \"origin.type\":\"rest\", \"origin.address\":\"172.17.0.1:40380\", \"url.path\":\"/\", \"request.method\":\"GET\", \"request.id\":\"pkduyMB5Tly6xgmkYbZi-A\"}",
+        "service.type": "elasticsearch",
+        "source.address": "172.17.0.1:40380",
+        "source.ip": "172.17.0.1",
+        "source.port": 40380,
+        "url.original": "/"
+    },
+    {
+        "@timestamp": "2019-06-11T15:03:32.778Z",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "KPgEINaXSbGNaIobp8OcMw",
+        "elasticsearch.node.id": "Xaq2BFVcQ1OhyMrjL8gNOg",
+        "event.action": "authentication_failed",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "http.request.method": "GET",
+        "input.type": "log",
+        "log.offset": 690,
+        "message": "{\"type\": \"audit\", \"timestamp\":\"2019-06-11T15:03:32,778+0000\", \"node.id\":\"Xaq2BFVcQ1OhyMrjL8gNOg\", \"event.type\":\"rest\", \"event.action\":\"authentication_failed\", \"user.name\":\"elastic\", \"origin.type\":\"rest\", \"origin.address\":\"172.17.0.1:40380\", \"url.path\":\"/\", \"request.method\":\"GET\", \"request.id\":\"KPgEINaXSbGNaIobp8OcMw\"}",
+        "service.type": "elasticsearch",
+        "source.address": "172.17.0.1:40380",
+        "source.ip": "172.17.0.1",
+        "source.port": 40380,
+        "url.original": "/",
+        "user.name": "elastic"
+    }
+]

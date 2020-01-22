@@ -1,0 +1,52 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.socket",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "socket"
+    },
+    "network": {
+        "direction": "listening",
+        "iana_number": "41",
+        "type": "ipv6"
+    },
+    "process": {
+        "args": [
+            "/tmp/go-build774092237/b001/socket.test",
+            "-data"
+        ],
+        "executable": "/tmp/go-build774092237/b001/socket.test",
+        "name": "socket.test",
+        "pid": 32127
+    },
+    "server": {
+        "ip": "::",
+        "port": 45109
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "socket": {
+            "local": {
+                "ip": "::",
+                "port": 45109
+            },
+            "process": {
+                "cmdline": "/tmp/go-build774092237/b001/socket.test -data"
+            }
+        }
+    },
+    "user": {
+        "full_name": "Jaime Soriano Pastor",
+        "id": "1000",
+        "name": "jaime"
+    }
+}

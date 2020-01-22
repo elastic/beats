@@ -1,0 +1,49 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"nats",
+        "name":"stats",
+        "rtt":44269
+    },
+    "nats":{
+        "server": {
+            "id": "bUAdpRFtMWddIBWw80Yd9D",
+            "time": "2018-12-28T12:33:53.026865597Z"
+        },
+        "stats":{
+            "cores":0,
+            "cpu":0.52,
+            "http":{
+                "req_stats":{
+                    "uri":{
+                        "connz":10,
+                        "routez":10,
+                        "subsz":10,
+                        "varz":10
+                    }
+                }
+            },
+            "in":{
+                "bytes":0,
+                "messages":0
+            },
+            "mem":{
+                "bytes": 806976
+            },
+            "out":{
+                "bytes":0,
+                "messages":0
+            },
+            "remotes":0,
+            "slow_consumers":0,
+            "total_connections":35,
+            "uptime":9702
+        }
+    },
+    "type":"metricsets"
+}

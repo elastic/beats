@@ -1,0 +1,102 @@
+- name: elb
+  type: group
+  release: ga
+  description: >
+    Fields for AWS ELB logs.
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the load balancer.
+    - name: type
+      type: keyword
+      description: >
+        The type of the load balancer for v2 Load Balancers.
+    - name: target_group.arn
+      type: keyword
+      description: >
+        The ARN of the target group handling the request.
+    - name: listener
+      type: keyword
+      description: >
+        The ELB listener that received the connection.
+    - name: protocol
+      type: keyword
+      description: >
+        The protocol of the load balancer (http or tcp).
+    - name: request_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the connection or request is received until it is sent to a registered backend.
+    - name: backend_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the connection is sent to the backend till the backend starts responding.
+    - name: response_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the response is received from the backend till it is sent to the client.
+    - name: connection_time.ms
+      type: long
+      description: >
+        The total time of the connection in milliseconds, since it is opened till it is closed.
+    - name: tls_handshake_time.ms
+      type: long
+      description: >
+        The total time for the TLS handshake to complete in milliseconds once the connection has been established.
+    - name: backend.ip
+      type: keyword
+      description: >
+        The IP address of the backend processing this connection.
+    - name: backend.port
+      type: keyword
+      description: >
+        The port in the backend processing this connection.
+    - name: backend.http.response.status_code
+      type: keyword
+      description: >
+        The status code from the backend (status code sent to the client from ELB is stored in `http.response.status_code`
+    - name: ssl_cipher
+      type: keyword
+      description: >
+        The SSL cipher used in TLS/SSL connections.
+    - name: ssl_protocol
+      type: keyword
+      description: >
+        The SSL protocol used in TLS/SSL connections.
+    - name: chosen_cert.arn
+      type: keyword
+      description: >
+        The ARN of the chosen certificate presented to the client in TLS/SSL connections.
+    - name: chosen_cert.serial
+      type: keyword
+      description: >
+        The serial number of the chosen certificate presented to the client in TLS/SSL connections.
+    - name: incoming_tls_alert
+      type: keyword
+      description: >
+        The integer value of TLS alerts received by the load balancer from the client, if present.
+    - name: tls_named_group
+      type: keyword
+      description: >
+        The TLS named group.
+    - name: trace_id
+      type: keyword
+      description: >
+        The contents of the `X-Amzn-Trace-Id` header.
+    - name: matched_rule_priority
+      type: keyword
+      description: >
+        The priority value of the rule that matched the request, if a rule matched.
+    - name: action_executed
+      type: keyword
+      description: >
+        The action executed when processing the request (forward, fixed-response, authenticate...). It can contain several values.
+    - name: redirect_url
+      type: keyword
+      description: >
+        The URL used if a redirection action was executed.
+    - name: error.reason
+      type: keyword
+      description:
+        The error reason if the executed action failed.

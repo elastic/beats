@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.filesystem",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "filesystem"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "filesystem": {
+            "available": 53067177984,
+            "device_name": "/dev/dm-5",
+            "files": 0,
+            "free": 54342492160,
+            "free_files": 0,
+            "mount_point": "/var/lib/lxd/storage-pools/default",
+            "total": 86301999104,
+            "type": "btrfs",
+            "used": {
+                "bytes": 31959506944,
+                "pct": 0.3759
+            }
+        }
+    }
+}

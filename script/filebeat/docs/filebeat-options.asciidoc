@@ -1,0 +1,81 @@
+[id="configuration-{beatname_lc}-options"]
+== Configure inputs
+
+++++
+<titleabbrev>Configure inputs</titleabbrev>
+++++
+
+TIP: <<{beatname_lc}-modules-overview,{beatname_uc} modules>> provide the
+fastest getting started experience for common log formats. See
+<<{beatname_lc}-modules-quickstart>> to learn how to get started with modules.
+Also see <<configuration-{beatname_lc}-modules>> for information about enabling
+and configuring modules.
+
+To configure {beatname_uc} manually (instead of using
+<<{beatname_lc}-modules-overview,modules>>), you specify a list of inputs in the
++{beatname_lc}.inputs+ section of the +{beatname_lc}.yml+. Inputs specify how
+{beatname_uc} locates and processes input data.
+
+The list is a http://yaml.org/[YAML] array, so each input begins with
+a dash (`-`). You can specify multiple inputs, and you can specify the same
+input type more than once. For example:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: log
+  paths:
+    - /var/log/system.log
+    - /var/log/wifi.log
+- type: log
+  paths:
+    - "/var/log/apache2/*"
+  fields:
+    apache: true
+  fields_under_root: true
+----
+
+
+[float]
+[id="{beatname_lc}-input-types"]
+=== Input types
+
+You can configure {beatname_uc} to use the following inputs:
+
+* <<{beatname_lc}-input-log>>
+* <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-container>>
+* <<{beatname_lc}-input-kafka>>
+* <<{beatname_lc}-input-redis>>
+* <<{beatname_lc}-input-udp>>
+* <<{beatname_lc}-input-docker>>
+* <<{beatname_lc}-input-tcp>>
+* <<{beatname_lc}-input-syslog>>
+* <<{beatname_lc}-input-s3>>
+* <<{beatname_lc}-input-netflow>>
+* <<{beatname_lc}-input-google-pubsub>>
+
+
+include::inputs/input-log.asciidoc[]
+
+include::inputs/input-stdin.asciidoc[]
+
+include::inputs/input-container.asciidoc[]
+
+include::inputs/input-kafka.asciidoc[]
+
+include::inputs/input-redis.asciidoc[]
+
+include::inputs/input-udp.asciidoc[]
+
+include::inputs/input-docker.asciidoc[]
+
+include::inputs/input-tcp.asciidoc[]
+
+include::inputs/input-syslog.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]

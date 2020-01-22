@@ -1,0 +1,142 @@
+:has_module_steps:
+:modulename: system nginx mysql
+
+[[filebeat-modules-quickstart]]
+=== Quick start: modules for common log formats
+
+{beatname_uc} provides a set of pre-built modules that you can use to rapidly
+implement and deploy a log monitoring solution, complete with sample dashboards
+and data visualizations (when available), in about 5 minutes. These modules
+support common log formats, such as Nginx, Apache2, and MySQL, and can be run by
+issuing a simple command.
+
+This topic shows you how to run the basic modules with minimal extra
+configuration. For detailed documentation and the full list of available
+modules, see <<filebeat-modules>>.
+
+Can't find a module for your log file type? Follow the numbered steps under
+<<filebeat-getting-started>> to set up and configure {beatname_uc} manually.
+
+==== Prerequisites
+
+Before running {beatname_uc} modules:
+
+* Install and configure the Elastic stack. See
+{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+
+* Complete the {beatname_uc} installation instructions described in
+<<filebeat-installation>>. After installing {beatname_uc}, return to this
+quick start page.
+
+* Verify that {es} and {kib} are running and that {es} is
+ready to receive data from {beatname_uc}.
+
+[[running-modules-quickstart]]
+==== Running {beatname_uc} modules
+
+To set up and run {beatname_uc} modules:
+
+. In the +{beatname_lc}.yml+ config file, set the location of the {es}
+installation. By default, {beatname_uc} assumes {es} is running locally on port
+9200.
++
+include::{libbeat-dir}/step-configure-output.asciidoc[]
+
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+
+. Enable the modules you want to run. For example, the following command enables
+the system, nginx, and mysql modules:
++
+include::./include/enable-modules-command.asciidoc[]
++
+This command enables the module configs defined in the `modules.d` directory. See
+<<configuration-{beatname_lc}-modules>> for other ways to enable modules.
++
+To see a list of enabled and disabled modules, run:
++
+include::./include/list-modules-command.asciidoc[]
+
+. Set up the initial environment:
++
+include::./include/setup-command.asciidoc[]
+
+. Run {beatname_uc}.
++
+If your logs aren't in the default location, 
+<<setting-variables,set the paths variable>> before running {beatname_uc}.
++
+include::./include/run-command.asciidoc[]
+
+include::./include/visualize-data.asciidoc[]
+
+[[example-dashboard]]
+==== Example dashboard
+
+Here's an example of the syslog dashboard:
+
+image::./images/kibana-system.png[Syslog dashboard]
+
+
+[[setting-variables]]
+==== Set the paths variable
+
+The examples here assume that the logs you're harvesting are in the location
+expected for your OS and that the default behavior of {beatname_uc} is appropriate
+for your environment. 
+
+include::./include/set-paths.asciidoc[]
+
+See <<configuration-filebeat-modules>> for more information about setting
+variables and advanced options.
+
+[[load-ingest-pipelines]]
+==== Load ingest pipelines manually
+
+The ingest pipelines used to parse log lines are set up automatically the first
+time you run the module, assuming the {es} output is enabled. If you're sending
+events to {ls}, or plan to use
+<<configuration-central-management,{beats} central management>>, you need to
+load the ingest pipelines manually. To do this, run the `setup` command with
+the `--pipelines` option specified. If you used the
+<<modules-command,`modules`>> command to enable modules in the `modules.d`
+directory, also specify the `--modules` flag. For example, the following command
+loads the ingest pipelines used by all filesets enabled in the system, nginx,
+and mysql modules:
+
+// override modulename attribute so it works with the --modules option
+:modulename: system,nginx,mysql
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules {modulename}
+----
+
+TIP: If you're loading ingest pipelines manually because you want to send events
+to {ls}, also see
+{logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
+
+:has_module_steps!:
+:modulename!:

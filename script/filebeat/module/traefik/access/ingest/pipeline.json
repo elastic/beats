@@ -1,0 +1,131 @@
+{
+    "description": "Pipeline for parsing Traefik access logs. Requires the geoip and user_agent plugins.",
+    "processors": [
+        {
+            "dissect": {
+                "field": "message",
+                "pattern": "%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}] \"%{http.request.method} %{url.original} HTTP/%{http.version}\" %{http.response.status_code} %{traefik.access.message}"
+            }
+        },
+        {
+            "grok": {
+                "field": "traefik.access.message",
+                "patterns": [
+                    "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:user_agent.original}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:temp.duration:long}ms)?)?"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "message",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "traefik.access.message",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "date": {
+                "field": "traefik.access.time",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:H:m:s Z"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": "traefik.access.time"
+            }
+        },
+
+        {
+            "convert": {
+                "field": "http.response.status_code",
+                "type": "long"
+            }
+        },
+
+        {
+            "grok": {
+                "field": "source.address",
+                "patterns": [
+                    "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
+                ]
+            }
+        },
+
+        {
+            "script": {
+                "lang": "painless",
+                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+                "params": { "scale": 1000000 },
+                "if": "ctx.temp?.duration != null"
+            }
+        },
+        {
+            "remove": {
+                "field": "temp.duration",
+                "ignore_missing": true
+            }
+        },
+
+        {
+            "user_agent": {
+                "field": "user_agent.original",
+                "ignore_failure": true
+            }
+        },
+        {
+            "geoip": {
+                "field": "source.ip",
+                "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

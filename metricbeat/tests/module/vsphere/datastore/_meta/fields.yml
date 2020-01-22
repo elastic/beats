@@ -1,0 +1,35 @@
+- name: datastore
+  type: group
+  description: >
+    datastore
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Datastore name
+    - name: fstype
+      type: keyword
+      description: >
+        Filesystem type
+    - name: capacity.total.bytes
+      type: long
+      description: >
+        Total bytes of the datastore
+      format: bytes
+    - name: capacity.free.bytes
+      type: long
+      description: >
+        Free bytes of the datastore
+      format: bytes
+    - name: capacity.used.bytes
+      type: long
+      description: >
+        Used bytes of the datastore
+      format: bytes
+    - name: capacity.used.pct
+      type: long
+      description: >
+        Used percent of the datastore
+      format: percent
+

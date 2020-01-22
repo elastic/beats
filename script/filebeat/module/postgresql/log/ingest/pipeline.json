@@ -1,0 +1,49 @@
+{
+  "description": "Pipeline for parsing PostgreSQL logs.",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "ignore_missing": true,
+        "patterns": [
+            "^%{DATETIME:postgresql.log.timestamp} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:log.level}:  (?:%{NUMBER:postgresql.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:postgresql.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})"
+        ],
+        "pattern_definitions": {
+          "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
+          "GREEDYDATA": "(.|\n|\t)*",
+          "POSTGRESQL_DB_NAME": "[a-zA-Z0-9_]+[a-zA-Z0-9_\\$]*",
+          "POSTGRESQL_QUERY_STEP": "%{WORD:postgresql.log.query_step}(?: <unnamed>| %{WORD:postgresql.log.query_name})?"
+        }
+      }
+    },
+    {
+      "date": {
+        "field": "postgresql.log.timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "yyyy-MM-dd HH:mm:ss.SSS zz", "yyyy-MM-dd HH:mm:ss zz"
+        ]
+      }
+    }, {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+        "params": { "scale": 1000000 },
+        "if": "ctx.temp?.duration != null"
+      }
+    }, {
+      "remove": {
+        "field": "temp.duration",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

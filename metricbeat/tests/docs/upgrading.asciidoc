@@ -1,0 +1,7 @@
+[[upgrading-metricbeat]]
+== Upgrading Metricbeat
+
+For information about upgrading to a new version, see the following topics in the _Beats Platform Reference_:
+
+* {beats-ref}/breaking-changes.html[Breaking Changes]
+* {beats-ref}/upgrading.html[Upgrading]

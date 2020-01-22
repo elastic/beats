@@ -1,0 +1,312 @@
+[[running-on-docker]]
+=== Running {beatname_uc} on Docker
+
+Docker images for {beatname_uc} are available from the Elastic Docker
+registry. The base image is https://hub.docker.com/_/centos/[centos:7].
+
+A list of all published Docker images and tags is available at
+https://www.docker.elastic.co[www.docker.elastic.co]. 
+
+These images are free to use under the Elastic license. They contain open source 
+and free commercial features and access to paid commercial features.  
+{xpack-ref}/license-management.html[Start a 30-day trial] to try out all of the 
+paid commercial features. See the 
+https://www.elastic.co/subscriptions[Subscriptions] page for information about 
+Elastic license levels.
+
+==== Pulling the image
+
+Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ command
+against the Elastic Docker registry.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+Alternatively, you can download other Docker images that contain only features
+available under the Apache 2.0 license. To download the images, go to 
+https://www.docker.elastic.co[www.docker.elastic.co]. 
+
+endif::[]
+
+ifndef::apm-server[]
+
+==== Run the {beatname_uc} setup
+
+Running {beatname_uc} with the setup command will create the index pattern and
+load visualizations
+ifndef::no_dashboards[]
+, dashboards,
+endif::no_dashboards[]
+and machine learning jobs.  Run this command:
+
+ifeval::["{beatname_lc}"=="filebeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="journalbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+--cap-add=NET_ADMIN \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+  --cap-add="AUDIT_CONTROL" \
+  --cap-add="AUDIT_READ" \
+  {dockerimage} \
+  setup -E setup.kibana.host=kibana:5601 \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+<1> Substitute your Kibana and Elasticsearch hosts and ports.
+<2> If you are using the hosted {ess} in {ecloud}, replace
+the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password
+using this syntax:
+
+[source,shell]
+--------------------------------------------
+-E cloud.id=<Cloud ID from Elasticsearch Service> \
+-E cloud.auth=elastic:<elastic password>
+--------------------------------------------
+
+endif::apm-server[]
+
+==== Configure {beatname_uc} on Docker
+
+The Docker image provides several methods for configuring {beatname_uc}. The
+conventional approach is to provide a configuration file via a volume mount, but 
+it's also possible to create a custom image with your
+configuration included.
+
+===== Example configuration file
+
+Download this example configuration file as a starting point:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O {dockerconfig}
+------------------------------------------------
+
+===== Volume-mounted configuration
+
+One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.docker.yml+ via a volume mount.
+With +docker run+, the volume mount can be specified like this.
+
+ifeval::["{beatname_lc}"=="filebeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user=root \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
+  --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
+  {dockerimage} {beatname_lc} -e -strict.perms=false \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="journalbeat"]
+Make sure you include the path to the host's journal. The path might be
+`/var/log/journal` or `/run/log/journal`.
+
+["source", "sh", subs="attributes"]
+--------------------------------------------
+sudo docker run -d \
+  --name={beatname_lc} \
+  --user=root \
+  --volume="/var/log/journal:/var/log/journal" \
+  --volume="/etc/machine-id:/etc/machine-id" \
+  --volume="/run/systemd:/run/systemd" \
+  --volume="/etc/hostname:/etc/hostname:ro" \
+  {dockerimage} {beatname_lc} -e -strict.perms=false \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user=root \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
+  --volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
+  --volume="/proc:/hostfs/proc:ro" \
+  --volume="/:/hostfs:ro" \
+  {dockerimage} {beatname_lc} -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --cap-add="NET_RAW" \
+  --cap-add="NET_ADMIN" \
+  --network=host \
+  {dockerimage} \
+  --strict.perms=false -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user=root \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --cap-add="AUDIT_CONTROL" \
+  --cap-add="AUDIT_READ" \
+  --pid=host \
+  {dockerimage} -e \
+  --strict.perms=false \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  {dockerimage} \
+  --strict.perms=false -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="apm-server"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  {dockerimage} \
+  --strict.perms=false -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+<1> Substitute your Elasticsearch hosts and ports.
+<2> If you are using the hosted {ess} in {ecloud}, replace
+the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password
+using the syntax shown earlier.
+
+===== Customize your configuration
+
+ifdef::has_docker_label_ex[]
+The +{beatname_lc}.docker.yml+ file you downloaded earlier is configured to deploy Beats modules based on the Docker labels applied to your containers.  See <<configuration-autodiscover-hints>> for more details. Add labels to your application Docker containers, and they will be picked up by the Beats autodiscover feature when they are deployed.  Here is an example command for an Apache HTTP Server container with labels to configure the Filebeat and Metricbeat modules for the Apache HTTP Server:
+
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+  --label co.elastic.logs/module=apache2 \
+  --label co.elastic.logs/fileset.stdout=access \
+  --label co.elastic.logs/fileset.stderr=error \
+  --label co.elastic.metrics/module=apache \
+  --label co.elastic.metrics/metricsets=status \
+  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+  --detach=true \
+  --name my-apache-app \
+  -p 8080:80 \
+  httpd:2.4
+--------------------------------------------
+endif::[]
+
+ifndef::has_docker_label_ex[]
+The +{beatname_lc}.docker.yml+ downloaded earlier should be customized for your environment. See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
+endif::[]
+
+===== Custom image configuration
+
+It's possible to embed your {beatname_uc} configuration in a custom image.
+Here is an example Dockerfile to achieve this:
+
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+["source", "dockerfile", subs="attributes"]
+--------------------------------------------
+FROM {dockerimage}
+COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER root
+RUN chown root:{beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER {beatname_lc}
+--------------------------------------------
+
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+
+["source", "dockerfile", subs="attributes"]
+--------------------------------------------
+FROM {dockerimage}
+COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+--------------------------------------------
+
+endif::[]

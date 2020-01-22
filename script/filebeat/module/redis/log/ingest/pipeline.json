@@ -1,0 +1,85 @@
+{
+    "description": "Pipeline for parsing redis logs",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "(%{POSINT:process.pid:long}:%{CHAR:redis.log.role} )?(%{REDISTIMESTAMP1:redis.log.timestamp}||%{REDISTIMESTAMP2:redis.log.timestamp}) %{REDISLEVEL:log.level} %{GREEDYDATA:message}",
+                    "%{POSINT:process.pid:long}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:message}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "[a-zA-Z]",
+                    "REDISLEVEL": "[.\\-*#]",
+                    "REDISTIMESTAMP1": "%{MONTHDAY} %{MONTH} %{TIME}",
+                    "REDISTIMESTAMP2": "%{MONTHDAY} %{MONTH} %{YEAR} %{TIME}"
+                }
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.log.level == params.dot) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.dash) {\n          ctx.log.level = params.verbose;\n        } else if (ctx.log.level == params.asterisk) {\n          ctx.log.level = params.notice;\n        } else if (ctx.log.level == params.hash) {\n          ctx.log.level = params.warning;\n        }",
+                "params": {
+                    "dot": ".",
+                    "debug": "debug",
+                    "dash": "-",
+                    "verbose": "verbose",
+                    "asterisk": "*",
+                    "notice": "notice",
+                    "hash": "#",
+                    "warning": "warning"
+                }
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.redis.log.role == params.master_abbrev) {\n          ctx.redis.log.role = params.master;\n        } else if (ctx.redis.log.role == params.slave_abbrev) {\n          ctx.redis.log.role = params.slave;\n        } else if (ctx.redis.log.role == params.child_abbrev) {\n          ctx.redis.log.role = params.child;\n        } else if (ctx.redis.log.role == params.sentinel_abbrev) {\n          ctx.redis.log.role = params.sentinel;\n        }\n        ",
+                "params": {
+                    "master_abbrev": "M",
+                    "master": "master",
+                    "slave_abbrev": "S",
+                    "slave": "slave",
+                    "child_abbrev": "C",
+                    "child": "child",
+                    "sentinel_abbrev": "X",
+                    "sentinel": "sentinel"
+                }
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "date": {
+                "field": "redis.log.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd MMM yyyy H:m:s.SSS",
+                    "dd MMM H:m:s.SSS",
+                    "dd MMM H:m:s",
+                    "UNIX"
+                ],
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "redis.log.timestamp",
+                "ignore_failure": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

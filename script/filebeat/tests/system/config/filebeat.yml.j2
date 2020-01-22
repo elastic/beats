@@ -1,0 +1,144 @@
+###################### Filebeat Config Template ###############################
+
+filebeat.{{input_config | default("inputs")}}:
+{% if inputs is not defined %}
+{% set inputs = true %}
+{% endif %}
+{% if inputs %}
+- type: {{type | default("log") }}
+  input_type: {{input_type_deprecated }}
+  # Paths that should be crawled and fetched
+  {% if path %}paths:
+    - {{ path }}{% endif %}
+  {% if disable_recursive_glob %}recursive_glob.enabled: false
+  {% endif %}
+  # Type of the files. Annotated in every documented
+  scan_frequency: {{scan_frequency | default("0.1s") }}
+  ignore_older: {{ignore_older}}
+  close_inactive: {{close_inactive}}
+  harvester_buffer_size: {{harvester_buffer_size}}
+  encoding: {{encoding | default("utf-8") }}
+  tail_files: {{tail_files}}
+  line_terminator: {{ line_terminator }}
+  backoff: 0.1s
+  backoff_factor: 1
+  max_backoff: 0.1s
+  close_removed: {{close_removed}}
+  close_renamed: {{close_renamed}}
+  close_eof: {{close_eof}}
+  close_timeout: {{close_timeout}}
+  clean_inactive: {{clean_inactive}}
+  clean_removed: {{clean_removed}}
+  harvester_limit: {{harvester_limit | default(0) }}
+  symlinks: {{symlinks}}
+  pipeline: {{pipeline}}
+  {%- if input_processors %}
+  processors:
+    {%- for processor in input_processors %}
+    {%- for name, settings in processor.items() %}
+    - {{name}}:
+      {%- if settings %}
+      {%- for k, v in settings.items() %}
+        {{k}}:
+          {{v | default([])}}
+      {%- endfor %}
+      {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  {% endif %}
+  {% if fields %}
+  fields:
+  {% for k,v in fields.items() %}
+    {{k}}: {{v}}
+  {% endfor %}
+  {% endif %}
+
+  fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
+
+  {% if include_lines %}
+  include_lines: {{include_lines}}
+  {% endif %}
+
+  {% if exclude_lines %}
+  exclude_lines: {{exclude_lines}}
+  {% endif %}
+
+  {% if exclude_files %}
+  exclude_files: {{exclude_files}}
+  {% endif %}
+
+  max_bytes: {{ max_bytes|default(10485760) }}
+
+  {% if json %}
+  json:
+    {% if json.message_key %}message_key: {{json.message_key}}{% endif %}
+    {% if json.keys_under_root %}keys_under_root: true{% endif %}
+    {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
+    {% if json.add_error_key %}add_error_key: true{% endif %}
+    {% if json.ignore_decoding_error %}ignore_decoding_error: true{% endif %}
+    {% if json.document_id %}document_id: {{json.document_id}}{% endif %}
+  {% endif %}
+
+  {% if multiline %}
+  multiline:
+    pattern: {{pattern}}
+    negate: {{negate}}
+    match: {{match}}
+    timeout: 1s
+    max_lines: {{ max_lines|default(500) }}
+  {% endif %}
+{% endif %}
+{% if input_raw %}
+{{input_raw}}
+{% endif %}
+
+filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+
+{% if not skip_registry_config %}
+filebeat.registry:
+  path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}
+  file_permissions: {{ registry_file_permissions|default("0600") }}
+  {% if registry_migrate_file %}
+  migrate_file: {{ beat.working_dir + '/' + registry_migrate_file }}
+  {% endif %}
+{%endif%}
+
+{% if reload or reload_path -%}
+filebeat.config.{{ reload_type|default("inputs") }}:
+  path: {{ reload_path }}
+  {% if reload  -%}
+  reload.period: 1s
+  reload.enabled: {{ reload|default("false") }}
+  {% endif -%}
+{% endif -%}
+
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  policy_name: libbeat-test-default-policy
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
+
+#============================== Autodiscover ==================================
+
+{% if autodiscover %}
+filebeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
+
+{% include './tests/system/config/libbeat.yml.j2' %}

@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-Apache-HTTPD-server-status
+      file: Metricbeat-apache-overview.json

@@ -1,0 +1,13 @@
+- key: jolokia
+  title: "Jolokia"
+  description: >
+    Jolokia module
+  short_config: false
+  release: ga
+  settings: ["ssl", "http"]
+  fields:
+    - name: jolokia
+      type: group
+      description: >
+          jolokia contains metrics exposed via jolokia agent
+      fields:

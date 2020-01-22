@@ -1,0 +1,123 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/dashboardsconfig.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-dashboards]]
+== Load the Kibana dashboards
+
+{beatname_uc} comes packaged with example Kibana dashboards, visualizations,
+and searches for visualizing {beatname_uc} data in Kibana.
+
+To load the dashboards, you can either enable dashboard loading in the
+`setup.dashboards` section of the +{beatname_lc}.yml+ config file, or you can
+run the `setup` command. Dashboard loading is disabled by default.
+
+When dashboard loading is enabled, {beatname_uc} uses the Kibana API to load the
+sample dashboards. Dashboard loading is only attempted when {beatname_uc} starts up.
+If Kibana is not available at startup, {beatname_uc} will stop with an error.
+
+To enable dashboard loading, add the following setting to the config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+setup.dashboards.enabled: true
+------------------------------------------------------------------------------
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `setup.dashboards` section of the
++{beatname_lc}.yml+ config file:
+
+[float]
+==== `setup.dashboards.enabled`
+
+If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
+
+NOTE: When dashboard loading is enabled, {beatname_uc} overwrites any existing
+dashboards that match the names of the dashboards you are loading. This happens
+every time {beatname_uc} starts. 
+
+If no other options are set, the dashboard are loaded
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
+To load dashboards from a different location, you can configure one of the
+following options: <<directory-option,`setup.dashboards.directory`>>,
+<<url-option,`setup.dashboards.url`>>, or
+<<file-option,`setup.dashboards.file`>>.
+
+[float]
+[[directory-option]]
+==== `setup.dashboards.directory`
+
+The directory that contains the dashboards to load. The default is the `kibana`
+folder in the home path.
+
+[float]
+[[url-option]]
+==== `setup.dashboards.url`
+
+The URL to use for downloading the dashboard archive. If this option
+is set, {beatname_uc} downloads the dashboard archive from the specified URL
+instead of using the local directory.
+
+[float]
+[[file-option]]
+==== `setup.dashboards.file`
+
+The file archive (zip file) that contains the dashboards to load. If this option
+is set, {beatname_uc} looks for a dashboard archive in the specified path
+instead of using the local directory.
+
+[float]
+==== `setup.dashboards.beat`
+
+In case the archive contains the dashboards for multiple Beats, this setting
+lets you select the Beat for which you want to load dashboards. To load all the
+dashboards in the archive, set this option to an empty string. The default is
++"{beatname_lc}"+.
+
+[float]
+==== `setup.dashboards.kibana_index`
+
+The name of the Kibana index to use for setting the configuration. The default
+is `".kibana"`
+
+
+[float]
+==== `setup.dashboards.index`
+
+The Elasticsearch index name. This setting overwrites the index name defined
+in the dashboards and index pattern. Example: `"testbeat-*"`
+
+NOTE: This setting only works for Kibana 6.0 and newer.
+
+[float]
+==== `setup.dashboards.always_kibana`
+
+Force loading of dashboards using the Kibana API without querying Elasticsearch for the version.
+The default is `false`.
+
+[float]
+==== `setup.dashboards.retry.enabled`
+
+If this option is set to true, and Kibana is not reachable at the time when dashboards are loaded,
+ {beatname_uc} will retry to reconnect to Kibana instead of exiting with an error. Disabled by default.
+
+[float]
+==== `setup.dashboards.retry.interval`
+
+Duration interval between Kibana connection retries. Defaults to 1 second.
+
+[float]
+==== `setup.dashboards.retry.maximum`
+
+Maximum number of retries before exiting with an error. Set to 0 for unlimited retrying.
+Default is unlimited.

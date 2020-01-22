@@ -1,0 +1,104 @@
+- name: collstats
+  type: group
+  description: >
+    MongoDB collection statistics metrics.
+  release: ga
+  fields:
+    - name: db
+      type: keyword
+      description: >
+        Database name.
+
+    - name: collection
+      type: keyword
+      description: >
+        Collection name.
+
+    - name: name
+      type: keyword
+      description: >
+        Combination of database and collection name.
+
+    - name: total.time.us
+      type: long
+      description: >
+        Total waiting time for locks in microseconds.
+    - name: total.count
+      type: long
+      description: >
+        Total number of lock wait events.
+
+    - name: lock
+      type: group
+      fields:
+        - name: read.time.us
+          type: long
+          description: >
+            Time waiting for read locks in microseconds.
+        - name: read.count
+          type: long
+          description: >
+            Number of read lock wait events.
+
+        - name: write.time.us
+          type: long
+          description: >
+            Time waiting for write locks in microseconds.
+        - name: write.count
+          type: long
+          description: >
+            Number of write lock wait events.
+
+    - name: queries.time.us
+      type: long
+      description: >
+        Time running queries in microseconds.
+    - name: queries.count
+      type: long
+      description: >
+        Number of queries executed.
+
+    - name: getmore.time.us
+      type: long
+      description: >
+        Time asking for more cursor rows in microseconds.
+    - name: getmore.count
+      type: long
+      description: >
+        Number of times a cursor asked for more data.
+
+    - name: insert.time.us
+      type: long
+      description: >
+        Time inserting new documents in microseconds.
+    - name: insert.count
+      type: long
+      description: >
+        Number of document insert events.
+
+    - name: update.time.us
+      type: long
+      description: >
+        Time updating documents in microseconds.
+    - name: update.count
+      type: long
+      description: >
+        Number of document update events.
+
+    - name: remove.time.us
+      type: long
+      description: >
+        Time deleting documents in microseconds.
+    - name: remove.count
+      type: long
+      description: >
+        Number of document delete events.
+
+    - name: commands.time.us
+      type: long
+      description: >
+        Time executing database commands in microseconds.
+    - name: commands.count
+      type: long
+      description: >
+        Number of database commands executed.

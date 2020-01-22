@@ -1,0 +1,113 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-redis]]
+:modulename: redis
+:has-dashboards: true
+
+== Redis module
+
+The +{modulename}+ module parses logs and slowlogs created by
+https://redis.io/[Redis].
+
+include::../include/what-happens.asciidoc[]
+
+The +{modulename}+ module has two filesets:
+
+* The `log` fileset collects and parses the logs that Redis writes to disk.  
+* The `slowlog` fileset connects to Redis via the network and retrieves the slow logs
+  by using the `SLOWLOG` command.
+
+For the `log` fileset, make sure the `logfile` option, from the Redis
+configuration file, is set to `redis-server.log`.
+
+For the `slowlog` fileset, make sure the `slowlog-log-slower-than` option, from
+the Redis configuration file, is set to a lower value than the default one.
+
+[float]
+=== Compatibility
+
+The Redis `log` fileset was tested with logs from Redis versions 1.2.6, 2.4.6, and 3.0.2, so we
+expect compatibility with any version 1.x, 2.x, or 3.x.
+
+On Windows, the default paths assume that Redis was installed from the Chocolatey repository.
+
+The Redis `slowlog` fileset was tested with Redis 3.0.2 and 2.4.6. We expect compatibility with any
+Redis version newer than 2.2.12, when the SLOWLOG command was added.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-redis.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Redis logs. It also shows how to set the
+host and password to retrieve slow logs: 
+
+["source","yaml",subs="attributes"]
+-----
+- module: redis
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/redis/redis-server.log*"]
+  slowlog:
+    enabled: true
+    var.hosts: ["localhost:6378"]
+    var.password: "{pwd}"
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "redis.log.var.paths=[/path/to/log/redis/redis-server.log*]" -M "redis.slowlog.var.hosts=[localhost:6378]" -M "redis.slowlog.var.password=[YOUR_PASSWORD]"
+-----
+
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `slowlog` fileset settings
+
+*`var.hosts`*::
+
+An array of hosts to which Filebeat should connect to retrieve the slow logs. If
+left empty, `localhost:6379` is assumed.
+
+*`var.password`*::
+
+The password to use to connect to Redis, in case Redis authentication is enabled
+(the `requirepass` option in the Redis configuration).
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-redis,exported fields>> section.
+

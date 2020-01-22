@@ -1,0 +1,29 @@
+- module: jolokia
+  #metricsets: ["jmx"]
+  period: 10s
+  hosts: ["localhost"]
+  namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
+  jmx.mappings:
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
+    # GC Metrics - this depends on what is available on your JVM
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:

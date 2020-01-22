@@ -1,0 +1,11 @@
+- key: traefik
+  title: "traefik"
+  description: >
+    Traefik reverse proxy / load balancer metrics
+  release: ga
+  fields:
+    - name: traefik
+      type: group
+      description: >
+        Traefik reverse proxy / load balancer metrics
+      fields:

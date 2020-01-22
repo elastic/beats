@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/auth.log*
+      - /var/log/secure*
+    os.darwin:
+      # this works in OS X < 10.8. Newer darwin versions don't write
+      # ssh logs to files
+      - /var/log/secure.log*
+    os.windows: []
+
+ingest_pipeline: ingest/pipeline.json
+input: config/auth.yml

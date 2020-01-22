@@ -1,0 +1,44 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-zeek]]
+[role="xpack"]
+
+:modulename: zeek
+:has-dashboards: true
+
+== Zeek (Bro) Module
+
+This is a module for Zeek, which used to be called Bro. It parses logs that are in the
+https://www.zeek.org/manual/release/logs/index.html[Zeek JSON format].
+
+[float]
+=== Compatibility
+
+This module has been developed against Zeek 2.6.1, but is expected to work
+with other versions of Zeek.
+
+Zeek requires a Unix-like platform, and it currently supports Linux, FreeBSD, and Mac OS X.
+Find out how to use Zeek here: https://www.zeek.org/
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-zeek.png[]
+
+:has-dashboards!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-zeek,exported fields>> section.
+

@@ -1,0 +1,90 @@
+[[configuring-howto-metricbeat]]
+= Configuring {beatname_uc}
+
+[partintro]
+--
+Before modifying configuration settings, make sure you've completed the
+<<metricbeat-configuration,configuration steps>> in the Getting Started.
+This section describes some common use cases for changing configuration options.
+
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
+you’ll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
+There's also a full example configuration file at
++/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated
+options. For mac and win, look in the archive that you extracted.
+
+The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
+See the {beats-ref}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+The following topics describe how to configure {beatname_uc}:
+
+* <<configuration-metricbeat>>
+* <<configuration-general-options>>
+* <<metricbeat-configuration-reloading>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<ilm>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-dashboards>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+* <<configuration-autodiscover>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<http-endpoint>>
+* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./metricbeat-options.asciidoc[]
+
+include::./metricbeat-general-options.asciidoc[]
+
+include::./reload-configuration.asciidoc[]
+
+include::{libbeat-dir}/queueconfig.asciidoc[]
+
+include::{libbeat-dir}/outputconfig.asciidoc[]
+
+include::{libbeat-dir}/shared-ilm.asciidoc[]
+
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
+
+include::./metricbeat-filtering.asciidoc[]
+
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
+
+include::{libbeat-dir}/shared-geoip.asciidoc[]
+
+include::{libbeat-dir}/shared-path-config.asciidoc[]
+
+include::{libbeat-dir}/shared-kibana-config.asciidoc[]
+
+include::{libbeat-dir}/setup-config.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
+
+:autodiscoverJolokia:
+:autodiscoverHints:
+include::{libbeat-dir}/shared-autodiscover.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
+
+include::{libbeat-dir}/regexp.asciidoc[]
+
+include::{libbeat-dir}/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/reference-yml.asciidoc[]

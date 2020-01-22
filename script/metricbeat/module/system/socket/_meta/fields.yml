@@ -1,0 +1,90 @@
+- name: socket
+  type: group
+  description: >
+    TCP sockets that are active.
+  release: ga
+  fields:
+    - name: direction
+      type: alias
+      path: network.direction
+      migration: true
+
+    - name: family
+      type: alias
+      path: network.type
+      migration: true
+
+    - name: local.ip
+      type: ip
+      example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+      description: >
+        Local IP address. This can be an IPv4 or IPv6 address.
+
+    - name: local.port
+      type: long
+      example: 22
+      description: >
+        Local port.
+
+    - name: remote.ip
+      type: ip
+      example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+      description: >
+        Remote IP address. This can be an IPv4 or IPv6 address.
+
+    - name: remote.port
+      type: long
+      example: 22
+      description: >
+        Remote port.
+
+    - name: remote.host
+      type: keyword
+      example: 76-211-117-36.nw.example.com.
+      description: >
+        PTR record associated with the remote IP. It is obtained via reverse
+        IP lookup.
+
+    - name: remote.etld_plus_one
+      type: keyword
+      example: example.com.
+      description: >
+       The effective top-level domain (eTLD) of the remote host plus one more
+       label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
+       The data for determining the eTLD comes from an embedded copy of the data
+       from http://publicsuffix.org.
+
+    - name: remote.host_error
+      type: keyword
+      description: >
+        Error describing the cause of the reverse lookup failure.
+
+    - name: process.pid
+      type: alias
+      path: process.pid
+      migration: true
+
+    - name: process.command
+      type: alias
+      path: process.name
+      migration: true
+
+    - name: process.cmdline
+      type: keyword
+      description: >
+        Full command line
+
+    - name: process.exe
+      type: alias
+      path: process.executable
+      migration: true
+
+    - name: user.id
+      type: alias
+      path: user.id
+      migration: true
+
+    - name: user.name
+      type: alias
+      path: user.full_name
+      migration: true

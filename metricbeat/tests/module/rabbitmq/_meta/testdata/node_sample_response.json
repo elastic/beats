@@ -1,0 +1,337 @@
+{
+  "partitions": [],
+  "os_pid": "133",
+  "fd_total": 1048576,
+  "sockets_total": 943626,
+  "mem_limit": 6628692787,
+  "mem_alarm": false,
+  "disk_free_limit": 50000000,
+  "disk_free_alarm": false,
+  "proc_total": 1048576,
+  "rates_mode": "basic",
+  "uptime": 98754834,
+  "run_queue": 0,
+  "processors": 4,
+  "exchange_types": [
+    {
+      "name": "fanout",
+      "description": "AMQP fanout exchange, as per the AMQP specification",
+      "enabled": true
+    },
+    {
+      "name": "topic",
+      "description": "AMQP topic exchange, as per the AMQP specification",
+      "enabled": true
+    },
+    {
+      "name": "direct",
+      "description": "AMQP direct exchange, as per the AMQP specification",
+      "enabled": true
+    },
+    {
+      "name": "headers",
+      "description": "AMQP headers exchange, as per the AMQP specification",
+      "enabled": true
+    }
+  ],
+  "auth_mechanisms": [
+    {
+      "name": "AMQPLAIN",
+      "description": "QPid AMQPLAIN mechanism",
+      "enabled": true
+    },
+    {
+      "name": "PLAIN",
+      "description": "SASL PLAIN authentication mechanism",
+      "enabled": true
+    },
+    {
+      "name": "RABBIT-CR-DEMO",
+      "description": "RabbitMQ Demo challenge-response authentication mechanism",
+      "enabled": false
+    }
+  ],
+  "applications": [
+    {
+      "name": "amqp_client",
+      "description": "RabbitMQ AMQP Client",
+      "version": "3.7.4"
+    },
+    {
+      "name": "asn1",
+      "description": "The Erlang ASN1 compiler version 5.0.4",
+      "version": "5.0.4"
+    },
+    {
+      "name": "compiler",
+      "description": "ERTS  CXC 138 10",
+      "version": "7.1.4"
+    },
+    {
+      "name": "cowboy",
+      "description": "Small, fast, modern HTTP server.",
+      "version": "2.2.2"
+    },
+    {
+      "name": "cowlib",
+      "description": "Support library for manipulating Web protocols.",
+      "version": "2.1.0"
+    },
+    {
+      "name": "crypto",
+      "description": "CRYPTO",
+      "version": "4.2"
+    },
+    {
+      "name": "goldrush",
+      "description": "Erlang event stream processor",
+      "version": "0.1.9"
+    },
+    {
+      "name": "inets",
+      "description": "INETS  CXC 138 49",
+      "version": "6.4.5"
+    },
+    {
+      "name": "jsx",
+      "description": "a streaming, evented json parsing toolkit",
+      "version": "2.8.2"
+    },
+    {
+      "name": "kernel",
+      "description": "ERTS  CXC 138 10",
+      "version": "5.4.2"
+    },
+    {
+      "name": "lager",
+      "description": "Erlang logging framework",
+      "version": "3.5.1"
+    },
+    {
+      "name": "mnesia",
+      "description": "MNESIA  CXC 138 12",
+      "version": "4.15.3"
+    },
+    {
+      "name": "os_mon",
+      "description": "CPO  CXC 138 46",
+      "version": "2.4.4"
+    },
+    {
+      "name": "public_key",
+      "description": "Public key infrastructure",
+      "version": "1.5.2"
+    },
+    {
+      "name": "rabbit",
+      "description": "RabbitMQ",
+      "version": "3.7.4"
+    },
+    {
+      "name": "rabbit_common",
+      "description": "Modules shared by rabbitmq-server and rabbitmq-erlang-client",
+      "version": "3.7.4"
+    },
+    {
+      "name": "rabbitmq_management",
+      "description": "RabbitMQ Management Console",
+      "version": "3.7.4"
+    },
+    {
+      "name": "rabbitmq_management_agent",
+      "description": "RabbitMQ Management Agent",
+      "version": "3.7.4"
+    },
+    {
+      "name": "rabbitmq_web_dispatch",
+      "description": "RabbitMQ Web Dispatcher",
+      "version": "3.7.4"
+    },
+    {
+      "name": "ranch",
+      "description": "Socket acceptor pool for TCP protocols.",
+      "version": "1.4.0"
+    },
+    {
+      "name": "ranch_proxy_protocol",
+      "description": "Ranch Proxy Protocol Transport",
+      "version": "1.4.4"
+    },
+    {
+      "name": "recon",
+      "description": "Diagnostic tools for production use",
+      "version": "2.3.2"
+    },
+    {
+      "name": "sasl",
+      "description": "SASL  CXC 138 11",
+      "version": "3.1.1"
+    },
+    {
+      "name": "ssl",
+      "description": "Erlang/OTP SSL application",
+      "version": "8.2.3"
+    },
+    {
+      "name": "stdlib",
+      "description": "ERTS  CXC 138 10",
+      "version": "3.4.3"
+    },
+    {
+      "name": "syntax_tools",
+      "description": "Syntax tools",
+      "version": "2.1.4"
+    },
+    {
+      "name": "xmerl",
+      "description": "XML parser",
+      "version": "1.3.16"
+    }
+  ],
+  "contexts": [
+    {
+      "description": "RabbitMQ Management",
+      "path": "/",
+      "ssl": "false",
+      "port": "15672"
+    }
+  ],
+  "log_files": [
+    "<stdout>"
+  ],
+  "db_dir": "/var/lib/rabbitmq/mnesia/rabbit@e2b1ae6390fd",
+  "config_files": [
+    "/etc/rabbitmq/rabbitmq.conf"
+  ],
+  "net_ticktime": 60,
+  "enabled_plugins": [
+    "rabbitmq_management"
+  ],
+  "mem_calculation_strategy": "rss",
+  "name": "rabbit@e2b1ae6390fd",
+  "type": "disc",
+  "running": true,
+  "mem_used": 105504768,
+  "mem_used_details": {
+    "rate": -3276.8
+  },
+  "fd_used": 31,
+  "fd_used_details": {
+    "rate": 0
+  },
+  "sockets_used": 3,
+  "sockets_used_details": {
+    "rate": 0
+  },
+  "proc_used": 403,
+  "proc_used_details": {
+    "rate": 0
+  },
+  "disk_free": 98317942784,
+  "disk_free_details": {
+    "rate": -6553.6
+  },
+  "gc_num": 1049055,
+  "gc_num_details": {
+    "rate": 20
+  },
+  "gc_bytes_reclaimed": 27352751800,
+  "gc_bytes_reclaimed_details": {
+    "rate": 529257.6
+  },
+  "context_switches": 5377028,
+  "context_switches_details": {
+    "rate": 114.6
+  },
+  "io_read_count": 3,
+  "io_read_count_details": {
+    "rate": 0
+  },
+  "io_read_bytes": 1,
+  "io_read_bytes_details": {
+    "rate": 0
+  },
+  "io_read_avg_time": 0.063,
+  "io_read_avg_time_details": {
+    "rate": 0
+  },
+  "io_write_count": 149402,
+  "io_write_count_details": {
+    "rate": 4
+  },
+  "io_write_bytes": 36305460,
+  "io_write_bytes_details": {
+    "rate": 972
+  },
+  "io_write_avg_time": 0.23600591692212955,
+  "io_write_avg_time_details": {
+    "rate": 0.2701
+  },
+  "io_sync_count": 149402,
+  "io_sync_count_details": {
+    "rate": 4
+  },
+  "io_sync_avg_time": 2.776535053078272,
+  "io_sync_avg_time_details": {
+    "rate": 1.9805
+  },
+  "io_seek_count": 23,
+  "io_seek_count_details": {
+    "rate": 0
+  },
+  "io_seek_avg_time": 0.077,
+  "io_seek_avg_time_details": {
+    "rate": 0
+  },
+  "io_reopen_count": 0,
+  "io_reopen_count_details": {
+    "rate": 0
+  },
+  "mnesia_ram_tx_count": 92,
+  "mnesia_ram_tx_count_details": {
+    "rate": 0
+  },
+  "mnesia_disk_tx_count": 1,
+  "mnesia_disk_tx_count_details": {
+    "rate": 0
+  },
+  "msg_store_read_count": 0,
+  "msg_store_read_count_details": {
+    "rate": 0
+  },
+  "msg_store_write_count": 0,
+  "msg_store_write_count_details": {
+    "rate": 0
+  },
+  "queue_index_journal_write_count": 448230,
+  "queue_index_journal_write_count_details": {
+    "rate": 12
+  },
+  "queue_index_write_count": 2,
+  "queue_index_write_count_details": {
+    "rate": 0
+  },
+  "queue_index_read_count": 0,
+  "queue_index_read_count_details": {
+    "rate": 0
+  },
+  "io_file_handle_open_attempt_count": 597670,
+  "io_file_handle_open_attempt_count_details": {
+    "rate": 16
+  },
+  "io_file_handle_open_attempt_avg_time": 0.004204301704954239,
+  "io_file_handle_open_attempt_avg_time_details": {
+    "rate": 0.0052875
+  },
+  "cluster_links": [],
+  "metrics_gc_queue_length": {
+    "connection_closed": 0,
+    "channel_closed": 0,
+    "consumer_deleted": 0,
+    "exchange_deleted": 0,
+    "queue_deleted": 0,
+    "vhost_deleted": 0,
+    "node_node_deleted": 0,
+    "channel_consumer_deleted": 0
+  }
+}

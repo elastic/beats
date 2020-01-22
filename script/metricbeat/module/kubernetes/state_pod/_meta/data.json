@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.pod",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "namespace": "kube-system",
+        "node": {
+            "name": "minikube"
+        },
+        "pod": {
+            "host_ip": "192.168.99.100",
+            "ip": "172.17.0.2",
+            "name": "tiller-deploy-3067024529-9lpmb",
+            "status": {
+                "phase": "running",
+                "ready": "true",
+                "scheduled": "true"
+            }
+        }
+    },
+    "metricset": {
+        "name": "state_pod",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}

@@ -1,0 +1,10 @@
+- key: {module}
+  title: "{module}"
+  release: beta
+  description: >
+    {module} module
+  fields:
+    - name: {module}
+      type: group
+      description: >
+      fields:

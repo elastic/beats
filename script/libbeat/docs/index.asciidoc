@@ -1,0 +1,37 @@
+= Beats Platform Reference
+
+:libbeat-dir: {docdir}/../../libbeat/docs
+
+include::./version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+:beatname_lc: beatname
+:beatname_uc: a Beat
+:beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs:
+
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
+
+include::./overview.asciidoc[]
+
+include::./communitybeats.asciidoc[]
+
+include::./gettingstarted.asciidoc[]
+
+include::./config-file-format.asciidoc[]
+
+include::./upgrading.asciidoc[]
+
+include::./release-notes/highlights/highlights.asciidoc[]
+
+include::./release-notes/breaking/breaking.asciidoc[]
+
+include::./release.asciidoc[]
+
+include::{libbeat-dir}/contributing-to-beats.asciidoc[]

@@ -1,0 +1,70 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/https.asciidoc[]
+//// This content is structured to be included as a whole file.
+//////////////////////////////////////////////////////////////////////////
+
+To secure the communication between {beatname_uc} and Elasticsearch, you can use
+HTTPS and basic authentication. Basic authentication for Elasticsearch is
+available when you enable {security} (see
+{ref}/secure-cluster.html[Secure a cluster] and <<securing-beats>>).
+If you aren't using {security}, you can use a web proxy instead.
+
+Here is a sample configuration:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output.elasticsearch:
+  username: {beatname_lc} <1>
+  password: verysecret <2>
+  protocol: https <3>
+  hosts: ["elasticsearch.example.com:9200"] <4>
+----------------------------------------------------------------------
+<1> The username to use for authenticating to Elasticsearch.
+<2> The password to use for authenticating to Elasticsearch.
+<3> This setting enables the HTTPS protocol.
+<4> The IP and port of the Elasticsearch nodes.
+
+TIP: To obfuscate passwords and other sensitive settings, use the
+<<keystore,secrets keystore>>.
+
+{beatname_uc} verifies the validity of the server certificates and only accepts trusted
+certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
+this document.
+
+By default {beatname_uc} uses the list of trusted certificate authorities from the
+operating system where {beatname_uc} is running. You can configure {beatname_uc} to use a specific list of
+CA certificates instead of the list from the OS. You can also configure it to use client authentication
+by specifying the certificate and key to use when the server requires the {beatname_uc} to authenticate. Here is an example
+configuration:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output.elasticsearch:
+  username: {beatname_lc}
+  password: verysecret
+  protocol: https
+  hosts: ["elasticsearch.example.com:9200"]
+  ssl.certificate_authorities: <1>
+    - /etc/pki/my_root_ca.pem
+    - /etc/pki/my_other_ca.pem
+  ssl.certificate: "/etc/pki/client.pem" <2>
+  ssl.key: "/etc/pki/key.pem" <3>
+----------------------------------------------------------------------
+<1> The list of CA certificates to trust
+<2> The path to the certificate for SSL client authentication
+<3> The client certificate key
+
+NOTE: For any given connection, the SSL/TLS certificates must have a subject
+that matches the value specified for `hosts`, or the SSL handshake fails.
+For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST
+include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
+(SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then
+you can associate the IP address with your hostname in `/etc/hosts`
+(on Unix) or `C:\Windows\System32\drivers\etc\hosts` (on Windows).

@@ -1,0 +1,36 @@
+{
+  "description": "Pipeline for parsing icinga debug logs",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "\\[%{TIMESTAMP:icinga.debug.timestamp}\\] %{WORD:log.level}/%{WORD:icinga.debug.facility}: %{GREEDYMULTILINE:message}"
+      ],
+      "ignore_missing": true,
+      "pattern_definitions": {
+        "TIMESTAMP": "%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND} %{ISO8601_TIMEZONE}",
+        "GREEDYMULTILINE": "(.|\n)*"
+      }
+    }
+  },
+  {
+    "date": {
+      "field": "icinga.debug.timestamp",
+      "target_field": "@timestamp",
+      "formats": ["yyyy-MM-dd HH:mm:ss Z"],
+      "ignore_failure": true
+    }
+  },
+  {
+    "remove": {
+      "field": "icinga.debug.timestamp"
+    }
+
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

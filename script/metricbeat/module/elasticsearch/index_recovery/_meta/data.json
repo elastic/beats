@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1"
+        },
+        "index": {
+            "name": ".monitoring-es-6-2018.11.20",
+            "recovery": {
+                "id": 0,
+                "primary": true,
+                "source": {},
+                "stage": "DONE",
+                "target": {
+                    "host": "127.0.0.1",
+                    "id": "FMRmkE3HTU6xxxoFK-06Ww",
+                    "name": "es1_1"
+                },
+                "type": "EMPTY_STORE"
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "index_recovery",
+        "namespace": "elasticsearch.index.recovery",
+        "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
+    }
+}

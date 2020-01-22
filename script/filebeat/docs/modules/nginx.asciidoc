@@ -1,0 +1,91 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-nginx]]
+:modulename: nginx
+:has-dashboards: true
+
+
+== Nginx module
+
+The +{modulename}+ module parses access and error logs created by the
+http://nginx.org/[Nginx] HTTP server.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Nginx module was tested with logs from version 1.10.
+
+On Windows, the module was tested with Nginx installed from the Chocolatey
+repository.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-nginx.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for access logs and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: nginx
+  access:
+    enabled: true
+    var.paths: ["/path/to/log/nginx/access.log*"]
+  error:
+    enabled: true
+    var.paths: ["/path/to/log/nginx/error.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
+-----
+
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: access
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `access` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `error` log fileset
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-nginx,exported fields>> section.
+

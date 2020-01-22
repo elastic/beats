@@ -1,0 +1,38 @@
+[2018-06-29T10:06:14,933][INFO ][index.search.slowlog.query] [v_VJhjV] [metricbeat-6.3.0-2018.06.26][0] took[4.5ms], took_millis[4], total_hits[19435], types[], stats[group1,group2], search_type[QUERY_THEN_FETCH], total_shards[1], source[{"query":{"match_all":{"boost":1.0}}}],
+[2018-06-29T10:06:14,943][INFO ][index.search.slowlog.fetch] [v_VJhjV] [metricbeat-6.3.0-2018.06.26][0] took[10.8ms], took_millis[10], total_hits[19435], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], source[{"query":{"match_all":{"boost":1.0}}}],
+[2018-06-29T09:01:01,821][INFO ][index.search.slowlog.query] [v_VJhjV] [metricbeat-6.3.0-2018.06.26][0] took[124.3ms], took_millis[124], total_hits[0], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], source[{"size":500,"query":{"match_none":{"boost":1.0}},"version":true,"_source":{"includes":[],"excludes":[]},"stored_fields":"*","docvalue_fields":["@timestamp","ceph.monitor_health.last_updated","docker.container.created","docker.healthcheck.event.end_date","docker.healthcheck.event.start_date","docker.image.created","kubernetes.container.start_time","kubernetes.event.metadata.timestamp.created","kubernetes.node.start_time","kubernetes.pod.start_time","kubernetes.system.start_time","mongodb.status.background_flushing.last_finished","mongodb.status.local_time","php_fpm.pool.start_time","postgresql.activity.backend_start","postgresql.activity.query_start","postgresql.activity.state_change","postgresql.activity.transaction_start","postgresql.bgwriter.stats_reset","postgresql.database.stats_reset","system.process.cpu.start_time"],"script_fields":{},"sort":[{"@timestamp":{"order":"desc","unmapped_type":"boolean"}}],"aggregations":{"2":{"date_histogram":{"field":"@timestamp","time_zone":"Europe/Berlin","interval":"30s","offset":0,"order":{"_key":"asc"},"keyed":false,"min_doc_count":1}}},"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fragment_size":2147483647,"fields":{"*":{}}}}],
+[2018-06-29T09:01:01,827][INFO ][index.search.slowlog.fetch] [v_VJhjV] [metricbeat-6.3.0-2018.06.26][0] took[7.2ms], took_millis[7], total_hits[0], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], source[{"size":500,"query":{"match_none":{"boost":1.0}},"version":true,"_source":{"includes":[],"excludes":[]},"stored_fields":"*","docvalue_fields":["@timestamp","ceph.monitor_health.last_updated","docker.container.created","docker.healthcheck.event.end_date","docker.healthcheck.event.start_date","docker.image.created","kubernetes.container.start_time","kubernetes.event.metadata.timestamp.created","kubernetes.node.start_time","kubernetes.pod.start_time","kubernetes.system.start_time","mongodb.status.background_flushing.last_finished","mongodb.status.local_time","php_fpm.pool.start_time","postgresql.activity.backend_start","postgresql.activity.query_start","postgresql.activity.state_change","postgresql.activity.transaction_start","postgresql.bgwriter.stats_reset","postgresql.database.stats_reset","system.process.cpu.start_time"],"script_fields":{},"sort":[{"@timestamp":{"order":"desc","unmapped_type":"boolean"}}],"aggregations":{"2":{"date_histogram":{"field":"@timestamp","time_zone":"Europe/Berlin","interval":"30s","offset":0,"order":{"_key":"asc"},"keyed":false,"min_doc_count":1}}},"highlight":{"pre_tags":["@kibana-highlighted-field@"],"post_tags":["@/kibana-highlighted-field@"],"fragment_size":2147483647,"fields":{"*":{}}}}],
+[2018-07-04T13:48:07,452][INFO ][index.indexing.slowlog.index] [v_VJhjV] [metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg] took[1.4ms], took_millis[1], type[doc], id[KUyMZWQBk9jw4gtg2y5-], routing[], source[{"@timestamp":"2018-07-04T13:47:50.747Z","system":{"process":{"ppid":34526,"state":"running","cpu":{"total":{"value":734879,"pct":0.0173,"norm":{"pct":0.0043}},"start_time":"2018-07-04T06:56:34.863Z"},"pgid":34526,"cmdline":"/Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -childID 1 -isForBrowser -prefsLen 22119 -schedulerPrefs 0001,2 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appdir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/rado/Library/Application Support/Firefox/Profiles/pt6eoq1j.default-1484133908360 34526 gecko-crash-server-pipe.34526 org.mozilla.machname.231926932 tab","name":"plugin-containe","memory":{"size":7489249280,"rss":{"bytes":567619584,"pct":0.033},"share":0},"pid":34528,"username":"rado"}},"metricset":{"name":"process","module":"system","rtt":43856},"beat":{"hostname":"Rados-MacBook-Pro.local","version":"6.3.0","name":"Rados-MacBook-Pro.local"},"host":{"name":"Rados-MacBook-Pro.local"}}]
+[2018-07-04T21:51:30,411][INFO ][index.indexing.slowlog.index] [v_VJhjV] [metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg] took[1.7ms], took_millis[1], type[doc], id[s01HZ2QBk9jw4gtgaFtn], routing[], source[
+{
+  "@timestamp":"2018-07-04T21:27:30.730Z",
+  "metricset":{
+    "name":"network",
+    "module":"system",
+    "rtt":7264},
+    "system":{
+      "network":{
+        "name":"lo0",
+        "in":{
+          "errors":0,
+          "dropped":0,
+          "bytes":77666873,
+          "packets":244595},
+          "out":{
+            "packets":244595,
+            "bytes":77666873,
+            "errors":0,
+            "dropped":0
+          }
+        }
+      },
+      "beat":{
+        "name":"Rados-MacBook-Pro.local",
+        "hostname":"Rados-MacBook-Pro.local",
+        "version":"6.3.0"
+      },
+      "host":{
+        "name":"Rados-MacBook-Pro.local"
+      }
+    }]
+[2019-11-14T21:18:40,269][TRACE][index.search.slowlog.query] [exp-data-elasticsearc-2] [exp_v3_1_current][3] took[516.4ms], took_millis[516], types[encounter], stats[], search_type[QUERY_THEN_FETCH], total_shards[10], source[{"size":1000,"query":{"constant_score":{"filter":{"bool":{"must":[{"bool":{"should":[{"nested":{"query":{"constant_score":{"filter":{"bool":{"must":[{"term":{"diagnosis.dx_rank":{"value":1,"boost":1.0}}}],"disable_coord":false,"adjust_pure_negative":true,"boost":1.0}},"boost":1.0}},"path":"diagnosis","ignore_unmapped":true,"score_mode":"avg","boost":1.0}},{"nested":{"query":{"constant_score":{"filter":{"bool":{"must":[{"term":{"procedure.px_rank":{"value":1,"boost":1.0}}}],"disable_coord":false,"adjust_pure_negative":true,"boost":1.0}},"boost":1.0}},"path":"procedure","ignore_unmapped":true,"score_mode":"avg","boost":1.0}}],"disable_coord":false,"adjust_pure_negative":true,"boost":1.0}}],"must_not":[{"exists":{"field":"primary_px_key","boost":1.0}}],"disable_coord":false,"adjust_pure_negative":true,"boost":1.0}},"boost":1.0}},"version":true,"sort":[{"_doc":{"order":"asc"}}]}]

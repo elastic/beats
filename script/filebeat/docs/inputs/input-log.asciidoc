@@ -1,0 +1,110 @@
+:type: log
+
+[id="{beatname_lc}-input-{type}"]
+=== Log input
+
+++++
+<titleabbrev>Log</titleabbrev>
+++++
+
+Use the `log` input to read lines from log files.
+
+To configure this input, specify a list of glob-based <<input-paths,`paths`>>
+that must be crawled to locate and fetch the log lines.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: log
+  paths:
+    - /var/log/messages
+    - /var/log/*.log
+----
+
+
+You can apply additional
+<<{beatname_lc}-input-{type}-options,configuration settings>> (such as `fields`,
+`include_lines`, `exclude_lines`, `multiline`, and so on) to the lines harvested
+from these files. The options that you specify are applied to all the files
+harvested by this input.
+
+To apply different configuration settings to different files, you need to define
+multiple input sections:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: log <1>
+  paths:
+    - /var/log/system.log
+    - /var/log/wifi.log
+- type: log <2>
+  paths:
+    - "/var/log/apache2/*"
+  fields:
+    apache: true
+  fields_under_root: true
+----
+
+<1> Harvests lines from two files:  `system.log` and
+`wifi.log`.
+<2> Harvests lines from every file in the `apache2` directory, and uses the
+`fields` configuration option to add a field called `apache` to the output.
+
+
+IMPORTANT: Make sure a file is not defined more than once across all inputs
+because this can lead to unexpected behaviour.
+
+[[rotating-logs]]
+==== Reading from rotating logs
+
+When dealing with file rotation, avoid harvesting symlinks. Instead
+use the <<input-paths>> setting to point to the original file, and specify
+a pattern that matches the file you want to harvest and all of its rotated
+files. Also make sure your log rotation strategy prevents lost or duplicate
+messages. For more information, see <<file-log-rotation>>.
+
+[id="{beatname_lc}-input-{type}-options"]
+==== Configuration options
+
+The `log` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[input-paths]]
+===== `paths`
+
+A list of glob-based paths that will be crawled and fetched. All patterns
+supported by https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also
+supported here. For example, to fetch all files from a predefined level of
+subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
+fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself.
+It is possible to recursively fetch all files in all subdirectories of a directory
+using the optional <<recursive_glob,`recursive_glob`>> settings.
+
+{beatname_uc} starts a harvester for each file that it finds under the specified
+paths. You can specify one path per line. Each line begins with a dash (-).
+
+[float]
+[[recursive_glob]]
+===== `recursive_glob.enabled`
+
+Enable expanding `**` into recursive glob patterns. With this feature enabled,
+the rightmost `**` in each path is expanded into a fixed number of glob
+patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`, `/foo/*/*`, and so
+on. If enabled it expands a single `**` into a 8-level deep `*` pattern.
+
+This feature is enabled by default. Set `recursive_glob.enabled` to false to
+disable it.
+
+include::../inputs/input-common-harvester-options.asciidoc[]
+
+include::../inputs/input-common-file-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

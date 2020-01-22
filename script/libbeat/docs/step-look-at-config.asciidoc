@@ -1,0 +1,2 @@
+For more information about configuring {beatname_uc}, see
+<<configuring-howto-{beatname_lc}>>.

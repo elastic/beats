@@ -1,0 +1,5 @@
+{"@timestamp":"2016-04-05T18:47:18.444Z"}
+{"@timestamp":"invalid"}
+{"@timestamp":{"hello": "test"}}
+{"@timestamp":"2016-04-05T18:47:18.444+00:00"}
+{"@timestamp":"2016-04-05T18:47:18+00:00"}

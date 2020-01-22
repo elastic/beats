@@ -1,0 +1,218 @@
+{
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
+    },
+    "@timestamp": "2018-11-30T01:09:42.755Z",
+    "agent": {
+        "hostname": "vagrant-2012-r2",
+        "type": "packetbeat",
+        "version": "7.0.0"
+    },
+    "bytes_in": 28,
+    "bytes_out": 463,
+    "client": {
+        "ip": "10.0.2.15",
+        "port": 63639
+    },
+    "dns": {
+        "additionals_count": 0,
+        "answers": [
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::1715:432e",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::36e1:d64a",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::36e1:dd80",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::6b15:ed5f",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::6b15:edbc",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::6b15:efc5",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::b848:f22f",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            },
+            {
+                "class": "IN",
+                "data": "2406:da00:ff00::b849:f5e9",
+                "name": "elastic.co.",
+                "ttl": "59",
+                "type": "AAAA"
+            }
+        ],
+        "answers_count": 8,
+        "authorities": [
+            {
+                "class": "IN",
+                "data": "a.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "b.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "c.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "d.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "e.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "f.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "g.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "h.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "i.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "j.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "k.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "l.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "m.root-servers.net.",
+                "name": ".",
+                "ttl": "41863",
+                "type": "NS"
+            }
+        ],
+        "authorities_count": 13,
+        "flags": {
+            "authentic_data": false,
+            "authoritative": false,
+            "checking_disabled": false,
+            "recursion_available": true,
+            "recursion_desired": true,
+            "truncated_response": false
+        },
+        "id": 7,
+        "op_code": "QUERY",
+        "question": {
+            "class": "IN",
+            "etld_plus_one": "elastic.co.",
+            "name": "elastic.co.",
+            "type": "AAAA"
+        },
+        "response_code": "NOERROR"
+    },
+    "host": {
+        "architecture": "x86_64",
+        "id": "42f11c3b-3062-4874-9ea3-50e0e08c4434",
+        "name": "vagrant-2012-r2",
+        "os": {
+            "build": "9600.0",
+            "family": "windows",
+            "kernel": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+            "platform": "windows",
+            "version": "6.3"
+        }
+    },
+    "method": "QUERY",
+    "network": {
+        "direction": "outgoing"
+    },
+    "query": "class IN, type AAAA, elastic.co.",
+    "resource": "elastic.co.",
+    "responsetime": 46,
+    "server": {
+        "ip": "10.0.2.3",
+        "port": 53
+    },
+    "status": "OK",
+    "transport": "udp",
+    "type": "dns"
+}

@@ -1,0 +1,1 @@
+[2017-10-30T09:57:58,243][WARN ][slowlog.logstash.filters.sleep] event processing time {:plugin_params=>{"time"=>3, "id"=>"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c"}, :took_in_nanos=>3027675106, :took_in_millis=>3027, :event=>"{\"@version\":\"1\",\"@timestamp\":\"2017-10-30T13:57:55.130Z\",\"host\":\"sashimi\",\"sequence\":0,\"message\":\"Hello world!\"}"}

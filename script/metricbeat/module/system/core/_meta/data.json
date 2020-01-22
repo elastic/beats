@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.core",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "core"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "core": {
+            "id": 0,
+            "idle": {
+                "pct": 0.84,
+                "ticks": 69564411
+            },
+            "iowait": {
+                "pct": 0,
+                "ticks": 419844
+            },
+            "irq": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "nice": {
+                "pct": 0,
+                "ticks": 45632
+            },
+            "softirq": {
+                "pct": 0,
+                "ticks": 189966
+            },
+            "steal": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "system": {
+                "pct": 0.08,
+                "ticks": 6211665
+            },
+            "user": {
+                "pct": 0.08,
+                "ticks": 18833962
+            }
+        }
+    }
+}

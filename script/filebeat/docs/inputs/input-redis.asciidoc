@@ -1,0 +1,81 @@
+:type: redis
+
+[id="{beatname_lc}-input-{type}"]
+=== Redis input
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
+
+experimental[]
+
+Use the `redis` input to read entries from Redis slowlogs.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: redis
+  hosts: ["localhost:6379"]
+  password: "${redis_pwd}"
+----
+
+
+==== Configuration options
+
+The `redis` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[redis-hosts]]
+===== `hosts`
+
+The list of Redis hosts to connect to.
+
+[float]
+[[redis-password]]
+===== `password`
+
+The password to use when connecting to Redis.
+
+[float]
+[[redis-scan_frequency]]
+===== `scan_frequency`
+
+How often {beatname_uc} reads entries from Redis slowlogs. Specify `1s` to scan
+Redis as frequently as possible without causing {beatname_uc} to scan too
+frequently. Do not set this value to less than `1s`.
+
+The default is `10s`.
+
+IMPORTANT: Redis slowlogs are not permanent. To ensure that all slowlog entries
+are collected, set `scan_frequency` to a value that allows {beatname_uc}
+sufficient time to connect to Redis, query the logs, and buffer them to the
+output within the specified interval.
+
+[float]
+[[redis-timeout]]
+===== `timeout`
+
+How long to wait for a response from Redis before the input returns an error.
+The default is `1s`.
+
+[float]
+[[redis-network]]
+===== `network`
+
+The network type to use for the Redis connection. Valid settings include: `tcp`,
+`tcp4`, `tcp6`, and `unix`. The default is `tcp`.
+
+[float]
+[[redis-maxconn]]
+===== `maxconn`
+
+The maximum number of concurrent connections. The default is `10`.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:
+

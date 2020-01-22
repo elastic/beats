@@ -1,0 +1,56 @@
+- name: slowlog
+  description: "Slowlog events from Elasticsearch"
+  example: "[2018-06-29T10:06:14,933][INFO ][index.search.slowlog.query] [v_VJhjV] [metricbeat-6.3.0-2018.06.26][0] took[4.5ms], took_millis[4], total_hits[19435], types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], source[{\"query\":{\"match_all\":{\"boost\":1.0}}}],"
+  type: group
+  fields:
+  - name: logger
+    description: "Logger name"
+    example: "index.search.slowlog.fetch"
+    type: keyword
+  - name: took
+    description: "Time it took to execute the query"
+    example: "300ms"
+    type: keyword
+  - name: types
+    description: "Types"
+    example: ""
+    type: keyword
+  - name: stats
+    description: "Stats groups"
+    example: "group1"
+    type: keyword
+  - name: search_type
+    description: "Search type"
+    example: "QUERY_THEN_FETCH"
+    type: keyword
+  - name: source_query
+    description: "Slow query"
+    example: "{\"query\":{\"match_all\":{\"boost\":1.0}}}"
+    type: keyword
+  - name: extra_source
+    description: "Extra source information"
+    example: ""
+    type: keyword
+  - name: total_hits
+    description: "Total hits"
+    example: 42
+    type: keyword
+  - name: total_shards
+    description: "Total queried shards"
+    example: 22
+    type: keyword
+  - name: routing
+    description: "Routing"
+    example: "s01HZ2QBk9jw4gtgaFtn"
+    type: keyword
+  - name: id
+    description: Id
+    example: ""
+    type: keyword
+  - name: type
+    description: "Type"
+    example: "doc"
+    type: keyword
+  - name: source
+    description: Source of document that was indexed
+    type: keyword

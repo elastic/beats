@@ -1,0 +1,96 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// :standalone:
+//// include::../../libbeat/docs/yaml.asciidoc[]
+//// Specify :standalone: when this file is pulled into and index. When
+//// the file is embedded in another file, do no specify :standalone:
+//////////////////////////////////////////////////////////////////////////
+
+ifdef::standalone[]
+
+[[yaml-tips]]
+== YAML tips and gotchas
+
+endif::[]
+
+The configuration file uses http://yaml.org/[YAML] for its syntax. When you edit the
+file to modify configuration settings, there are a few things that you should know.
+
+[float]
+=== Use spaces for indentation
+
+Indentation is meaningful in YAML. Make sure that you use spaces, rather than tab characters, to indent sections.
+
+In the default configuration files and in all the examples in the documentation,
+we use 2 spaces per indentation level. We recommend you do the same.
+
+[float]
+=== Look at the default config file for structure
+
+The best way to understand where to define a configuration option is by looking
+at the provided sample configuration files. The configuration files contain most
+of the default configurations that are available for the Beat. To change a setting,
+simply uncomment the line and change the values.
+
+[float]
+=== Test your config file
+
+You can test your configuration file to verify that the structure is valid.
+Simply change to the directory where the binary is installed, and run
+the Beat in the foreground with the `test config` command specified. For
+example:
+
+ifndef::win-only[]
+
+["source","shell",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} test config -c {beatname_lc}.yml
+----------------------------------------------------------------------
+
+endif::win-only[]
+
+ifdef::win-only[]
+
+["source","shell",subs="attributes"]
+----------------------------------------------------------------------
+.\winlogbeat.exe test config -c .\winlogbeat.yml -e
+----------------------------------------------------------------------
+
+endif::win-only[]
+
+You'll see a message if the Beat finds an error in the file.
+
+[float]
+=== Wrap regular expressions in single quotation marks
+
+If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping.
+
+For more information about YAML, see http://yaml.org/.
+
+[float]
+[[wrap-paths-in-quotes]]
+=== Wrap paths in single quotation marks
+
+Windows paths in particular sometimes contain spaces or characters, such as drive
+letters or triple dots, that may be misinterpreted by the YAML parser.
+
+To avoid this problem, it's a good idea to wrap paths in single quotation marks.
+
+[float]
+[[avoid-leading-zeros]]
+=== Avoid using leading zeros in numeric values
+
+If you use a leading zero (for example, `09`) in a numeric field without
+wrapping the value in single quotation marks, the value may be interpreted
+incorrectly by the YAML parser. If the value is a valid octal, it's converted
+to an integer. If not, it's converted to a float.
+
+To prevent unwanted type conversions, avoid using leading zeros in field values,
+or wrap the values in single quotation marks.
+

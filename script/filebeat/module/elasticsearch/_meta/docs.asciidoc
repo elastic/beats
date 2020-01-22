@@ -1,0 +1,127 @@
+:modulename: elasticsearch
+:has-dashboards: false
+
+== Elasticsearch module
+
+beta[]
+
+This is the elasticsearch module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Elasticsearch module is compatible with Elasticsearch 6.2 and newer.
+
+
+include::../include/running-modules.asciidoc[]
+
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: server
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `server` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  server:
+    enabled: true
+    var.paths:
+      - /var/log/elasticsearch/*.log          # Plain text logs
+      - /var/log/elasticsearch/*_server.json  # JSON logs
+----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
+
+[float]
+==== `gc` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  gc:
+    var.paths:
+      - /var/log/elasticsearch/gc.log.[0-9]*
+      - /var/log/elasticsearch/gc.log
+----
+
+[float]
+==== `audit` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  audit:
+    var.paths:
+      - /var/log/elasticsearch/*_access.log  # Plain text logs
+      - /var/log/elasticsearch/*_audit.json  # JSON logs
+----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
+
+[float]
+==== `slowlog` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  slowlog:
+    var.paths:
+      - /var/log/elasticsearch/*_index_search_slowlog.log     # Plain text logs
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log   # Plain text logs
+      - /var/log/elasticsearch/*_index_search_slowlog.json    # JSON logs
+      - /var/log/elasticsearch/*_index_indexing_slowlog.json  # JSON logs
+----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
+
+[float]
+==== `deprecation` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  deprecation:
+    var.paths:
+      - /var/log/elasticsearch/*_deprecation.log   # Plain text logs
+      - /var/log/elasticsearch/*_deprecation.json  # JSON logs
+----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

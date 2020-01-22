@@ -1,0 +1,12 @@
+This module targets Etcd V2 and V3.
+
+When using V2, metrics are collected using https://coreos.com/etcd/docs/latest/v2/api.html[Etcd v2 API].
+When using V3, metrics are retrieved from the `/metrics` endpoint as intended for https://coreos.com/etcd/docs/latest/metrics.html[Etcd v3]
+
+When using V3, metricsest are bundled into `metrics`
+When using V2, metricsets available are `leader`, `self` and `store`.
+
+[float]
+=== Compatibility
+
+The etcd module is tested with etcd 3.2 and 3.3.

@@ -1,0 +1,40 @@
+- name: ccr
+  type: group
+  description: >
+    Cross-cluster replication stats
+  release: ga
+  fields:
+    - name: leader
+      type: group
+      fields:
+        - name: index
+          type: keyword
+          description: >
+            Name of leader index
+        - name: max_seq_no
+          type: long
+          description: >
+            Maximum sequence number of operation on the leader shard
+    - name: follower
+      type: group
+      fields:
+        - name: index
+          type: keyword
+          description: >
+            Name of follower index
+        - name: shard.number
+          type: long
+          description: >
+            Number of the shard within the index
+        - name: operations_written
+          type: long
+          description: >
+            Number of operations indexed (replicated) into the follower shard from the leader shard
+        - name: time_since_last_read.ms
+          type: long
+          description: >
+            Time, in ms, since the follower last fetched from the leader
+        - name: global_checkpoint
+          type: long
+          description: >
+            Global checkpoint value on follower shard

@@ -1,0 +1,39 @@
+# Module: aws
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-aws.html
+
+- module: aws
+  s3access:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  vpcflow:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  cloudtrail:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws

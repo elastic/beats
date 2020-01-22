@@ -1,0 +1,189 @@
+{
+    "output": {
+        "election_epoch": 24,
+        "fsid": "c8a2176b-630a-4a67-a142-54e23ad91f90",
+        "fsmap": {
+            "by_rank": [],
+            "epoch": 1
+        },
+        "health": {
+            "detail": [
+                "mon.ceph1 addr 192.168.56.122:6789/0 clock skew 7133.3s > max 0.05s (latency 0.657497s)"
+            ],
+            "health": {
+                "health_services": [
+                    {
+                        "mons": [
+                            {
+                                "avail_percent": 87,
+                                "health": "HEALTH_OK",
+                                "kb_avail": 15581228,
+                                "kb_total": 17811456,
+                                "kb_used": 2230228,
+                                "last_updated": "2017-08-24 00:04:09.783438",
+                                "name": "ceph0",
+                                "store_stats": {
+                                    "bytes_log": 2031616,
+                                    "bytes_misc": 65552,
+                                    "bytes_sst": 21914124,
+                                    "bytes_total": 24011292,
+                                    "last_updated": "0.000000"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "overall_status": "HEALTH_ERR",
+            "summary": [
+                {
+                    "severity": "HEALTH_ERR",
+                    "summary": "101 pgs are stuck inactive for more than 300 seconds"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "265 pgs degraded"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "80 pgs stuck degraded"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "101 pgs stuck inactive"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "320 pgs stuck unclean"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "80 pgs stuck undersized"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "265 pgs undersized"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "recovery 294/768 objects degraded (38.281%)"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "recovery 88/768 objects misplaced (11.458%)"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "1/4 in osds are down"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "1 mons down, quorum 0,1 ceph0,ceph1"
+                },
+                {
+                    "severity": "HEALTH_WARN",
+                    "summary": "Monitor clock skew detected "
+                }
+            ],
+            "timechecks": {
+                "epoch": 24,
+                "mons": [
+                    {
+                        "health": "HEALTH_OK",
+                        "latency": 0.0,
+                        "name": "ceph0",
+                        "skew": 0.0
+                    },
+                    {
+                        "details": "clock skew 7133.3s > max 0.05s",
+                        "health": "HEALTH_WARN",
+                        "latency": 0.657497,
+                        "name": "ceph1",
+                        "skew": 7133.303939
+                    }
+                ],
+                "round": 8,
+                "round_status": "finished"
+            }
+        },
+        "monmap": {
+            "created": "2017-08-22 03:27:23.660293",
+            "epoch": 1,
+            "fsid": "c8a2176b-630a-4a67-a142-54e23ad91f90",
+            "modified": "2017-08-22 03:27:23.660293",
+            "mons": [
+                {
+                    "addr": "192.168.56.121:6789/0",
+                    "name": "ceph0",
+                    "rank": 0
+                },
+                {
+                    "addr": "192.168.56.122:6789/0",
+                    "name": "ceph1",
+                    "rank": 1
+                },
+                {
+                    "addr": "192.168.56.123:6789/0",
+                    "name": "ceph2",
+                    "rank": 2
+                }
+            ]
+        },
+        "osdmap": {
+            "osdmap": {
+                "epoch": 264,
+                "full": false,
+                "nearfull": false,
+                "num_in_osds": 4,
+                "num_osds": 6,
+                "num_remapped_pgs": 240,
+                "num_up_osds": 3
+            }
+        },
+        "pgmap": {
+            "read_bytes_sec": 55667788,
+            "read_op_per_sec": 1234,
+            "write_bytes_sec": 11996158,
+            "write_op_per_sec": 10,
+			"bytes_avail": 9965821952,
+            "bytes_total": 12838682624,
+            "bytes_used": 2872860672,
+            "data_bytes": 1054023794,
+            "degraded_objects": 294,
+            "degraded_ratio": 0.382812,
+            "degraded_total": 768,
+            "misplaced_objects": 88,
+            "misplaced_ratio": 0.114583,
+            "misplaced_total": 768,
+            "num_pgs": 320,
+            "pgs_by_state": [
+                {
+                    "count": 109,
+                    "state_name": "active+undersized+degraded"
+                },
+                {
+                    "count": 101,
+                    "state_name": "undersized+degraded+peered"
+                },
+                {
+                    "count": 55,
+                    "state_name": "active+remapped"
+                },
+                {
+                    "count": 55,
+                    "state_name": "active+undersized+degraded+remapped"
+                }
+            ],
+            "version": 813
+        },
+        "quorum": [
+            0,
+            1
+        ],
+        "quorum_names": [
+            "ceph0",
+            "ceph1"
+        ]
+    },
+    "status": "OK"
+}

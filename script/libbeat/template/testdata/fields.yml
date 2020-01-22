@@ -1,0 +1,36 @@
+- key: test
+  title: Test fields.yml
+  description: >
+    Contains all types for testing
+  fields:
+
+    - name: object
+      type: object
+
+    - name: array
+      type: array
+
+    - name: keyword
+      type: keyword
+
+    - name: object_disabled
+      type: object
+      enabled: false
+
+    - name: array_disabled
+      type: array
+      enabled: false
+
+    - name: alias
+      type: alias
+      path: keyword
+
+    - name: migration_alias_true
+      type: alias
+      path: keyword
+      migration: true
+
+    - name: migration_alias_false
+      type: alias
+      path: keyword
+      migration: false

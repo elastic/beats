@@ -1,0 +1,33 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "logstash.node",
+        "duration": 115000,
+        "module": "logstash"
+    },
+    "logstash": {
+        "node": {
+            "jvm": {
+                "version": "1.8.0_191"
+            }
+        }
+    },
+    "metricset": {
+        "name": "node"
+    },
+    "process": {
+        "pid": 93559
+    },
+    "service": {
+        "address": "127.0.0.1:9600",
+        "hostname": "Shaunaks-MBP-2.attlocal.net",
+        "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
+        "name": "logstash",
+        "type": "logstash",
+        "version": "7.0.0"
+    }
+}

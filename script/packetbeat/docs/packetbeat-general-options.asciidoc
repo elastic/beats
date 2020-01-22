@@ -1,0 +1,8 @@
+[[configuration-general-options]]
+== Specify general settings
+
+You can specify settings in the +{beatname_lc}.yml+ config file to control the
+general behavior of {beatname_uc}.
+
+include::{libbeat-dir}/generalconfig.asciidoc[]
+

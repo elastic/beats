@@ -1,0 +1,13 @@
+The System `load` metricset provides load statistics.
+
+This metricset is available on:
+
+- FreeBSD
+- Linux
+- macOS
+- OpenBSD
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.

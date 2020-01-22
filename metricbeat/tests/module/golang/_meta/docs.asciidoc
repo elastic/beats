@@ -1,0 +1,1 @@
+The golang module collects metrics by submitting HTTP GET requests to https://golang.org/pkg/expvar/[golang-expvar-api].

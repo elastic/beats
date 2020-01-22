@@ -1,0 +1,54 @@
+- name: slowlog
+  type: group
+  description: >
+    slowlog
+  fields:
+    - name: module
+      type: keyword
+      description: >
+        The module or class where the event originate.
+    - name: thread
+      type: keyword
+      description: >
+        Information about the running thread where the log originate.
+      multi_fields:
+        - name: text
+          type: text
+    - name: event
+      type: keyword
+      description: >
+        Raw dump of the original event
+      multi_fields:
+        - name: text
+          type: text
+    - name: plugin_name
+      type: keyword
+      description: >
+        Name of the plugin
+    - name: plugin_type
+      type: keyword
+      description: >
+        Type of the plugin: Inputs, Filters, Outputs or Codecs.
+    - name: took_in_millis
+      type: long
+      description: >
+        Execution time for the plugin in milliseconds.
+    - name: plugin_params
+      type: keyword
+      description: >
+        String value of the plugin configuration
+      multi_fields:
+        - name: text
+          type: text
+    - name: plugin_params_object
+      type: object
+      description: >
+        key -> value of the configuration used by the plugin.
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: took_in_nanos
+      type: alias
+      path: event.duration
+      migration: true

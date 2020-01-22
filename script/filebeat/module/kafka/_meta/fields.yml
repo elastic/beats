@@ -1,0 +1,9 @@
+- key: kafka
+  title: "Kafka"
+  description: >
+    Kafka module
+  fields:
+    - name: kafka
+      type: group
+      description: >
+      fields:

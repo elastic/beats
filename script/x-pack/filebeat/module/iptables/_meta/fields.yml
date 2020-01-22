@@ -1,0 +1,10 @@
+- key: iptables
+  title: iptables
+  description: >
+    Module for handling the iptables logs.
+  fields:
+    - name: iptables
+      type: group
+      description: >
+        Fields from the iptables logs.
+      fields:

@@ -1,0 +1,9 @@
+# Module: haproxy
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-haproxy.html
+
+- module: haproxy
+  #metricsets:
+  #  - info
+  #  - stat
+  period: 10s
+  hosts: ["tcp://127.0.0.1:14567"]

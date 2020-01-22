@@ -1,0 +1,52 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "etcd": {
+        "api_version": "2",
+        "store": {
+            "compareanddelete": {
+                "fail": 0,
+                "success": 0
+            },
+            "compareandswap": {
+                "fail": 0,
+                "success": 0
+            },
+            "create": {
+                "fail": 0,
+                "success": 1
+            },
+            "delete": {
+                "fail": 0,
+                "success": 0
+            },
+            "expire": {
+                "count": 0
+            },
+            "gets": {
+                "fail": 4,
+                "success": 2
+            },
+            "sets": {
+                "fail": 0,
+                "success": 12
+            },
+            "update": {
+                "fail": 0,
+                "success": 0
+            },
+            "watchers": 0
+        }
+    },
+    "event": {
+        "dataset": "etcd.store",
+        "duration": 115000,
+        "module": "etcd"
+    },
+    "metricset": {
+        "name": "store"
+    },
+    "service": {
+        "address": "127.0.0.1:2379",
+        "type": "etcd"
+    }
+}

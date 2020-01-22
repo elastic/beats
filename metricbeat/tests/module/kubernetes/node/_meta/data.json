@@ -1,0 +1,84 @@
+{
+    "@timestamp": "2017-04-06T15:29:27.150Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost",
+        "version": "6.0.0-alpha1"
+    },
+    "kubernetes": {
+        "node": {
+            "cpu": {
+                "usage": {
+                    "core" : {
+                        "ns": 7247863769557035
+                    },
+                    "nanocores": 1662117892
+                }
+            },
+            "fs": {
+                "available": {
+                    "bytes": 1188063105024
+                },
+                "capacity": {
+                    "bytes": 1197211648000
+                },
+                "inodes": {
+                    "count": 584581120,
+                    "free": 584447029,
+                    "used": 134091
+                },
+                "used": {
+                    "bytes": 9148542976
+                }
+            },
+            "memory": {
+                "available": {
+                    "bytes": 134202847232
+                },
+                "majorpagefaults": 1044,
+                "pagefaults": 83482928,
+                "rss": {
+                    "bytes": 178053120
+                },
+                "usage": {
+                    "bytes": 67062091776
+                },
+                "workingset": {
+                    "bytes": 51496206336
+                }
+            },
+            "name": "localhost",
+            "network": {
+                "rx": {
+                    "bytes": 957942806894,
+                    "errors": 0
+                },
+                "tx": {
+                    "bytes": 461158498276,
+                    "errors": 0
+                }
+            },
+            "runtime": {
+                "imagefs": {
+                    "available": {
+                        "bytes": 64694517760
+                    },
+                    "capacity": {
+                        "bytes": 142782496768
+                    },
+                    "used": {
+                        "bytes": 29570629855
+                    }
+                }
+            },
+            "start_time": "2017-02-08T10:33:38Z"
+        }
+    },
+    "metricset": {
+        "host": "localhost:10255",
+        "module": "kubernetes",
+        "name": "node",
+        "rtt": 650741
+    },
+    "type": "metricsets"
+}

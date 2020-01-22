@@ -1,0 +1,63 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+processors:
+  - rename:
+      fields:
+        - {from: message, to: event.original}
+  - decode_json_fields:
+      fields: [event.original]
+      target: zeek.intel
+  - timestamp:
+      field: zeek.intel.ts
+      layouts: [UNIX]
+      test: "1573030980.989353"
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: zeek.intel.id.orig_h, to: source.address}
+        - {from: zeek.intel.id.orig_h, to: source.ip, type: ip}
+        - {from: zeek.intel.id.orig_p, to: source.port, type: long}
+        - {from: zeek.intel.id.resp_h, to: destination.address}
+        - {from: zeek.intel.id.resp_h, to: destination.ip, type: ip}
+        - {from: zeek.intel.id.resp_p, to: destination.port, type: long}
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: zeek.intel.uid
+          to: zeek.session_id
+
+        # Expand field names containing dots.
+        - from: zeek.intel.seen.indicator
+          to: seen.indicator
+        - from: zeek.intel.seen.indicator_type
+          to: seen.indicator_type
+        - from: zeek.intel.seen.host
+          to: seen.host
+        - from: zeek.intel.seen.where
+          to: seen.where
+        - from: zeek.intel.seen.node
+          to: seen.node
+        - from: zeek.intel.seen.conn
+          to: seen.conn
+        - from: zeek.intel.seen.uid
+          to: seen.uid
+        - from: zeek.intel.seen.f
+          to: seen.f
+        - from: zeek.intel.seen.fuid
+          to: seen.fuid
+        - from: seen
+          to: zeek.intel.seen
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - zeek.intel.ts
+        - zeek.intel.id.orig_h
+        - zeek.intel.id.orig_p
+        - zeek.intel.id.resp_h
+        - zeek.intel.id.resp_p

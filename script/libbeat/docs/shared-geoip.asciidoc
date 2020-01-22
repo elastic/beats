@@ -1,0 +1,144 @@
+[id="{beatname_lc}-geoip"]
+== Enrich events with geoIP information
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+TIP: To populate the client locations map in the {beatname_uc} dashboard, follow
+the steps in this section.
+endif::[]
+
+You can use {beatname_uc} along with the {ref}/geoip-processor.html[GeoIP
+Processor] in {es} to export geographic location information based on IP
+addresses. Then you can use this information to visualize the location of IP
+addresses on a map in {kib}.
+
+The `geoip` processor adds information about the geographical location of
+IP addresses, based on data from the Maxmind GeoLite2 City Database. Because the
+processor uses a geoIP database that's installed on {es}, you don't need
+to install a geoIP database on the machines running {beatname_uc}.
+
+ifndef::no-output-logstash[]
+NOTE: If your use case involves using {ls}, you can use the
+{logstash-ref}/plugins-filters-geoip.html[GeoIP filter] available in {ls}
+instead of using the `geoip` processor. However, using the `geoip` processor is
+the simplest approach when you don't require the additional processing power of
+{ls}.
+endif::no-output-logstash[]
+
+[float]
+[id="{beatname_lc}-configuring-geoip"]
+=== Configure the `geoip` processor
+
+To configure {beatname_uc} and the `geoip` processor:
+
+1. Define an ingest node pipeline that uses one or more `geoip` processors to
+add location information to the event. For example, you can use the Console in
+{kib} to create the following pipeline:
++
+--
+[source,json]
+----
+PUT _ingest/pipeline/geoip-info
+{
+  "description": "Add geoip info",
+  "processors": [
+    {
+      "geoip": {
+        "field": "client.ip",
+        "target_field": "client.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "destination.ip",
+        "target_field": "destination.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "server.ip",
+        "target_field": "server.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "host.ip",
+        "target_field": "host.geo",
+        "ignore_missing": true
+      }
+    }
+  ]
+}
+----
+//CONSOLE
+--
++
+In this example, the pipeline ID is `geoip-info`. `field` specifies the field
+that contains the IP address to use for the geographical lookup, and
+`target_field` is the field that will hold the geographical information.
+`"ignore_missing": true` configures the pipeline to continue processing when
+it encounters an event that doesn't have the specified field.
++
+See
+{ref}/geoip-processor.html[GeoIP Processor] for more options.
++
+To learn more about adding host information to an event, see
+<<add-host-metadata>>.
+
+2. In the {beatname_uc} config file, configure the {es} output to use the
+pipeline. Specify the pipeline ID in the `pipeline` option under
+`output.elasticsearch`. For example:
++
+[source,yaml]
+-------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  pipeline: geoip-info
+-------------------------------------------------------------------------------
+
+3. Run {beatname_uc}. Remember to use `sudo` if the config file is owned by
+root.
++
+["source","sh",subs="attributes"]
+-------------------------------------------------------------------------------
+./{beatname_lc} -e
+-------------------------------------------------------------------------------
++
+If the lookups succeed, the events are enriched with `geo_point` fields, such as
+`client.geo.location` and `host.geo.location`, that you can use to populate
+visualizations in {kib}.
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+As a convenience, the {beatname_uc} index template already has mappings defined
+for `client.geo.location`, `source.geo.location`, `destination.geo.location`,
+`server.geo.location`, and `host.geo.location`. The mappings ensure that each
+field, when it exists, gets indexed as a `geo_point`.
+endif::[]
+
+If you add a field that's not already defined as a `geo_point` in the
+index template, add a mapping so the field gets indexed correctly. 
+
+[float]
+[id="{beatname_lc}-visualizing-location"]
+=== Visualize locations
+
+To visualize the location of IP addresses, you can
+ifdef::has_map[]
+<<load-kibana-dashboards,set up the example {kib} dashboards>> (if
+you haven't already), or
+endif::has_map[]
+create a new {kibana-ref}/tilemap.html[coordinate map] in {kib} and select the
+location field, for example `client.geo.location` or `host.geo.location`, as
+the Geohash.
+
+[role="screenshot"]
+image::./images/coordinate-map.png[Coordinate map in {kib}]

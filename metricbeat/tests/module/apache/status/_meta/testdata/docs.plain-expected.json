@@ -1,0 +1,69 @@
+[
+    {
+        "apache": {
+            "status": {
+                "bytes_per_request": 112.913,
+                "bytes_per_sec": 103.832,
+                "connections": {
+                    "async": {
+                        "closing": 0,
+                        "keep_alive": 0,
+                        "writing": 0
+                    },
+                    "total": 0
+                },
+                "cpu": {
+                    "children_system": 0,
+                    "children_user": 0,
+                    "load": 0.125874,
+                    "system": 0.2,
+                    "user": 0.16
+                },
+                "hostname": "127.0.0.1:37579",
+                "load": {
+                    "1": 2,
+                    "15": 1.91,
+                    "5": 1.85
+                },
+                "requests_per_sec": 0.91958,
+                "scoreboard": {
+                    "closing_connection": 0,
+                    "dns_lookup": 0,
+                    "gracefully_finishing": 0,
+                    "idle_cleanup": 0,
+                    "keepalive": 0,
+                    "logging": 0,
+                    "open_slot": 325,
+                    "reading_request": 0,
+                    "sending_reply": 1,
+                    "starting_up": 0,
+                    "total": 400,
+                    "waiting_for_connection": 74
+                },
+                "total_accesses": 263,
+                "total_kbytes": 29,
+                "uptime": {
+                    "server_uptime": 286,
+                    "uptime": 286
+                },
+                "workers": {
+                    "busy": 1,
+                    "idle": 74
+                }
+            }
+        },
+        "event": {
+            "dataset": "apache.status",
+            "duration": 115000,
+            "module": "apache"
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "apache"
+        }
+    }
+]

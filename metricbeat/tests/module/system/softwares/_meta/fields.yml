@@ -1,0 +1,10 @@
+- name: webiks2
+  type: group
+  release: beta
+  description: >
+    webiks2
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

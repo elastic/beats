@@ -1,0 +1,75 @@
+- name: diskio
+  type: group
+  description: >
+    Disk I/O metrics.
+  release: ga
+  fields:
+    - name: read
+      type: group
+      description: >
+        Accumulated reads during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of reads during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes read during the life of the container
+        - name: rate
+          type: long
+          description: >
+            Number of current reads per second
+    - name: reads
+      type: scaled_float
+      deprecated: 6.4
+      description: >
+        Number of current reads per second
+    - name: write
+      type: group
+      description: >
+        Accumulated writes during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of writes during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes written during the life of the container
+        - name: rate
+          type: long
+          description: >
+            Number of current writes per second
+    - name: writes
+      type: scaled_float
+      deprecated: 6.4
+      description: >
+        Number of current writes per second
+    - name: summary
+      type: group
+      description: >
+        Accumulated reads and writes during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of I/O operations during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes read and written during the life of the container
+        - name: rate
+          type: long
+          description: >
+            Number of current operations per second
+    - name: total
+      type: scaled_float
+      deprecated: 6.4
+      description: >
+        Number of reads and writes per second

@@ -1,0 +1,375 @@
+[[config-file-format]]
+== Config file format
+
+Beats config files are based on http://www.yaml.org[YAML], a file format that is
+easier to read and write than other common data formats like XML or JSON.
+
+In beats all YAML files start with a dictionary, an unordered collection of
+name/value pairs. In addition to dictionaries, YAML also supports lists, numbers,
+strings, and many other data types. All members of the same list or dictionary must
+have the same indentation level.
+
+Dictionaries are represented by simple `key: value` pairs all having the same
+indentation level. The colon after `key` must be followed by a space.
+
+[source,yaml]
+-----
+name: John Doe
+age: 34
+country: Canada
+-----
+
+Lists are introduced by dashes `- `. All list members will be lines beginning
+with `- ` at the same indentation level.
+
+[source,yaml]
+-----
+- Red
+- Green
+- Blue
+-----
+
+Lists and dictionaries are used in beats to build structured configurations.
+
+[source,yaml]
+-----
+filebeat:
+  inputs:
+    - type: log
+      paths:
+        - /var/log/*.log
+      multiline:
+        pattern: '^['
+        match: after
+-----
+
+Lists and dictionaries can also be represented in abbreviated form. Abbreviated
+form is somewhat similar to JSON using `{}` for dictionaries and `[]` for lists:
+
+[source,yaml]
+-----
+person: {name: "John Doe", age: 34, country: "Canada"}
+colors: ["Red", "Green", "Blue"]
+-----
+
+The following topics provide more detail to help you understand and work with config files in YAML:
+
+* <<config-file-format-namespacing>>
+* <<config-file-format-type>>
+* <<config-file-format-env-vars>>
+* <<config-gile-format-refs>>
+* <<config-file-permissions>>
+* <<config-file-format-cli>>
+* <<config-file-format-tips>>
+
+[[config-file-format-namespacing]]
+=== Namespacing
+
+All settings are structured using dictionaries and lists. Those are collapsed
+into "namespaced" settings, by creating a setting using the full path of the
+settings name and it's parent structures names, when reading the configuration
+file.
+
+For example this setting:
+
+["source","yaml",subs="attributes"]
+-----
+output:
+  elasticsearch:
+    index: 'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'
+-----
+
+gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'+. The
+full name of a setting is based on all parent structures involved.
+
+Lists create numeric names starting with 0.
+
+For example this filebeat setting:
+
+[source,yaml]
+-----
+filebeat:
+  inputs:
+    - type: log
+-----
+
+Gets collapsed into `filebeat.inputs.0.type: log`.
+
+Alternatively to using indentation, setting names can be used in collapsed form too.
+
+Note: having two settings with same fully collapsed path is invalid.
+
+Simple filebeat example with partially collapsed setting names and use of compact form:
+
+
+[source,yaml]
+-----
+filebeat.inputs:
+- type: log
+  paths: ["/var/log/*.log"]
+  multiline.pattern: '^['
+  multiline.match: after
+
+output.elasticsearch.hosts: ["http://localhost:9200"]
+-----
+
+[[config-file-format-type]]
+=== Config file data types
+
+Values of configuration settings are interpreted as required by beats.
+If a value can not be correctly interpreted as the required type - for example a
+string is given when a number is required - the beat will fail to start up.
+
+==== Boolean
+
+Boolean values can be either `true` or `false`. Alternative names for `true` are
+`yes` and `on`. Instead of `false` the values `no` and `off` can be used.
+
+[source,yaml]
+-----
+enabled: true
+disabled: false
+-----
+
+==== Number
+
+Number values require you to enter the number to use without using single or
+double quotes. Some settings only support a restricted number range though.
+
+[source,yaml]
+-----
+integer: 123
+negative: -1
+float: 5.4
+-----
+
+==== String
+
+In YAML[http://www.yaml.org], multiple styles of string definitions are supported:
+ double-quoted, single-quoted, unquoted.
+
+The double-quoted style is specified by surrounding the string with `"`. This
+style provides support for escaping unprintable characters using `\`, but comes
+at the cost of having to escape `\` and `"` characters.
+
+The single-quoted style is specified by surrounding the string with `'`. This
+style supports no escaping (use `''` to quote a single quote). Only printable
+characters can be used when using this form.
+
+Unquoted style requires no quotes, but does not support any escaping plus care
+needs to be taken to not use any symbol that has a special meaning in YAML.
+
+Note: Single-quoted style is recommended when defining regular expressions,
+event format strings, windows file paths, or non-alphabetical symbolic characters.
+
+==== Duration
+
+Durations require a numeric value with optional fraction and required unit.
+Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Sometimes features based
+on durations can be disabled by using zero or negative durations.
+
+[source,yaml]
+-----
+duration1: 2.5s
+duration2: 6h
+duration_disabled: -1s
+-----
+
+==== Regular expression
+
+Regular expressions are special strings getting compiled into regular
+expressions at load time.
+
+As regular expressions and YAML use `\` for escaping
+characters in strings, it's highly recommended to use single quoted strings when
+defining regular expressions. When single quoted strings are used, `\` character
+is not interpreted by YAML parser as escape symbol.
+
+==== Format String (sprintf)
+
+Format strings enable you to refer to event field values creating a string based
+on the current event being processed. Variable expansions are enclosed in
+expansion braces `%{<accessor>:default value}`. Event fields are accessed using
+field references `[fieldname]`. Optional default values can be specified in case the
+field name is missing from the event.
+
+You can also format time stored in the
+`@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt[time
+format].
+
+[source,yaml]
+-----
+constant-format-string: 'constant string'
+field-format-string: '%{[fieldname]} string'
+format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
+-----
+
+
+[[config-file-format-env-vars]]
+=== Environment variables
+
+include::shared-env-vars.asciidoc[]
+
+[[config-gile-format-refs]]
+=== Reference variables
+
+Beats settings can reference other settings splicing multiple optionally custom
+named settings into new values. References use the same syntax as
+<<config-file-format-env-vars>> do. Only fully collapsed setting names can be
+referenced to.
+
+For example the filebeat registry file defaults to:
+
+[source,yaml]
+-----
+filebeat.registry: ${path.data}/registry
+-----
+
+With `path.data` being an implicit config setting, that is overridable from
+command line, as well as in the configuration file.
+
+Example referencing `es.host` in `output.elasticsearch.hosts`:
+
+[source,yaml]
+-----
+es.host: '${ES_HOST:localhost}'
+
+output.elasticsearch:
+  hosts: ['http://${es.host}:9200']
+-----
+
+Introducing `es.host`, the host can be overwritten from command line using
+`-E es.host=another-host`.
+
+Plain references, having no default value and are not spliced with other
+references or strings can reference complete namespaces.
+
+These setting with duplicate content:
+
+[source,yaml]
+-----
+namespace1:
+  subnamespace:
+    host: localhost
+    sleep: 1s
+
+namespace2:
+  subnamespace:
+    host: localhost
+    sleep: 1s
+-----
+
+can be rewritten to
+
+[source,yaml]
+-----
+namespace1: ${shared}
+namespace2: ${shared}
+
+shared:
+  subnamespace:
+    host: localhost
+    sleep: 1s
+-----
+
+when using plain references.
+
+
+[[config-file-permissions]]
+=== Config file ownership and permissions
+
+NOTE: This section does not apply to Windows or other non-POSIX operating systems.
+
+On systems with POSIX file permissions, all Beats configuration files are
+subject to ownership and file permission checks. The purpose of these checks is
+to prevent unauthorized users from providing or modifying configurations that
+are run by the Beat. The owner of the configuration files must be either `root`
+or the user who is executing the Beat process. The permissions on each file must
+disallow writes by anyone other than the owner.
+
+When installed via an RPM or DEB package, the config file at
+`/etc/{beatname}/{beatname}.yml` will have the proper owner and permissions. The
+file is owned by `root` and has file permissions of `0644` (`-rw-r--r--`).
+
+You may encounter the following errors if your config file fails these checks:
+
+[source,sh]
+-----
+Exiting: error loading config file: config file ("{beatname}.yml") must be
+owned by the beat user (uid=501) or root
+-----
+
+To correct this problem you can use either `chown root {beatname}.yml` or
+`chown 501 {beatname}.yml` to change the owner of the configuration file.
+
+[source,sh]
+-----
+Exiting: error loading config file: config file ("{beatname}.yml") can only be
+writable by the owner but the permissions are "-rw-rw-r--" (to fix the
+permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
+-----
+
+To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
+remove write privileges from anyone other than the owner.
+
+Other config files, such as the files in the `modules.d` directory, are subject
+to the same ownership and file permission checks. 
+
+==== Disabling strict permission checks
+
+You can disable strict permission checks from the command line by using
+`--strict.perms=false`, but we strongly encourage you to leave the checks enabled.
+
+[[config-file-format-cli]]
+=== Command line arguments
+
+Config files to load are set using the `-c` flag on command line. If no flag is
+given, a beat and OS-specific default file path will be assumed.
+
+You can specify multiple configuration files by repeating the `-c` flag. You can
+use this, for example, for setting defaults in a base configuration file, and
+overwrite settings via local configuration files.
+
+In addition to overwriting settings using multiple configuration files,
+individual settings can be overwritten using `-E <setting>=<value>`. The
+`<value>` can be either a single value or a complex object, such as a list or
+dictionary.
+
+For example, given the following configuration:
+
+[source,yaml]
+-----
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+-----
+
+You can disable the Elasticsearch output and write all events to the console by
+setting:
+
+[source,sh]
+-----
+-E output='{elasticsearch.enabled: false, console.pretty: true}'
+-----
+
+Any complex objects that you specify at the command line are merged with the
+original configuration, and the following configuration is passed to the Beat:
+
+[source,yaml]
+-----
+output.elasticsearch:
+  enabled: false
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+
+output.console:
+  pretty: true
+-----
+
+
+[[config-file-format-tips]]
+=== YAML tips and gotchas
+
+include::yaml.asciidoc[]

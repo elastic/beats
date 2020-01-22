@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/weird.log
+    os.linux:
+      - /var/log/bro/current/weird.log
+    os.darwin:
+      - /usr/local/var/logs/current/weird.log
+  - name: tags
+    default: [zeek.weird]
+
+ingest_pipeline: ingest/pipeline.json
+input: config/weird.yml

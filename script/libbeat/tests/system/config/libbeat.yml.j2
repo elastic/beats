@@ -1,0 +1,110 @@
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+name: {{shipper_name}}
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+tags: [
+  {%- if agent_tags -%}
+      {%- for tag in agent_tags -%}
+          "{{ tag }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  {%- endif -%}
+]
+
+{% if setup_template_name %}
+setup.template.name: "{{setup_template_name}}"
+setup.template.pattern: "{{setup_template_pattern}}"
+{%- endif %}
+
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  {% if ilm.policy_name %}
+  policy_name: {{ ilm.policy_name }}
+  {% endif %}
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
+#================================ Processors =====================================
+
+{%- if processors %}
+processors:
+{%- for processor in processors %}
+{%- for name, settings in processor.items() %}
+- {{name}}:
+  {%- if settings %}
+  {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+  {%- endfor %}
+  {%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+{%- endif %}
+
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: {{ flush_min_events|default(8) }}
+  flush.timeout: 0.1s
+
+{% if kibana -%}
+setup.kibana.host: "{{ kibana.host }}"
+{%- endif %}
+
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+{% if elasticsearch -%}
+output:
+  elasticsearch:
+    hosts: ["{{ elasticsearch.host }}"]
+  {% if elasticsearch.pipeline %}
+    pipeline: {{elasticsearch.pipeline}}
+  {% endif %}
+  {% if elasticsearch.index %}
+    index: {{elasticsearch.index}}
+  {% endif %}
+  {% if elasticsearch.ilm %}
+    ilm.enabled: {{elasticsearch.ilm}}
+  {% endif %}
+{%- endif %}
+
+{% if logstash %}
+output.logstash:
+  hosts: ["{{ logstash.host }}"]
+{%- endif %}
+
+{% if not (console or elasticsearch or logstash) -%}
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default(beat.beat_name) }}"
+  rotate_every_kb: {{ rotate_every_kb | default(1000) }}
+  #number_of_files: 7
+{%- endif %}
+
+{% if path_data %}
+#================================ Paths =====================================
+path:
+  data: {{path_data}}
+{%endif%}
+
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
+{% endif %}

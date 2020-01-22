@@ -1,0 +1,63 @@
+- name: dbstats
+  type: group
+  description: >
+    dbstats provides an overview of a particular mongo database. This document
+    is most concerned with data volumes of a database.
+  release: ga
+  fields:
+    - name: avg_obj_size.bytes
+      type: long
+      format: bytes
+
+    - name: collections
+      type: integer
+
+    - name: data_size.bytes
+      type: long
+      format: bytes
+
+    - name: db
+      type: keyword
+
+    - name: file_size.bytes
+      type: long
+      format: bytes
+
+    - name: index_size.bytes
+      type: long
+      format: bytes
+
+    - name: indexes
+      type: long
+
+    - name: num_extents
+      type: long
+
+    - name: objects
+      type: long
+
+    - name: storage_size.bytes
+      type: long
+      format: bytes
+
+    - name: ns_size_mb.mb
+      type: long
+
+    - name: data_file_version
+      type: group
+      fields:
+        - name: major
+          type: long
+
+        - name: minor
+          type: long
+
+    - name: extent_free_list
+      type: group
+      fields:
+        - name: num
+          type: long
+
+        - name: size.bytes
+          type: long
+          format: bytes

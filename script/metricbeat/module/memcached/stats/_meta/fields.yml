@@ -1,0 +1,97 @@
+- name: stats
+  type: group
+  description: >
+    stats
+  release: ga
+  fields:
+    - name: pid
+      type: long
+      description: >
+        Current process ID of the Memcached task.
+
+    - name: uptime.sec
+      type: long
+      description: >
+        Memcached server uptime.
+
+    - name: threads
+      type: long
+      description: >
+        Number of threads used by the current Memcached server process.
+
+    - name: connections.current
+      type: long
+      description: >
+        Number of open connections to this Memcached server, should be the same
+        value on all servers during normal operation.
+
+    - name: connections.total
+      type: long
+      description: >
+        Numer of successful connect attempts to this server since it has been started.
+
+    - name: get.hits
+      type: long
+      description: >
+        Number of successful "get" commands (cache hits) since startup, divide them
+        by the "cmd_get" value to get the cache hitrate.
+
+    - name: get.misses
+      type: long
+      description: >
+        Number of failed "get" requests because nothing was cached for this key
+        or the cached value was too old.
+
+    - name: cmd.get
+      type: long
+      description: >
+        Number of "get" commands received since server startup not counting if they
+        were successful or not.
+
+    - name: cmd.set
+      type: long
+      description: >
+        Number of "set" commands serviced since startup.
+
+    - name: read.bytes
+      type: long
+      formate: bytes
+      description: >
+        Total number of bytes received from the network by this server.
+
+    - name: written.bytes
+      type: long
+      formate: bytes
+      description: >
+        Total number of bytes send to the network by this server.
+
+    - name: items.current
+      type: long
+      description: >
+        Number of items currently in this server's cache.
+
+    - name: items.total
+      type: long
+      formate: bytes
+      description: >
+        Number of items stored ever stored on this server. This is no "maximum item
+        count" value but a counted increased by every new item stored in the cache.
+
+    - name: evictions
+      type: long
+      formate: bytes
+      description: >
+        Number of objects removed from the cache to free up memory for new items
+        because Memcached reached it's maximum memory setting (limit_maxbytes).
+
+    - name: bytes.current
+      type: long
+      formate: bytes
+      description: >
+        Number of bytes currently used for caching items.
+
+    - name: bytes.limit
+      type: long
+      formate: bytes
+      description: >
+        Number of bytes this server is allowed to use for storage.

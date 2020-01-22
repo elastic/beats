@@ -1,0 +1,127 @@
+- key: auditd
+  title: "Auditd"
+  description: >
+    Module for parsing auditd logs.
+  short_config: true
+  fields:
+
+    - name: user
+      type: group
+      fields:
+
+        - name: terminal
+          type: keyword
+          description: >
+            Terminal or tty device on which the user is performing the observed activity.
+
+        - name: audit
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+            - name: name
+              type: keyword
+              example: albert
+              description: >
+                Short name or login of the user.
+
+            - name: group.id
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+            - name: group.name
+              type: keyword
+              description: >
+                    Name of the group.
+
+        - name: effective
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+            - name: name
+              type: keyword
+              example: albert
+              description: >
+                Short name or login of the user.
+            - name: group.id
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+            - name: group.name
+              type: keyword
+              description: >
+                    Name of the group.
+
+        - name: filesystem
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+            - name: name
+              type: keyword
+              example: albert
+              description: >
+                Short name or login of the user.
+            - name: group.id
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+            - name: group.name
+              type: keyword
+              description: >
+                    Name of the group.
+
+        - name: owner
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+            - name: name
+              type: keyword
+              example: albert
+              description: >
+                Short name or login of the user.
+            - name: group.id
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+            - name: group.name
+              type: keyword
+              description: >
+                    Name of the group.
+
+        - name: saved
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+            - name: name
+              type: keyword
+              example: albert
+              description: >
+                Short name or login of the user.
+            - name: group.id
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+            - name: group.name
+              type: keyword
+              description: >
+                    Name of the group.
+
+    - name: auditd
+      type: group
+      description: >
+        Fields from the auditd logs.
+      fields:

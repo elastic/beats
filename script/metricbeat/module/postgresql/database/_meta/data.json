@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "postgresql:5432",
+        "module": "postgresql",
+        "name": "database",
+        "rtt": 115
+    },
+    "postgresql": {
+        "database": {
+            "blocks": {
+                "hit": 0,
+                "read": 0,
+                "time": {
+                    "read": {
+                        "ms": 0
+                    },
+                    "write": {
+                        "ms": 0
+                    }
+                }
+            },
+            "conflicts": 0,
+            "deadlocks": 0,
+            "name": "template1",
+            "number_of_backends": 0,
+            "oid": 1,
+            "rows": {
+                "deleted": 0,
+                "fetched": 0,
+                "inserted": 0,
+                "returned": 0,
+                "updated": 0
+            },
+            "temporary": {
+                "bytes": 0,
+                "files": 0
+            },
+            "transactions": {
+                "commit": 0,
+                "rollback": 0
+            }
+        }
+    }
+}

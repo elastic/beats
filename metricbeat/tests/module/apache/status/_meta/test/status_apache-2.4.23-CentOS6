@@ -1,0 +1,43 @@
+127.0.0.1
+ServerVersion: Apache/2.4.23 (CentOS) OpenSSL/1.0.1e-fips
+ServerMPM: prefork
+Server Built: Jul 22 2016 09:11:01
+CurrentTime: Wednesday, 30-Nov-2016 05:32:43 NZDT
+RestartTime: Tuesday, 29-Nov-2016 20:41:30 NZDT
+ParentServerConfigGeneration: 1
+ParentServerMPMGeneration: 0
+ServerUptimeSeconds: 31873
+ServerUptime: 8 hours 51 minutes 13 seconds
+Load1: 0.00
+Load5: 0.01
+Load15: 0.05
+Total Accesses: 2181
+Total kBytes: 53079
+CPUUser: 8.4
+CPUSystem: 1.22
+CPUChildrenUser: 0
+CPUChildrenSystem: 0
+CPULoad: .0301823
+Uptime: 31873
+ReqPerSec: .0684278
+BytesPerSec: 1705.3
+BytesPerReq: 24921.1
+BusyWorkers: 1
+IdleWorkers: 9
+Scoreboard: .W.___....................................................................................................................................................................................................................................................
+TLSSessionCacheStatus
+CacheType: SHMCB
+CacheSharedMemory: 512000
+CacheCurrentEntries: 0
+CacheSubcaches: 32
+CacheIndexesPerSubcaches: 88
+CacheIndexUsage: 0%
+CacheUsage: 0%
+CacheStoreCount: 35
+CacheReplaceCount: 0
+CacheExpireCount: 35
+CacheDiscardCount: 0
+CacheRetrieveHitCount: 0
+CacheRetrieveMissCount: 89
+CacheRemoveHitCount: 0
+CacheRemoveMissCount: 0

@@ -1,0 +1,59 @@
+version: '2.3'
+
+services:
+  beat:
+    build: ${PWD}/.
+    environment:
+      - BEAT_STRICT_PERMS=false
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/metricbeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
+    command: make
+
+  # Used by base tests
+  elasticsearch:
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
+    build:
+      context: ./module/elasticsearch/_meta
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.4.0}
+    environment:
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
+    ports:
+      - 9200
+
+  # Used by autodiscover tests
+  jolokia:
+    extends:
+      file: ./module/jolokia/docker-compose.yml
+      service: jolokia
+
+  # Used by base tests
+  kibana:
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.4.0}-1
+    build:
+      context: ./module/kibana/_meta
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.4.0}
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601
+
+  # Used by base tests
+  metricbeat:
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.3.0}-1
+    build:
+      context: ./module/beat/_meta
+      args:
+        BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    command: '-e'
+    ports:
+      - 5066

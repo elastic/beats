@@ -1,0 +1,570 @@
+- name: info
+  type: group
+  description: >
+    `info` contains the information and statistics returned by the `INFO` command.
+  release: ga
+  fields:
+    - name: clients
+      type: group
+      description: >
+        Redis client stats.
+      fields:
+        - name: connected
+          type: long
+          description: >
+            Number of client connections (excluding connections from slaves).
+        - name: longest_output_list
+          type: long
+          deprecated: "6.5.0"
+          description: >
+            Longest output list among current client connections (replaced by max_output_buffer).
+        - name: max_output_buffer
+          type: long
+          description: >
+            Longest output list among current client connections.
+        - name: biggest_input_buf
+          type: long
+          deprecated: "6.5.0"
+          description: >
+            Biggest input buffer among current client connections (replaced by max_input_buffer).
+        - name: max_input_buffer
+          type: long
+          description: >
+            Biggest input buffer among current client connections (on redis 5.0).
+        - name: blocked
+          type: long
+          description: >
+            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
+
+    - name: cluster
+      type: group
+      description: >
+        Redis cluster information.
+      fields:
+        - name: enabled
+          type: boolean
+          description: >
+            Indicates that the Redis cluster is enabled.
+
+    - name: cpu
+      type: group
+      description: >
+        Redis CPU stats
+      fields:
+        - name: used.sys
+          type: scaled_float
+          description: >
+            System CPU consumed by the Redis server.
+        - name: used.sys_children
+          type: scaled_float
+          description: >
+            User CPU consumed by the Redis server.
+        - name: used.user
+          type: scaled_float
+          description: >
+            System CPU consumed by the background processes.
+        - name: used.user_children
+          type: scaled_float
+          description: >
+            User CPU consumed by the background processes.
+
+    - name: memory
+      type: group
+      description: >
+        Redis memory stats.
+      fields:
+        - name: used.value
+          type: long
+          format: bytes
+          description: >
+            Total number of bytes allocated by Redis.
+        - name: used.rss
+          type: long
+          format: bytes
+          description: >
+            Number of bytes that Redis allocated as seen by the operating system (a.k.a resident set size).
+        - name: used.peak
+          type: long
+          format: bytes
+          description: >
+            Peak memory consumed by Redis.
+        - name: used.lua
+          type: long
+          format: bytes
+          description: >
+            Used memory by the Lua engine.        
+        - name: used.dataset
+          type: long
+          format: bytes
+          description: >
+            The size in bytes of the dataset 
+
+        - name: max.value
+          type: long
+          format: bytes
+          description: >
+            Memory limit.
+        - name: max.policy
+          type: keyword
+          description: >
+            Eviction policy to use when memory limit is reached.
+
+        - name: fragmentation.ratio
+          type: float
+          description: >
+            Ratio between used_memory_rss and used_memory
+        - name: fragmentation.bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes between used_memory_rss and used_memory
+
+        - name: active_defrag.is_running
+          type: boolean
+          description: >
+            Flag indicating if active defragmentation is active
+
+        - name: allocator
+          type: keyword
+          description: >
+            Memory allocator.
+
+        - name: allocator_stats
+          type: group
+          fields:
+            - name: allocated
+              type: long
+              format: bytes
+              description: >
+                Allocated memory
+            - name: active
+              type: long
+              format: bytes
+              description: >
+                Active memeory
+            - name: resident
+              type: long
+              format: bytes
+              description: >
+                Resident memory
+            - name: fragmentation.ratio
+              type: float
+              description: >
+                Fragmentation ratio
+            - name: fragmentation.bytes
+              type: long
+              format: bytes
+              description: >
+                Fragmented bytes
+            - name: rss.ratio
+              type: float
+              description: >
+                Resident ratio
+            - name: rss.bytes
+              type: long
+              format: bytes
+              description: >
+                Resident bytes
+
+    - name: persistence
+      type: group
+      description: >
+        Redis CPU stats.
+      fields:
+        - name: loading
+          type: boolean
+          description: >
+            Flag indicating if the load of a dump file is on-going
+          # ToDo move `loading` to `loading.enabled` and add other loading stats beside that (start time, total bytes, loaded bytes, ...)
+
+        - name: rdb
+          type: group
+          description: >
+            Provides information about RDB persistence
+          fields:
+            - name: last_save.changes_since
+              type: long
+              description: >
+                Number of changes since the last dump
+            - name: last_save.time
+              type: long
+              description: >
+                Epoch-based timestamp of last successful RDB save
+
+            - name: bgsave.in_progress
+              type: boolean
+              description: >
+                Flag indicating a RDB save is on-going
+            - name: bgsave.last_status
+              type: keyword
+              description: >
+                Status of the last RDB save operation
+            - name: bgsave.last_time.sec
+              type: long
+              format: duration
+              description: >
+                Duration of the last RDB save operation in seconds
+            - name: bgsave.current_time.sec
+              type: long
+              format: duration
+              description: >
+                Duration of the on-going RDB save operation if any
+            
+            - name: copy_on_write.last_size
+              type: long
+              format: bytes
+              description: >
+                The size in bytes of copy-on-write allocations during the last RBD save operation                
+
+        - name: aof
+          type: group
+          description: >
+            Provides information about AOF persitence
+          fields:
+            - name: enabled
+              type: boolean
+              description: >
+                Flag indicating AOF logging is activated
+
+            - name: rewrite.in_progress
+              type: boolean
+              description: >
+                Flag indicating a AOF rewrite operation is on-going
+            - name: rewrite.scheduled
+              type: boolean
+              description: >
+                Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB save is complete.
+            - name: rewrite.last_time.sec
+              type: long
+              format: duration
+              description: >
+                Duration of the last AOF rewrite operation in seconds
+            - name: rewrite.current_time.sec
+              type: long
+              format: duration
+              description: >
+                Duration of the on-going AOF rewrite operation if any
+            - name: rewrite.buffer.size
+              type: long
+              format: bytes
+              description: >
+                Size of the AOF rewrite buffer
+
+            - name: bgrewrite.last_status
+              type: keyword
+              description: >
+                Status of the last AOF rewrite operatio
+
+            - name: write.last_status
+              type: keyword
+              description: >
+                Status of the last write operation to the AOF
+
+            - name: copy_on_write.last_size
+              type: long
+              format: bytes
+              description: >
+                The size in bytes of copy-on-write allocations during the last RBD save operation
+
+            - name: buffer.size
+              type: long
+              format: bytes
+              description: >
+                Size of the AOF buffer
+            
+            - name: size.current
+              type: long
+              format: bytes
+              description: >
+                AOF current file size             
+            - name: size.base
+              type: long
+              format: bytes
+              description: >
+                AOF file size on latest startup or rewrite
+
+            - name: fsync.pending
+              type: long
+              description: >
+                Number of fsync pending jobs in background I/O queue
+            - name: fsync.delayed
+              type: long
+              description: >
+                Delayed fsync counter
+
+    - name: replication
+      type: group
+      description: >
+        Replication
+      fields:
+        - name: role
+          type: keyword
+          description: >
+            Role of the instance (can be "master", or "slave").
+
+        - name: connected_slaves
+          type: long
+          description: >
+            Number of connected slaves
+
+        - name: master_offset
+          type: long
+          deprecated: 6.5
+          description: >
+            The server's current replication offset
+        
+        - name: backlog.active
+          type: long
+          description: >
+            Flag indicating replication backlog is active
+        - name: backlog.size
+          type: long
+          format: bytes
+          description: >
+            Total size in bytes of the replication backlog buffer
+        - name: backlog.first_byte_offset
+          type: long
+          description: >
+            The master offset of the replication backlog buffer          
+        - name: backlog.histlen
+          type: long
+          description: >
+            Size in bytes of the data in the replication backlog buffer
+
+        - name: master.offset
+          type: long
+          description: >
+            The server's current replication offset
+        - name: master.second_offset
+          type: long
+          description: >
+            The offset up to which replication IDs are accepted
+        - name: master.link_status
+          type: keyword
+          description: >
+            Status of the link (up/down)
+        - name: master.last_io_seconds_ago
+          type: long
+          format: duration
+          description: >
+            Number of seconds since the last interaction with master
+        - name: master.sync.in_progress
+          type: boolean
+          description: >
+             Indicate the master is syncing to the slave
+        - name: master.sync.left_bytes
+          type: long
+          format: bytes
+          description: >
+            Number of bytes left before syncing is complete
+        - name: master.sync.last_io_seconds_ago
+          type: long
+          format: duration
+          description: >
+            Number of seconds since last transfer I/O during a SYNC operation
+        
+        - name: slave.offset
+          type: long
+          description: >
+            The replication offset of the slave instance
+        - name: slave.priority
+          type: long
+          description: >
+            The priority of the instance as a candidate for failover
+        - name: slave.is_readonly
+          type: boolean
+          description: >
+            Flag indicating if the slave is read-only
+
+    - name: server
+      type: group
+      description: >
+        Server info
+      fields:
+        - name: version
+          type: alias
+          path: service.version
+          migration: true
+          description:
+
+        - name: git_sha1
+          type: keyword
+          description:
+
+        - name: git_dirty
+          type: keyword
+          description:
+
+        - name: build_id
+          type: keyword
+          description:
+
+        - name: mode
+          type: keyword
+          description:
+
+        - name: os
+          type: alias
+          path: os.full
+          migration: true
+          description:
+
+        - name: arch_bits
+          type: keyword
+          description:
+
+        - name: multiplexing_api
+          type: keyword
+          description:
+
+        - name: gcc_version
+          type: keyword
+          description:
+
+        - name: process_id
+          type: alias
+          path: process.pid
+          migration: true
+          description:
+
+        - name: run_id
+          type: keyword
+          description:
+
+        - name: tcp_port
+          type: long
+          description:
+
+        - name: uptime
+          type: long
+          description:
+
+        - name: hz
+          type: long
+          description:
+
+        - name: lru_clock
+          type: long
+          description:
+
+        - name: config_file
+          type: keyword
+          description:
+
+    - name: stats
+      type: group
+      description: >
+        Redis stats.
+      fields:
+        - name: connections.received
+          type: long
+          description:
+            Total number of connections received.
+        - name: connections.rejected
+          type: long
+          description:
+            Total number of connections rejected.
+
+        - name: commands_processed
+          type: long
+          description:
+            Total number of commands processed.
+
+        - name: net.input.bytes
+          type: long
+          description:
+            Total network input in bytes.
+        - name: net.output.bytes
+          type: long
+          description:
+            Total network output in bytes.
+
+        - name: instantaneous.ops_per_sec
+          type: long
+          description: >
+            Number of commands processed per second
+        - name: instantaneous.input_kbps
+          type: scaled_float
+          description: >
+            The network's read rate per second in KB/sec
+        - name: instantaneous.output_kbps
+          type: scaled_float
+          description: >
+            The network's write rate per second in KB/sec
+
+        - name: sync.full
+          type: long
+          description: >
+            The number of full resyncs with slaves
+        - name: sync.partial.ok
+          type: long
+          description: >
+            The number of accepted partial resync requests
+        - name: sync.partial.err
+          type: long
+          description: >
+            The number of denied partial resync requests
+
+        - name: keys.expired
+          type: long
+          description: >
+            Total number of key expiration events
+        - name: keys.evicted
+          type: long
+          description: >
+            Number of evicted keys due to maxmemory limit
+        
+        - name: keyspace.hits
+          type: long
+          description: >
+            Number of successful lookup of keys in the main dictionary
+        - name: keyspace.misses
+          type: long
+          description: >
+            Number of failed lookup of keys in the main dictionary
+
+        - name: pubsub.channels
+          type: long
+          description: >
+            Global number of pub/sub channels with client subscriptions
+        - name: pubsub.patterns
+          type: long
+          description: >
+            Global number of pub/sub pattern with client subscriptions
+
+        - name: latest_fork_usec
+          type: long
+          description: >
+            Duration of the latest fork operation in microseconds
+
+        - name: migrate_cached_sockets
+          type: long
+          description: >
+            The number of sockets open for MIGRATE purposes
+
+        - name: slave_expires_tracked_keys
+          type: long
+          description: >
+            The number of keys tracked for expiry purposes (applicable only to writable slaves)
+
+        - name: active_defrag.hits
+          type: long
+          description: >
+            Number of value reallocations performed by active the defragmentation process
+        - name: active_defrag.misses
+          type: long
+          description: >
+            Number of aborted value reallocations started by the active defragmentation process
+        - name: active_defrag.key_hits
+          type: long
+          description: >
+            Number of keys that were actively defragmented
+        - name: active_defrag.key_misses
+          type: long
+          description: >
+            Number of keys that were skipped by the active defragmentation process
+    - name: slowlog.count
+      type: long
+      description: >
+        Count of slow operations
+

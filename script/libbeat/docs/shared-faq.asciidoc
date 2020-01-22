@@ -1,0 +1,146 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-faq.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[error-loading-config]]
+=== Error loading config file
+
+You may encounter errors loading the config file on POSIX operating systems if:
+
+* an unauthorized user tries to load the config file, or
+* the config file has the wrong permissions.
+
+See {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
+for more about resolving these errors.
+
+[[error-found-unexpected-character]]
+=== Found unexpected or unknown characters
+
+Either there is a problem with the structure of your config file, or you have
+used a path or expression that the YAML parser cannot resolve because the config
+file contains characters that aren't properly escaped.
+
+If the YAML file contains paths with spaces or unusual characters, wrap the
+paths in single quotation marks (see <<wrap-paths-in-quotes>>).
+
+Also see the general advice under <<yaml-tips>>.
+
+ifndef::no-output-logstash[]
+[[connection-problem]]
+=== {ls} connection doesn't work
+
+You may have configured {ls} or {beatname_uc} incorrectly. To resolve the issue:
+
+* Make sure that {ls} is running and you can connect to it. First, try to ping the {ls} host to verify that you can reach it
+from the host running {beatname_uc}. Then use either `nc` or `telnet` to make sure that the port is available. For example:
++
+[source,shell]
+----------------------------------------------------------------------
+ping <hostname or IP>
+telnet <hostname or IP> 5044
+----------------------------------------------------------------------
+* Verify that the config file for {beatname_uc} specifies the correct port where {ls} is running.
+* Make sure that the {es} output is commented out in the config file and the {ls} output is uncommented.
+* Confirm that the most recent {logstash-ref}/plugins-inputs-beats.html[Beats
+input plugin for {ls}] is installed and configured. Note that Beats will not
+connect to the Lumberjack input plugin. To learn how to install and update
+plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
+endif::[]
+
+ifndef::no-output-logstash[]
+[[metadata-missing]]
+=== @metadata is missing in {ls}
+
+{ls} outputs remove `@metadata` fields automatically. Therefore, if {ls} instances are chained directly or via some message
+queue (for example, Redis or Kafka), the `@metadata` field will not be available in the final {ls} instance.
+
+TIP: To preserve `@metadata` fields, use the {ls} mutate filter with the rename setting to rename the fields to
+non-internal fields.
+endif::[]
+
+ifndef::no-output-logstash[]
+[[diff-logstash-beats]]
+=== Not sure whether to use {ls} or Beats
+
+Beats are lightweight data shippers that you install as agents on your servers to send specific types of operational
+data to {es}. Beats have a small footprint and use fewer system resources than {ls}.
+
+{ls} has a larger footprint, but provides a broad array of input, filter, and output plugins for collecting, enriching,
+and transforming data from a variety of sources.
+
+For more information, see the https://www.elastic.co/guide/en/logstash/current/introduction.html[{ls} Introduction] and
+the https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html[Beats Overview].
+endif::[]
+
+ifndef::no-output-logstash[]
+[[ssl-client-fails]]
+=== SSL client fails to connect to {ls}
+
+The host running {ls} might be unreachable or the certificate may not be valid. To resolve your issue:
+
+* Make sure that {ls} is running and you can connect to it. First, try to ping the {ls} host to verify that you can reach it
+from the host running {beatname_uc}. Then use either `nc` or `telnet` to make sure that the port is available. For example:
++
+[source,shell]
+----------------------------------------------------------------------
+ping <hostname or IP>
+telnet <hostname or IP> 5044
+----------------------------------------------------------------------
+
+* Verify that the certificate is valid and that the hostname and IP match.
++
+TIP: For testing purposes only, you can set `verification_mode: none` to disable hostname checking.
+
+* Use OpenSSL to test connectivity to the {ls} server and diagnose problems. See the https://www.openssl.org/docs/manmaster/apps/s_client.html[OpenSSL documentation] for more info.
+* Make sure that you have enabled SSL (set `ssl => true`) when configuring the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for {ls}].
+
+==== Common SSL-Related Errors and Resolutions
+
+Here are some common errors and ways to fix them:
+
+* <<cannot-validate-certificate,x509: cannot validate certificate>>
+* <<getsockopt-no-route-to-host,getsockopt: no route to host>>
+* <<getsockopt-connection-refused,getsockopt: connection refused>>
+* <<target-machine-refused-connection,No connection could be made because the target machine actively refused it>>
+
+[[cannot-validate-certificate]]
+===== x509: cannot validate certificate for <IP address> because it doesn't contain any IP SANs
+
+This happens because your certificate is only valid for the hostname present in the Subject field.
+
+To resolve this problem, try one of these solutions:
+
+* Create a DNS entry for the hostname mapping it to the server's IP.
+* Create an entry in `/etc/hosts` for the hostname. Or on Windows add an entry to
+`C:\Windows\System32\drivers\etc\hosts`.
+* Re-create the server certificate and add a SubjectAltName (SAN) for the IP address of the server. This make the
+server's certificate valid for both the hostname and the IP address.
+
+[[getsockopt-no-route-to-host]]
+===== getsockopt: no route to host
+
+This is not a SSL problem. It's a networking problem. Make sure the two hosts can communicate.
+
+[[getsockopt-connection-refused]]
+===== getsockopt: connection refused
+
+This is not a SSL problem. Make sure that {ls} is running and that there is no firewall blocking the traffic.
+
+[[target-machine-refused-connection]]
+===== No connection could be made because the target machine actively refused it
+
+A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
+destination host.
+endif::no-output-logstash[]
+
+[[monitoring-shows-fewer-than-expected-beats]]
+=== Monitoring UI shows fewer Beats than expected
+
+If you are running multiple Beat instances on the same host, make sure they each have a distinct `path.data` value.

@@ -1,0 +1,76 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.http"
+
+        - from: "zeek.http.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.http.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.http.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.http.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.http.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.http.method"
+          to: "http.request.method"
+
+        - from: "zeek.http.referrer"
+          to: "http.request.referrer"
+
+        - from: "zeek.http.status_code"
+          to: "http.response.status_code"
+
+        - from: "zeek.http.version"
+          to: "http.version"
+
+        - from: "zeek.http.request_body_len"
+          to: "http.request.body.bytes"
+
+        - from: "zeek.http.response_body_len"
+          to: "http.response.body.bytes"
+
+        - from: "zeek.http.uri"
+          to: "url.original"
+
+        - from: "zeek.http.host"
+          to: "url.domain"
+
+        - from: "zeek.http.username"
+          to: "url.username"
+
+        - from: "zeek.http.password"
+          to: "url.password"
+        
+        - from: "zeek.http.user_agent"
+          to: "user_agent.original"
+
+      ignore_missing: true
+      fail_on_error: false
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

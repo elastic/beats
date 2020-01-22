@@ -1,0 +1,13 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/postgresql/postgresql-*-*.log*
+    os.darwin:
+      - /usr/local/var/postgres/*.log*
+    os.windows:
+      - "c:/Program Files/PostgreSQL/*/logs/*.log*"
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

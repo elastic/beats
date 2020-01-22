@@ -1,0 +1,71 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-haproxy]]
+:modulename: haproxy
+:has-dashboards: true
+
+== haproxy module
+
+The +{modulename}+ module collects and parses logs from a (`haproxy`) process.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from `haproxy` running on AWS Linux as a gateway to a cluster of microservices.
+
+This module is not available for Windows.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing geolocation, distribution of requests between backends and frontends,
+and status codes over time. For example:
+
+[role="screenshot"]
+image::./images/kibana-haproxy-overview.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001. However
+it can also be configured to read from a file path. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: haproxy
+  log:
+    enabled: true
+    var.paths: ["/var/log/haproxy.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-haproxy,exported fields>> section.
+

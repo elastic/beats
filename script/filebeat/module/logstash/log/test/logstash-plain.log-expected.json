@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2017-10-23T14:20:12.046-02:00",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 0,
+        "logstash.log.module": "logstash.modules.scaffold",
+        "message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}",
+        "service.type": "logstash"
+    },
+    {
+        "@timestamp": "2017-11-20T03:55:00.318-02:00",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.offset": 175,
+        "logstash.log.module": "logstash.inputs.jdbc",
+        "message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n",
+        "service.type": "logstash"
+    }
+]

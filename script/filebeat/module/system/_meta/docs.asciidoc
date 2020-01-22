@@ -1,0 +1,78 @@
+:modulename: system
+:has-dashboards: true
+
+== System module
+
+The +{modulename}+ module collects and parses logs created by the system logging
+service of common Unix/Linux based distributions.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
+macOS Sierra.
+
+This module is not available for Windows.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-system.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for the syslog and authorization logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: system
+  syslog:
+    enabled: true
+    var.paths: ["/path/to/log/syslog*"]
+  auth:
+    enabled: true
+    var.paths: ["/path/to/log/auth.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "system.syslog.var.paths=[/path/to/log/syslog*]" -M "system.auth.var.paths=[/path/to/log/auth.log*]"
+-----
+
+
+
+
+//set the fileset name used in the included example
+:fileset_ex: syslog
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `syslog` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `auth` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

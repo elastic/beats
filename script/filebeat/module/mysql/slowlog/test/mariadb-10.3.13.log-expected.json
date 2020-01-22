@@ -1,0 +1,38 @@
+[
+    {
+        "@timestamp": "2019-03-24T16:03:00.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 2461578000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 230,
+        "mysql.slowlog.bytes_sent": 319,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.filesort": true,
+        "mysql.slowlog.filesort_on_disk": false,
+        "mysql.slowlog.full_join": false,
+        "mysql.slowlog.full_scan": true,
+        "mysql.slowlog.lock_time.sec": 0.000196,
+        "mysql.slowlog.merge_passes": 0,
+        "mysql.slowlog.priority_queue": true,
+        "mysql.slowlog.query": "SELECT last_name, MAX(salary) AS salary FROM employees\n    INNER JOIN salaries ON employees.emp_no = salaries.emp_no\n    GROUP BY last_name\n    ORDER BY salary DESC\n    LIMIT 10;",
+        "mysql.slowlog.query_cache_hit": false,
+        "mysql.slowlog.rows_affected": 0,
+        "mysql.slowlog.rows_examined": 3145718,
+        "mysql.slowlog.rows_sent": 10,
+        "mysql.slowlog.schema": "employees",
+        "mysql.slowlog.tmp_disk_tables": "0",
+        "mysql.slowlog.tmp_table": true,
+        "mysql.slowlog.tmp_table_on_disk": false,
+        "mysql.slowlog.tmp_table_sizes": 4026528,
+        "mysql.slowlog.tmp_tables": 1,
+        "mysql.thread_id": "37",
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    }
+]

@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "zookeeper.mntr",
+        "duration": 115000,
+        "module": "zookeeper"
+    },
+    "metricset": {
+        "name": "mntr"
+    },
+    "service": {
+        "address": "localhost:32770",
+        "type": "zookeeper",
+        "version": "3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653, built on 05/03/2019 12:07 GMT"
+    },
+    "zookeeper": {
+        "mntr": {
+            "approximate_data_size": 44,
+            "ephemerals_count": 0,
+            "latency": {
+                "avg": 0,
+                "max": 0,
+                "min": 0
+            },
+            "max_file_descriptor_count": 1048576,
+            "num_alive_connections": 1,
+            "open_file_descriptor_count": 65,
+            "outstanding_requests": 0,
+            "packets": {
+                "received": 2,
+                "sent": 1
+            },
+            "server_state": "standalone",
+            "watch_count": 0,
+            "znode_count": 5
+        }
+    }
+}

@@ -1,0 +1,10 @@
+[[visualizing-data]]
+== Visualizing your data in Kibana
+
+This section describes how to load the sample Beats dashboards. After loading
+the dashboards in Kibana, you can modify them to meet your needs.
+
+This section includes the following topics:
+
+* <<load-kibana-dashboards>>
+* <<view-kibana-dashboards>>

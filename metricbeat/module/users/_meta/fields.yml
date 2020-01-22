@@ -1,0 +1,10 @@
+- key: users
+  title: "users"
+  release: beta
+  description: >
+    users module
+  fields:
+    - name: users
+      type: group
+      description: >
+      fields:

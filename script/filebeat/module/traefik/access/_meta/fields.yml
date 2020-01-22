@@ -1,0 +1,100 @@
+- name: access
+  type: group
+  description: >
+    Contains fields for the Traefik access logs.
+  fields:
+    - name: user_identifier
+      type: keyword
+      description: >
+        Is the RFC 1413 identity of the client
+    - name: request_count
+      type: long
+      description: >
+        The number of requests
+    - name: frontend_name
+      type: keyword
+      description: >
+        The name of the frontend used
+    - name: backend_url
+      type: keyword
+      description:
+        The url of the backend where request is forwarded
+
+    - name: body_sent.bytes
+      type: alias
+      path: http.response.body.bytes
+      migration: true
+    - name: remote_ip
+      type: alias
+      path: source.address
+      migration: true
+    - name: user_name
+      type: alias
+      path: user.name
+      migration: true
+    - name: method
+      type: alias
+      path: http.request.method
+      migration: true
+    - name: url
+      type: alias
+      path: url.original
+      migration: true
+    - name: http_version
+      type: alias
+      path: http.version
+      migration: true
+    - name: response_code
+      type: alias
+      path: http.response.status_code
+      migration: true
+    - name: referrer
+      type: alias
+      path: http.request.referrer
+      migration: true
+    - name: agent
+      type: alias
+      path: user_agent.original
+      migration: true
+
+    - name: user_agent
+      type: group
+      fields:
+        - name: device
+          type: alias
+          path: user_agent.device.name
+        - name: name
+          type: alias
+          path: user_agent.name
+        - name: os
+          type: alias
+          path: user_agent.os.full_name
+        - name: os_name
+          type: alias
+          path: user_agent.os.name
+        - name: original
+          type: alias
+          path: user_agent.original
+
+    - name: geoip
+      type: group
+      fields:
+        - name: continent_name
+          type: alias
+          path: source.geo.continent_name
+        - name: country_iso_code
+          type: alias
+          path: source.geo.country_iso_code
+        - name: location
+          type: alias
+          path: source.geo.location
+        - name: region_name
+          type: alias
+          path: source.geo.region_name
+        - name: city_name
+          type: alias
+          path: source.geo.city_name
+        - name: region_iso_code
+          type: alias
+          path: source.geo.region_iso_code
+

@@ -1,0 +1,24 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/getting-help.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+Start by searching the https://discuss.elastic.co/c/{discuss_forum}[{beatname_uc} discussion forum] for your issue. If you can't find a resolution, open a new issue or add a comment to an existing one. Make sure you provide the following information, and we'll help
+you troubleshoot the problem:
+
+* {beatname_uc} version
+* Operating System
+* Configuration
+* Any supporting information, such as debugging output, that will help us diagnose your
+problem. See <<enable-{beatname_lc}-debugging>> for more details.
+
+If you're sure you found a bug, you can open a ticket on
+https://github.com/elastic/{github_repo_name}/issues?state=open[GitHub]. Note, however,
+that we close GitHub issues containing questions or requests for help if they
+don't indicate the presence of a bug.

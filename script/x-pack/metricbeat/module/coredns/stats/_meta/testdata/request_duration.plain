@@ -1,0 +1,21 @@
+# HELP coredns_dns_request_duration_seconds Histogram of the time (in seconds) each request took.
+# TYPE coredns_dns_request_duration_seconds histogram
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.00025"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.0005"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.001"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.002"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.004"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.008"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.016"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.032"} 0.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.064"} 424.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.128"} 437.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.256"} 438.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.512"} 440.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="1.024"} 440.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="2.048"} 440.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="4.096"} 440.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="8.192"} 440.0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="+Inf"} 440.0
+coredns_dns_request_duration_seconds_sum{server="dns://:53",zone="."} 21.712619368
+coredns_dns_request_duration_seconds_count{server="dns://:53",zone="."} 440.0

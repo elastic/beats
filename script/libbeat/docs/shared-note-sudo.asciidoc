@@ -1,0 +1,1 @@
+NOTE: Use `sudo` to run these commands if the config file is owned by root.

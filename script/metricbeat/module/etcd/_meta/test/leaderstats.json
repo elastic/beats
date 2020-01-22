@@ -1,0 +1,29 @@
+{ 
+	"followers": { 
+		"6e3bd23ae5f1eae0": { 
+			"counts": { 
+				"fail": 0,
+			       	"success": 745 
+			}, 
+			"latency": { 
+				"average": 0.017039507382550306, 
+				"current": 0.000138, 
+				"maximum": 1.007649, 
+				"minimum": 0, 
+				"standardDeviation": 0.05289178277920594 } 
+		}, 
+		"a8266ecf031671f3": { 
+			"counts": { 
+				"fail": 0, 
+				"success": 735 
+			}, 
+			"latency": { 
+				"average": 0.012124141496598642, 
+				"current": 0.000559, 
+				"maximum": 0.791547, 
+				"minimum": 0, 
+				"standardDeviation": 0.04187900156583733 } 
+		} 
+	}, 
+	"leader": "924e2e83e93f2560" 
+}

@@ -1,0 +1,94 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-kafka]]
+:modulename: kafka
+:has-dashboards: true
+
+== Kafka module
+
+The +{modulename}+ module collects and parses the logs created by
+https://kafka.apache.org/[Kafka].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from versions 0.9, 1.1.0 and 2.0.0.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard to see Kafka logs and stack traces.
+
+[role="screenshot"]
+image::./images/filebeat-kafka-logs-overview.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for logs:
+
+[source,yaml]
+-----
+- module: kafka
+  log:
+    enabled: true
+    var.paths:
+      - "/path/to/logs/controller.log*"
+      - "/path/to/logs/server.log*"
+      - "/path/to/logs/state-change.log*"
+      - "/path/to/logs/kafka-*.log*"
+-----
+
+
+To specify the same settings at the command line, you use:
+
+[source,yaml]
+-----
+-M "kafka.log.var.paths=[/path/to/logs/controller.log*, /path/to/logs/server.log*, /path/to/logs/state-change.log*, /path/to/logs/kafka-*.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+*`var.kafka_home`*::
+
+The path to your Kafka installation. The default is `/opt`. For example:
++
+[source,yaml]
+----
+- module: kafka
+  log:
+    enabled: true
+    var.kafka_home: /usr/share/kafka_2.12-2.4.0
+    ...
+----
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-kafka,exported fields>> section.
+

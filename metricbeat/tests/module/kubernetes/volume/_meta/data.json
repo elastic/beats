@@ -1,0 +1,43 @@
+{
+    "@timestamp": "2017-04-06T15:29:27.150Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost",
+        "version": "6.0.0-alpha1"
+    },
+    "kubernetes": {
+        "namespace": "ns",
+        "node": {
+          "name": "localhost",
+        },
+        "pod": {
+            "name": "nginx-3137573019-pcfzh",
+        },
+        "volume": {
+            "fs": {
+                "available": {
+                    "bytes": 92849512448
+                },
+                "capacity": {
+                    "bytes": 92849524736
+                },
+                "inodes": {
+                    "count": 22668341,
+                    "free": 22668332,
+                    "used": 9
+                },
+                "used": {
+                    "bytes": 12288
+                }
+            },
+            "name": "default-token-4fkmg"
+        }
+    },
+    "metricset": {
+        "host": "localhost:10255",
+        "module": "kubernetes",
+        "name": "volume",
+        "rtt": 648606
+    },
+    "type": "metricsets"
+}

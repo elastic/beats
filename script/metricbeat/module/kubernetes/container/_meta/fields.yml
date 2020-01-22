@@ -1,0 +1,170 @@
+- name: container
+  type: group
+  description: >
+    kubernetes container metrics
+  release: ga
+  fields:
+    - name: start_time
+      type: date
+      description: >
+        Start time
+    - name: cpu
+      type: group
+      description: >
+        CPU usage metrics
+      fields:
+        - name: usage
+          type: group
+          fields:
+            - name: core
+              type: group
+              fields:
+                - name: ns
+                  type: long
+                  description: >
+                    Container CPU Core usage nanoseconds
+            - name: nanocores
+              type: long
+              description: >
+                CPU used nanocores
+            - name: node.pct
+              type: scaled_float
+              format: percent
+              description: >
+                CPU usage as a percentage of the total node allocatable CPU
+            - name: limit.pct
+              type: scaled_float
+              format: percent
+              description: >
+                CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+    - name: logs
+      type: group
+      description: >
+        Logs info
+      fields:
+        - name: available
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Logs available capacity in bytes
+        - name: capacity
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Logs total capacity in bytes
+        - name: used
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Logs used capacity in bytes
+        - name: inodes
+          type: group
+          fields:
+            - name: count
+              type: long
+              description: >
+                Total available inodes
+            - name: free
+              type: long
+              description: >
+                Total free inodes
+            - name: used
+              type: long
+              description: >
+                Total used inodes
+    - name: memory
+      type: group
+      fields:
+        - name: available
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Total available memory
+        - name: usage
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Total memory usage
+            - name: node.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Memory usage as a percentage of the total node allocatable memory
+            - name: limit.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+        - name: rss
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                RSS memory usage
+        - name: workingset
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Working set memory usage
+        - name: pagefaults
+          type: long
+          description: >
+            Number of page faults
+        - name: majorpagefaults
+          type: long
+          description: >
+            Number of major page faults
+    - name: rootfs
+      type: group
+      fields:
+        - name: capacity
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Root filesystem total capacity in bytes
+        - name: available
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Root filesystem total available in bytes
+        - name: used
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Root filesystem total used in bytes
+        - name: inodes
+          type: group
+          fields:
+            - name: used
+              type: long
+              description: >
+                Used inodes

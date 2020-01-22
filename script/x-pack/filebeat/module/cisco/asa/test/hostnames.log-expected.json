@@ -1,0 +1,58 @@
+[
+    {
+        "@timestamp": "2019-10-10T10:21:36.000-02:00",
+        "cisco.asa.mapped_source_ip": "10.0.55.66",
+        "cisco.asa.message_id": "302021",
+        "destination.domain": "target.destination.hostname.local",
+        "event.action": "flow-expiration",
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr target.destination.hostname.local/10005 gaddr 10.0.55.66/0 laddr Prod-host.name.addr/0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.file.path": "hostnames.log",
+        "log.level": "informational",
+        "log.offset": 0,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "service.type": "cisco",
+        "source.domain": "Prod-host.name.addr",
+        "source.nat.ip": "10.0.55.66",
+        "tags": [
+            "cisco-asa"
+        ]
+    },
+    {
+        "@timestamp": "2011-06-04T21:59:52.000-02:00",
+        "cisco.asa.mapped_source_ip": "192.0.2.134",
+        "cisco.asa.message_id": "302021",
+        "cisco.asa.source_username": "type",
+        "destination.address": "192.0.2.15",
+        "destination.ip": "192.0.2.15",
+        "event.action": "flow-expiration",
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr 192.0.2.15/0 gaddr 192.0.2.134/57808 laddr 192.0.2.134/57808 type 8 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "MYHOSTNAME",
+        "input.type": "log",
+        "log.file.path": "hostnames.log",
+        "log.level": "informational",
+        "log.offset": 169,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "service.type": "cisco",
+        "source.address": "192.0.2.134",
+        "source.ip": "192.0.2.134",
+        "tags": [
+            "cisco-asa"
+        ]
+    }
+]

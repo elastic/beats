@@ -1,0 +1,63 @@
+[[add-process-metadata]]
+=== Add process metadata
+
+The Add process metadata processor enriches events with information from running
+processes, identified by their process ID (PID).
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_process_metadata:
+    match_pids: [system.process.ppid]
+    target: system.process.parent
+-------------------------------------------------------------------------------
+
+The fields added to the event look as follows:
+[source,json]
+-------------------------------------------------------------------------------
+"process": {
+  "name":  "systemd",
+  "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+  "exe":   "/usr/lib/systemd/systemd",
+  "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
+  "pid":   1,
+  "ppid":  0,
+  "start_time": "2018-08-22T08:44:50.684Z",
+}
+-------------------------------------------------------------------------------
+
+Optionally, the process environment can be included, too:
+[source,json]
+-------------------------------------------------------------------------------
+  ...
+  "env": {
+    "HOME":       "/",
+    "TERM":       "linux",
+    "BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+    "LANG":       "en_US.UTF-8",
+  }
+  ...
+-------------------------------------------------------------------------------
+It has the following settings:
+
+`match_pids`:: List of fields to lookup for a PID. The processor will
+search the list sequentially until the field is found in the current event, and
+the PID lookup will be applied to the value of this field.
+
+`target`:: (Optional) Destination prefix where the `process` object will be
+created. The default is the event's root.
+
+`include_fields`:: (Optional) List of fields to add. By default, the processor
+will add all the available fields except `process.env`.
+
+`ignore_missing`:: (Optional) When set to `false`, events that don't contain any
+of the fields in match_pids will be discarded and an error will be generated. By
+default, this condition is ignored.
+
+`overwrite_keys`:: (Optional) By default, if a target field already exists, it
+will not be overwritten and an error will be logged. If `overwrite_keys` is
+set to `true`, this condition will be ignored.
+
+`restricted_fields`:: (Optional) By default, the `process.env` field is not
+output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
+field will be present in the output.

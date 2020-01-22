@@ -1,0 +1,83 @@
+:modulename: icinga
+:has-dashboards: true
+
+== Icinga module
+
+The +{modulename}+ module parses the main, debug, and startup logs of
+https://www.icinga.com/products/icinga-2/[Icinga].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with Icinga >= 2.x on various Linux and Windows
+systems.
+
+This module is not available for macOS.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-icinga-main.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: icinga
+  main:
+    enabled: true
+    var.paths: ["/path/to/log/icinga2/icinga2.log*"]
+  debug:
+    enabled: true
+    var.paths: ["/path/to/log/icinga2/debug.log*"]
+  startup:
+    enabled: true
+    var.paths: ["/path/to/log/icinga2/startup.log"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "icinga.main.var.paths=[/path/to/log/icinga2/icinga2.log*]" -M "icinga.debug.var.paths=[/path/to/log/icinga2/debug.log*]" -M "icinga.startup.var.paths=[/path/to/log/icinga2/startup.log]"
+-----
+
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: main
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `main` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `debug` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `startup` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

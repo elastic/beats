@@ -1,0 +1,44 @@
+[
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "Saving the final RDB snapshot before exiting.",
+        "process.pid": 98738,
+        "redis.log.role": "master",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 76,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects.",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 165,
+        "message": "The server is now ready to accept connections on port 6379\"",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 250,
+        "message": "Received SIGINT scheduling shutdown...",
+        "process.pid": 5092,
+        "service.type": "redis"
+    }
+]

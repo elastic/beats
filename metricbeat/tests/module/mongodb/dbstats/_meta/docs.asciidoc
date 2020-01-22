@@ -1,0 +1,6 @@
+This is the `dbstats` metricset of the MongoDB module.
+
+It requires the following privileges, which is covered by the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role]:
+
+- https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+- for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]

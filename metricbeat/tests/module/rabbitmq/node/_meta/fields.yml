@@ -1,0 +1,160 @@
+- name: node
+  type: group
+  description: >
+    node
+  release: ga
+  fields:
+    - name: disk.free.bytes
+      type: long
+      description: >
+        Disk free space in bytes.
+      format: bytes
+    - name: disk.free.limit.bytes
+      type: long
+      description: >
+        Point at which the disk alarm will go off.
+      format: bytes
+    - name: fd.total
+      type: long
+      description: >
+        File descriptors available.
+    - name: fd.used
+      type: long
+      description: >
+        Used file descriptors.
+    - name: gc.num.count
+      type: long
+      description: >
+        Number of GC operations.
+    - name: gc.reclaimed.bytes
+      type: long
+      description: >
+        GC bytes reclaimed.
+      format: bytes
+    - name: io.file_handle.open_attempt.avg.ms
+      type: long
+      description: >
+        File handle open avg time
+    - name: io.file_handle.open_attempt.count
+      type: long
+      description: >
+        File handle open attempts
+    - name: io.read.avg.ms
+      type: long
+      description: >
+        File handle read avg time
+    - name: io.read.bytes
+      type: long
+      description: >
+        Data read in bytes
+      format: bytes
+    - name: io.read.count
+      type: long
+      description: >
+        Data read operations
+    - name: io.reopen.count
+      type: long
+      description: >
+        Data reopen operations
+    - name: io.seek.avg.ms
+      type: long
+      description: >
+        Data seek avg time
+    - name: io.seek.count
+      type: long
+      description: >
+        Data seek operations
+    - name: io.sync.avg.ms
+      type: long
+      description: >
+        Data sync avg time
+    - name: io.sync.count
+      type: long
+      description: >
+        Data sync operations
+    - name: io.write.avg.ms
+      type: long
+      description: >
+        Data write avg time
+    - name: io.write.bytes
+      type: long
+      description: >
+        Data write in bytes
+      format: bytes
+    - name: io.write.count
+      type: long
+      description: >
+        Data write operations
+    - name: mem.limit.bytes
+      type: long
+      description: >
+        Point at which the memory alarm will go off.
+      format: bytes
+    - name: mem.used.bytes
+      type: long
+      description: >
+        Memory used in bytes.
+    - name: mnesia.disk.tx.count
+      type: long
+      description: >
+        Number of Mnesia transactions which have been performed that required writes to disk.
+    - name: mnesia.ram.tx.count
+      type: long
+      description: >
+        Number of Mnesia transactions which have been performed that did not require writes to disk.
+    - name: msg.store_read.count
+      type: long
+      description: >
+        Number of messages which have been read from the message store.
+    - name: msg.store_write.count
+      type: long
+      description: >
+        Number of messages which have been written to the message store.
+    - name: name
+      type: keyword
+      description:
+        Node name
+    - name: proc.total
+      type: long
+      description: >
+        Maximum number of Erlang processes.
+    - name: proc.used
+      type: long
+      description: >
+        Number of Erlang processes in use.
+    - name: processors
+      type: long
+      description: >
+        Number of cores detected and usable by Erlang.
+    - name: queue.index.journal_write.count
+      type: long
+      description: >
+        Number of records written to the queue index journal.
+    - name: queue.index.read.count
+      type: long
+      description: >
+        Number of records read from the queue index.
+    - name: queue.index.write.count
+      type: long
+      description: >
+        Number of records written to the queue index.
+    - name: run.queue
+      type: long
+      description: >
+        Average number of Erlang processes waiting to run.
+    - name: socket.total
+      type: long
+      description: >
+        File descriptors available for use as sockets.
+    - name: socket.used
+      type: long
+      description: >
+        File descriptors used as sockets.
+    - name: type
+      type: keyword
+      description: >
+        Node type.
+    - name: uptime
+      type: long
+      description: >
+        Node uptime.

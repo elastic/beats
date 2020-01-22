@@ -1,0 +1,45 @@
+###################### Metricbeat Configuration Example #######################
+
+#==========================  Modules configuration ============================
+metricbeat.modules:
+
+#------------------------------ Http Module -----------------------------
+- module: http
+  metricsets: ["json"]
+  enabled: true
+  period: 10s
+  hosts: ["http://date.jsontest.com"]
+  namespace: "http_json_namespace"
+  headers:
+    Accept: application/json
+  request.enabled: true
+  json.is_array: false
+  response.enabled: true
+
+#================================ Outputs =====================================
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
+
+output.file:
+  # Boolean flag to enable or disable the output module.
+  enabled: true
+
+  # Path to the directory where to save the generated files. The option is
+  # mandatory.
+  path: "/tmp/httpmetric"
+
+logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+logging.selectors: ["*"]

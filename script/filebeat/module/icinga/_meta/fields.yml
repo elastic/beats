@@ -1,0 +1,9 @@
+- key: icinga
+  title: "Icinga"
+  description: >
+    Icinga Module
+  fields:
+    - name: icinga
+      type: group
+      description: >
+      fields:

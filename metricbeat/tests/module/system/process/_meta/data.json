@@ -1,0 +1,220 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.process",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "process"
+    },
+    "process": {
+        "args": [
+            "/usr/bin/dockerd",
+            "-H",
+            "unix://"
+        ],
+        "executable": "/usr/bin/dockerd-ce",
+        "name": "dockerd",
+        "pgid": 2080,
+        "pid": 2080,
+        "ppid": 1,
+        "working_directory": "/"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "process": {
+            "cgroup": {
+                "blkio": {
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
+                    "total": {
+                        "bytes": 844576104448,
+                        "ios": 54869430
+                    }
+                },
+                "cpu": {
+                    "cfs": {
+                        "period": {
+                            "us": 100000
+                        },
+                        "quota": {
+                            "us": 0
+                        },
+                        "shares": 1024
+                    },
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
+                    "rt": {
+                        "period": {
+                            "us": 0
+                        },
+                        "runtime": {
+                            "us": 0
+                        }
+                    },
+                    "stats": {
+                        "periods": 0,
+                        "throttled": {
+                            "ns": 0,
+                            "periods": 0
+                        }
+                    }
+                },
+                "cpuacct": {
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
+                    "percpu": {
+                        "1": 7058282754012,
+                        "2": 7053634662537,
+                        "3": 7069386293853,
+                        "4": 7050055153087
+                    },
+                    "stats": {
+                        "system": {
+                            "ns": 7202920000000
+                        },
+                        "user": {
+                            "ns": 19573240000000
+                        }
+                    },
+                    "total": {
+                        "ns": 28231358863489
+                    }
+                },
+                "id": "docker.service",
+                "memory": {
+                    "id": "docker.service",
+                    "kmem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 9223372036854771712
+                        },
+                        "usage": {
+                            "bytes": 21139456,
+                            "max": {
+                                "bytes": 480030720
+                            }
+                        }
+                    },
+                    "kmem_tcp": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 9223372036854771712
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "mem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 9223372036854771712
+                        },
+                        "usage": {
+                            "bytes": 3337703424,
+                            "max": {
+                                "bytes": 5245300736
+                            }
+                        }
+                    },
+                    "memsw": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "path": "/system.slice/docker.service",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 779677696
+                        },
+                        "active_file": {
+                            "bytes": 1753378816
+                        },
+                        "cache": {
+                            "bytes": 2127810560
+                        },
+                        "hierarchical_memory_limit": {
+                            "bytes": 9223372036854771712
+                        },
+                        "hierarchical_memsw_limit": {
+                            "bytes": 0
+                        },
+                        "inactive_anon": {
+                            "bytes": 409075712
+                        },
+                        "inactive_file": {
+                            "bytes": 374431744
+                        },
+                        "major_page_faults": 53164,
+                        "mapped_file": {
+                            "bytes": 7491584
+                        },
+                        "page_faults": 21923702,
+                        "pages_in": 57261049,
+                        "pages_out": 56521859,
+                        "rss": {
+                            "bytes": 1188753408
+                        },
+                        "rss_huge": {
+                            "bytes": 56623104
+                        },
+                        "swap": {
+                            "bytes": 0
+                        },
+                        "unevictable": {
+                            "bytes": 0
+                        }
+                    }
+                },
+                "path": "/system.slice/docker.service"
+            },
+            "cmdline": "/usr/bin/dockerd -H unix://",
+            "cpu": {
+                "start_time": "2019-01-08T17:06:39.000Z",
+                "total": {
+                    "norm": {
+                        "pct": 0.0049
+                    },
+                    "pct": 0.0195,
+                    "value": 27827810
+                }
+            },
+            "fd": {
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                },
+                "open": 68
+            },
+            "memory": {
+                "rss": {
+                    "bytes": 1187336192,
+                    "pct": 0.0716
+                },
+                "share": 8253440,
+                "size": 4438523904
+            },
+            "state": "sleeping"
+        }
+    },
+    "user": {
+        "name": "root"
+    }
+}

@@ -1,0 +1,104 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-path-config.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-path]]
+== Configure project paths
+
+The `path` section of the +{beatname_lc}.yml+ config file contains configuration
+options that define where {beatname_uc} looks for its files. For example, {beatname_uc}
+looks for the Elasticsearch template file in the configuration path and writes
+log files in the logs path.
+ifdef::has_registry[]
+{beatname_uc} looks for its registry files in the data path.
+endif::[]
+
+Please see the <<directory-layout>> section for more details.
+
+Here is an example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+path.home: /usr/share/beat
+path.config: /etc/beat
+path.data: /var/lib/beat
+path.logs: /var/log/
+------------------------------------------------------------------------------
+
+Note that it is possible to override these options by using command line flags.
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `path` section of the +{beatname_lc}.yml+ config file:
+
+[float]
+==== `home`
+
+The home path for the {beatname_uc} installation. This is the default base path for all
+other path settings and for miscellaneous files that come with the distribution (for example, the
+sample dashboards). If not set by a CLI flag or in the configuration file, the default
+for the home path is the location of the {beatname_uc} binary.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+path.home: /usr/share/beats
+------------------------------------------------------------------------------
+
+[float]
+==== `config`
+
+The configuration path for the {beatname_uc} installation. This is the default base path
+for configuration files, including the main YAML configuration file and the
+Elasticsearch template file. If not set by a CLI flag or in the configuration file, the default for the
+configuration path is the home path.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+path.config: /usr/share/beats/config
+------------------------------------------------------------------------------
+
+[float]
+==== `data`
+
+The data path for the {beatname_uc} installation. This is the default base path for all
+the files in which {beatname_uc} needs to store its data. If not set by a CLI
+flag or in the configuration file, the default for the data path is a `data`
+subdirectory inside the home path.
+
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+path.data: /var/lib/beats
+------------------------------------------------------------------------------
+
+TIP: When running multiple {beatname_uc} instances on the same host, make sure they
+each have a distinct `path.data` value.
+
+[float]
+==== `logs`
+
+The logs path for a {beatname_uc} installation. This is the default location for {beatname_uc}'s
+log files. If not set by a CLI flag or in the configuration file, the default
+for the logs path is a `logs` subdirectory inside the home path.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+path.logs: /var/log/beats
+------------------------------------------------------------------------------

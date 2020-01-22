@@ -1,0 +1,24 @@
+- name: keyspace
+  type: group
+  description: >
+    `keyspace` contains the information about the keyspaces returned by the `INFO` command.
+  release: ga
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        Keyspace identifier.
+
+    - name: avg_ttl
+      type: long
+      description: >
+        Average ttl.
+
+    - name: keys
+      type: long
+      description: >
+        Number of keys in the keyspace.
+
+    - name: expires
+      type: long
+      description: >

@@ -1,0 +1,70 @@
+{
+    "@timestamp": "2018-11-29T22:49:03.308Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
+    },
+    "server": {
+        "port": 80,
+        "ip": "192.16.31.23"
+    },
+    "status": "OK",
+    "bytes_out": 593,
+    "type": "http",
+    "method": "GET",
+    "bytes_in": 379,
+    "client": {
+        "port": 10437,
+        "process": {
+            "exe": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            "start": "2018-11-29T22:48:59.276Z",
+            "pid": 2928,
+            "ppid": 1860,
+            "name": "chrome.exe",
+            "args": [
+                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            ]
+        },
+        "ip": "10.0.2.15"
+    },
+    "host": {
+        "name": "vagrant-2012-r2",
+        "architecture": "x86_64",
+        "os": {
+            "version": "6.3",
+            "family": "windows",
+            "kernel": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+            "build": "9600.0",
+            "platform": "windows"
+        },
+        "id": "42f11c3b-3062-4874-9ea3-50e0e08c4434"
+    },
+    "query": "GET /",
+    "responsetime": 29,
+    "path": "/",
+    "http": {
+        "request": {
+            "headers": {
+                "content-length": 0
+            },
+            "params": ""
+        },
+        "response": {
+            "code": 301,
+            "phrase": "Moved Permanently",
+            "headers": {
+                "content-length": 292,
+                "content-type": "text/html; charset=iso-8859-1"
+            }
+        }
+    },
+    "agent": {
+        "type": "packetbeat",
+        "hostname": "vagrant-2012-r2",
+        "version": "7.0.0"
+    },
+    "network": {
+        "direction": "outgoing"
+    }
+}

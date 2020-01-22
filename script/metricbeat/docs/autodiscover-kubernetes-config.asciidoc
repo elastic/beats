@@ -1,0 +1,19 @@
+Metricbeat supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      include_annotations: ["prometheus.io.scrape"]
+      templates:
+        - condition:
+            contains:
+              kubernetes.annotations.prometheus.io.scrape: "true"
+          config:
+            - module: prometheus
+              metricsets: ["collector"]
+              hosts: "${data.host}:${data.port}"
+-------------------------------------------------------------------------------------
+
+This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.

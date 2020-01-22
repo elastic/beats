@@ -1,0 +1,52 @@
+# Module: kafka
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kafka.html
+
+# Kafka metrics collected using the Kafka protocol
+- module: kafka
+  #metricsets:
+  #  - partition
+  #  - consumergroup
+  period: 10s
+  hosts: ["localhost:9092"]
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]

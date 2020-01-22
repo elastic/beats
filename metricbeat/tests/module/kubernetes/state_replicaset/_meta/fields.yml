@@ -1,0 +1,31 @@
+- name: replicaset
+  type: group
+  description: >
+    kubernetes replica set metrics
+  release: ga
+  fields:
+    - name: replicas
+      type: group
+      description: >
+        Kubernetes replica set paused status
+      fields:
+        - name: available
+          type: long
+          description: >
+            The number of replicas per ReplicaSet
+        - name: desired
+          type: long
+          description: >
+            The number of replicas per ReplicaSet
+        - name: ready
+          type: long
+          description: >
+            The number of ready replicas per ReplicaSet
+        - name: observed
+          type: long
+          description: >
+            The generation observed by the ReplicaSet controller
+        - name: labeled
+          type: long
+          description: >
+            The number of fully labeled replicas per ReplicaSet

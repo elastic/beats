@@ -1,0 +1,27 @@
+# Module: icinga
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-icinga.html
+
+- module: icinga
+  # Main logs
+  main:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Debug logs
+  debug:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Startup logs
+  startup:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:

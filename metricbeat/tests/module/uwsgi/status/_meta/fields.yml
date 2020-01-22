@@ -1,0 +1,122 @@
+- name: status
+  type: group
+  release: ga
+  description: >
+    uwsgi.status metricset fields
+  fields:
+    - name: total.requests
+      type: long
+      description: >
+        Total requests handled
+    - name: total.exceptions
+      type: long
+      description: >
+        Total exceptions
+    - name: total.write_errors
+      type: long
+      description: >
+        Total requests write errors
+    - name: total.read_errors
+      type: long
+      description: >
+        Total read errors
+    - name: total.pid
+      type: long
+      description: >
+        Process id
+    - name: worker.id
+      type: long
+      description: >
+        Worker id
+    - name: worker.pid
+      type: long
+      description: >
+        Worker process id
+    - name: worker.accepting
+      type: long
+      description: >
+        State of worker, 1 if still accepting new requests otherwise 0
+    - name: worker.requests
+      type: long
+      description: >
+        Number of requests served by this worker
+    - name: worker.delta_requests
+      type: long
+      description: >
+        Number of requests served by this worker after worker is reloaded when reached MAX_REQUESTS
+    - name: worker.exceptions
+      type: long
+      description: >
+        Exceptions raised
+    - name: worker.harakiri_count
+      type: long
+      description: >
+        Dropped requests by timeout
+    - name: worker.signals
+      type: long
+      description: >
+        Emitted signals count
+    - name: worker.signal_queue
+      type: long
+      description: >
+        Number of signals waiting to be handled
+    - name: worker.status
+      type: keyword
+      description: >
+        Worker status (cheap, pause, sig, busy, idle)
+    - name: worker.rss
+      type: keyword
+      description: >
+        Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
+    - name: worker.vsz
+      type: long
+      description: >
+        Virtual Set Size. memory size assigned to a process. if always zero try `--memory-report` option of uwsgi
+    - name: worker.running_time
+      type: long
+      description: >
+        Process running time
+    - name: worker.respawn_count
+      type: long
+      description: >
+        Respawn count
+    - name: worker.tx
+      type: long
+      description: >
+        Transmitted size
+    - name: worker.avg_rt
+      type: long
+      description: >
+        Average response time
+    - name: core.id
+      type: long
+      description: >
+        worker ID
+    - name: core.worker_pid
+      type: long
+      description: >
+        Parent worker PID
+    - name: core.requests.total
+      type: long
+      description: >
+        Number of total requests served
+    - name: core.requests.static
+      type: long
+      description: >
+        Number of static file serves
+    - name: core.requests.routed
+      type: long
+      description: >
+        Routed requests
+    - name: core.requests.offloaded
+      type: long
+      description: >
+        Offloaded requests
+    - name: core.write_errors
+      type: long
+      description: >
+        Number of failed writes
+    - name: core.read_errors
+      type: long
+      description: >
+        Number of failed reads
