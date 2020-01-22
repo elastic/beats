@@ -64,9 +64,9 @@ type s3Input struct {
 	awsConfig  awssdk.Config
 	logger     *logp.Logger
 	close      chan struct{}
-	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
-	context    *channelContext
-	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
+	workerOnce sync.Once       // Guarantees that the worker goroutine is only started once.
+	inputCtx   context.Context // Wraps the Done channel from parent input.Context.
+	workerWg   sync.WaitGroup  // Waits on s3 worker goroutine.
 	stopOnce   sync.Once
 }
 
@@ -107,25 +107,8 @@ type s3Context struct {
 	errC chan error
 }
 
-// channelContext implements context.Context by wrapping a channel
-type channelContext struct {
-	done <-chan struct{}
-}
-
-func (c *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
-func (c *channelContext) Done() <-chan struct{}       { return c.done }
-func (c *channelContext) Err() error {
-	select {
-	case <-c.done:
-		return context.Canceled
-	default:
-		return nil
-	}
-}
-func (c *channelContext) Value(key interface{}) interface{} { return nil }
-
 // NewInput creates a new s3 input
-func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, inputContext input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
 	logger := logp.NewLogger(inputName)
 
@@ -136,7 +119,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
+			DynamicFields: inputContext.DynamicFields,
 		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
@@ -156,13 +139,29 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	closeChannel := make(chan struct{})
+
+	// Wrap input.Context's Done channel with a context.Context. This goroutine
+	// stops with the parent closes the Done channel.
+	// Create a context with a timeout that will abort the API call if it takes
+	// more than the default timeout 2 minute.
+	ctx := context.Background()
+	ctx, _ = context.WithTimeout(ctx, config.ContextTimeout)
+	inputCtx, cancelInputCtx := context.WithCancel(ctx)
+	go func() {
+		defer cancelInputCtx()
+		select {
+		case <-inputContext.Done:
+		case <-inputCtx.Done():
+		}
+	}()
+
 	p := &s3Input{
 		outlet:    out,
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
 		close:     closeChannel,
-		context:   &channelContext{closeChannel},
+		inputCtx:  inputCtx,
 	}
 	return p, nil
 }
@@ -194,7 +193,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
-	for p.context.Err() == nil {
+	for p.inputCtx.Err() == nil {
 		// receive messages from sqs
 		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
@@ -221,7 +220,7 @@ func (p *s3Input) Stop() {
 	p.stopOnce.Do(func() {
 		defer p.outlet.Close()
 		close(p.close)
-		p.context.Done()
+		p.inputCtx.Done()
 		p.logger.Info("Stopping s3 input")
 	})
 }
@@ -317,7 +316,7 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 			WaitTimeSeconds:       &waitTimeSecond,
 		})
 
-	return req.Send(p.context)
+	return req.Send(p.inputCtx)
 }
 
 func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI, receiptHandle *string) error {
@@ -326,7 +325,7 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 		VisibilityTimeout: &visibilityTimeout,
 		ReceiptHandle:     receiptHandle,
 	})
-	_, err := req.Send(p.context)
+	_, err := req.Send(p.inputCtx)
 	return err
 }
 
@@ -383,11 +382,6 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 			return err
 		}
 
-		if resp == nil {
-			resp.Body.Close()
-			return nil
-		}
-
 		reader := bufio.NewReader(resp.Body)
 		// Check content-type
 		if resp.ContentType != nil {
@@ -403,8 +397,6 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 				}
 				reader = bufio.NewReader(gzipReader)
 				gzipReader.Close()
-			default:
-				reader = bufio.NewReader(resp.Body)
 			}
 		} else if strings.HasSuffix(s3Info.key, ".gz") {
 			// If there is no content-type, check file name instead.
@@ -548,11 +540,6 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 }
 
 func (p *s3Input) getS3ObjectResponse(svc s3iface.ClientAPI, s3Info s3Info) (*s3.GetObjectResponse, error) {
-	// Create a context with a timeout that will abort the download if it takes
-	// more than the default timeout 2 minute.
-	ctx := context.Background()
-	ctx, _ = context.WithTimeout(ctx, p.config.ContextTimeout)
-
 	// Download the S3 object using GetObjectRequest. The Context will interrupt
 	// the request if the timeout expires.
 	s3GetObjectInput := &s3.GetObjectInput{
@@ -561,7 +548,7 @@ func (p *s3Input) getS3ObjectResponse(svc s3iface.ClientAPI, s3Info s3Info) (*s3
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(ctx)
+	resp, err := req.Send(p.inputCtx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			// If the SDK can determine the request or retry delay was canceled
