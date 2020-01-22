@@ -24,6 +24,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -96,11 +98,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	processor := &kubernetesAnnotator{
 		cache:               newCache(config.CleanupTimeout),
 		kubernetesAvailable: false,
@@ -122,8 +119,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return processor, nil
 	}
 
-	processor.indexers = NewIndexers(config.Indexers, metaGen)
-
 	matchers := NewMatchers(config.Matchers)
 
 	if matchers.Empty() {
@@ -141,12 +136,14 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Host,
 		Namespace:   config.Namespace,
-	})
+	}, nil)
 	if err != nil {
 		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 
+	metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+	processor.indexers = NewIndexers(config.Indexers, metaGen)
 	processor.watcher = watcher
 	processor.kubernetesAvailable = true
 

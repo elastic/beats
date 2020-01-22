@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2020-01-10T18:25:42.000Z",
+        "aws.cloudtrail.event_type": "AwsApiCall",
+        "aws.cloudtrail.event_version": "1.05",
+        "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_parameters": "{userName=Bob}",
+        "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",
+        "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",
+        "aws.cloudtrail.user_identity.invoked_by": "signin.amazonaws.com",
+        "aws.cloudtrail.user_identity.session_context.creation_date": "2020-01-10T14:38:30.000Z",
+        "aws.cloudtrail.user_identity.session_context.mfa_authenticated": "true",
+        "aws.cloudtrail.user_identity.type": "IAMUser",
+        "cloud.account.id": "0123456789012",
+        "cloud.region": "us-east-1",
+        "event.action": "UpdateLoginProfile",
+        "event.dataset": "aws.cloudtrail",
+        "event.id": "EXAMPLE-c3b6-4498-b818-EXAMPLE",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-10T14:38:30Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-10T18:25:42Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"UpdateLoginProfile\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"userName\":\"Bob\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-0dc6-447a-8859-EXAMPLE\",\"eventID\":\"EXAMPLE-c3b6-4498-b818-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
+        "event.outcome": "success",
+        "event.provider": "iam.amazonaws.com",
+        "event.type": "info",
+        "fileset.name": "cloudtrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.user": [
+            "Bob"
+        ],
+        "service.type": "aws",
+        "source.address": "127.0.0.1",
+        "user.id": "EXAMPLE_ID",
+        "user.name": "Alice",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "signin.amazonaws.com"
+    }
+]

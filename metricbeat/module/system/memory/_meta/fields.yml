@@ -102,6 +102,39 @@
           description: >
             The percentage of used swap memory.
 
+    - name: page_stats
+      type: group
+      description: memory page statistics
+      fields:
+        - name: pgscan_kswapd.pages
+          type: long
+          format: number
+          description: pages scanned by kswapd
+        - name: pgscan_direct.pages
+          type: long
+          format: number
+          description: pages scanned directly
+        - name: pgfree.pages
+          type: long
+          format: number
+          description: pages freed by the system
+        - name: pgsteal_kswapd.pages
+          type: long
+          format: number
+          description: number of pages reclaimed by kswapd
+        - name: pgsteal_direct.pages
+          type: long
+          format: number
+          description: number of pages reclaimed directly
+        - name: direct_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+        - name: kswapd_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
     - name: hugepages
       type: group
       prefix: "[float]"

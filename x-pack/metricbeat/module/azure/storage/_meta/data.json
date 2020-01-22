@@ -1,0 +1,84 @@
+{
+    "_index" : "metricbeat-8.0.0-2020.01.09-000001",
+    "_type" : "_doc",
+    "_id" : "XxYjjG8BQe78yNOEwING",
+    "_score" : null,
+    "_source" : {
+        "@timestamp" : "2020-01-09T21:04:00.000Z",
+        "event" : {
+            "duration" : 122304420600,
+            "dataset" : "azure.storage",
+            "module" : "azure"
+        },
+        "metricset" : {
+            "name" : "storage",
+            "period" : 300000
+        },
+        "azure" : {
+            "namespace" : "Microsoft.Storage/storageAccounts/blobServices",
+            "dimensions" : {
+                "apiname" : "DeleteBlob"
+            },
+            "storage" : {
+                "successe2elatency" : {
+                    "avg" : 9.1
+                },
+                "availability" : {
+                    "avg" : 100
+                },
+                "transactions" : {
+                    "total" : 10
+                },
+                "ingress" : {
+                    "total" : 5330
+                },
+                "egress" : {
+                    "total" : 1010
+                },
+                "successserverlatency" : {
+                    "avg" : 9.1
+                }
+            },
+            "resource" : {
+                "name" : "obsdiaglinux",
+                "type" : "Microsoft.Storage/storageAccounts",
+                "group" : "obs-infrastructure"
+            },
+            "subscription_id" : "12345678-qwer-1234-5678-12345678"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "ecs" : {
+            "version" : "1.2.0"
+        },
+        "host" : {
+            "architecture" : "x86_64",
+            "name" : "DESKTOP-RFOOE09",
+            "os" : {
+                "kernel" : "10.0.18362.535 (WinBuild.160101.0800)",
+                "build" : "18362.535",
+                "platform" : "windows",
+                "version" : "10.0",
+                "family" : "windows",
+                "name" : "Windows 10 Pro"
+            },
+            "id" : "12345678-qwer-1234-5678-12345678",
+            "hostname" : "DESKTOP-RFOOE09"
+        },
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "12345678-qwer-1234-5678-12345678",
+            "version" : "8.0.0",
+            "type" : "metricbeat",
+            "ephemeral_id" : "12345678-qwer-1234-5678-12345678"
+        },
+        "cloud" : {
+            "provider" : "azure",
+            "region" : "westeurope"
+        }
+    },
+    "sort" : [
+        1578603840000
+    ]
+}
