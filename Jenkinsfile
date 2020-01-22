@@ -545,9 +545,9 @@ def withBeatsEnv(Closure body){
   ]){
     deleteDir()
     unstash 'source'
-    sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-    sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
     dir("${BASE_DIR}"){
+      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
+      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       try {
         body()
       } finally {
@@ -570,8 +570,8 @@ def withBeatsEnvWin(Closure body){
   ]){
     deleteDir()
     unstash 'source'
-    bat(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
     dir("${BASE_DIR}"){
+      bat(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
       try {
         body()
       } finally {
