@@ -35,21 +35,23 @@ pipeline {
       steps {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
-        script {
-          env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
-          env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
-          env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
-          env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
-          env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
-          env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
-          env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
-          env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
-          env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
-          env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
-          env.BUILD_GENERATOR = isChanged(["^generator/.*"])
-          env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-          env.BUILD_DOCS = isGitRegionMatch(patterns: ["^docs/.*"], comparator: 'regexp') || params.runAllStages
-          env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^Libbeat/.*"], comparator: 'regexp') || params.runAllStages
+        dir("${BASE_DIR}"){
+          script {
+            env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
+            env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
+            env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
+            env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
+            env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
+            env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
+            env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+            env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
+            env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
+            env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
+            env.BUILD_GENERATOR = isChanged(["^generator/.*"])
+            env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+            env.BUILD_DOCS = isGitRegionMatch(patterns: ["^docs/.*"], comparator: 'regexp') || params.runAllStages
+            env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^Libbeat/.*"], comparator: 'regexp') || params.runAllStages
+          }
         }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
