@@ -12486,6 +12486,28 @@ example: Please add example
 
 --
 
+*`greenplum.log.user`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.database`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
 *`greenplum.log.process_id`*::
 +
 --
@@ -12508,7 +12530,60 @@ example: Please add example
 
 --
 
+*`greenplum.log.host`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.port`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.session_start`*::
++
+--
+Please add description
+
+example: Please add example
+
+--
+
 *`greenplum.log.transaction_id`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.session_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.command_count`*::
 +
 --
 Please add description
@@ -12547,6 +12622,50 @@ example: Please add example
 
 --
 
+*`greenplum.log.slice_id`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.distributed_transaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.local_transaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.subtransaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
 *`greenplum.log.level`*::
 +
 --
@@ -12570,6 +12689,72 @@ example: Please add example
 --
 
 *`greenplum.log.message`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.detail`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.hint`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.query`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.query_position`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.context`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.debug`*::
 +
 --
 Please add description
@@ -12614,6 +12799,17 @@ example: Please add example
 Please add description
 
 type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.stack`*::
++
+--
+Please add description
+
+type: text
 
 example: Please add example
 
