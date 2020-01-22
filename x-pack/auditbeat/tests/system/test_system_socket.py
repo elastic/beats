@@ -652,7 +652,7 @@ class DNSTestCase:
                 "event.kind": "event",
                 "event.module": "system",
                 "network.packets": net_bytes,
-                "network.direction": "inbound",
+                "network.direction": "outbound",
                 "network.packets": net_packets,
                 "network.transport": self.socket_factory.transport,
                 "network.type": self.socket_factory.network,
