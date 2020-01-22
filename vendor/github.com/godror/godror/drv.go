@@ -26,7 +26,8 @@
 //     poolSessionMaxLifetime=1h& \
 //     poolSessionTimeout=30s& \
 //     timezone=Local& \
-//     newPassword=
+//     newPassword= \
+//     onInit=ALTER+SESSION+SET+current_schema%3Dmy_schema
 //
 // These are the defaults. Many advocate that a static session pool (min=max, incr=0)
 // is better, with 1-10 sessions per CPU thread.
@@ -57,7 +58,6 @@ import (
 	"fmt"
 	"hash/fnv"
 	"io"
-	"math"
 	"net/url"
 	"strconv"
 	"strings"
@@ -87,7 +87,9 @@ const (
 	DpiVersionNumber = C.DPI_VERSION_NUMBER
 
 	// DriverName is set on the connection to be seen in the DB
-	DriverName = "github.com/godror/godror : " + Version
+	//
+	// It cannot be longer than 30 bytes !
+	DriverName = "godror : " + Version
 
 	// DefaultPoolMinSessions specifies the default value for minSessions for pool creation.
 	DefaultPoolMinSessions = 1
@@ -108,238 +110,39 @@ const (
 	DefaultMaxLifeTime = 1 * time.Hour
 )
 
-// Number as string
-type Number string
-
-var (
-	// Int64 for converting to-from int64.
-	Int64 = intType{}
-	// Float64 for converting to-from float64.
-	Float64 = floatType{}
-	// Num for converting to-from Number (string)
-	Num = numType{}
-)
-
-type intType struct{}
-
-func (intType) String() string { return "Int64" }
-func (intType) ConvertValue(v interface{}) (driver.Value, error) {
-	if Log != nil {
-		Log("ConvertValue", "Int64", "value", v)
-	}
-	switch x := v.(type) {
-	case int8:
-		return int64(x), nil
-	case int16:
-		return int64(x), nil
-	case int32:
-		return int64(x), nil
-	case int64:
-		return x, nil
-	case uint16:
-		return int64(x), nil
-	case uint32:
-		return int64(x), nil
-	case uint64:
-		return int64(x), nil
-	case float32:
-		if _, f := math.Modf(float64(x)); f != 0 {
-			return int64(x), errors.Errorf("non-zero fractional part: %f", f)
-		}
-		return int64(x), nil
-	case float64:
-		if _, f := math.Modf(x); f != 0 {
-			return int64(x), errors.Errorf("non-zero fractional part: %f", f)
-		}
-		return int64(x), nil
-	case string:
-		if x == "" {
-			return 0, nil
-		}
-		return strconv.ParseInt(x, 10, 64)
-	case Number:
-		if x == "" {
-			return 0, nil
-		}
-		return strconv.ParseInt(string(x), 10, 64)
-	default:
-		return nil, errors.Errorf("unknown type %T", v)
-	}
-}
-
-type floatType struct{}
-
-func (floatType) String() string { return "Float64" }
-func (floatType) ConvertValue(v interface{}) (driver.Value, error) {
-	if Log != nil {
-		Log("ConvertValue", "Float64", "value", v)
-	}
-	switch x := v.(type) {
-	case int8:
-		return float64(x), nil
-	case int16:
-		return float64(x), nil
-	case int32:
-		return float64(x), nil
-	case uint16:
-		return float64(x), nil
-	case uint32:
-		return float64(x), nil
-	case int64:
-		return float64(x), nil
-	case uint64:
-		return float64(x), nil
-	case float32:
-		return float64(x), nil
-	case float64:
-		return x, nil
-	case string:
-		if x == "" {
-			return 0, nil
-		}
-		return strconv.ParseFloat(x, 64)
-	case Number:
-		if x == "" {
-			return 0, nil
-		}
-		return strconv.ParseFloat(string(x), 64)
-	default:
-		return nil, errors.Errorf("unknown type %T", v)
-	}
-}
-
-type numType struct{}
-
-func (numType) String() string { return "Num" }
-func (numType) ConvertValue(v interface{}) (driver.Value, error) {
-	if Log != nil {
-		Log("ConvertValue", "Num", "value", v)
-	}
-	switch x := v.(type) {
-	case string:
-		if x == "" {
-			return 0, nil
-		}
-		return x, nil
-	case Number:
-		if x == "" {
-			return 0, nil
-		}
-		return string(x), nil
-	case int8, int16, int32, int64, uint16, uint32, uint64:
-		return fmt.Sprintf("%d", x), nil
-	case float32, float64:
-		return fmt.Sprintf("%f", x), nil
-	default:
-		return nil, errors.Errorf("unknown type %T", v)
-	}
-}
-func (n Number) String() string { return string(n) }
-
-// Value returns the Number as driver.Value
-func (n Number) Value() (driver.Value, error) {
-	return string(n), nil
-}
-
-// Scan into the Number from a driver.Value.
-func (n *Number) Scan(v interface{}) error {
-	if v == nil {
-		*n = ""
-		return nil
-	}
-	switch x := v.(type) {
-	case string:
-		*n = Number(x)
-	case Number:
-		*n = x
-	case int8, int16, int32, int64, uint16, uint32, uint64:
-		*n = Number(fmt.Sprintf("%d", x))
-	case float32, float64:
-		*n = Number(fmt.Sprintf("%f", x))
-	default:
-		return errors.Errorf("unknown type %T", v)
-	}
-	return nil
-}
-
-// MarshalText marshals a Number to text.
-func (n Number) MarshalText() ([]byte, error) { return []byte(n), nil }
-
-// UnmarshalText parses text into a Number.
-func (n *Number) UnmarshalText(p []byte) error {
-	var dotNum int
-	for i, c := range p {
-		if !(c == '-' && i == 0 || '0' <= c && c <= '9') {
-			if c == '.' {
-				dotNum++
-				if dotNum == 1 {
-					continue
-				}
-			}
-			return errors.Errorf("unknown char %c in %q", c, p)
-		}
-	}
-	*n = Number(p)
-	return nil
-}
-
-// MarshalJSON marshals a Number into a JSON string.
-func (n Number) MarshalJSON() ([]byte, error) {
-	b, err := n.MarshalText()
-	b2 := make([]byte, 1, 1+len(b)+1)
-	b2[0] = '"'
-	b2 = append(b2, b...)
-	b2 = append(b2, '"')
-	return b2, err
-}
-
-// UnmarshalJSON parses a JSON string into the Number.
-func (n *Number) UnmarshalJSON(p []byte) error {
-	*n = Number("")
-	if len(p) == 0 {
-		return nil
-	}
-	if len(p) > 2 && p[0] == '"' && p[len(p)-1] == '"' {
-		p = p[1 : len(p)-1]
-	}
-	return n.UnmarshalText(p)
-}
-
 // Log function. By default, it's nil, and thus logs nothing.
 // If you want to change this, change it to a github.com/go-kit/kit/log.Swapper.Log
 // or analog to be race-free.
 var Log func(...interface{}) error
 
-var defaultDrv *drv
+var defaultDrv = &drv{}
 
 func init() {
-	defaultDrv = newDrv()
 	sql.Register("godror", defaultDrv)
-}
-
-func newDrv() *drv {
-	return &drv{pools: make(map[string]*connPool)}
 }
 
 var _ = driver.Driver((*drv)(nil))
 
 type drv struct {
-	clientVersion VersionInfo
 	mu            sync.Mutex
 	dpiContext    *C.dpiContext
 	pools         map[string]*connPool
+	clientVersion VersionInfo
 }
 
 type connPool struct {
 	dpiPool       *C.dpiPool
-	serverVersion VersionInfo
 	timeZone      *time.Location
 	tzOffSecs     int
+	serverVersion VersionInfo
 }
 
 func (d *drv) init() error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	if d.pools == nil {
+		d.pools = make(map[string]*connPool)
+	}
 	if d.dpiContext != nil {
 		return nil
 	}
@@ -376,81 +179,38 @@ func (d *drv) ClientVersion() (VersionInfo, error) {
 	return d.clientVersion, nil
 }
 
+var cUTF8, cDriverName = C.CString("AL32UTF8"), C.CString(DriverName)
+
 func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 	if err := d.init(); err != nil {
 		return nil, err
 	}
 
-	c := conn{drv: d, connParams: P, timeZone: time.Local}
+	P.Comb()
+	c := &conn{drv: d, connParams: P, timeZone: time.Local, Client: d.clientVersion}
 	connString := P.String()
 
-	defer func() {
-		d.mu.Lock()
-		if Log != nil {
-			Log("pools", d.pools, "conn", P.String())
-		}
-		d.mu.Unlock()
-	}()
-
-	authMode := C.dpiAuthMode(C.DPI_MODE_AUTH_DEFAULT)
-	// OR all the modes together
-	for _, elt := range []struct {
-		Is   bool
-		Mode C.dpiAuthMode
-	}{
-		{P.IsSysDBA, C.DPI_MODE_AUTH_SYSDBA},
-		{P.IsSysOper, C.DPI_MODE_AUTH_SYSOPER},
-		{P.IsSysASM, C.DPI_MODE_AUTH_SYSASM},
-		{P.IsPrelim, C.DPI_MODE_AUTH_PRELIM},
-	} {
-		if elt.Is {
-			authMode |= elt.Mode
-		}
-	}
-	P.StandaloneConnection = P.StandaloneConnection || P.ConnClass == NoConnectionPoolingConnectionClass
-	if P.IsPrelim || P.StandaloneConnection {
-		// Prelim: the shared memory may not exist when Oracle is shut down.
-		P.ConnClass = ""
+	if Log != nil {
+		defer func() {
+			d.mu.Lock()
+			Log("pools", d.pools, "conn", P.String(), "drv", fmt.Sprintf("%p", d))
+			d.mu.Unlock()
+		}()
 	}
 
-	extAuth := C.int(b2i(P.Username == "" && P.Password == ""))
-	var connCreateParams C.dpiConnCreateParams
-	if C.dpiContext_initConnCreateParams(d.dpiContext, &connCreateParams) == C.DPI_FAILURE {
-		return nil, errors.Errorf("initConnCreateParams: %w", d.getError())
-	}
-	connCreateParams.authMode = authMode
-	connCreateParams.externalAuth = extAuth
-	if P.ConnClass != "" {
-		cConnClass := C.CString(P.ConnClass)
-		defer C.free(unsafe.Pointer(cConnClass))
-		connCreateParams.connectionClass = cConnClass
-		connCreateParams.connectionClassLength = C.uint32_t(len(P.ConnClass))
-	}
 	if !(P.IsSysDBA || P.IsSysOper || P.IsSysASM || P.IsPrelim || P.StandaloneConnection) {
 		d.mu.Lock()
 		dp := d.pools[connString]
 		d.mu.Unlock()
 		if dp != nil {
 			//Proxy authenticated connections to database will be provided by methods with context
-			c.mu.Lock()
-			c.Client, c.Server = d.clientVersion, dp.serverVersion
-			c.timeZone, c.tzOffSecs = dp.timeZone, dp.tzOffSecs
-			c.mu.Unlock()
-			if err := c.acquireConn("", ""); err != nil {
-				return nil, err
-			}
-			err := c.init()
-			if err == nil {
-				c.mu.Lock()
-				dp.serverVersion = c.Server
-				dp.timeZone, dp.tzOffSecs = c.timeZone, c.tzOffSecs
-				c.mu.Unlock()
-			}
-			return &c, err
+			err := dp.acquireConn(c, P)
+			return c, err
 		}
 	}
 
-	var cUserName, cPassword, cNewPassword *C.char
+	extAuth := C.int(b2i(P.Username == "" && P.Password == ""))
+	var cUserName, cPassword, cNewPassword, cConnClass *C.char
 	if !(P.Username == "" && P.Password == "") {
 		cUserName, cPassword = C.CString(P.Username), C.CString(P.Password)
 	}
@@ -458,8 +218,6 @@ func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 	if P.SID != "" {
 		cSid = C.CString(P.SID)
 	}
-	cUTF8, cConnClass := C.CString("AL32UTF8"), C.CString(P.ConnClass)
-	cDriverName := C.CString(DriverName)
 	defer func() {
 		if cUserName != nil {
 			C.free(unsafe.Pointer(cUserName))
@@ -471,9 +229,9 @@ func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 		if cSid != nil {
 			C.free(unsafe.Pointer(cSid))
 		}
-		C.free(unsafe.Pointer(cUTF8))
-		C.free(unsafe.Pointer(cConnClass))
-		C.free(unsafe.Pointer(cDriverName))
+		if cConnClass != nil {
+			C.free(unsafe.Pointer(cConnClass))
+		}
 	}()
 	var commonCreateParams C.dpiCommonCreateParams
 	if C.dpiContext_initCommonCreateParams(d.dpiContext, &commonCreateParams) == C.DPI_FAILURE {
@@ -489,32 +247,9 @@ func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 	commonCreateParams.driverNameLength = C.uint32_t(len(DriverName))
 
 	if P.IsSysDBA || P.IsSysOper || P.IsSysASM || P.IsPrelim || P.StandaloneConnection {
-		if P.NewPassword != "" {
-			cNewPassword = C.CString(P.NewPassword)
-			connCreateParams.newPassword = cNewPassword
-			connCreateParams.newPasswordLength = C.uint32_t(len(P.NewPassword))
-		}
-		dc := C.malloc(C.sizeof_void)
-		if Log != nil {
-			Log("C", "dpiConn_create", "params", P.String(), "common", commonCreateParams, "conn", connCreateParams)
-		}
-		if C.dpiConn_create(
-			d.dpiContext,
-			cUserName, C.uint32_t(len(P.Username)),
-			cPassword, C.uint32_t(len(P.Password)),
-			cSid, C.uint32_t(len(P.SID)),
-			&commonCreateParams,
-			&connCreateParams,
-			(**C.dpiConn)(unsafe.Pointer(&dc)),
-		) == C.DPI_FAILURE {
-			C.free(unsafe.Pointer(dc))
-			return nil, errors.Errorf("username=%q sid=%q params=%+v: %w", P.Username, P.SID, connCreateParams, d.getError())
-		}
-		c.dpiConn = (*C.dpiConn)(dc)
-		c.currentUser = P.Username
-		c.newSession = true
-		err := c.init()
-		return &c, err
+		// no pool
+		c.connParams = P
+		return c, c.acquireConn(P.Username, P.Password, P.ConnClass)
 	}
 	var poolCreateParams C.dpiPoolCreateParams
 	if C.dpiContext_initPoolCreateParams(d.dpiContext, &poolCreateParams) == C.DPI_FAILURE {
@@ -566,30 +301,94 @@ func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 		return nil, errors.Errorf("params=%s extAuth=%v: %w", P.String(), extAuth, d.getError())
 	}
 	C.dpiPool_setStmtCacheSize(dp, 40)
+	pool := &connPool{dpiPool: dp}
 	d.mu.Lock()
-	d.pools[connString] = &connPool{dpiPool: dp}
+	d.pools[connString] = pool
 	d.mu.Unlock()
 
-	return d.openConn(P)
+	return c, pool.acquireConn(c, P)
 }
 
-func (c *conn) acquireConn(user, pass string) error {
+func (dp *connPool) acquireConn(c *conn, P ConnectionParams) error {
+	P.Comb()
+	c.mu.Lock()
+	c.connParams = P
+	c.Client, c.Server = c.drv.clientVersion, dp.serverVersion
+	c.timeZone, c.tzOffSecs = dp.timeZone, dp.tzOffSecs
+	c.mu.Unlock()
+
 	var connCreateParams C.dpiConnCreateParams
-	if C.dpiContext_initConnCreateParams(c.dpiContext, &connCreateParams) == C.DPI_FAILURE {
-		return errors.Errorf("initConnCreateParams: %w", "", c.getError())
+	if C.dpiContext_initConnCreateParams(c.drv.dpiContext, &connCreateParams) == C.DPI_FAILURE {
+		return errors.Errorf("initConnCreateParams: %w", c.drv.getError())
+	}
+	if P.ConnClass != "" {
+		cConnClass := C.CString(P.ConnClass)
+		defer C.free(unsafe.Pointer(cConnClass))
+		connCreateParams.connectionClass = cConnClass
+		connCreateParams.connectionClassLength = C.uint32_t(len(P.ConnClass))
+	}
+	dc := C.malloc(C.sizeof_void)
+	if C.dpiPool_acquireConnection(
+		dp.dpiPool,
+		nil, 0, nil, 0,
+		&connCreateParams,
+		(**C.dpiConn)(unsafe.Pointer(&dc)),
+	) == C.DPI_FAILURE {
+		C.free(unsafe.Pointer(dc))
+		return errors.Errorf("acquirePoolConnection(user=%q, params=%#v): %w", P.Username, connCreateParams, c.getError())
 	}
 
-	dc := C.malloc(C.sizeof_void)
-	if Log != nil {
-		Log("C", "dpiPool_acquirePoolConnection", "conn", connCreateParams)
+	c.mu.Lock()
+	c.dpiConn = (*C.dpiConn)(dc)
+	c.currentUser = P.Username
+	c.newSession = connCreateParams.outNewSession == 1
+	c.mu.Unlock()
+	err := c.init(P.OnInit)
+	if err == nil {
+		c.mu.Lock()
+		dp.serverVersion = c.Server
+		dp.timeZone, dp.tzOffSecs = c.timeZone, c.tzOffSecs
+		c.mu.Unlock()
 	}
-	var cUserName, cPassword *C.char
+
+	return err
+}
+
+func (c *conn) acquireConn(user, pass, connClass string) error {
+	P := c.connParams
+	if !(P.IsSysDBA || P.IsSysOper || P.IsSysASM || P.IsPrelim || P.StandaloneConnection) {
+		c.drv.mu.Lock()
+		pool := c.drv.pools[P.String()]
+		if Log != nil {
+			Log("pools", c.drv.pools, "drv", fmt.Sprintf("%p", c.drv))
+		}
+		c.drv.mu.Unlock()
+		if pool != nil {
+			P.Username, P.Password, P.ConnClass = user, pass, connClass
+			return pool.acquireConn(c, P)
+		}
+	}
+
+	var connCreateParams C.dpiConnCreateParams
+	if C.dpiContext_initConnCreateParams(c.drv.dpiContext, &connCreateParams) == C.DPI_FAILURE {
+		return errors.Errorf("initConnCreateParams: %w", c.drv.getError())
+	}
+	var cUserName, cPassword, cNewPassword, cConnClass, cSid *C.char
 	defer func() {
 		if cUserName != nil {
 			C.free(unsafe.Pointer(cUserName))
 		}
 		if cPassword != nil {
 			C.free(unsafe.Pointer(cPassword))
+		}
+		if cNewPassword != nil {
+			C.free(unsafe.Pointer(cNewPassword))
+		}
+		if cConnClass != nil {
+			C.free(unsafe.Pointer(cConnClass))
+		}
+		if cSid != nil {
+			C.free(unsafe.Pointer(cSid))
 		}
 	}()
 	if user != "" {
@@ -598,52 +397,79 @@ func (c *conn) acquireConn(user, pass string) error {
 	if pass != "" {
 		cPassword = C.CString(pass)
 	}
+	if connClass != "" {
+		cConnClass = C.CString(connClass)
+		connCreateParams.connectionClass = cConnClass
+		connCreateParams.connectionClassLength = C.uint32_t(len(connClass))
+	}
+	var commonCreateParams C.dpiCommonCreateParams
+	if C.dpiContext_initCommonCreateParams(c.drv.dpiContext, &commonCreateParams) == C.DPI_FAILURE {
+		return errors.Errorf("initCommonCreateParams: %w", c.drv.getError())
+	}
+	commonCreateParams.createMode = C.DPI_MODE_CREATE_DEFAULT | C.DPI_MODE_CREATE_THREADED
+	if P.EnableEvents {
+		commonCreateParams.createMode |= C.DPI_MODE_CREATE_EVENTS
+	}
+	commonCreateParams.encoding = cUTF8
+	commonCreateParams.nencoding = cUTF8
+	commonCreateParams.driverName = cDriverName
+	commonCreateParams.driverNameLength = C.uint32_t(len(DriverName))
 
-	c.drv.mu.Lock()
-	pool := c.pools[c.connParams.String()]
-	c.drv.mu.Unlock()
-	if C.dpiPool_acquireConnection(
-		pool.dpiPool,
-		cUserName, C.uint32_t(len(user)), cPassword, C.uint32_t(len(pass)),
+	if P.SID != "" {
+		cSid = C.CString(P.SID)
+	}
+	connCreateParams.authMode = P.authMode()
+	extAuth := C.int(b2i(user == "" && pass == ""))
+	connCreateParams.externalAuth = extAuth
+	if P.NewPassword != "" {
+		cNewPassword = C.CString(P.NewPassword)
+		connCreateParams.newPassword = cNewPassword
+		connCreateParams.newPasswordLength = C.uint32_t(len(P.NewPassword))
+	}
+	if Log != nil {
+		Log("C", "dpiConn_create", "params", P.String(), "common", commonCreateParams, "conn", connCreateParams)
+	}
+	dc := C.malloc(C.sizeof_void)
+	if C.dpiConn_create(
+		c.drv.dpiContext,
+		cUserName, C.uint32_t(len(user)),
+		cPassword, C.uint32_t(len(pass)),
+		cSid, C.uint32_t(len(P.SID)),
+		&commonCreateParams,
 		&connCreateParams,
 		(**C.dpiConn)(unsafe.Pointer(&dc)),
 	) == C.DPI_FAILURE {
 		C.free(unsafe.Pointer(dc))
-		return errors.Errorf("acquirePoolConnection: %w", c.getError())
+		return errors.Errorf("username=%q sid=%q params=%+v: %w", user, P.SID, connCreateParams, c.drv.getError())
 	}
-
 	c.mu.Lock()
 	c.dpiConn = (*C.dpiConn)(dc)
 	c.currentUser = user
-	c.newSession = connCreateParams.outNewSession == 1
-	c.Client, c.Server = c.drv.clientVersion, pool.serverVersion
-	c.timeZone, c.tzOffSecs = pool.timeZone, pool.tzOffSecs
-	c.mu.Unlock()
-	err := c.init()
-	if err == nil {
-		c.mu.Lock()
-		pool.serverVersion = c.Server
-		pool.timeZone, pool.tzOffSecs = c.timeZone, c.tzOffSecs
-		c.mu.Unlock()
+	c.newSession = true
+	P.Username, P.Password, P.ConnClass = user, pass, connClass
+	if P.NewPassword != "" {
+		P.Password, P.NewPassword = P.NewPassword, ""
 	}
-
-	return err
+	c.connParams = P
+	c.mu.Unlock()
+	return c.init(P.OnInit)
 }
 
 // ConnectionParams holds the params for a connection (pool).
 // You can use ConnectionParams{...}.StringWithPassword()
 // as a connection string in sql.Open.
 type ConnectionParams struct {
+	OnInit                             []string
 	Username, Password, SID, ConnClass string
 	// NewPassword is used iff StandaloneConnection is true!
 	NewPassword                              string
 	MinSessions, MaxSessions, PoolIncrement  int
 	WaitTimeout, MaxLifeTime, SessionTimeout time.Duration
+	Timezone                                 *time.Location
 	IsSysDBA, IsSysOper, IsSysASM, IsPrelim  bool
 	HeterogeneousPool                        bool
 	StandaloneConnection                     bool
 	EnableEvents                             bool
-	Timezone                                 *time.Location
 }
 
 // String returns the string representation of ConnectionParams.
@@ -713,6 +539,7 @@ func (P ConnectionParams) string(class, withPassword bool) string {
 	q.Add("poolWaitTimeout", P.WaitTimeout.String())
 	q.Add("poolSessionMaxLifetime", P.MaxLifeTime.String())
 	q.Add("poolSessionTimeout", P.SessionTimeout.String())
+	q["onInit"] = P.OnInit
 	return (&url.URL{
 		Scheme:   "oracle",
 		User:     url.UserPassword(P.Username, password),
@@ -720,6 +547,15 @@ func (P ConnectionParams) string(class, withPassword bool) string {
 		Path:     path,
 		RawQuery: q.Encode(),
 	}).String()
+}
+
+func (P *ConnectionParams) Comb() {
+	P.StandaloneConnection = P.StandaloneConnection || P.ConnClass == NoConnectionPoolingConnectionClass
+	if P.IsPrelim || P.StandaloneConnection {
+		// Prelim: the shared memory may not exist when Oracle is shut down.
+		P.ConnClass = ""
+		P.HeterogeneousPool = false
+	}
 }
 
 // ParseConnString parses the given connection string into a struct.
@@ -815,14 +651,6 @@ func ParseConnString(connString string) (ConnectionParams, error) {
 		}
 	}
 
-	P.StandaloneConnection = P.StandaloneConnection || P.ConnClass == NoConnectionPoolingConnectionClass
-	if P.IsPrelim {
-		P.ConnClass = ""
-	}
-	if P.StandaloneConnection {
-		P.NewPassword = q.Get("newPassword")
-	}
-
 	for _, task := range []struct {
 		Dest *int
 		Key  string
@@ -878,7 +706,38 @@ func ParseConnString(connString string) (ConnectionParams, error) {
 	} else if P.PoolIncrement < 1 {
 		P.PoolIncrement = 1
 	}
+	P.OnInit = q["onInit"]
+
+	P.Comb()
+	if P.StandaloneConnection {
+		P.NewPassword = q.Get("newPassword")
+	}
+
 	return P, nil
+}
+
+// SetSessionParamOnInit adds an "ALTER SESSION k=v" to the OnInit task list.
+func (P *ConnectionParams) SetSessionParamOnInit(k, v string) {
+	P.OnInit = append(P.OnInit, fmt.Sprintf("ALTER SESSION SET %s = q'(%s)'", k, strings.Replace(v, "'", "''", -1)))
+}
+
+func (P ConnectionParams) authMode() C.dpiAuthMode {
+	authMode := C.dpiAuthMode(C.DPI_MODE_AUTH_DEFAULT)
+	// OR all the modes together
+	for _, elt := range []struct {
+		Is   bool
+		Mode C.dpiAuthMode
+	}{
+		{P.IsSysDBA, C.DPI_MODE_AUTH_SYSDBA},
+		{P.IsSysOper, C.DPI_MODE_AUTH_SYSOPER},
+		{P.IsSysASM, C.DPI_MODE_AUTH_SYSASM},
+		{P.IsPrelim, C.DPI_MODE_AUTH_PRELIM},
+	} {
+		if elt.Is {
+			authMode |= elt.Mode
+		}
+	}
+	return authMode
 }
 
 // OraErr is an error holding the ORA-01234 code and the message.
@@ -950,15 +809,15 @@ func b2i(b bool) uint8 {
 // VersionInfo holds version info returned by Oracle DB.
 type VersionInfo struct {
 	ServerRelease                                           string
-	Version, Release, Update, PortRelease, PortUpdate, Full int
+	Version, Release, Update, PortRelease, PortUpdate, Full uint8
 }
 
 func (V *VersionInfo) set(v *C.dpiVersionInfo) {
 	*V = VersionInfo{
-		Version: int(v.versionNum),
-		Release: int(v.releaseNum), Update: int(v.updateNum),
-		PortRelease: int(v.portReleaseNum), PortUpdate: int(v.portUpdateNum),
-		Full: int(v.fullVersionNum),
+		Version: uint8(v.versionNum),
+		Release: uint8(v.releaseNum), Update: uint8(v.updateNum),
+		PortRelease: uint8(v.portReleaseNum), PortUpdate: uint8(v.portUpdateNum),
+		Full: uint8(v.fullVersionNum),
 	}
 }
 func (V VersionInfo) String() string {
@@ -1012,12 +871,13 @@ func ContextWithLog(ctx context.Context, logF func(...interface{}) error) contex
 	return context.WithValue(ctx, logCtxKey, logF)
 }
 
+var _ = driver.DriverContext((*drv)(nil))
 var _ = driver.Connector((*connector)(nil))
 
 type connector struct {
-	ConnectionParams
-	*drv
+	drv    *drv
 	onInit func(driver.Conn) error
+	ConnectionParams
 }
 
 // OpenConnector must parse the name in the same format that Driver.Open
@@ -1062,15 +922,24 @@ func (c connector) Driver() driver.Driver { return c.drv }
 // NewConnector returns a driver.Connector to be used with sql.OpenDB,
 // which calls the given onInit if the connection is new.
 //
-// For an example, see NewSessionIniter.
-func NewConnector(name string, onInit func(driver.Conn) error) (driver.Connector, error) {
-	cxr, err := defaultDrv.OpenConnector(name)
+// For an onInit example, see NewSessionIniter.
+func (d *drv) NewConnector(name string, onInit func(driver.Conn) error) (driver.Connector, error) {
+	cxr, err := d.OpenConnector(name)
 	if err != nil {
 		return nil, err
 	}
 	cx := cxr.(connector)
 	cx.onInit = onInit
 	return cx, err
+}
+
+// NewConnector returns a driver.Connector to be used with sql.OpenDB,
+// (for the default Driver registered with godror)
+// which calls the given onInit if the connection is new.
+//
+// For an onInit example, see NewSessionIniter.
+func NewConnector(name string, onInit func(driver.Conn) error) (driver.Connector, error) {
+	return defaultDrv.NewConnector(name, onInit)
 }
 
 // NewSessionIniter returns a function suitable for use in NewConnector as onInit,
