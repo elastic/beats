@@ -152,6 +152,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 - google-pubsub input: ACK pub/sub message when acknowledged by publisher. {issue}13346[13346] {pull}14715[14715]
 - Remove Beta label from google-pubsub input. {issue}13346[13346] {pull}14715[14715]
+- Allow a list of status codes for HTTP checks. {pull}15587[15587]
+
 
 *Heartbeat*
 
