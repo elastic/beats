@@ -50,6 +50,7 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 *Heartbeat*
 
+- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Journalbeat*
 
