@@ -33,7 +33,7 @@ const wrapResultset = "--WRAP_RESULTSET--"
 // with 32-bit platforms. The size of a `C.dpiData` is 32 Byte on a 64-bit system, `C.dpiSubscrMessageTable` is 40 bytes.
 // So this is 2^25.
 // See https://github.com/go-godror/godror/issues/73#issuecomment-401281714
-const maxArraySize = (1<<32)/C.sizeof_dpiSubscrMessageTable - 1
+const maxArraySize = (1<<30)/C.sizeof_dpiSubscrMessageTable - 1
 
 var _ = driver.Conn((*conn)(nil))
 var _ = driver.ConnBeginTx((*conn)(nil))
@@ -43,19 +43,19 @@ var _ = driver.Pinger((*conn)(nil))
 //var _ = driver.ExecerContext((*conn)(nil))
 
 type conn struct {
-	connParams     ConnectionParams
 	currentTT      TraceTag
+	connParams     ConnectionParams
 	Client, Server VersionInfo
 	tranParams     tranParams
-	sync.RWMutex
-	currentUser string
-	*drv
-	dpiConn       *C.dpiConn
-	inTransaction bool
-	newSession    bool
-	timeZone      *time.Location
-	tzOffSecs     int
-	objTypes      map[string]ObjectType
+	mu             sync.RWMutex
+	currentUser    string
+	drv            *drv
+	dpiConn        *C.dpiConn
+	timeZone       *time.Location
+	objTypes       map[string]ObjectType
+	tzOffSecs      int
+	inTransaction  bool
+	newSession     bool
 }
 
 func (c *conn) getError() error {
@@ -66,8 +66,8 @@ func (c *conn) getError() error {
 }
 
 func (c *conn) Break() error {
-	c.RLock()
-	defer c.RUnlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	if Log != nil {
 		Log("msg", "Break", "dpiConn", c.dpiConn)
 	}
@@ -76,6 +76,8 @@ func (c *conn) Break() error {
 	}
 	return nil
 }
+
+func (c *conn) ClientVersion() (VersionInfo, error) { return c.drv.ClientVersion() }
 
 // Ping checks the connection's state.
 //
@@ -90,8 +92,8 @@ func (c *conn) Ping(ctx context.Context) error {
 	if err := c.ensureContextUser(ctx); err != nil {
 		return err
 	}
-	c.RLock()
-	defer c.RUnlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	done := make(chan error, 1)
 	go func() {
 		defer close(done)
@@ -136,8 +138,8 @@ func (c *conn) Close() error {
 	if c == nil {
 		return nil
 	}
-	c.Lock()
-	defer c.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	return c.close(true)
 }
 
@@ -160,7 +162,7 @@ func (c *conn) close(doNotReuse bool) error {
 			continue
 		}
 		seen[nm] = struct{}{}
-		o.close()
+		o.close(doNotReuse)
 	}
 	if !doNotReuse {
 		return nil
@@ -252,19 +254,19 @@ func (c *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, e
 		c.tranParams = todo
 	}
 
-	c.RLock()
+	c.mu.RLock()
 	inTran := c.inTransaction
-	c.RUnlock()
+	c.mu.RUnlock()
 	if inTran {
 		return nil, errors.New("already in transaction")
 	}
-	c.Lock()
+	c.mu.Lock()
 	c.inTransaction = true
-	c.Unlock()
+	c.mu.Unlock()
 	if tt, ok := ctx.Value(traceTagCtxKey).(TraceTag); ok {
-		c.Lock()
+		c.mu.Lock()
 		c.setTraceTag(tt)
-		c.Unlock()
+		c.mu.Unlock()
 	}
 	return c, nil
 }
@@ -284,9 +286,9 @@ func (c *conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, e
 		return nil, err
 	}
 	if tt, ok := ctx.Value(traceTagCtxKey).(TraceTag); ok {
-		c.Lock()
+		c.mu.Lock()
 		c.setTraceTag(tt)
-		c.Unlock()
+		c.mu.Unlock()
 	}
 	if query == getConnection {
 		if Log != nil {
@@ -299,8 +301,8 @@ func (c *conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, e
 	defer func() {
 		C.free(unsafe.Pointer(cSQL))
 	}()
-	c.RLock()
-	defer c.RUnlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	var dpiStmt *C.dpiStmt
 	if C.dpiConn_prepareStmt(c.dpiConn, 0, cSQL, C.uint32_t(len(query)), nil, 0,
 		(**C.dpiStmt)(unsafe.Pointer(&dpiStmt)),
@@ -316,7 +318,7 @@ func (c *conn) Rollback() error {
 	return c.endTran(false)
 }
 func (c *conn) endTran(isCommit bool) error {
-	c.Lock()
+	c.mu.Lock()
 	c.inTransaction = false
 	c.tranParams = tranParams{}
 
@@ -332,7 +334,7 @@ func (c *conn) endTran(isCommit bool) error {
 			err = maybeBadConn(errors.Errorf("Rollback: %w", c.getError()), c)
 		}
 	}
-	c.Unlock()
+	c.mu.Unlock()
 	//fmt.Printf("%p.%s\n", c, msg)
 	return err
 }
@@ -385,13 +387,43 @@ func (c *conn) ServerVersion() (VersionInfo, error) {
 	return c.Server, nil
 }
 
-func (c *conn) init() error {
+func (c *conn) init(onInit []string) error {
 	if c.Client.Version == 0 {
 		var err error
 		if c.Client, err = c.drv.ClientVersion(); err != nil {
 			return err
 		}
 	}
+
+	if err := c.initVersionTZ(); err != nil || len(onInit) == 0 || !c.newSession {
+		return err
+	}
+	if Log != nil {
+		Log("newSession", c.newSession, "onInit", onInit)
+	}
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Duration(len(onInit))*time.Second)
+			defer cancel()
+			if Log != nil {
+				Log("doOnInit", len(onInit))
+			}
+			for _, qry := range onInit {
+				if Log != nil {
+					Log("onInit", qry)
+				}
+				st, err := c.PrepareContext(ctx, qry)
+				if err != nil {
+					return errors.Errorf("%s: %w", qry, err)
+				}
+				_, err = st.Exec(nil) //lint:ignore SA1019 - it's hard to use ExecContext here
+				st.Close()
+				if err != nil {
+					return errors.Errorf("%s: %w", qry, err)
+				}
+			}
+			return nil
+	}
+
+func (c *conn) initVersionTZ() error {
 	if c.Server.Version == 0 {
 		var v C.dpiVersionInfo
 		var release *C.char
@@ -690,18 +722,16 @@ const userpwCtxKey = ctxKey("userPw")
 
 // ContextWithUserPassw returns a context with the specified user and password,
 // to be used with heterogeneous pools.
-func ContextWithUserPassw(ctx context.Context, user, password string) context.Context {
-	return context.WithValue(ctx, userpwCtxKey, [2]string{user, password})
+func ContextWithUserPassw(ctx context.Context, user, password, connClass string) context.Context {
+	return context.WithValue(ctx, userpwCtxKey, [3]string{user, password, connClass})
 }
 
 func (c *conn) ensureContextUser(ctx context.Context) error {
-	if !c.connParams.HeterogeneousPool {
+	if !(c.connParams.HeterogeneousPool || c.connParams.StandaloneConnection) {
 		return nil
 	}
-
-	var up [2]string
-	var ok bool
-	if up, ok = ctx.Value(userpwCtxKey).([2]string); !ok || up[0] == c.currentUser {
+	up, ok := ctx.Value(userpwCtxKey).([3]string)
+	if !ok || up[0] == c.currentUser {
 		return nil
 	}
 
@@ -711,14 +741,7 @@ func (c *conn) ensureContextUser(ctx context.Context) error {
 		}
 	}
 
-	c.Lock()
-	defer c.Unlock()
-
-	if err := c.acquireConn(up[0], up[1]); err != nil {
-		return err
-	}
-
-	return c.init()
+	return c.acquireConn(up[0], up[1], up[2])
 }
 
 // StartupMode for the database.

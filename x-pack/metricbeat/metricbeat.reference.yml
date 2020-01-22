@@ -73,12 +73,13 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
@@ -130,6 +131,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
@@ -980,10 +984,9 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
 
 
