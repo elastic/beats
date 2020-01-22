@@ -2,10 +2,18 @@
 
 type: s3
 queue_url: {{ .queue_url }}
-credential_profile_name: {{ .credential_profile_name }}
 expand_event_list_from_field: Records
 visibility_timeout: {{ .visibility_timeout }}
 context_timeout: {{ .context_timeout }}
+
+{{ if .credential_profile_name }}
+credential_profile_name: {{ .credential_profile_name }}
+{{ end }}
+
+{{ if .shared_credential_file }}
+shared_credential_file: {{ .shared_credential_file }}
+{{ end }}
+
 
 {{ else if eq .input "file" }}
 

@@ -1,5 +1,18 @@
 type: s3
 queue_url: {{ .queue_url }}
+
+{{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
+{{ end }}
+
+{{ if .shared_credential_file }}
+shared_credential_file: {{ .shared_credential_file }}
+{{ end }}
+
+{{ if .visibility_timeout }}
 visibility_timeout: {{ .visibility_timeout }}
+{{ end }}
+
+{{ if .context_timeout }}
 context_timeout: {{ .context_timeout }}
+{{ end }}
