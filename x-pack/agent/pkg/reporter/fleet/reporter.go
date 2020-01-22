@@ -21,6 +21,7 @@ const (
 type ackFn func()
 
 type event struct {
+	AgentID   string                 `json:"agent_id"`
 	EventType string                 `json:"type"`
 	Ts        fleetapi.Time          `json:"timestamp"`
 	SubType   string                 `json:"subtype"`
@@ -73,11 +74,12 @@ func (r *Reporter) Report(e reporter.Event) error {
 	defer r.qlock.Unlock()
 
 	r.queue = append(r.queue, &event{
+		AgentID:   r.info.AgentID(),
 		EventType: e.Type(),
 		Ts:        fleetapi.Time(e.Time()),
 		SubType:   e.SubType(),
 		Msg:       e.Message(),
-		Payload:   injectAgentID(e.Payload(), r.info),
+		Payload:   e.Payload(),
 		Data:      e.Data(),
 	})
 
@@ -174,19 +176,6 @@ func (r *Reporter) dropFirst() {
 	first := r.queue[0]
 	r.logger.Infof("fleet reporter dropped event because threshold[%d] was reached: %v", r.threshold, first)
 	r.queue = r.queue[1:]
-}
-
-func injectAgentID(payload map[string]interface{}, info agentInfo) map[string]interface{} {
-	if info == nil {
-		return payload
-	}
-
-	if payload == nil {
-		payload = make(map[string]interface{})
-	}
-
-	payload[agentIDKey] = info.AgentID()
-	return payload
 }
 
 // Check it is reporter.Backend.

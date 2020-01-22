@@ -38,17 +38,8 @@ func TestEventsHaveAgentID(t *testing.T) {
 			t.Fatal("reported event is not an event")
 		}
 
-		if re.Payload == nil {
-			t.Fatal("reported event is without payload")
-		}
-
-		id, found := re.Payload[agentIDKey]
-		if !found {
-			t.Fatal("reported event payload is without agent id")
-		}
-
-		if id != "agentID" {
-			t.Fatalf("reported event id incorrect, expected: 'agentID', got: '%v'", id)
+		if re.AgentID != "agentID" {
+			t.Fatalf("reported event id incorrect, expected: 'agentID', got: '%v'", re.AgentID)
 		}
 	}
 

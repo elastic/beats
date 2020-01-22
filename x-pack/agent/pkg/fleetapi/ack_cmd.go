@@ -22,6 +22,7 @@ const ackPath = "/api/fleet/agents/%s/acks"
 //   "action_ids": ["id1"]
 // }
 type AckRequest struct {
+	AgentID string   `json:"agent_id"`
 	Actions []string `json:"action_ids"`
 }
 
