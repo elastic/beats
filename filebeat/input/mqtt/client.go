@@ -25,10 +25,11 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/vmihailenco/msgpack.v2"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"gopkg.in/vmihailenco/msgpack.v2"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -157,9 +158,9 @@ func (input *mqttInput) onMessage(client MQTT.Client, msg MQTT.Message) {
 
 	// Finally sending the message to elasticsearch
 	beatEvent.Fields = eventFields
-	input.outlet.OnEvent(beatEvent)
+	isSent := input.outlet.OnEvent(beatEvent)
 
-	logp.Debug("MQTT", "Event sent: %t")
+	logp.Debug("MQTT", "Event sent: %t", isSent)
 }
 
 // connectionLostHandler will try to reconnect when connection is lost
