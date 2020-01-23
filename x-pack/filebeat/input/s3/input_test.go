@@ -133,7 +133,7 @@ func TestHandleMessage(t *testing.T) {
 
 }
 
-func TestGetS3ObjectResponse(t *testing.T) {
+func TestNewS3BucketReader(t *testing.T) {
 	p := &s3Input{inputCtx: context.Background()}
 	reader, err := p.newS3BucketReader(mockSvc, info)
 	assert.NoError(t, err)
