@@ -17,8 +17,6 @@ env:
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
-    # Migration to Python 3
-    - PYTHON_EXE=python3
 
 jobs:
   include:
@@ -203,7 +201,7 @@ jobs:
             retries: true
           update: true
           packages:
-            - python-virtualenv
+            - python3-venv
             - libpcap-dev
             - xsltproc
             - libxml2-utils
@@ -223,7 +221,7 @@ addons:
       retries: true
     update: true
     packages:
-      - python-virtualenv
+      - python3-venv
       - libpcap-dev
       - xsltproc
       - libxml2-utils
@@ -232,6 +230,7 @@ addons:
 
 before_install:
   - python --version
+  - python3 --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
