@@ -49,7 +49,7 @@ input:
           query: '\Web Service(_Total)\Delete Requests/sec'
         - instance_label: ''
           measurement_label: network.service_uptime
-          query: '\Web Service(*)\Service Uptime'
+          query: '\Web Service(_Total)\Service Uptime'
     #cache
         - instance_label: ''
           measurement_label: cache.current_files_cached

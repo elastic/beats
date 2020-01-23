@@ -137,33 +137,46 @@ func (r *Reader) RefreshCounterPaths() error {
 }
 
 // Read executes a query and returns those values in an event.
-func (r *Reader) Read() ([]mb.Event, error) {
+func (this *Reader) Read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	if err := r.query.CollectData(); err != nil {
+	if err := this.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}
 
 	// Get the values.
-	values, err := r.query.GetFormattedCounterValues()
+	values, err := this.query.GetFormattedCounterValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
+	var events []mb.Event
+	if this.config.GroupAllCounters {
+		if event := this.groupToEvent(values); event.MetricSetFields != nil {
+			events = append(events, event)
+		}
+	}else {
+		if grouped := this.groupToEvents(values); len(grouped)>0 {
+			events = append(events, grouped...)
+		}
+	}
 
+	this.executed = true
+	return events, nil
+}
+
+func (this *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
 	eventMap := make(map[string]*mb.Event)
-
-	for counterPath, values := range values {
+	for counterPath, values := range counters {
 		for ind, val := range values {
 			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-			if val.Err != nil && !r.executed {
-				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
+			if val.Err != nil && !this.executed {
+				this.log.Debugw("Ignoring the first measurement because the data isn't ready",
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
 				continue
 			}
-
 			var eventKey string
-			if r.config.GroupMeasurements && val.Err == nil {
+			if this.config.GroupMeasurements && val.Err == nil {
 				// Send measurements with the same instance label as part of the same event
 				eventKey = val.Instance
 			} else {
@@ -178,20 +191,20 @@ func (r *Reader) Read() ([]mb.Event, error) {
 					MetricSetFields: common.MapStr{},
 					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
 				}
-				if val.Instance != "" && r.instanceLabel[counterPath] != "" {
+				if val.Instance != "" && this.instanceLabel[counterPath] != "" {
 					//will ignore instance counter
 					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)
+						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], match)
 					} else {
-						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
+						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], val.Instance)
 					}
 				}
 			}
 			event := eventMap[eventKey]
 			if val.Measurement != nil {
-				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
+				event.MetricSetFields.Put(this.measurement[counterPath], val.Measurement)
 			} else {
-				event.MetricSetFields.Put(r.measurement[counterPath], 0)
+				event.MetricSetFields.Put(this.measurement[counterPath], 0)
 			}
 		}
 	}
@@ -201,14 +214,64 @@ func (r *Reader) Read() ([]mb.Event, error) {
 	for _, val := range eventMap {
 		events = append(events, *val)
 	}
+	return events
+}
 
-	r.executed = true
-	return events, nil
+func (this *Reader)groupToEvent(counters map[string][]pdh.CounterValue) mb.Event {
+	event := mb.Event{
+		MetricSetFields: common.MapStr{},
+	}
+	grouped:= make(map[string][]common.MapStr)
+	eventMap := make(map[string]*mb.Event)
+	for counterPath, values := range counters {
+		for ind, val := range values {
+			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+			if val.Err != nil && !this.executed {
+				this.log.Debugw("Ignoring the first measurement because the data isn't ready",
+					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
+				continue
+			}
+			var eventKey string
+			if this.config.GroupMeasurements && val.Err == nil {
+				// Send measurements with the same instance label as part of the same event
+				eventKey = val.Instance
+			} else {
+				// Send every measurement as an individual event
+				// If a counter contains an error, it will always be sent as an individual event
+				eventKey = counterPath + strconv.Itoa(ind)
+			}
+
+			// Create a new event if the key doesn't exist in the map
+			if _, ok := eventMap[eventKey]; !ok {
+				eventMap[eventKey] = &mb.Event{
+					MetricSetFields: common.MapStr{},
+					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
+				}
+				if val.Instance != "" && this.instanceLabel[counterPath] != "" {
+					//will ignore instance counter
+					if ok, match := matchesParentProcess(val.Instance); ok {
+						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], match)
+					} else {
+						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], val.Instance)
+					}
+				}
+			}
+			event := eventMap[eventKey]
+			if val.Measurement != nil {
+				event.MetricSetFields.Put(this.measurement[counterPath], val.Measurement)
+			} else {
+				event.MetricSetFields.Put(this.measurement[counterPath], 0)
+			}
+		}
+	}
+
+	return event
 }
 
 // Close will close the PDH query for now.
-func (r *Reader) Close() error {
-	return r.query.Close()
+func (this *Reader) Close() error {
+	return this.query.Close()
 }
 
 // matchParentProcess will try to get the parent process name
