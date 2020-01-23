@@ -39,9 +39,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
+- TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
+- Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
+- Fix missing output in dockerlogbeat {pull}15719[15719]
 
 *Auditbeat*
 
+- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
 
