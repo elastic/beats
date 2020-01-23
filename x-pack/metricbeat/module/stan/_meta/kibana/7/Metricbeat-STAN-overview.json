@@ -169,7 +169,7 @@
             }
           }
         },
-        "title": "STAN Channel Queue Depth [Metricbeat Module]",
+        "title": "Channel Queue Depth [Metricbeat STAN]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
