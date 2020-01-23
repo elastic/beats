@@ -68,6 +68,12 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 // Set `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
 func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.Processor {
+	fmt.Println(&addFields{fields: fields, shared: shared, overwrite: overwrite}, "testtttttttttttttttttttttttttttttttttt new fields")
+
+	if fields["sapirtest"] == true {
+		fields["sapirtest"] = "TEST1234512"
+		fields["sapirtest"] = common.MapStr{"name": "Ben", "TEST400": "check123"}
+	}
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 
@@ -76,13 +82,11 @@ func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	if af.shared {
 		fields = fields.Clone()
 	}
-
 	if af.overwrite {
 		event.Fields.DeepUpdate(fields)
 	} else {
 		event.Fields.DeepUpdateNoOverwrite(fields)
 	}
-
 	return event, nil
 }
 

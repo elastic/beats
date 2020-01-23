@@ -60,9 +60,8 @@ setup.template.settings:
 fields_under_root: true
 fields:
   city: Tel-Aviv
-  neighborhood: WebiksHood  
-  branch: Webiks
-  title: c1
+  sapirtest: true
+
 
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
@@ -149,8 +148,11 @@ processors:
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
   - add_kubernetes_metadata: ~
-#  - add_fields:
-#    target: "bentest"
+ # - add_fields:
+  #   target: "ben"
+   #  fields:
+    #   name: test
+
 
 
 #================================ Logging =====================================
