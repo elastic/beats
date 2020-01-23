@@ -186,13 +186,10 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	type meta struct {
 		UUID uuid.UUID `json:"uuid"`
 	}
-
-	logp.Debug("beat", "Beat metadata path: %v", metaPath)
-
 	// check for an existing file
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
-		return uuid.Nil, errors.Wrap(err, "beat meta file failed to open")
+		return uuid.Nil, errors.Wrapf(err, "beat meta file %s failed to open", metaPath)
 	}
 
 	//return the UUID if it exists
@@ -200,7 +197,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
-			return uuid.Nil, errors.Wrap(err, "beat meta file reading error")
+			return uuid.Nil, errors.Wrapf(err, "Error reading %s", metaPath)
 		}
 
 		f.Close()
@@ -218,28 +215,28 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "failed to create Beat meta file")
+		return uuid.Nil, errors.Wrapf(err, "failed to create Beat meta file at %s", tempFile)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: newID})
 	err = f.Sync()
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "beat meta file failed to write")
+		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to write", tempFile)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "beat meta file failed to write")
+		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to close", tempFile)
 	}
 
 	if encodeErr != nil {
-		return uuid.Nil, errors.Wrap(err, "beat meta file failed to write")
+		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to write", tempFile)
 	}
 
 	// move temporary file into final location
 	err = file.SafeFileRotate(metaPath, tempFile)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "error rotating file")
+		return uuid.Nil, errors.Wrapf(err, "error rotating file to %s", metaPath)
 	}
 	return newID, nil
 }
@@ -248,13 +245,13 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 func openRegular(filename string) (*os.File, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		return f, errors.Wrap(err, "error opening file")
+		return f, errors.Wrapf(err, "error opening file %s", filename)
 	}
 
 	info, err := f.Stat()
 	if err != nil {
 		f.Close()
-		return nil, errors.Wrap(err, "error in stat()")
+		return nil, errors.Wrapf(err, "error statting %s", filename)
 	}
 
 	if !info.Mode().IsRegular() {
