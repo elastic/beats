@@ -293,7 +293,7 @@ var sharedKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udp_sendmsg_in",
 			Address:   "udp_sendmsg",
-			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.SOCKADDR_IN_ADDR}}(+0({{.UDP_SENDMSG_MSG}})):x32 siptr=+0({{.UDP_SENDMSG_MSG}}) siaf=+{{.SOCKADDR_IN_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16 rport=+{{.SOCKADDR_IN_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddr=+{{.INET_SOCK_RADDR}}({{.UDP_SENDMSG_SOCK}}):u32 altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
+			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.SOCKADDR_IN_ADDR}}(+0({{.UDP_SENDMSG_MSG}})):u32 siptr=+0({{.UDP_SENDMSG_MSG}}) siaf=+{{.SOCKADDR_IN_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16 rport=+{{.SOCKADDR_IN_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddr=+{{.INET_SOCK_RADDR}}({{.UDP_SENDMSG_SOCK}}):u32 altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpSendMsgCall) }),
 	},
