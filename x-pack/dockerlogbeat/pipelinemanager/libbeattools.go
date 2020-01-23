@@ -15,6 +15,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/logp"
@@ -67,6 +68,13 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 	if err != nil {
 		return nil, err
 	}
+
+	// Attach CloudID config if needed
+	err = cloudid.OverwriteSettings(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error creating CloudID")
+	}
+
 	config := containerConfig{}
 	err = cfg.Unpack(&config)
 	if err != nil {

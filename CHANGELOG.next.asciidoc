@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
+- Fix missing output in dockerlogbeat {pull}15719[15719]
 
 *Auditbeat*
 
