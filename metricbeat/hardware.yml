@@ -1,0 +1,32 @@
+# Add more queries as you want : 
+# e.g: https://www.robvanderwoude.com/wmiqueries.php
+# for each query type choose a name to display in the Kibana e.g - type:Win32_DesktopMonitor, name: monitor
+
+hardware_query: 
+- type: Win32_DesktopMonitor
+  name: monitor
+- type: Win32_Processor
+  name: cpu
+- type: Win32_TapeDrive
+  name: tape drive
+- type: Win32_USBHub
+  name: usb hub
+- type: Win32_SoundDevice
+  name: sound
+- type: Win32_VideoController
+  name: video
+- type: Win32_ComputerSystem
+  name: cpu system
+- type: Win32_CDROMDrive
+  name: cd
+
+
+# Choose the data format type that will be sent yo Kibana 
+# e.g -  use_type_as_key: true - will show the data with key of the "name" you chose above. 
+# e.g -  use_constant_key: true - will show the data with key "data". 
+# Both of them can be set to TRUE, But if none of them will be TRUE no data will be shown.
+
+output_format:
+  use_type_as_key: false 
+  use_constant_key: true 
+
