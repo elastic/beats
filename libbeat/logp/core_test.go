@@ -26,8 +26,6 @@ import (
 
 func TestLogger(t *testing.T) {
 	exerciseLogger := func() {
-		// Info("unnamed global logger")
-
 		log := NewLogger("example")
 		log.Info("some message")
 		log.Infof("some message with parameter x=%v, y=%v", 1, 2)
