@@ -155,6 +155,9 @@ processors:
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
   - add_kubernetes_metadata: ~
+  - fetch_data: 
+     fields:
+       namae: test
   #- add_fields:
    #  target: ben
     # fields:

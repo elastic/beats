@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
 	_ "github.com/elastic/beats/libbeat/processors/extract_array"
+	_ "github.com/elastic/beats/libbeat/processors/fetch_data"
 	_ "github.com/elastic/beats/libbeat/processors/fingerprint"
 	_ "github.com/elastic/beats/libbeat/processors/registered_domain"
 	_ "github.com/elastic/beats/libbeat/publisher/includes" // Register publisher pipeline modules
