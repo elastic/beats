@@ -10,13 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/jmoiron/sqlx"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -24,7 +23,9 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("sql", "query", New)
+	mb.Registry.MustAddMetricSet("sql", "query", New,
+		mb.WithHostParser(ParseDSN),
+	)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -33,9 +34,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver     string
-	Datasource string
-	Query      string
+	Driver string
+	Query  string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -44,9 +44,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
 	config := struct {
-		Driver     string `config:"driver"`
-		Datasource string `config:"datasource"`
-		Query      string `config:"sql_query"`
+		Driver string `config:"driver" validate:"nonzero,required"`
+		Query  string `config:"sql_query" validate:"nonzero,required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -56,7 +55,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		Driver:        config.Driver,
-		Datasource:    config.Datasource,
 		Query:         config.Query,
 	}, nil
 }
@@ -65,7 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	db, err := sqlx.Open(m.Driver, m.Datasource)
+	db, err := sqlx.Open(m.Driver, m.HostData().URI)
 	if err != nil {
 		return errors.Wrap(err, "error opening connection")
 	}
@@ -98,10 +96,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		vals[i] = new(interface{})
 	}
 
-	numericValue := common.MapStr{}
-
-	stringValue := common.MapStr{}
-
 	for rows.Next() {
 		err = rows.Scan(vals...)
 		if err != nil {
@@ -109,30 +103,32 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		data := common.MapStr{
-			"metrics": common.MapStr{},
-		}
-		data.Put("driver", m.Driver)
-		data.Put("query", m.Query)
+		numericMetrics := common.MapStr{}
+		stringMetrics := common.MapStr{}
 
 		for i := 0; i < len(vals); i++ {
-			dataMetrics := data["metrics"].(common.MapStr)
-
 			value := getValue(vals[i].(*interface{}))
-
 			num, err := strconv.ParseFloat(value, 64)
 			if err == nil {
-				numericValue.Put(cols[i], num)
-				dataMetrics.Put("numeric", numericValue)
+				numericMetrics[cols[i]] = num
 			} else {
-				stringValue.Put(cols[i], value)
-				dataMetrics.Put("string", stringValue)
+				stringMetrics[cols[i]] = value
 			}
 
-			report.Event(mb.Event{
-				RootFields: common.MapStr{"sql": data},
-			})
 		}
+
+		report.Event(mb.Event{
+			RootFields: common.MapStr{
+				"sql": common.MapStr{
+					"driver": m.Driver,
+					"query":  m.Query,
+					"metrics": common.MapStr{
+						"numeric": numericMetrics,
+						"string":  stringMetrics,
+					},
+				},
+			},
+		})
 	}
 
 	if rows.Err() != nil {

@@ -30,7 +30,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_0",
             "title": "HTTP 5XX Errors",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -44,7 +44,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_1",
             "title": "Request Count",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -58,7 +58,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_2",
             "title": "Unhealthy Host Count",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -72,7 +72,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_3",
             "title": "Healthy Host Count",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -86,7 +86,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_4",
             "title": "Latency in Seconds",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -100,7 +100,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_5",
             "title": "HTTP Backend 4XX Errors",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -114,7 +114,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_6",
             "title": "Backend Connection Errors",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -127,7 +127,7 @@
             },
             "panelIndex": "9",
             "panelRefName": "panel_7",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -141,7 +141,7 @@
             "panelIndex": "10",
             "panelRefName": "panel_8",
             "title": "HTTP Backend 2XX",
-            "version": "7.4.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -1006,5 +1006,5 @@
       "version": "WzI0MTIsN10="
     }
   ],
-  "version": "7.4.0"
+  "version": "7.3.0"
 }

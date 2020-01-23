@@ -36,7 +36,7 @@ grouped in the following categories:
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
-* <<exported-fields-tls>>
+* <<exported-fields-tls_detailed>>
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
@@ -9339,15 +9339,16 @@ If the call resulted in exceptions, this field contains the exceptions in a huma
 
 --
 
-[[exported-fields-tls]]
-== TLS fields
+[[exported-fields-tls_detailed]]
+== Detailed TLS fields
 
-TLS-specific event fields.
-
-
+Detailed TLS-specific event fields.
 
 
-*`tls.version`*::
+
+
+
+*`tls.detailed.version`*::
 +
 --
 The version of the TLS protocol used.
@@ -9359,27 +9360,7 @@ example: TLS 1.3
 
 --
 
-*`tls.handshake_completed`*::
-+
---
-Whether the TLS negotiation has been successful and the session has transitioned to encrypted mode.
-
-
-type: boolean
-
---
-
-*`tls.resumed`*::
-+
---
-If the TLS session has been resumed from a previous session.
-
-
-type: boolean
-
---
-
-*`tls.resumption_method`*::
+*`tls.detailed.resumption_method`*::
 +
 --
 If the session has been resumed, the underlying method used. One of "id" for TLS session ID or "ticket" for TLS ticket extension.
@@ -9389,7 +9370,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate_requested`*::
+*`tls.detailed.client_certificate_requested`*::
 +
 --
 Whether the server has requested the client to authenticate itself using a client certificate.
@@ -9400,7 +9381,7 @@ type: boolean
 --
 
 
-*`tls.client_hello.version`*::
+*`tls.detailed.client_hello.version`*::
 +
 --
 The version of the TLS protocol by which the client wishes to communicate during this session.
@@ -9410,23 +9391,23 @@ type: keyword
 
 --
 
-*`tls.client_hello.supported_ciphers`*::
+*`tls.detailed.client_hello.session_id`*::
 +
 --
-List of ciphers the client is willing to use for this session. See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+Unique number to identify the session for the corresponding connection with the client.
 
 
-type: array
+type: keyword
 
 --
 
-*`tls.client_hello.supported_compression_methods`*::
+*`tls.detailed.client_hello.supported_compression_methods`*::
 +
 --
 The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
 
 
-type: array
+type: keyword
 
 --
 
@@ -9436,7 +9417,7 @@ type: array
 The hello extensions provided by the client.
 
 
-*`tls.client_hello.extensions.server_name_indication`*::
+*`tls.detailed.client_hello.extensions.server_name_indication`*::
 +
 --
 List of hostnames
@@ -9445,7 +9426,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.application_layer_protocol_negotiation`*::
+*`tls.detailed.client_hello.extensions.application_layer_protocol_negotiation`*::
 +
 --
 List of application-layer protocols the client is willing to use.
@@ -9455,7 +9436,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.session_ticket`*::
+*`tls.detailed.client_hello.extensions.session_ticket`*::
 +
 --
 Length of the session ticket, if provided, or an empty string to advertise support for tickets.
@@ -9465,7 +9446,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.supported_versions`*::
+*`tls.detailed.client_hello.extensions.supported_versions`*::
 +
 --
 List of TLS versions that the client is willing to use.
@@ -9475,7 +9456,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.supported_groups`*::
+*`tls.detailed.client_hello.extensions.supported_groups`*::
 +
 --
 List of Elliptic Curve Cryptography (ECC) curve groups supported by the client.
@@ -9485,7 +9466,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.signature_algorithms`*::
+*`tls.detailed.client_hello.extensions.signature_algorithms`*::
 +
 --
 List of signature algorithms that may be use in digital signatures.
@@ -9495,7 +9476,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions.ec_points_formats`*::
+*`tls.detailed.client_hello.extensions.ec_points_formats`*::
 +
 --
 List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
@@ -9505,7 +9486,7 @@ type: keyword
 
 --
 
-*`tls.client_hello.extensions._unparsed_`*::
+*`tls.detailed.client_hello.extensions._unparsed_`*::
 +
 --
 List of extensions that were left unparsed by Packetbeat.
@@ -9516,7 +9497,7 @@ type: keyword
 --
 
 
-*`tls.server_hello.version`*::
+*`tls.detailed.server_hello.version`*::
 +
 --
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
@@ -9526,17 +9507,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.selected_cipher`*::
-+
---
-The cipher suite selected by the server from the list provided by in the client hello.
-
-
-type: keyword
-
---
-
-*`tls.server_hello.selected_compression_method`*::
+*`tls.detailed.server_hello.selected_compression_method`*::
 +
 --
 The compression method selected by the server from the list provided in the client hello.
@@ -9546,7 +9517,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.session_id`*::
+*`tls.detailed.server_hello.session_id`*::
 +
 --
 Unique number to identify the session for the corresponding connection with the client.
@@ -9562,16 +9533,16 @@ type: keyword
 The hello extensions provided by the server.
 
 
-*`tls.server_hello.extensions.application_layer_protocol_negotiation`*::
+*`tls.detailed.server_hello.extensions.application_layer_protocol_negotiation`*::
 +
 --
 Negotiated application layer protocol
 
-type: array
+type: keyword
 
 --
 
-*`tls.server_hello.extensions.session_ticket`*::
+*`tls.detailed.server_hello.extensions.session_ticket`*::
 +
 --
 Used to announce that a session ticket will be provided by the server. Always an empty string.
@@ -9581,7 +9552,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions.supported_versions`*::
+*`tls.detailed.server_hello.extensions.supported_versions`*::
 +
 --
 Negotiated TLS version to be used.
@@ -9591,7 +9562,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions.ec_points_formats`*::
+*`tls.detailed.server_hello.extensions.ec_points_formats`*::
 +
 --
 List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the server can parse.
@@ -9601,7 +9572,7 @@ type: keyword
 
 --
 
-*`tls.server_hello.extensions._unparsed_`*::
+*`tls.detailed.server_hello.extensions._unparsed_`*::
 +
 --
 List of extensions that were left unparsed by Packetbeat.
@@ -9617,7 +9588,7 @@ type: keyword
 Certificate provided by the client for authentication.
 
 
-*`tls.client_certificate.version`*::
+*`tls.detailed.client_certificate.version`*::
 +
 --
 X509 format version.
@@ -9626,7 +9597,7 @@ type: long
 
 --
 
-*`tls.client_certificate.serial_number`*::
+*`tls.detailed.client_certificate.serial_number`*::
 +
 --
 The certificate's serial number.
@@ -9635,7 +9606,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.not_before`*::
+*`tls.detailed.client_certificate.not_before`*::
 +
 --
 Date before which the certificate is not valid.
@@ -9644,7 +9615,7 @@ type: date
 
 --
 
-*`tls.client_certificate.not_after`*::
+*`tls.detailed.client_certificate.not_after`*::
 +
 --
 Date after which the certificate expires.
@@ -9653,7 +9624,7 @@ type: date
 
 --
 
-*`tls.client_certificate.public_key_algorithm`*::
+*`tls.detailed.client_certificate.public_key_algorithm`*::
 +
 --
 The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
@@ -9663,7 +9634,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.public_key_size`*::
+*`tls.detailed.client_certificate.public_key_size`*::
 +
 --
 Size of the public key.
@@ -9672,7 +9643,7 @@ type: long
 
 --
 
-*`tls.client_certificate.signature_algorithm`*::
+*`tls.detailed.client_certificate.signature_algorithm`*::
 +
 --
 The algorithm used for the certificate's signature.
@@ -9682,19 +9653,10 @@ type: keyword
 
 --
 
-*`tls.client_certificate.alternative_names`*::
+*`tls.detailed.client_certificate.alternative_names`*::
 +
 --
 Subject Alternative Names for this certificate.
-
-type: array
-
---
-
-*`tls.client_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
 
 type: keyword
 
@@ -9706,7 +9668,7 @@ type: keyword
 Subject represented by this certificate.
 
 
-*`tls.client_certificate.subject.country`*::
+*`tls.detailed.client_certificate.subject.country`*::
 +
 --
 Country code.
@@ -9715,7 +9677,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.organization`*::
+*`tls.detailed.client_certificate.subject.organization`*::
 +
 --
 Organization name.
@@ -9724,7 +9686,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.organizational_unit`*::
+*`tls.detailed.client_certificate.subject.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -9733,7 +9695,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.province`*::
+*`tls.detailed.client_certificate.subject.province`*::
 +
 --
 Province or region within country.
@@ -9742,10 +9704,19 @@ type: keyword
 
 --
 
-*`tls.client_certificate.subject.common_name`*::
+*`tls.detailed.client_certificate.subject.common_name`*::
 +
 --
 Name or host name identified by the certificate.
+
+type: keyword
+
+--
+
+*`tls.detailed.client_certificate.subject.locality`*::
++
+--
+Locality.
 
 type: keyword
 
@@ -9757,7 +9728,7 @@ type: keyword
 Entity that issued and signed this certificate.
 
 
-*`tls.client_certificate.issuer.country`*::
+*`tls.detailed.client_certificate.issuer.country`*::
 +
 --
 Country code.
@@ -9766,7 +9737,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.organization`*::
+*`tls.detailed.client_certificate.issuer.organization`*::
 +
 --
 Organization name.
@@ -9775,7 +9746,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.organizational_unit`*::
+*`tls.detailed.client_certificate.issuer.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -9784,7 +9755,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.province`*::
+*`tls.detailed.client_certificate.issuer.province`*::
 +
 --
 Province or region within country.
@@ -9793,7 +9764,7 @@ type: keyword
 
 --
 
-*`tls.client_certificate.issuer.common_name`*::
+*`tls.detailed.client_certificate.issuer.common_name`*::
 +
 --
 Name or host name identified by the certificate.
@@ -9802,29 +9773,10 @@ type: keyword
 
 --
 
-
-*`tls.client_certificate.fingerprint.md5`*::
+*`tls.detailed.client_certificate.issuer.locality`*::
 +
 --
-Certificate's MD5 fingerprint.
-
-type: keyword
-
---
-
-*`tls.client_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.client_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
+Locality.
 
 type: keyword
 
@@ -9836,7 +9788,7 @@ type: keyword
 Certificate provided by the server for authentication.
 
 
-*`tls.server_certificate.version`*::
+*`tls.detailed.server_certificate.version`*::
 +
 --
 X509 format version.
@@ -9845,7 +9797,7 @@ type: long
 
 --
 
-*`tls.server_certificate.serial_number`*::
+*`tls.detailed.server_certificate.serial_number`*::
 +
 --
 The certificate's serial number.
@@ -9854,7 +9806,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.not_before`*::
+*`tls.detailed.server_certificate.not_before`*::
 +
 --
 Date before which the certificate is not valid.
@@ -9863,7 +9815,7 @@ type: date
 
 --
 
-*`tls.server_certificate.not_after`*::
+*`tls.detailed.server_certificate.not_after`*::
 +
 --
 Date after which the certificate expires.
@@ -9872,7 +9824,7 @@ type: date
 
 --
 
-*`tls.server_certificate.public_key_algorithm`*::
+*`tls.detailed.server_certificate.public_key_algorithm`*::
 +
 --
 The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
@@ -9882,7 +9834,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.public_key_size`*::
+*`tls.detailed.server_certificate.public_key_size`*::
 +
 --
 Size of the public key.
@@ -9891,7 +9843,7 @@ type: long
 
 --
 
-*`tls.server_certificate.signature_algorithm`*::
+*`tls.detailed.server_certificate.signature_algorithm`*::
 +
 --
 The algorithm used for the certificate's signature.
@@ -9901,19 +9853,10 @@ type: keyword
 
 --
 
-*`tls.server_certificate.alternative_names`*::
+*`tls.detailed.server_certificate.alternative_names`*::
 +
 --
 Subject Alternative Names for this certificate.
-
-type: array
-
---
-
-*`tls.server_certificate.raw`*::
-+
---
-The raw certificate in PEM format.
 
 type: keyword
 
@@ -9925,7 +9868,7 @@ type: keyword
 Subject represented by this certificate.
 
 
-*`tls.server_certificate.subject.country`*::
+*`tls.detailed.server_certificate.subject.country`*::
 +
 --
 Country code.
@@ -9934,7 +9877,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.organization`*::
+*`tls.detailed.server_certificate.subject.organization`*::
 +
 --
 Organization name.
@@ -9943,7 +9886,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.organizational_unit`*::
+*`tls.detailed.server_certificate.subject.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -9952,7 +9895,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.province`*::
+*`tls.detailed.server_certificate.subject.province`*::
 +
 --
 Province or region within country.
@@ -9961,10 +9904,19 @@ type: keyword
 
 --
 
-*`tls.server_certificate.subject.common_name`*::
+*`tls.detailed.server_certificate.subject.common_name`*::
 +
 --
 Name or host name identified by the certificate.
+
+type: keyword
+
+--
+
+*`tls.detailed.server_certificate.subject.locality`*::
++
+--
+Locality.
 
 type: keyword
 
@@ -9976,7 +9928,7 @@ type: keyword
 Entity that issued and signed this certificate.
 
 
-*`tls.server_certificate.issuer.country`*::
+*`tls.detailed.server_certificate.issuer.country`*::
 +
 --
 Country code.
@@ -9985,7 +9937,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.organization`*::
+*`tls.detailed.server_certificate.issuer.organization`*::
 +
 --
 Organization name.
@@ -9994,7 +9946,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.organizational_unit`*::
+*`tls.detailed.server_certificate.issuer.organizational_unit`*::
 +
 --
 Unit within organization.
@@ -10003,7 +9955,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.province`*::
+*`tls.detailed.server_certificate.issuer.province`*::
 +
 --
 Province or region within country.
@@ -10012,7 +9964,7 @@ type: keyword
 
 --
 
-*`tls.server_certificate.issuer.common_name`*::
+*`tls.detailed.server_certificate.issuer.common_name`*::
 +
 --
 Name or host name identified by the certificate.
@@ -10021,35 +9973,16 @@ type: keyword
 
 --
 
-
-*`tls.server_certificate.fingerprint.md5`*::
+*`tls.detailed.server_certificate.issuer.locality`*::
 +
 --
-Certificate's MD5 fingerprint.
+Locality.
 
 type: keyword
 
 --
 
-*`tls.server_certificate.fingerprint.sha1`*::
-+
---
-Certificate's SHA-1 fingerprint.
-
-type: keyword
-
---
-
-*`tls.server_certificate.fingerprint.sha256`*::
-+
---
-Certificate's SHA-256 fingerprint.
-
-type: keyword
-
---
-
-*`tls.server_certificate_chain`*::
+*`tls.detailed.server_certificate_chain`*::
 +
 --
 Chain of trust for the server certificate.
@@ -10058,7 +9991,7 @@ type: array
 
 --
 
-*`tls.client_certificate_chain`*::
+*`tls.detailed.client_certificate_chain`*::
 +
 --
 Chain of trust for the client certificate.
@@ -10067,42 +10000,10 @@ type: array
 
 --
 
-*`tls.alert_types`*::
+*`tls.detailed.alert_types`*::
 +
 --
 An array containing the TLS alert type for every alert received.
-
-
-type: keyword
-
---
-
-[float]
-=== fingerprints
-
-Fingerprints for this TLS session.
-
-
-[float]
-=== ja3
-
-JA3 TLS client fingerprint
-
-
-*`tls.fingerprints.ja3.hash`*::
-+
---
-The JA3 fingerprint hash for the client side.
-
-
-type: keyword
-
---
-
-*`tls.fingerprints.ja3.str`*::
-+
---
-The JA3 string used to calculate the hash.
 
 
 type: keyword

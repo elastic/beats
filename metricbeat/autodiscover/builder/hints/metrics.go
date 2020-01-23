@@ -141,14 +141,14 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["password"] = password
 	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: +%v", *cfg)
+	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
