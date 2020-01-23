@@ -46,7 +46,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Module] STAN Channel Metrics",
+        "title": "[Metricbeat STAN] Channel Overview Metrics",
         "version": 1
       },
       "id": "dbf2e220-37ce-11ea-a9c8-152a657da3ab",
