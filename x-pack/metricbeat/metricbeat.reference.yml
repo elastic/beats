@@ -73,6 +73,7 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
@@ -130,6 +131,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
@@ -1421,9 +1425,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -1513,9 +1517,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1686,9 +1690,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -1798,9 +1802,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -2067,9 +2071,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -2243,9 +2247,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications

@@ -78,11 +78,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 
 *Heartbeat*
 
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
+- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Journalbeat*
 
