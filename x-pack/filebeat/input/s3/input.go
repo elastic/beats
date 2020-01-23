@@ -145,7 +145,10 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	// Create a context with a timeout that will abort the API call if it takes
 	// more than the default timeout 2 minute.
 	ctx := context.Background()
-	ctx, _ = context.WithTimeout(ctx, config.ContextTimeout)
+	var cancelFn func()
+	ctx, cancelFn = context.WithTimeout(ctx, config.ContextTimeout)
+	defer cancelFn()
+
 	inputCtx, cancelInputCtx := context.WithCancel(ctx)
 	go func() {
 		defer cancelInputCtx()
