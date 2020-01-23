@@ -9,6 +9,7 @@ package guess
 import (
 	"encoding/hex"
 	"os"
+	"strconv"
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -17,8 +18,14 @@ import (
 )
 
 /*
+	This is not an actual guess but a helper to check if the kernel kprobe
+	subsystem returns garbage after dereferencing a null pointer.
 
- */
+	This code is run when the AUDITBEAT_SYSTEM_SOCKET_CHECK_DEREF environment
+    variable is set to a value greater than 0. When set, it will run the given
+    number of times, print the hexdump to the debug logs if non-zero memory is
+    found and set the NULL_PTR_DEREF_IS_OK (bool) variable.
+*/
 
 func init() {
 	if err := Registry.AddGuess(&guessDeref{}); err != nil {
@@ -27,17 +34,27 @@ func init() {
 }
 
 const (
-	flagName = "NULL_PTR_DEREF_IS_GARBAGE"
+	flagName = "NULL_PTR_DEREF_IS_OK"
 	envVar   = "AUDITBEAT_SYSTEM_SOCKET_CHECK_DEREF"
 )
 
 type guessDeref struct {
-	ctx Context
+	ctx     Context
+	tries   int
+	garbage bool
 }
 
-func (g *guessDeref) Condition(ctx Context) (bool, error) {
+// Condition allows the guess to run if the environment variable is set to a
+// decimal value greater than zero.
+func (g *guessDeref) Condition(ctx Context) (run bool, err error) {
 	v := os.Getenv(envVar)
-	return v == "1", nil
+	if v == "" {
+		return false, nil
+	}
+	if g.tries, err = strconv.Atoi(v); err != nil || g.tries <= 0 {
+		return false, nil
+	}
+	return true, nil
 }
 
 // Name of this guess.
@@ -59,8 +76,8 @@ func (g *guessDeref) Requires() []string {
 	}
 }
 
-// Probes returns a kretprobe on prepare_creds that dumps the first bytes
-// pointed to by the return value, which is a struct cred.
+// Probes returns a kprobe on uname() that dumps the first bytes
+// pointed to by its first parameter.
 func (g *guessDeref) Probes() ([]helper.ProbeDef, error) {
 	return []helper.ProbeDef{
 		{
@@ -86,11 +103,13 @@ func (g *guessDeref) Terminate() error {
 	return nil
 }
 
+// MaxRepeats returns the configured number of repeats.
 func (g *guessDeref) MaxRepeats() int {
-	return 1000
+	return g.tries
 }
 
-// Extract receives the struct cred dump and discovers the offsets.
+// Extract receives the memory read through a null pointer and checks if it's
+// zero or garbage.
 func (g *guessDeref) Extract(ev interface{}) (common.MapStr, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
@@ -98,17 +117,21 @@ func (g *guessDeref) Extract(ev interface{}) (common.MapStr, bool) {
 	}
 	for _, val := range raw {
 		if val != 0 {
-			g.ctx.Log.Errorf("Found non-empty memory:\n%s", hex.Dump(raw))
-			//return nil, false
+			g.ctx.Log.Errorf("Found non-zero memory:\n%s", hex.Dump(raw))
+			g.garbage = true
+			break
 		}
 	}
-	return nil, true
+	// Repeat until completed all tries
+	if g.tries--; g.tries > 0 {
+		return nil, true
+	}
+	return common.MapStr{
+		flagName: !g.garbage,
+	}, true
 }
 
-// Trigger invokes the SYS_ACCESS syscall:
-//	  int access(const char *pathname, int mode);
-// The function call will return an error due to path being NULL, but it will
-// have invoked prepare_creds before argument validation.
+// Trigger invokes the uname syscall with a null parameter.
 func (g *guessDeref) Trigger() error {
 	var ptr *syscall.Utsname
 	syscall.Uname(ptr)
