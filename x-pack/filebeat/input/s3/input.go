@@ -313,7 +313,7 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	return req.Send(ctx)
@@ -328,7 +328,7 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)
@@ -524,7 +524,7 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, info s3Info) (*bufio.
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -581,7 +581,7 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)
