@@ -1,9 +1,10 @@
 from elasticsearch import NotFoundError
 from nose.tools import raises
 import datetime
+import unittest
 
 
-class IdxMgmt(object):
+class IdxMgmt(unittest.TestCase):
 
     def __init__(self, client, index):
         self._client = client
@@ -96,11 +97,15 @@ class IdxMgmt(object):
         assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d"
 
     def assert_docs_written_to_alias(self, alias, pattern=None):
+        # Refresh the indices to guarantee all documents are available
+        # through the _search API.
+        self._client.transport.perform_request('POST', '/_refresh')
+
         if pattern is None:
             pattern = self.default_pattern()
         name = alias + "-" + pattern
         data = self._client.transport.perform_request('GET', '/' + name + '/_search')
-        assert data["hits"]["total"] > 0
+        self.assertGreater(data["hits"]["total"]["value"], 0)
 
     def default_pattern(self):
         d = datetime.datetime.now().strftime("%Y.%m.%d")
