@@ -31244,7 +31244,6 @@ type: object
 stan Module
 
 
-
 [float]
 === stan
 

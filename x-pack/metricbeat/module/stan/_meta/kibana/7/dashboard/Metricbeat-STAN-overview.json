@@ -46,7 +46,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat STAN] Channel Overview Metrics",
+        "title": "[Metricbeat Stan] Channel Overview Metrics",
         "version": 1
       },
       "id": "dbf2e220-37ce-11ea-a9c8-152a657da3ab",
@@ -81,7 +81,7 @@
             }
           }
         },
-        "title": "STAN Channel Messages [Metricbeat Module]",
+        "title": "Channel Messages [Metricbeat Stan]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -144,7 +144,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "STAN Channel Messages [Metricbeat Module]",
+          "title": "Channel Messages [Metricbeat Stan]",
           "type": "metrics"
         }
       },
@@ -169,7 +169,7 @@
             }
           }
         },
-        "title": "Channel Queue Depth [Metricbeat STAN]",
+        "title": "Channel Queue Depth [Metricbeat Stan]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -243,7 +243,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Channel Queue Depth [Metricbeat STAN]",
+          "title": "Channel Queue Depth [Metricbeat Stan]",
           "type": "metrics"
         }
       },
