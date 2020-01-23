@@ -134,20 +134,24 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
-// GetPipelines returns the list of pipelines running on a Logstash node
-func GetPipelines(m *MetricSet) ([]PipelineState, error) {
+// GetPipelines returns the list of pipelines running on a Logstash node and,
+// optionally, an override cluster UUID.
+func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
-		return nil, errors.Wrap(err, "could not fetch node pipelines")
+		return nil, "", errors.Wrap(err, "could not fetch node pipelines")
 	}
 
 	pipelinesResponse := struct {
+		Monitoring struct {
+			ClusterID string `json:"cluster_uuid"`
+		} `json:"monitoring"`
 		Pipelines map[string]PipelineState `json:"pipelines"`
 	}{}
 
 	err = json.Unmarshal(content, &pipelinesResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not parse node pipelines response")
+		return nil, "", errors.Wrap(err, "could not parse node pipelines response")
 	}
 
 	var pipelines []PipelineState
@@ -156,7 +160,7 @@ func GetPipelines(m *MetricSet) ([]PipelineState, error) {
 		pipelines = append(pipelines, pipeline)
 	}
 
-	return pipelines, nil
+	return pipelines, pipelinesResponse.Monitoring.ClusterID, nil
 }
 
 // CheckPipelineGraphAPIsAvailable returns an error if pipeline graph APIs are not

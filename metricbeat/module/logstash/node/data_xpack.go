@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState, overrideClusterUUID string) error {
 	pipelines = getUserDefinedPipelines(pipelines)
-	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
 			removeClusterUUIDsFromPipeline(pipeline)
@@ -62,9 +62,14 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 	return nil
 }
 
-func makeClusterToPipelinesMap(pipelines []logstash.PipelineState) map[string][]logstash.PipelineState {
+func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClusterUUID string) map[string][]logstash.PipelineState {
 	var clusterToPipelinesMap map[string][]logstash.PipelineState
 	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
+
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
 
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
