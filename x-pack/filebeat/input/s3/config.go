@@ -18,7 +18,7 @@ type config struct {
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
-	AwsApiTimeout            time.Duration       `config:"aw_api_timeout"`
+	AwsApiTimeout             time.Duration       `config:"aws_api_timeout"`
 }
 
 func defaultConfig() config {
@@ -27,7 +27,7 @@ func defaultConfig() config {
 			Type: "s3",
 		},
 		VisibilityTimeout: 300 * time.Second,
-		AwsApiTimeout:    120 * time.Second,
+		AwsApiTimeout:     120 * time.Second,
 	}
 }
 

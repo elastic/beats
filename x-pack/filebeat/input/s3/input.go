@@ -142,14 +142,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 
 	// Wrap input.Context's Done channel with a context.Context. This goroutine
 	// stops with the parent closes the Done channel.
-	// Create a context with a timeout that will abort the API call if it takes
-	// more than the default timeout 2 minute.
-	ctx := context.Background()
-	var cancelFn func()
-	ctx, cancelFn = context.WithTimeout(ctx, config.AwsApiTimeout)
-	defer cancelFn()
-
-	inputCtx, cancelInputCtx := context.WithCancel(ctx)
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
 		defer cancelInputCtx()
 		select {
@@ -223,7 +216,6 @@ func (p *s3Input) Stop() {
 	p.stopOnce.Do(func() {
 		defer p.outlet.Close()
 		close(p.close)
-		p.inputCtx.Done()
 		p.logger.Info("Stopping s3 input")
 	})
 }
@@ -319,7 +311,12 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 			WaitTimeSeconds:       &waitTimeSecond,
 		})
 
-	return req.Send(p.inputCtx)
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	defer cancelFn()
+
+	return req.Send(ctx)
 }
 
 func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI, receiptHandle *string) error {
@@ -328,7 +325,13 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 		VisibilityTimeout: &visibilityTimeout,
 		ReceiptHandle:     receiptHandle,
 	})
-	_, err := req.Send(p.inputCtx)
+
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	defer cancelFn()
+
+	_, err := req.Send(ctx)
 	return err
 }
 
@@ -367,116 +370,85 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 }
 
 func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
-	s3Context := &s3Context{
+	s3Ctx := &s3Context{
 		refs: 1,
 		errC: errC,
 	}
-	defer s3Context.done()
+	defer s3Ctx.done()
 
-	for _, s3Info := range s3Infos {
-		objectHash := s3ObjectHash(s3Info)
-
-		// read from s3 object
-		resp, err := p.getS3ObjectResponse(svc, s3Info)
+	for _, info := range s3Infos {
+		err := p.createEventsFromS3Info(svc, info, s3Ctx)
 		if err != nil {
-			err = errors.Wrap(err, "newS3BucketReader failed")
+			err = errors.Wrapf(err, "createEventsFromS3Info failed for %v", info.key)
 			p.logger.Error(err)
-			s3Context.setError(err)
-			return err
-		}
-
-		reader := bufio.NewReader(resp.Body)
-		// Check content-type
-		if resp.ContentType != nil {
-			switch *resp.ContentType {
-			case "application/x-gzip":
-				gzipReader, err := gzip.NewReader(resp.Body)
-				if err != nil {
-					err = errors.Wrapf(err, "Failed to decompress application/x-gzip file %v", s3Info.key)
-					p.logger.Error(err)
-					s3Context.setError(err)
-					resp.Body.Close()
-					return err
-				}
-				reader = bufio.NewReader(gzipReader)
-				gzipReader.Close()
-			}
-		} else if strings.HasSuffix(s3Info.key, ".gz") {
-			// If there is no content-type, check file name instead.
-			gzipReader, err := gzip.NewReader(resp.Body)
-			if err != nil {
-				err = errors.Wrapf(err, "Failed to decompress file with .gz suffix %v", s3Info.key)
-				p.logger.Error(err)
-				s3Context.setError(err)
-				resp.Body.Close()
-				return err
-			}
-			reader = bufio.NewReader(gzipReader)
-			gzipReader.Close()
-		}
-
-		// Decode JSON documents when expand_event_list_from_field is given in config
-		if p.config.ExpandEventListFromField != "" {
-			decoder := json.NewDecoder(reader)
-			err := p.decodeJSONWithKey(decoder, objectHash, s3Info, s3Context)
-			if err != nil {
-				err = errors.Wrapf(err, "decodeJSONWithKey failed for %v", s3Info.key)
-				p.logger.Error(err)
-				s3Context.setError(err)
-				resp.Body.Close()
-				return err
-			}
-			resp.Body.Close()
-			return nil
-		}
-
-		// handle s3 objects that are not json content-type
-		offset := 0
-		for {
-			log, err := reader.ReadString('\n')
-			if log == "" {
-				break
-			}
-
-			if err == io.EOF {
-				// create event for last line
-				offset += len([]byte(log))
-				event := createEvent(log, offset, s3Info, objectHash, s3Context)
-				err = p.forwardEvent(event)
-				if err != nil {
-					err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
-					p.logger.Error(err)
-					s3Context.setError(err)
-					resp.Body.Close()
-					return err
-				}
-				resp.Body.Close()
-				return nil
-			} else if err != nil {
-				err = errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
-				p.logger.Error(err)
-				s3Context.setError(err)
-				resp.Body.Close()
-				return err
-			}
-
-			// create event per log line
-			offset += len([]byte(log))
-			event := createEvent(log, offset, s3Info, objectHash, s3Context)
-			err = p.forwardEvent(event)
-			if err != nil {
-				err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
-				p.logger.Error(err)
-				s3Context.setError(err)
-				resp.Body.Close()
-				return err
-			}
+			s3Ctx.setError(err)
 		}
 	}
 	return nil
 }
 
-func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3Ctx *s3Context) error {
+	objectHash := s3ObjectHash(info)
+
+	// read from s3 object
+	reader, err := p.newS3BucketReader(svc, info)
+	if err != nil {
+		err = errors.Wrap(err, "getS3ObjectResponse failed")
+		p.logger.Error(err)
+		return err
+	}
+
+	// Decode JSON documents when expand_event_list_from_field is given in config
+	if p.config.ExpandEventListFromField != "" {
+		decoder := json.NewDecoder(reader)
+		err := p.decodeJSONWithKey(decoder, objectHash, info, s3Ctx)
+		if err != nil {
+			err = errors.Wrap(err, "decodeJSONWithKey failed")
+			p.logger.Error(err)
+			return err
+		}
+		return nil
+	}
+
+	// handle s3 objects that are not json content-type
+	offset := 0
+	for {
+		log, err := reader.ReadString('\n')
+		if log == "" {
+			break
+		}
+
+		if err == io.EOF {
+			// create event for last line
+			offset += len([]byte(log))
+			event := createEvent(log, offset, info, objectHash, s3Ctx)
+			err = p.forwardEvent(event)
+			if err != nil {
+				err = errors.Wrap(err, "forwardEvent failed")
+				p.logger.Error(err)
+				return err
+			}
+			return nil
+		} else if err != nil {
+			err = errors.Wrap(err, "ReadString failed")
+			p.logger.Error(err)
+			return err
+		}
+
+		// create event per log line
+		offset += len([]byte(log))
+		event := createEvent(log, offset, info, objectHash, s3Ctx)
+		err = p.forwardEvent(event)
+		if err != nil {
+			err = errors.Wrap(err, "forwardEvent failed")
+			p.logger.Error(err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
 	offset := 0
 	for {
 		var jsonFields map[string][]interface{}
@@ -490,15 +462,15 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 			// get logs from expand_event_list_from_field
 			textValues, ok := jsonFields[p.config.ExpandEventListFromField]
 			if !ok {
-				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpandEventListFromField))
+				err = errors.Wrapf(err, fmt.Sprintf("key '%s' not found", p.config.ExpandEventListFromField))
 				p.logger.Error(err)
 				return err
 			}
 
 			for _, v := range textValues {
-				err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
+				err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx)
 				if err != nil {
-					err = errors.Wrapf(err, fmt.Sprintf("convertJSONToEvent failed for %v", s3Info.key))
+					err = errors.Wrap(err, "convertJSONToEvent failed")
 					p.logger.Error(err)
 					return err
 				}
@@ -517,7 +489,7 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 		}
 
 		for _, v := range textValues {
-			err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Context)
+			err := p.convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx)
 			if err != nil {
 				err = errors.Wrapf(err, fmt.Sprintf("Key '%s' not found", p.config.ExpandEventListFromField))
 				p.logger.Error(err)
@@ -527,49 +499,68 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 	}
 }
 
-func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Context *s3Context) error {
+func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
 	vJSON, err := json.Marshal(jsonFields)
 	log := string(vJSON)
 	offset += len([]byte(log))
-	event := createEvent(log, offset, s3Info, objectHash, s3Context)
+	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
 
 	err = p.forwardEvent(event)
 	if err != nil {
-		err = errors.Wrapf(err, fmt.Sprintf("forwardEvent failed for %s", s3Info.key))
+		err = errors.Wrap(err, fmt.Sprintf("forwardEvent failed"))
 		p.logger.Error(err)
 		return err
 	}
 	return nil
 }
 
-func (p *s3Input) getS3ObjectResponse(svc s3iface.ClientAPI, s3Info s3Info) (*s3.GetObjectResponse, error) {
-	// Download the S3 object using GetObjectRequest. The Context will interrupt
-	// the request if the timeout expires.
+func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, info s3Info) (*bufio.Reader, error) {
+	// Download the S3 object using GetObjectRequest.
 	s3GetObjectInput := &s3.GetObjectInput{
-		Bucket: awssdk.String(s3Info.name),
-		Key:    awssdk.String(s3Info.key),
+		Bucket: awssdk.String(info.name),
+		Key:    awssdk.String(info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(p.inputCtx)
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	defer cancelFn()
+
+	resp, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = errors.Wrapf(err, "GetObject of s3 file with key %v failed due to timeout", s3Info.key)
+				err = errors.Wrap(err, "GetObject request canceled")
 				p.logger.Error(err)
 				return nil, err
 			}
 
 			if awsErr.Code() == "NoSuchKey" {
-				p.logger.Warn("Cannot find s3 file with key ", s3Info.key)
+				p.logger.Warn("Cannot find s3 file")
 				return nil, nil
 			}
 		}
-		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
+		return nil, errors.Wrap(err, "s3 get object request failed")
 	}
-	return resp, nil
+
+	defer resp.Body.Close()
+
+	reader := bufio.NewReader(resp.Body)
+	// Check content-type
+	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrap(err, "gzip.NewReader failed")
+			p.logger.Error(err)
+			return nil, err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
+	}
+	return reader, nil
 }
 
 func (p *s3Input) forwardEvent(event beat.Event) error {
@@ -587,7 +578,12 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 	}
 
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
-	ctx := context.Background()
+
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsApiTimeout)
+	defer cancelFn()
+
 	_, err := req.Send(ctx)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
@@ -598,33 +594,33 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 	return nil
 }
 
-func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Context *s3Context) beat.Event {
+func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
 			"offset":    int64(offset),
-			"file.path": constructObjectURL(s3Info),
+			"file.path": constructObjectURL(info),
 		},
 		"aws": common.MapStr{
 			"s3": common.MapStr{
 				"bucket": common.MapStr{
-					"name": s3Info.name,
-					"arn":  s3Info.arn},
-				"object.key": s3Info.key,
+					"name": info.name,
+					"arn":  info.arn},
+				"object.key": info.key,
 			},
 		},
 		"cloud": common.MapStr{
 			"provider": "aws",
-			"region":   s3Info.region,
+			"region":   info.region,
 		},
 	}
 
-	s3Context.Inc()
+	s3Ctx.Inc()
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields:    f,
 		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Context,
+		Private:   s3Ctx,
 	}
 }
 

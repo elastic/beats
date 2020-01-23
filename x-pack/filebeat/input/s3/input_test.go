@@ -5,7 +5,6 @@
 package s3
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -28,16 +27,10 @@ type MockS3Client struct {
 	s3iface.ClientAPI
 }
 
-// MockS3ClientErr struct is used for unit tests.
-type MockS3ClientErr struct {
-	s3iface.ClientAPI
-}
-
 var (
 	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
 	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
 	mockSvc      = &MockS3Client{}
-	mockSvcErr   = &MockS3ClientErr{}
 	info         = s3Info{
 		name:   "test-s3-ks",
 		key:    "log2019-06-21-16-16-54",
@@ -53,16 +46,6 @@ func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRe
 			Data: &s3.GetObjectOutput{
 				Body: logBody,
 			},
-			HTTPRequest: httpReq,
-		},
-	}
-}
-
-func (m *MockS3ClientErr) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return s3.GetObjectRequest{
-		Request: &awssdk.Request{
-			Data:        &s3.GetObjectOutput{},
 			HTTPRequest: httpReq,
 		},
 	}
@@ -152,8 +135,7 @@ func TestHandleMessage(t *testing.T) {
 
 func TestGetS3ObjectResponse(t *testing.T) {
 	p := &s3Input{inputCtx: context.Background()}
-	resp, err := p.getS3ObjectResponse(mockSvc, info)
-	reader := bufio.NewReader(resp.Body)
+	reader, err := p.newS3BucketReader(mockSvc, info)
 	assert.NoError(t, err)
 	for i := 0; i < 3; i++ {
 		switch i {
@@ -190,8 +172,8 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	resp, err := p.getS3ObjectResponse(mockSvc, s3Info)
-	reader := bufio.NewReader(resp.Body)
+	reader, err := p.newS3BucketReader(mockSvc, s3Info)
+
 	assert.NoError(t, err)
 	var events []beat.Event
 	for {
