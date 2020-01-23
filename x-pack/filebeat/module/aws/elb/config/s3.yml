@@ -13,6 +13,6 @@ shared_credential_file: {{ .shared_credential_file }}
 visibility_timeout: {{ .visibility_timeout }}
 {{ end }}
 
-{{ if .context_timeout }}
-context_timeout: {{ .context_timeout }}
+{{ if .aws_api_timeout }}
+aws_api_timeout: {{ .aws_api_timeout }}
 {{ end }}

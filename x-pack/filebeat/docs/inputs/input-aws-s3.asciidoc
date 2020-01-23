@@ -62,11 +62,11 @@ messages under the group value into separate events. For example, CloudTrail log
 are in JSON format and events are found under the JSON object "Records":
 
 [float]
-==== `context_timeout`
+==== `aws_api_timeout`
 
-The maximum duration of GetObjectRequest AWS API can take. If it exceeds the
-timeout, GetObjectRequest will be interrupted.
-The default context timeout for a message is 120 seconds. The minimum
+The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+will be interrupted.
+The default AWS API timeout for a message is 120 seconds. The minimum
 is 0 seconds. The maximum is half of the visibility timeout value.
 
 ["source","json"]

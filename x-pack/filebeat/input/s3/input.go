@@ -146,7 +146,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	// more than the default timeout 2 minute.
 	ctx := context.Background()
 	var cancelFn func()
-	ctx, cancelFn = context.WithTimeout(ctx, config.ContextTimeout)
+	ctx, cancelFn = context.WithTimeout(ctx, config.AwsApiTimeout)
 	defer cancelFn()
 
 	inputCtx, cancelInputCtx := context.WithCancel(ctx)
@@ -174,7 +174,7 @@ func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		p.logger.Infof("visibility timeout is set to %v seconds: ", visibilityTimeout)
-		p.logger.Infof("context timeout is set to %v: ", p.config.ContextTimeout)
+		p.logger.Infof("aws api timeout is set to %v: ", p.config.AwsApiTimeout)
 
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
