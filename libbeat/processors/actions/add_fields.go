@@ -34,6 +34,8 @@ type addFields struct {
 	overwrite bool
 }
 
+type NewTest map[string]interface{}
+
 // FieldsKey is the default target key for the add_fields processor.
 const FieldsKey = "fields"
 
@@ -59,7 +61,7 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 
 	return makeFieldsProcessor(
 		optTarget(config.Target, FieldsKey),
-		config.Fields,
+		config.Fields, 
 		true,
 	), nil
 }
@@ -72,7 +74,8 @@ func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.
 
 	if fields["sapirtest"] == true {
 		fields["sapirtest"] = "TEST1234512"
-		fields["sapirtest"] = common.MapStr{"name": "Ben", "TEST400": "check123"}
+		fields["sapirtest3"] = "sapirtest3"
+		fields["sapirtest4"] = NewTest{"name": "Ben", "age": "modiin"}
 	}
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
