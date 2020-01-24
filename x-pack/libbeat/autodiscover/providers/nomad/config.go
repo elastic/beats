@@ -21,7 +21,7 @@ type Config struct {
 	WaitTime       time.Duration `config:"wait_time"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	AllowStale     bool          `config:"allow_stale"`
-	CleanupTimeout time.Duration `config:"cleanup_timeout"`
+	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
@@ -32,14 +32,15 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		Address:    "http://127.0.0.1:4646",
-		Region:     "",
-		Namespace:  "",
-		SecretID:   "",
-		AllowStale: true,
-		WaitTime:   15 * time.Second,
-		SyncPeriod: 30 * time.Second,
-		Prefix:     "co.elastic",
+		Address:        "http://127.0.0.1:4646",
+		Region:         "",
+		Namespace:      "",
+		SecretID:       "",
+		AllowStale:     true,
+		WaitTime:       15 * time.Second,
+		SyncPeriod:     30 * time.Second,
+		CleanupTimeout: 60 * time.Second,
+		Prefix:         "co.elastic",
 	}
 }
 

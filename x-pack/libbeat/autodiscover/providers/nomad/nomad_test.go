@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/jarcoal/httpmock.v1"
 
+	"github.com/elastic/beats/libbeat/tests/resources"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -234,9 +235,10 @@ func TestEmitEvent(t *testing.T) {
 		},
 	}
 
-	config := api.DefaultConfig()
-	config.Address = "http://127.0.0.1"
-	config.SecretID = ""
+	config := &api.Config{
+		Address:  "http://127.0.0.1",
+		SecretID: "",
+	}
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -289,6 +291,10 @@ func TestEmitEvent(t *testing.T) {
 			}
 		})
 	}
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 
 	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
 }

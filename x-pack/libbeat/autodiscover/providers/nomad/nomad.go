@@ -101,8 +101,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		},
 		UpdateFunc: func(obj nomad.Resource) {
 			logp.Debug("nomad", "Watcher Allocation update: %+v", obj.ID)
-			p.emit(&obj, "stop")
-			p.emit(&obj, "start")
+			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "stop") })
+			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "start") })
 		},
 		DeleteFunc: func(obj nomad.Resource) {
 			logp.Debug("nomad", "Watcher Allocation delete: %+v", obj.ID)
