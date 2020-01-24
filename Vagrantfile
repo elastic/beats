@@ -24,8 +24,8 @@
 # freebsd and openbsd
 # -------------------
 #   - Use gmake instead of make.
-#   - Folder syncing doesn't work well. Consider copying the files into the box or
-#     cloning the project inside the box.
+#   - Folder syncing doesn't work well. Consider copying the files into the box
+#     or cloning the project inside the box.
 ###
 
 # Read the branch's Go version from the .go-version file.
@@ -82,27 +82,14 @@ if (-Not (Get-Command "choco" -ErrorAction SilentlyContinue)) {
 choco feature disable -n=showDownloadProgress
 
 if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
-    echo "Installing python2"
-    choco install python2 -y -r
+    echo "Installing python 3"
+    choco install python -y -r --version 3.8.1.20200110
     refreshenv
-    $env:PATH = "$env:PATH;C:\\Python27;C:\\Python27\\Scripts"
+    $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
 }
 
-if (-Not (Get-Command "pip" -ErrorAction SilentlyContinue)) {
-    echo "Installing pip"
-    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile get-pip.py
-    python get-pip.py -U --force-reinstall 2>&1 | %{ "$_" }
-    rm get-pip.py
-    Invoke-WebRequest
-} else {
-    echo "Updating pip"
-    python -m pip install --upgrade pip 2>&1 | %{ "$_" }
-}
-
-if (-Not (Get-Command "virtualenv" -ErrorAction SilentlyContinue)) {
-    echo "Installing virtualenv"
-    python -m pip install virtualenv 2>&1 | %{ "$_" }
-}
+echo "Updating pip"
+python -m pip install --upgrade pip 2>&1 | %{ "$_" }
 
 if (-Not (Get-Command "git" -ErrorAction SilentlyContinue)) {
     echo "Installing git"
@@ -113,6 +100,9 @@ if (-Not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
     echo "Installing mingw (gcc)"
     choco install mingw -y -r
 }
+
+echo "Setting PYTHON_ENV in VM to point to C:\\beats-python-env."
+[System.Environment]::SetEnvironmentVariable("PYTHON_ENV", "C:\\beats-python-env", [System.EnvironmentVariableTarget]::Machine)
 SCRIPT
 
 # Provisioning for Unix/Linux

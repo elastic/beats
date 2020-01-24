@@ -32,16 +32,20 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+
+// WINDOWS USERS:
+// The python installer does not create a python3 alias like it does on other
+// platforms. So do verify the version with python.exe --version.
+//
+// Setting up a python virtual environment on a network drive does not work
+// well. So if this applies to your development environment set PYTHON_EXE
+// to point to somewhere on C:\.
+
 const (
 	libbeatRequirements = "{{ elastic_beats_dir}}/libbeat/tests/system/requirements.txt"
 )
 
 var (
-	// pythonExe points to the python executable to use. It defaults to python3
-	// so this must be on the PATH. The PYTHON_EXE environment can be used to
-	// modify the executable used.
-	pythonExe = EnvOr("PYTHON_EXE", "python3")
-
 	// VirtualenvReqs specifies a list of virtualenv requirements files to be
 	// used when calling PythonVirtualenv(). It defaults to the libbeat
 	// requirements.txt file.
@@ -58,7 +62,20 @@ var (
 		"module/*/test_*.py",
 		"module/*/*/test_*.py",
 	}
+
+	// pythonExe points to the python executable to use. The PYTHON_EXE
+	// environment can be used to modify the executable used.
+	// On Windows this defaults to python and on all other platforms this
+	// defaults to python3.
+	pythonExe = EnvOr("PYTHON_EXE", "python3")
 )
+
+func init() {
+	// The python installer for Windows does not setup a python3 alias.
+	if runtime.GOOS == "windows" {
+		pythonExe = EnvOr("PYTHON_EXE", "python")
+	}
+}
 
 // PythonTestArgs are the arguments used for the "python*Test" targets and they
 // define how "nosetests" is invoked.
