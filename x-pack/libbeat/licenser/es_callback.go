@@ -22,6 +22,7 @@ func Enforce(name string, checks ...CheckFunc) {
 	name = strings.Title(name)
 
 	cb := func(client *elasticsearch.Client) error {
+		// Logger created earlier than this place are at risk of discarding any log statement.
 		log := logp.NewLogger(licenseDebugK)
 
 		fetcher := NewElasticFetcher(client)
