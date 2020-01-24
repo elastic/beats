@@ -83,14 +83,8 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 	tasksMeta := []common.MapStr{}
 
 	for _, group := range job.TaskGroups {
-		// TODO: copy of job.Meta
-		meta := make(map[string]string)
-		for k, v := range job.Meta {
-			meta[k] = v
-		}
-
-		mergo.Merge(&meta, group.Meta, mergo.WithOverride)
-		group.Meta = meta
+		mergo.Merge(&job.Meta, group.Meta, mergo.WithOverride)
+		group.Meta = job.Meta
 
 		tasks := g.tasksMeta(group)
 		tasksMeta = append(tasksMeta, tasks...)

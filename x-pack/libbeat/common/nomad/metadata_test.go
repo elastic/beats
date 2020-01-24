@@ -20,7 +20,7 @@ import (
 func newJob(jobID string) *Job {
 	return &Job{
 		ID:          helper.StringToPtr(jobID),
-		Region:      helper.StringToPtr("global"),
+		Region:      helper.StringToPtr(api.GlobalRegion),
 		Name:        helper.StringToPtr("my-job"),
 		Type:        helper.StringToPtr(structs.JobTypeService),
 		Status:      helper.StringToPtr(structs.TaskStateRunning),
@@ -69,7 +69,7 @@ func TestAllocationMetadata(t *testing.T) {
 		ID:        uuid.Generate(),
 		Job:       newJob(jobID),
 		Name:      "job.task",
-		Namespace: "default",
+		Namespace: api.DefaultNamespace,
 	}
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -116,4 +116,57 @@ func TestExcludeMetadata(t *testing.T) {
 	exists, err := tasks[0].HasKey("key1")
 	assert.Nil(t, err)
 	assert.False(t, exists)
+}
+
+func TestCronJob(t *testing.T) {
+	jobID, allocID := uuid.Generate(), uuid.Generate()
+
+	cron := &api.Job{
+		ID:          helper.StringToPtr(jobID),
+		Region:      helper.StringToPtr("global"),
+		Name:        helper.StringToPtr("my-job"),
+		Type:        helper.StringToPtr(structs.JobTypeBatch),
+		Status:      helper.StringToPtr(structs.TaskStateRunning),
+		Datacenters: []string{"europe-west4"},
+		TaskGroups: []*TaskGroup{
+			{
+				Name: helper.StringToPtr("group"),
+				Tasks: []*api.Task{
+					{
+						Name:   "web",
+						Driver: "docker",
+					},
+					{
+						Name:   "api",
+						Driver: "docker",
+					},
+				},
+			},
+		},
+		Periodic: &api.PeriodicConfig{
+			SpecType: helper.StringToPtr(api.PeriodicSpecCron),
+			Enabled:  helper.BoolToPtr(true),
+		},
+	}
+
+	alloc := Resource{
+		ID:        allocID,
+		Job:       cron,
+		Name:      "cronjob",
+		Namespace: api.DefaultNamespace,
+	}
+
+	config, err := common.NewConfigFrom(map[string]interface{}{})
+
+	metaGen, err := NewMetaGenerator(config, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	meta := metaGen.ResourceMetadata(alloc)
+	tasks := metaGen.GroupMeta(alloc.Job)
+
+	assert.Equal(t, meta["alloc_id"], allocID)
+	assert.Equal(t, meta["type"], structs.JobTypeBatch)
+	assert.Len(t, tasks, 2)
 }

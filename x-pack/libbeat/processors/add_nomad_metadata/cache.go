@@ -53,6 +53,7 @@ func (c *cache) set(key string, data common.MapStr) {
 
 func (c *cache) cleanup() {
 	ticker := time.Tick(c.timeout)
+
 	for now := range ticker {
 		c.Lock()
 		for k, t := range c.deleted {
