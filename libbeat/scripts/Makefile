@@ -213,6 +213,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
+	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=1 \
 	  beat make integration-tests
 
 # Runs the system tests

@@ -148,7 +148,7 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 			return errors.New("integration tests failed")
 		}
 		return nil
-	}, "BEATS_DOCKER_INTEGRATION_TEST_ENV=1")
+	})
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an
