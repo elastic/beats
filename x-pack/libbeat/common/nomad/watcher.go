@@ -36,6 +36,7 @@ type watcher struct {
 	lastFetch time.Time
 	handler   ResourceEventHandlerFuncs
 	waitIndex uint64
+	done      chan struct{}
 }
 
 // WatchOptions controls watch behaviors
@@ -60,50 +61,25 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 		client:    client,
 		options:   options,
 		logger:    logp.NewLogger("nomad"),
-		waitIndex: 0,
+		waitIndex: 1,
 		lastFetch: time.Now(),
+		done:      make(chan struct{}),
 	}
-
-	return w, nil
-}
-
-func (w *watcher) Start() error {
-	// Get the initial annotations and metadata
-	err := w.sync()
-	if err != nil {
-		w.Stop()
-		return err
-	}
-
-	// initiate the watcher
-	go w.watch()
-
-	return nil
-}
-
-func (w *watcher) Stop() {}
-
-func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
-	w.handler = h
-}
-
-// Sync the allocations on the given node and update the local metadata
-func (w *watcher) sync() error {
-	w.logger.Info("Nomad: Syncing allocations and metadata")
 
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
 		AllowStale: w.options.AllowStale,
-		WaitIndex:  w.waitIndex,
+		WaitIndex:  1,
 	}
 
 	if w.nodeID == "" {
 		// Fetch the nodeId from the node name, used to filter the allocations
-		// If for some reason the NodeID changes filebeat will have to be restarted as well
+		// If for some reason the NodeID changes filebeat will have to be restarted
 		nodes, _, err := w.client.Nodes().List(queryOpts)
+
 		if err != nil {
-			w.logger.Errorf("Nomad: Fetching node list err %s", err.Error())
-			return err
+			w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
+			return nil, err
 		}
 
 		for _, node := range nodes {
@@ -114,7 +90,42 @@ func (w *watcher) sync() error {
 		}
 	}
 
-	w.logger.Infof("Filtering allocations running in node: [%s, %s]", w.nodeID, w.options.Node)
+	return w, nil
+}
+
+func (w *watcher) Start() error {
+	// Get the initial annotations and metadata
+	err := w.sync()
+	if err != nil {
+		return err
+	}
+
+	// initiate the watcher
+	go w.watch()
+
+	return nil
+}
+
+func (w *watcher) Stop() {
+	close(w.done)
+}
+
+func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
+	w.handler = h
+}
+
+// Sync the allocations on the given node and update the local metadata
+func (w *watcher) sync() error {
+	w.logger.Info("Nomad: Syncing allocations and metadata")
+	w.logger.Debugf("Starting with w.WaitIndex=%v", w.waitIndex)
+
+	queryOpts := &api.QueryOptions{
+		WaitTime:   w.options.SyncTimeout,
+		AllowStale: w.options.AllowStale,
+		WaitIndex:  w.waitIndex,
+	}
+
+	w.logger.Infof("Filtering allocations running in node: [%s, %s]", w.options.Node, w.nodeID)
 
 	// Do we need to keep direct access to the metadata as well?
 	allocations, meta, err := w.client.Nodes().Allocations(w.nodeID, queryOpts)
@@ -129,18 +140,11 @@ func (w *watcher) sync() error {
 	localWaitIndex := queryOpts.WaitIndex
 
 	// Only emit updated metadata if the WaitIndex have changed
-	if (remoteWaitIndex <= localWaitIndex) && localWaitIndex != 0 {
-		w.logger.Debugf("Allocations index is unchanged remoteWaitIndex=%v localWaitIndex=%v",
+	if remoteWaitIndex <= localWaitIndex {
+		w.logger.Debugf("Allocations index is unchanged remoteWaitIndex=%v == localWaitIndex=%v",
 			fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 		return nil
 	}
-
-	// Only emit updated metadata if the WaitIndex have changed
-	// if remoteWaitIndex == localWaitIndex {
-	// 	w.logger.Debugf("Allocations index is unchanged (%d == %d)",
-	// 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
-	// 	return nil
-	// }
 
 	for _, alloc := range allocations {
 		// "patch" the local hostname/node name into the allocations. filebeat
@@ -173,15 +177,10 @@ func (w *watcher) sync() error {
 		}
 	}
 
-	w.logger.Debug("Allocations index has changed: %d %d",
+	w.logger.Debugf("Allocations index has changed remoteWaitIndex=%v localWaitIndex=%v",
 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 
 	w.waitIndex = meta.LastIndex
-	w.lastFetch = time.Now()
-
-	if w.waitIndex == 0 {
-		w.waitIndex = 1
-	}
 
 	return nil
 }
@@ -191,9 +190,12 @@ func (w *watcher) watch() {
 	var failures uint
 	logp.Info("Nomad: %s", "Watching API for resource events")
 	ticker := time.NewTicker(w.options.RefreshInterval)
+	defer ticker.Stop()
 
 	for {
 		select {
+		case <-w.done:
+			return
 		case <-ticker.C:
 			err := w.sync()
 			if err != nil {
