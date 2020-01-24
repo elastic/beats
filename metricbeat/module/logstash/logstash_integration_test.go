@@ -70,3 +70,30 @@ func TestData(t *testing.T) {
 		})
 	}
 }
+
+func TestXPackEnabled(t *testing.T) {
+	service := compose.EnsureUp(t, "logstash")
+	nameToTypeMap := map[string]string{
+		"node":       "logstash_state",
+		"node_stats": "logstash_stats",
+	}
+
+	config := map[string]interface{}{
+		"module":        "logstash",
+		"metricsets":    metricSets,
+		"hosts":         []string{"localhost:9600"},
+		"xpack.enabled": true,
+	}
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, f := range metricSets {
+		events, errs := mbtest.ReportingFetchV2Error(f)
+		assert.Empty(t, errs)
+		if !assert.NotEmpty(t, events) {
+			t.FailNow()
+		}
+
+		event := events[0]
+		assert.Equal(t, nameToTypeMap[f.Name()], event.RootFields["type"])
+		assert.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
+	}
+}
