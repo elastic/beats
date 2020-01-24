@@ -193,11 +193,7 @@ func HaveDocker() error {
 
 // GetDockerInfo returns data from the docker info command.
 func GetDockerInfo() (*DockerInfo, error) {
-	dockerInfoOnce.Do(func() {
-		dockerInfoValue, dockerInfoErr = dockerInfo()
-	})
-
-	return dockerInfoValue, dockerInfoErr
+	return dockerInfo()
 }
 
 func dockerInfo() (*DockerInfo, error) {
