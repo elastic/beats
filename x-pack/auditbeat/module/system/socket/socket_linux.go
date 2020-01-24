@@ -199,8 +199,11 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			if m.isDetailed {
 				m.detailLog.Debug(v.String())
 			}
-			if err := v.Update(st); err != nil {
-				m.log.Infof("error processing event '%s': %v", v.String(), err)
+			if err := v.Update(st); err != nil && m.isDetailed {
+				// These errors are seldom interesting, as the flow state engine
+				// doesn't have many error conditions and all benign enough to
+				// not be worth logging them by default.
+				m.detailLog.Warnf("Issue while processing event '%s': %v", v.String(), err)
 			}
 			atomic.AddUint64(&eventCount, 1)
 
