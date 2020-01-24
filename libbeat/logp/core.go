@@ -88,7 +88,7 @@ func Configure(cfg Config) error {
 	}
 
 	// Default logger is always discard, debug level below will
-	// possible re-enable it.
+	// possibly re-enable it.
 	golog.SetOutput(ioutil.Discard)
 
 	// Enabled selectors when debug is enabled.
@@ -104,7 +104,7 @@ func Configure(cfg Config) error {
 		}
 
 		// Re-enable the default go logger output when either stdlog
-		// or all enable selected is specified.
+		// or all selector is enabled.
 		_, stdlogEnabled := selectors["stdlog"]
 		_, allEnabled := selectors["*"]
 		if stdlogEnabled || allEnabled {
