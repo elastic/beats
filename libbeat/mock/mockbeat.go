@@ -31,7 +31,7 @@ import (
 var Version = "9.9.9"
 var Name = "mockbeat"
 
-var Settings = instance.Settings{Name: Name, Version: Version}
+var Settings = instance.Settings{Name: Name, Version: Version, HasDashboards: true}
 
 type Mockbeat struct {
 	done chan struct{}
