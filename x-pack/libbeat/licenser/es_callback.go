@@ -14,12 +14,16 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
+const licenseDebugK = "license"
+
 // Enforce setups the corresponding callbacks in libbeat to verify the license on the
 // remote elasticsearch cluster.
-func Enforce(log *logp.Logger, name string, checks ...CheckFunc) {
+func Enforce(name string, checks ...CheckFunc) {
 	name = strings.Title(name)
 
 	cb := func(client *elasticsearch.Client) error {
+		log := logp.NewLogger(licenseDebugK)
+
 		fetcher := NewElasticFetcher(client)
 		license, err := fetcher.Fetch()
 
@@ -41,6 +45,8 @@ func Enforce(log *logp.Logger, name string, checks ...CheckFunc) {
 				license.Get(),
 			)
 		}
+
+		log.Infof("Elasticsearch license: %s", license.Get())
 
 		return nil
 	}
