@@ -129,7 +129,7 @@ def linuxGvmProvision(arch="amd64")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-linux-#{arch}
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
@@ -145,7 +145,7 @@ def linuxDebianProvision()
 #!/usr/bin/env bash
 set -eio pipefail
 apt-get update
-apt-get install -y make gcc python-pip python-virtualenv git
+apt-get install -y make gcc python3 python3-pip python3-venv git
 SCRIPT
 end
 
@@ -245,7 +245,8 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git rpm-devel"
+    c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
+    c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
   end
 
   config.vm.define "centos7", primary: true do |c|
@@ -254,25 +255,16 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git rpm-devel"
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
-  config.vm.define "fedora29", primary: true do |c|
-    c.vm.box = "bento/fedora-29"
+  config.vm.define "fedora31", primary: true do |c|
+    c.vm.box = "bento/fedora-31"
     c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git rpm-devel"
-  end
-
-  config.vm.define "sles12", primary: true do |c|
-    c.vm.box = "elastic/sles-12-x86_64"
-    c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "pip install virtualenv"
+    c.vm.provision "shell", inline: "dnf install -y make gcc python3 python3-pip git rpm-devel"
   end
 
   config.vm.define "archlinux", primary: true do |c|
@@ -281,6 +273,6 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python-pip python-virtualenv git"
+    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"
   end
 end
