@@ -1,0 +1,187 @@
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 4.4967e-05
+go_gc_duration_seconds{quantile="0.25"} 8.9966e-05
+go_gc_duration_seconds{quantile="0.5"} 0.000167823
+go_gc_duration_seconds{quantile="0.75"} 0.000307834
+go_gc_duration_seconds{quantile="1"} 0.000406795
+go_gc_duration_seconds_sum 0.001143664
+go_gc_duration_seconds_count 6
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 2104
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.13.4"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 1.1449296e+07
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.5864624e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.455033e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 208299
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction 0.0007062330567889804
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 2.394112e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 1.1449296e+07
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 4.6948352e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 1.4917632e+07
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 65319
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 4.694016e+07
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 6.1865984e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.579607381243147e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 273618
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 10416
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 16384
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 178160
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 180224
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 1.4764976e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.656127e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 5.24288e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 5.24288e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 7.2810744e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 14
+# HELP istio_build Istio component build info
+# TYPE istio_build gauge
+istio_build{component="mixer",tag="1.4.3"} 1
+# HELP istio_mcp_reconnections The number of times the sink has reconnected.
+# TYPE istio_mcp_reconnections counter
+istio_mcp_reconnections{component="mixer"} 1
+# HELP istio_mcp_request_acks_total The number of request acks received by the source.
+# TYPE istio_mcp_request_acks_total counter
+istio_mcp_request_acks_total{collection="istio/config/v1alpha2/adapters",component="mixer"} 1
+istio_mcp_request_acks_total{collection="istio/config/v1alpha2/templates",component="mixer"} 1
+istio_mcp_request_acks_total{collection="istio/policy/v1beta1/attributemanifests",component="mixer"} 1
+istio_mcp_request_acks_total{collection="istio/policy/v1beta1/handlers",component="mixer"} 1
+istio_mcp_request_acks_total{collection="istio/policy/v1beta1/instances",component="mixer"} 1
+istio_mcp_request_acks_total{collection="istio/policy/v1beta1/rules",component="mixer"} 1
+# HELP mixer_config_adapter_info_config_errors_total The number of errors encountered during processing of the adapter info configuration.
+# TYPE mixer_config_adapter_info_config_errors_total gauge
+mixer_config_adapter_info_config_errors_total 0
+# HELP mixer_config_adapter_info_configs_total The number of known adapters in the current config.
+# TYPE mixer_config_adapter_info_configs_total gauge
+mixer_config_adapter_info_configs_total 0
+# HELP mixer_config_attributes_total The number of known attributes in the current config.
+# TYPE mixer_config_attributes_total gauge
+mixer_config_attributes_total 113
+# HELP mixer_config_handler_configs_total The number of known handlers in the current config.
+# TYPE mixer_config_handler_configs_total gauge
+mixer_config_handler_configs_total 3
+# HELP mixer_config_handler_validation_error_total The number of errors encountered because handler validation returned error.
+# TYPE mixer_config_handler_validation_error_total gauge
+mixer_config_handler_validation_error_total 0
+# HELP mixer_config_instance_config_errors_total The number of errors encountered during processing of the instance configuration.
+# TYPE mixer_config_instance_config_errors_total gauge
+mixer_config_instance_config_errors_total 0
+# HELP mixer_config_instance_configs_total The number of known instances in the current config.
+# TYPE mixer_config_instance_configs_total gauge
+mixer_config_instance_configs_total 11
+# HELP mixer_config_rule_config_errors_total The number of errors encountered during processing of the rule configuration.
+# TYPE mixer_config_rule_config_errors_total gauge
+mixer_config_rule_config_errors_total 0
+# HELP mixer_config_rule_config_match_error_total The number of rule conditions that was not parseable.
+# TYPE mixer_config_rule_config_match_error_total gauge
+mixer_config_rule_config_match_error_total 0
+# HELP mixer_config_rule_configs_total The number of known rules in the current config.
+# TYPE mixer_config_rule_configs_total gauge
+mixer_config_rule_configs_total 8
+# HELP mixer_config_template_config_errors_total The number of errors encountered during processing of the template configuration.
+# TYPE mixer_config_template_config_errors_total gauge
+mixer_config_template_config_errors_total 0
+# HELP mixer_config_template_configs_total The number of known templates in the current config.
+# TYPE mixer_config_template_configs_total gauge
+mixer_config_template_configs_total 0
+# HELP mixer_config_unsatisfied_action_handler_total The number of actions that failed due to handlers being unavailable.
+# TYPE mixer_config_unsatisfied_action_handler_total gauge
+mixer_config_unsatisfied_action_handler_total 0
+# HELP mixer_dispatcher_destinations_per_variety_total Number of Mixer adapter destinations by template variety type
+# TYPE mixer_dispatcher_destinations_per_variety_total gauge
+mixer_dispatcher_destinations_per_variety_total{variety="TEMPLATE_VARIETY_ATTRIBUTE_GENERATOR"} 1
+mixer_dispatcher_destinations_per_variety_total{variety="TEMPLATE_VARIETY_REPORT"} 2
+# HELP mixer_handler_closed_handlers_total The number of handlers that were closed during config transition.
+# TYPE mixer_handler_closed_handlers_total gauge
+mixer_handler_closed_handlers_total 0
+# HELP mixer_handler_daemons_total The current number of active daemon routines in a given adapter environment.
+# TYPE mixer_handler_daemons_total gauge
+mixer_handler_daemons_total{handler="kubernetesenv.istio-system"} 4
+mixer_handler_daemons_total{handler="prometheus.istio-system"} 1
+# HELP mixer_handler_handler_build_failures_total The number of handlers that failed creation during config transition.
+# TYPE mixer_handler_handler_build_failures_total gauge
+mixer_handler_handler_build_failures_total 0
+# HELP mixer_handler_handler_close_failures_total The number of errors encountered while closing handlers during config transition.
+# TYPE mixer_handler_handler_close_failures_total gauge
+mixer_handler_handler_close_failures_total 0
+# HELP mixer_handler_new_handlers_total The number of handlers that were newly created during config transition.
+# TYPE mixer_handler_new_handlers_total gauge
+mixer_handler_new_handlers_total 3
+# HELP mixer_handler_reused_handlers_total The number of handlers that were re-used during config transition.
+# TYPE mixer_handler_reused_handlers_total gauge
+mixer_handler_reused_handlers_total 0
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 0.23
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 14
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 5.7409536e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.57960737432e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.64786176e+08
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes -1

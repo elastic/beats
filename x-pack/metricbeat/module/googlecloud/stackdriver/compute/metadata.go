@@ -90,9 +90,13 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		metadataCollectorData.Labels[googlecloud.LabelUser] = s.computeMetadata.User
 	}
 
-	if s.computeMetadata.Metadata != nil {
-		metadataCollectorData.Labels[googlecloud.LabelMetadata] = s.computeMetadata.Metadata
-	}
+	/*
+		Do not collect meta for now, as it can contain sensitive info
+		TODO revisit this and make meta available through whitelisting
+		if s.computeMetadata.Metadata != nil {
+			metadataCollectorData.Labels[googlecloud.LabelMetadata] = s.computeMetadata.Metadata
+		}
+	*/
 
 	return metadataCollectorData, nil
 }

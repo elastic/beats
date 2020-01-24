@@ -11,7 +11,7 @@ beta[]
 This is the Istio module. The Istio module collects metrics from the
 Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
-The default metricset is `mesh`.
+The default metricsets are `mesh`, `mixer`.
 
 [float]
 === Compatibility
@@ -28,10 +28,19 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
+# Istio mesh. To collect all all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
   period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
 ----
 
 [float]
@@ -41,5 +50,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-istio-mesh,mesh>>
 
+* <<metricbeat-metricset-istio-mixer,mixer>>
+
 include::istio/mesh.asciidoc[]
+
+include::istio/mixer.asciidoc[]
 
