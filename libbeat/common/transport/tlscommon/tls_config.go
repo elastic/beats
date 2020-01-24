@@ -69,6 +69,10 @@ type TLSConfig struct {
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
 // ServerName set, use that method for servers with SNI.
 func (c *TLSConfig) ToConfig() *tls.Config {
+	if c == nil {
+		return nil
+	}
+
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 	insecure := c.Verification != VerifyFull
 	if insecure {
