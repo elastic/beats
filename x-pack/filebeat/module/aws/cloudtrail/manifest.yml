@@ -3,6 +3,8 @@ module_version: 1.0
 var:
   - name: input
     default: s3
+  - name: shared_credential_file
+  - name: credential_profile_name
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/cloudtrail.yml

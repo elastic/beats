@@ -68,6 +68,8 @@ def main():
                         help="Which remote to push the backport branch to")
     parser.add_argument("--zube-team", default="",
                         help="Team the PR belongs to")
+    parser.add_argument("--keep-backport-label", action="store_true",
+                        help="Preserve label needs_backport in original PR")
     args = parser.parse_args()
 
     print(args)
@@ -170,8 +172,9 @@ def main():
         session.post(
             base + "/issues/{}/labels".format(new_pr["number"]), json=labels)
 
-        # remove needs backport label from the original PR
-        session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
+        if not args.keep_backport_label:
+            # remove needs backport label from the original PR
+            session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
 
         # get version and set a version label on the original PR
         version = get_version(os.getcwd())

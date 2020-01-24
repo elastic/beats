@@ -118,8 +118,30 @@ function Audit(keep_original_message) {
     var RenameNestedFields = function(evt) {
         var arr = evt.Get("googlecloud.audit.authorization_info");
         for (var i = 0; i < arr.length; i++) {
-          arr[i].resource_attributes = arr[i].resourceAttributes;
-          delete arr[i].resourceAttributes;
+            arr[i].resource_attributes = arr[i].resourceAttributes;
+            delete arr[i].resourceAttributes;
+        }
+    };
+
+    // Set event.outcome based on authentication_info and status.
+    var setEventOutcome = function(evt) {
+        if (evt.Get("googlecloud.audit.status.code") == null) {
+            var authorization_info = evt.Get("googlecloud.audit.authorization_info");
+            if (authorization_info.length === 1) {
+                if (authorization_info[0].granted == null) {
+                    evt.Put("event.outcome", "unknown");
+                } else if (authorization_info[0].granted === true) {
+                    evt.Put("event.outcome", "success");
+                } else {
+                    evt.Put("event.outcome", "failure");
+                }
+            } else {
+                evt.Put("event.outcome", "unknown");
+            } 
+        } else if (evt.Get("googlecloud.audit.status.code") === 0) {
+            evt.Put("event.outcome", "success");
+        } else {
+            evt.Put("event.outcome", "failure");
         }
     };
 
@@ -135,6 +157,7 @@ function Audit(keep_original_message) {
         .Add(copyFields)
         .Add(dropExtraFields)
         .Add(RenameNestedFields)
+        .Add(setEventOutcome)
         .Build();
 
     return {
