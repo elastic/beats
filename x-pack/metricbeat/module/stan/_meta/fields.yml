@@ -1,6 +1,7 @@
 - key: stan
   title: "Stan"
-  description: stan Module
+  description: >
+    stan Module
   release: beta
   fields:
     - name: stan
