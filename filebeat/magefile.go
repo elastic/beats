@@ -22,11 +22,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/filebeat/generator/fields"
+	"github.com/elastic/beats/filebeat/generator/fileset"
+	"github.com/elastic/beats/filebeat/generator/module"
 	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
 
 	// mage:import
@@ -219,4 +223,58 @@ func PythonIntegTest(ctx context.Context) error {
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
 	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
+}
+
+// CreateModule creates a new Filebeat module.
+// Use MODULE=module to specify the name of the new module
+func CreateModule() error {
+	targetModule := os.Getenv("MODULE")
+	if targetModule == "" {
+		return fmt.Errorf("You must specify the module: MODULE=name mage createModule")
+	}
+
+	filebeatDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	return module.Generate(targetModule, filebeatDir, filebeatDir)
+}
+
+// CreateFileset creates a new fileset for an existing Filebeat module.
+// Use MODULE=module to specify the name of the existing module
+// Use FILESET=fileset to specify the name of the new fileset
+func CreateFileset() error {
+	targetModule := os.Getenv("MODULE")
+	targetFileset := os.Getenv("FILESET")
+
+	if targetModule == "" || targetFileset == "" {
+		return fmt.Errorf("You must specify module and fileset: MODULE=module FILESET=fileset mage createFileset")
+	}
+
+	filebeatDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	return fileset.Generate(targetModule, targetFileset, filebeatDir, filebeatDir)
+}
+
+// CreateFields creates a new fields.yml for an existing Filebeat fileset.
+// Use MODULE=module to specify the name of the existing module
+// Use FILESET=fileset to specify the name of the existing fileset
+func CreateFields() error {
+	targetModule := os.Getenv("MODULE")
+	targetFileset := os.Getenv("FILESET")
+
+	if targetModule == "" || targetFileset == "" {
+		return fmt.Errorf("You must specify module and fileset: MODULE=module FILESET=fileset mage createFields")
+	}
+
+	filebeatDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	return fields.Generate(filebeatDir, targetModule, targetFileset, false)
 }

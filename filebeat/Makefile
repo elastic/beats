@@ -15,14 +15,14 @@ update: mage
 # Creates a new module. Requires the params MODULE.
 .PHONY: create-module
 create-module:
-	@go run ${ES_BEATS}/filebeat/scripts/generator/module/main.go --path=$(PWD) --beats_path=$(BEAT_GOPATH)/src/$(BEAT_PATH) --module=$(MODULE)
+	mage createModule
 
 # Creates a new fileset. Requires the params MODULE and FILESET.
 .PHONY: create-fileset
 create-fileset:
-	@go run ${ES_BEATS}/filebeat/scripts/generator/fileset/main.go --path=$(PWD) --beats_path=$(BEAT_GOPATH)/src/$(BEAT_PATH) --module=$(MODULE) --fileset=$(FILESET)
+	mage createFileset
 
 # Creates a fields.yml based on a pipeline.json file. Requires the params MODULE and FILESET.
 .PHONY: create-fields
 create-fields:
-	@go run ${ES_BEATS}/filebeat/scripts/generator/fields/main.go --beats_path=$(BEAT_GOPATH)/src/$(BEAT_PATH) --module=$(MODULE) --fileset=$(FILESET)
+	mage createFields
