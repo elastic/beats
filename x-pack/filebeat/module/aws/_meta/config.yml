@@ -18,9 +18,9 @@
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before GetObject request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted by context
     # Default to be 120s
-    #var.context_timeout: 120s
+    #var.aws_api_timeout: 120s
 
   elb:
     enabled: false
@@ -41,9 +41,9 @@
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before GetObject request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted by context
     # Default to be 120s
-    #var.context_timeout: 120s
+    #var.aws_api_timeout: 120s
 
   vpcflow:
     enabled: false
@@ -64,9 +64,9 @@
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before GetObject request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted by context
     # Default to be 120s
-    #var.context_timeout: 120s
+    #var.aws_api_timeout: 120s
 
   cloudtrail:
     enabled: false
@@ -87,6 +87,6 @@
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before GetObject request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted by context
     # Default to be 120s
-    #var.context_timeout: 120s
+    #var.aws_api_timeout: 120s

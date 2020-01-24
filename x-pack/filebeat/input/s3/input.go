@@ -390,12 +390,50 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3Ctx *s3Context) error {
 	objectHash := s3ObjectHash(info)
 
-	// read from s3 object
-	reader, err := p.newS3BucketReader(svc, info)
+	// Download the S3 object using GetObjectRequest.
+	s3GetObjectInput := &s3.GetObjectInput{
+		Bucket: awssdk.String(info.name),
+		Key:    awssdk.String(info.key),
+	}
+	req := svc.GetObjectRequest(s3GetObjectInput)
+
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	defer cancelFn()
+
+	resp, err := req.Send(ctx)
 	if err != nil {
-		err = errors.Wrap(err, "getS3ObjectResponse failed")
-		p.logger.Error(err)
-		return err
+		if awsErr, ok := err.(awserr.Error); ok {
+			// If the SDK can determine the request or retry delay was canceled
+			// by a context the ErrCodeRequestCanceled error will be returned.
+			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+				err = errors.Wrap(err, "GetObject request canceled")
+				p.logger.Error(err)
+				return err
+			}
+
+			if awsErr.Code() == "NoSuchKey" {
+				p.logger.Warn("Cannot find s3 file")
+				return nil
+			}
+		}
+		return errors.Wrap(err, "s3 get object request failed")
+	}
+
+	defer resp.Body.Close()
+
+	reader := bufio.NewReader(resp.Body)
+	// Check content-type
+	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrap(err, "gzip.NewReader failed")
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
 	}
 
 	// Decode JSON documents when expand_event_list_from_field is given in config
@@ -512,55 +550,6 @@ func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectH
 		return err
 	}
 	return nil
-}
-
-func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, info s3Info) (*bufio.Reader, error) {
-	// Download the S3 object using GetObjectRequest.
-	s3GetObjectInput := &s3.GetObjectInput{
-		Bucket: awssdk.String(info.name),
-		Key:    awssdk.String(info.key),
-	}
-	req := svc.GetObjectRequest(s3GetObjectInput)
-
-	// The Context will interrupt the request if the timeout expires.
-	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
-	defer cancelFn()
-
-	resp, err := req.Send(ctx)
-	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			// If the SDK can determine the request or retry delay was canceled
-			// by a context the ErrCodeRequestCanceled error will be returned.
-			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = errors.Wrap(err, "GetObject request canceled")
-				p.logger.Error(err)
-				return nil, err
-			}
-
-			if awsErr.Code() == "NoSuchKey" {
-				p.logger.Warn("Cannot find s3 file")
-				return nil, nil
-			}
-		}
-		return nil, errors.Wrap(err, "s3 get object request failed")
-	}
-
-	defer resp.Body.Close()
-
-	reader := bufio.NewReader(resp.Body)
-	// Check content-type
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrap(err, "gzip.NewReader failed")
-			p.logger.Error(err)
-			return nil, err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
-	}
-	return reader, nil
 }
 
 func (p *s3Input) forwardEvent(event beat.Event) error {

@@ -5,6 +5,8 @@ var:
     default: s3
   - name: shared_credential_file
   - name: credential_profile_name
+  - name: visibility_timeout
+  - name: aws_api_timeout
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
