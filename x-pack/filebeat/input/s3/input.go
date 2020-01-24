@@ -65,7 +65,7 @@ type s3Input struct {
 	logger     *logp.Logger
 	close      chan struct{}
 	workerOnce sync.Once       // Guarantees that the worker goroutine is only started once.
-	inputCtx   context.Context // Wraps the Done channel from parent input.Context.
+	context    *channelContext
 	workerWg   sync.WaitGroup  // Waits on s3 worker goroutine.
 	stopOnce   sync.Once
 }
@@ -107,6 +107,23 @@ type s3Context struct {
 	errC chan error
 }
 
+// channelContext implements context.Context by wrapping a channel
+type channelContext struct {
+	done <-chan struct{}
+}
+
+func (c *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (c *channelContext) Done() <-chan struct{}       { return c.done }
+func (c *channelContext) Err() error {
+	select {
+	case <-c.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (c *channelContext) Value(key interface{}) interface{} { return nil }
+
 // NewInput creates a new s3 input
 func NewInput(cfg *common.Config, connector channel.Connector, inputContext input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
@@ -140,24 +157,13 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 
 	closeChannel := make(chan struct{})
 
-	// Wrap input.Context's Done channel with a context.Context. This goroutine
-	// stops with the parent closes the Done channel.
-	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Done:
-		case <-inputCtx.Done():
-		}
-	}()
-
 	p := &s3Input{
 		outlet:    out,
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
 		close:     closeChannel,
-		inputCtx:  inputCtx,
+		context:   &channelContext{closeChannel},
 	}
 	return p, nil
 }
@@ -189,7 +195,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
-	for p.inputCtx.Err() == nil {
+	for p.context.Err() == nil {
 		// receive messages from sqs
 		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
@@ -313,7 +319,7 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	return req.Send(ctx)
@@ -328,7 +334,7 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)
@@ -399,7 +405,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -570,7 +576,7 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)

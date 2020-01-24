@@ -135,7 +135,7 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestNewS3BucketReader(t *testing.T) {
-	p := &s3Input{inputCtx: context.Background()}
+	p := &s3Input{context: &channelContext{}}
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(info.name),
 		Key:    awssdk.String(info.key),
@@ -144,13 +144,13 @@ func TestNewS3BucketReader(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
 	assert.NoError(t, err)
 	reader := bufio.NewReader(resp.Body)
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	for i := 0; i < 3; i++ {
 		switch i {
@@ -171,7 +171,7 @@ func TestNewS3BucketReader(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	p := &s3Input{inputCtx: context.Background()}
+	p := &s3Input{context: &channelContext{}}
 	errC := make(chan error)
 	s3Context := &s3Context{
 		refs: 1,
@@ -195,7 +195,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.inputCtx, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
