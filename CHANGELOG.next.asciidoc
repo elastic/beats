@@ -77,6 +77,8 @@ TLS or Beats that accept connections over TLS and validate client certificates. 
 
 *Filebeat*
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
+- Add dashboard for AWS ELB filebeat module. {pull}15804[15804]
+
 
 *Heartbeat*
 
