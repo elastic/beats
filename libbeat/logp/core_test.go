@@ -119,13 +119,30 @@ func TestL(t *testing.T) {
 	}
 }
 
-func TestAllStdoutDisablesDefaultGoLogger(t *testing.T) {
+func TestDebugAllStdoutEnablesDefaultGoLogger(t *testing.T) {
 	DevelopmentSetup(WithSelectors("*"))
-	assert.Equal(t, ioutil.Discard, golog.Writer())
+	assert.Equal(t, _defaultGoLog, golog.Writer())
 
 	DevelopmentSetup(WithSelectors("stdlog"))
-	assert.Equal(t, ioutil.Discard, golog.Writer())
+	assert.Equal(t, _defaultGoLog, golog.Writer())
 
 	DevelopmentSetup(WithSelectors("*", "stdlog"))
-	assert.NotEqual(t, ioutil.Discard, golog.Writer())
+	assert.Equal(t, _defaultGoLog, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("other"))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+}
+
+func TestNotDebugAllStdoutDisablesDefaultGoLogger(t *testing.T) {
+	DevelopmentSetup(WithSelectors("*"), WithLevel(InfoLevel))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("stdlog"), WithLevel(InfoLevel))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("*", "stdlog"), WithLevel(InfoLevel))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
+
+	DevelopmentSetup(WithSelectors("other"), WithLevel(InfoLevel))
+	assert.Equal(t, ioutil.Discard, golog.Writer())
 }

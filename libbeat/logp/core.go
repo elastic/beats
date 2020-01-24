@@ -87,6 +87,10 @@ func Configure(cfg Config) error {
 		return errors.Wrap(err, "failed to build log output")
 	}
 
+	// Default logger is always discard, debug level below will
+	// possible re-enable it.
+	golog.SetOutput(ioutil.Discard)
+
 	// Enabled selectors when debug is enabled.
 	selectors := make(map[string]struct{}, len(cfg.Selectors))
 	if cfg.Level.Enabled(DebugLevel) && len(cfg.Selectors) > 0 {
@@ -99,13 +103,11 @@ func Configure(cfg Config) error {
 			selectors["*"] = struct{}{}
 		}
 
+		// Re-enable the default go logger output when either stdlog
+		// or all enable selected is specified.
 		_, stdlogEnabled := selectors["stdlog"]
 		_, allEnabled := selectors["*"]
-		if !stdlogEnabled || !allEnabled {
-			// Disable standard logging by default (this is sometimes used by
-			// libraries and we don't want their spam).
-			golog.SetOutput(ioutil.Discard)
-		} else {
+		if stdlogEnabled || allEnabled {
 			golog.SetOutput(_defaultGoLog)
 		}
 
