@@ -222,7 +222,6 @@ func (this *Reader)groupToEvent(counters map[string][]pdh.CounterValue) mb.Event
 		MetricSetFields: common.MapStr{},
 	}
 	grouped:= make(map[string][]common.MapStr)
-	eventMap := make(map[string]*mb.Event)
 	for counterPath, values := range counters {
 		for ind, val := range values {
 			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
@@ -241,27 +240,16 @@ func (this *Reader)groupToEvent(counters map[string][]pdh.CounterValue) mb.Event
 				// If a counter contains an error, it will always be sent as an individual event
 				eventKey = counterPath + strconv.Itoa(ind)
 			}
-
 			// Create a new event if the key doesn't exist in the map
-			if _, ok := eventMap[eventKey]; !ok {
-				eventMap[eventKey] = &mb.Event{
-					MetricSetFields: common.MapStr{},
-					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
-				}
-				if val.Instance != "" && this.instanceLabel[counterPath] != "" {
-					//will ignore instance counter
-					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], match)
-					} else {
-						eventMap[eventKey].MetricSetFields.Put(this.instanceLabel[counterPath], val.Instance)
-					}
-				}
+			if _, ok := grouped[eventKey]; !ok {
+				grouped[eventKey] = make([]common.MapStr,0)
+					//[]common.MapStr {{"Error":errors.Wrapf(val.Err, "failed on query=%v", counterPath)}}
 			}
-			event := eventMap[eventKey]
+
 			if val.Measurement != nil {
-				event.MetricSetFields.Put(this.measurement[counterPath], val.Measurement)
+				grouped[eventKey] = append(grouped[eventKey], common.MapStr{this.measurement[counterPath]: val.Measurement})
 			} else {
-				event.MetricSetFields.Put(this.measurement[counterPath], 0)
+				grouped[eventKey] = append(grouped[eventKey], common.MapStr{this.measurement[counterPath]: 0})
 			}
 		}
 	}
