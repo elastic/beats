@@ -70,7 +70,7 @@ type TLSConfig struct {
 // ServerName set, use that method for servers with SNI.
 func (c *TLSConfig) ToConfig() *tls.Config {
 	if c == nil {
-		return nil
+		return &tls.Config{}
 	}
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
