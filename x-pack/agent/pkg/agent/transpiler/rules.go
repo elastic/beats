@@ -217,6 +217,7 @@ func (r *ExtractListItemRule) Apply(ast *AST) error {
 	return Insert(ast, newList, r.To)
 }
 
+// ExtractListItem creates a ExtractListItemRule
 func ExtractListItem(path Selector, item, target string) *ExtractListItemRule {
 	return &ExtractListItemRule{
 		Path: path,
