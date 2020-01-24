@@ -168,12 +168,6 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
-    # Docs
-    - os: linux
-      env: TARGETS="docs"
-      go: $TRAVIS_GO_VERSION
-      stage: test
-
     # Kubernetes
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
