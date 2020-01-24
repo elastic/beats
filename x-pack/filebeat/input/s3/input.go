@@ -171,8 +171,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
-		p.logger.Infof("visibility timeout is set to %v seconds: ", visibilityTimeout)
-		p.logger.Infof("aws api timeout is set to %v: ", p.config.AwsAPITimeout)
+		p.logger.Infof("visibility timeout is set to %v seconds", visibilityTimeout)
+		p.logger.Infof("aws api timeout is set to %v", p.config.AwsAPITimeout)
 
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {

@@ -201,7 +201,7 @@ func TestCreateEvent(t *testing.T) {
 	resp, err := req.Send(ctx)
 	assert.NoError(t, err)
 	reader := bufio.NewReader(resp.Body)
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	var events []beat.Event
 	for {
