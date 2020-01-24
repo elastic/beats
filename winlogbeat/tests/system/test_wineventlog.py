@@ -413,4 +413,3 @@ Logon Process Name:  IKE"""
         self.assertIn("message", evts[0], msg=evts[0])
         self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
         self.assertEqual(str(msg), codecs.decode(evts[0]["message"], "unicode_escape"), msg=evts[0])
-
