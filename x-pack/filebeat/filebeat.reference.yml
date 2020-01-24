@@ -115,7 +115,7 @@ filebeat.modules:
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before AWS API request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.aws_api_timeout: 120s
 
@@ -138,7 +138,7 @@ filebeat.modules:
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before AWS API request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.aws_api_timeout: 120s
 
@@ -161,7 +161,7 @@ filebeat.modules:
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before AWS API request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.aws_api_timeout: 120s
 
@@ -184,7 +184,7 @@ filebeat.modules:
     # Default to be 300s
     #var.visibility_timeout: 300s
 
-    # Maximum duration before AWS API request will be interrupted by context
+    # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.aws_api_timeout: 120s
 

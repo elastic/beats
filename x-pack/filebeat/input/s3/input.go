@@ -64,9 +64,9 @@ type s3Input struct {
 	awsConfig  awssdk.Config
 	logger     *logp.Logger
 	close      chan struct{}
-	workerOnce sync.Once       // Guarantees that the worker goroutine is only started once.
+	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
 	context    *channelContext
-	workerWg   sync.WaitGroup  // Waits on s3 worker goroutine.
+	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
 	stopOnce   sync.Once
 }
 
@@ -125,7 +125,7 @@ func (c *channelContext) Err() error {
 func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new s3 input
-func NewInput(cfg *common.Config, connector channel.Connector, inputContext input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
 	logger := logp.NewLogger(inputName)
 
@@ -136,7 +136,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
+			DynamicFields: context.DynamicFields,
 		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
@@ -156,7 +156,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	}
 
 	closeChannel := make(chan struct{})
-
 	p := &s3Input{
 		outlet:    out,
 		config:    config,
@@ -318,7 +317,6 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 		})
 
 	// The Context will interrupt the request if the timeout expires.
-	var cancelFn func()
 	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
@@ -333,7 +331,6 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 	})
 
 	// The Context will interrupt the request if the timeout expires.
-	var cancelFn func()
 	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
@@ -404,7 +401,6 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	var cancelFn func()
 	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
@@ -575,7 +571,6 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	var cancelFn func()
 	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
 	defer cancelFn()
 
