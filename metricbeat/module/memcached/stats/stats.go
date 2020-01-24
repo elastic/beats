@@ -19,6 +19,7 @@ package stats
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"strings"
 
@@ -35,11 +36,23 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
+
+	network    string
+	socketPath string
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := struct {
+		Network    string `config:"network"`
+		SocketPath string `config:"socket_path"`
+	}{}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
+		network:       config.Network,
+		socketPath:    config.SocketPath,
 	}, nil
 }
 
@@ -47,7 +60,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
+	network, address, err := m.getNetworkAndAddress()
+	if err != nil {
+		return errors.Wrap(err, "error in fetch")
+	}
+
+	conn, err := net.DialTimeout(network, address, m.Module().Config().Timeout)
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")
 	}
@@ -80,4 +98,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	reporter.Event(mb.Event{MetricSetFields: event})
 
 	return nil
+}
+
+func (m *MetricSet) getNetworkAndAddress() (network string, address string, err error) {
+	switch m.network {
+	case "", "tcp":
+		network = "tcp"
+		address = m.Host()
+	case "unix":
+		network = "unix"
+		address = m.socketPath
+	default:
+		err = fmt.Errorf("unsupported network: %s", m.network)
+	}
+	return
 }
