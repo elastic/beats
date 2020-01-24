@@ -99,6 +99,8 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	return metricset
 }
 
+// NewMetricSets instantiates a list of new MetricSets using the given
+// module configuration.
 func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	c, err := common.NewConfigFrom(config)
 	if err != nil {
@@ -188,6 +190,7 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 	return reportingMetricSetV2Error
 }
 
+// NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
 func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
 	metricSets := NewMetricSets(t, config)
 	var reportingMetricSets []mb.ReportingMetricSetV2Error
