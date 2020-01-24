@@ -1,7 +1,7 @@
 [[configuration-metricbeat]]
 == Specify which modules to run
 
-Metricbeat provides a couple different ways to enable modules and metricsets:
+Metricbeat provides a couple of different ways to enable modules and metricsets:
 
 * <<enable-modules-d-configs>>
 * <<enable-modules-config-file>>
