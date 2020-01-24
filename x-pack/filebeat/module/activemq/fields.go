@@ -19,5 +19,5 @@ func init() {
 // AssetActivemq returns asset data.
 // This is the base64 encoded gzipped contents of module/activemq.
 func AssetActivemq() string {
-	return "eJysksFO80AMhO95ilFP/39oHyAHJC7cioQEZ2TtOttVN9nU9hb17VFCCwktqkTxKZrY801iL7HlQw1yFvfc7irAoiWusThJiwrwrE5ibzF3Ne4qAFhnXxKjyYKeRGMXcD9OrJ+QckATE+uqAprIyWs9Di3RUcsz3FB26LlGkFz6o3IBOHeaujlKieVTPvlt+fCWxU/0i64f9UgtIzewDR/9EFXL8FmDlHIIw7PwrrAa/rlEqsgCYc1FHP9fneWyjTD523I9jx6wDRkCdyxk7GeReM+dncOL3vpLXpTlF2AqPtoZebrcK9yHcc1oJLdfJzW6DmhdTZp/uoiUw98n6PsUHQ39V3NMs6iR276akOPZ++87eQ8AAP//PUf+ig=="
+	return "eJyskrFu20AQRHt+xUBVUkgfwCJAmnQKECCpg81xSB105FG7SwX6e4O0ZJOWDAGWtyKGe2/mbneNPU8lJHg8sj0UgEdPLLG6SKsCUCaKscQ/uhRARQsae4+5K/GtAIBtroZE1FnRi1rsGnyfCNtfSLlBHRNtUwB1ZKqsnA6t0UnLhf1YfupZotE89GflhuGSNKcFSYn6Il94e57+Z61m+k3qc/2Ulsg1fMczD9FsGK81Sik3zfitPAw0x5eQxAxZobQ8aODXzVUu3ymleizX74kB34mjYUcVZ7WIxCM7vzYf7NEn+WPUDxjLUEW/cp4P947vj2nMqDW3rys1UUdr28ya39uIlJvPT9D3KQYZ++/mmGcxl7D/6yqBi/9vZ/IUAAD//5OoA7o="
 }

@@ -3,10 +3,10 @@
 :modulename: coredns
 :has-dashboards: true
 
-== Coredns Module
+== CoreDNS module
 
-This is a filebeat module for coredns. It supports both standalone coredns deployment and 
-coredns deployment in Kubernetes. 
+This is a filebeat module for CoreDNS. It supports both standalone CoreDNS deployment and
+CoreDNS deployment in Kubernetes.
 
 [float]
 === Compatibility
@@ -21,3 +21,23 @@ This module comes with a sample dashboard.
 
 [role="screenshot"]
 image::./images/kibana-coredns.jpg[]
+
+[float]
+==== `log` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: coredns
+  log:
+    enabled: true
+    var.paths: ["/var/log/coredns.log"]
+    var.tags: ["coredns", "staging"]
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+An array of tags describing the monitored CoreDNS setup.

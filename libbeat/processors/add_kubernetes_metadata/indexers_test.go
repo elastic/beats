@@ -21,8 +21,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -30,7 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen, _ = kubernetes.NewMetaGenerator(common.NewConfig())
+var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -64,11 +66,11 @@ func TestPodIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
 		"namespace": "testns",
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
 		"node": common.MapStr{
 			"name": "testnode",
 		},
@@ -84,8 +86,7 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	metaGenWithPodUID, err := kubernetes.NewMetaGenerator(common.NewConfig())
-	assert.Nil(t, err)
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.Nil(t, err)
@@ -116,11 +117,11 @@ func TestPodUIDIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
 		"namespace": "testns",
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
 		"node": common.MapStr{
 			"name": "testnode",
 		},
@@ -172,11 +173,11 @@ func TestContainerIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
 		"namespace": "testns",
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
 		"node": common.MapStr{
 			"name": "testnode",
 		},
@@ -249,14 +250,14 @@ func TestFilteredGenMeta(t *testing.T) {
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ := indexers[0].Data["labels"]
+	rawLabels, _ := indexers[0].Data.GetValue("pod.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(common.MapStr)
 	assert.Equal(t, ok, true)
 	assert.Equal(t, len(labelMap), 2)
 
-	rawAnnotations := indexers[0].Data["annotations"]
+	rawAnnotations, _ := indexers[0].Data.GetValue("pod.annotations")
 	assert.Nil(t, rawAnnotations)
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -265,8 +266,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	filteredGen, err := kubernetes.NewMetaGenerator(config)
-	assert.Nil(t, err)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil)
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
@@ -274,7 +274,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	indexers = podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ = indexers[0].Data["labels"]
+	rawLabels, _ = indexers[0].Data.GetValue("pod.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok = rawLabels.(common.MapStr)
@@ -284,7 +284,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	ok, _ = labelMap.HasKey("foo")
 	assert.Equal(t, ok, true)
 
-	rawAnnotations = indexers[0].Data["annotations"]
+	rawAnnotations, _ = indexers[0].Data.GetValue("pod.annotations")
 	assert.NotNil(t, rawAnnotations)
 	annotationsMap, ok := rawAnnotations.(common.MapStr)
 
@@ -303,8 +303,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	filteredGen, err := kubernetes.NewMetaGenerator(config)
-	assert.Nil(t, err)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil)
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
@@ -332,7 +331,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ := indexers[0].Data["labels"]
+	rawLabels, _ := indexers[0].Data.GetValue("pod.labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(common.MapStr)
@@ -393,11 +392,11 @@ func TestIpPortIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"labels": common.MapStr{
+				"labelkey": "labelvalue",
+			},
 		},
 		"namespace": "testns",
-		"labels": common.MapStr{
-			"labelkey": "labelvalue",
-		},
 		"node": common.MapStr{
 			"name": "testnode",
 		},

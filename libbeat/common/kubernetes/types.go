@@ -22,7 +22,7 @@ import (
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	extv1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -45,6 +45,9 @@ type PodStatus = v1.PodStatus
 
 // Node data
 type Node = v1.Node
+
+// Namespace data
+type Namespace = v1.Namespace
 
 // Container data
 type Container = v1.Container

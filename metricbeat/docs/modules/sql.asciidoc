@@ -1,0 +1,44 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-sql]]
+[role="xpack"]
+== sql module
+
+beta[]
+
+This is the sql module that fetches metrics from a SQL database. You can define driver and SQL query.
+
+
+
+
+[float]
+=== Example configuration
+
+The sql module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
+
+  driver: "postgres"
+  sql_query: "select now()"
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-sql-query,query>>
+
+include::sql/query.asciidoc[]
+

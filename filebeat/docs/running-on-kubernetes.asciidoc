@@ -77,7 +77,7 @@ spec:
 ===== Red Hat OpenShift configuration
 
 If you are using Red Hat OpenShift, you need to specify additional settings in
-the manifest file and enable the container to run as privileged.
+the manifest file and enable the container to run as privileged. Filebeat needs to run as a privileged container to mount logs written on the node (hostPath) and read them.
 
 . Modify the `DaemonSet` container spec in the manifest file:
 +

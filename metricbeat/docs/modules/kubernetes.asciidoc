@@ -95,6 +95,9 @@ metricbeat.modules:
     - state_container
     - state_cronjob
     - state_resourcequota
+    - state_service
+    - state_persistentvolume
+    - state_persistentvolumeclaim
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -180,11 +183,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
 
+* <<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>
+
 * <<metricbeat-metricset-kubernetes-state_pod,state_pod>>
 
 * <<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>
 
 * <<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>
+
+* <<metricbeat-metricset-kubernetes-state_service,state_service>>
 
 * <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
 
@@ -216,11 +223,15 @@ include::kubernetes/state_deployment.asciidoc[]
 
 include::kubernetes/state_node.asciidoc[]
 
+include::kubernetes/state_persistentvolumeclaim.asciidoc[]
+
 include::kubernetes/state_pod.asciidoc[]
 
 include::kubernetes/state_replicaset.asciidoc[]
 
 include::kubernetes/state_resourcequota.asciidoc[]
+
+include::kubernetes/state_service.asciidoc[]
 
 include::kubernetes/state_statefulset.asciidoc[]
 

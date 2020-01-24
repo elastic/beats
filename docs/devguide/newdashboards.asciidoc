@@ -46,7 +46,7 @@ To import the dashboards, run the `setup` command.
 ./metricbeat setup
 -------------------------
 
-The `setup` phase loads several dependencies, such as: 
+The `setup` phase loads several dependencies, such as:
 
 - Index mapping template in Elasticsearch
 - Kibana dashboards
@@ -186,6 +186,20 @@ Before building your own dashboards or customizing the existing ones, you need t
 For the Elastic Beats, the index pattern is available in the Beat package under
 `kibana/*/index-pattern`. The index-pattern is automatically generated from the `fields.yml` file, available in the Beat package. For more details
 check the <<generate-index-pattern,generate index pattern>> section.
+
+All Beats dashboards, visualizations and saved searches must follow common naming conventions:
+
+* Dashboard names have prefix `[BeatName Module]`, e.g. `[Filebeat Nginx] Access logs`
+* Visualizations and searches have suffix `[BeatName Module]`, e.g. `Top processes [Filebeat Nginx]`
+
+NOTE: You can set a custom name (skip suffix) for visualization placed on a dashboard. The original visualization will
+stay intact.
+
+The naming convention rules can be verified with the the tool `mage check`. The command fails if it detects:
+
+* empty description on a dashboard
+* unexpected dashboard title format (missing prefix `[BeatName ModuleName]`)
+* unexpected visualization title format (missing suffix `[BeatName Module]`)
 
 After creating your own dashboards in Kibana, you can <<export-dashboards,export the Kibana dashboards>> to a local
 directory, and then <<archive-dashboards,archive the dashboards>> in order to be able to share the dashboards with the community.

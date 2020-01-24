@@ -23,19 +23,18 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/validator"
-
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/go-lookslike"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/beats/heartbeat/hbtestllext"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 type MockBeatClient struct {
@@ -116,6 +115,7 @@ func mockEventMonitorValidator(id string) validator.Validator {
 				"check_group": isdef.IsString,
 			},
 		}),
+		hbtestllext.MonitorTimespanValidator,
 		hbtest.SummaryChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))

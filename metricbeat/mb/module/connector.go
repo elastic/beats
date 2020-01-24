@@ -20,7 +20,9 @@ package module
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
@@ -36,6 +38,8 @@ type Connector struct {
 
 type connectorConfig struct {
 	Processors processors.PluginConfig `config:"processors"`
+	// ES output index pattern
+	Index fmtstr.EventFormatString `config:"index"`
 
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
@@ -43,13 +47,16 @@ type connectorConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
 
-func NewConnector(pipeline beat.Pipeline, c *common.Config, dynFields *common.MapStrPointer) (*Connector, error) {
+func NewConnector(
+	beatInfo beat.Info, pipeline beat.Pipeline,
+	c *common.Config, dynFields *common.MapStrPointer,
+) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	processors, err := processors.New(config.Processors)
+	processors, err := processorsForConfig(beatInfo, config)
 	if err != nil {
 		return nil, err
 	}
@@ -72,4 +79,32 @@ func (c *Connector) Connect() (beat.Client, error) {
 			KeepNull:      c.keepNull,
 		},
 	})
+}
+
+// processorsForConfig assembles the Processors for a Connector.
+func processorsForConfig(
+	beatInfo beat.Info, config connectorConfig,
+) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor order is important! The index processor, if present, must be
+	// added before the user processors.
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
+
+	userProcs, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcs)
+
+	return procs, nil
 }

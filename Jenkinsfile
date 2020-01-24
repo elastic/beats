@@ -1,11 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@master',
-retriever: modernSCM(
-  [$class: 'GitSCMSource',
-  credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
-  id: '37cf2c00-2cc7-482e-8c62-7bbffef475e2',
-  remote: 'git@github.com:elastic/apm-pipeline-library.git'])
+@Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -36,12 +31,7 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
-        //TODO we need to configure the library in Jenkins to use privileged methods.
-        //gitCheckout(basedir: "${BASE_DIR}")
-        dir("${BASE_DIR}"){
-          checkout scm
-          githubEnv()
-        }
+        gitCheckout(basedir: "${BASE_DIR}")
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
@@ -51,6 +41,7 @@ pipeline {
           env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
           env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
           env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+          env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
           env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
           env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
           env.BUILD_GENERATOR = isChanged(["^generator/.*"])
@@ -325,6 +316,25 @@ pipeline {
             }
           }
         }
+        stage('dockerlogbeat'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_DOCKERLOGBEAT != "false"
+            }
+          }
+          stages {
+            stage('Dockerlogbeat'){
+              steps {
+                withBeatsEnv(){
+                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
+                }
+              }
+            }
+          }
+        }
         stage('Winlogbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -404,14 +414,14 @@ pipeline {
             stage('Generators Metricbeat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
+                  makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test test-package")
                 }
               }
             }
             stage('Generators Beat Linux'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Generators Beat Linux", "-C generator/beat test")
+                  makeTarget("Generators Beat Linux", "-C generator/beat test test-package")
                 }
               }
             }

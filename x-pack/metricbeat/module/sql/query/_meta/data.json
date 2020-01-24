@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "sql.query",
+        "duration": 115000,
+        "module": "sql"
+    },
+    "metricset": {
+        "name": "query",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.22.0.3:3306",
+        "type": "sql"
+    },
+    "sql": {
+        "driver": "mysql",
+        "metrics": {
+            "numeric": {
+                "table_rows": 6
+            },
+            "string": {
+                "engine": "InnoDB",
+                "table_name": "sys_config",
+                "table_schema": "sys"
+            }
+        },
+        "query": "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows \u003e 0;"
+    }
+}

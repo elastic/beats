@@ -1,0 +1,6 @@
+- name: usage
+  type: group
+  description: >
+    `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+  release: beta
+  fields:
