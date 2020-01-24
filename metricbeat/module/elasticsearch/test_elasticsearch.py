@@ -74,6 +74,7 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
                              ["service"], extras={"index_recovery.active_only": "false"})
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
         """
         elasticsearch-xpack module tests
