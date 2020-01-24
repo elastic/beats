@@ -196,7 +196,6 @@ unit: ## @testing Runs the unit tests without coverage reports.
 .PHONY: integration-tests
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
-	echo "[integration-tests] TEST_ENVIRONMENT=${TEST_ENVIRONMENT}"
 	rm -f docker-compose.yml.lock
 	mage goIntegTest
 
@@ -208,7 +207,6 @@ integration-tests-environment: prepare-tests build-image
 	#
 	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
 	# by default because it can create noise if the test inside the container fails.
-	echo "[integration-tests-environment] TEST_ENVIRONMENT=${TEST_ENVIRONMENT}"
 	${DOCKER_COMPOSE} run \
 	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \

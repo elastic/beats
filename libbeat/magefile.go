@@ -21,8 +21,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 
@@ -56,7 +54,5 @@ func Config() error {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	e, _ := os.LookupEnv("TEST_ENVIRONMENT")
-	fmt.Printf("In libbeat/magefile.go:GoIntegTest. TEST_ENVIRONMENT=%v\n", e)
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
