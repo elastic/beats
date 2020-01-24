@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/goracle.v2"
+	"github.com/godror/godror"
 )
 
 // GetOracleConnectionDetails return a valid SID to use for testing
 func GetOracleConnectionDetails(host string) string {
-	params := goracle.ConnectionParams{
+	params := godror.ConnectionParams{
 		SID:      fmt.Sprintf("%s/%s", host, GetOracleEnvServiceName()),
 		Username: GetOracleEnvUsername(),
 		Password: GetOracleEnvPassword(),

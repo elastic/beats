@@ -1,3 +1,0 @@
-type: http
-url: "/metrics"
-suffix: plain
