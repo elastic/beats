@@ -38,7 +38,6 @@ var (
 	// BeatsWithDashboards is a list of Beats to collect dashboards from.
 	BeatsWithDashboards = []string{
 		"heartbeat",
-		"journalbeat",
 		"packetbeat",
 		"winlogbeat",
 		"x-pack/auditbeat",
