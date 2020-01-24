@@ -150,7 +150,7 @@
       },
       "id": "fbc095e0-37cc-11ea-a9c8-152a657da3ab",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
@@ -249,7 +249,7 @@
       },
       "id": "9385f9a0-33f0-11ea-a9c8-152a657da3ab",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
