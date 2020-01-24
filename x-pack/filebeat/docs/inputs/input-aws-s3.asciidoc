@@ -62,7 +62,7 @@ messages under the group value into separate events. For example, CloudTrail log
 are in JSON format and events are found under the JSON object "Records":
 
 [float]
-==== `aws_api_timeout`
+==== `api_timeout`
 
 The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
 will be interrupted.

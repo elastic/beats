@@ -144,7 +144,7 @@ func TestNewS3BucketReader(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -195,7 +195,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)

@@ -172,7 +172,7 @@ func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		p.logger.Infof("visibility timeout is set to %v seconds", visibilityTimeout)
-		p.logger.Infof("aws api timeout is set to %v", p.config.AwsAPITimeout)
+		p.logger.Infof("aws api timeout is set to %v", p.config.APITimeout)
 
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -317,7 +317,7 @@ func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout in
 		})
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	return req.Send(ctx)
@@ -331,7 +331,7 @@ func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int
 	})
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)
@@ -401,7 +401,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -571,7 +571,7 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.AwsAPITimeout)
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)

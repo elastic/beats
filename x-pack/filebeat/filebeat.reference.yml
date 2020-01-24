@@ -117,7 +117,7 @@ filebeat.modules:
 
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
-    #var.aws_api_timeout: 120s
+    #var.api_timeout: 120s
 
   elb:
     enabled: false
@@ -140,7 +140,7 @@ filebeat.modules:
 
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
-    #var.aws_api_timeout: 120s
+    #var.api_timeout: 120s
 
   vpcflow:
     enabled: false
@@ -163,7 +163,7 @@ filebeat.modules:
 
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
-    #var.aws_api_timeout: 120s
+    #var.api_timeout: 120s
 
   cloudtrail:
     enabled: false
@@ -186,7 +186,7 @@ filebeat.modules:
 
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
-    #var.aws_api_timeout: 120s
+    #var.api_timeout: 120s
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
