@@ -1,12 +1,29 @@
+name:	Production Website DB Servers
+fleet:
+    kibana_url:		https://kibana.mydomain.com:5601
+    ca_hash:		7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+    checkin_interval:	5m
 streams:
-  - type: metric/docker
-    setting: one
-  - type: metric/apache
-    setting: two
-  - type: event/file
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
+  - type: metrics
+    name: Docker metrics
+    input:
+      type: docker
+      metricsets: [status]
+    dataset:
+      type: docker.status
+  - type: metrics
+    name: Apache metrics
+    namespace: testing
+    input:
+      type: apache
+      metricsets: [info]
+  - type: logs
+    name: generic logs
+    input:
+      type: event/file
+      paths:
+        - /var/log/hello1.log
+        - /var/log/hello2.log
 management:
   host: "localhost"
 config:
@@ -17,3 +34,5 @@ outputs:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
     username: elastic
     password: changeme
+    api_key:	TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_hash:	7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=

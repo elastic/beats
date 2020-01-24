@@ -89,6 +89,9 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 		}
 
 		if !ok {
+			fmt.Println("vv")
+			fmt.Println("!ok", spec)
+			fmt.Println(specificAST)
 			continue
 		}
 
@@ -96,6 +99,8 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 			Spec:   spec,
 			Config: specificAST,
 		}
+		fmt.Println(">> got program>>>>")
+		fmt.Println(program)
 		programs = append(programs, program)
 	}
 	return programs, nil
@@ -125,6 +130,8 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 	// Normalize using an intermediate map.
 	normMap, err := single.Map()
+	fmt.Println(">>>> nommap")
+	fmt.Println(normMap)
 	if err != nil {
 		return nil, errors.New(err, "could not read configuration")
 	}

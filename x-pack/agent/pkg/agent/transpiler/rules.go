@@ -203,6 +203,8 @@ func (r CopyRule) Apply(ast *AST) error {
 	node, ok := Lookup(ast, r.From)
 	// skip when the `from` node is not found.
 	if !ok {
+		fmt.Println("not found", r.From)
+		fmt.Println(ast)
 		return nil
 	}
 

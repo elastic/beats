@@ -3,11 +3,16 @@ cmd: filebeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
+- filter_values:
+    selector: streams
+    key: type
+    values:
+    - logs
 - map:
     path: streams
     rules:
     - translate:
-        path: type
+        path: input.type
         mapper:
           event/file: log
           event/stdin: stdin
@@ -17,7 +22,7 @@ rules:
           log/redis_slowlog: redis
           log/syslog: syslog
 - filter_values:
-    selector: streams
+    selector: streams.input.type
     key: type
     values:
     - log
@@ -27,16 +32,19 @@ rules:
     - docker
     - redis
     - syslog
+- map:
+    path: streams
+    rules:
+    - rename:
+        from: input
+        to: inputs
 - copy:
-    from: streams
+    from: streams.inputs
     to: filebeat
-- rename:
-    from: filebeat.streams
-    to: inputs
-- filter:
-    selectors:
-    - filebeat
-    - output
-    - keystore
+# - filter:
+#     selectors:
+#     - filebeat
+#     - output
+#     - keystore
 when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
   'kafka', 'logstash')

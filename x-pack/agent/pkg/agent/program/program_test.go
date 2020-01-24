@@ -526,35 +526,35 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat"},
-			expected: 2,
+			programs: []string{"filebeat"}, //, "metricbeat"},
+			expected: 1,                    //2,
 		},
-		// "audit_config": {
-		// 	programs: []string{"auditbeat"},
+		// // "audit_config": {
+		// // 	programs: []string{"auditbeat"},
+		// // 	expected: 1,
+		// // },
+		// // "journal_config": {
+		// // 	programs: []string{"journalbeat"},
+		// // 	expected: 1,
+		// // },
+		// // "monitor_config": {
+		// // 	programs: []string{"heartbeat"},
+		// // 	expected: 1,
+		// // },
+		// "enabled_true": {
+		// 	programs: []string{"filebeat"},
 		// 	expected: 1,
 		// },
-		// "journal_config": {
-		// 	programs: []string{"journalbeat"},
+		// "enabled_false": {
+		// 	expected: 0,
+		// },
+		// "enabled_output_true": {
+		// 	programs: []string{"filebeat"},
 		// 	expected: 1,
 		// },
-		// "monitor_config": {
-		// 	programs: []string{"heartbeat"},
-		// 	expected: 1,
+		// "enabled_output_false": {
+		// 	expected: 0,
 		// },
-		"enabled_true": {
-			programs: []string{"filebeat"},
-			expected: 1,
-		},
-		"enabled_false": {
-			expected: 0,
-		},
-		"enabled_output_true": {
-			programs: []string{"filebeat"},
-			expected: 1,
-		},
-		"enabled_output_false": {
-			expected: 0,
-		},
 	}
 
 	for name, test := range testcases {
