@@ -20,18 +20,15 @@ receives the data from {beats}, the duplicate events are indexed as new data.
 === How can I avoid duplicates?
 
 Rather than allowing {es} to set the document ID, set the ID in {beats}. The ID
-is stored in the {beats} `@metadata.id` field where it can be used to set the
-document ID during indexing. That way, if {beats} sends the same event to {es}
-more than once, {es} overwrites the existing document rather than creating a new
-one.
+is stored in the {beats} `@metadata.id` field and used to set the document ID
+during indexing. That way, if {beats} sends the same event to {es} more than
+once, {es} overwrites the existing document rather than creating a new one.
 
 The `@metadata.id` field is passed along with the event so that you can use
-it to set the document ID later in your processing pipeline, for example, in
-{ls}.
+it to set the document ID later in your processing pipeline, for example,
+in {ls}. See <<ls-doc-id>>. 
 
 There are several ways to set the document ID in {beats}:
-
-TODO: Need some realistic examples to flesh out the following sections. Also need to test these...haha.
 
 * *`add_id` processor*
 +
@@ -44,33 +41,69 @@ This example generates a unique ID for each event and adds it to the
 [source,yaml]
 ----
 processors:
- - add_id: ~
+  - add_id: ~
 ----
  
 * *`fingerprint` processor*
 +
-Use the <<fingerprint,`fingerprint`>> processor when you want to derive a unique
-key from multiple existing fields.
+Use the <<fingerprint,`fingerprint`>> processor to derive a unique key from
+multiple existing fields.
 +
-This example combines the values of `field1` and `field2` to create a unique key
-that it adds to the `_id` field:
+This example uses the values of `field1` and `field2` to derive a unique key
+that it adds to the `@metadata.id` field:
 +
 [source,yaml]
 ----
 processors:
- - fingerprint:
-     fields: ["field1", "field2", ...]
-     target_field: "_id"
+  - fingerprint:
+      fields: ["field1", "field2"]
+      target_field: "@metadata.id"
 ----
 +
-TODO: Test the syntax. I’m guessing here. 
 
 * *JSON input settings*
 +
 Use the `json.document_id` input setting if you’re ingesting JSON-formatted
 data, and the data has a natural key field.
 +
-This example sets the document ID to the value of field1 from the JSON document.
+This example takes the value of `key1` from the JSON document and stores it in
+the `@metadata.id` field:
 +
-TODO: Add an example here. Should show the input config in addition to the JSON
-settings to provide context.
+[source,yaml]
+----
+filebeat.inputs:
+- type: log 
+  paths:
+    - /path/to/json.log
+  json.document_id: "key1"
+----
+
+[float]
+[[ls-doc-id]]
+=== {ls} pipeline example
+
+For this example, assume that you've used one of the approaches described
+earlier to store the document ID in the {beats} `@metadata.id` field. In
+the {logstash-ref}/plugins-outputs-elasticsearch.html[{es} output], set
+the `document_id` field based on the `@metadata.id` field:
+
+[source,json]
+----
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    document_id => "%{[@metadata][id]}" <1>
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}" 
+  }
+}
+----
+<1> Sets the `document_id` field to the value stored in `@metadata.id`.
+
+When {es} indexes the document, it sets the document ID to the specified value,
+preserving the ID passed from {beats}.
