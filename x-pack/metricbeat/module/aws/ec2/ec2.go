@@ -201,8 +201,14 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					}
 				}
 
-				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+				if m.Dedot {
+					for _, tag := range tags {
+						events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+					}
+				} else {
+					for _, tag := range tags {
+						events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+					}
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()

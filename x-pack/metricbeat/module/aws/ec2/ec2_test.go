@@ -73,6 +73,17 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	privateDNSName := "ip-5-6-7-8.us-west-1.compute.internal"
 	privateIP := "5.6.7.8"
 
+	tags := []ec2.Tag{
+		{
+			Key:   awssdk.String("app.kubernetes.io/name"),
+			Value: awssdk.String("foo"),
+		},
+		{
+			Key:   awssdk.String("helm.sh/chart"),
+			Value: awssdk.String("foo-chart"),
+		},
+	}
+
 	instance := ec2.Instance{
 		InstanceId:   awssdk.String(instanceID),
 		InstanceType: ec2.InstanceTypeT2Medium,
@@ -95,6 +106,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 		PublicIpAddress:  &publicIP,
 		PrivateDnsName:   &privateDNSName,
 		PrivateIpAddress: &privateIP,
+		Tags:             tags,
 	}
 
 	httpReq, _ := http.NewRequest("", "", nil)
@@ -126,7 +138,7 @@ func TestGetInstanceIDs(t *testing.T) {
 	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceID].Placement.AvailabilityZone)
 }
 
-func TestCreateCloudWatchEvents(t *testing.T) {
+func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 	expectedEvent := mb.Event{
 		RootFields: common.MapStr{
 			"cloud": common.MapStr{
@@ -155,6 +167,10 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 					"dns_name": "ip-5-6-7-8.us-west-1.compute.internal",
 					"ip":       "5.6.7.8",
 				},
+			},
+			"tags": common.MapStr{
+				"app_kubernetes_io/name": "foo",
+				"helm_sh/chart":          "foo-chart",
 			},
 		},
 	}
@@ -194,7 +210,9 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	}
 
 	metricSet := MetricSet{
-		&aws.MetricSet{},
+		&aws.MetricSet{
+			Dedot: true,
+		},
 		nil,
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
@@ -203,6 +221,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
 	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
+	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
 }
 
 func TestConstructMetricQueries(t *testing.T) {
