@@ -297,6 +297,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
+- Made the event parser more lenient w.r.t. invalid event log definition version numbers. {issue}15838[15838]
 
 ==== Deprecated
 
