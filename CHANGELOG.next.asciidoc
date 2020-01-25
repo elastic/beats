@@ -62,6 +62,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}[]
+
 
 *Packetbeat*
 
