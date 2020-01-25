@@ -166,6 +166,7 @@ func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error 
 // fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
 func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
 
+	data := common.MapStr{}
 	for rows.Next() {
 		var key string
 		var val interface{}
@@ -176,35 +177,38 @@ func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) err
 		}
 
 		key = strings.ToLower(key)
+		data[key] = val
+	}
 
-		numericMetrics := common.MapStr{}
-		stringMetrics := common.MapStr{}
+	if err := rows.Err(); err != nil {
+		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
+	}
 
-		value := getValue(&val)
+	numericMetrics := common.MapStr{}
+	stringMetrics := common.MapStr{}
+
+	for key, value := range data {
+		value := getValue(&value)
 		num, err := strconv.ParseFloat(value, 64)
 		if err == nil {
 			numericMetrics[key] = num
 		} else {
 			stringMetrics[key] = value
 		}
+	}
 
-		report.Event(mb.Event{
-			RootFields: common.MapStr{
-				"sql": common.MapStr{
-					"driver": m.Driver,
-					"query":  m.Query,
-					"metrics": common.MapStr{
-						"numeric": numericMetrics,
-						"string":  stringMetrics,
-					},
+	report.Event(mb.Event{
+		RootFields: common.MapStr{
+			"sql": common.MapStr{
+				"driver": m.Driver,
+				"query":  m.Query,
+				"metrics": common.MapStr{
+					"numeric": numericMetrics,
+					"string":  stringMetrics,
 				},
 			},
-		})
-	}
-
-	if err := rows.Err(); err != nil {
-		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
-	}
+		},
+	})
 
 	return nil
 }
