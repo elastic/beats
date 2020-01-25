@@ -20,8 +20,8 @@ import (
 
 // represents the response format of the query
 const (
-	table    = "table"
-	variable = "variable"
+	tableResponseFormat    = "table"
+	variableResponseFormat = "variables"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -40,9 +40,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver            string
-	Query             string
-	SQLResponseFormat string
+	Driver         string
+	Query          string
+	ResponseFormat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -60,15 +60,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if config.SQLResponseFormat != variable && config.SQLResponseFormat != table {
+	if config.SQLResponseFormat != variableResponseFormat && config.SQLResponseFormat != tableResponseFormat {
 		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.SQLResponseFormat)
 	}
 
 	return &MetricSet{
-		BaseMetricSet:     base,
-		Driver:            config.Driver,
-		Query:             config.Query,
-		SQLResponseFormat: config.SQLResponseFormat,
+		BaseMetricSet:  base,
+		Driver:         config.Driver,
+		Query:          config.Query,
+		ResponseFormat: config.SQLResponseFormat,
 	}, nil
 }
 
@@ -95,7 +95,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	defer rows.Close()
 
-	if m.SQLResponseFormat == table {
+	if m.ResponseFormat == tableResponseFormat {
 		return m.fetchTableMode(rows, report)
 	}
 
@@ -165,7 +165,6 @@ func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error 
 
 // fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
 func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
-
 	data := common.MapStr{}
 	for rows.Next() {
 		var key string

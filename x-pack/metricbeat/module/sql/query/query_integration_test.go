@@ -41,7 +41,7 @@ func TestMySQL(t *testing.T) {
 		Driver:            "mysql",
 		Query:             "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
 		Host:              mysql.GetMySQLEnvDSN(service.Host()),
-		SQLResponseFormat: table,
+		SQLResponseFormat: tableResponseFormat,
 		Assertion:         assertFieldNotContains("service.address", ":test@"),
 	}
 
@@ -57,7 +57,7 @@ func TestMySQL(t *testing.T) {
 		Driver:            "mysql",
 		Query:             "show status;",
 		Host:              mysql.GetMySQLEnvDSN(service.Host()),
-		SQLResponseFormat: variable,
+		SQLResponseFormat: variableResponseFormat,
 		Assertion:         assertFieldNotContains("service.address", ":test@"),
 	}
 
@@ -82,7 +82,7 @@ func TestPostgreSQL(t *testing.T) {
 		Driver:            "postgres",
 		Query:             "select * from pg_stat_database",
 		Host:              fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
-		SQLResponseFormat: table,
+		SQLResponseFormat: tableResponseFormat,
 		Assertion:         assertFieldNotContains("service.address", "password="+password),
 	}
 
@@ -94,7 +94,7 @@ func TestPostgreSQL(t *testing.T) {
 		Driver:            "postgres",
 		Query:             "select * from pg_stat_database",
 		Host:              fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
-		SQLResponseFormat: table,
+		SQLResponseFormat: tableResponseFormat,
 		Assertion:         assertFieldNotContains("service.address", ":"+password+"@"),
 	}
 
@@ -110,7 +110,7 @@ func TestPostgreSQL(t *testing.T) {
 		Driver:            "postgres",
 		Query:             "select name, setting from pg_settings",
 		Host:              fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
-		SQLResponseFormat: variable,
+		SQLResponseFormat: variableResponseFormat,
 		Assertion:         assertFieldNotContains("service.address", ":"+password+"@"),
 	}
 
