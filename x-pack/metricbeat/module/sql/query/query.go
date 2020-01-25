@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// represents the response format of the query
 const (
 	table    = "table"
 	variable = "variable"
@@ -74,6 +75,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
+// It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
+// format of the query.
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	db, err := sqlx.Open(m.Driver, m.HostData().URI)
 	if err != nil {
@@ -99,51 +102,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return m.fetchVariableMode(rows, report)
 }
 
-func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
-
-	for rows.Next() {
-		var key string
-		var val interface{}
-		err := rows.Scan(&key, &val)
-		if err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to scan rows"))
-			continue
-		}
-
-		key = strings.ToLower(key)
-
-		numericMetrics := common.MapStr{}
-		stringMetrics := common.MapStr{}
-
-		value := getValue(&val)
-		num, err := strconv.ParseFloat(value, 64)
-		if err == nil {
-			numericMetrics[key] = num
-		} else {
-			stringMetrics[key] = value
-		}
-
-		report.Event(mb.Event{
-			RootFields: common.MapStr{
-				"sql": common.MapStr{
-					"driver": m.Driver,
-					"query":  m.Query,
-					"metrics": common.MapStr{
-						"numeric": numericMetrics,
-						"string":  stringMetrics,
-					},
-				},
-			},
-		})
-	}
-
-	if err := rows.Err(); err != nil {
-		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
-	}
-
-	return nil
-}
-
+// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
 func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
 
 	// Extracted from
@@ -198,6 +157,52 @@ func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error 
 	}
 
 	if err = rows.Err(); err != nil {
+		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
+	}
+
+	return nil
+}
+
+// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
+func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
+
+	for rows.Next() {
+		var key string
+		var val interface{}
+		err := rows.Scan(&key, &val)
+		if err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to scan rows"))
+			continue
+		}
+
+		key = strings.ToLower(key)
+
+		numericMetrics := common.MapStr{}
+		stringMetrics := common.MapStr{}
+
+		value := getValue(&val)
+		num, err := strconv.ParseFloat(value, 64)
+		if err == nil {
+			numericMetrics[key] = num
+		} else {
+			stringMetrics[key] = value
+		}
+
+		report.Event(mb.Event{
+			RootFields: common.MapStr{
+				"sql": common.MapStr{
+					"driver": m.Driver,
+					"query":  m.Query,
+					"metrics": common.MapStr{
+						"numeric": numericMetrics,
+						"string":  stringMetrics,
+					},
+				},
+			},
+		})
+	}
+
+	if err := rows.Err(); err != nil {
 		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
 	}
 
