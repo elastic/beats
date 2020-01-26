@@ -1,6 +1,8 @@
 # Add more queries as you want : 
 # e.g: https://www.robvanderwoude.com/wmiqueries.php
 # for each query type choose a name to display in the Kibana e.g - type:Win32_DesktopMonitor, name: monitor
+# The query can get "type" only from Namespace - root/CIMV2 as default. 
+# except - WmiMonitorID, a special ability added in the code to support it. 
 
 hardware_query: 
 - type: Win32_DesktopMonitor
@@ -17,8 +19,8 @@ hardware_query:
   name: video
 - type: Win32_ComputerSystem
   name: cpu system
-- type: Win32_CDROMDrive
-  name: cd
+- type: WmiMonitorID 
+  name: monitorID
 
 
 # Choose the data format type that will be sent yo Kibana 
@@ -27,6 +29,6 @@ hardware_query:
 # Both of them can be set to TRUE, But if none of them will be TRUE no data will be shown.
 
 output_format:
-  use_type_as_key: false 
+  use_type_as_key: true 
   use_constant_key: true 
 

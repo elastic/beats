@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/StackExchange/wmi"
 	"github.com/elastic/beats/libbeat/common"
@@ -28,9 +29,10 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	hardwareQuery []queryKey
-	formatQuery   configYaml
-	hardware      common.MapStr
+	hardwareQuery        []queryKey
+	formatQuery          configYaml
+	hardware             common.MapStr
+	hardwareMonitorQuery []win32MonitorID
 }
 
 type queryKey struct {
@@ -42,7 +44,16 @@ type queryKey struct {
 	Output       innerConfigFormat
 }
 
+type win32MonitorID struct {
+	UserFriendlyName  []int8
+	YearOfManufacture int
+	Output            innerConfigFormat
+	Type              string
+	Index             int
+}
+
 var newQuery = []queryKey{}
+var monitorQuery = []win32MonitorID{}
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
@@ -52,11 +63,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	readFile(&cfg)
 
 	for _, value := range cfg.Query {
-		var dst []queryKey
-		wmi.Query("Select * from "+value.TypeOf, &dst)
-		for _, v := range dst {
-			newQuery = append(newQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format})
+		// Special ability to handle WmiMonitorID
+		if value.TypeOf != "WmiMonitorID" {
+			var dst []queryKey
+			wmi.Query("Select * from "+value.TypeOf, &dst)
+			for _, v := range dst {
+				newQuery = append(newQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format})
+			}
+		} else {
+			var dst []win32MonitorID
+			err := wmi.QueryNamespace("select * from "+value.TypeOf, &dst, "root\\WMI")
+			if err != nil {
+				log.Println(err)
+			}
+			for i, v := range dst {
+				monitorQuery = append(monitorQuery, win32MonitorID{UserFriendlyName: v.UserFriendlyName, YearOfManufacture: v.YearOfManufacture, Type: value.Name, Output: cfg.Format, Index: i + 1})
+			}
+
 		}
+
 	}
 
 	config := struct{}{}
@@ -65,9 +90,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		hardwareQuery: newQuery,
-		hardware:      common.MapStr{},
+		BaseMetricSet:        base,
+		hardwareQuery:        newQuery,
+		hardwareMonitorQuery: monitorQuery,
+		hardware:             common.MapStr{},
 	}, nil
 }
 
@@ -91,6 +117,7 @@ func getData() {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	metricSetFields := common.MapStr{}
 	for _, hard := range m.hardwareQuery {
 		rootFields := common.MapStr{
 			"Type":         hard.Type,
@@ -106,14 +133,43 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				},
 			})
 		}
+
 		if hard.Output.UseType == true {
+			metricSetFields[hard.Type] = rootFields
+		}
+	}
+	for _, hard := range m.hardwareMonitorQuery {
+		rootFields := common.MapStr{
+			"Type":             hard.Type,
+			"Name":             b2s(hard.UserFriendlyName),
+			"ManufacturerYear": hard.YearOfManufacture,
+		}
+		if hard.Output.UseConst == true {
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					hard.Type: rootFields,
+					"data": rootFields,
 				},
 			})
 		}
+		if hard.Output.UseType == true {
+			if len(m.hardwareMonitorQuery) == 1 {
+				metricSetFields[hard.Type] = rootFields
+			} else {
+				report.Event(mb.Event{
+					MetricSetFields: common.MapStr{
+						hard.Type: common.MapStr{strconv.Itoa(hard.Index): rootFields},
+					},
+				})
+			}
+		}
 	}
+
+	if len(metricSetFields) > 0 {
+		var event mb.Event
+		event.MetricSetFields = metricSetFields
+		report.Event(event)
+	}
+
 	return nil
 }
 
@@ -149,4 +205,12 @@ func readFile(cfg *configYaml) {
 func processError(err error) {
 	fmt.Println(err)
 	os.Exit(2)
+}
+
+func b2s(bs []int8) string {
+	b := make([]byte, len(bs))
+	for i, v := range bs {
+		b[i] = byte(v)
+	}
+	return string(b)
 }
