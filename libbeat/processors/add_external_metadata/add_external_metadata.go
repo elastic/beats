@@ -69,7 +69,16 @@ func New(c *common.Config) (processors.Processor, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the fetch_data configuration: %s", err)
 	}
-	data, _ := postMessageData()
+	data, err := postMessageData()
+	if err != nil {
+		p := &addFields{fields: common.MapStr{
+			"stationCity":    "null",
+			"stationCountry": "null",
+		}}
+
+		return p, nil
+
+	}
 	stationCity := data.City
 	stationCountry := data.Country
 
