@@ -146,7 +146,7 @@ func postMessageData() nameData {
 // registery software functions
 
 func readFile(cfg *Config) {
-	f, err := os.Open("./webiks2.yml")
+	f, err := os.Open("./softwares.yml")
 	if err != nil {
 		processError(err)
 	}
