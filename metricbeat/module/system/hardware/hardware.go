@@ -1,18 +1,16 @@
 package hardware
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/StackExchange/wmi"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"gopkg.in/yaml.v2"
+	"github.com/elastic/beats/metricbeat/module/system/hardware/util"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -30,41 +28,34 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	hardwareQuery        []queryKey
-	formatQuery          configYaml
+	formatQuery          util.ConfigYaml
 	hardware             common.MapStr
-	hardwareMonitorQuery []win32MonitorID
+	hardwareMonitorQuery []queryKey
 }
 
 type queryKey struct {
-	Type         string
-	Name         string
-	DeviceID     string
-	Description  string
-	Manufacturer string
-	Output       innerConfigFormat
-	Index        int
-}
-
-type win32MonitorID struct {
+	Type              string
+	Name              string
+	DeviceID          string
+	Description       string
+	Manufacturer      string
 	UserFriendlyName  []int8
 	YearOfManufacture int
-	Output            innerConfigFormat
-	Type              string
+	Output            util.InnerConfigFormat
 	Index             int
 }
 
 var newQuery = []queryKey{}
-var monitorQuery = []win32MonitorID{}
+var monitorQuery = []queryKey{}
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system hardware metricset is beta.")
-	var cfg configYaml
-	readFile(&cfg)
+	var cfg util.ConfigYaml
+	util.ReadFile(&cfg)
 
 	for _, value := range cfg.Query {
-		// Special ability to handle WmiMonitorID
 		if value.TypeOf != "WmiMonitorID" {
 			var dst []queryKey
 			wmi.Query("Select * from "+value.TypeOf, &dst)
@@ -72,15 +63,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				newQuery = append(newQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format, Index: i + 1})
 			}
 		} else {
-			var dst []win32MonitorID
+			// Special ability to handle WmiMonitorID
+			var dst []queryKey
 			err := wmi.QueryNamespace("select * from "+value.TypeOf, &dst, "root\\WMI")
 			if err != nil {
 				log.Println(err)
 			}
 			for i, v := range dst {
-				monitorQuery = append(monitorQuery, win32MonitorID{UserFriendlyName: v.UserFriendlyName, YearOfManufacture: v.YearOfManufacture, Type: value.Name, Output: cfg.Format, Index: i + 1})
+				monitorQuery = append(monitorQuery, queryKey{UserFriendlyName: v.UserFriendlyName, YearOfManufacture: v.YearOfManufacture, Type: value.Name, Output: cfg.Format, Index: i + 1})
 			}
-
 		}
 
 	}
@@ -127,53 +118,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			"Manufacturer": hard.Manufacturer,
 			"DeviceID":     hard.DeviceID,
 		}
-		if hard.Output.UseConst == true {
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"data": rootFields,
-				},
-			})
-		}
-
-		if hard.Output.UseType == true {
-			if len(m.hardwareQuery) == 1 {
-				metricSetFields[hard.Type] = rootFields
-			} else if hard.Index == 1 {
-				metricSetFields[hard.Type] = common.MapStr{
-					strconv.Itoa(hard.Index): rootFields,
-				}
-			} else {
-				newMap := metricSetFields[hard.Type].(common.MapStr)
-				newMap[strconv.Itoa(hard.Index)] = rootFields
-			}
-		}
+		sendEventHardware(hard, m.hardwareQuery, rootFields, metricSetFields, report)
 	}
 	for _, hard := range m.hardwareMonitorQuery {
 		rootFields := common.MapStr{
 			"Type":             hard.Type,
-			"Name":             b2s(hard.UserFriendlyName),
+			"Name":             util.B2s(hard.UserFriendlyName),
 			"ManufacturerYear": hard.YearOfManufacture,
 		}
-		if hard.Output.UseConst == true {
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"data": rootFields,
-				},
-			})
-		}
-		if hard.Output.UseType == true {
-			if len(m.hardwareMonitorQuery) == 1 {
-				metricSetFields[hard.Type] = rootFields
-			} else if hard.Index == 1 {
-				metricSetFields[hard.Type] = common.MapStr{
-					strconv.Itoa(hard.Index): rootFields,
-				}
-			} else {
-				newMap := metricSetFields[hard.Type].(common.MapStr)
-				newMap[strconv.Itoa(hard.Index)] = rootFields
-			}
-		}
-
+		sendEventHardware(hard, m.hardwareMonitorQuery, rootFields, metricSetFields, report)
 	}
 
 	if len(metricSetFields) > 0 {
@@ -185,44 +138,24 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-type configYaml struct {
-	Query  []innerConfig     `yaml:"hardware_query"`
-	Format innerConfigFormat `yaml:"output_format"`
-}
-
-type innerConfig struct {
-	TypeOf string `yaml:"type"`
-	Name   string `yaml:"name"`
-}
-
-type innerConfigFormat struct {
-	UseType  bool `yaml:"use_type_as_key"`
-	UseConst bool `yaml:"use_constant_key"`
-}
-
-func readFile(cfg *configYaml) {
-	f, err := os.Open("hardware.yml")
-	if err != nil {
-		processError(err)
+func sendEventHardware(hard queryKey, hardware []queryKey, rootFields common.MapStr, metricSetFields common.MapStr, report mb.ReporterV2) {
+	if hard.Output.UseConst == true {
+		report.Event(mb.Event{
+			MetricSetFields: common.MapStr{
+				"data": rootFields,
+			},
+		})
 	}
-	defer f.Close()
-
-	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(cfg)
-	if err != nil {
-		processError(err)
+	if hard.Output.UseType == true {
+		if len(hardware) == 1 {
+			metricSetFields[hard.Type] = rootFields
+		} else if hard.Index == 1 {
+			metricSetFields[hard.Type] = common.MapStr{
+				strconv.Itoa(hard.Index): rootFields,
+			}
+		} else {
+			newMap := metricSetFields[hard.Type].(common.MapStr)
+			newMap[strconv.Itoa(hard.Index)] = rootFields
+		}
 	}
-}
-
-func processError(err error) {
-	fmt.Println(err)
-	os.Exit(2)
-}
-
-func b2s(bs []int8) string {
-	b := make([]byte, len(bs))
-	for i, v := range bs {
-		b[i] = byte(v)
-	}
-	return string(b)
 }
