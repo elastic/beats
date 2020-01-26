@@ -1,9 +1,9 @@
+from xpack_metricbeat import XPackTest, metricbeat
 import os
 import sys
 import unittest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-from xpack_metricbeat import XPackTest, metricbeat
 
 
 class Test(XPackTest):
