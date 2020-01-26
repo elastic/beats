@@ -51,24 +51,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
 	config := struct {
-		Driver            string `config:"driver" validate:"nonzero,required"`
-		Query             string `config:"sql_query" validate:"nonzero,required"`
-		SQLResponseFormat string `config:"sql_response_format" validate:"nonzero,required"`
+		Driver         string `config:"driver" validate:"nonzero,required"`
+		Query          string `config:"sql_query" validate:"nonzero,required"`
+		ResponseFormat string `config:"response_format"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	if config.SQLResponseFormat != variableResponseFormat && config.SQLResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.SQLResponseFormat)
+	if config.ResponseFormat == "" {
+		config.ResponseFormat = tableResponseFormat
+	}
+
+	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
+		return nil, fmt.Errorf("invalid response_format value: %s", config.ResponseFormat)
 	}
 
 	return &MetricSet{
 		BaseMetricSet:  base,
 		Driver:         config.Driver,
 		Query:          config.Query,
-		ResponseFormat: config.SQLResponseFormat,
+		ResponseFormat: config.ResponseFormat,
 	}, nil
 }
 
