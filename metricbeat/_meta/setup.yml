@@ -30,9 +30,11 @@ metricbeat.config.modules:
   path: ${path.config}/modules.d/*.yml
 
   # Set to true to enable config reloading
+  reload.enabled: false
   reload.enabled: true
 
   # Period on which files under path should be checked for changes
+  #reload.period: 10s
   reload.period: 60s
 
 
@@ -42,6 +44,24 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
   #_source.enabled: false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #================================ General =====================================
 
@@ -59,7 +79,6 @@ setup.template.settings:
 #  env: staging
 fields_under_root: true
 fields:
-  city: Tel-Aviv
   sapirtest: true
 
 
@@ -148,10 +167,9 @@ processors:
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
   - add_kubernetes_metadata: ~
- # - add_fields:
-  #   target: "ben"
-   #  fields:
-    #   name: test
+  - add_external_metadata: 
+     fields:
+       name: test
 
 
 
@@ -192,3 +210,15 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+  reload.enabled: true
+
+  # Period on which files under path should be checked for changes
+  reload.period: 60s
+
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false

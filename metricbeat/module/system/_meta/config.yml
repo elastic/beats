@@ -9,7 +9,7 @@
     - process_summary
     - socket_summary
     - softwares
-    #- entropy
+    - hardware
     #- core
     #- diskio
     #- socket

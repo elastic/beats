@@ -31774,6 +31774,23 @@ format: bytes
 --
 
 [float]
+=== hardware
+
+hardware
+
+
+
+*`system.hardware.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
 === load
 
 CPU load averages.

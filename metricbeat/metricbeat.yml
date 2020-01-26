@@ -29,9 +29,7 @@
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/metricbeat/index.html
-
-#==========================  Modules configuration ============================
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html#==========================  Modules configuration ============================
 
 metricbeat.config.modules:
   # Glob pattern for configuration loading
@@ -69,7 +67,6 @@ fields_under_root: true
 fields:
   city: Tel-Aviv
   sapirtest: true
-
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
@@ -133,7 +130,6 @@ setup.kibana:
 output.logstash:
   # The Logstash hosts
   hosts: ["192.168.1.196:5000"]
-
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -158,11 +154,6 @@ processors:
   - add_external_metadata: 
      fields:
        namae: test
-  #- add_fields:
-   #  target: ben
-    # fields:
-     #  name: test
-
 
 #================================ Logging =====================================
 
