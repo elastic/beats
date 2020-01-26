@@ -42,6 +42,7 @@ type queryKey struct {
 	Description  string
 	Manufacturer string
 	Output       innerConfigFormat
+	Index        int
 }
 
 type win32MonitorID struct {
@@ -67,8 +68,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		if value.TypeOf != "WmiMonitorID" {
 			var dst []queryKey
 			wmi.Query("Select * from "+value.TypeOf, &dst)
-			for _, v := range dst {
-				newQuery = append(newQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format})
+			for i, v := range dst {
+				newQuery = append(newQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format, Index: i + 1})
 			}
 		} else {
 			var dst []win32MonitorID
@@ -135,7 +136,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		if hard.Output.UseType == true {
-			metricSetFields[hard.Type] = rootFields
+			if len(m.hardwareQuery) == 1 {
+				metricSetFields[hard.Type] = rootFields
+			} else if hard.Index == 1 {
+				metricSetFields[hard.Type] = common.MapStr{
+					strconv.Itoa(hard.Index): rootFields,
+				}
+			} else {
+				newMap := metricSetFields[hard.Type].(common.MapStr)
+				newMap[strconv.Itoa(hard.Index)] = rootFields
+			}
 		}
 	}
 	for _, hard := range m.hardwareMonitorQuery {
@@ -154,14 +164,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if hard.Output.UseType == true {
 			if len(m.hardwareMonitorQuery) == 1 {
 				metricSetFields[hard.Type] = rootFields
+			} else if hard.Index == 1 {
+				metricSetFields[hard.Type] = common.MapStr{
+					strconv.Itoa(hard.Index): rootFields,
+				}
 			} else {
-				report.Event(mb.Event{
-					MetricSetFields: common.MapStr{
-						hard.Type: common.MapStr{strconv.Itoa(hard.Index): rootFields},
-					},
-				})
+				newMap := metricSetFields[hard.Type].(common.MapStr)
+				newMap[strconv.Itoa(hard.Index)] = rootFields
 			}
 		}
+
 	}
 
 	if len(metricSetFields) > 0 {
