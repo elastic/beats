@@ -50,7 +50,7 @@ func TestMySQL(t *testing.T) {
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "")
+		testData(t, config, "./_meta/data_mysql_tables.json")
 	})
 
 	config = testFetchConfig{
