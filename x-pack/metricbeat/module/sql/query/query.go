@@ -53,7 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		Driver         string `config:"driver" validate:"nonzero,required"`
 		Query          string `config:"sql_query" validate:"nonzero,required"`
-		ResponseFormat string `config:"response_format"`
+		ResponseFormat string `config:"sql_response_format"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -65,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid response_format value: %s", config.ResponseFormat)
+		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.ResponseFormat)
 	}
 
 	return &MetricSet{

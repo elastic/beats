@@ -141,12 +141,12 @@ func testData(t *testing.T, cfg testFetchConfig, postfix string) {
 
 func getConfig(cfg testFetchConfig) map[string]interface{} {
 	return map[string]interface{}{
-		"module":          "sql",
-		"metricsets":      []string{"query"},
-		"hosts":           []string{cfg.Host},
-		"driver":          cfg.Driver,
-		"sql_query":       cfg.Query,
-		"response_format": cfg.ResponseFormat,
+		"module":              "sql",
+		"metricsets":          []string{"query"},
+		"hosts":               []string{cfg.Host},
+		"driver":              cfg.Driver,
+		"sql_query":           cfg.Query,
+		"sql_response_format": cfg.ResponseFormat,
 	}
 }
 
