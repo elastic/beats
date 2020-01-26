@@ -61,7 +61,7 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 
 	return makeFieldsProcessor(
 		optTarget(config.Target, FieldsKey),
-		config.Fields, 
+		config.Fields,
 		true,
 	), nil
 }
@@ -70,13 +70,6 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 // Set `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
 func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.Processor {
-	fmt.Println(&addFields{fields: fields, shared: shared, overwrite: overwrite}, "testtttttttttttttttttttttttttttttttttt new fields")
-
-	if fields["sapirtest"] == true {
-		fields["sapirtest"] = "TEST1234512"
-		fields["sapirtest3"] = "sapirtest3"
-		fields["sapirtest4"] = NewTest{"name": "Ben", "age": "modiin"}
-	}
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 

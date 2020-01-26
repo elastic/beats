@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fetch_data
+package add_external_metadata
 
 import (
 	"bytes"
@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os/user"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -32,8 +34,8 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("fetch_data", New)
-	jsprocessor.RegisterPlugin("FetchData", New)
+	processors.RegisterPlugin("add_external_metadata", New)
+	jsprocessor.RegisterPlugin("AddExternalMetadata", New)
 }
 
 type addHostMetadata struct {
@@ -51,7 +53,7 @@ type addFields struct {
 }
 
 const (
-	processorName = "fetch_data"
+	processorName = "add_external_metadata"
 )
 
 // FieldsKey is the default target key for the add_fields processor.
@@ -67,19 +69,24 @@ func New(c *common.Config) (processors.Processor, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the fetch_data configuration: %s", err)
 	}
+	data, _ := postMessageData()
+	stationCity := data.City
+	stationCountry := data.Country
 
-	p := &addFields{fields: common.MapStr{}}
+	p := &addFields{fields: common.MapStr{
+		"stationCity":    stationCity,
+		"stationCountry": stationCountry,
+	}}
+
 	return p, nil
 }
 
 func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	fields := af.fields
-	fields["TESTFROMFETCHDATA"] = "ben"
+	// fields["TESTFROMFETCHDATA"] = "ben"
 	// if af.shared {
 	// 	fields = fields.Clone()
 	// }
-	fmt.Println(event.Fields.GetValue("city"))
-
 	event.Fields.DeepUpdate(fields)
 	// } else {
 	// 	event.Fields.DeepUpdateNoOverwrite(fields)
@@ -100,10 +107,14 @@ type nameData struct {
 
 func postMessageData() (*nameData, error) {
 	url := "http://localhost:3001/api/host/"
-
 	fmt.Println("URL:>", url)
+
+	// getting username of enduser
+	stationName := getStationName()
+
 	var resData nameData
-	var jsonStr = []byte(`{"name":"ben"}`)
+	var jsonStr = []byte(`{"name":"` + stationName + `"}`)
+
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		log.Println("Problem With Request To Server ", err)
@@ -131,6 +142,16 @@ func postMessageData() (*nameData, error) {
 		log.Println("Problem with Json Parsing", err2)
 		return nil, err
 	}
-	fmt.Println(resData)
+	// fmt.Println(resData)
 	return &resData, nil
+}
+
+// getting username of enduser
+func getStationName() string {
+	user, err := user.Current()
+	if err != nil {
+		log.Println("Could Not Get UserName Details ", err)
+	}
+	stationName := strings.Split(user.Username, `\`)[0]
+	return stationName
 }
