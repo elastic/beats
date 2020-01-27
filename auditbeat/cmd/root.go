@@ -47,6 +47,11 @@ func init() {
 		),
 	)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	RootCmd = cmd.GenRootCmdWithSettings(create, instance.Settings{RunFlags: runFlags, Name: Name})
+	settings := instance.Settings{
+		RunFlags:      runFlags,
+		Name:          Name,
+		HasDashboards: true,
+	}
+	RootCmd = cmd.GenRootCmdWithSettings(create, settings)
 	RootCmd.AddCommand(ShowCmd)
 }
