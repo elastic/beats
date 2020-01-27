@@ -213,9 +213,10 @@ func NewClient(
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
-					Proxy:   proxy,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: s.TLS.ToConfig(),
+					Proxy:           proxy,
 				},
 				Timeout: s.Timeout,
 			},

@@ -43,6 +43,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
+- Do not load dashboards where not available. {pull}15802[15802]
+- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
+- Update replicaset group to apps/v1 {pull}15854[15802]
+- Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
+
 
 *Auditbeat*
 
@@ -63,6 +68,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
+
 
 *Packetbeat*
 
@@ -104,6 +111,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add mesh metricset for Istio Metricbeat module {pull}15535[15535]
 - Add mixer metricset for Istio Metricbeat module {pull}15696[15696]
 - Make the `system/cpu` metricset collect normalized CPU metrics by default. {issue}15618[15618] {pull}15729[15729]
+- Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
+- Add STAN dashboard {pull}15654[15654]
+- Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
 
 *Packetbeat*
 
