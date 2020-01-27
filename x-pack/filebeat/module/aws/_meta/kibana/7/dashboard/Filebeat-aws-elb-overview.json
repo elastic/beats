@@ -26,7 +26,8 @@
                 "lon": 17.07232,
                 "zoom": 3.47
               },
-              "openTOCDetails": []
+              "openTOCDetails": [],
+              "title": "ELB Requests Geolocation"
             },
             "gridData": {
               "h": 14,
@@ -37,10 +38,13 @@
             },
             "panelIndex": "2c97b32e-5548-429d-9ce0-1bbc3d2398ac",
             "panelRefName": "panel_0",
+            "title": "ELB Requests Geolocation",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB Inbound Traffic"
+            },
             "gridData": {
               "h": 14,
               "i": "26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
@@ -50,10 +54,13 @@
             },
             "panelIndex": "26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
             "panelRefName": "panel_1",
+            "title": "ELB Inbound Traffic",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB Top User Agents"
+            },
             "gridData": {
               "h": 14,
               "i": "48ecb39f-57a5-4805-a8a9-77385a996d75",
@@ -63,10 +70,13 @@
             },
             "panelIndex": "48ecb39f-57a5-4805-a8a9-77385a996d75",
             "panelRefName": "panel_2",
+            "title": "ELB Top User Agents",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB Total Requests"
+            },
             "gridData": {
               "h": 14,
               "i": "9812996e-ba10-41bd-b134-c9705a0973b4",
@@ -76,10 +86,13 @@
             },
             "panelIndex": "9812996e-ba10-41bd-b134-c9705a0973b4",
             "panelRefName": "panel_3",
+            "title": "ELB Total Requests",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB Top IP Addresses"
+            },
             "gridData": {
               "h": 14,
               "i": "bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
@@ -89,10 +102,13 @@
             },
             "panelIndex": "bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
             "panelRefName": "panel_4",
+            "title": "ELB Top IP Addresses",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB Outbound Traffic"
+            },
             "gridData": {
               "h": 14,
               "i": "bf43580d-cc26-415b-ae36-d678a232b544",
@@ -102,10 +118,13 @@
             },
             "panelIndex": "bf43580d-cc26-415b-ae36-d678a232b544",
             "panelRefName": "panel_5",
+            "title": "ELB Outbound Traffic",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB HTTP 2xx"
+            },
             "gridData": {
               "h": 14,
               "i": "466e825b-6ee2-43c3-b221-21abe27612dd",
@@ -115,10 +134,13 @@
             },
             "panelIndex": "466e825b-6ee2-43c3-b221-21abe27612dd",
             "panelRefName": "panel_6",
+            "title": "ELB HTTP 2xx",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB HTTP 4xx"
+            },
             "gridData": {
               "h": 14,
               "i": "d42994a6-922c-4f86-bf99-a46f87ff106d",
@@ -128,10 +150,13 @@
             },
             "panelIndex": "d42994a6-922c-4f86-bf99-a46f87ff106d",
             "panelRefName": "panel_7",
+            "title": "ELB HTTP 4xx",
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "ELB HTTP 5xx"
+            },
             "gridData": {
               "h": 14,
               "i": "f45aaa2c-c244-4d1a-8ad4-4794130b9827",
@@ -141,6 +166,7 @@
             },
             "panelIndex": "f45aaa2c-c244-4d1a-8ad4-4794130b9827",
             "panelRefName": "panel_8",
+            "title": "ELB HTTP 5xx",
             "version": "7.4.0"
           }
         ],
@@ -200,8 +226,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-01-24T09:15:51.180Z",
-      "version": "WzU3NiwxXQ=="
+      "updated_at": "2020-01-27T07:52:13.100Z",
+      "version": "WzUxNSwxXQ=="
     },
     {
       "attributes": {
@@ -253,8 +279,8 @@
         }
       ],
       "type": "map",
-      "updated_at": "2020-01-24T07:49:32.452Z",
-      "version": "WzUyNCwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzEzOCwxXQ=="
     },
     {
       "attributes": {
@@ -329,8 +355,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T08:35:58.461Z",
-      "version": "WzU1MSwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzEzOSwxXQ=="
     },
     {
       "attributes": {
@@ -434,8 +460,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T08:55:11.105Z",
-      "version": "WzU2MiwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0MCwxXQ=="
     },
     {
       "attributes": {
@@ -509,8 +535,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T08:13:26.380Z",
-      "version": "WzUzOSwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0MSwxXQ=="
     },
     {
       "attributes": {
@@ -614,8 +640,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T08:55:33.545Z",
-      "version": "WzU2NCwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0MiwxXQ=="
     },
     {
       "attributes": {
@@ -690,8 +716,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T08:37:21.938Z",
-      "version": "WzU1MywxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0MywxXQ=="
     },
     {
       "attributes": {
@@ -765,8 +791,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T09:13:57.598Z",
-      "version": "WzU3MCwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0NCwxXQ=="
     },
     {
       "attributes": {
@@ -840,8 +866,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T09:15:07.326Z",
-      "version": "WzU3MywxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0NSwxXQ=="
     },
     {
       "attributes": {
@@ -915,8 +941,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-24T09:15:40.841Z",
-      "version": "WzU3NSwxXQ=="
+      "updated_at": "2020-01-27T07:49:00.984Z",
+      "version": "WzE0NiwxXQ=="
     }
   ],
   "version": "7.4.0"
