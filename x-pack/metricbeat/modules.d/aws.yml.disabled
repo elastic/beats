@@ -20,12 +20,14 @@
 - module: aws
   period: 5m
   metricsets:
+    - dynamodb
     - ebs
     - ec2
     - elb
+    - lambda
+    - rds
     - sns
     - sqs
-    - rds
 - module: aws
   period: 12h
   metricsets:
