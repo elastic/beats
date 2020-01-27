@@ -182,7 +182,7 @@ type InjectIndexRule struct {
 	Type string
 }
 
-// Apply extracts items from array.
+// Apply injects index into input.
 func (r *InjectIndexRule) Apply(ast *AST) error {
 	const defaultNamespace = "default"
 	const defaultDataset = "generic"
