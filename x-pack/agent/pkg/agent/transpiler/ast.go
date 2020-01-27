@@ -132,13 +132,10 @@ func (k *Key) String() string {
 func (k *Key) Find(key string) (Node, bool) {
 	switch v := k.value.(type) {
 	case *Dict:
-		fmt.Println("d")
 		return v.Find(key)
 	case *List:
-		fmt.Println("l")
 		return v.Find(key)
 	default:
-		fmt.Println("?")
 		return nil, false
 	}
 }
@@ -653,9 +650,6 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 	// Run through the graph and find matching nodes.
 	current := a.root
 	for _, part := range splitPath(selector) {
-		if strings.Contains(selector, "streams.input") {
-			fmt.Printf("looking for '%s' in %v %T\n\n", part, current, current)
-		}
 		n, ok := current.Find(part)
 		if !ok {
 			return nil, false
