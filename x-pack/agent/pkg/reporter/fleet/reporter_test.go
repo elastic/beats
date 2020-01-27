@@ -230,7 +230,6 @@ func (testStateEvent) SubType() string                 { return reporter.EventSu
 func (testStateEvent) Time() time.Time                 { return time.Unix(0, 1) }
 func (testStateEvent) Message() string                 { return "hello" }
 func (testStateEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-func (testStateEvent) Data() string                    { return "" }
 
 type testErrorEvent struct{}
 
@@ -239,4 +238,3 @@ func (testErrorEvent) SubType() string                 { return "PATH" }
 func (testErrorEvent) Time() time.Time                 { return time.Unix(0, 1) }
 func (testErrorEvent) Message() string                 { return "hello" }
 func (testErrorEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-func (testErrorEvent) Data() string                    { return "" }

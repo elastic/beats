@@ -27,7 +27,6 @@ type event struct {
 	SubType   string                 `json:"subtype"`
 	Msg       string                 `json:"message"`
 	Payload   map[string]interface{} `json:"payload,omitempty"`
-	Data      string                 `json:"data,omitempty"`
 }
 
 func (e *event) Type() string {
@@ -80,7 +79,6 @@ func (r *Reporter) Report(e reporter.Event) error {
 		SubType:   e.SubType(),
 		Msg:       e.Message(),
 		Payload:   e.Payload(),
-		Data:      e.Data(),
 	})
 
 	if r.threshold > 0 && len(r.queue) > r.threshold {
