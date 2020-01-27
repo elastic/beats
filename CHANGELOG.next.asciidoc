@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
+- Do not load dashboards where not available. {pull}15802[15802]
 
 *Auditbeat*
 
