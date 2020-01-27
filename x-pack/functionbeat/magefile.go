@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -43,12 +44,30 @@ func Build() error {
 		return err
 	}
 
+	// Getting selected cloud providers
+	selectedProviders, err := functionbeat.SelectedProviders()
+	if err != nil {
+		return err
+	}
+
 	// Building functions to deploy
-	for _, provider := range functionbeat.SelectedProviders {
-		inputFiles := filepath.Join("provider", provider, "main.go")
+	for _, provider := range selectedProviders {
+		if !provider.Buildable {
+			continue
+		}
+
+		inputFiles := filepath.Join("provider", provider.Name, "main.go")
 		params.InputFiles = []string{inputFiles}
-		params.Name = devtools.BeatName + "-" + provider
-		params.OutputDir = filepath.Join("provider", provider)
+		params.Name = devtools.BeatName + "-" + provider.Name
+		params.OutputDir = filepath.Join("provider", provider.Name)
+		params.CGO = false
+		params.Env = make(map[string]string)
+		if provider.GOOS != "" {
+			params.Env["GOOS"] = provider.GOOS
+		}
+		if provider.GOARCH != "" {
+			params.Env["GOARCH"] = provider.GOARCH
+		}
 		err := devtools.Build(params)
 		if err != nil {
 			return err
@@ -76,9 +95,19 @@ func CrossBuild() error {
 		return err
 	}
 
+	// Getting selected cloud providers
+	selectedProviders, err := functionbeat.SelectedProviders()
+	if err != nil {
+		return err
+	}
+
 	// Building functions to deploy
-	for _, provider := range functionbeat.SelectedProviders {
-		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider))
+	for _, provider := range selectedProviders {
+		if !provider.Buildable {
+			continue
+		}
+
+		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider.Name))
 		if err != nil {
 			return err
 		}
@@ -127,6 +156,36 @@ func GoTestUnit() {
 	mg.Deps(unittest.GoUnitTest)
 }
 
+// BuildPkgForFunctions creates a folder named pkg and adds functions to it.
+// This makes testing the manager more comfortable.
+func BuildPkgForFunctions() error {
+	mg.Deps(Update, Build)
+
+	err := os.MkdirAll("pkg", 700)
+	if err != nil {
+		return err
+	}
+
+	filesToCopy := map[string]string{
+		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
+		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
+	}
+	for src, dest := range filesToCopy {
+		c := &devtools.CopyTask{
+			Source: src,
+			Dest:   dest,
+		}
+		err = c.Execute()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // BuildSystemTestBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
@@ -137,11 +196,22 @@ func BuildSystemTestBinary() error {
 	}
 
 	params := devtools.DefaultTestBinaryArgs()
-	for _, provider := range functionbeat.SelectedProviders {
-		params.Name = filepath.Join("provider", provider, devtools.BeatName+"-"+provider)
+
+	// Getting selected cloud providers
+	selectedProviders, err := functionbeat.SelectedProviders()
+	if err != nil {
+		return err
+	}
+
+	for _, provider := range selectedProviders {
+		if !provider.Buildable {
+			continue
+		}
+
+		params.Name = filepath.Join("provider", provider.Name, devtools.BeatName+"-"+provider.Name)
 		inputFiles := make([]string, 0)
 		for _, inputFileName := range []string{"main.go", "main_test.go"} {
-			inputFiles = append(inputFiles, filepath.Join("provider", provider, inputFileName))
+			inputFiles = append(inputFiles, filepath.Join("provider", provider.Name, inputFileName))
 		}
 		params.InputFiles = inputFiles
 		err := devtools.BuildSystemTestGoBinary(params)

@@ -8,7 +8,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This is the sql module that fetches metrics from a SQL database. You can define driver, datasource and SQL query.
+This is the sql module that fetches metrics from a SQL database. You can define driver and SQL query.
 
 
 
@@ -26,12 +26,11 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
-
+  sql_response_format: table
 ----
 
 [float]

@@ -1,0 +1,10 @@
+- key: ibmmq
+  title: 'IBM MQ'
+  release: beta
+  description: >
+    IBM MQ module
+  settings: ["http"]
+  fields:
+    - name: ibmmq
+      type: group
+      fields:
