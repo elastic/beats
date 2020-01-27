@@ -19,40 +19,32 @@ package stats
 
 import (
 	"bufio"
-	"fmt"
 	"net"
+	"net/url"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
+
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("memcached", "stats", New,
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
-
-	network    string
-	socketPath string
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct {
-		Network    string `config:"network"`
-		SocketPath string `config:"socket_path"`
-	}{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		network:       config.Network,
-		socketPath:    config.SocketPath,
 	}, nil
 }
 
@@ -101,15 +93,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 }
 
 func (m *MetricSet) getNetworkAndAddress() (network string, address string, err error) {
-	switch m.network {
-	case "", "tcp":
-		network = "tcp"
-		address = m.Host()
-	case "unix":
-		network = "unix"
-		address = m.socketPath
-	default:
-		err = fmt.Errorf("unsupported network: %s", m.network)
+	hostData := m.HostData()
+	u, err := url.Parse(hostData.URI)
+	if err != nil {
+		err = errors.Wrap(err, "invalid URL")
+		return
 	}
+	network = u.Scheme
+	address = u.Host
 	return
 }
