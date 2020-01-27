@@ -64,7 +64,7 @@ func TestParseTimeNegative(t *testing.T) {
 	tests := []inputOutput{
 		{
 			Input: "2015-02-29TT14:06:05.071Z",
-			Err:   "parsing time \"2015-02-29TT14:06:05.071Z\" as \"2006-01-02T15:04:05.000Z\": cannot parse \"T14:06:05.071Z\" as \"15\"",
+			Err:   "parsing time \"2015-02-29TT14:06:05.071Z\" as \"2006-01-02T15:04:05.000000000Z\": cannot parse \"T14:06:05.071Z\" as \"15\"",
 		},
 	}
 

@@ -45,7 +45,7 @@ type unpaddedNumber struct {
 
 type paddedNumber struct {
 	ft                   fieldType
-	div                  int
+	divExp               int
 	minDigits, maxDigits int
 	signed               bool
 }
@@ -123,12 +123,9 @@ func numRequires(c *ctxConfig, ft fieldType) error {
 		ftSecondOfMinute:
 		c.enableClock()
 
-	case ftMillisOfDay:
-		c.enableClock()
-		c.enableMillis()
+	case ftNanoOfSecond:
+		c.enableNano()
 
-	case ftMillisOfSecond:
-		c.enableMillis()
 	}
 
 	return nil
@@ -191,10 +188,10 @@ func (n unpaddedNumber) compile() (prog, error) {
 }
 
 func (n paddedNumber) compile() (prog, error) {
-	if n.div == 0 {
+	if n.divExp == 0 {
 		return makeProg(opNumPadded, byte(n.ft), byte(n.maxDigits))
 	}
-	return makeProg(opExtNumPadded, byte(n.ft), byte(n.div), byte(n.maxDigits))
+	return makeProg(opExtNumPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits))
 }
 
 func (n twoDigitYear) compile() (prog, error) {

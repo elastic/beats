@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add @timestamp support nanoseconds. {pull}9818[9818]
+
 
 *Auditbeat*
 
