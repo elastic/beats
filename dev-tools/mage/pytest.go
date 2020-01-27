@@ -32,7 +32,6 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-
 // WINDOWS USERS:
 // The python installer does not create a python3 alias like it does on other
 // platforms. So do verify the version with python.exe --version.
