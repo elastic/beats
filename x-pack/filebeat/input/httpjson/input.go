@@ -260,6 +260,7 @@ func (in *httpjsonInput) run() error {
 		Transport: &http.Transport{
 			Dial:              dialer.Dial,
 			DialTLS:           tlsDialer.Dial,
+			TLSClientConfig:   tlsConfig.ToConfig(),
 			DisableKeepAlives: true,
 		},
 		Timeout: in.config.HTTPClientTimeout,
