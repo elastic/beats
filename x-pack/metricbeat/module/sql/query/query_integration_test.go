@@ -27,9 +27,10 @@ import (
 )
 
 type testFetchConfig struct {
-	Driver string
-	Query  string
-	Host   string
+	Driver         string
+	Query          string
+	Host           string
+	ResponseFormat string
 
 	Assertion func(t *testing.T, event beat.Event)
 }
@@ -48,7 +49,23 @@ func TestMySQL(t *testing.T) {
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "")
+		testData(t, config, "./_meta/data_mysql_tables.json")
+	})
+
+	config = testFetchConfig{
+		Driver:         "mysql",
+		Query:          "show status;",
+		Host:           mysql.GetMySQLEnvDSN(service.Host()),
+		ResponseFormat: variableResponseFormat,
+		Assertion:      assertFieldNotContains("service.address", ":test@"),
+	}
+
+	t.Run("fetch", func(t *testing.T) {
+		testFetch(t, config)
+	})
+
+	t.Run("data", func(t *testing.T) {
+		testData(t, config, "./_meta/data_mysql_variables.json")
 	})
 }
 
@@ -83,7 +100,23 @@ func TestPostgreSQL(t *testing.T) {
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "./_meta/data_postgres.json")
+		testData(t, config, "./_meta/data_postgres_tables.json")
+	})
+
+	config = testFetchConfig{
+		Driver:         "postgres",
+		Query:          "select name, setting from pg_settings",
+		Host:           fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+		ResponseFormat: variableResponseFormat,
+		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
+	}
+
+	t.Run("fetch with URL", func(t *testing.T) {
+		testFetch(t, config)
+	})
+
+	t.Run("data", func(t *testing.T) {
+		testData(t, config, "./_meta/data_postgres_variables.json")
 	})
 }
 
@@ -107,13 +140,19 @@ func testData(t *testing.T, cfg testFetchConfig, postfix string) {
 }
 
 func getConfig(cfg testFetchConfig) map[string]interface{} {
-	return map[string]interface{}{
+	values := map[string]interface{}{
 		"module":     "sql",
 		"metricsets": []string{"query"},
 		"hosts":      []string{cfg.Host},
 		"driver":     cfg.Driver,
 		"sql_query":  cfg.Query,
 	}
+
+	if cfg.ResponseFormat != "" {
+		values["sql_response_format"] = cfg.ResponseFormat
+	}
+
+	return values
 }
 
 func assertFieldNotContains(field, s string) func(t *testing.T, event beat.Event) {
