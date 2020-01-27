@@ -54,14 +54,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Driver         string `config:"driver" validate:"nonzero,required"`
 		Query          string `config:"sql_query" validate:"nonzero,required"`
 		ResponseFormat string `config:"sql_response_format"`
-	}{}
+	}{ResponseFormat: tableResponseFormat}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-
-	if config.ResponseFormat == "" {
-		config.ResponseFormat = tableResponseFormat
 	}
 
 	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
