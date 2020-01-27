@@ -314,7 +314,7 @@ include::system/socket.asciidoc[]
 
 include::system/socket_summary.asciidoc[]
 
-include::system/softwares.asciidoc[]
+include::system/software.asciidoc[]
 
 include::system/uptime.asciidoc[]
 
@@ -323,3 +323,4 @@ include::system/users.asciidoc[]
 include::system/usersinfo.asciidoc[]
 
 include::system/webiks.asciidoc[]
+

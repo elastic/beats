@@ -1,9 +1,0 @@
-# Module: users
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-users.html
-
-- module: users
-  metricsets: ["info"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-

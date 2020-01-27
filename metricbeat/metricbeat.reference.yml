@@ -753,14 +753,6 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:8080"]
 
-#-------------------------------- Users Module --------------------------------
-- module: users
-  metricsets: ["info"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-
-
 #-------------------------------- Uwsgi Module --------------------------------
 - module: uwsgi
   metricsets: ["status"]
