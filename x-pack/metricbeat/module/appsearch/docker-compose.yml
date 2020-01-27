@@ -2,14 +2,17 @@ version: '2.3'
 
 services:
   appsearch:
+    image: docker.elastic.co/integrations-ci/beats-appsearch:${APPSEARCH_VERSION:-7.5.0}-1
     build:
       context: ./_meta
+      args:
+        APPSEARCH_VERSION: ${APPSEARCH_VERSION:-7.5.0}
     depends_on:
       - elasticsearch
     environment:
       - "elasticsearch.host=http://elasticsearch:9200"
       - "allow_es_settings_modification=true"
-      - "JAVA_OPTS=-Xms2g -Xmx2g"
+      - "JAVA_OPTS=-Xms1g -Xmx1g"
     ports:
       - 3002
     command: --process app-server
