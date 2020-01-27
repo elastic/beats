@@ -23,7 +23,6 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	extv1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -65,7 +64,7 @@ type PodContainerStatus = v1.ContainerStatus
 type Deployment = appsv1.Deployment
 
 // ReplicaSet data
-type ReplicaSet = extv1.ReplicaSet
+type ReplicaSet = appsv1.ReplicaSet
 
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
