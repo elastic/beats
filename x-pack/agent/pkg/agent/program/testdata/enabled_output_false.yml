@@ -1,8 +1,11 @@
 streams:
-  - type: event/file
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
+  - type: logs
+    name: generic logs
+    input:
+      type: event/file
+      paths:
+        - /var/log/hello1.log
+        - /var/log/hello2.log
 management:
   host: "localhost"
 config:

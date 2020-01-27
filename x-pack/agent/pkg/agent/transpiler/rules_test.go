@@ -22,7 +22,71 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
-
+		"inject index": {
+			givenYAML: `
+streams:
+- name: All default
+  input:
+    type:	file
+    path:	/var/log/mysql/error.log
+- name: Specified namespace
+  namespace: nsns
+  input:
+    type:	file
+    path: /var/log/mysql/access.log
+- name: Specified dataset
+  dataset:
+    type: dsds
+  input:
+    type: mysql
+    host: localhost
+    port: 3306
+- name: All specified
+  namespace: nsns
+  dataset:
+    type: dsds
+  input:
+    type: mysql
+    host: localhost
+    port: 3306
+`,
+			expectedYAML: `
+streams:
+- name: All default
+  input:
+    type:	file
+    path:	/var/log/mysql/error.log
+    index: mytype-default-generic
+- name: Specified namespace
+  namespace: nsns
+  input:
+    type:	file
+    path: /var/log/mysql/access.log
+    index: mytype-nsns-generic
+- name: Specified dataset
+  dataset:
+    type: dsds
+  input:
+    type: mysql
+    host: localhost
+    port: 3306
+    index: mytype-default-dsds
+- name: All specified
+  namespace: nsns
+  dataset:
+    type: dsds
+  input:
+    type: mysql
+    host: localhost
+    port: 3306
+    index: mytype-nsns-dsds
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectIndex("mytype"),
+				},
+			},
+		},
 		"extract items from array": {
 			givenYAML: `
 streams:
@@ -440,6 +504,7 @@ func TestSerialization(t *testing.T) {
 		FilterValues("select-v", "key-v", "v1", "v2"),
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
+		InjectIndex("index-type"),
 	)
 
 	y := `- rename:
@@ -484,6 +549,8 @@ func TestSerialization(t *testing.T) {
     path: path.p
     item: item
     to: target
+- inject_index:
+    type: index-type
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

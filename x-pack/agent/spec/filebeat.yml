@@ -8,6 +8,10 @@ rules:
     key: type
     values:
     - logs
+
+- inject_index:
+    type: filebeat
+
 - map:
     path: streams
     rules:
@@ -21,8 +25,14 @@ rules:
           log/docker: docker
           log/redis_slowlog: redis
           log/syslog: syslog
+
+- extract_list_items:
+    path: streams
+    item: input
+    to: inputs
+
 - filter_values:
-    selector: streams.input.type
+    selector: inputs
     key: type
     values:
     - log
@@ -32,19 +42,15 @@ rules:
     - docker
     - redis
     - syslog
-- map:
-    path: streams
-    rules:
-    - rename:
-        from: input
-        to: inputs
+
 - copy:
-    from: streams.inputs
+    from: inputs
     to: filebeat
-# - filter:
-#     selectors:
-#     - filebeat
-#     - output
-#     - keystore
+
+- filter:
+    selectors:
+    - filebeat
+    - output
+    - keystore
 when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
   'kafka', 'logstash')

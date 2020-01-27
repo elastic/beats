@@ -3,12 +3,22 @@ cmd: metricbeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
-- filter_values_with_regexp:
-    key: type
-    re: ^metric/.+
+- filter_values:
     selector: streams
-- map:
+    key: type
+    values:
+    - metrics
+
+- inject_index:
+    type: metricbeat
+
+- extract_list_items:
     path: streams
+    item: input
+    to: inputs
+
+- map:
+    path: inputs
     rules:
     - translate_with_regexp:
         path: type
@@ -17,16 +27,20 @@ rules:
     - rename:
         from: type
         to: module
+
 - copy:
-    from: streams
+    from: inputs
     to: metricbeat
+
 - rename:
-    from: metricbeat.streams
+    from: metricbeat.inputs
     to: modules
+
 - filter:
     selectors:
     - metricbeat
     - output
     - keystore
+
 when: HasItems(%{[metricbeat.modules]}) && HasNamespace('output', 'elasticsearch',
   'redis', 'kafka', 'logstash')

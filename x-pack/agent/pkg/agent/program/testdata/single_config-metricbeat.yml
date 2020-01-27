@@ -2,11 +2,13 @@ metricbeat:
   modules:
   - module: docker
     metricsets: [status]
+    index: metricbeat-default-docker.status
   - module: apache
-  metricsets: [info]
+    metricsets: [info]
+    index: metricbeat-testing-generic
 output:
   elasticsearch:
-    index: metrics-testing-docker.status
+    # index: metrics-testing-docker.status
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
     username: elastic
     password: changeme

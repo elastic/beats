@@ -63,6 +63,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "filter_values_with_regexp"
 		case *ExtractListItemRule:
 			name = "extract_list_items"
+		case *InjectIndexRule:
+			name = "inject_index"
 
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
@@ -156,6 +158,11 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			if err := unpack(fields, r); err != nil {
 				return err
 			}
+		case "inject_index":
+			r = &InjectIndexRule{}
+			if err := unpack(fields, r); err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("unkown rule of type %s", name)
 		}
@@ -164,6 +171,80 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	r.Rules = rules
 	return nil
+}
+
+// InjectIndexRule injects index to each input.
+// Index is in form {type}-{namespace}-{dataset-type}
+// type: is provided to the rule.
+// namespace: is collected from streams[n].namespace. If not found used 'default'.
+// dataset-type: is collected from streams[n].dataset.type. If not found used 'generic'.
+type InjectIndexRule struct {
+	Type string
+}
+
+// Apply extracts items from array.
+func (r *InjectIndexRule) Apply(ast *AST) error {
+	const defaultNamespace = "default"
+	const defaultDataset = "generic"
+
+	streamsNode, found := Lookup(ast, "streams")
+	if !found {
+		return nil
+	}
+
+	streamsList, ok := streamsNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, streamNode := range streamsList.value {
+		namespace := defaultNamespace
+		nsNode, found := streamNode.Find("namespace")
+		if found {
+			nsKey, ok := nsNode.(*Key)
+			if ok {
+				namespace = nsKey.value.String()
+			}
+		}
+
+		dataset := defaultDataset
+
+		dsNode, found := streamNode.Find("dataset")
+		if found {
+			dsTypeNode, found := dsNode.Find("type")
+			if found {
+				dsKey, ok := dsTypeNode.(*Key)
+				if ok {
+					dataset = dsKey.value.String()
+				}
+			}
+		}
+
+		// get input
+		inputNode, found := streamNode.Find("input")
+		if !found {
+			continue
+		}
+
+		inputMap, ok := inputNode.Value().(*Dict)
+		if !ok {
+			continue
+		}
+
+		inputMap.value = append(inputMap.value, &Key{
+			name:  "index",
+			value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, namespace, dataset)},
+		})
+	}
+
+	return nil
+}
+
+// InjectIndex creates a InjectIndexRule
+func InjectIndex(indexType string) *InjectIndexRule {
+	return &InjectIndexRule{
+		Type: indexType,
+	}
 }
 
 // ExtractListItemRule extract items with specified name from a list of maps.

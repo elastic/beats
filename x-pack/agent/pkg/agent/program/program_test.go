@@ -526,35 +526,35 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat"}, //, "metricbeat"},
-			expected: 1,                    //2,
+			programs: []string{"metricbeat", "filebeat"},
+			expected: 2,
 		},
-		// // "audit_config": {
-		// // 	programs: []string{"auditbeat"},
-		// // 	expected: 1,
-		// // },
-		// // "journal_config": {
-		// // 	programs: []string{"journalbeat"},
-		// // 	expected: 1,
-		// // },
-		// // "monitor_config": {
-		// // 	programs: []string{"heartbeat"},
-		// // 	expected: 1,
-		// // },
-		// "enabled_true": {
-		// 	programs: []string{"filebeat"},
+		// "audit_config": {
+		// 	programs: []string{"auditbeat"},
 		// 	expected: 1,
 		// },
-		// "enabled_false": {
-		// 	expected: 0,
-		// },
-		// "enabled_output_true": {
-		// 	programs: []string{"filebeat"},
+		// "journal_config": {
+		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
-		// "enabled_output_false": {
-		// 	expected: 0,
+		// "monitor_config": {
+		// 	programs: []string{"heartbeat"},
+		// 	expected: 1,
 		// },
+		"enabled_true": {
+			programs: []string{"filebeat"},
+			expected: 1,
+		},
+		"enabled_false": {
+			expected: 0,
+		},
+		"enabled_output_true": {
+			programs: []string{"filebeat"},
+			expected: 1,
+		},
+		"enabled_output_false": {
+			expected: 0,
+		},
 	}
 
 	for name, test := range testcases {
@@ -576,7 +576,7 @@ func TestConfiguration(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			require.Equal(t, 1, len(programs))
+			require.Equal(t, 1, len(programs), programs)
 
 			defPrograms, ok := programs["default"]
 			require.True(t, ok)
