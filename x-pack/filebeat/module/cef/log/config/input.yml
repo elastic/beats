@@ -24,3 +24,14 @@ processors:
   - decode_cef:
       field: event.original
   - community_id:
+  - script:
+      lang: javascript
+      source: >-
+        function process(evt) {
+          switch (evt.Get("cef.extensions.deviceCustomString1Label")) {
+            case "RuleID":
+              evt.Put("rule.id", evt.Get("cef.extensions.deviceCustomString1"));
+            default:
+              return;
+          }
+        }
