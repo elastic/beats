@@ -19,27 +19,27 @@
             "numeric": {
                 "blk_read_time": 0,
                 "blk_write_time": 0,
-                "blks_hit": 0,
-                "blks_read": 0,
+                "blks_hit": 105648,
+                "blks_read": 240,
                 "conflicts": 0,
-                "datid": 1,
+                "datid": 12379,
                 "deadlocks": 0,
-                "numbackends": 0,
+                "numbackends": 1,
                 "temp_bytes": 0,
                 "temp_files": 0,
                 "tup_deleted": 0,
-                "tup_fetched": 0,
+                "tup_fetched": 71845,
                 "tup_inserted": 0,
-                "tup_returned": 0,
+                "tup_returned": 150847,
                 "tup_updated": 0,
-                "xact_commit": 0,
+                "xact_commit": 1157,
                 "xact_rollback": 0
             },
             "string": {
-                "datname": "template1",
-                "stats_reset": "NULL"
+                "datname": "postgres",
+                "stats_reset": "2020-01-27T02:45:53.51247Z"
             }
         },
-        "query": "select * from pg_stat_database"
+        "query": "select * from pg_stat_database where datname='postgres'"
     }
 }
