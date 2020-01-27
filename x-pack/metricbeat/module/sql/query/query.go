@@ -150,7 +150,7 @@ func getValue(pval *interface{}) string {
 	case []byte:
 		return string(v)
 	case time.Time:
-		return v.Format("2006-01-02 15:04:05.999")
+		return v.Format(time.RFC3339Nano)
 	default:
 		return fmt.Sprint(v)
 	}

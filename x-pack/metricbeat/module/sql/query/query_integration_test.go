@@ -73,7 +73,7 @@ func TestPostgreSQL(t *testing.T) {
 
 	config = testFetchConfig{
 		Driver:    "postgres",
-		Query:     "select * from pg_stat_database",
+		Query:     "select * from pg_stat_database where datname='postgres'",
 		Host:      fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
 		Assertion: assertFieldNotContains("service.address", ":"+password+"@"),
 	}
