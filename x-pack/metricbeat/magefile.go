@@ -33,6 +33,9 @@ func init() {
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
+
+	// XXX: Remove this
+	os.Setenv("MAGEFILE_VERBOSE", "true")
 }
 
 // Aliases provides compatibility with CI while we transition all Beats
