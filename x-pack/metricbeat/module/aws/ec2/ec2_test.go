@@ -210,9 +210,7 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 	}
 
 	metricSet := MetricSet{
-		&aws.MetricSet{
-			Dedot: true,
-		},
+		&aws.MetricSet{},
 		nil,
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")

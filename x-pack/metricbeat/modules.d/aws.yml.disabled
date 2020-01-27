@@ -7,7 +7,6 @@
     - usage
 - module: aws
   period: 5m
-  tags.dedot: true
   metricsets:
     - cloudwatch
   metrics:
@@ -18,11 +17,6 @@
       #  - name: InstanceId
       #    value: i-0686946e22cf9494a
       #statistic: ["Average", "Maximum"]
-- module: aws
-  period: 5m
-  tags.dedot: true
-  metricsets:
-    - ec2
 - module: aws
   period: 5m
   metricsets:

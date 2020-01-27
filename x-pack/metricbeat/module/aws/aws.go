@@ -25,7 +25,6 @@ import (
 type Config struct {
 	Period    time.Duration       `config:"period" validate:"nonzero,required"`
 	Regions   []string            `config:"regions"`
-	Dedot     bool                `config:"tags.dedot"`
 	AWSConfig awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -37,7 +36,6 @@ type MetricSet struct {
 	AwsConfig   *awssdk.Config
 	AccountName string
 	AccountID   string
-	Dedot       bool
 }
 
 // Tag holds a configuration specific for ec2 and cloudwatch metricset.
@@ -85,7 +83,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		BaseMetricSet: base,
 		Period:        config.Period,
 		AwsConfig:     &awsConfig,
-		Dedot:         config.Dedot,
 	}
 
 	// Get IAM account name

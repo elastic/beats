@@ -515,14 +515,10 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
-					if m.Dedot {
-						for _, tag := range tags {
-							events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
-						}
-					} else {
-						for _, tag := range tags {
-							events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
-						}
+
+					// By default, replace dot "." using under bar "_" for tag keys and values
+					for _, tag := range tags {
+						events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
 					}
 				}
 			}
