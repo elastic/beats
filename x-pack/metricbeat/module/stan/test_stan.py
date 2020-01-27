@@ -1,10 +1,10 @@
-from xpack_metricbeat import XPackTest, metricbeat
 import os
 import sys
 import unittest
 from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+from xpack_metricbeat import XPackTest, metricbeat
 
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]
 

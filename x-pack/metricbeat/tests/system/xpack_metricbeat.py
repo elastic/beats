@@ -1,8 +1,9 @@
-import metricbeat
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../metricbeat/tests/system'))
+
+import metricbeat
 
 
 class XPackTest(metricbeat.BaseTest):
