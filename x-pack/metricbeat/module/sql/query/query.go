@@ -18,6 +18,12 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// represents the response format of the query
+const (
+	tableResponseFormat    = "table"
+	variableResponseFormat = "variables"
+)
+
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
@@ -34,8 +40,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver string
-	Query  string
+	Driver         string
+	Query          string
+	ResponseFormat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -44,24 +51,32 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
 	config := struct {
-		Driver string `config:"driver" validate:"nonzero,required"`
-		Query  string `config:"sql_query" validate:"nonzero,required"`
-	}{}
+		Driver         string `config:"driver" validate:"nonzero,required"`
+		Query          string `config:"sql_query" validate:"nonzero,required"`
+		ResponseFormat string `config:"sql_response_format"`
+	}{ResponseFormat: tableResponseFormat}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
+		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.ResponseFormat)
+	}
+
 	return &MetricSet{
-		BaseMetricSet: base,
-		Driver:        config.Driver,
-		Query:         config.Query,
+		BaseMetricSet:  base,
+		Driver:         config.Driver,
+		Query:          config.Query,
+		ResponseFormat: config.ResponseFormat,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
+// It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
+// format of the query.
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	db, err := sqlx.Open(m.Driver, m.HostData().URI)
 	if err != nil {
@@ -79,6 +94,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error executing query")
 	}
 	defer rows.Close()
+
+	if m.ResponseFormat == tableResponseFormat {
+		return m.fetchTableMode(rows, report)
+	}
+
+	return m.fetchVariableMode(rows, report)
+}
+
+// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
 
 	// Extracted from
 	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
@@ -131,9 +156,58 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		})
 	}
 
-	if rows.Err() != nil {
+	if err = rows.Err(); err != nil {
 		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
 	}
+
+	return nil
+}
+
+// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
+func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
+	data := common.MapStr{}
+	for rows.Next() {
+		var key string
+		var val interface{}
+		err := rows.Scan(&key, &val)
+		if err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to scan rows"))
+			continue
+		}
+
+		key = strings.ToLower(key)
+		data[key] = val
+	}
+
+	if err := rows.Err(); err != nil {
+		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
+	}
+
+	numericMetrics := common.MapStr{}
+	stringMetrics := common.MapStr{}
+
+	for key, value := range data {
+		value := getValue(&value)
+		num, err := strconv.ParseFloat(value, 64)
+		if err == nil {
+			numericMetrics[key] = num
+		} else {
+			stringMetrics[key] = value
+		}
+	}
+
+	report.Event(mb.Event{
+		RootFields: common.MapStr{
+			"sql": common.MapStr{
+				"driver": m.Driver,
+				"query":  m.Query,
+				"metrics": common.MapStr{
+					"numeric": numericMetrics,
+					"string":  stringMetrics,
+				},
+			},
+		},
+	})
 
 	return nil
 }
