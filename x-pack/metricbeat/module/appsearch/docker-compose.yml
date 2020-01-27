@@ -12,7 +12,7 @@ services:
     environment:
       - "elasticsearch.host=http://elasticsearch:9200"
       - "allow_es_settings_modification=true"
-      - "JAVA_OPTS=-Xms1g -Xmx1g"
+      - "JAVA_OPTS=-Xms2g -Xmx2g"
     ports:
       - 3002
     command: --process app-server
