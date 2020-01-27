@@ -9,7 +9,7 @@ package tablespace
 import (
 	"testing"
 
-	_ "gopkg.in/goracle.v2"
+	_ "github.com/godror/godror"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"

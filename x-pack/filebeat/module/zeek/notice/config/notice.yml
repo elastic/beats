@@ -56,7 +56,7 @@ processors:
           to: "zeek.notice.file.id"
 
         - from: "zeek.notice.f.parent_id"
-          to: "dzeek.notice.file.parent_id"
+          to: "zeek.notice.file.parent_id"
 
         - from: "zeek.notice.f.source"
           to: "zeek.notice.file.source"
@@ -70,7 +70,7 @@ processors:
         - from: "zeek.notice.f.total_bytes"
           to: "zeek.notice.file.total_bytes"
 
-        - from: "zzeek.notice.file_mime_type"
+        - from: "zeek.notice.file_mime_type"
           to: "zeek.notice.file.mime_type"
 
       ignore_missing: true
