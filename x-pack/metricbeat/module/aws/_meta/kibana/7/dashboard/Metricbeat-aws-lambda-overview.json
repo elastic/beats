@@ -32,7 +32,7 @@
             "panelIndex": "8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a",
             "panelRefName": "panel_0",
             "title": "AWS Account Filter",
-            "version": "7.5.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "443a9699-3451-44f7-8415-99a16c3f45b3",
             "panelRefName": "panel_1",
             "title": "Top Errors",
-            "version": "7.5.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "60a16bf0-2979-467a-b30e-05ea29547b41",
             "panelRefName": "panel_2",
             "title": "AWS Region Filter",
-            "version": "7.5.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "349ef0d1-fea1-4b91-b95d-7a668914e10b",
             "panelRefName": "panel_3",
             "title": "Lambda Function Duration in Milliseconds",
-            "version": "7.5.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "048b1577-5aed-48e5-8f90-147aa3d56c1a",
             "panelRefName": "panel_4",
             "title": "Top Invoked Lambda Functions",
-            "version": "7.5.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "4c8e471c-45da-47be-a866-c5bfc6d28a05",
             "panelRefName": "panel_5",
             "title": "Top Throttled Lambda Functions",
-            "version": "7.5.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -204,7 +204,7 @@
       },
       "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [
         {
@@ -310,7 +310,7 @@
       },
       "id": "4bf0a740-28d1-11ea-ba6c-49a884eb104f",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
@@ -362,7 +362,7 @@
       },
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [
         {
@@ -450,7 +450,7 @@
       },
       "id": "39dfc8d0-28cf-11ea-ba6c-49a884eb104f",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
@@ -542,7 +542,7 @@
       },
       "id": "1f3f00c0-28d1-11ea-ba6c-49a884eb104f",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
@@ -642,7 +642,7 @@
       },
       "id": "915bcd50-28d1-11ea-ba6c-49a884eb104f",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
@@ -650,5 +650,5 @@
       "version": "WzI2OTIsM10="
     }
   ],
-  "version": "7.5.0"
+  "version": "7.3.0"
 }
