@@ -400,6 +400,8 @@ func BenchmarkHashMethods(b *testing.B) {
 }
 
 func nRandomEvents(num int) []beat.Event {
+	prng := rand.New(rand.NewSource(12345))
+
 	const charset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"0123456789"
@@ -409,7 +411,7 @@ func nRandomEvents(num int) []beat.Event {
 	var events []beat.Event
 	for i := 0; i < num; i++ {
 		for j := range b {
-			b[j] = charset[rand.Intn(charsetLen)]
+			b[j] = charset[prng.Intn(charsetLen)]
 		}
 		events = append(events, beat.Event{
 			Fields: common.MapStr{
