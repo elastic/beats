@@ -45,7 +45,6 @@ func TestMemSizeFactor64(t *testing.T) {
 		assert.Equal(t, 128, v.Megabytes())
 	})
 }
-
 func TestBucket(t *testing.T) {
 	t.Run("valid bucket name", func(t *testing.T) {
 		b := bucket("")

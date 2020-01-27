@@ -361,7 +361,7 @@
                 "line_width": "1",
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_running.avg",
+                    "field": "azure.compute_vm.asp_net_applications_running.avg",
                     "id": "d1acb8f2-eaa2-11e9-a229-c9171499dcc6",
                     "type": "max"
                   }
@@ -436,7 +436,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.sqlserver.general_statistics_user_connections.avg",
+                    "field": "azure.compute_vm.sqlserver_general_statistics_user_connections.avg",
                     "id": "da495db2-eaa7-11e9-a88b-4b683ca3087b",
                     "type": "avg"
                   }
@@ -510,7 +510,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_requests_timed_out.avg",
+                    "field": "azure.compute_vm.asp_net_applications_requests_timed_out.avg",
                     "id": "be74e9e2-eaa4-11e9-8923-850d87d8e766",
                     "type": "avg"
                   }
@@ -532,7 +532,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_requests_failed.avg",
+                    "field": "azure.compute_vm.asp_net_applications_requests_failed.avg",
                     "id": "be74e9e4-eaa4-11e9-8923-850d87d8e766",
                     "type": "avg"
                   }
@@ -554,7 +554,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_requests_succeeded.avg",
+                    "field": "azure.compute_vm.asp_net_applications_requests_succeeded.avg",
                     "id": "be7510f1-eaa4-11e9-8923-850d87d8e766",
                     "type": "avg"
                   }
@@ -576,7 +576,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_requests_total.avg",
+                    "field": "azure.compute_vm.asp_net_applications_requests_total.avg",
                     "id": "be7510f3-eaa4-11e9-8923-850d87d8e766",
                     "type": "avg"
                   }
@@ -654,7 +654,7 @@
                 "line_width": "1",
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_errors_total.avg",
+                    "field": "azure.compute_vm.asp_net_applications_errors_total.avg",
                     "id": "29578b11-eaa4-11e9-a2d3-e7a00bbd3c18",
                     "type": "avg"
                   }
@@ -728,7 +728,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.sqlserver.memory_manager_total_server_memory.avg",
+                    "field": "azure.compute_vm.sqlserver_memory_manager_total_server_memory.avg",
                     "id": "94af6a02-eaa8-11e9-9269-d92e2d3f77fd",
                     "type": "avg"
                   }
@@ -802,7 +802,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_sessions_active.avg",
+                    "field": "azure.compute_vm.asp_net_applications_sessions_active.avg",
                     "id": "6d6575a2-eaa5-11e9-84ad-5919a47b8f34",
                     "type": "avg"
                   }
@@ -824,7 +824,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_sessions_timed_out.avg",
+                    "field": "azure.compute_vm.asp_net_applications_sessions_timed_out.avg",
                     "id": "6d6575a4-eaa5-11e9-84ad-5919a47b8f34",
                     "type": "avg"
                   }
@@ -846,7 +846,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_sessions_abandoned.avg",
+                    "field": "azure.compute_vm.asp_net_applications_sessions_abandoned.avg",
                     "id": "6d6575a6-eaa5-11e9-84ad-5919a47b8f34",
                     "type": "avg"
                   }
@@ -868,7 +868,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.asp.net_applications_sessions_total.avg",
+                    "field": "azure.compute_vm.asp_net_applications_sessions_total.avg",
                     "id": "6d6575a8-eaa5-11e9-84ad-5919a47b8f34",
                     "type": "avg"
                   }
@@ -942,7 +942,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.sqlserver.buffer_manager_page_reads_per_sec.avg",
+                    "field": "azure.compute_vm.sqlserver_buffer_manager_page_reads_per_sec.avg",
                     "id": "35459a32-eaa8-11e9-a379-c33a712c0373",
                     "type": "avg"
                   }
@@ -964,7 +964,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.compute_vm.sqlserver.buffer_manager_page_writes_per_sec.avg",
+                    "field": "azure.compute_vm.sqlserver_buffer_manager_page_writes_per_sec.avg",
                     "id": "35459a34-eaa8-11e9-a379-c33a712c0373",
                     "type": "avg"
                   }

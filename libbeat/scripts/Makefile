@@ -36,7 +36,21 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2
 GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
 GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
-ES_HOST?="elasticsearch"
+ES_HOST?=elasticsearch
+ES_PORT?=9200
+ES_USER?=beats
+ES_PASS?=testing
+KIBANA_HOST?=kibana
+KIBANA_PORT?=5601
+# Kibana's Elaticsearch user
+KIBANA_ES_USER?=beats
+KIBANA_ES_PASS?=testing
+# The beat's Kibana user
+BEAT_KIBANA_USER?=${KIBANA_ES_USER}
+BEAT_KIBANA_PASS?=${KIBANA_ES_PASS}
+# Define a superuser, e.g. for initial setup
+ES_SUPERUSER_USER?=admin
+ES_SUPERUSER_PASS?=changeme
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
@@ -46,7 +60,7 @@ COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
+GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
@@ -108,7 +122,7 @@ ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 
 # Create test coverage binary
 ${BEAT_NAME}.test: $(GOFILES_ALL)
-	@go build -i -o /dev/null
+	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 .PHONY: crosscompile
@@ -173,12 +187,10 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	go test -i ${GOPACKAGES}
 	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
-	go test -i ${GOPACKAGES}
 	go test $(RACE) ${GOPACKAGES}
 
 .PHONY: integration-tests
@@ -378,10 +390,21 @@ stop-environment:
 write-environment:
 	mkdir -p ${BUILD_DIR}
 	echo "BEAT_STRICT_PERMS=false" > ${BUILD_DIR}/test.env
+	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
-	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
-	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
-	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_PASS=${ES_SUPERUSER_PASS}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_HOST=${KIBANA_HOST}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PORT=${KIBANA_PORT}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_USER=${BEAT_KIBANA_USER}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PASS=${BEAT_KIBANA_PASS}" >> ${BUILD_DIR}/test.env
+	# set Kibana ENV variables
+	echo "ELASTICSEARCH_URL=${ES_HOST}:${ES_PORT}" > ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_USERNAME=${KIBANA_ES_USER}" >> ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_PASSWORD=${KIBANA_ES_PASS}" >> ${BUILD_DIR}/kibana.test.env
 
 # Tails the environment logs
 .PHONY: env-logs

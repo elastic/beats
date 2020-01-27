@@ -34,7 +34,7 @@ heartbeat.monitors:
 - type: http
   schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
-  check.response.status: 200
+  check.response.status: [200]
 heartbeat.scheduler:
   limit: 10
 ----------------------------------------------------------------------
@@ -69,7 +69,7 @@ monitor definitions only, e.g. what is normally under the `heartbeat.monitors` s
 - type: http
   schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
-  check.response.status: 200
+  check.response.status: [200]
 ----------------------------------------------------------------------
 
 [float]
@@ -429,7 +429,7 @@ The username for authenticating with the server. The credentials are passed
 with the request. This setting is optional.
 
 You need to specify credentials when your `check.response` settings require it.
-For example, you can check for a 403 response (`check.response.status: 403`)
+For example, you can check for a 403 response (`check.response.status: [403]`)
 without setting credentials.
 
 [float]
@@ -489,7 +489,7 @@ Example configuration:
   schedule: '@every 5s'
   hosts: ["http://myhost:80"]
   check.request.method: HEAD
-  check.response.status: 200
+  check.response.status: [200]
 -------------------------------------------------------------------------------
 
 
@@ -517,7 +517,7 @@ to the endpoint `/demo/add`
     # urlencode the body:
     body: "name=first&email=someemail%40someemailprovider.com"
   check.response:
-    status: 200
+    status: [200]
     body:
       - Saved
       - saved
@@ -525,14 +525,14 @@ to the endpoint `/demo/add`
 
 Under `check.response`, specify these options:
 
-*`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
+*`status`*:: A list of expected status codes. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match. HTTP response
 bodies of up to 100MiB are supported.
 
 Example configuration:
 This monitor examines the
-response body for the strings `saved` or `Saved`
+response body for the strings `saved` or `Saved` and expects 200 or 201 status codes
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -546,7 +546,7 @@ response body for the strings `saved` or `Saved`
     # urlencode the body:
     body: "name=first&email=someemail%40someemailprovider.com"
   check.response:
-    status: 200
+    status: [200, 201]
     body:
       - Saved
       - saved
@@ -568,7 +568,7 @@ contains JSON:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     json:
       - description: check status
         condition:
@@ -589,7 +589,7 @@ patterns:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     body:
       - hello
       - world
@@ -608,7 +608,7 @@ regex:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     body: '(?s)first.*second.*third'
 -------------------------------------------------------------------------------
 

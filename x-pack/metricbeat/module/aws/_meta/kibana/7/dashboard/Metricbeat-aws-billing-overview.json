@@ -56,12 +56,12 @@
             },
             "gridData": {
               "h": 11,
-              "i": "04159643-33c0-4f01-80f1-fb8d212ed959",
+              "i": "221aab02-2747-4d84-9dde-028ccd51bdce",
               "w": 16,
               "x": 0,
               "y": 5
             },
-            "panelIndex": "04159643-33c0-4f01-80f1-fb8d212ed959",
+            "panelIndex": "221aab02-2747-4d84-9dde-028ccd51bdce",
             "panelRefName": "panel_2",
             "title": "Total Estimated Charges",
             "version": "7.5.0"
@@ -114,8 +114,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-12-02T18:54:47.255Z",
-      "version": "WzU1NywyXQ=="
+      "updated_at": "2020-01-17T15:11:20.337Z",
+      "version": "WzY2MiwxXQ=="
     },
     {
       "attributes": {
@@ -140,7 +140,7 @@
                 "fieldName": "cloud.account.name",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
-                "label": "AWS account",
+                "label": "account name",
                 "options": {
                   "dynamicOptions": true,
                   "multiselect": true,
@@ -172,8 +172,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-12-02T18:50:52.450Z",
-      "version": "WzU1MywyXQ=="
+      "updated_at": "2020-01-17T14:43:10.917Z",
+      "version": "WzE1NywxXQ=="
     },
     {
       "attributes": {
@@ -209,7 +209,7 @@
               "id": "1",
               "params": {
                 "customLabel": "",
-                "field": "aws.metrics.EstimatedCharges.max"
+                "field": "aws.billing.metrics.EstimatedCharges.max"
               },
               "schema": "metric",
               "type": "sum"
@@ -219,7 +219,7 @@
               "id": "2",
               "params": {
                 "customLabel": "",
-                "field": "aws.cloudwatch.dimensions.ServiceName",
+                "field": "aws.dimensions.ServiceName",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -227,7 +227,7 @@
                   "enabled": true,
                   "id": "2-orderAgg",
                   "params": {
-                    "field": "aws.metrics.EstimatedCharges.max"
+                    "field": "aws.billing.metrics.EstimatedCharges.max"
                   },
                   "schema": "orderAgg",
                   "type": "avg"
@@ -295,8 +295,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-12-02T18:53:50.818Z",
-      "version": "WzU1NSwyXQ=="
+      "updated_at": "2020-01-17T14:43:00.631Z",
+      "version": "WzU0LDFd"
     },
     {
       "attributes": {
@@ -329,7 +329,7 @@
                 "id": "ebb52700-1531-11ea-961e-c1db9cc6166e"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 1,
             "gauge_color_rules": [
@@ -352,7 +352,7 @@
                 "fill": 0.5,
                 "filter": {
                   "language": "kuery",
-                  "query": "aws.cloudwatch.dimensions.ServiceName :* "
+                  "query": "not aws.dimensions.ServiceName : * "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -360,21 +360,25 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
                 ],
+                "override_index_pattern": 1,
                 "point_size": 1,
                 "separate_axis": 0,
+                "series_drop_last_bucket": 0,
+                "series_interval": "12h",
                 "split_mode": "filter",
                 "stacked": "none",
+                "time_range_mode": "entire_time_range",
                 "value_template": "${{value}}"
               }
             ],
             "show_grid": 1,
             "show_legend": 1,
-            "time_field": null,
+            "time_field": "@timestamp",
             "type": "metric"
           },
           "title": "Total Estimated Charges [Metricbeat AWS]",
@@ -387,8 +391,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-02T18:35:29.434Z",
-      "version": "WzU0NywyXQ=="
+      "updated_at": "2020-01-17T15:10:12.013Z",
+      "version": "WzY1OSwxXQ=="
     },
     {
       "attributes": {
@@ -435,11 +439,11 @@
                 },
                 "formatter": "number",
                 "id": "729b1fc0-152a-11ea-ae8f-79fec1a0d4d3",
-                "label": "avg(aws.metrics.EstimatedCharges.max)",
+                "label": "avg(aws.billing.metrics.EstimatedCharges.max)",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                     "type": "avg"
                   }
@@ -450,7 +454,7 @@
                 "split_mode": "terms",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "aws.cloudwatch.dimensions.ServiceName",
+                "terms_field": "aws.dimensions.ServiceName",
                 "terms_include": "",
                 "terms_order_by": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                 "terms_size": "5",
@@ -472,8 +476,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-02T18:49:11.978Z",
-      "version": "WzU1MSwyXQ=="
+      "updated_at": "2020-01-17T14:43:00.631Z",
+      "version": "WzU2LDFd"
     }
   ],
   "version": "7.5.0"

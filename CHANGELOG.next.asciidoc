@@ -18,6 +18,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
+- Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
+- Update to ECS 1.4.0. {pull}14844[14844]
 
 *Auditbeat*
 
@@ -37,9 +39,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+- Update cloudwatch metricset mapping for both metrics and dimensions. {pull}15245[15245]
 
 *Packetbeat*
 
+- TLS: Fields have been changed to adapt to ECS. {pull}15497[15497]
+- TLS: The behavior of send_certificates and include_raw_certificates options has changed. {pull}15497[15497]
 
 *Winlogbeat*
 
@@ -54,9 +59,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
 - Update replicaset group to apps/v1 {pull}15854[15802]
+- Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
+- Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+- Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
+- Fix missing output in dockerlogbeat {pull}15719[15719]
+- Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
+- Do not load dashboards where not available. {pull}15802[15802]
 
 *Auditbeat*
 
+- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
 
@@ -66,10 +78,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix SSL config in input.yml for Filebeat httpjson input in the MISP module. {pull}14767[14767]
 - Check content-type when creating new reader in s3 input. {pull}15252[15252] {issue}15225[15225]
 - Fix session reset detection and a crash in Netflow input. {pull}14904[14904]
+- Handle errors in handleS3Objects function and add more debug messages for s3 input. {pull}15545[15545]
+- netflow: Allow for options templates without scope fields. {pull}15449[15449]
+- netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
+- netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
+- Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
+- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 
 *Heartbeat*
 
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
+- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Journalbeat*
 
@@ -79,11 +99,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Fix `docker.container.size` fields values {issue}14979[14979] {pull}15224[15224]
 - Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
+- Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 - Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
+- Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
+
 
 *Packetbeat*
 
@@ -114,6 +139,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_id` processor. {pull}14524[14524]
 - Enable TLS 1.3 in all beats. {pull}12973[12973]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
+- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
+- Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 
 *Auditbeat*
 
@@ -124,21 +151,46 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Add new fileset googlecloud/audit for ingesting Google Cloud Audit logs. {pull}15200[15200]
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
+- Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
+- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
+- Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
+- Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
+- Add cloudtrail fileset to AWS module. {issue}14657[14657] {pull}15227[15227]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
+- google-pubsub input: ACK pub/sub message when acknowledged by publisher. {issue}13346[13346] {pull}14715[14715]
+- Remove Beta label from google-pubsub input. {issue}13346[13346] {pull}14715[14715]
+- Allow a list of status codes for HTTP checks. {pull}15587[15587]
+
 
 *Heartbeat*
-
 
 *Journalbeat*
 
 *Metricbeat*
 
+- Add lambda metricset in aws module. {pull}15260[15260]
+- Expand data for the `system/memory` metricset {pull}15492[15492]
+- Add azure `storage` metricset in order to retrieve metric values for storage accounts. {issue}14548[14548] {pull}15342[15342]
+- Add cost warnings for the azure module. {pull}15356[15356]
+- Add DynamoDB AWS Metricbeat light module {pull}15097[15097]
+- Release elb module as GA. {pull}15485[15485]
+- Add a `system/network_summary` metricset {pull}15196[15196]
+- Add IBM MQ light-weight Metricbeat module {pull}15301[15301]
+- Enable script processor. {pull}14711[14711]
+- Add mixer metricset for Istio Metricbeat module {pull}15696[15696]
+- Add mesh metricset for Istio Metricbeat module{pull}15535[15535]
+- Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
 
 *Packetbeat*
 
 
 *Functionbeat*
 
+- Add monitoring info about triggered functions. {pull}14876[14876]
+- Add Google Cloud Platform support. {pull}13598[13598]
 
 *Winlogbeat*
 

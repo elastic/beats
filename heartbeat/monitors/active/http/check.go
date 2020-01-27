@@ -77,7 +77,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	var respValidators []respValidator
 	var bodyValidators []bodyValidator
 
-	if config.Status > 0 {
+	if len(config.Status) > 0 {
 		respValidators = append(respValidators, checkStatus(config.Status))
 	} else {
 		respValidators = append(respValidators, checkStatusOK)
@@ -102,10 +102,12 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	return multiValidator{respValidators, bodyValidators}, nil
 }
 
-func checkStatus(status uint16) respValidator {
+func checkStatus(status []uint16) respValidator {
 	return func(r *http.Response) error {
-		if r.StatusCode == int(status) {
-			return nil
+		for _, v := range status {
+			if r.StatusCode == int(v) {
+				return nil
+			}
 		}
 		return fmt.Errorf("received status code %v expecting %v", r.StatusCode, status)
 	}

@@ -1,0 +1,35 @@
+[
+    {
+        "@timestamp": "2014-03-25T21:08:14.000Z",
+        "aws.cloudtrail.event_version": "1.0",
+        "aws.cloudtrail.request_parameters": "{groupName=admin, userName=Bob}",
+        "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",
+        "aws.cloudtrail.user_identity.arn": "arn:aws:iam::123456789012:user/Alice",
+        "aws.cloudtrail.user_identity.session_context.creation_date": "2014-03-25T18:45:11.000Z",
+        "aws.cloudtrail.user_identity.session_context.mfa_authenticated": "false",
+        "aws.cloudtrail.user_identity.type": "IAMUser",
+        "cloud.account.id": "123456789012",
+        "cloud.region": "us-east-2",
+        "event.action": "AddUserToGroup",
+        "event.dataset": "aws.cloudtrail",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "{\"eventVersion\":\"1.0\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EX_PRINCIPAL_ID\",\"arn\":\"arn:aws:iam::123456789012:user/Alice\",\"accountId\":\"123456789012\",\"accessKeyId\":\"EXAMPLE_KEY_ID\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"false\",\"creationDate\":\"2014-03-25T18:45:11Z\"}}},\"eventTime\":\"2014-03-25T21:08:14Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"AddUserToGroup\",\"awsRegion\":\"us-east-2\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"AWSConsole\",\"requestParameters\":{\"userName\":\"Bob\",\"groupName\":\"admin\"},\"responseElements\":null}",
+        "event.outcome": "success",
+        "event.provider": "iam.amazonaws.com",
+        "event.type": "info",
+        "fileset.name": "cloudtrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.user": [
+            "Bob"
+        ],
+        "service.type": "aws",
+        "source.address": "127.0.0.1",
+        "user.id": "EX_PRINCIPAL_ID",
+        "user.name": "Alice",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "AWSConsole"
+    }
+]
