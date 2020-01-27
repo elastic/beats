@@ -1,3 +1,4 @@
+import codecs
 import os
 import sys
 import time
@@ -257,4 +258,4 @@ Logon Process Name:  IKE"""
         self.assertNotIn("event.original", evts[0], msg=evts[0])
         self.assertIn("message", evts[0], msg=evts[0])
         self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
-        self.assertEqual(str(msg), evts[0]["message"].decode('unicode-escape'), msg=evts[0])
+        self.assertEqual(str(msg), codecs.decode(evts[0]["message"], "unicode_escape"), msg=evts[0])

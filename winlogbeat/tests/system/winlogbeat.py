@@ -43,7 +43,7 @@ class WriteReadTest(BaseTest):
 
         # Every test will use its own event log and application names to ensure
         # isolation.
-        self.testSuffix = "_" + hashlib.sha256(self.api + self._testMethodName).hexdigest()[:5]
+        self.testSuffix = "_" + hashlib.sha256(str(self.api + self._testMethodName).encode('utf_8')).hexdigest()[:5]
         self.providerName = PROVIDER + self.testSuffix
         self.applicationName = APP_NAME + self.testSuffix
         self.otherAppName = OTHER_APP_NAME + self.testSuffix
@@ -70,18 +70,18 @@ class WriteReadTest(BaseTest):
 
     def write_event_log(self, message, eventID=10, sid=None,
                         level=None, source=None):
-        if sid == None:
+        if sid is None:
             sid = self.get_sid()
-        if source == None:
+        if source is None:
             source = self.applicationName
-        if level == None:
+        if level is None:
             level = win32evtlog.EVENTLOG_INFORMATION_TYPE
 
         win32evtlogutil.ReportEvent(source, eventID,
                                     eventType=level, strings=[message], sid=sid)
 
     def get_sid(self):
-        if self.sid == None:
+        if self.sid is None:
             ph = win32api.GetCurrentProcess()
             th = win32security.OpenProcessToken(ph, win32con.TOKEN_READ)
             self.sid = win32security.GetTokenInformation(
@@ -90,13 +90,13 @@ class WriteReadTest(BaseTest):
         return self.sid
 
     def get_sid_string(self):
-        if self.sidString == None:
+        if self.sidString is None:
             self.sidString = win32security.ConvertSidToStringSid(self.get_sid())
 
         return self.sidString
 
     def read_events(self, config=None, expected_events=1):
-        if config == None:
+        if config is None:
             config = {
                 "event_logs": [
                     {"name": self.providerName, "api": self.api}
@@ -141,13 +141,13 @@ class WriteReadTest(BaseTest):
             "winlog.api": self.api,
         }, evt)
 
-        if msg == None:
+        if msg is None:
             assert "message" not in evt
         else:
             self.assertEqual(evt["message"], msg)
             self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
 
-        if sid == None:
+        if sid is None:
             self.assertEqual(evt["winlog.user.identifier"], self.get_sid_string())
             self.assertEqual(evt["winlog.user.name"].lower(),
                              win32api.GetUserName().lower())
@@ -158,7 +158,7 @@ class WriteReadTest(BaseTest):
             assert "winlog.user.name" not in evt
             assert "winlog.user.type" not in evt
 
-        if extra != None:
+        if extra is not None:
             self.assertDictContainsSubset(extra, evt)
 
 
