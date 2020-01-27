@@ -114,8 +114,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-01-27T17:11:40.585Z",
-      "version": "WzYzNywxXQ=="
+      "updated_at": "2020-01-27T20:51:32.061Z",
+      "version": "WzM4NjAsMV0="
     },
     {
       "attributes": {
@@ -172,8 +172,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T16:08:35.784Z",
-      "version": "WzE2NCwxXQ=="
+      "updated_at": "2020-01-27T19:32:04.671Z",
+      "version": "WzMzODUsMV0="
     },
     {
       "attributes": {
@@ -273,8 +273,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T16:29:37.175Z",
-      "version": "WzYzNiwxXQ=="
+      "updated_at": "2020-01-27T19:31:53.402Z",
+      "version": "WzMyNzUsMV0="
     },
     {
       "attributes": {
@@ -309,7 +309,7 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 1,
+            "drop_last_bucket": 0,
             "gauge_color_rules": [
               {
                 "id": "e8a045e0-1531-11ea-961e-c1db9cc6166e"
@@ -340,23 +340,24 @@
                   {
                     "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
-                "override_index_pattern": 1,
+                "override_index_pattern": 0,
                 "point_size": 1,
                 "separate_axis": 0,
                 "series_drop_last_bucket": 0,
                 "series_interval": "12h",
                 "split_mode": "filter",
                 "stacked": "none",
-                "time_range_mode": "entire_time_range",
+                "time_range_mode": "last_value",
                 "value_template": "${{value}}"
               }
             ],
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "time_range_mode": "last_value",
             "type": "metric"
           },
           "title": "Total Estimated Charges [Metricbeat AWS]",
@@ -369,8 +370,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-27T16:08:24.435Z",
-      "version": "WzU1LDFd"
+      "updated_at": "2020-01-27T20:51:25.785Z",
+      "version": "WzM4NTksMV0="
     },
     {
       "attributes": {
@@ -454,8 +455,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-27T16:08:24.435Z",
-      "version": "WzU2LDFd"
+      "updated_at": "2020-01-27T19:31:53.402Z",
+      "version": "WzMyNzcsMV0="
     }
   ],
   "version": "7.4.0"
