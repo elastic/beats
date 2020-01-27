@@ -16603,6 +16603,337 @@ istio Module
 
 
 [float]
+=== galley
+
+Contains statistics related to the Istio galley service
+
+
+
+*`istio.galley.name`*::
++
+--
+The name of the resource the metric is related to
+
+
+type: keyword
+
+--
+
+*`istio.galley.namespace`*::
++
+--
+The Kubernates namespace of the resource
+
+
+type: keyword
+
+--
+
+*`istio.galley.version`*::
++
+--
+The version of the object
+
+
+type: keyword
+
+--
+
+*`istio.galley.collection`*::
++
+--
+The collection of the instance
+
+
+type: keyword
+
+--
+
+*`istio.galley.istio.authentication.meshpolicies`*::
++
+--
+The number of valid istio/authentication/meshpolicies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.authentication.policies`*::
++
+--
+The number of valid istio/authentication/policies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.mesh.MeshConfig`*::
++
+--
+The number of valid istio/mesh/MeshConfig known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.destinationrules`*::
++
+--
+The number of valid istio/networking/destinationrules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.envoyfilters`*::
++
+--
+The number of valid istio/networking/envoyfilters known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.gateways`*::
++
+--
+The number of valid istio/networking/gateways known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.sidecars`*::
++
+--
+The number of valid istio/networking/sidecars known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.virtualservices`*::
++
+--
+The number of valid istio/networking/virtualservices known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.attributemanifests`*::
++
+--
+The number of valid istio/policy/attributemanifests known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.handlers`*::
++
+--
+The number of valid istio/policy/handlers known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.instances`*::
++
+--
+The number of valid istio/policy/instances known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.rules`*::
++
+--
+The number of valid istio/policy/rules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.bucket.*`*::
++
+--
+The duration between each incoming event as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.sum`*::
++
+--
+The duration between each incoming event, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.bucket.*`*::
++
+--
+The number of events that have been processed as histogram buckets
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.sum`*::
++
+--
+The number of events that have been processed, sum of events
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.bucket.*`*::
++
+--
+The duration of each snapshot as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.sum`*::
++
+--
+The duration of each snapshot, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.count`*::
++
+--
+The duration of each snapshot, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.state_type_instances`*::
++
+--
+The number of type instances per type URL
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.on_change`*::
++
+--
+The number of times the strategy's onChange has been called
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.timer_quiesce_reached`*::
++
+--
+The number of times a quiesce has been reached
+
+
+type: long
+
+--
+
+*`istio.galley.source_kube_event_success_total`*::
++
+--
+The number of times a kubernetes source successfully handled an event
+
+
+type: long
+
+--
+
+*`istio.galley.validation.cert_key.updates`*::
++
+--
+Galley validation webhook certificate updates
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.load`*::
++
+--
+k8s webhook configuration (re)loads
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.updates`*::
++
+--
+k8s webhook configuration updates
+
+
+type: long
+
+--
+
+[float]
 === mesh
 
 Contains statistics related to the Istio mesh service

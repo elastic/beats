@@ -1,0 +1,145 @@
+- name: galley
+  type: group
+  description: >
+    Contains statistics related to the Istio galley service
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the resource the metric is related to
+    - name: namespace
+      type: keyword
+      description: >
+        The Kubernates namespace of the resource
+    - name: version
+      type: keyword
+      description: >
+        The version of the object
+    - name: collection
+      type: keyword
+      description: >
+        The collection of the instance
+
+    - name: istio.authentication.meshpolicies
+      type: long
+      description: >
+        The number of valid istio/authentication/meshpolicies known to galley at a point in time
+    - name: istio.authentication.policies
+      type: long
+      description: >
+        The number of valid istio/authentication/policies known to galley at a point in time
+    - name: istio.mesh.MeshConfig
+      type: long
+      description: >
+        The number of valid istio/mesh/MeshConfig known to galley at a point in time
+    - name: istio.networking.destinationrules
+      type: long
+      description: >
+        The number of valid istio/networking/destinationrules known to galley at a point in time
+    - name: istio.networking.envoyfilters
+      type: long
+      description: >
+        The number of valid istio/networking/envoyfilters known to galley at a point in time
+    - name: istio.networking.gateways
+      type: long
+      description: >
+        The number of valid istio/networking/gateways known to galley at a point in time
+    - name: istio.networking.sidecars
+      type: long
+      description: >
+        The number of valid istio/networking/sidecars known to galley at a point in time
+    - name: istio.networking.virtualservices
+      type: long
+      description: >
+        The number of valid istio/networking/virtualservices known to galley at a point in time
+    - name: istio.policy.attributemanifests
+      type: long
+      description: >
+        The number of valid istio/policy/attributemanifests known to galley at a point in time
+    - name: istio.policy.handlers
+      type: long
+      description: >
+        The number of valid istio/policy/handlers known to galley at a point in time
+    - name: istio.policy.instances
+      type: long
+      description: >
+        The number of valid istio/policy/instances known to galley at a point in time
+    - name: istio.policy.rules
+      type: long
+      description: >
+        The number of valid istio/policy/rules known to galley at a point in time
+
+
+    - name: runtime.processor.event_span.duration.ms.bucket.*
+      type: object
+      object_type: long
+      description: >
+        The duration between each incoming event as histogram buckets in milliseconds
+    - name: runtime.processor.event_span.duration.ms.sum
+      type: long
+      format: duration
+      description: >
+        The duration between each incoming event, sum of durations in milliseconds
+    - name: runtime.processor.event_span.duration.ms.count
+      type: long
+      description: >
+        The duration between each incoming event, number of metrics
+
+    - name: runtime.processor.snapshot_events.bucket.*
+      type: object
+      object_type: long
+      description: >
+        The number of events that have been processed as histogram buckets
+    - name: runtime.processor.snapshot_events.sum
+      type: long
+      description: >
+        The number of events that have been processed, sum of events
+    - name: runtime.processor.snapshot_events.count
+      type: long
+      description: >
+        The duration between each incoming event, number of metrics
+
+    - name: runtime.processor.snapshot_lifetime.duration.ms.bucket.*
+      type: object
+      object_type: long
+      description: >
+        The duration of each snapshot as histogram buckets in milliseconds
+    - name: runtime.processor.snapshot_lifetime.duration.ms.sum
+      type: long
+      format: duration
+      description: >
+        The duration of each snapshot, sum of durations in milliseconds
+    - name: runtime.processor.snapshot_lifetime.duration.ms.count
+      type: long
+      description: >
+        The duration of each snapshot, number of metrics
+
+    - name: runtime.state_type_instances
+      type: long
+      description: >
+        The number of type instances per type URL
+    - name: runtime.strategy.on_change
+      type: long
+      description: >
+        The number of times the strategy's onChange has been called
+    - name: runtime.strategy.timer_quiesce_reached
+      type: long
+      description: >
+        The number of times a quiesce has been reached
+    - name: source_kube_event_success_total
+      type: long
+      description: >
+        The number of times a kubernetes source successfully handled an event
+    - name: validation.cert_key.updates
+      type: long
+      description: >
+        Galley validation webhook certificate updates
+    - name: validation.config.load
+      type: long
+      description: >
+        k8s webhook configuration (re)loads
+    - name: validation.config.updates
+      type: long
+      description: >
+        k8s webhook configuration updates

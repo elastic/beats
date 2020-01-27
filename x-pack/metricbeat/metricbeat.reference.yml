@@ -538,7 +538,7 @@ metricbeat.modules:
           }
 
 #-------------------------------- Istio Module --------------------------------
-# Istio mesh. To collect all all Mixer-generated metrics
+# Istio mesh. To collect all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
   period: 10s
@@ -550,6 +550,13 @@ metricbeat.modules:
   metricsets: ["mixer"]
   period: 10s
   # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio galley. To collect all Galley-generated metrics
+- module: galley
+  metricsets: ["galley"]
+  period: 10s
+  # use istio-galley.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
 #------------------------------- Jolokia Module -------------------------------
