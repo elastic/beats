@@ -168,7 +168,7 @@ processors:
   - add_docker_metadata: ~
   - add_kubernetes_metadata: ~
   - add_external_metadata: 
-     fields: 
+     fields:
        name: test
 
 
