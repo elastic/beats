@@ -13,7 +13,7 @@
   hosts: ["localhost:15014"]
 
 # Istio galley. To collect all Galley-generated metrics
-- module: galley
+- module: istio
   metricsets: ["galley"]
   period: 10s
   # use istio-galley.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
