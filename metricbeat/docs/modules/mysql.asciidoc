@@ -1,0 +1,94 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-mysql]]
+== MySQL module
+
+This module periodically fetches metrics from https://www.mysql.com/[MySQL]
+servers.
+
+The default metricset is `status`.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
+of the following format:
+
+----
+[username[:password]@][protocol[(address)]]/
+----
+
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the DSN take
+precedence over those specified in the `username` and `password` config options.
+
+----
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(127.0.0.1:3306)/"]
+  username: root
+  password: secret
+----
+
+[float]
+=== Compatibility
+
+The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expected
+to work with all versions >= 5.7.0.
+It is also tested with MariaDB 10.2, 10.3 and 10.4.
+
+[float]
+=== Dashboard
+
+The mysql module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-mysql.png[]
+
+
+[float]
+=== Example configuration
+
+The MySQL module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mysql
+  metricsets:
+    - "status"
+  #  - "galera_status"
+  period: 10s
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mysql-galera_status,galera_status>>
+
+* <<metricbeat-metricset-mysql-status,status>>
+
+include::mysql/galera_status.asciidoc[]
+
+include::mysql/status.asciidoc[]
+

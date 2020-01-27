@@ -1,0 +1,57 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-zookeeper]]
+== ZooKeeper module
+
+The ZooKeeper module fetches statistics from the ZooKeeper service. The default
+metricset is `mntr` and `server`.
+
+[float]
+=== Compatibility
+
+The ZooKeeper metricsets were tested with ZooKeeper 3.4.8 and are expected to work with all version
+>= 3.4.0. Versions prior to 3.4 do not support the `mntr` command.
+
+[float]
+=== Dashboard
+
+The Zookeeper module comes with a predefined dashboard:
+
+image::./images/metricbeat-zookeeper.png[]
+
+
+[float]
+=== Example configuration
+
+The ZooKeeper module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: zookeeper
+  enabled: true
+  metricsets: ["mntr", "server"]
+  period: 10s
+  hosts: ["localhost:2181"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-zookeeper-connection,connection>>
+
+* <<metricbeat-metricset-zookeeper-mntr,mntr>>
+
+* <<metricbeat-metricset-zookeeper-server,server>>
+
+include::zookeeper/connection.asciidoc[]
+
+include::zookeeper/mntr.asciidoc[]
+
+include::zookeeper/server.asciidoc[]
+

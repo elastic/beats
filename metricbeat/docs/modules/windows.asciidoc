@@ -1,0 +1,51 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-windows]]
+== Windows module
+
+This is the Windows module. It collects metrics from Windows systems,
+by default metricset `service` is enabled.
+
+
+[float]
+=== Example configuration
+
+The Windows module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: windows
+  metricsets: ["perfmon"]
+  enabled: true
+  period: 10s
+  perfmon.ignore_non_existent_counters: false
+  perfmon.group_measurements_by_instance: false
+  perfmon.counters:
+  #  - instance_label: processor.name
+  #    instance_name: total
+  #    measurement_label: processor.time.total.pct
+  #    query: '\Processor Information(_Total)\% Processor Time'
+
+- module: windows
+  metricsets: ["service"]
+  enabled: true
+  period: 60s
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-windows-perfmon,perfmon>>
+
+* <<metricbeat-metricset-windows-service,service>>
+
+include::windows/perfmon.asciidoc[]
+
+include::windows/service.asciidoc[]
+

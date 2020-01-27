@@ -1,0 +1,155 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-mongodb]]
+== MongoDB module
+
+This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
+servers.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use MongoDB URLs of the following
+format:
+
+-----------------------------------
+[mongodb://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
+----------------------------------------------------------------------
+
+The username and password can be included in the URL or they can be set using
+the respective configuration options. The credentials in the URL take precedence
+over the username and password configuration options.
+
+[source,yaml]
+----
+- module: mongodb
+  metricsets: ["status"]
+  hosts: ["localhost:27017"]
+  username: root
+  password: test
+----
+
+The default metricsets are `collstats`, `dbstats` and `status`.
+
+[float]
+=== Compatibility
+
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
+work with all versions >= 2.8.
+
+[float]
+=== MongoDB Privileges
+
+In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges].
+
+We recommend using the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role] to cover all the necessary privileges.
+
+You can use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
+
+["source","js",subs="attributes"]
+----
+db.createUser(
+    {
+        user: "beats",
+        pwd: "pass",
+        roles: ["clusterMonitor"]
+    }
+)
+----
+
+You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
+
+["source","js",subs="attributes"]
+----
+db.grantRolesToUser("user", ["clusterMonitor"])
+----
+
+
+[float]
+=== Example configuration
+
+The MongoDB module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mongodb
+  metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
+  period: 10s
+  enabled: true
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
+  hosts: ["localhost:27017"]
+
+  # Optional SSL. By default is off.
+  #ssl.enabled: true
+
+  # Mode of verification of server certificate ('none' or 'full')
+  #ssl.verification_mode: 'full'
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mongodb-collstats,collstats>>
+
+* <<metricbeat-metricset-mongodb-dbstats,dbstats>>
+
+* <<metricbeat-metricset-mongodb-metrics,metrics>>
+
+* <<metricbeat-metricset-mongodb-replstatus,replstatus>>
+
+* <<metricbeat-metricset-mongodb-status,status>>
+
+include::mongodb/collstats.asciidoc[]
+
+include::mongodb/dbstats.asciidoc[]
+
+include::mongodb/metrics.asciidoc[]
+
+include::mongodb/replstatus.asciidoc[]
+
+include::mongodb/status.asciidoc[]
+
