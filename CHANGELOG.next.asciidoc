@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
 - Do not load dashboards where not available. {pull}15802[15802]
+- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
+- Update replicaset group to apps/v1 {pull}15854[15802]
 
 *Auditbeat*
 
