@@ -1283,17 +1283,6 @@ var security = (function () {
        evt.Put("winlog.event_data.AuditPolicyChangesDescription",action_results);
     };
 
-    var addRelatedUser= function(evt,user) {
-        var related_user = evt.Get("related.user");
-        if (!related_user) {
-            related_user=[];
-            related_user.push(user);
-            evt.Put("related.user", related_user);
-        } else {
-            evt.AppendTo('related.user',user);
-        }
-    };
-
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1305,7 +1294,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user);
+            evt.AppendTo('related.user',user);
         })
         .Build();
 
@@ -1351,7 +1340,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
-            addRelatedUser(evt,user);
+            evt.AppendTo('related.user',user);
         })
         .Build();
 
@@ -1366,7 +1355,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.user_data.SubjectUserName");
-            addRelatedUser(evt,user);
+            evt.AppendTo('related.user',user);
         })
         .Build();
 
@@ -1528,7 +1517,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user);
+            evt.AppendTo('related.user',user);
         })
         .Build();
 
@@ -1550,7 +1539,7 @@ var security = (function () {
         .Add(addActionDesc)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user);
+            evt.AppendTo('related.user',user);
         })
         .Build();
 
@@ -1560,9 +1549,9 @@ var security = (function () {
         .Add(addActionDesc)
         .Add(function(evt) {
             var user_new = evt.Get("winlog.event_data.NewTargetUserName");
-            addRelatedUser(evt,user_new);
+            evt.AppendTo('related.user',user_new);
             var user_old = evt.Get("winlog.event_data.OldTargetUserName");
-            addRelatedUser(evt,user_old);
+            evt.AppendTo('related.user',user_old);
         })
         .Build();
 
