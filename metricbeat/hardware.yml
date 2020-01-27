@@ -5,8 +5,8 @@
 # except - WmiMonitorID, a special ability added in the code to support it. 
 
 hardware_query: 
-- type: Win32_DesktopMonitor
-  name: monitor
+# - type: Win32_DesktopMonitor
+#   name: monitor
 - type: Win32_Processor
   name: cpu
 - type: Win32_TapeDrive
@@ -18,7 +18,7 @@ hardware_query:
 - type: Win32_VideoController
   name: video
 - type: Win32_ComputerSystem
-  name: cpu system
+  name: system
 - type: WmiMonitorID 
   name: monitorID
 

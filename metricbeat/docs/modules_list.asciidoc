@@ -196,7 +196,6 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-statsd,Statsd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>> beta[]  
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.22+| .22+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
 |<<metricbeat-metricset-system-entropy,entropy>>   
@@ -213,7 +212,6 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-service,service>> beta[]  
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
-|<<metricbeat-metricset-system-softwares,softwares>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
 |<<metricbeat-metricset-system-users,users>> beta[]  
 |<<metricbeat-metricset-system-usersinfo,usersinfo>> beta[]  
@@ -225,6 +223,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-tomcat-threading,threading>> beta[]  
 |<<metricbeat-module-traefik,traefik>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
+|<<metricbeat-module-users,users>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-users-info,info>> beta[]  
 |<<metricbeat-module-uwsgi,uwsgi>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -292,6 +292,7 @@ include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
+include::modules/users.asciidoc[]
 include::modules/uwsgi.asciidoc[]
 include::modules/vsphere.asciidoc[]
 include::modules/windows.asciidoc[]

@@ -1,12 +1,9 @@
-package softwares
+
+package software
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -23,7 +20,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("system", "softwares", New)
+	mb.Registry.MustAddMetricSet("system", "software", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -31,13 +28,9 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 // add struct for  get data - webiks added
-type nameData struct {
-	City    string `json:"city"`
-	Country string `json:"country"`
-}
 
 type Config struct {
-	Softwares []string `yaml:"softwares"`
+	Software []string `yaml:"software"`
 }
 
 type Software struct {
@@ -49,10 +42,6 @@ type Software struct {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
-	// added for test
-	city      string
-	country   string
 	softwares []Software
 	software  common.MapStr
 }
@@ -60,31 +49,15 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The system softwares metricset by webiks is beta.")
+	cfgwarn.Beta("The system software metricset by webiks is beta.")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	// adding webiks api call
-	var res = postMessageData()
-
-	// read config
-	var cfg Config
-	readFile(&cfg)
-
-	// get info from registery
-	var data = readAllSoftwareRegistery()
-	// filter data by query
-	var filterdData = filterByYmlField(data, cfg.Softwares)
-
 	return &MetricSet{
 		BaseMetricSet: base,
-		counter:       1,
-		city:          res.City,
-		country:       res.Country,
-		softwares:     filterdData,
 		software:      common.MapStr{},
 	}, nil
 }
@@ -93,60 +66,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	for _, soft := range m.softwares {
+	// read config
+	var cfg Config
+	readFile(&cfg)
+
+	// get info from registery
+	var data = readAllSoftwareRegistery()
+	// filter data by query
+	var filterdData = filterByYmlField(data, cfg.Software)
+
+	for _, soft := range filterdData {
 		rootFields := common.MapStr{
-			"Name":         soft.Name,
-			"Version":      soft.Version,
-			"MajorVersion": soft.MajorVersion,
-			"MinorVersion": soft.MinorVersion,
+			"name":         soft.Name,
+			"version":      soft.Version,
+			"majorVersion": soft.MajorVersion,
+			"minorVersion": soft.MinorVersion,
 		}
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"counter":  m.counter,
-				"city":     m.city,
-				"country":  m.country,
-				"Software": rootFields,
+
+				"data": rootFields,
 			},
 		})
 	}
-	m.counter++
 	return nil
-}
-
-func postMessageData() nameData {
-	url := "http://localhost:3001/api/host/"
-	// TODO remove
-	fmt.Println("URL:>", url)
-
-	var jsonStr = []byte(`{"name":"ben"}`)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	var resData nameData
-	error := json.Unmarshal([]byte(body), &resData)
-	if error != nil {
-		log.Println(error)
-	}
-	fmt.Println(resData)
-	return resData
 }
 
 // registery software functions
 
 func readFile(cfg *Config) {
-	f, err := os.Open("./webiks2.yml")
+	f, err := os.Open("./software.yml")
 	if err != nil {
 		processError(err)
 	}

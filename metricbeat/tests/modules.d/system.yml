@@ -11,7 +11,7 @@
     - process
     - process_summary
     - socket_summary
-    - softwares
+    - software
     #- entropy
     #- core
     #- diskio

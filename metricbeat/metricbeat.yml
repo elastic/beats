@@ -29,6 +29,12 @@
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html#==========================  Modules configuration ============================
+# This file is an example configuration file highlighting only the most common
+# options. The metricbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 ###################### Metricbeat Configuration Example #######################
 
@@ -64,6 +70,24 @@ setup.template.settings:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -78,6 +102,10 @@ setup.template.settings:
 # output.
 #fields:
 #  env: staging
+fields_under_root: true
+fields:
+  city: Tel-Aviv
+  sapirtest: true
 #fields_under_root: true
 
 
@@ -144,6 +172,7 @@ setup.kibana:
 #----------------------------- Logstash output --------------------------------
 output.logstash:
   # The Logstash hosts
+  hosts: ["localhost:5000"]
   hosts: ["192.168.1.196:5000"]
 
   # Optional SSL. By default is off.
@@ -169,6 +198,7 @@ processors:
   - add_kubernetes_metadata: ~
   - add_external_metadata: 
      fields:
+       namae: test
        name: test
 
 
@@ -210,8 +240,12 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+
+
+
+
+
 reload.enabled: true
 
   # Period on which files under path should be checked for changes
 reload.period: 60s
-

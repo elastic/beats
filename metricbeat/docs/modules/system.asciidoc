@@ -270,7 +270,7 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-socket_summary,socket_summary>>
 
-* <<metricbeat-metricset-system-softwares,softwares>>
+* <<metricbeat-metricset-system-software,software>>
 
 * <<metricbeat-metricset-system-uptime,uptime>>
 
@@ -323,4 +323,3 @@ include::system/users.asciidoc[]
 include::system/usersinfo.asciidoc[]
 
 include::system/webiks.asciidoc[]
-

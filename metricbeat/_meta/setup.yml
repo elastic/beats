@@ -136,7 +136,7 @@ setup.kibana:
 #----------------------------- Logstash output --------------------------------
 output.logstash:
   # The Logstash hosts
-  hosts: ["192.168.1.196:5000"]
+  hosts: ["localhost:5000"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -202,8 +202,10 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+
 reload.enabled: true
 
   # Period on which files under path should be checked for changes
+
 reload.period: 60s
 

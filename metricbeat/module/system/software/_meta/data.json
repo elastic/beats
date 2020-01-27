@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"system",
-        "name":"webiks2",
+        "name":"software",
         "rtt":44269
     },
     "system":{
         "webiks2":{
-            "example": "webiks2"
+            "example": "software"
         }
     },
     "type":"metricsets"

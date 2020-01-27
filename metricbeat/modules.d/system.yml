@@ -11,7 +11,7 @@
     - process
     - process_summary
     - socket_summary
-    #- softwares
+    #- software
     #- hardware
     #- users
     #- core
@@ -39,7 +39,7 @@
 - module: system
   period: 180m
   metricsets:
-    - softwares
+    - software
     - hardware
     - users
 #- module: system
