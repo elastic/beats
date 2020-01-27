@@ -538,10 +538,19 @@ metricbeat.modules:
           }
 
 #-------------------------------- Istio Module --------------------------------
+# Istio mesh. To collect all all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
   period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -2027,7 +2036,7 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'metricbeat-%{[agent.version]}'.
+# 'metricbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
