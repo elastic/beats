@@ -3449,13 +3449,13 @@
 			"revisionTime": "2019-09-30T11:59:46Z"
 		},
 		{
-			"checksumSHA1": "fW8mQy9XfBOcO8dwudie7NHXC5o=",
+			"checksumSHA1": "xJkfP+WyfKJSBcEa+8T15QjNIr4=",
 			"path": "github.com/godror/godror",
-			"revision": "446a29355d2967f04604e8e015a3343917860adf",
-			"revisionTime": "2019-12-12T16:49:28Z",
+			"revision": "0123d49bd73e1bed106ac8b6af67f943fbbf06e2",
+			"revisionTime": "2020-01-12T11:05:39Z",
 			"tree": true,
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "MlaWEe1K+Kpb9wDF88qPoqO1uro=",
