@@ -5,13 +5,15 @@
   period: 10s
   metricsets:
     - cpu
+    #- load
     - memory
     - network
     - process
     - process_summary
     - socket_summary
-    - hardware
-    - softwares
+    #- softwares
+    #- hardware
+    #- users
     #- core
     #- diskio
     #- socket
@@ -34,6 +36,12 @@
   metricsets:
     - uptime
 
+- module: system
+  period: 180m
+  metricsets:
+    - softwares
+    - hardware
+    - users
 #- module: system
 #  period: 5m
 #  metricsets:

@@ -1,0 +1,131 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-kafka]]
+== Kafka module
+
+This is the Kafka module.
+
+The default metricsets are `consumergroup` and `partition`.
+
+If authorization is configured in the Kafka cluster, the following ACLs are
+required for the Metricbeat user:
+
+* READ Topic, for the topics to be monitored
+* DESCRIBE Group, for the groups to be monitored
+
+For example, if the `stats` user is being used for Metricbeat, to monitor all
+topics and all consumer groups, ACLS can be granted with the following commands:
+
+[source,shell]
+-----
+kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Read --topic '*'
+kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Describe --group '*'
+-----
+
+[float]
+=== Compatibility
+
+This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.1.1.
+
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for Jolokia's compatibility notes.
+
+[float]
+=== Usage
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
+
+
+[float]
+=== Dashboard
+
+The Kafka module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_kafka_dashboard.png[]
+
+
+[float]
+=== Example configuration
+
+The Kafka module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+# Kafka metrics collected using the Kafka protocol
+- module: kafka
+  #metricsets:
+  #  - partition
+  #  - consumergroup
+  period: 10s
+  hosts: ["localhost:9092"]
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-kafka-broker,broker>>
+
+* <<metricbeat-metricset-kafka-consumer,consumer>>
+
+* <<metricbeat-metricset-kafka-consumergroup,consumergroup>>
+
+* <<metricbeat-metricset-kafka-partition,partition>>
+
+* <<metricbeat-metricset-kafka-producer,producer>>
+
+include::kafka/broker.asciidoc[]
+
+include::kafka/consumer.asciidoc[]
+
+include::kafka/consumergroup.asciidoc[]
+
+include::kafka/partition.asciidoc[]
+
+include::kafka/producer.asciidoc[]
+

@@ -1,0 +1,53 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-munin]]
+== Munin module
+
+This is the munin module.
+
+The default metricset is `node`.
+
+[float]
+=== Compatibility
+
+Munin module should be compatible with any implementation of the munin network
+protocol (http://guide.munin-monitoring.org/en/latest/master/network-protocol.html),
+it is tested with munin node 2.0.
+
+
+[float]
+=== Example configuration
+
+The Munin module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: munin
+  metricsets: ["node"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:4949"]
+
+  # List of plugins to collect metrics from, by default it collects from
+  # all the available ones.
+  #munin.plugins: []
+
+  # If set to true, it sanitizes fields names in concordance with munin
+  # implementation (all characters that are not alphanumeric, or underscore
+  # are replaced by underscores).
+  #munin.sanitize: false
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-munin-node,node>>
+
+include::munin/node.asciidoc[]
+

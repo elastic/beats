@@ -22,6 +22,14 @@
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
+###################### Metricbeat Configuration Example #######################
+
+# This file is an example configuration file highlighting only the most common
+# options. The metricbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
 
@@ -48,21 +56,6 @@ setup.template.settings:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -77,9 +70,8 @@ setup.template.settings:
 # output.
 #fields:
 #  env: staging
-fields_under_root: true
-fields:
-  sapirtest: true
+#fields_under_root: true
+
 
 
 #============================== Dashboards =====================================
@@ -210,15 +202,8 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
-  reload.enabled: true
+reload.enabled: true
 
   # Period on which files under path should be checked for changes
-  reload.period: 60s
+reload.period: 60s
 
-
-#==================== Elasticsearch template setting ==========================
-
-setup.template.settings:
-  index.number_of_shards: 1
-  index.codec: best_compression
-  #_source.enabled: false

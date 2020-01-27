@@ -1,0 +1,326 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-system]]
+== System module
+
+The System module allows you to monitor your servers. Because the System module
+always applies to the local server, the `hosts` config option is not needed.
+
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process`, and
+`process_summary`. To disable a default metricset, comment it out in the
+`modules.d/system.yml` configuration file. If _all_ metricsets are commented out
+and the System module is enabled, {beatname_uc} uses the default metricsets.
+
+Note that certain metricsets may access `/proc` to gather process information,
+and the resulting `ptrace_may_access()` call by the kernel to check for
+permissions can be blocked by
+https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor
+and other LSM software], even though the System module doesn't use `ptrace`
+directly.
+
+[float]
+=== Dashboard
+
+The System module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_system_dashboard.png[]
+
+[float]
+=== Required permissions
+
+The System metricsets collect different kinds of metric data, which may require dedicated permissions
+to be fetched. For security reasons it's advised to grant the lowest possible permissions. This section
+justifies which permissions must be present for particular metricsets.
+
+Please notice that modern Linux implementations divide the privileges traditionally associated with superuser
+into distinct units, known as capabilities, which can be independently enabled and disabled.
+Capabilities are a per-thread attribute.
+
+[float]
+==== cpu
+
+CPU statistics (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+elevated permissions.
+
+[float]
+==== load
+
+CPU load data (1 min, 5 min, 15 min, cores) should be available without elevated permissions.
+
+[float]
+==== memory
+
+Memory statistics (swap, total, used, free, actual) should be available without elevated permissions.
+
+[float]
+==== network
+
+Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without elevated
+permissions.
+
+[float]
+==== process
+
+Process execution data (state, memory, cpu, cmdline) should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+["source"]
+----
+2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
+----
+
+[float]
+==== process_summary
+
+General process summary (unknown, dead, total, sleeping, running, idle, stopped, zombie) should be available without
+elevated permissions. Please notice that if the process data belongs to the other users, it will be counted as unknown
+value (no error will be reported in application logs).
+
+[float]
+==== socket_summary
+
+Used sockets summary (TCP, UDP, count, listening, established, wait, etc.) should be available without elevated
+permissions.
+
+[float]
+==== entropy
+
+Entropy data (available, pool size) requires access to the `/proc/sys/kernel/random` path.
+Otherwise an error will be reported.
+
+[float]
+==== core
+
+Usage statistics for each CPU core (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+elevated permissions.
+
+[float]
+==== diskio
+
+Disk IO metrics (io, read, write) should be available without elevated permissions.
+
+[float]
+==== socket
+
+Events for each new TCP socket should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to view socket data belonging to
+other users.
+
+[float]
+==== service
+
+Systemd service data (memory, tasks, states) should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+["source"]
+----
+2020-01-02T08:19:50.635Z	INFO	module/wrapper.go:252	Error fetching data for metricset system.service: error getting list of running units: Rejected send message, 2 matched rules; type="method_call", sender=":1.35" (uid=1000 pid=4429 comm="./metricbeat -d * -e ") interface="org.freedesktop.systemd1.Manager" member="ListUnitsByPatterns" error name="(unset)" requested_reply="0" destination="org.freedesktop.systemd1" (uid=0 pid=1 comm="/usr/lib/systemd/systemd --switched-root --system ")
+----
+
+[float]
+==== filesystem
+
+Filesystem metrics data (total, available, type, mount point, files, free, used) should be available without elevated
+permissions.
+
+[float]
+==== fsstat
+
+Fsstat metrics data (total size, free, total, used count) should be available without elevated permissions.
+
+[float]
+==== uptime
+
+Uptime metrics data (duration) should be available without elevated permissions.
+
+[float]
+==== raid
+
+RAID metrics data (block, disks) requires access to the `/sys/block` mount point and all referenced devices.
+Otherwise an error will be reported.
+
+
+[float]
+=== Example configuration
+
+The System module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    - uptime          # System Uptime
+    - socket_summary  # Socket summary
+    #- core           # Per CPU core usage
+    #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
+    #- raid           # Raid
+    #- socket         # Sockets and connection info (linux only)
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages"]  # The other available option is ticks.
+
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  # If not set, types associated to virtual filesystems are automatically
+  # added when this information is available in the system (e.g. the list of
+  # `nodev` types in `/proc/filesystem`).
+  #filesystem.ignore_types: []
+
+  # These options allow you to filter out all processes that are not
+  # in the top N by CPU or memory, in order to reduce the number of documents created.
+  # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
+  # is included.
+  #process.include_top_n:
+
+    # Set to false to disable this feature and include all processes
+    #enabled: true
+
+    # How many processes to include from the top by CPU. The processes are sorted
+    # by the `system.process.cpu.total.pct` field.
+    #by_cpu: 0
+
+    # How many processes to include from the top by memory. The processes are sorted
+    # by the `system.process.memory.rss.bytes` field.
+    #by_memory: 0
+
+  # If false, cmdline of a process is not cached.
+  #process.cmdline.cache.enabled: true
+
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
+
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
+
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
+
+  # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
+  #socket.reverse_lookup.enabled: false
+  #socket.reverse_lookup.success_ttl: 60s
+  #socket.reverse_lookup.failure_ttl: 60s
+
+  # Diskio configurations
+  #diskio.include_devices: []
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-system-core,core>>
+
+* <<metricbeat-metricset-system-cpu,cpu>>
+
+* <<metricbeat-metricset-system-diskio,diskio>>
+
+* <<metricbeat-metricset-system-entropy,entropy>>
+
+* <<metricbeat-metricset-system-filesystem,filesystem>>
+
+* <<metricbeat-metricset-system-fsstat,fsstat>>
+
+* <<metricbeat-metricset-system-hardware,hardware>>
+
+* <<metricbeat-metricset-system-load,load>>
+
+* <<metricbeat-metricset-system-memory,memory>>
+
+* <<metricbeat-metricset-system-network,network>>
+
+* <<metricbeat-metricset-system-network_summary,network_summary>>
+
+* <<metricbeat-metricset-system-process,process>>
+
+* <<metricbeat-metricset-system-process_summary,process_summary>>
+
+* <<metricbeat-metricset-system-raid,raid>>
+
+* <<metricbeat-metricset-system-service,service>>
+
+* <<metricbeat-metricset-system-socket,socket>>
+
+* <<metricbeat-metricset-system-socket_summary,socket_summary>>
+
+* <<metricbeat-metricset-system-softwares,softwares>>
+
+* <<metricbeat-metricset-system-uptime,uptime>>
+
+* <<metricbeat-metricset-system-users,users>>
+
+* <<metricbeat-metricset-system-usersinfo,usersinfo>>
+
+* <<metricbeat-metricset-system-webiks,webiks>>
+
+include::system/core.asciidoc[]
+
+include::system/cpu.asciidoc[]
+
+include::system/diskio.asciidoc[]
+
+include::system/entropy.asciidoc[]
+
+include::system/filesystem.asciidoc[]
+
+include::system/fsstat.asciidoc[]
+
+include::system/hardware.asciidoc[]
+
+include::system/load.asciidoc[]
+
+include::system/memory.asciidoc[]
+
+include::system/network.asciidoc[]
+
+include::system/network_summary.asciidoc[]
+
+include::system/process.asciidoc[]
+
+include::system/process_summary.asciidoc[]
+
+include::system/raid.asciidoc[]
+
+include::system/service.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/socket_summary.asciidoc[]
+
+include::system/softwares.asciidoc[]
+
+include::system/uptime.asciidoc[]
+
+include::system/users.asciidoc[]
+
+include::system/usersinfo.asciidoc[]
+
+include::system/webiks.asciidoc[]
+

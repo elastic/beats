@@ -71,7 +71,6 @@ grouped in the following categories:
 * <<exported-fields-system>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
-* <<exported-fields-users>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -34066,6 +34065,40 @@ format: duration
 --
 
 [float]
+=== users
+
+users
+
+
+
+*`system.users.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
+=== usersinfo
+
+usersinfo
+
+
+
+*`system.usersinfo.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
 === webiks2
 
 webiks2
@@ -34458,36 +34491,6 @@ Number of responses per status code
 
 
 type: object
-
---
-
-[[exported-fields-users]]
-== users fields
-
-users module
-
-
-
-[float]
-=== users
-
-
-
-
-[float]
-=== info
-
-info
-
-
-
-*`users.info.example`*::
-+
---
-Example field
-
-
-type: keyword
 
 --
 

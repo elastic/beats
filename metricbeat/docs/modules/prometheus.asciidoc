@@ -1,0 +1,55 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-prometheus]]
+== Prometheus module
+
+[[prometheus-module]]
+This module periodically scrapes metrics from
+https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
+
+[float]
+=== Dashboard
+
+The Prometheus module comes with a predefined dashboard for Prometheus specific stats. For example:
+
+image::./images/metricbeat-prometheus-overview.png[]
+
+
+
+
+[float]
+=== Example configuration
+
+The Prometheus module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #username: "user"
+  #password: "secret"
+
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-prometheus-collector,collector>>
+
+include::prometheus/collector.asciidoc[]
+

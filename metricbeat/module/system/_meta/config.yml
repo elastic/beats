@@ -8,8 +8,9 @@
     - process
     - process_summary
     - socket_summary
-    - softwares
-    - hardware
+    #- softwares
+    #- hardware
+    #- users
     #- core
     #- diskio
     #- socket
@@ -32,6 +33,12 @@
   metricsets:
     - uptime
 
+- module: system
+  period: 180m
+  metricsets:
+    - softwares
+    - hardware
+    - users
 #- module: system
 #  period: 5m
 #  metricsets:

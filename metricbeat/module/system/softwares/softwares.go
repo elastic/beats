@@ -1,12 +1,8 @@
 package softwares
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -31,10 +27,6 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 // add struct for  get data - webiks added
-type nameData struct {
-	City    string `json:"city"`
-	Country string `json:"country"`
-}
 
 type Config struct {
 	Softwares []string `yaml:"softwares"`
@@ -49,10 +41,6 @@ type Software struct {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
-	// added for test
-	city      string
-	country   string
 	softwares []Software
 	software  common.MapStr
 }
@@ -67,9 +55,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	// adding webiks api call
-	// var res = postMessageData()
+	return &MetricSet{
+		BaseMetricSet: base,
+		software:      common.MapStr{},
+	}, nil
+}
 
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// read config
 	var cfg Config
 	readFile(&cfg)
@@ -79,21 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// filter data by query
 	var filterdData = filterByYmlField(data, cfg.Softwares)
 
-	return &MetricSet{
-		BaseMetricSet: base,
-		counter:       1,
-		// city:          res.City,
-		// country:       res.Country,
-		softwares: filterdData,
-		software:  common.MapStr{},
-	}, nil
-}
-
-// Fetch methods implements the data gathering and data conversion to the right
-// format. It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	for _, soft := range m.softwares {
+	for _, soft := range filterdData {
 		rootFields := common.MapStr{
 			"Name":         soft.Name,
 			"Version":      soft.Version,
@@ -102,45 +83,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"counter": m.counter,
-				// "city":     m.city,
-				// "country":  m.country,
+
 				"Software": rootFields,
 			},
 		})
 	}
-	m.counter++
 	return nil
-}
-
-func postMessageData() nameData {
-	url := "http://localhost:3001/api/host/"
-	// TODO remove
-	fmt.Println("URL:>", url)
-
-	var jsonStr = []byte(`{"name":"ben"}`)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	var resData nameData
-	error := json.Unmarshal([]byte(body), &resData)
-	if error != nil {
-		log.Println(error)
-	}
-	fmt.Println(resData)
-	return resData
 }
 
 // registery software functions

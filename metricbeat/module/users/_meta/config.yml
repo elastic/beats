@@ -1,6 +1,0 @@
-- module: users
-  metricsets: ["info"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-

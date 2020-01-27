@@ -1,0 +1,10 @@
+- name: usersinfo
+  type: group
+  release: beta
+  description: >
+    usersinfo
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

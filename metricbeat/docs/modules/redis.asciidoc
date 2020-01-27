@@ -1,0 +1,97 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-redis]]
+== Redis module
+
+This module periodically fetches metrics from http://redis.io/[Redis] servers.
+
+The defaut metricsets are `info` and `keyspace`.
+
+[float]
+=== Module-specific configuration notes
+
+The Redis module has these additional config options:
+
+*`hosts`*:: URLs that are used to connect to Redis.
+URL format:
+redis://[:password@]host[:port][/db-number][?option=value]
+redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
+*`password`*:: The password to authenticate, by default it's empty.
+*`idle_timeout`*:: The duration to remain idle before closing connections. If
+  the value is zero, then idle connections are not closed. The default value
+  is 2 times the module period to allow a connection to be reused across
+  fetches. The `idle_timeout` should be set to less than the server's connection
+  timeout.
+*`network`*:: The network type to be used for the Redis connection. The default value is
+  `tcp`.
+*`maxconn`*:: The maximum number of concurrent connections to Redis. The default value
+  is 10.
+
+
+[float]
+=== Compatibility
+
+The Redis metricsets were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4,  and are expected
+to work with all versions >= 3.0.
+
+
+[float]
+=== Example configuration
+
+The Redis module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: redis
+  metricsets: ["info", "keyspace"]
+  enabled: true
+  period: 10s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+  # Timeout after which time a metricset should return an error
+  # Timeout is by default defined as period, as a fetch of a metricset
+  # should never take longer then period, as otherwise calls can pile up.
+  #timeout: 1s
+
+  # Optional fields to be added to each event
+  #fields:
+  #  datacenter: west
+
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
+
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
+
+  # Filters can be used to reduce the number of fields sent.
+  #processors:
+  #  - include_fields:
+  #      fields: ["beat", "metricset", "redis.info.stats"]
+
+  # Redis AUTH password. Empty by default.
+  #password: foobared
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-redis-info,info>>
+
+* <<metricbeat-metricset-redis-key,key>>
+
+* <<metricbeat-metricset-redis-keyspace,keyspace>>
+
+include::redis/info.asciidoc[]
+
+include::redis/key.asciidoc[]
+
+include::redis/keyspace.asciidoc[]
+
