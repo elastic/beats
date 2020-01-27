@@ -15,24 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package logp
 
 import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+	"testing"
 
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
+	"github.com/stretchr/testify/assert"
 )
 
-// Name of this beat
-var Name = "winlogbeat"
+func TestHasSelector(t *testing.T) {
+	DevelopmentSetup(WithSelectors("*", "config"))
+	assert.True(t, HasSelector("config"))
+	assert.False(t, HasSelector("publish"))
+}
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: true})
+func TestLoggerSelectors(t *testing.T) {
+	if err := DevelopmentSetup(WithSelectors("good", " padded "), ToObserverOutput()); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, HasSelector("padded"))
+
+	good := NewLogger("good")
+	bad := NewLogger("bad")
+
+	good.Debug("is logged")
+	logs := ObserverLogs().TakeAll()
+	assert.Len(t, logs, 1)
+
+	// Selectors only apply to debug level logs.
+	bad.Debug("not logged")
+	logs = ObserverLogs().TakeAll()
+	assert.Len(t, logs, 0)
+
+	bad.Info("is also logged")
+	logs = ObserverLogs().TakeAll()
+	assert.Len(t, logs, 1)
+}
