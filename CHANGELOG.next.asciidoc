@@ -62,9 +62,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
+- Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
 
 *Auditbeat*
 
+- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
 
@@ -80,6 +82,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
+- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 
 *Heartbeat*
 
@@ -173,8 +176,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add a `system/network_summary` metricset {pull}15196[15196]
 - Add IBM MQ light-weight Metricbeat module {pull}15301[15301]
 - Enable script processor. {pull}14711[14711]
-- Add mesh metricset for Istio Metricbeat module {pull}15535[15535]
 - Add mixer metricset for Istio Metricbeat module {pull}15696[15696]
+- Add mesh metricset for Istio Metricbeat module{pull}15535[15535]
+- Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
 
 *Packetbeat*
 
