@@ -526,7 +526,7 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"metricbeat", "filebeat"},
+			programs: []string{"filebeat", "metricbeat"},
 			expected: 2,
 		},
 		// "audit_config": {
@@ -576,7 +576,7 @@ func TestConfiguration(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			require.Equal(t, 1, len(programs), programs)
+			require.Equal(t, 1, len(programs))
 
 			defPrograms, ok := programs["default"]
 			require.True(t, ok)

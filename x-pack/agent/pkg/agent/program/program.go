@@ -96,7 +96,6 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 			Spec:   spec,
 			Config: specificAST,
 		}
-
 		programs = append(programs, program)
 	}
 	return programs, nil
