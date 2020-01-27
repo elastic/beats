@@ -11,7 +11,7 @@
     - process_summary
     - socket_summary
     - hardware
-    - softwares
+    - software
     #- core
     #- diskio
     #- socket

@@ -148,7 +148,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/socket_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/uptime"
 	_ "github.com/elastic/beats/metricbeat/module/system/webiks"
-	_ "github.com/elastic/beats/metricbeat/module/system/softwares"
+	_ "github.com/elastic/beats/metricbeat/module/system/software"
 	_ "github.com/elastic/beats/metricbeat/module/traefik"
 	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
 	_ "github.com/elastic/beats/metricbeat/module/uwsgi"

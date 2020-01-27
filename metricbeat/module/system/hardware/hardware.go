@@ -112,19 +112,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	metricSetFields := common.MapStr{}
 	for _, hard := range m.hardwareQuery {
 		rootFields := common.MapStr{
-			"Type":         hard.Type,
-			"Name":         hard.Name,
-			"Description":  hard.Description,
-			"Manufacturer": hard.Manufacturer,
-			"DeviceID":     hard.DeviceID,
+			"type":         hard.Type,
+			"name":         hard.Name,
+			"description":  hard.Description,
+			"manufacturer": hard.Manufacturer,
+			"deviceID":     hard.DeviceID,
+			"index":        hard.Index,
 		}
 		sendEventHardware(hard, m.hardwareQuery, rootFields, metricSetFields, report)
 	}
 	for _, hard := range m.hardwareMonitorQuery {
 		rootFields := common.MapStr{
-			"Type":             hard.Type,
-			"Name":             util.B2s(hard.UserFriendlyName),
-			"ManufacturerYear": hard.YearOfManufacture,
+			"type":             hard.Type,
+			"name":             util.B2s(hard.UserFriendlyName),
+			"manufacturerYear": hard.YearOfManufacture,
+			"index":            hard.Index,
 		}
 		sendEventHardware(hard, m.hardwareMonitorQuery, rootFields, metricSetFields, report)
 	}

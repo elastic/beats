@@ -1,8 +1,8 @@
-- name: webiks2
+- name: software
   type: group
   release: beta
   description: >
-    webiks2
+    software
   fields:
     - name: example
       type: keyword

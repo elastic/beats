@@ -1,4 +1,4 @@
-package softwares
+package software
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("system", "softwares", New)
+	mb.Registry.MustAddMetricSet("system", "software", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -37,7 +37,7 @@ type nameData struct {
 }
 
 type Config struct {
-	Softwares []string `yaml:"softwares"`
+	Software []string `yaml:"software"`
 }
 
 type Software struct {
@@ -60,7 +60,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The system softwares metricset by webiks is beta.")
+	cfgwarn.Beta("The system software metricset by webiks is beta.")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -68,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// adding webiks api call
-	var res = postMessageData()
+	// var res = postMessageData()
 
 	// read config
 	var cfg Config
@@ -77,15 +77,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// get info from registery
 	var data = readAllSoftwareRegistery()
 	// filter data by query
-	var filterdData = filterByYmlField(data, cfg.Softwares)
+	var filterdData = filterByYmlField(data, cfg.Software)
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		counter:       1,
-		city:          res.City,
-		country:       res.Country,
-		softwares:     filterdData,
-		software:      common.MapStr{},
+		// city:          res.City,
+		// country:       res.Country,
+		softwares: filterdData,
+		software:  common.MapStr{},
 	}, nil
 }
 
@@ -95,17 +95,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, soft := range m.softwares {
 		rootFields := common.MapStr{
-			"Name":         soft.Name,
-			"Version":      soft.Version,
-			"MajorVersion": soft.MajorVersion,
-			"MinorVersion": soft.MinorVersion,
+			"name":         soft.Name,
+			"version":      soft.Version,
+			"majorVersion": soft.MajorVersion,
+			"minorVersion": soft.MinorVersion,
 		}
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"counter":  m.counter,
-				"city":     m.city,
-				"country":  m.country,
-				"Software": rootFields,
+				"counter": m.counter,
+				// "city":     m.city,
+				// "country":  m.country,
+				"data": rootFields,
 			},
 		})
 	}
@@ -146,7 +146,7 @@ func postMessageData() nameData {
 // registery software functions
 
 func readFile(cfg *Config) {
-	f, err := os.Open("./webiks2.yml")
+	f, err := os.Open("./software.yml")
 	if err != nil {
 		processError(err)
 	}
