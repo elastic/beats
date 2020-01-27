@@ -27,3 +27,23 @@ input:
         field: messages.count
       - attr: TotalProducerCount
         field: producers.count
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
+          if (broker_memory_broker_pct != null) {
+            event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
+          }
+
+          var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
+          if (broker_memory_temlep_pct != null) {
+            event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
+          }
+
+          var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
+          if (broker_memory_store_pct != null) {
+            event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
+          }
+        }
