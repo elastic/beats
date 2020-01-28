@@ -103,7 +103,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),
 		detailLog:       logp.NewLogger(detailSelector),
-		isDetailed:      logp.IsDebug(detailSelector),
+		isDetailed:      logp.HasSelector(detailSelector),
 		sniffer:         sniffer,
 	}
 
