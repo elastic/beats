@@ -28,6 +28,8 @@ const (
 func TestWatcherAddAllocation(t *testing.T) {
 	node := mock.Node()
 	alloc := mock.Alloc()
+	alloc.ModifyIndex = uint64(time.Now().Unix())
+	alloc.ClientStatus = AllocClientStatusRunning
 
 	mux := http.NewServeMux()
 
@@ -78,19 +80,19 @@ func TestWatcherAddAllocation(t *testing.T) {
 		t.Error(err)
 	}
 
-	addedAllocs := []api.Allocation{}
-	updatedAllocs := []api.Allocation{}
-	deletedAllocs := []api.Allocation{}
+	added := []api.Allocation{}
+	updated := []api.Allocation{}
+	deleted := []api.Allocation{}
 
 	watcher.AddEventHandler(ResourceEventHandlerFuncs{
 		AddFunc: func(alloc api.Allocation) {
-			addedAllocs = append(addedAllocs, alloc)
+			added = append(added, alloc)
 		},
 		UpdateFunc: func(alloc api.Allocation) {
-			updatedAllocs = append(updatedAllocs, alloc)
+			updated = append(updated, alloc)
 		},
 		DeleteFunc: func(alloc api.Allocation) {
-			deletedAllocs = append(deletedAllocs, alloc)
+			deleted = append(deleted, alloc)
 		},
 	})
 
@@ -100,9 +102,9 @@ func TestWatcherAddAllocation(t *testing.T) {
 	watcher.Start()
 	defer watcher.Stop()
 
-	assert.Len(t, addedAllocs, 1)
-	assert.Len(t, updatedAllocs, 0)
-	assert.Len(t, deletedAllocs, 0)
+	assert.Len(t, added, 1)
+	assert.Len(t, updated, 0)
+	assert.Len(t, deleted, 0)
 }
 
 func TestWatcherUnchangedIndex(t *testing.T) {
@@ -158,19 +160,19 @@ func TestWatcherUnchangedIndex(t *testing.T) {
 		t.Error(err)
 	}
 
-	addedAllocs := []api.Allocation{}
-	updatedAllocs := []api.Allocation{}
-	deletedAllocs := []api.Allocation{}
+	added := []api.Allocation{}
+	updated := []api.Allocation{}
+	deleted := []api.Allocation{}
 
 	watcher.AddEventHandler(ResourceEventHandlerFuncs{
 		AddFunc: func(alloc api.Allocation) {
-			addedAllocs = append(addedAllocs, alloc)
+			added = append(added, alloc)
 		},
 		UpdateFunc: func(alloc api.Allocation) {
-			updatedAllocs = append(updatedAllocs, alloc)
+			updated = append(updated, alloc)
 		},
 		DeleteFunc: func(alloc api.Allocation) {
-			deletedAllocs = append(deletedAllocs, alloc)
+			deleted = append(deleted, alloc)
 		},
 	})
 
@@ -180,7 +182,97 @@ func TestWatcherUnchangedIndex(t *testing.T) {
 	watcher.Start()
 	defer watcher.Stop()
 
-	assert.Len(t, addedAllocs, 0)
-	assert.Len(t, updatedAllocs, 0)
-	assert.Len(t, deletedAllocs, 0)
+	assert.Len(t, added, 0)
+	assert.Len(t, updated, 0)
+	assert.Len(t, deleted, 0)
+}
+
+func TestWatcherIgnoreOldAllocations(t *testing.T) {
+	node := mock.Node()
+
+	// The Watcher is initialized with an initial WaitIndex of 1
+	// this allocation should be ignored
+	alloc := mock.Alloc()
+	alloc.ModifyIndex = 0
+
+	alloc1 := mock.Alloc()
+	alloc1.ModifyIndex = 1
+	alloc1.ClientStatus = AllocClientStatusRunning
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
+		payload, err := json.Marshal([]interface{}{node})
+		if err != nil {
+			t.Error(err)
+		}
+
+		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
+		w.Write(payload)
+	})
+
+	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
+		payload, err := json.Marshal([]interface{}{alloc, alloc1})
+		if err != nil {
+			t.Error(err)
+		}
+
+		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
+		w.Write(payload)
+	})
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		t.Error("Unexpected requested detected")
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	config := &api.Config{
+		Address:    server.URL,
+		HttpClient: server.Client(),
+	}
+
+	options := WatchOptions{
+		RefreshInterval: 1 * time.Second,
+		Node:            node.Name,
+	}
+
+	client, err := api.NewClient(config)
+	if err != nil {
+		t.Error(err)
+	}
+
+	watcher, err := NewWatcher(client, options)
+	if err != nil {
+		t.Error(err)
+	}
+
+	added := []api.Allocation{}
+	updated := []api.Allocation{}
+	deleted := []api.Allocation{}
+
+	watcher.AddEventHandler(ResourceEventHandlerFuncs{
+		AddFunc: func(alloc api.Allocation) {
+			added = append(added, alloc)
+		},
+		UpdateFunc: func(alloc api.Allocation) {
+			updated = append(updated, alloc)
+		},
+		DeleteFunc: func(alloc api.Allocation) {
+			deleted = append(deleted, alloc)
+		},
+	})
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	watcher.Start()
+	defer watcher.Stop()
+
+	assert.Len(t, added, 1)
+	assert.Len(t, updated, 0)
+	assert.Len(t, deleted, 0)
+
+	assert.NotEqual(t, added[0].ID, alloc.ID)
 }

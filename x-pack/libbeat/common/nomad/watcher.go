@@ -69,7 +69,7 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
 		AllowStale: w.options.AllowStale,
-		WaitIndex:  1,
+		WaitIndex:  uint64(1),
 	}
 
 	if w.nodeID == "" {
@@ -117,7 +117,7 @@ func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
 // Sync the allocations on the given node and update the local metadata
 func (w *watcher) sync() error {
 	w.logger.Info("Nomad: Syncing allocations and metadata")
-	w.logger.Debugf("Starting with w.WaitIndex=%v", w.waitIndex)
+	w.logger.Debugf("Starting with WaitIndex=%v", w.waitIndex)
 
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
@@ -147,6 +147,10 @@ func (w *watcher) sync() error {
 	}
 
 	for _, alloc := range allocations {
+		if alloc.ModifyIndex < w.waitIndex {
+			continue
+		}
+
 		// "patch" the local hostname/node name into the allocations. filebeat
 		// runs locally on each client filters the allocations based on the
 		// hostname/client node name. Due this particular setup all allocations
@@ -157,23 +161,14 @@ func (w *watcher) sync() error {
 			alloc.NodeName = w.options.Node
 		}
 
-		w.logger.Debugf("Received allocation: %s - %s", alloc.ID, alloc.DesiredStatus)
+		w.logger.Debugf("Received allocation: %s DesiredStatus:%s ClientStatus:%s", alloc.ID,
+			alloc.DesiredStatus, alloc.ClientStatus)
 
-		switch alloc.DesiredStatus {
-		case AllocDesiredStatusRun:
+		switch alloc.ClientStatus {
+		case AllocClientStatusComplete, AllocClientStatusFailed, api.AllocClientStatusLost:
+			w.handler.OnDelete(*alloc)
+		case AllocClientStatusRunning:
 			w.handler.OnAdd(*alloc)
-		case AllocDesiredStatusStop:
-			w.handler.OnDelete(*alloc)
-		case AllocDesiredStatusEvict:
-			w.handler.OnDelete(*alloc)
-		}
-
-		// allocation was updated after our last fetch
-		// TODO verify if this is needed while relying on the WaitIndex
-		// TODO `alloc.ModifyTime` is set in UTC we would probably need to do
-		// the same here
-		if alloc.ModifyTime > w.lastFetch.UnixNano() {
-			w.handler.OnUpdate(*alloc)
 		}
 	}
 

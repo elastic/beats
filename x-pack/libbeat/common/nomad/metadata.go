@@ -90,7 +90,7 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 		}
 
 		mergo.Merge(&meta, group.Meta, mergo.WithOverride)
-		group.Meta = job.Meta
+		group.Meta = meta
 
 		tasks := g.tasksMeta(group)
 		tasksMeta = append(tasksMeta, tasks...)

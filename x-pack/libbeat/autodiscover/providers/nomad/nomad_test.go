@@ -5,6 +5,7 @@
 package nomad
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -16,10 +17,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/jarcoal/httpmock.v1"
 
-	"github.com/elastic/beats/libbeat/tests/resources"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/tests/resources"
 	"github.com/elastic/beats/x-pack/libbeat/common/nomad"
 )
 
@@ -101,17 +102,18 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Test common allocation start",
 			Status:  "start",
 			Allocation: nomad.Resource{
-				ID:        UUID.String(),
-				Name:      "job.task",
-				Namespace: namespace,
-				NodeName:  host,
-				NodeID:    "nomad1",
+				ID:            UUID.String(),
+				Name:          "job.task",
+				Namespace:     namespace,
+				DesiredStatus: api.AllocDesiredStatusRun,
+				NodeName:      host,
+				NodeID:        "nomad1",
 				Job: &nomad.Job{
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
 					Type:        helper.StringToPtr(structs.JobTypeService),
-					Status:      helper.StringToPtr(structs.AllocClientStatusRunning),
+					Status:      helper.StringToPtr(structs.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -151,7 +153,7 @@ func TestEmitEvent(t *testing.T) {
 			},
 			Expected: bus.Event{
 				"provider": UUID,
-				"id":       UUID.String(),
+				"id":       fmt.Sprintf("%s-%s", UUID.String(), "task1"),
 				"config":   []*common.Config{},
 				"start":    true,
 				"host":     host,
@@ -183,17 +185,18 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Allocation without a host/node name",
 			Status:  "start",
 			Allocation: nomad.Resource{
-				ID:        UUID.String(),
-				Name:      "job.task",
-				Namespace: "default",
-				NodeName:  "",
-				NodeID:    "5456bd7a",
+				ID:            UUID.String(),
+				Name:          "job.task",
+				Namespace:     "default",
+				DesiredStatus: api.AllocDesiredStatusRun,
+				NodeName:      "",
+				NodeID:        "5456bd7a",
 				Job: &nomad.Job{
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
 					Type:        helper.StringToPtr(structs.JobTypeService),
-					Status:      helper.StringToPtr(structs.AllocClientStatusRunning),
+					Status:      helper.StringToPtr(structs.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -294,7 +297,6 @@ func TestEmitEvent(t *testing.T) {
 
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
-
 
 	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
 }

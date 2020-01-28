@@ -27,3 +27,12 @@ const (
 	AllocDesiredStatusStop  = api.AllocDesiredStatusStop  // Allocation should stop
 	AllocDesiredStatusEvict = api.AllocDesiredStatusEvict // Allocation should stop, and was evicted
 )
+
+// Allocation of the status on a given Nomad client
+const (
+	AllocClientStatusPending  = api.AllocClientStatusPending
+	AllocClientStatusRunning  = api.AllocClientStatusRunning
+	AllocClientStatusComplete = api.AllocClientStatusComplete
+	AllocClientStatusFailed   = api.AllocClientStatusFailed
+	AllocClientStatusLost     = api.AllocClientStatusLost
+)

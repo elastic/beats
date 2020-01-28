@@ -1,10 +1,11 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. Licensed under the Elastic License; you may not use this file except in
+// compliance with the Elastic License.
 
 package nomad
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -135,7 +136,8 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	nodeName := obj.NodeName
 
 	if len(nodeName) == 0 {
-		// On older versions of Nomad the NodeName property is not set, as a workaround we can use the NodeID
+		// On older versions of Nomad the NodeName property is not set, as a workaround we can use
+		// the NodeID
 		host, err := p.metagen.AllocationNodeName(obj.NodeID)
 		if err != nil {
 			logp.Err("Error fetching node information: %s", err)
@@ -150,7 +152,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	}
 
 	// common metadata from the entire allocation
-	rawMeta := p.metagen.ResourceMetadata(*obj)
+	allocMeta := p.metagen.ResourceMetadata(*obj)
 
 	// job metadatata merged with the task metadata
 	tasks := p.metagen.GroupMeta(obj.Job)
@@ -159,10 +161,10 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	for _, task := range tasks {
 		event := bus.Event{
 			"provider": p.uuid,
-			"id":       obj.ID,
+			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
 			flag:       true,
 			"host":     nodeName,
-			"meta": common.MapStrUnion(rawMeta, common.MapStr{
+			"meta": common.MapStrUnion(allocMeta, common.MapStr{
 				"task": task,
 			}),
 		}
@@ -185,12 +187,13 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 
+	logp.Debug("nomad", "Publishing event: %+v", event)
 	p.bus.Publish(event)
 }
 
 func (p *Provider) generateHints(event bus.Event) bus.Event {
-	// Try to build a config with enabled builders. Send a provider agnostic payload.
-	// Builders are Beat specific.
+	// Try to build a config with enabled builders. Send a provider agnostic payload. Builders are
+	// Beat specific.
 	e := bus.Event{}
 
 	var tags, container common.MapStr
@@ -212,14 +215,10 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		e["host"] = host
 	}
 
-	// We keep this in case that we decide to add information about the container.
-	// Nomad supports different runtimes, so it will not always be _container_ info, but we could
-	// generalize it by calling it runtime
+	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
+	// metadata about the runtime driver
 	if rawCont, ok := meta["container"]; ok {
 		container = rawCont.(common.MapStr)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
 		e["container"] = container
 	}
 
