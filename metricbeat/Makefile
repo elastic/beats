@@ -79,7 +79,7 @@ assets:
 	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
 
 .PHONY: integration-tests
-integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
+integration-tests: ## @testing Run golang integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
 	mage goIntegTest
