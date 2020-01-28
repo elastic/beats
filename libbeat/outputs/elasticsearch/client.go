@@ -437,7 +437,7 @@ func createEventBulkMeta(
 
 	var id string
 	if m := event.Meta; m != nil {
-		if tmp := m["id"]; tmp != nil {
+		if tmp := m["_id"]; tmp != nil {
 			if s, ok := tmp.(string); ok {
 				id = s
 			} else {
