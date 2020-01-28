@@ -89,7 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-
+- Add STAN dashboard {pull}15654[15654]
 
 *Packetbeat*
 
