@@ -33,21 +33,21 @@ find_latest_beats_pr_job() {
 find_job_for_pr() {
     job=$1
     pr=$2
-    
+
     found=$(curl -s "https://beats-ci.elastic.co/job/elastic+beats+pull-request/$job/api/json" \
                 | jq -c ".actions[] | select(._class == \"org.jenkinsci.plugins.ghprb.GhprbParametersAction\").parameters[] | select(.name == \"ghprbPullId\" and .value == \"$pr\")" \
                 | wc -l)
 
     echo $found
 }
-    
+
 main() {
     pr=$(get_pr_from_input $1)
     echo "Searching last $NUM_JOBS_TO_SEARCH Jenkins jobs for PR number: $pr..."
 
     n=$(find_latest_beats_pr_job $pr)
     let e=$n-$NUM_JOBS_TO_SEARCH
-    
+
     while [ $n -gt $e ]; do
         found=$(find_job_for_pr $n $pr)
         if [ $found -gt 0 ]; then
