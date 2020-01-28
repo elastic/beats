@@ -995,7 +995,7 @@ metricbeat.modules:
 
   driver: "postgres"
   sql_query: "select now()"
-
+  sql_response_format: table
 
 #--------------------------------- Stan Module ---------------------------------
 - module: stan
