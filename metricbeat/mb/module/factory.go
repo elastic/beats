@@ -18,7 +18,7 @@
 package module
 
 import (
-	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -43,27 +43,38 @@ func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	var errs multierror.Errors
-
-	connector, err := NewConnector(r.beatInfo, p, c, meta)
-	if err != nil {
-		errs = append(errs, err)
-	}
 	w, err := NewWrapper(c, mb.Registry, r.options...)
 	if err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := errs.Err(); err != nil {
 		return nil, err
 	}
 
-	client, err := connector.Connect()
-	if err != nil {
-		return nil, err
+	clients := map[string]beat.Client{}
+
+	for _, msw := range w.MetricSets() {
+		processorsForMetricSet, err := mb.Registry.ProcessorsForMetricSet(msw.Module().Name(), msw.MetricSet.Name())
+		if err != nil {
+			return nil, errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
+				msw.Module().Name(), msw.MetricSet.Name())
+		}
+
+		connector, err := NewConnector(r.beatInfo, p, c, meta)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, p := range processorsForMetricSet.List {
+			connector.processors.AddProcessor(p)
+		}
+
+		client, err := connector.Connect()
+		if err != nil {
+			return nil, err
+		}
+
+		clients[msw.MetricSet.Name()] = client
 	}
 
-	mr := NewRunner(client, w)
+	mr := NewRunner(clients, w)
 	return mr, nil
 }
 

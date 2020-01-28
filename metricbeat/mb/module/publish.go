@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // PublishChannels publishes the events read from each channel to the given
@@ -31,14 +32,40 @@ import (
 // and are fully read. To stop the method immediately, close the channels and
 // close the publisher client to ensure that publishing does not block. This
 // may result is some events being discarded.
-func PublishChannels(client beat.Client, cs ...<-chan beat.Event) {
+func PublishChannels(clients map[string]beat.Client, cs ...<-chan beat.Event) {
 	var wg sync.WaitGroup
 
 	// output publishes values from c until c is closed, then calls wg.Done.
 	output := func(c <-chan beat.Event) {
 		defer wg.Done()
+		logger := logp.NewLogger("PublishChannels")
+
+		sink, staticModule := clients["@static"]
+
 		for event := range c {
-			client.Publish(event)
+			if staticModule {
+				sink.Publish(event)
+				continue
+			}
+
+			v, err := event.Fields.GetValue("metricset.name")
+			if err != nil {
+				logger.Errorf("Error occurred while retrieving key 'metricset': %v", err)
+				continue
+			}
+
+			metricSetName, ok := v.(string)
+			if !ok {
+				logger.Error("Non-string type of 'metricset'")
+				continue
+			}
+
+			if _, ok := clients[metricSetName]; !ok {
+				logger.Errorf("Non-registered metricset client (name: %s)", metricSetName)
+				continue
+			}
+
+			clients[metricSetName].Publish(event)
 		}
 	}
 

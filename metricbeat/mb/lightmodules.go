@@ -150,6 +150,26 @@ type lightModuleConfig struct {
 	MetricSets []string `config:"metricsets"`
 }
 
+func (s *LightModulesSource) UnpackMetricSetConfiguration(r *Register, moduleName string , metricSetName string,
+	cfg interface{}) error {
+
+	modulePath, found := s.findModulePath(moduleName)
+	if !found {
+		return fmt.Errorf("module '%s' not found", moduleName)
+	}
+
+	manifestPath := filepath.Join(filepath.Dir(modulePath), metricSetName, manifestYML)
+	config, err := common.LoadFile(manifestPath)
+	if err != nil {
+		return errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)
+	}
+
+	if err := config.Unpack(cfg); err != nil {
+		return errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
+	}
+	return nil
+}
+
 // LightModule contains the definition of a light module
 type LightModule struct {
 	Name       string

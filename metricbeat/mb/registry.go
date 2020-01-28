@@ -19,6 +19,7 @@ package mb
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/processors"
 	"sort"
 	"strings"
 	"sync"
@@ -121,6 +122,7 @@ type ModulesSource interface {
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	ModulesInfo(r *Register) string
+	UnpackMetricSetConfiguration(r *Register, moduleName string, metricSetName string, cfg interface{}) error
 }
 
 // NewRegister creates and returns a new Register.
@@ -360,6 +362,36 @@ func (r *Register) MetricSets(module string) []string {
 	}
 
 	return metricsets
+}
+
+func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	var procs *processors.Processors
+
+	moduleName = strings.ToLower(moduleName)
+	metricSetName = strings.ToLower(metricSetName)
+
+	metricSets, exists := r.metricSets[moduleName]
+	if exists {
+		_, exists := metricSets[metricSetName]
+		if exists {
+			return procs, nil // Standard metric sets don't have processor definitions.
+		}
+	}
+
+	if source := r.secondarySource; source != nil && source.HasMetricSet(moduleName, metricSetName) {
+		config := struct {
+			Processors processors.PluginConfig `config:"processors"`
+		}{}
+		err := source.UnpackMetricSetConfiguration(r, moduleName, metricSetName, &config)
+		if err != nil {
+			return nil, err
+		}
+		return processors.New(config.Processors)
+	}
+	return procs, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, metricSetName, moduleName)
 }
 
 // SetSecondarySource sets an additional source of modules

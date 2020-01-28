@@ -227,7 +227,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 			return err
 		}
 
-		r := module.NewRunner(client, m.module)
+		r := module.NewRunnerForStaticModule(client, m.module)
 		r.Start()
 		wg.Add(1)
 		go func() {
