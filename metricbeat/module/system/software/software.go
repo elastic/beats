@@ -1,4 +1,3 @@
-
 package software
 
 import (
@@ -169,7 +168,6 @@ func readAllSoftwareRegistery() []Software {
 	var win64reg = readRegistry(`SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall`)
 	combinedArray = append(combinedArray, win32reg...)
 	combinedArray = append(combinedArray, win64reg...)
-	fmt.Printf("all programs installed in both reg %q\n", combinedArray)
 	return combinedArray
 }
 
@@ -197,6 +195,5 @@ func filterByYmlField(data []Software, query []string) []Software {
 			}
 		}
 	}
-	fmt.Println(filterdArray, "filterd array by yml")
 	return filterdArray
 }

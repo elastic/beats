@@ -62,14 +62,15 @@ const FieldsKey = "fields"
 // New constructs a new fetch_data processor.
 func New(c *common.Config) (processors.Processor, error) {
 	config := struct {
-		Fields common.MapStr `config:"fields" validate:"required"`
-		Target *string       `config:"target"`
+		URL string `config:"url"`
+		// Fields common.MapStr `config:"fields" validate:"required"`
+		Target *string `config:"target"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the fetch_data configuration: %s", err)
 	}
-	data, err := postMessageData()
+	data, err := postMessageData(config.URL)
 	if err != nil {
 		p := &addFields{fields: common.MapStr{
 			"stationCity":    "null",
@@ -92,14 +93,7 @@ func New(c *common.Config) (processors.Processor, error) {
 
 func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	fields := af.fields
-	// fields["TESTFROMFETCHDATA"] = "ben"
-	// if af.shared {
-	// 	fields = fields.Clone()
-	// }
 	event.Fields.DeepUpdate(fields)
-	// } else {
-	// 	event.Fields.DeepUpdateNoOverwrite(fields)
-	// }
 	return event, nil
 }
 
@@ -114,8 +108,9 @@ type nameData struct {
 	Country string `json:"country"`
 }
 
-func postMessageData() (*nameData, error) {
-	url := "http://localhost:3001/api/host/"
+func postMessageData(url string) (*nameData, error) {
+	// fmt.Print(url2, "URL2")
+	// url := "http://localhost:3001/api/host/"
 	fmt.Println("URL:>", url)
 
 	// getting username of enduser
@@ -164,3 +159,22 @@ func getStationName() string {
 	stationName := strings.Split(user.Username, `\`)[0]
 	return stationName
 }
+
+// func readFile(cfg *Config) {
+// 	f, err := os.Open("./software.yml")
+// 	if err != nil {
+// 		processError(err)
+// 	}
+// 	defer f.Close()
+
+// 	decoder := yaml.NewDecoder(f)
+// 	err = decoder.Decode(cfg)
+// 	if err != nil {
+// 		processError(err)
+// 	}
+// }
+
+// func processError(err error) {
+// 	fmt.Println(err)
+// 	os.Exit(2)
+// }

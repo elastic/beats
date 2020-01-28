@@ -1,9 +1,7 @@
 package hardware
 
 import (
-	"io/ioutil"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/StackExchange/wmi"
@@ -62,22 +60,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		hardwareMonitorQuery: monitorQuery,
 		hardware:             common.MapStr{},
 	}, nil
-}
-
-func getData() {
-	resp, err := http.Get("https://jsonplaceholder.typicode.com/users")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println(string(body))
 }
 
 // Fetch methods implements the data gathering and data conversion to the right

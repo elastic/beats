@@ -137,8 +137,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"user": common.MapStr{
 				"name": getAndRemove(proc, "username"),
 			},
-			// add any field you want
-			"ben": "idan",
 		}
 
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {

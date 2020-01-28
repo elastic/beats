@@ -44,7 +44,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:  base,
 		counter:        1,
 		computerNumber: 27,
-		owner:          "Ben",
 	}, nil
 }
 

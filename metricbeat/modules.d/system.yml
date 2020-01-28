@@ -36,6 +36,7 @@
   metricsets:
     - uptime
 
+#Send Custom metricsets - which usually updated in low frequency , every 3h.
 - module: system
   period: 180m
   metricsets:
