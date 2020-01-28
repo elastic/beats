@@ -113,51 +113,28 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		switch name {
 		case "copy":
 			r = &CopyRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "rename":
 			r = &RenameRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "translate":
 			r = &TranslateRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "translate_with_regexp":
 			r = &TranslateWithRegexpRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "map":
 			r = &MapRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter":
 			r = &FilterRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter_values":
 			r = &FilterValuesRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter_values_with_regexp":
 			r = &FilterValuesWithRegexpRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "extract_list_items":
 			r = &ExtractListItemRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		default:
-			return fmt.Errorf("unkown rule of type %s", name)
+			return fmt.Errorf("unknown rule of type %s", name)
+		}
+
+		if err := unpack(fields, r); err != nil {
+			return err
 		}
 
 		rules = append(rules, r)
