@@ -150,7 +150,8 @@ type lightModuleConfig struct {
 	MetricSets []string `config:"metricsets"`
 }
 
-func (s *LightModulesSource) UnpackMetricSetConfiguration(r *Register, moduleName string , metricSetName string,
+// UnpackMetricSetConfiguration deserializes metricset configuration to the given structure.
+func (s *LightModulesSource) UnpackMetricSetConfiguration(r *Register, moduleName string, metricSetName string,
 	cfg interface{}) error {
 
 	modulePath, found := s.findModulePath(moduleName)

@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const staticModuleSink = "@static"
+
 // PublishChannels publishes the events read from each channel to the given
 // publisher client. If the publisher client blocks for any reason then events
 // will not be read from the given channels.
@@ -40,7 +42,7 @@ func PublishChannels(clients map[string]beat.Client, cs ...<-chan beat.Event) {
 		defer wg.Done()
 		logger := logp.NewLogger("PublishChannels")
 
-		sink, staticModule := clients["@static"]
+		sink, staticModule := clients[staticModuleSink]
 
 		for event := range c {
 			if staticModule {

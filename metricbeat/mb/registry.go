@@ -19,10 +19,11 @@ package mb
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/processors"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/elastic/beats/libbeat/processors"
 
 	"github.com/pkg/errors"
 
