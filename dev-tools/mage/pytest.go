@@ -160,7 +160,7 @@ func PythonNoseTest(params PythonTestArgs) error {
 	}
 
 	defer fmt.Println(">> python test:", params.TestName, "Testing Complete")
-	_, err := sh.Exec(nosetestsEnv, os.Stdout, os.Stderr, nosetestsPath, append(nosetestsOptions, testFiles...)...)
+	_, err = sh.Exec(nosetestsEnv, os.Stdout, os.Stderr, nosetestsPath, append(nosetestsOptions, testFiles...)...)
 	return err
 
 	// TODO: Aggregate all the individual code coverage reports and generate
