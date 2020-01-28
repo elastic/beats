@@ -4,7 +4,9 @@ var:
   - name: input
     default: s3
   - name: visibility_timeout
+    default: 300s
   - name: api_timeout
+    default: 120s
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
