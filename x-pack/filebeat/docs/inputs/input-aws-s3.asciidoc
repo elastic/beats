@@ -45,12 +45,20 @@ URL of the AWS SQS queue that messages will be received from. Required.
 [float]
 ==== `visibility_timeout`
 
-The duration (in seconds) that the received messages are hidden from subsequent
+The duration that the received messages are hidden from subsequent
 retrieve requests after being retrieved by a ReceiveMessage request.
-This value needs to be a lot bigger than filebeat collection frequency so
+This value needs to be a lot bigger than {beatname_uc} collection frequency so
 if it took too long to read the s3 log, this sqs message will not be reprocessed.
 The default visibility timeout for a message is 300 seconds. The minimum
 is 0 seconds. The maximum is 12 hours.
+
+[float]
+==== `api_timeout`
+
+The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+will be interrupted.
+The default AWS API timeout for a message is 120 seconds. The minimum
+is 0 seconds. The maximum is half of the visibility timeout value.
 
 [float]
 ==== `aws credentials`

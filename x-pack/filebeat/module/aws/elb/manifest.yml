@@ -3,6 +3,8 @@ module_version: 1.0
 var:
   - name: input
     default: s3
+  - name: visibility_timeout
+  - name: api_timeout
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

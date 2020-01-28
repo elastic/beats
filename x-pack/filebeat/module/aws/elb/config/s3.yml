@@ -1,3 +1,11 @@
 type: s3
 queue_url: {{ .queue_url }}
 credential_profile_name: {{ .credential_profile_name }}
+
+{{ if .visibility_timeout }}
+visibility_timeout: {{ .visibility_timeout }}
+{{ end }}
+
+{{ if .api_timeout }}
+api_timeout: {{ .api_timeout }}
+{{ end }}
