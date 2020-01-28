@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
+- Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
