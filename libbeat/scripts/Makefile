@@ -197,7 +197,7 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	mage goIntegTest
+	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
