@@ -359,7 +359,7 @@ func (m *MetricSet) Setup() (err error) {
 		return errors.Wrap(err, "unable to guess one or more required parameters")
 	}
 
-	if m.isDetailed {
+	if m.isDebug {
 		names := make([]string, 0, len(m.templateVars))
 		for name := range m.templateVars {
 			names = append(names, name)
@@ -367,7 +367,7 @@ func (m *MetricSet) Setup() (err error) {
 		sort.Strings(names)
 		m.log.Debugf("%d template variables in use:", len(m.templateVars))
 		for _, key := range names {
-			m.detailLog.Debugf("  %s = %v", key, m.templateVars[key])
+			m.log.Debugf("  %s = %v", key, m.templateVars[key])
 		}
 	}
 
