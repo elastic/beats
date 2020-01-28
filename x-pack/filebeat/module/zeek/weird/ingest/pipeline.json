@@ -28,13 +28,15 @@
     {
       "set": {
         "field": "source.ip",
-        "value": "{{source.address}}"
+        "value": "{{source.address}}",
+        "if": "ctx.source.address != null"
       }
     },
     {
       "set": {
         "field": "destination.ip",
-        "value": "{{destination.address}}"
+        "value": "{{destination.address}}",
+        "if": "ctx.destination.address != null"
       }
     }
   ],
