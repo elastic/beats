@@ -3,6 +3,9 @@ module_version: 1.0
 var:
   - name: input
     default: s3
-
+  - name: shared_credential_file
+    default: ~/.aws/credentials
+  - name: credential_profile_name
+    default: test
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
