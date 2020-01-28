@@ -21,6 +21,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 	"os"
 	"time"
 
@@ -37,7 +39,9 @@ import (
 )
 
 const (
-	timeout = time.Second * 5
+	timeout    = time.Second * 5
+	maxBackoff = 30 * time.Second
+	maxRetries = 10
 )
 
 type kubernetesAnnotator struct {
@@ -46,6 +50,10 @@ type kubernetesAnnotator struct {
 	matchers            *Matchers
 	cache               *cache
 	kubernetesAvailable bool
+	cfg                 *common.Config
+	config              *kubeAnnotatorConfig
+	nextRetry           time.Time
+	retryCount          byte
 }
 
 func init() {
@@ -100,82 +108,98 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	processor := &kubernetesAnnotator{
 		cache:               newCache(config.CleanupTimeout),
+		cfg:                 cfg,
+		config:              &config,
 		kubernetesAvailable: false,
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	return processor, processor.initKubernetes()
+}
+
+func (k *kubernetesAnnotator) initKubernetes() error {
+	client, err := kubernetes.GetKubernetesClient(k.config.KubeConfig)
 	if err != nil {
-		if kubernetes.IsInCluster(config.KubeConfig) {
+		if kubernetes.IsInCluster(k.config.KubeConfig) {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config: %v", "add_kubernetes_metadata", err)
-		} else if config.KubeConfig == "" {
+		} else if k.config.KubeConfig == "" {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"), err)
 		} else {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", config.KubeConfig, err)
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", k.config.KubeConfig, err)
 		}
-		return processor, nil
+		return nil
 	}
 
 	if !isKubernetesAvailable(client) {
-		return processor, nil
+		k.updateNextRetry()
+		return nil
 	}
 
-	matchers := NewMatchers(config.Matchers)
+	matchers := NewMatchers(k.config.Matchers)
 
 	if matchers.Empty() {
 		logp.Debug("kubernetes", "%v: could not initialize kubernetes plugin with zero matcher plugins", "add_kubernetes_metadata")
-		return processor, nil
+		return nil
 	}
 
-	processor.matchers = matchers
+	k.matchers = matchers
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+	k.config.Host = kubernetes.DiscoverKubernetesNode(k.config.Host, kubernetes.IsInCluster(k.config.KubeConfig), client)
 
-	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %s", config.Host)
+	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %s", k.config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Host,
-		Namespace:   config.Namespace,
+		SyncTimeout: k.config.SyncPeriod,
+		Node:        k.config.Host,
+		Namespace:   k.config.Namespace,
 	}, nil)
 	if err != nil {
 		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
-		return nil, err
+		return err
 	}
 
-	metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
-	processor.indexers = NewIndexers(config.Indexers, metaGen)
-	processor.watcher = watcher
-	processor.kubernetesAvailable = true
+	metaGen := metadata.NewPodMetadataGenerator(k.cfg, watcher.Store(), nil, nil)
+	k.indexers = NewIndexers(k.config.Indexers, metaGen)
+	k.watcher = watcher
+	k.kubernetesAvailable = true
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
 			logp.Debug("kubernetes", "%v: adding pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
-			processor.addPod(pod)
+			k.addPod(pod)
 		},
 		UpdateFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
 			logp.Debug("kubernetes", "%v: updating pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
-			processor.updatePod(pod)
+			k.updatePod(pod)
 		},
 		DeleteFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
 			logp.Debug("kubernetes", "%v: removing pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
-			processor.removePod(pod)
+			k.removePod(pod)
 		},
 	})
 
 	if err := watcher.Start(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return processor, nil
+	return nil
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
-		return event, nil
+		// Check if we should try again
+		if k.retryCount <= maxRetries && k.nextRetry.Before(time.Now()) {
+			k.initKubernetes()
+		}
+
+		// If it's still not available, pass
+		if !k.kubernetesAvailable {
+			return event, nil
+		}
 	}
+
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		return event, nil
@@ -198,6 +222,17 @@ func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	for _, m := range metadata {
 		k.cache.set(m.Index, m.Data)
 	}
+}
+
+func (k *kubernetesAnnotator) updateNextRetry() {
+	nextBackoff := time.Duration(math.Pow(2, float64(k.retryCount))+rand.Float64()) * time.Second
+	if nextBackoff < maxBackoff {
+		k.nextRetry = time.Now().Add(nextBackoff)
+	} else {
+		k.nextRetry = time.Now().Add(maxBackoff)
+	}
+
+	k.retryCount++
 }
 
 func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
