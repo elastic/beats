@@ -694,7 +694,12 @@ func Insert(a *AST, node Node, to Selector) error {
 		return fmt.Errorf("expecting Key and received %T", current)
 	}
 
-	d.value = &Dict{[]Node{node}}
+	switch node.(type) {
+	case *List:
+		d.value = node
+	default:
+		d.value = &Dict{[]Node{node}}
+	}
 	return nil
 }
 
