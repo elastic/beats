@@ -391,7 +391,8 @@ func generateFieldName(namespace string, labels []string) string {
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
 	statMethod, _ := statisticLookup(stat)
-	return "aws." + stripNamespace(namespace) + ".metrics." + labels[metricNameIdx] + "." + statMethod
+	// By default, replace dot "." using under bar "_" for metric names
+	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
 }
 
 // stripNamespace converts Cloudwatch namespace into the root field we will use for metrics
