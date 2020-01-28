@@ -82,11 +82,10 @@ func appendFractPadded(bs []byte, val, digits, fractSz int) []byte {
 
 	// find index range of last digits in buffer, such that a multiple of fractSz
 	// will be kept if the range of digits is removed.
+	// invariant: 0 <= end - begin <= fractSz
+	end := len(bs)
+	digits = end - initalLen
 	begin := initalLen + ((digits-1)/fractSz)*fractSz
-	end := begin + fractSz
-	if L := len(bs); end >= L {
-		end = L
-	}
 
 	// remove trailing zeros, such that a multiple of fractSz digits will be
 	// presend in the final buffer. At minimum fractSz digits will always be
@@ -96,7 +95,7 @@ func appendFractPadded(bs []byte, val, digits, fractSz int) []byte {
 			break
 		}
 
-		digits -= (end - begin) // invariant: 0 <= end - being <= fractSz
+		digits -= (end - begin)
 		end = begin
 		begin -= fractSz
 
