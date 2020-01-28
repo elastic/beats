@@ -33,9 +33,9 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-var (
-	processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
-)
+var processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
+
+const instanceCountLabel = ":count"
 
 // Reader will contain the config options
 type Reader struct {
@@ -94,21 +94,20 @@ func NewReader(config Config) (*Reader, error) {
 			r.measurement[v] = counter.MeasurementLabel
 		}
 	}
-
 	return r, nil
 }
 
 // RefreshCounterPaths will recheck for any new instances and add them to the counter list
-func (r *Reader) RefreshCounterPaths() error {
+func (this *Reader) RefreshCounterPaths() error {
 	var newCounters []string
-	for _, counter := range r.config.CounterConfig {
-		childQueries, err := r.query.GetCounterPaths(counter.Query)
+	for _, counter := range this.config.CounterConfig {
+		childQueries, err := this.query.GetCounterPaths(counter.Query)
 		if err != nil {
-			if r.config.IgnoreNECounters {
+			if this.config.IgnoreNECounters {
 				switch err {
 				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
 					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
-					r.log.Infow("Ignoring non existent counter", "error", err,
+					this.log.Infow("Ignoring non existent counter", "error", err,
 						logp.Namespace("perfmon"), "query", counter.Query)
 					continue
 				}
@@ -120,15 +119,15 @@ func (r *Reader) RefreshCounterPaths() error {
 		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
-				if err := r.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
+				if err := this.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
 				}
-				r.instanceLabel[v] = counter.InstanceLabel
-				r.measurement[v] = counter.MeasurementLabel
+				this.instanceLabel[v] = counter.InstanceLabel
+				this.measurement[v] = counter.MeasurementLabel
 			}
 		}
 	}
-	err := r.query.RemoveUnusedCounters(newCounters)
+	err := this.query.RemoveUnusedCounters(newCounters)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
@@ -137,7 +136,7 @@ func (r *Reader) RefreshCounterPaths() error {
 }
 
 // Read executes a query and returns those values in an event.
-func (this *Reader) Read() ([]mb.Event, error) {
+func (this *Reader) Read(metricset string) ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := this.query.CollectData(); err != nil {
@@ -150,22 +149,19 @@ func (this *Reader) Read() ([]mb.Event, error) {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event
-	if this.config.GroupAllCounters {
-		if event := this.groupToEvent(values); event.MetricSetFields != nil {
-			events = append(events, event)
-		}
-	}else {
-		if grouped := this.groupToEvents(values); len(grouped)>0 {
-			events = append(events, grouped...)
-		}
+	if this.config.GroupAllCounters && (metricsetName != metricset) {
+		event := this.groupToEvent(values)
+		events = append(events, event)
+	} else {
+		events = this.groupToEvents(values)
 	}
-
 	this.executed = true
 	return events, nil
 }
 
 func (this *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
 	eventMap := make(map[string]*mb.Event)
+
 	for counterPath, values := range counters {
 		for ind, val := range values {
 			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
@@ -175,6 +171,7 @@ func (this *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.E
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
 				continue
 			}
+
 			var eventKey string
 			if this.config.GroupMeasurements && val.Err == nil {
 				// Send measurements with the same instance label as part of the same event
@@ -208,7 +205,6 @@ func (this *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.E
 			}
 		}
 	}
-
 	// Write the values into the map.
 	events := make([]mb.Event, 0, len(eventMap))
 	for _, val := range eventMap {
@@ -217,13 +213,13 @@ func (this *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.E
 	return events
 }
 
-func (this *Reader)groupToEvent(counters map[string][]pdh.CounterValue) mb.Event {
+func (this *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event {
 	event := mb.Event{
 		MetricSetFields: common.MapStr{},
 	}
-	grouped:= make(map[string][]common.MapStr)
+	measurements := make(map[string]float64, 0)
 	for counterPath, values := range counters {
-		for ind, val := range values {
+		for _, val := range values {
 			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 			if val.Err != nil && !this.executed {
@@ -231,29 +227,27 @@ func (this *Reader)groupToEvent(counters map[string][]pdh.CounterValue) mb.Event
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
 				continue
 			}
-			var eventKey string
-			if this.config.GroupMeasurements && val.Err == nil {
-				// Send measurements with the same instance label as part of the same event
-				eventKey = val.Instance
-			} else {
-				// Send every measurement as an individual event
-				// If a counter contains an error, it will always be sent as an individual event
-				eventKey = counterPath + strconv.Itoa(ind)
-			}
-			// Create a new event if the key doesn't exist in the map
-			if _, ok := grouped[eventKey]; !ok {
-				grouped[eventKey] = make([]common.MapStr,0)
-					//[]common.MapStr {{"Error":errors.Wrapf(val.Err, "failed on query=%v", counterPath)}}
-			}
 
-			if val.Measurement != nil {
-				grouped[eventKey] = append(grouped[eventKey], common.MapStr{this.measurement[counterPath]: val.Measurement})
+			if _, ok := measurements[this.measurement[counterPath]]; !ok {
+				measurements[this.measurement[counterPath]] = val.Measurement.(float64)
+				measurements[this.measurement[counterPath]+instanceCountLabel] = 1
 			} else {
-				grouped[eventKey] = append(grouped[eventKey], common.MapStr{this.measurement[counterPath]: 0})
+				measurements[this.measurement[counterPath]+instanceCountLabel] = measurements[this.measurement[counterPath]+instanceCountLabel] + 1
+				measurements[this.measurement[counterPath]] = measurements[this.measurement[counterPath]] + val.Measurement.(float64)
 			}
 		}
 	}
-
+	for key, val := range measurements {
+		if strings.Contains(key, instanceCountLabel) {
+			if val == 1 {
+				continue
+			} else {
+				event.MetricSetFields.Put(strings.Split(key, ".")[0]+".instances", val)
+			}
+		} else {
+			event.MetricSetFields.Put(key, val)
+		}
+	}
 	return event
 }
 

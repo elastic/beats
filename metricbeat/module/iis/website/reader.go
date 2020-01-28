@@ -68,6 +68,7 @@ func (this *Reader) InitCounters(hosts []string) error {
 			newQueries = append(newQueries, value)
 		}
 	}
+
 	err = this.query.RemoveUnusedCounters(newQueries)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
@@ -137,3 +138,4 @@ func containsHost(item string, array []string) bool {
 	}
 	return false
 }
+

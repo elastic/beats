@@ -20,7 +20,6 @@
 package perfmon
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -114,32 +113,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			return errors.Wrap(err, "failed retrieving counters")
 		}
 	}
-	events, err := m.reader.Read()
+	events, err := m.reader.Read(m.BaseMetricSet.Name())
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
-	if m.reader.config.GroupAllCounters {
-		event := groupAllEvents(events)
-		report.Event(event)
-	} else {
-		for _, event := range events {
-			isOpen := report.Event(event)
-			if !isOpen {
-				break
-			}
+
+	for _, event := range events {
+		isOpen := report.Event(event)
+		if !isOpen {
+			break
 		}
 	}
-	return nil
-}
 
-func groupAllEvents(events []mb.Event) mb.Event {
-	ev := mb.Event{
-		MetricSetFields: common.MapStr{},
-	}
-	for _, event := range events {
-		ev.MetricSetFields.Update(event.MetricSetFields)
-	}
-	return ev
+	return nil
 }
 
 // Close will be called when metricbeat is stopped, should close the query.

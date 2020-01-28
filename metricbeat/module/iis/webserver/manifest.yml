@@ -61,7 +61,7 @@ input:
           measurement_label: cache.file_cache_hits
           query: '\Web Service Cache\File Cache Hits'
         - instance_label: ''
-          measurement_label: cache.file_cache_mises
+          measurement_label: cache.file_cache_misses
           query: '\Web Service Cache\File Cache Misses'
         - instance_label: ''
           measurement_label: cache.current_file_cache_memory_usage
