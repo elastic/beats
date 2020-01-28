@@ -109,6 +109,26 @@ func (b *builder) nanoOfSecond(digits int) {
 	}
 }
 
+func (b *builder) fractNanoOfSecond(digits int) {
+	const fractDigits = 3
+
+	if digits <= 0 {
+		return
+	}
+
+	// cap number of digits at 9, as we do not support higher precision and
+	// would remove trailing zeroes anyway.
+	if digits > 9 {
+		digits = 9
+	}
+
+	minDigits := fractDigits
+	if digits < minDigits {
+		minDigits = digits
+	}
+	b.add(paddedNumber{ftNanoOfSecond, 9 - digits, minDigits, digits, fractDigits, false})
+}
+
 func (b *builder) secondOfMinute(digits int) {
 	b.appendDecimal(ftSecondOfMinute, digits, 2)
 }
@@ -223,12 +243,12 @@ func (b *builder) appendDecimalValue(ft fieldType, minDigits, maxDigits int, sig
 	if minDigits <= 1 {
 		b.add(unpaddedNumber{ft, maxDigits, signed})
 	} else {
-		b.add(paddedNumber{ft, 0, minDigits, maxDigits, signed})
+		b.add(paddedNumber{ft, 0, minDigits, maxDigits, 0, signed})
 	}
 }
 
 func (b *builder) appendExtDecimal(ft fieldType, divExp, minDigits, maxDigits int) {
-	b.add(paddedNumber{ft, divExp, minDigits, maxDigits, false})
+	b.add(paddedNumber{ft, divExp, minDigits, maxDigits, 0, false})
 }
 
 func (b *builder) appendDecimal(ft fieldType, minDigits, maxDigits int) {

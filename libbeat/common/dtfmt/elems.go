@@ -44,10 +44,10 @@ type unpaddedNumber struct {
 }
 
 type paddedNumber struct {
-	ft                   fieldType
-	divExp               int
-	minDigits, maxDigits int
-	signed               bool
+	ft                                fieldType
+	divExp                            int
+	minDigits, maxDigits, fractDigits int
+	signed                            bool
 }
 
 type textField struct {
@@ -188,10 +188,14 @@ func (n unpaddedNumber) compile() (prog, error) {
 }
 
 func (n paddedNumber) compile() (prog, error) {
-	if n.divExp == 0 {
+	switch {
+	case n.fractDigits != 0:
+		return makeProg(opExtNumFractPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits), byte(n.fractDigits))
+	case n.divExp == 0:
 		return makeProg(opNumPadded, byte(n.ft), byte(n.maxDigits))
+	default:
+		return makeProg(opExtNumPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits))
 	}
-	return makeProg(opExtNumPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits))
 }
 
 func (n twoDigitYear) compile() (prog, error) {

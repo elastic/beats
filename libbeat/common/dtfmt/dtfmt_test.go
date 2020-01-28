@@ -82,10 +82,37 @@ func TestFormat(t *testing.T) {
 		{mkTime(8, 5, 24, 0), "kk:mm:ss aa", "09:05:24 AM"},
 		{mkTime(20, 5, 24, 0), "k:m:s a", "21:5:24 PM"},
 		{mkTime(20, 5, 24, 0), "kk:mm:ss aa", "21:05:24 PM"},
-		{mkTime(1, 2, 3, 123), "S", "1"},
-		{mkTime(1, 2, 3, 123), "SS", "12"},
-		{mkTime(1, 2, 3, 123), "SSS", "123"},
-		{mkTime(1, 2, 3, 123), "SSSS", "1230"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "S", "1"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "SS", "12"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "SSS", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "SSSS", "1230"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "f", "1"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "ff", "12"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "fff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "ffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "fffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "ffffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "fffffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "ffffffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Millisecond), "fffffffff", "123"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "f", "0"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "ff", "00"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "fff", "000"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "ffff", "0001"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "fffff", "00012"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "ffffff", "000123"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "fffffff", "000123"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "ffffffff", "000123"},
+		{mkTime(1, 2, 3, 123*time.Microsecond), "fffffffff", "000123"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "f", "0"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "ff", "00"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "fff", "000"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "ffff", "000"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "fffff", "000"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "ffffff", "000"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "fffffff", "0000001"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "ffffffff", "00000012"},
+		{mkTime(1, 2, 3, 123*time.Nanosecond), "fffffffff", "000000123"},
 
 		// literals
 		{time.Now(), "--=++,_!/?\\[]{}@#$%^&*()", "--=++,_!/?\\[]{}@#$%^&*()"},
@@ -94,24 +121,27 @@ func TestFormat(t *testing.T) {
 		{time.Now(), "'plain' '' 'text'", "plain ' text"},
 		{time.Now(), "'plain '' text'", "plain ' text"},
 
-		// beats timestamp
-		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
+		// timestamps with microseconds precision only
+		{mkDateTime(2017, 1, 2, 4, 6, 7, 123*time.Millisecond),
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+			"2017-01-02T04:06:07.123Z"},
+		{mkDateTime(2017, 1, 2, 4, 6, 7, 123456*time.Microsecond),
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
 			"2017-01-02T04:06:07.123Z"},
 
 		// beats timestamp
-		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
-			"yyyy-MM-dd'T'HH:mm:ss.SSSz",
+		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123*time.Millisecond, time.FixedZone("PST", -8*60*60)),
+			"yyyy-MM-dd'T'HH:mm:ss.fffffffffz",
 			"2017-01-02T04:06:07.123-08:00"},
 
 		// beats nanoseconds timestamp
-		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
-			"yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn'Z'",
-			"2017-01-02T04:06:07.123000000Z"},
+		{mkDateTime(2017, 1, 2, 4, 6, 7, 123*time.Nanosecond),
+			"yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'",
+			"2017-01-02T04:06:07.000000123Z"},
 
-		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
-			"yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnz",
-			"2017-01-02T04:06:07.123000000-08:00"},
+		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123*time.Millisecond, time.FixedZone("PST", -8*60*60)),
+			"yyyy-MM-dd'T'HH:mm:ss.fffffffffz",
+			"2017-01-02T04:06:07.123-08:00"},
 	}
 
 	for i, test := range tests {
@@ -132,14 +162,14 @@ func mkDate(y, m, d int) time.Time {
 	return mkDateTime(y, m, d, 0, 0, 0, 0)
 }
 
-func mkTime(h, m, s, S int) time.Time {
+func mkTime(h, m, s int, S time.Duration) time.Time {
 	return mkDateTime(2000, 1, 1, h, m, s, S)
 }
 
-func mkDateTime(y, M, d, h, m, s, S int) time.Time {
+func mkDateTime(y, M, d, h, m, s int, S time.Duration) time.Time {
 	return mkDateTimeWithLocation(y, M, d, h, m, s, S, time.UTC)
 }
 
-func mkDateTimeWithLocation(y, M, d, h, m, s, S int, l *time.Location) time.Time {
-	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, l)
+func mkDateTimeWithLocation(y, M, d, h, m, s int, S time.Duration, l *time.Location) time.Time {
+	return time.Date(y, time.Month(M), d, h, m, s, int(S), l)
 }
