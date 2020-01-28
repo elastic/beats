@@ -135,6 +135,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+- Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
+- Add dashboard for AWS ELB fileset. {pull}15804[15804]
+
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
