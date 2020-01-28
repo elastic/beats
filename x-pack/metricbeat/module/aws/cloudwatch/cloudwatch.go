@@ -17,6 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -514,10 +515,11 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
-					for _, tag := range tags {
-						events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
-					}
 
+					// By default, replace dot "." using under bar "_" for tag keys and values
+					for _, tag := range tags {
+						events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+					}
 				}
 			}
 		}
