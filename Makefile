@@ -144,7 +144,7 @@ notice: python-env
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==1.9.5 future==0.18.2
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==2.4.4
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
