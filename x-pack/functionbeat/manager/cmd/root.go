@@ -24,6 +24,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
 		Name:            Name,
+		HasDashboards:   false,
 		ConfigOverrides: config.Overrides,
 	})
 
