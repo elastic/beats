@@ -51,7 +51,7 @@ func (e *Event) SetID(id string) {
 	if e.Meta == nil {
 		e.Meta = common.MapStr{}
 	}
-	e.Meta["id"] = id
+	e.Meta["_id"] = id
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
