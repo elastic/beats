@@ -35,4 +35,4 @@ import (
 var Name = "winlogbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: true})
