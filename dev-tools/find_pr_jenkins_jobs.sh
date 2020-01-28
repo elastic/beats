@@ -1,14 +1,16 @@
 #!/bin/bash
 
 # Description:
-#   This script finds Jenkins jobs for a given Beats PR.
+#    This script finds Jenkins jobs for a given Beats PR.
 #
 # Usage:
-#   ./find_pr_jenkins_job.sh PR_NUMBER
+#    ./find_pr_jenkins_job.sh PR_NUMBER
 #
 # Example:
-#   ./find_pr_jenkins_job.sh 15790
+#    ./find_pr_jenkins_job.sh 15790
 #
+# Dependencies:
+#    curl, jq
 
 set -e
 
