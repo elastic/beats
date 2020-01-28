@@ -22,6 +22,54 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
+
+		"extract items from array": {
+			givenYAML: `
+streams:
+  - name: MySQL error log
+    input:
+      type:	file
+      path:	/var/log/mysql/error.log
+  - name: MySQL access log
+    input:
+      type:	file
+      path:	/var/log/mysql/access.log
+  - name: MySQL metrics
+    input:
+      type: mysql
+      host: localhost
+      port: 3306
+`,
+			expectedYAML: `
+streams:
+  - name: MySQL error log
+    input:
+      type:	file
+      path:	/var/log/mysql/error.log
+  - name: MySQL access log
+    input:
+      type:	file
+      path: /var/log/mysql/access.log
+  - name: MySQL metrics
+    input:
+      type: mysql
+      host: localhost
+      port: 3306
+inputs:
+  - type: file
+    path: /var/log/mysql/error.log
+  - type: file
+    path: /var/log/mysql/access.log
+  - type: mysql
+    host: localhost
+    port: 3306
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					ExtractListItem("streams", "input", "inputs"),
+				},
+			},
+		},
 		"two level rename": {
 			givenYAML: `
 output:
@@ -391,6 +439,7 @@ func TestSerialization(t *testing.T) {
 		Filter("f1", "f2"),
 		FilterValues("select-v", "key-v", "v1", "v2"),
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
+		ExtractListItem("path.p", "item", "target"),
 	)
 
 	y := `- rename:
@@ -431,6 +480,10 @@ func TestSerialization(t *testing.T) {
     key: type
     re: ^metric/.*
     selector: inputs
+- extract_list_items:
+    path: path.p
+    item: item
+    to: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

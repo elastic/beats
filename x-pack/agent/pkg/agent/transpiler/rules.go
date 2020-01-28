@@ -61,6 +61,9 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "filter_values"
 		case *FilterValuesWithRegexpRule:
 			name = "filter_values_with_regexp"
+		case *ExtractListItemRule:
+			name = "extract_list_items"
+
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -110,52 +113,94 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		switch name {
 		case "copy":
 			r = &CopyRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "rename":
 			r = &RenameRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "translate":
 			r = &TranslateRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "translate_with_regexp":
 			r = &TranslateWithRegexpRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "map":
 			r = &MapRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter":
 			r = &FilterRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter_values":
 			r = &FilterValuesRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
 		case "filter_values_with_regexp":
 			r = &FilterValuesWithRegexpRule{}
-			if err := unpack(fields, r); err != nil {
-				return err
-			}
+		case "extract_list_items":
+			r = &ExtractListItemRule{}
 		default:
-			return fmt.Errorf("unkown rule of type %s", name)
+			return fmt.Errorf("unknown rule of type %s", name)
+		}
+
+		if err := unpack(fields, r); err != nil {
+			return err
 		}
 
 		rules = append(rules, r)
 	}
 	r.Rules = rules
 	return nil
+}
+
+// ExtractListItemRule extract items with specified name from a list of maps.
+// The result is store in a new array.
+// Example:
+// Source: {items: []List{ map{"key": "val1"}, map{"key", "val2"} } }
+// extract-list-item -path:items -item:key -to:keys
+// result:
+// {items: []List{ map{"key": "val1"}, map{"key", "val2"} }, keys: []List {"val1", "val2"} }
+type ExtractListItemRule struct {
+	Path Selector
+	Item string
+	To   string
+}
+
+// Apply extracts items from array.
+func (r *ExtractListItemRule) Apply(ast *AST) error {
+	node, found := Lookup(ast, r.Path)
+	if !found {
+		return nil
+	}
+
+	nodeVal := node.Value()
+	if nodeVal == nil {
+		return nil
+	}
+
+	l, isList := nodeVal.(*List)
+	if !isList {
+		return nil
+	}
+
+	newList := &List{
+		value: make([]Node, 0, len(l.value)),
+	}
+
+	for _, n := range l.value {
+		in, found := n.Find(r.Item)
+		if !found {
+			continue
+		}
+
+		vn, ok := in.Value().(Node)
+		if !ok {
+			continue
+		}
+
+		newList.value = append(newList.value, vn.Clone())
+	}
+
+	return Insert(ast, newList, r.To)
+}
+
+// ExtractListItem creates a ExtractListItemRule
+func ExtractListItem(path Selector, item, target string) *ExtractListItemRule {
+	return &ExtractListItemRule{
+		Path: path,
+		Item: item,
+		To:   target,
+	}
 }
 
 // RenameRule takes a selectors and will rename the last path of a Selector to a new name.
