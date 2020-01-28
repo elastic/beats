@@ -87,6 +87,7 @@ streams:
 				},
 			},
 		},
+
 		"extract items from array": {
 			givenYAML: `
 streams:

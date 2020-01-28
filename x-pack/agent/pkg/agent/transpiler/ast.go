@@ -697,8 +697,6 @@ func Insert(a *AST, node Node, to Selector) error {
 	switch node.(type) {
 	case *List:
 		d.value = node
-	case *Dict:
-		d.value = &Dict{[]Node{node}}
 	default:
 		d.value = &Dict{[]Node{node}}
 	}
