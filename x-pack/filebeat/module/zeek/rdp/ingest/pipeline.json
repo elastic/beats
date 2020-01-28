@@ -27,6 +27,13 @@
     },
     {
       "set": {
+        "field": "tls.established",
+        "value": "{{zeek.rdp.ssl}}",
+        "if": "ctx.zeek?.rdp.ssl != null"
+      }
+    },
+    {
+      "set": {
         "field": "source.ip",
         "value": "{{source.address}}"
       }

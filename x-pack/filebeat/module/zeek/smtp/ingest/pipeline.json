@@ -38,6 +38,13 @@
       }
     },
     {
+      "set": {
+        "field": "tls.established",
+        "value": "{{zeek.smtp.tls}}",
+        "if": "ctx.zeek?.smtp.tls != null"
+      }
+    },
+    {
       "date": {
         "field": "zeek.smtp.date",
         "target_field": "zeek.smtp.date",
