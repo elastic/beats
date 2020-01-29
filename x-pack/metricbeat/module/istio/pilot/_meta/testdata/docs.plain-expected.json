@@ -1351,6 +1351,84 @@
         },
         "istio": {
             "pilot": {
+                "conflict": {
+                    "listener": {
+                        "inbound": 0,
+                        "outbound": {
+                            "http": {
+                                "over": {
+                                    "current": {
+                                        "tcp": 0
+                                    }
+                                }
+                            },
+                            "tcp": {
+                                "over": {
+                                    "current": {
+                                        "http": 0,
+                                        "tcp": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "no": {
+                    "ip": 0
+                },
+                "proxy": {
+                    "conv": {
+                        "ms": {
+                            "bucket": {
+                                "+Inf": 29,
+                                "1000": 9,
+                                "10000": 27,
+                                "100000": 29,
+                                "20000": 29,
+                                "3000": 13,
+                                "30000": 29,
+                                "5000": 24,
+                                "50000": 29
+                            },
+                            "count": 29,
+                            "sum": 103057.56475999998
+                        }
+                    }
+                },
+                "services": 27,
+                "virt": {
+                    "services": 0
+                },
+                "xds": {
+                    "count": 12,
+                    "internal": {
+                        "errors": 0
+                    },
+                    "push": {
+                        "context": {
+                            "errors": 0
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
                 "cluster": "outbound|15014||istio-telemetry.istio-system.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -1605,86 +1683,6 @@
                 "xds": {
                     "eds": {
                         "instances": 1
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "pilot",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.pilot",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "pilot": {
-                "conflict": {
-                    "inbound": {
-                        "listener": 0
-                    },
-                    "outbound": {
-                        "listener": {
-                            "http": {
-                                "over": {
-                                    "current": {
-                                        "tcp": 0
-                                    }
-                                }
-                            },
-                            "tcp": {
-                                "over": {
-                                    "current": {
-                                        "http": 0,
-                                        "tcp": 0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "no": {
-                    "ip": 0
-                },
-                "proxy": {
-                    "conv": {
-                        "ms": {
-                            "bucket": {
-                                "+Inf": 29,
-                                "1000": 9,
-                                "10000": 27,
-                                "100000": 29,
-                                "20000": 29,
-                                "3000": 13,
-                                "30000": 29,
-                                "5000": 24,
-                                "50000": 29
-                            },
-                            "count": 29,
-                            "sum": 103057.56475999998
-                        }
-                    }
-                },
-                "services": 27,
-                "virt": {
-                    "services": 0
-                },
-                "xds": {
-                    "count": 12,
-                    "internal": {
-                        "errors": 0
-                    },
-                    "push": {
-                        "context": {
-                            "errors": 0
-                        }
                     }
                 }
             }
