@@ -122,7 +122,7 @@ auditbeat.modules:
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
 
--module: system
+- module: system
   datasets:
     - package # Installed, updated, and removed packages
 
