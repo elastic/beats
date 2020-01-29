@@ -19,11 +19,12 @@ package mb
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/processors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/processors"
 
 	"github.com/pkg/errors"
 

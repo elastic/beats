@@ -18,8 +18,9 @@
 package mb
 
 import (
-	"github.com/elastic/beats/libbeat/processors"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/processors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
