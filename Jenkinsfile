@@ -24,7 +24,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
-    booleanParam(name: 'windowsTest', defaultValue: false, description: 'Allow Windows stages.')
+    booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
   }
   stages {
     /**
@@ -50,7 +50,7 @@ pipeline {
             env.BUILD_GENERATOR = isChanged(["^generator/.*"])
             env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
             env.BUILD_DOCS = isGitRegionMatch(patterns: ["^docs/.*"], comparator: 'regexp') || params.runAllStages
-            env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^Libbeat/.*"], comparator: 'regexp') || params.runAllStages
+            env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^libbeat/.*","^x-pack/filebeat./*"], comparator: 'regexp') || params.runAllStages
           }
         }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
@@ -198,7 +198,7 @@ pipeline {
               }
               steps {
                 mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
-                mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
+                //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
               }
             }
           }
@@ -324,7 +324,7 @@ pipeline {
           }
           steps {
             mageTargetWin("Metricbeat Windows Unit test", "-d metricbeat goUnitTest")
-            mageTargetWin("Metricbeat Windows Integration test", "-d metricbeat goIntegTest")
+            //mageTargetWin("Metricbeat Windows Integration test", "-d metricbeat goIntegTest")
           }
         }
         stage('Packetbeat'){
