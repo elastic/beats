@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
+
 
 *Auditbeat*
 
@@ -54,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 
@@ -66,8 +69,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
 - Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
+- Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
 
 *Packetbeat*
 
@@ -82,12 +87,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
+
 
 *Auditbeat*
 
 
 *Filebeat*
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
+- Add dashboard for AWS ELB fileset. {pull}15804[15804]
+
 
 *Heartbeat*
 
