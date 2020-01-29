@@ -213,7 +213,6 @@ addons:
       retries: true
     update: true
     packages:
-      - python3-venv
       - libpcap-dev
       - xsltproc
       - libxml2-utils
@@ -221,6 +220,9 @@ addons:
       - librpm-dev
 
 before_install:
+  - sudo add-apt-repository ppa:deadsnakes/ppa
+  - sudo apt-get update
+  - sudo apt-get install python3.7
   - python --version
   - python3 --version
   - umask 022
