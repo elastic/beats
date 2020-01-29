@@ -37,6 +37,7 @@ datasources:
       version: 1.7.0
     namespace?: prod
     constraints:
+      # Contraints look are not final
       - os.platform: { in: "windows" }
       - agent.version: { ">=": "8.0.0" }
     inputs:
