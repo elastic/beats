@@ -17205,7 +17205,7 @@ type: integer
 
 --
 
-*`istio.pilot.conflict.inbound.listener`*::
+*`istio.pilot.conflict.listener.inbound`*::
 +
 --
 Number of conflicting inbound listeners.
@@ -17215,7 +17215,7 @@ type: integer
 
 --
 
-*`istio.pilot.conflict.outbound.listener.http.over.current.tcp`*::
+*`istio.pilot.conflict.listener.outbound.http.over.current.tcp`*::
 +
 --
 Number of conflicting wildcard http listeners with current wildcard tcp listener.
@@ -17225,7 +17225,7 @@ type: integer
 
 --
 
-*`istio.pilot.conflict.outbound.listener.http.over.https`*::
+*`istio.pilot.conflict.listener.outbound.http.over.https`*::
 +
 --
 Number of conflicting HTTP listeners with well known HTTPS ports.
@@ -17235,7 +17235,7 @@ type: integer
 
 --
 
-*`istio.pilot.conflict.outbound.listener.tcp.over.current.http`*::
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.http`*::
 +
 --
 Number of conflicting wildcard tcp listeners with current wildcard http listener.
@@ -17245,7 +17245,7 @@ type: integer
 
 --
 
-*`istio.pilot.conflict.outbound.listener.tcp.over.current.tcp`*::
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.tcp`*::
 +
 --
 Number of conflicting tcp listeners with current tcp listener.
