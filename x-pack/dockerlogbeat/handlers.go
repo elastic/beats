@@ -39,7 +39,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 		}
 
 		pm.Logger.Debugf("Homepath: %v\n", filepath.Dir(os.Args[0]))
-		pm.Logger.Debugf("Got start request object from container %#v\n", startReq.Info.ContainerName)
+		pm.Logger.Infof("Got start request object from container %#v\n", startReq.Info.ContainerName)
 		pm.Logger.Debugf("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
 		pm.Logger.Debugf("Got a container with the following log opts: %#v\n", startReq.Info.Config)
 
@@ -70,7 +70,7 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 		go func() {
 			err = pm.CloseClientWithFile(stopReq.File)
 			if err != nil {
-				pm.Logger.Infof(" Got stop request error %#v\n", err)
+				pm.Logger.Errorf(" Got stop request error %#v\n", err)
 			}
 		}()
 
