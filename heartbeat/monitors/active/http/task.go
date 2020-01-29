@@ -53,14 +53,6 @@ func newHTTPMonitorHostJob(
 	validator multiValidator,
 ) (jobs.Job, error) {
 
-	// Trace visited URLs when redirects occur
-	var redirects []string
-	client := &http.Client{
-		CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
-		Transport:     transport,
-		Timeout:       config.Timeout,
-	}
-
 	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
@@ -69,7 +61,17 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response, &redirects)
+		var redirects []string
+		client := &http.Client{
+			// Trace visited URLs when redirects occur
+			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
+			Transport:     transport,
+			Timeout:       config.Timeout,
+		}
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		if len(redirects) > 0 {
+			event.PutValue("http.response.redirects", redirects)
+		}
 		return err
 	}), nil
 }
@@ -111,7 +113,6 @@ func createPingFactory(
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
-	checkRedirect := makeCheckRedirect(config.MaxRedirects, nil)
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
@@ -137,6 +138,10 @@ func createPingFactory(
 		// It seems they can be invoked still sometime after the request is done
 		cbMutex := sync.Mutex{}
 
+		// We don't support redirects for IP jobs, so this effectively just
+		// prevents following redirects in this case, we know that
+		// config.MaxRedirects must be zero to even be here
+		checkRedirect := makeCheckRedirect(0, nil)
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
@@ -160,7 +165,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response, nil)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -181,6 +186,10 @@ func createPingFactory(
 
 		return err
 	})
+}
+
+func makeIPClient() {
+
 }
 
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
@@ -221,7 +230,6 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-	redirects *[]string,
 ) (start, end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -248,9 +256,6 @@ func execPing(
 
 	httpFields := common.MapStr{"response": responseFields}
 
-	if redirects != nil && len(*redirects) > 0 {
-		httpFields["redirects"] = redirects
-	}
 	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
@@ -321,6 +326,9 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 	}
 
 	return func(r *http.Request, via []*http.Request) error {
+		if via == nil {
+			redirects = nil
+		}
 		if redirects != nil {
 			*redirects = append(*redirects, r.URL.String())
 		}

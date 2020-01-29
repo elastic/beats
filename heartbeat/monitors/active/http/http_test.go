@@ -479,25 +479,27 @@ func TestRedirect(t *testing.T) {
 	sched, _ := schedule.Parse("@every 1s")
 	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
-	event := &beat.Event{}
-	_, err = job(event)
-	require.NoError(t, err)
+	for i := 0; i < 10; i++ {
+		event := &beat.Event{}
+		_, err = job(event)
+		require.NoError(t, err)
 
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks("", "up", "http"),
-			hbtest.SummaryChecks(1, 0),
-			minimalRespondingHTTPChecks(testURL, 200),
-			lookslike.MustCompile(map[string]interface{}{
-				"http.redirects": []string{
-					server.URL + redirectingPaths["/redirect_one"],
-					server.URL + redirectingPaths["/redirect_two"],
-				},
-			}),
-		)),
-		event.Fields,
-	)
+		testslike.Test(
+			t,
+			lookslike.Strict(lookslike.Compose(
+				hbtest.BaseChecks("", "up", "http"),
+				hbtest.SummaryChecks(1, 0),
+				minimalRespondingHTTPChecks(testURL, 200),
+				lookslike.MustCompile(map[string]interface{}{
+					"http.response.redirects": []string{
+						server.URL + redirectingPaths["/redirect_one"],
+						server.URL + redirectingPaths["/redirect_two"],
+					},
+				}),
+			)),
+			event.Fields,
+		)
+	}
 }
 
 func TestNewRoundTripper(t *testing.T) {
