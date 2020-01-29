@@ -136,8 +136,9 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			Password: password,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: tlsConfig.ToConfig(),
 				},
 				Timeout: config.Timeout,
 			},

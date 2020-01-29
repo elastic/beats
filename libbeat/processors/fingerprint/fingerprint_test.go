@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"math/rand"
 	"strconv"
 	"testing"
 	"time"
@@ -43,6 +44,7 @@ func TestHashMethods(t *testing.T) {
 		"sha256": {"1208288932231e313b369bae587ff574cd3016a408e52e7128d7bee752674003"},
 		"sha384": {"295adfe0bc03908948e4b0b6a54f441767867e426dda590430459c8a147fbba242a38cba282adee78335b9e08877b86c"},
 		"sha512": {"f50ad51b63c92a0ed0c910527119b81806f3110f0afaa1dcb93506a78371ea761e50c0fc09b08c441d832dd2da1b45e5d8361adfb240e1fffc2695122a23e183"},
+		"xxhash": {"37bc50682fba6686"},
 	}
 
 	for method, test := range tests {
@@ -375,4 +377,48 @@ func TestIgnoreMissing(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkHashMethods(b *testing.B) {
+	events := nRandomEvents(100000)
+
+	for method := range hashes {
+		testConfig, _ := common.NewConfigFrom(common.MapStr{
+			"fields": []string{"message"},
+			"method": method,
+		})
+
+		p, _ := New(testConfig)
+
+		b.Run(method, func(b *testing.B) {
+			b.ResetTimer()
+			for _, e := range events {
+				p.Run(&e)
+			}
+		})
+	}
+}
+
+func nRandomEvents(num int) []beat.Event {
+	prng := rand.New(rand.NewSource(12345))
+
+	const charset = "abcdefghijklmnopqrstuvwxyz" +
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"0123456789"
+	charsetLen := len(charset)
+	b := make([]byte, 200)
+
+	var events []beat.Event
+	for i := 0; i < num; i++ {
+		for j := range b {
+			b[j] = charset[prng.Intn(charsetLen)]
+		}
+		events = append(events, beat.Event{
+			Fields: common.MapStr{
+				"message": string(b),
+			},
+		})
+	}
+
+	return events
 }

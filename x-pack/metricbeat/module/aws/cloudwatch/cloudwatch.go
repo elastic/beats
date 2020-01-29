@@ -17,6 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -120,6 +121,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
 	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+
+	// Check statistic method in config
+	err := m.checkStatistics()
+	if err != nil {
+		return errors.Wrap(err, "checkStatistics failed")
+	}
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
@@ -238,6 +245,17 @@ func constructTagsFilters(namespaceDetails []namespaceDetail) map[string][]aws.T
 		}
 	}
 	return resourceTypeTagFilters
+}
+
+func (m *MetricSet) checkStatistics() error {
+	for _, config := range m.CloudwatchConfigs {
+		for _, stat := range config.Statistic {
+			if _, ok := statisticLookup(stat); !ok {
+				return errors.New("statistic method specified is not valid: " + stat)
+			}
+		}
+	}
+	return nil
 }
 
 func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]namespaceDetail) {
@@ -368,19 +386,26 @@ func statisticLookup(stat string) (string, bool) {
 	return statMethod, ok
 }
 
-func generateFieldName(labels []string) string {
+func generateFieldName(namespace string, labels []string) string {
 	stat := labels[statisticIdx]
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
-	if statMethod, ok := statisticLookup(stat); ok {
-		return "aws.metrics." + labels[metricNameIdx] + "." + statMethod
-	}
-	// If not, then it should be a percentile in the form of pN
-	return "metrics." + labels[metricNameIdx] + "." + stat
+	// With checkStatistics function, no need to check bool return value here
+	statMethod, _ := statisticLookup(stat)
+	// By default, replace dot "." using under bar "_" for metric names
+	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
+}
+
+// stripNamespace converts Cloudwatch namespace into the root field we will use for metrics
+// example AWS/EC2 -> ec2
+func stripNamespace(namespace string) string {
+	parts := strings.Split(namespace, "/")
+	return strings.ToLower(parts[len(parts)-1])
 }
 
 func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
-	event.RootFields.Put(generateFieldName(labels), metricValue)
-	event.RootFields.Put("aws.cloudwatch.namespace", labels[namespaceIdx])
+	namespace := labels[namespaceIdx]
+	event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
+	event.RootFields.Put("aws.cloudwatch.namespace", namespace)
 	if len(labels) == 3 {
 		return event
 	}
@@ -388,7 +413,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	dimNames := strings.Split(labels[identifierNameIdx], ",")
 	dimValues := strings.Split(labels[identifierValueIdx], ",")
 	for i := 0; i < len(dimNames); i++ {
-		event.RootFields.Put("aws.cloudwatch.dimensions."+dimNames[i], dimValues[i])
+		event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
 	}
 	return event
 }
@@ -491,10 +516,11 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
-					for _, tag := range tags {
-						events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
-					}
 
+					// By default, replace dot "." using under bar "_" for tag keys and values
+					for _, tag := range tags {
+						events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+					}
 				}
 			}
 		}

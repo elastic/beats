@@ -128,24 +128,8 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		ev := newEvent()
-		Parse(data, ev)
-		if !ev.IsValid() {
-			log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
-			// On error revert to the raw bytes content, we need a better way to communicate this kind of
-			// error upstream this should be a global effort.
-			forwarder.Send(beat.Event{
-				Timestamp: time.Now(),
-				Meta: common.MapStr{
-					"truncated": metadata.Truncated,
-				},
-				Fields: common.MapStr{
-					"message": string(data),
-				},
-			})
-		} else {
-			forwarder.Send(createEvent(ev, metadata, time.Local, log))
-		}
+		ev := parseAndCreateEvent(data, metadata, time.Local, log)
+		forwarder.Send(ev)
 	}
 
 	server, err := factory(cb, config.Protocol)
@@ -201,11 +185,6 @@ func (p *Input) Wait() {
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
-		"log": common.MapStr{
-			"source": common.MapStr{
-				"address": metadata.RemoteAddr.String(),
-			},
-		},
 	}
 
 	syslog := common.MapStr{}
@@ -254,13 +233,31 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		f["event.sequence"] = ev.Sequence()
 	}
 
-	return beat.Event{
-		Timestamp: ev.Timestamp(timezone),
+	return newBeatEvent(ev.Timestamp(timezone), metadata, f)
+}
+
+func parseAndCreateEvent(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
+	ev := newEvent()
+	Parse(data, ev)
+	if !ev.IsValid() {
+		log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
+		return newBeatEvent(time.Now(), metadata, common.MapStr{
+			"message": string(data),
+		})
+	}
+	return createEvent(ev, metadata, time.Local, log)
+}
+
+func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields common.MapStr) beat.Event {
+	event := beat.Event{
+		Timestamp: timestamp,
 		Meta: common.MapStr{
 			"truncated": metadata.Truncated,
 		},
-		Fields: f,
+		Fields: fields,
 	}
+	event.Fields.Put("log.source.address", metadata.RemoteAddr.String())
+	return event
 }
 
 func mapValueToName(v int, m mapper) (string, error) {

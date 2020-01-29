@@ -27,6 +27,12 @@ type selectiveCore struct {
 	core         zapcore.Core
 }
 
+// HasSelector returns true if the given selector was explicitly set.
+func HasSelector(selector string) bool {
+	_, found := loadLogger().selectors[selector]
+	return found
+}
+
 func selectiveWrapper(core zapcore.Core, selectors map[string]struct{}) zapcore.Core {
 	if len(selectors) == 0 {
 		return core

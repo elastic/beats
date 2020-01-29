@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -36,7 +37,7 @@ import (
 type node struct {
 	uuid    uuid.UUID
 	config  *Config
-	metagen kubernetes.MetaGenerator
+	metagen metadata.MetaGen
 	logger  *logp.Logger
 	publish func(bus.Event)
 	watcher kubernetes.Watcher
@@ -44,15 +45,10 @@ type node struct {
 
 // NewNodeEventer creates an eventer that can discover and process node objects
 func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
-	metagen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	logger := logp.NewLogger("autodiscover.node")
 
 	config := defaultConfig()
-	err = cfg.Unpack(&config)
+	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +66,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Node,
-	})
+	}, nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
@@ -80,7 +76,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		config:  config,
 		uuid:    uuid,
 		publish: publish,
-		metagen: metagen,
+		metagen: metadata.NewNodeMetadataGenerator(cfg, watcher.Store()),
 		logger:  logger,
 		watcher: watcher,
 	}
@@ -172,11 +168,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	}
 
 	eventID := fmt.Sprint(node.GetObjectMeta().GetUID())
-	meta := n.metagen.ResourceMetadata(node)
-
-	// TODO: Refactor metagen to make sure that this is seamless
-	meta.Put("node.name", node.Name)
-	meta.Put("node.uid", string(node.GetObjectMeta().GetUID()))
+	meta := n.metagen.Generate(node)
 
 	kubemeta := meta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.

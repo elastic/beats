@@ -36,42 +36,71 @@ type PrivateKey struct {
 	iv            []byte
 }
 
+<<<<<<< HEAD
 func NewRSAPrivateKey(currentTime time.Time, priv *rsa.PrivateKey) *PrivateKey {
 	pk := new(PrivateKey)
 	pk.PublicKey = *NewRSAPublicKey(currentTime, &priv.PublicKey)
+=======
+func NewRSAPrivateKey(creationTime time.Time, priv *rsa.PrivateKey) *PrivateKey {
+	pk := new(PrivateKey)
+	pk.PublicKey = *NewRSAPublicKey(creationTime, &priv.PublicKey)
+>>>>>>> master
 	pk.PrivateKey = priv
 	return pk
 }
 
+<<<<<<< HEAD
 func NewDSAPrivateKey(currentTime time.Time, priv *dsa.PrivateKey) *PrivateKey {
 	pk := new(PrivateKey)
 	pk.PublicKey = *NewDSAPublicKey(currentTime, &priv.PublicKey)
+=======
+func NewDSAPrivateKey(creationTime time.Time, priv *dsa.PrivateKey) *PrivateKey {
+	pk := new(PrivateKey)
+	pk.PublicKey = *NewDSAPublicKey(creationTime, &priv.PublicKey)
+>>>>>>> master
 	pk.PrivateKey = priv
 	return pk
 }
 
+<<<<<<< HEAD
 func NewElGamalPrivateKey(currentTime time.Time, priv *elgamal.PrivateKey) *PrivateKey {
 	pk := new(PrivateKey)
 	pk.PublicKey = *NewElGamalPublicKey(currentTime, &priv.PublicKey)
+=======
+func NewElGamalPrivateKey(creationTime time.Time, priv *elgamal.PrivateKey) *PrivateKey {
+	pk := new(PrivateKey)
+	pk.PublicKey = *NewElGamalPublicKey(creationTime, &priv.PublicKey)
+>>>>>>> master
 	pk.PrivateKey = priv
 	return pk
 }
 
+<<<<<<< HEAD
 func NewECDSAPrivateKey(currentTime time.Time, priv *ecdsa.PrivateKey) *PrivateKey {
 	pk := new(PrivateKey)
 	pk.PublicKey = *NewECDSAPublicKey(currentTime, &priv.PublicKey)
+=======
+func NewECDSAPrivateKey(creationTime time.Time, priv *ecdsa.PrivateKey) *PrivateKey {
+	pk := new(PrivateKey)
+	pk.PublicKey = *NewECDSAPublicKey(creationTime, &priv.PublicKey)
+>>>>>>> master
 	pk.PrivateKey = priv
 	return pk
 }
 
 // NewSignerPrivateKey creates a PrivateKey from a crypto.Signer that
 // implements RSA or ECDSA.
+<<<<<<< HEAD
 func NewSignerPrivateKey(currentTime time.Time, signer crypto.Signer) *PrivateKey {
+=======
+func NewSignerPrivateKey(creationTime time.Time, signer crypto.Signer) *PrivateKey {
+>>>>>>> master
 	pk := new(PrivateKey)
 	// In general, the public Keys should be used as pointers. We still
 	// type-switch on the values, for backwards-compatibility.
 	switch pubkey := signer.Public().(type) {
 	case *rsa.PublicKey:
+<<<<<<< HEAD
 		pk.PublicKey = *NewRSAPublicKey(currentTime, pubkey)
 	case rsa.PublicKey:
 		pk.PublicKey = *NewRSAPublicKey(currentTime, &pubkey)
@@ -79,6 +108,15 @@ func NewSignerPrivateKey(currentTime time.Time, signer crypto.Signer) *PrivateKe
 		pk.PublicKey = *NewECDSAPublicKey(currentTime, pubkey)
 	case ecdsa.PublicKey:
 		pk.PublicKey = *NewECDSAPublicKey(currentTime, &pubkey)
+=======
+		pk.PublicKey = *NewRSAPublicKey(creationTime, pubkey)
+	case rsa.PublicKey:
+		pk.PublicKey = *NewRSAPublicKey(creationTime, &pubkey)
+	case *ecdsa.PublicKey:
+		pk.PublicKey = *NewECDSAPublicKey(creationTime, pubkey)
+	case ecdsa.PublicKey:
+		pk.PublicKey = *NewECDSAPublicKey(creationTime, &pubkey)
+>>>>>>> master
 	default:
 		panic("openpgp: unknown crypto.Signer type in NewSignerPrivateKey")
 	}

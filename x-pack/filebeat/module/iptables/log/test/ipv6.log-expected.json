@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-01-22T09:05:05.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -28,7 +27,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:05.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -56,7 +54,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:06.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -84,7 +81,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:06.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -112,7 +108,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:07.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -140,7 +135,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:07.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -168,7 +162,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:08.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -196,7 +189,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:08.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -224,7 +216,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:09.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -252,7 +243,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T09:05:09.000-02:00",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
@@ -280,7 +270,6 @@
         ]
     },
     {
-        "@timestamp": "2019-01-22T10:52:34.000-02:00",
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0000:0016",
         "destination.mac": "90:10:12:34:56:78",
         "event.dataset": "iptables.log",

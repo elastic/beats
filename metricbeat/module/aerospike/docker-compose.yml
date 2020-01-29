@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   aerospike:
-    image: docker.elastic.co/observability-ci/beats-integration-aerospike:${AEROSPIKE_VERSION:-3.9.0}-1
+    image: docker.elastic.co/integrations-ci/beats-aerospike:${AEROSPIKE_VERSION:-3.9.0}-1
     build:
       context: ./_meta
       args:
