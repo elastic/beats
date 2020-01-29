@@ -699,6 +699,12 @@ func TestGenerateFieldName(t *testing.T) {
 			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
 		},
+		{
+			"test metric name with dot",
+			"cloudwatch",
+			[]string{"DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
+			"aws.firehose.metrics.DeliveryToS3_Records.avg",
+		},
 	}
 
 	for _, c := range cases {
