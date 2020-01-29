@@ -71,11 +71,9 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode > 399 {
-		if p.logger.IsDebug() {
-			bodyBytes, err := ioutil.ReadAll(resp.Body)
-			if err == nil {
-				p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
-			}
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err == nil {
+			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
 		}
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
