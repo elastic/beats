@@ -224,8 +224,9 @@ addons:
       - python3.6-venv
 
 before_install:
+  - if [ x$TRAVIS_DIST = xtrusty ]; then sudo ln -sf python3.6 /usr/bin/python3; fi
   - python --version
-  - openssl version
+  - python3 --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
