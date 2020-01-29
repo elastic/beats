@@ -6,7 +6,8 @@
         "module": "system"
     },
     "metricset": {
-        "name": "memory"
+        "name": "memory",
+        "period": 10000
     },
     "service": {
         "type": "system"
@@ -14,13 +15,13 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 671084544,
+                "free": 14247317504,
                 "used": {
-                    "bytes": 362037248,
-                    "pct": 0.3504
+                    "bytes": 1407057920,
+                    "pct": 0.0899
                 }
             },
-            "free": 340848640,
+            "free": 4859097088,
             "hugepages": {
                 "default_size": 2097152,
                 "free": 0,
@@ -38,28 +39,51 @@
                     "pct": 0
                 }
             },
-            "swap": {
-                "free": 0,
-                "in": {
-                    "pages": 0
+            "page_stats": {
+                "direct_efficiency": {
+                    "pct": 0.9976
                 },
-                "out": {
-                    "pages": 0
+                "kswapd_efficiency": {
+                    "pct": 0.6213
                 },
-                "readahead": {
-                    "cached": 0,
-                    "pages": 0
+                "pgfree": {
+                    "pages": 4382105954
                 },
-                "total": 0,
-                "used": {
-                    "bytes": 0,
-                    "pct": 0
+                "pgscan_direct": {
+                    "pages": 485820
+                },
+                "pgscan_kswapd": {
+                    "pages": 77390925
+                },
+                "pgsteal_direct": {
+                    "pages": 484631
+                },
+                "pgsteal_kswapd": {
+                    "pages": 48081976
                 }
             },
-            "total": 1033121792,
+            "swap": {
+                "free": 7846490112,
+                "in": {
+                    "pages": 1111
+                },
+                "out": {
+                    "pages": 20255
+                },
+                "readahead": {
+                    "cached": 28,
+                    "pages": 65
+                },
+                "total": 7897870336,
+                "used": {
+                    "bytes": 51380224,
+                    "pct": 0.0065
+                }
+            },
+            "total": 15654375424,
             "used": {
-                "bytes": 692273152,
-                "pct": 0.6701
+                "bytes": 10795278336,
+                "pct": 0.6896
             }
         }
     }

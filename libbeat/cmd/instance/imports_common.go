@@ -24,6 +24,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/actions"              // Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/add_id"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 	_ "github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
@@ -32,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
 	_ "github.com/elastic/beats/libbeat/processors/extract_array"
+	_ "github.com/elastic/beats/libbeat/processors/fingerprint"
 	_ "github.com/elastic/beats/libbeat/processors/registered_domain"
 	_ "github.com/elastic/beats/libbeat/publisher/includes" // Register publisher pipeline modules
 )

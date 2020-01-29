@@ -5,9 +5,13 @@
 package mage
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 // Update target namespace.
@@ -20,7 +24,7 @@ var Aliases = map[string]interface{}{
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs)
+	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs, Update.VendorBeats)
 }
 
 // Config generates both the short and reference configs.
@@ -45,4 +49,40 @@ func (Update) IncludeFields() error {
 	mg.Deps(Update.Fields)
 
 	return devtools.GenerateAllInOneFieldsGo()
+}
+
+// VendorBeats collects the vendor folder required to deploy the function for GCP.
+func (Update) VendorBeats() error {
+	for _, f := range []string{"pubsub", "storage"} {
+		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
+
+		deps, err := gotool.ListDeps("github.com/elastic/beats/x-pack/functionbeat/provider/gcp/" + f)
+		if err != nil {
+			return err
+		}
+
+		for _, d := range deps {
+			in := strings.ReplaceAll(d, "github.com/elastic/beats/", "")
+			in = filepath.Join("..", "..", in)
+
+			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
+
+			cp := &devtools.CopyTask{
+				Source: in,
+				Dest:   filepath.Join(gcpVendorPath, out),
+				Mode:   0600,
+				Exclude: []string{
+					".*_test.go$",
+					".*.yml",
+				},
+			}
+			err := cp.Execute()
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+
+	return nil
 }

@@ -52,6 +52,13 @@ func ListPackages(pkgs ...string) ([]string, error) {
 	return getLines(callGo(nil, "list", pkgs...))
 }
 
+// ListDeps calls `go list -dep` for every package spec given.
+func ListDeps(pkg string) ([]string, error) {
+	const tmpl = `{{if not .Standard}}{{.ImportPath}}{{end}}`
+
+	return getLines(callGo(nil, "list", "-deps", "-f", tmpl, pkg))
+}
+
 // ListTestFiles lists all go and cgo test files available in a package.
 func ListTestFiles(pkg string) ([]string, error) {
 	const tmpl = `{{ range .TestGoFiles }}{{ printf "%s\n" . }}{{ end }}` +

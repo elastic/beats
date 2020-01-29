@@ -200,6 +200,11 @@ packetbeat.protocols:
   # all headers by setting this option to true. The default is false.
   #send_all_headers: false
 
+  # A list of headers to redact if present in the HTTP request. This will keep
+  # the header field present, but will redact it's value to show the headers
+  # presence.
+  #redact_headers: []
+
   # The list of content types for which Packetbeat includes the full HTTP
   # payload. If the request's or response's Content-Type matches any on this
   # list, the full body will be included under the request or response field.

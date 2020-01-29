@@ -71,7 +71,7 @@ class Test(BaseTest):
         )
         exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
 
-        assert exit_code == 0
+        assert exit_code == 0, 'Error output: ' + self.get_log()
         assert self.log_contains("Kibana dashboards successfully loaded.")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")

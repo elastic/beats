@@ -43,7 +43,7 @@ func BuildGoDaemon() error {
 
 	// Test if binaries are up-to-date.
 	output := MustExpand("build/golang-crossbuild/god-{{.Platform.GOOS}}-{{.Platform.Arch}}")
-	input := MustExpand("{{ elastic_beats_dir }}/dev-tools/vendor/github.com/tsg/go-daemon/god.c")
+	input := MustExpand("{{ elastic_beats_dir }}/vendor/github.com/tsg/go-daemon/god.c")
 	if IsUpToDate(output, input) {
 		log.Println(">>> buildGoDaemon is up-to-date for", Platform.Name)
 		return nil
