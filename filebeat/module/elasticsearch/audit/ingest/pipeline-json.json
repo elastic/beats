@@ -37,7 +37,6 @@
         },
         {
             "rename": {
-                "if": "ctx.elasticsearch.audit.timestamp != null",
                 "field": "elasticsearch.audit.timestamp",
                 "target_field": "elasticsearch.audit.@timestamp",
                 "ignore_missing": true
