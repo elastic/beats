@@ -72,6 +72,7 @@ func NewConnector(
 	}, nil
 }
 
+// UseMetricSetProcessors appends processors defined in metricset configuration to the connector properties.
 func (c *Connector) UseMetricSetProcessors(r *mb.Register, moduleName, metricSetName string) error {
 	metricSetProcessors, err := mb.Registry.ProcessorsForMetricSet(moduleName, metricSetName)
 	if err != nil {
