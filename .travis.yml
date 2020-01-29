@@ -1,5 +1,5 @@
 sudo: required
-dist: bionic
+dist: trusty
 services:
   - docker
 
@@ -193,7 +193,6 @@ jobs:
             retries: true
           update: true
           packages:
-            - python3-venv
             - libpcap-dev
             - xsltproc
             - libxml2-utils
@@ -212,15 +211,20 @@ addons:
     config:
       retries: true
     update: true
+    sources:
+      - deadsnakes
     packages:
-      - python3-venv
       - libpcap-dev
       - xsltproc
       - libxml2-utils
-      - libsystemd-dev
+      - libsystemd-journal-dev
       - librpm-dev
+      # From deadsnakes PPA
+      - python3.6
+      - python3.6-venv
 
 before_install:
+  - if [ x$TRAVIS_DIST = xtrusty ]; then sudo ln -sf python3.6 /usr/bin/python3; fi
   - python --version
   - python3 --version
   - umask 022
@@ -231,10 +235,7 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
-  # Docker update on Ubuntu Bionic
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" ; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get update ; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get -y install docker-ce docker-ce-cli containerd.io ; fi
+
 
 # Skips installations step
 install: true
