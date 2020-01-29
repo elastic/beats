@@ -24,7 +24,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
-    booleanParam(name: 'windowsTest', defaultValue: false, description: 'Allow to run all stages.')
+    booleanParam(name: 'windowsTest', defaultValue: false, description: 'Allow Windows stages.')
   }
   stages {
     /**
