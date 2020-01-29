@@ -1,0 +1,172 @@
+outputs:
+  default:
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+    # Not supported at first
+    queue:
+      type: disk
+  long_term_storage:
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+    queue:
+      type: disk
+
+  monitoring:
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+
+settings.monitoring:
+  use_output: monitoring
+
+datasources:
+  # use the nginx package
+  - id: nginx-x1
+    title: "This is a nice title for human"
+    # @Ruflin: This is something that Jen raised here, how do I know where that datasource is managed?
+    # Is this something handled by fleet where we have an association between the ID and the creator
+    # of the datasource.
+    managed_by: fleet
+    # Package this config group is coming from. On importing, we know where it belongs
+    # The package tells the UI which application to link to
+    package:
+      name: epm/nginx
+      version: 1.7.0
+    namespace?: prod
+    constraints:
+      - os.platform: { in: "windows" }
+      - agent.version: { ">=": "8.0.0" }
+    inputs:
+      - type: logs
+        processors?:
+        streams:
+          - id?: {id}
+            dataset: nginx.acccess
+            paths: /var/log/nginx/access.log
+          - id?: {id}
+            dataset: nginx.error
+            paths: /var/log/nginx/error.log
+      - type: metrics/nginx
+        streams:
+          - id?: {id}
+            dataset: nginx.stub_status
+            metricset: stub_status
+
+  #################################################################################################
+  # Custom Kafka datasource
+  - id: kafka-x1
+    title: "Consume data from kafka"
+    managed_by: fleet
+    namespace?: prod
+    use_output: long_term_storage
+    inputs:
+      - type: kafka
+        host: localhost:6566
+        streams:
+          - dataset: foo.dataset
+            topic: foo
+            processors:
+             - extract_bro_specifics
+
+
+  #################################################################################################
+  # System EPM package
+  - id: system
+    title: Collect system information and metrics
+    managed_by: fleet
+    package:
+      name: epm/system
+      version: 1.7.0
+    inputs:
+      - type: metrics/system
+        streams:
+         - id?: {id}
+           enabled?: false # default true
+           metricset: cpu
+           period: 10s
+           metrics: ["percentages", "normalized_percentages"]
+         - metricset: memory
+         - metricset: diskio
+         - metricset: load
+         - metricset: memory
+         - metricset: process
+           processes: ["firefox*"]
+         - metricset: process_summary
+         - metricset: uptime
+         - metricset: socket_summary
+         - metricset: filesystem
+         - metricset: raid
+         - metricset: socket
+         - metricset: service
+         - metricset: fsstat
+         - metricset: foo
+
+  #################################################################################################
+  # Endpoint for Windows
+ - id: myendpoint-x1
+   title: Endpoint for windows
+   managed_by: endpoint
+   constraints:
+     - os.platform: { in: "windows" }
+   inputs:
+     - type: endpoint
+       streams:
+         - type: malware
+           detect: true
+           prevent: false
+           notify_user: false
+           threshold: recommended
+
+        - type: eventing
+          api: true
+          clr: false
+          dll_and_driver_load: false
+          dns: true
+          file: false
+
+  #################################################################################################
+  # Endpoint for Mac
+ - id: myendpoint-x2
+   title: Endpoint for mac
+   managed_by: endpoint
+   constraints:
+     - os.platform: { in: "mac" }
+   use_output: default
+   inputs:
+     - type: endpoint
+       streams:
+         - type: malware
+           detect: true
+           prevent: false
+           notify_user: false
+           threshold: recommended
+
+        - type: eventing
+          api: true
+          clr: false
+          dll_and_driver_load: false
+          dns: true
+          file: false
+
+  #################################################################################################
+  # Endpoint for Linux
+ - id: myendpoint-x2
+   title: Endpoint for Linux
+   managed_by: endpoint
+   constraints:
+     - os.platform: { in: "Linux" }
+   use_output: default
+   inputs:
+     - type: endpoint
+       streams:
+         - type: malware
+           detect: true
+           prevent: false
+           notify_user: false
+           threshold: recommended
+
+        - type: eventing
+          api: true
+          clr: false
+          dll_and_driver_load: false
+          dns: true
+          file: false
