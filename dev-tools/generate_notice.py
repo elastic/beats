@@ -53,10 +53,23 @@ def read_go_mod(vendor_dir):
 def _get_version_info(elems):
     data = {}
     data["path"] = elems[0]
-    if len(elems[1]) > 30:
-        data["revision"] = elems[1][-13:].rstrip()
-    else:
-        data["version"] = elems[1].rstrip("+incompatible\n")
+
+    version_info = elems[1].rstrip("\n")
+    if version_info.endswith("+incompatible"):
+        version_info = version_info[:-len("+incompatible")]
+
+    if len(version_info) < 30:
+        data["version"] = version_info
+        return data
+
+    revision_elems = version_info.split("-")
+    if len(revision_elems) != 3:
+        raise ValueError("unexpected number of elements")
+
+    if revision_elems[0] != "v0.0.0":
+        data["version"] = revision_elems[0]
+    data["revision"] = revision_elems[2]
+
     return data
 
 
