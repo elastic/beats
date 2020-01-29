@@ -34,3 +34,6 @@ default value is false.
 `error` field is going to be part of event with error message. If it set to false, there
 will not be any error in event's field. Even error occurs while decoding json keys. The
 default value is false
+`document_id`:: (Optional) JSON key to use as the document id. If configured,
+the field will be removed from the original json document and stored in
+`@metadata._id`

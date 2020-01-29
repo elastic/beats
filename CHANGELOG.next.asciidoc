@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
+
 
 *Auditbeat*
 
@@ -71,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
 - Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
 - Change lookup_fields from metricset.host to service.address {pull}15883[15883]
+- Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
 
 *Packetbeat*
 
@@ -84,6 +87,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+
+- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 
 
 *Auditbeat*
