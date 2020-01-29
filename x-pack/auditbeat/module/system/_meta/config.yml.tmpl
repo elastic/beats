@@ -5,7 +5,7 @@
 # or stops).
 {{ end -}}
 {{- if ne .GOOS "windows" }}
--module: system
+- module: system
   datasets:
     - package # Installed, updated, and removed packages
 
