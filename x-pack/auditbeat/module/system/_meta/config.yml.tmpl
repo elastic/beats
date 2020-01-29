@@ -4,14 +4,19 @@
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
 {{ end -}}
+{{- if ne .GOOS "windows" }}
+-module: system
+  datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 30m # The frequency at which the datasets check for changes
+{{- end }}
+
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
     {{- if eq .GOOS "linux" }}
     - login   # User logins, logouts, and system boots.
-    {{- end -}}
-    {{- if ne .GOOS "windows" }}
-    - package # Installed, updated, and removed packages
     {{- end }}
     - process # Started and stopped processes
     {{- if eq .GOOS "linux" }}
