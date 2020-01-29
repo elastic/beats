@@ -35,6 +35,8 @@ import (
 const (
 	processorName   = "add_process_metadata"
 	cacheExpiration = time.Second * 30
+	hostPath        = "/"
+	cgroupPrefix    = "/kubepods"
 )
 
 var (
@@ -47,14 +49,17 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
 
+	gCidProvider = newCidProvider(hostPath, cgroupPrefix)
+
 	instanceID atomic.Uint32
 )
 
 type addProcessMetadata struct {
-	config   config
-	provider processMetadataProvider
-	log      *logp.Logger
-	mappings common.MapStr
+	config      config
+	provider    processMetadataProvider
+	cidProvider cidProvider
+	log         *logp.Logger
+	mappings    common.MapStr
 }
 
 type processMetadata struct {
@@ -71,6 +76,10 @@ type processMetadataProvider interface {
 	GetProcessMetadata(pid int) (*processMetadata, error)
 }
 
+type cidProvider interface {
+	GetCid(pid int) (string, error)
+}
+
 func init() {
 	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddProcessMetadata", New)
@@ -78,10 +87,10 @@ func init() {
 
 // New constructs a new add_process_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache, gCidProvider)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, cidProvider cidProvider) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -94,9 +103,10 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	}
 
 	p := addProcessMetadata{
-		config:   config,
-		provider: provider,
-		log:      log,
+		config:      config,
+		provider:    provider,
+		cidProvider: cidProvider,
+		log:         log,
 	}
 	if p.mappings, err = config.getMappings(); err != nil {
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
@@ -177,6 +187,18 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 			return nil, err
 		}
 	}
+
+	// enrich with the container id, if include_cid is set to true
+	if p.config.IncludeCid {
+		cid, err := p.cidProvider.GetCid(pid)
+		if err != nil {
+			return nil, err
+		}
+		if _, err = result.Put("cid", cid); err != nil {
+			return nil, err
+		}
+	}
+
 	return result, nil
 }
 

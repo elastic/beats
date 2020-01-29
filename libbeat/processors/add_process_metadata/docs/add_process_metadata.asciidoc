@@ -42,6 +42,14 @@ Optionally, the process environment can be included, too:
   }
   ...
 -------------------------------------------------------------------------------
+
+Optionally, the container id can be included, too:
+[source,json]
+-------------------------------------------------------------------------------
+  ...
+  "cid": "9317bb0f0c8eef642ded08bf5da182061f7f512a3987b665521a724cc84651ac" 
+  ...
+-------------------------------------------------------------------------------
 It has the following settings:
 
 `match_pids`:: List of fields to lookup for a PID. The processor will
@@ -65,3 +73,7 @@ set to `true`, this condition will be ignored.
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
+
+`include_cid`:: (Optional) By default, this value is false, and the `cid` 
+container id field is not outputed. If `restricted_fields` is `true`, `cid` 
+container id can be enriched from cgroup, when running auditbeat on kubernetes.

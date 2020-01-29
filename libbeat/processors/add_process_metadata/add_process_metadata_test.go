@@ -51,6 +51,10 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 	}
 
+	tCidProvider := testCidProvider{
+		1: "test-cid",
+	}
+
 	for _, test := range []struct {
 		description             string
 		config, event, expected common.MapStr
@@ -385,13 +389,59 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 			err: ErrNoProcess,
 		},
+		{
+			description: "env field (IncludeCid: true)",
+			config: common.MapStr{
+				"match_pids":  []string{"system.process.ppid"},
+				"include_cid": true,
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"process": common.MapStr{
+					"name":       "systemd",
+					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+					"executable": "/usr/lib/systemd/systemd",
+					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+					"pid":        1,
+					"ppid":       0,
+					"start_time": startTime,
+				},
+				"cid": "test-cid",
+			},
+		},
+		{
+			description: "env field (IncludeCid: true), process not found",
+			config: common.MapStr{
+				"match_pids":  []string{"ppid"},
+				"include_cid": true,
+			},
+			event: common.MapStr{
+				"ppid": 42,
+			},
+			expected: common.MapStr{
+				"ppid": 42,
+			},
+			err: ErrNoProcess,
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := common.NewConfigFrom(test.config)
 			if err != nil {
 				t.Fatal(err)
 			}
-			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs)
+
+			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, tCidProvider)
 			if test.initErr == nil {
 				if err != nil {
 					t.Fatal(err)
