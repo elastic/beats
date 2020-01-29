@@ -83,7 +83,17 @@ func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metr
 		return errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
 			moduleName, metricSetName)
 	}
-	c.processors.AddProcessors(*metricSetProcessors)
+
+	if metricSetProcessors == nil || len(metricSetProcessors.List) == 0 {
+		return nil // no processors are defined
+	}
+
+	procs := processors.NewList(nil)
+	procs.AddProcessors(*metricSetProcessors)
+	for _, p := range c.processors.List {
+		procs.AddProcessor(p)
+	}
+	c.processors = procs
 	return nil
 }
 

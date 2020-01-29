@@ -18,8 +18,6 @@
 package module
 
 import (
-	"strings"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -43,29 +41,32 @@ func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	w, err := NewWrapper(c, mb.Registry, r.options...)
+	module, metricSets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
 		return nil, err
 	}
 
-	clients := map[string]beat.Client{}
+	var runners []Runner
+	for _, metricSet := range metricSets {
+		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.options...)
+		if err != nil {
+			return nil, err
+		}
 
-	for _, msw := range w.MetricSets() {
 		connector, err := NewConnector(r.beatInfo, p, c, meta)
 		if err != nil {
 			return nil, err
 		}
-		connector.UseMetricSetProcessors(mb.Registry, msw.Name(), msw.MetricSet.Name())
+		connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
 
 		client, err := connector.Connect()
 		if err != nil {
 			return nil, err
 		}
-		clients[strings.ToLower(msw.MetricSet.Name())] = client
+		runners = append(runners, NewRunner(client, wrapper))
 	}
 
-	mr := NewRunner(clients, w)
-	return mr, nil
+	return newRunnerGroup(runners), nil
 }
 
 // CheckConfig checks if a config is valid or not

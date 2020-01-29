@@ -38,7 +38,7 @@ processors:
           }
 
           var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
-          if (broker_memory_temlep_pct != null) {
+          if (broker_memory_temp_pct != null) {
             event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
           }
 

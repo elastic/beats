@@ -105,6 +105,25 @@ func NewWrapper(config *common.Config, r *mb.Register, options ...Option) (*Wrap
 	return wrapper, nil
 }
 
+// NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
+func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, options ...Option) (*Wrapper, error) {
+	wrapper := &Wrapper{
+		Module:     module,
+		metricSets: make([]*metricSetWrapper, 1),
+	}
+
+	for _, applyOption := range options {
+		applyOption(wrapper)
+	}
+
+	wrapper.metricSets[0] = &metricSetWrapper{
+		MetricSet: metricSet,
+		module:    wrapper,
+		stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
+	}
+	return wrapper, nil
+}
+
 // Wrapper methods
 
 // Start starts the Module's MetricSet workers which are responsible for
