@@ -188,17 +188,28 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		},
 	}
 	n.publish(event)
-
 }
 
+// getAddress returns an IP address from a kubernetes node.
+//
+// It will use external IP if existing, falling back to Internal IP if not,
+// hostname and DNS entries are not taken into account.
 func getAddress(node *kubernetes.Node) string {
+	nodeAddress := ""
 	for _, address := range node.Status.Addresses {
+		if address.Address == "" {
+			continue
+		}
 		if address.Type == v1.NodeExternalIP && address.Address != "" {
-			return address.Address
+			nodeAddress = address.Address
+			break
+		}
+		if address.Type == v1.NodeInternalIP && address.Address != "" {
+			nodeAddress = address.Address
 		}
 	}
 
-	return ""
+	return nodeAddress
 }
 
 func isNodeReady(node *kubernetes.Node) bool {
