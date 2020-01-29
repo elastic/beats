@@ -18,6 +18,8 @@
 package module
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -59,7 +61,7 @@ func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		if err != nil {
 			return nil, err
 		}
-		clients[msw.MetricSet.Name()] = client
+		clients[strings.ToLower(msw.MetricSet.Name())] = client
 	}
 
 	mr := NewRunner(clients, w)
