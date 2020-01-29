@@ -22,7 +22,7 @@ jobs:
   include:
     # General checks
     - os: linux
-      env: TARGETS="check" PYTHON_EXE="python3.6"
+      env: TARGETS="check"
       go: $TRAVIS_GO_VERSION
       stage: check
 
