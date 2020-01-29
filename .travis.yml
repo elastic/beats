@@ -212,17 +212,19 @@ addons:
     config:
       retries: true
     update: true
+    sources:
+      - deadsnakes
     packages:
       - libpcap-dev
       - xsltproc
       - libxml2-utils
       - libsystemd-journal-dev
       - librpm-dev
+      # From deadsnakes PPA
+      - python3.7
+      - python3.7-venv
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; sudo add-apt-repository -y ppa:deadsnakes/ppa; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; sudo apt-get -q update; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; sudo apt-get install -y python3.7 python3.7-venv; fi
   - python --version
   - python3 --version
   - umask 022
