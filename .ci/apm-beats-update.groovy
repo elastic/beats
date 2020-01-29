@@ -33,7 +33,7 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "beats")
+        gitCheckout(basedir: "beats", githubNotifyFirstTimeContributor: false)
         script {
           dir("beats"){
             env.GO_VERSION = readFile(".go-version").trim()
@@ -73,15 +73,9 @@ pipeline {
       steps {
         withGithubNotify(context: 'Check Apm Server Beats Update') {
           deleteDir()
-          gitCheckout(basedir: "${BASE_DIR}",
-            repo: "git@github.com:elastic/${REPO}.git",
-            branch: 'master',
-            credentialsId: 'credentials-id',
-            githubNotifyFirstTimeContributor: false,
-            depth: 1,
-            reference: "/var/lib/jenkins/.git-references/${REPO}.git"
-          )
           dir("${BASE_DIR}"){
+            git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
+              url:  "git@github.com:elastic/${REPO}.git")
             sh(label: 'Update Beats script', script: """
               export BEATS_VERSION=${env.GIT_BASE_COMMIT}
               git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
