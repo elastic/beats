@@ -304,7 +304,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.True(t, called, "module factory must be called if registered")
 }
 
-func TestUnpackMetricSetConfiguration(t *testing.T) {
+func TestUnpackMetricSetConfiguration_ProcessorsDefined(t *testing.T) {
 	logp.TestingSetup()
 
 	r := NewRegister()
@@ -315,7 +315,7 @@ func TestUnpackMetricSetConfiguration(t *testing.T) {
 	config := struct {
 		Processors processors.PluginConfig `config:"processors"`
 	}{}
-	err := source.UnpackMetricSetConfiguration(r, "unpack", "metricset", &config)
+	err := source.UnpackMetricSetConfiguration(r, "unpack", "withprocessors", &config)
 	require.NoError(t, err)
 
 	p, err := processors.New(config.Processors)
@@ -323,6 +323,26 @@ func TestUnpackMetricSetConfiguration(t *testing.T) {
 
 	assert.Len(t, p.List, 1)
 	assert.Equal(t, "add_id=[target_field=[@metadata.id]]", p.List[0].String())
+}
+
+func TestUnpackMetricSetConfiguration_ProcessorsUndefined(t *testing.T) {
+	logp.TestingSetup()
+
+	r := NewRegister()
+	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
+	source := NewLightModulesSource("testdata/lightmodules")
+	r.SetSecondarySource(source)
+
+	config := struct {
+		Processors processors.PluginConfig `config:"processors"`
+	}{}
+	err := source.UnpackMetricSetConfiguration(r, "unpack", "noprocessors", &config)
+	require.NoError(t, err)
+
+	p, err := processors.New(config.Processors)
+	require.NoError(t, err)
+
+	assert.Len(t, p.List, 0)
 }
 
 type metricSetWithOption struct {

@@ -1,3 +1,4 @@
 name: service
 metricsets:
-- metricset
+- withprocessors
+- noprocessors
