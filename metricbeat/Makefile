@@ -3,6 +3,7 @@ BEAT_NAME?=metricbeat
 BEAT_TITLE?=Metricbeat
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
+BEATS_DOCKER_INTEGRATION_TEST_ENV?=true
 ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
@@ -76,3 +77,9 @@ assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
 	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+
+.PHONY: integration-tests
+integration-tests: ## @testing Run golang integration tests.
+integration-tests: prepare-tests mage
+	rm -f docker-compose.yml.lock
+	mage goIntegTest

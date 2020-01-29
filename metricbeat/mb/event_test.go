@@ -139,7 +139,7 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		e := mbEvent.BeatEvent(module, metricSet)
 		e = mbEvent.BeatEvent(module, metricSet)
 
-		assert.Equal(t, "foobar", e.Meta["id"])
+		assert.Equal(t, "foobar", e.Meta["_id"])
 		assert.Equal(t, timestamp, e.Timestamp)
 		assert.Equal(t, common.MapStr{
 			"type": "docker",
