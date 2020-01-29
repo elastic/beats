@@ -16,11 +16,28 @@
             "remove": {
                 "field": "elasticsearch.audit.type",
                 "ignore_missing": true
-
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.elasticsearch.audit['@timestamp'] != null && ctx.event.timezone != null",
+                "field": "elasticsearch.audit.@timestamp",
+                "target_field": "elasticsearch.audit.@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS"
+                ],
+                "timezone": "{{ event.timezone }}"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit['@timestamp'] == null && ctx.event.timezone != null",
+                "field": "event.timezone"
             }
         },
         {
             "rename": {
+                "if": "ctx.elasticsearch.audit.timestamp != null",
                 "field": "elasticsearch.audit.timestamp",
                 "target_field": "elasticsearch.audit.@timestamp",
                 "ignore_missing": true
@@ -204,7 +221,7 @@
     ],
     "on_failure": [
         {
-            "set": {
+            "append": {
                 "field": "error.message",
                 "value": "{{ _ingest.on_failure_message }}"
             }

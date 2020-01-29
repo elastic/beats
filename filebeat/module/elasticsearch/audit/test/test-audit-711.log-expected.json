@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-09-05T14:02:37.921Z",
+        "@timestamp": "2019-09-05T16:02:37.921Z",
         "elasticsearch.audit.action": "indices:monitor/stats",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -11,6 +11,7 @@
         "event.action": "authentication_success",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -22,7 +23,7 @@
         "user.name": "_system"
     },
     {
-        "@timestamp": "2020-01-29T09:41:10.856Z",
+        "@timestamp": "2020-01-29T11:41:10.856Z",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -36,6 +37,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 363,
@@ -47,7 +49,7 @@
         "user.name": "_xpack_security"
     },
     {
-        "@timestamp": "2020-01-29T09:41:10.859Z",
+        "@timestamp": "2020-01-29T11:41:10.859Z",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear[n]",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -61,6 +63,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 785,
