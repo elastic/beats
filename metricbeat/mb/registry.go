@@ -123,7 +123,7 @@ type ModulesSource interface {
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	ModulesInfo(r *Register) string
-	UnpackMetricSetConfiguration(r *Register, moduleName string, metricSetName string, cfg interface{}) error
+	ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -381,15 +381,8 @@ func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*pr
 		}
 	}
 
-	if source := r.secondarySource; source != nil && source.HasMetricSet(moduleName, metricSetName) {
-		config := struct {
-			Processors processors.PluginConfig `config:"processors"`
-		}{}
-		err := source.UnpackMetricSetConfiguration(r, moduleName, metricSetName, &config)
-		if err != nil {
-			return nil, err
-		}
-		return processors.New(config.Processors)
+	if source := r.secondarySource; source != nil {
+		return source.ProcessorsForMetricSet(r, moduleName, metricSetName)
 	}
 	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, metricSetName, moduleName)
 }

@@ -19,6 +19,7 @@ package mb
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/processors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -150,25 +151,14 @@ type lightModuleConfig struct {
 	MetricSets []string `config:"metricsets"`
 }
 
-// UnpackMetricSetConfiguration deserializes metricset configuration to the given structure.
-func (s *LightModulesSource) UnpackMetricSetConfiguration(r *Register, moduleName string, metricSetName string,
-	cfg interface{}) error {
-
-	modulePath, found := s.findModulePath(moduleName)
-	if !found {
-		return fmt.Errorf("module '%s' not found", moduleName)
+// ProcessorsForMetricSet returns processors defined for the light metricset.
+func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error) {
+	module, err := s.loadModule(r, moduleName)
+	metricSet, ok := module.MetricSets[metricSetName]
+	if !ok {
+		return nil, errors.Wrapf(err, "unknown metricset '%s' in module '%s'", metricSetName, moduleName)
 	}
-
-	manifestPath := filepath.Join(filepath.Dir(modulePath), metricSetName, manifestYML)
-	config, err := common.LoadFile(manifestPath)
-	if err != nil {
-		return errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)
-	}
-
-	if err := config.Unpack(cfg); err != nil {
-		return errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
-	}
-	return nil
+	return processors.New(metricSet.Processors)
 }
 
 // LightModule contains the definition of a light module
