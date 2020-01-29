@@ -22,7 +22,7 @@ jobs:
   include:
     # General checks
     - os: linux
-      env: TARGETS="check"
+      env: TARGETS="check" PYTHON_EXE="python3.7"
       go: $TRAVIS_GO_VERSION
       stage: check
 
@@ -224,9 +224,7 @@ addons:
       - python3.7-venv
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo ln -sf python3.7 /usr/bin/python3; fi
   - python --version
-  - python3 --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
