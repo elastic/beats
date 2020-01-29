@@ -99,9 +99,9 @@ pipeline {
       }
     }
   }
-  post {
-    cleanup {
-      notifyBuildResult()
-    }
-  }
+  // post {
+  //   cleanup {
+  //     notifyBuildResult()
+  //   }
+  // }
 }
