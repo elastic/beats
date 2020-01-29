@@ -26,10 +26,6 @@ datasources:
   # use the nginx package
   - id: nginx-x1
     title: "This is a nice title for human"
-    # @Ruflin: This is something that Jen raised here, how do I know where that datasource is managed?
-    # Is this something handled by fleet where we have an association between the ID and the creator
-    # of the datasource.
-    managed_by: fleet
     # Package this config group is coming from. On importing, we know where it belongs
     # The package tells the UI which application to link to
     package:
@@ -60,7 +56,6 @@ datasources:
   # Custom Kafka datasource
   - id: kafka-x1
     title: "Consume data from kafka"
-    managed_by: fleet
     namespace?: prod
     use_output: long_term_storage
     inputs:
@@ -77,7 +72,6 @@ datasources:
   # System EPM package
   - id: system
     title: Collect system information and metrics
-    managed_by: fleet
     package:
       name: epm/system
       version: 1.7.0
@@ -88,38 +82,54 @@ datasources:
            enabled?: false # default true
            metricset: cpu
            period: 10s
+           dataset: system.cpu
            metrics: ["percentages", "normalized_percentages"]
          - metricset: memory
+           dataset: system.memory
          - metricset: diskio
+           dataset: system.diskio
          - metricset: load
+           dataset: system.load
          - metricset: memory
+           dataset: system.memory
          - metricset: process
+           dataset: system.process
            processes: ["firefox*"]
          - metricset: process_summary
+           dataset: system.process_summary
          - metricset: uptime
+           dataset: system.uptime
          - metricset: socket_summary
+           dataset: system.socket_summary
          - metricset: filesystem
+           dataset: system.filesystem
          - metricset: raid
+           dataset: system.raid
          - metricset: socket
+           dataset: system.socket
          - metricset: service
+           dataset: system.service
          - metricset: fsstat
+           dataset: system.fsstat
          - metricset: foo
+           dataset: system.foo
 
-  #################################################################################################
-  # Endpoint for Windows
+#################################################################################################
+### suggestion 1
  - id: myendpoint-x1
-   title: Endpoint for windows
-   managed_by: endpoint
-   constraints:
-     - os.platform: { in: "windows" }
+   title: Endpoint configuration
+   package:
+     name: endpoint
+     version: xxx
    inputs:
-     - type: endpoint
+     - type: endpoint # Reserved key word
        streams:
          - type: malware
            detect: true
            prevent: false
            notify_user: false
            threshold: recommended
+           platform: windows
 
         - type: eventing
           api: true
@@ -127,51 +137,73 @@ datasources:
           dll_and_driver_load: false
           dns: true
           file: false
+          platform: windows
 
-  #################################################################################################
-  # Endpoint for Mac
- - id: myendpoint-x2
-   title: Endpoint for mac
-   managed_by: endpoint
-   constraints:
-     - os.platform: { in: "mac" }
-   use_output: default
+       - type: malware
+         detect: true
+         prevent: false
+         notify_user: false
+         threshold: recommended
+         platform: mac
+
+      - type: eventing
+        api: true
+        clr: false
+        dll_and_driver_load: false
+        dns: true
+        file: false
+        platform: mac
+
+       - type: malware
+         detect: true
+         prevent: false
+         notify_user: false
+         threshold: recommended
+         platform: linux
+
+      - type: eventing
+        api: true
+        clr: false
+        dll_and_driver_load: false
+        dns: true
+        file: false
+        platform: linux
+
+#################################################################################################
+### suggestion 2
+ - id: myendpoint-1
+   title: Endpoint configuration
+   package:
+     name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
+     version: xxx
    inputs:
-     - type: endpoint
-       streams:
-         - type: malware
-           detect: true
-           prevent: false
-           notify_user: false
-           threshold: recommended
-
-        - type: eventing
-          api: true
-          clr: false
-          dll_and_driver_load: false
-          dns: true
-          file: false
-
-  #################################################################################################
-  # Endpoint for Linux
- - id: myendpoint-x2
-   title: Endpoint for Linux
-   managed_by: endpoint
-   constraints:
-     - os.platform: { in: "Linux" }
-   use_output: default
-   inputs:
-     - type: endpoint
-       streams:
-         - type: malware
-           detect: true
-           prevent: false
-           notify_user: false
-           threshold: recommended
-
-        - type: eventing
-          api: true
-          clr: false
-          dll_and_driver_load: false
-          dns: true
-          file: false
+     - type: endpoint # Reserved key word
+       windows:
+            eventing:
+                api: true
+                clr: false
+                dll_and_driver_load: false
+                dns: true
+                 ...
+                file: false
+            malware:
+                detect: true
+                prevent: false
+                notify_user: false
+                threshold: recommended
+        mac:
+            eventing:
+                file: true
+                network: false
+                process: false
+                ...
+            malware:
+               detect: true
+               prevent: false
+               notify_user: false
+               threshold: recommended
+         linux:
+            eventing:
+                file: true
+                network: false
+                process: false
