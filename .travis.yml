@@ -1,5 +1,5 @@
 sudo: required
-dist: xenial
+dist: trusty
 services:
   - docker
 
@@ -217,7 +217,7 @@ addons:
       - libpcap-dev
       - xsltproc
       - libxml2-utils
-      - libsystemd-dev
+      - libsystemd-journal-dev
       - librpm-dev
 
 before_install:
@@ -231,10 +231,7 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
-  # Docker update on Ubuntu Bionic
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" ; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get update ; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get -y install docker-ce docker-ce-cli containerd.io ; fi
+
 
 # Skips installations step
 install: true
