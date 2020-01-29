@@ -121,7 +121,6 @@ auditbeat.modules:
 # All datasets send both periodic state information (e.g. all currently
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
-
 - module: system
   datasets:
     - package # Installed, updated, and removed packages

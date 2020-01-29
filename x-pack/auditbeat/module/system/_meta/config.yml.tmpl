@@ -4,7 +4,8 @@
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
 {{ end -}}
-{{- if ne .GOOS "windows" }}
+
+{{- if ne .GOOS "windows" -}}
 - module: system
   datasets:
     - package # Installed, updated, and removed packages

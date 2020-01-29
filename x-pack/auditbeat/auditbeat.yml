@@ -47,7 +47,6 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 
-
 - module: system
   datasets:
     - package # Installed, updated, and removed packages
