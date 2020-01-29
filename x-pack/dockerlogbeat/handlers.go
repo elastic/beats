@@ -64,7 +64,7 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
 			return
 		}
-		pm.Logger.Infof(" Got stop request object %#v\n", stopReq)
+		pm.Logger.Infof("Got stop request object %#v\n", stopReq)
 		// Run the stop async, since nothing 'depends' on it,
 		// and we can break people's docker automation if this times out.
 		go func() {
