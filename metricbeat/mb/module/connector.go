@@ -23,6 +23,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
@@ -68,6 +70,16 @@ func NewConnector(
 		dynamicFields: dynFields,
 		keepNull:      config.KeepNull,
 	}, nil
+}
+
+func (c *Connector) UseMetricSetProcessors(r *mb.Register, moduleName, metricSetName string) error {
+	metricSetProcessors, err := mb.Registry.ProcessorsForMetricSet(moduleName, metricSetName)
+	if err != nil {
+		return errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
+			moduleName, metricSetName)
+	}
+	c.processors.AddProcessors(*metricSetProcessors)
+	return nil
 }
 
 func (c *Connector) Connect() (beat.Client, error) {

@@ -18,8 +18,6 @@
 package module
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -51,26 +49,16 @@ func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 	clients := map[string]beat.Client{}
 
 	for _, msw := range w.MetricSets() {
-		processorsForMetricSet, err := mb.Registry.ProcessorsForMetricSet(msw.Module().Name(), msw.MetricSet.Name())
-		if err != nil {
-			return nil, errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
-				msw.Module().Name(), msw.MetricSet.Name())
-		}
-
 		connector, err := NewConnector(r.beatInfo, p, c, meta)
 		if err != nil {
 			return nil, err
 		}
-
-		for _, p := range processorsForMetricSet.List {
-			connector.processors.AddProcessor(p)
-		}
+		connector.UseMetricSetProcessors(mb.Registry, msw.Name(), msw.MetricSet.Name())
 
 		client, err := connector.Connect()
 		if err != nil {
 			return nil, err
 		}
-
 		clients[msw.MetricSet.Name()] = client
 	}
 

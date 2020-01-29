@@ -365,11 +365,10 @@ func (r *Register) MetricSets(module string) []string {
 	return metricsets
 }
 
+// ProcessorsForMetricSet returns a list of processors defined in manifest of the registered metricset.
 func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
-
-	var procs *processors.Processors
 
 	moduleName = strings.ToLower(moduleName)
 	metricSetName = strings.ToLower(metricSetName)
@@ -378,7 +377,7 @@ func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*pr
 	if exists {
 		_, exists := metricSets[metricSetName]
 		if exists {
-			return procs, nil // Standard metric sets don't have processor definitions.
+			return nil, nil // Standard metric sets don't have processor definitions.
 		}
 	}
 
@@ -392,7 +391,7 @@ func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*pr
 		}
 		return processors.New(config.Processors)
 	}
-	return procs, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, metricSetName, moduleName)
+	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, metricSetName, moduleName)
 }
 
 // SetSecondarySource sets an additional source of modules

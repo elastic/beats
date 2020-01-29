@@ -49,7 +49,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create the Runner facade.
-	runner := module.NewRunner(factory(), m)
+	runner := module.NewRunnerForStaticModule(factory(), m)
 
 	// Start the module and have it publish to a new publisher.Client.
 	runner.Start()
