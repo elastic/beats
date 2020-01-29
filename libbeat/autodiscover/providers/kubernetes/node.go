@@ -200,11 +200,11 @@ func getAddress(node *kubernetes.Node) string {
 		if address.Address == "" {
 			continue
 		}
-		if address.Type == v1.NodeExternalIP && address.Address != "" {
+		if address.Type == v1.NodeExternalIP {
 			nodeAddress = address.Address
 			break
 		}
-		if address.Type == v1.NodeInternalIP && address.Address != "" {
+		if address.Type == v1.NodeInternalIP {
 			nodeAddress = address.Address
 		}
 	}
