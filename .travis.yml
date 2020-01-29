@@ -193,7 +193,6 @@ jobs:
             retries: true
           update: true
           packages:
-            - python3-venv
             - libpcap-dev
             - xsltproc
             - libxml2-utils
@@ -221,10 +220,11 @@ addons:
       - libsystemd-journal-dev
       - librpm-dev
       # From deadsnakes PPA
-      - python3
-      - python3-venv
+      - python3.7
+      - python3.7-venv
 
 before_install:
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo ln -sf python3.7 /usr/bin/python3; fi
   - python --version
   - python3 --version
   - umask 022
