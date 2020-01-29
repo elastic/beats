@@ -479,6 +479,8 @@ func TestRedirect(t *testing.T) {
 	sched, _ := schedule.Parse("@every 1s")
 	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
+	// Run this test multiple times since in the past we had an issue where the redirects
+	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
 	for i := 0; i < 10; i++ {
 		event := &beat.Event{}
 		_, err = job(event)
