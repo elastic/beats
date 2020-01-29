@@ -128,7 +128,7 @@ func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
 		},
 	}
 	err := connector.UseMetricSetProcessors(r, "module", "metricset")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Len(t, connector.processors.List, 2)
 }
 
