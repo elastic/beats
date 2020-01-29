@@ -99,9 +99,7 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 		return err
 	}
 
-	if err := a.waitForGrpc(spec, ca); err != nil {
-		return errors.New(err, "grpc not started within a time range", errors.TypeNetwork)
-	}
+	a.waitForGrpc(spec, ca)
 
 	a.grpcClient, err = generateClient(spec.Configurable, a.state.ProcessInfo.Address, a.clientFactory, ca)
 	if err != nil {
@@ -117,9 +115,9 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 
 func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
 	const (
-		rounds           int           = 5
+		rounds           int           = 3
 		roundsTimeoutSec time.Duration = 30 * time.Second
-		retries          int           = 3
+		retries          int           = 5
 		retryTimeoutSec  time.Duration = 2 * time.Second
 	)
 
@@ -155,6 +153,7 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 		}
 	}
 
+	// do not err out, config calls will fail with after some more retries
 	return nil
 }
 
