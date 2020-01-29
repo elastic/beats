@@ -29,23 +29,23 @@
       type: integer
       description: >
         Total number of internal XDS errors in pilot.
-    - name: conflict.inbound.listener
+    - name: conflict.listener.inbound
       type: integer
       description: >
         Number of conflicting inbound listeners.
-    - name: conflict.outbound.listener.http.over.current.tcp
+    - name: conflict.listener.outbound.http.over.current.tcp
       type: integer
       description: >
         Number of conflicting wildcard http listeners with current wildcard tcp listener.
-    - name: conflict.outbound.listener.http.over.https
+    - name: conflict.listener.outbound.http.over.https
       type: integer
       description: >
         Number of conflicting HTTP listeners with well known HTTPS ports.
-    - name: conflict.outbound.listener.tcp.over.current.http
+    - name: conflict.listener.outbound.tcp.over.current.http
       type: integer
       description: >
         Number of conflicting wildcard tcp listeners with current wildcard http listener.
-    - name: conflict.outbound.listener.tcp.over.current.tcp
+    - name: conflict.listener.outbound.tcp.over.current.tcp
       type: integer
       description: >
         Number of conflicting tcp listeners with current tcp listener.
