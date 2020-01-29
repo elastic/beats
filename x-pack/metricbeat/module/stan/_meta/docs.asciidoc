@@ -6,3 +6,9 @@ The default metricsets are `channels`, `stats` and `subscriptions`.
 === Compatibility
 
 The STAN module is tested with STAN 0.15.1.
+
+[float]
+== Dashboard
+Dashboards for topic message count and queue depth are included:
+
+image::./images/metricbeat-stan-overview.png[]

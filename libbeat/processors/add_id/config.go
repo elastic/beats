@@ -29,7 +29,7 @@ type config struct {
 
 func defaultConfig() config {
 	return config{
-		TargetField: "@metadata.id",
+		TargetField: "@metadata._id",
 		Type:        "elasticsearch",
 	}
 }

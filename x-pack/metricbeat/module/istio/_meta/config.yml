@@ -1,7 +1,16 @@
+# Istio mesh. To collect all all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
   period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kuberentes cluster
   hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster
+  hosts: ["localhost:15014"]
 
 # Istio pilot. To collect all Pilot-generated metrics.
 - module: istio

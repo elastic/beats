@@ -538,18 +538,26 @@ metricbeat.modules:
           }
 
 #-------------------------------- Istio Module --------------------------------
+# Istio mesh. To collect all all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
   period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
 
 # Istio pilot. To collect all Pilot-generated metrics.
 - module: istio
   metricsets: ["pilot"]
   period: 10s
-  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kuberentes cluster
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
-
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
@@ -986,7 +994,7 @@ metricbeat.modules:
 
   driver: "postgres"
   sql_query: "select now()"
-
+  sql_response_format: table
 
 #--------------------------------- Stan Module ---------------------------------
 - module: stan
@@ -1432,9 +1440,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -1524,9 +1532,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1697,9 +1705,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -1809,9 +1817,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -2034,7 +2042,7 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'metricbeat-%{[agent.version]}'.
+# 'metricbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
@@ -2078,9 +2086,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -2254,9 +2262,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
