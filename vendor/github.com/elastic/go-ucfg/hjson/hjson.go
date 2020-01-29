@@ -15,27 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package yaml
+package hjson
 
 import (
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/hjson/hjson-go.v3"
 
 	"github.com/elastic/go-ucfg"
 )
 
-// NewConfig creates a new configuration object from the YAML string passed via in.
+// NewConfig creates a new configuration object from the HJSON string passed via in.
 func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
 	var m interface{}
-	if err := yaml.Unmarshal(in, &m); err != nil {
+	if err := hjson.Unmarshal(in, &m); err != nil {
 		return nil, err
 	}
 
 	return ucfg.NewFrom(m, opts...)
 }
 
-// NewConfigWithFile loads a new configuration object from an external YAML file.
+// NewConfigWithFile loads a new configuration object from an external HJSON file.
 func NewConfigWithFile(name string, opts ...ucfg.Option) (*ucfg.Config, error) {
 	input, err := ioutil.ReadFile(name)
 	if err != nil {
