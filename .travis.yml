@@ -221,8 +221,8 @@ addons:
       - libsystemd-journal-dev
       - librpm-dev
       # From deadsnakes PPA
-      - python3.7
-      - python3.7-venv
+      - python3
+      - python3-venv
 
 before_install:
   - python --version
