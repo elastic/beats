@@ -7,6 +7,10 @@ var:
     default: ~/.aws/credentials
   - name: credential_profile_name
     default: test
+  - name: visibility_timeout
+    default: 300s
+  - name: api_timeout
+    default: 120s
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

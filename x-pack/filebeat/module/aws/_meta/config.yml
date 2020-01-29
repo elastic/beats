@@ -14,6 +14,14 @@
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
   elb:
     enabled: false
 
@@ -28,3 +36,11 @@
     # Profile name for aws credential
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s

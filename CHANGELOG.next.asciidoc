@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
+- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 
