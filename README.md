@@ -88,8 +88,8 @@ For testing purposes, we generate snapshot builds that you can find [here](https
 
 ## CI
 
-It is possible to trigger some jobs by putting a comment on a GitHub PR,
-this service is only available for Elastic users.
+It is possible to trigger some jobs by putting a comment on a GitHub PR.
+(This service is only available for users affiliated with Elastic and not for open-source contributors.)
 
 * [beats][]
   * `jenkins run the tests please`
