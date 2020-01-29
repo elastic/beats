@@ -115,7 +115,7 @@ pipeline {
           }
           steps {
             mageTargetWin("Filebeat oss Windows Unit test", "-d filebeat goUnitTest")
-            mageTargetWin("Filebeat oss Windows Integration test", "-d filebeat goIntegTest")
+            //mageTargetWin("Filebeat oss Windows Integration test", "-d filebeat goIntegTest")
           }
         }
         stage('Heartbeat'){
