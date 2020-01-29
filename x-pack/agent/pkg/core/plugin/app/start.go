@@ -5,9 +5,13 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
+	"unicode"
 
 	"gopkg.in/yaml.v2"
 
@@ -24,6 +28,12 @@ const (
 	configFileTempl       = "%s.yml" // providing beat id
 	configFilePermissions = 0644     // writable only by owner
 )
+
+// ConfiguratorClient is the client connecting agent and a process
+type stateClient interface {
+	Status(ctx context.Context) (string, error)
+	Close() error
+}
 
 // Start starts the application with a specified config.
 func (a *Application) Start(cfg map[string]interface{}) (err error) {
@@ -89,6 +99,10 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 		return err
 	}
 
+	if err := a.waitForGrpc(spec, ca); err != nil {
+		return errors.New(err, "grpc not started within a time range", errors.TypeNetwork)
+	}
+
 	a.grpcClient, err = generateClient(spec.Configurable, a.state.ProcessInfo.Address, a.clientFactory, ca)
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
@@ -97,6 +111,91 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 
 	// setup watcher
 	a.watch(a.state.ProcessInfo.Process, cfg)
+
+	return nil
+}
+
+func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
+	const (
+		rounds           int           = 5
+		roundsTimeoutSec time.Duration = 30 * time.Second
+		retries          int           = 3
+		retryTimeoutSec  time.Duration = 2 * time.Second
+	)
+
+	if spec.Configurable != ConfigurableGrpc {
+		return nil
+	}
+
+	var checkFn func(context.Context, string) error = func(ctx context.Context, address string) error {
+		return a.checkGrpcHttp(ctx, address, ca)
+	}
+	if isPipe(a.state.ProcessInfo.Address) {
+		checkFn = a.checkGrpcPipe
+	}
+
+	for round := 1; round <= rounds; round++ {
+		for retry := 1; retry <= retries; retry++ {
+			c, cancelFn := context.WithTimeout(context.Background(), retryTimeoutSec)
+			err := checkFn(c, a.state.ProcessInfo.Address)
+			if err == nil {
+				cancelFn()
+				return nil
+			}
+			cancelFn()
+
+			// do not wait on last
+			if retry != retries {
+				<-time.After(retryTimeoutSec)
+			}
+		}
+		// do not wait on last
+		if round != rounds {
+			time.After(time.Duration(round) * roundsTimeoutSec)
+		}
+	}
+
+	return nil
+}
+
+func isPipe(address string) bool {
+	address = strings.TrimPrefix(address, "http+")
+	return strings.HasPrefix(address, "file:") ||
+		strings.HasPrefix(address, "unix:") ||
+		strings.HasPrefix(address, "npipe") ||
+		strings.HasPrefix(address, `\\.\pipe\`) ||
+		isWindowsPath(address)
+}
+
+func (a *Application) checkGrpcPipe(ctx context.Context, address string) error {
+	// TODO: not supported yet
+	return nil
+}
+
+func (a *Application) checkGrpcHttp(ctx context.Context, address string, ca *authority.CertificateAuthority) error {
+	grpcClient, err := generateClient(ConfigurableGrpc, a.state.ProcessInfo.Address, a.clientFactory, ca)
+	if err != nil {
+		return errors.New(err, errors.TypeSecurity)
+	}
+
+	stateClient, ok := grpcClient.(stateClient)
+	if !ok {
+		// does not support getting state
+		// let successive calls fail/succeed
+		return nil
+	}
+
+	result, err := stateClient.Status(ctx)
+	defer stateClient.Close()
+	if err != nil {
+		return errors.New(err, "getting state failed", errors.TypeNetwork)
+	}
+
+	if strings.ToLower(result) != "ok" {
+		return errors.New(
+			fmt.Sprintf("getting state failed. not ok state received: '%s'", result),
+			errors.TypeNetwork)
+	}
 
 	return nil
 }
@@ -249,4 +348,11 @@ func getProcessCredentials(configurable string, ca *authority.CertificateAuthori
 	}
 
 	return processCreds, nil
+}
+
+func isWindowsPath(path string) bool {
+	if len(path) < 4 {
+		return false
+	}
+	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
 }
