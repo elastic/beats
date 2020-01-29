@@ -23,11 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
+	_ "github.com/elastic/beats/libbeat/processors/add_id"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -300,6 +302,27 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
+}
+
+func TestUnpackMetricSetConfiguration(t *testing.T) {
+	logp.TestingSetup()
+
+	r := NewRegister()
+	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
+	source := NewLightModulesSource("testdata/lightmodules")
+	r.SetSecondarySource(source)
+
+	config := struct {
+		Processors processors.PluginConfig `config:"processors"`
+	}{}
+	err := source.UnpackMetricSetConfiguration(r, "unpack", "metricset", &config)
+	require.NoError(t, err)
+
+	p, err := processors.New(config.Processors)
+	require.NoError(t, err)
+
+	assert.Len(t, p.List, 1)
+	assert.Equal(t, "add_id=[target_field=[@metadata.id]]", p.List[0].String())
 }
 
 type metricSetWithOption struct {
