@@ -22,7 +22,7 @@ jobs:
   include:
     # General checks
     - os: linux
-      env: TARGETS="check" PYTHON_EXE="python3.8"
+      env: TARGETS="check" PYTHON_EXE="python3.6"
       go: $TRAVIS_GO_VERSION
       stage: check
 
@@ -220,8 +220,8 @@ addons:
       - libsystemd-journal-dev
       - librpm-dev
       # From deadsnakes PPA
-      - python3.8
-      - python3.8-venv
+      - python3.6
+      - python3.6-venv
 
 before_install:
   - python --version
