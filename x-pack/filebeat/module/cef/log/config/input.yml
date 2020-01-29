@@ -27,10 +27,18 @@ processors:
   - script:
       lang: javascript
       source: >-
-        function process(evt) {
+        function forcepoint_mappings(evt) {
           switch (evt.Get("cef.extensions.deviceCustomString1Label")) {
             case "RuleID":
               evt.Put("rule.id", evt.Get("cef.extensions.deviceCustomString1"));
+            default:
+              return;
+          }
+        }
+        function process(evt) {
+          switch (evt.Get("cef.device.vendor")) {
+            case "FORCEPOINT":
+              forcepoint_mappings(evt);
             default:
               return;
           }
