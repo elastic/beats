@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -497,4 +498,32 @@ func TestRedirect(t *testing.T) {
 		)),
 		event.Fields,
 	)
+}
+
+func TestNewRoundTripper(t *testing.T) {
+	configs := map[string]Config{
+		"Plain":      {Timeout: time.Second},
+		"With Proxy": {Timeout: time.Second, ProxyURL: "http://localhost:1234"},
+	}
+
+	for name, config := range configs {
+		t.Run(name, func(t *testing.T) {
+			transp, err := newRoundTripper(&config, &transport.TLSConfig{})
+			require.NoError(t, err)
+
+			if config.ProxyURL == "" {
+				require.Nil(t, transp.Proxy)
+			} else {
+				require.NotNil(t, transp.Proxy)
+			}
+
+			// It's hard to compare func types in tests
+			require.NotNil(t, transp.Dial)
+			require.NotNil(t, transport.TLSDialer)
+
+			require.Equal(t, (&transport.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			require.True(t, transp.DisableKeepAlives)
+		})
+	}
+
 }

@@ -11,21 +11,23 @@
     - cloudwatch
   metrics:
     - namespace: AWS/EC2
-      name: ["CPUUtilization", "DiskWriteOps"]
+      #name: ["CPUUtilization", "DiskWriteOps"]
       tags.resource_type_filter: ec2:instance
       #dimensions:
       #  - name: InstanceId
       #    value: i-0686946e22cf9494a
-      statistic: ["Average", "Maximum"]
+      #statistic: ["Average", "Maximum"]
 - module: aws
   period: 5m
   metricsets:
+    - dynamodb
     - ebs
     - ec2
     - elb
+    - lambda
+    - rds
     - sns
     - sqs
-    - rds
 - module: aws
   period: 12h
   metricsets:

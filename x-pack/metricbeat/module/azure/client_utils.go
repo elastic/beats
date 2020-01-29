@@ -151,3 +151,40 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	}
 	return false
 }
+
+// convertTimegrainToDuration will convert azure timegrain options to actual duration values
+func convertTimegrainToDuration(timegrain string) time.Duration {
+	var duration time.Duration
+	switch timegrain {
+	case "PT1M":
+		duration = time.Duration(time.Minute)
+	default:
+	case "PT5M":
+		duration = time.Duration(5 * time.Minute)
+	case "PT15M":
+		duration = time.Duration(15 * time.Minute)
+	case "PT30M":
+		duration = time.Duration(30 * time.Minute)
+	case "PT1H":
+		duration = time.Duration(time.Hour)
+	case "PT6H":
+		duration = time.Duration(6 * time.Hour)
+	case "PT12H":
+		duration = time.Duration(12 * time.Hour)
+	case "PT1D":
+		duration = time.Duration(24 * time.Hour)
+	}
+	return duration
+}
+
+// groupMetricsByResource is used in order to group metrics by resource and return data faster
+func groupMetricsByResource(metrics []Metric) map[string][]Metric {
+	grouped := make(map[string][]Metric)
+	for _, metric := range metrics {
+		if _, ok := grouped[metric.Resource.ID]; !ok {
+			grouped[metric.Resource.ID] = make([]Metric, 0)
+		}
+		grouped[metric.Resource.ID] = append(grouped[metric.Resource.ID], metric)
+	}
+	return grouped
+}
