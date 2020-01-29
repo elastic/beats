@@ -225,6 +225,7 @@ addons:
 
 before_install:
   - python --version
+  - openssl version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
