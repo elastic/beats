@@ -1001,6 +1001,10 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/docker
+Version: v1.4.2
+Revision: 8af4db6f002a
+Overwrite: github.com/docker/engine
+Overwrite-Revision: ea84732a7725
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/docker/LICENSE:
 --------------------------------------------------------------------
@@ -1102,7 +1106,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/dop251/goja
-Revision: adff31b136e6
+Overwrite: github.com/andrewkroh/goja
+Overwrite-Revision: dd2ac4456e20
 License type (autodetected): MIT
 ./vendor/github.com/dop251/goja/LICENSE:
 --------------------------------------------------------------------
@@ -1464,6 +1469,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
+Overwrite: github.com/elastic/fsevents
+Overwrite-Revision: e1d381a4d270
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------
@@ -1497,6 +1504,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsnotify
+Version: v1.4.7
+Overwrite: github.com/adriansr/fsnotify
+Overwrite-Revision: c9bbe1f46f1d
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsnotify/LICENSE:
 --------------------------------------------------------------------
@@ -4324,6 +4334,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
+Overwrite: github.com/elastic/sarama
+Overwrite-Revision: 355d120d0970
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------

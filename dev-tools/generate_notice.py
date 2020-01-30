@@ -42,9 +42,7 @@ def read_go_mod(vendor_dir):
                 continue
 
             if " => " in line:
-                _, replaced = line.split(" => ")
-                elems = replaced.split(" ")
-                data = _get_version_info(elems)
+                data = _get_replaced_dep_data(line)
                 deps.append(data)
 
     return deps
@@ -69,6 +67,26 @@ def _get_version_info(elems):
     if revision_elems[0] != "v0.0.0":
         data["version"] = revision_elems[0]
     data["revision"] = revision_elems[2]
+
+    return data
+
+
+def _get_replaced_dep_data(line):
+    original, fork = line.split(" => ")
+    elems = fork.split(" ")
+    fork_data = _get_version_info(elems)
+    elems = original.split(" ")
+    data = _get_version_info(elems)
+
+    if "path" in fork_data:
+        data["overwrite-path"] = fork_data["path"]
+    if "version" in fork_data:
+        data["overwrite-version"] = fork_data["version"]
+    if "revision" in fork_data:
+        data["overwrite-revision"] = fork_data["revision"]
+
+    if "revision" in data and data["revision"] == "000000000000":
+        del(data["revision"])
 
     return data
 
@@ -228,6 +246,12 @@ def write_notice_file(f, beat, copyright, dependencies):
                 f.write("Version: {}\n".format(lib["version"]))
             if "revision" in lib:
                 f.write("Revision: {}\n".format(lib["revision"]))
+            if "overwrite-path" in lib:
+                f.write("Overwrite: {}\n".format(lib["overwrite-path"]))
+            if "overwrite-version" in lib:
+                f.write("Overwrite-Version: {}\n".format(lib["overwrite-version"]))
+            if "overwrite-revision" in lib:
+                f.write("Overwrite-Revision: {}\n".format(lib["overwrite-revision"]))
             f.write("License type (autodetected): {}\n".format(lib["license_summary"]))
             f.write("{}:\n".format(lib["license_file"]))
             f.write("--------------------------------------------------------------------\n")
