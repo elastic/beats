@@ -119,6 +119,7 @@ datasources:
 ### suggestion 1
  - id?: myendpoint-x1
    title: Endpoint configuration
+   namespace?: "canada"
    package:
      name: endpoint
      version: xxx
@@ -174,6 +175,7 @@ datasources:
 ### suggestion 2
  - id?: myendpoint-1
    title: Endpoint configuration
+   namespace?: "canada"
    package:
      name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
      version: xxx
