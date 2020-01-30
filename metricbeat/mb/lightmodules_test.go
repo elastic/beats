@@ -319,6 +319,15 @@ func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
 	require.Nil(t, procs)
 }
 
+func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
+	require.NoError(t, err)
+	require.NotNil(t, procs)
+	require.Len(t, procs.List, 1)
+}
+
 type metricSetWithOption struct {
 	BaseMetricSet
 	Option string
