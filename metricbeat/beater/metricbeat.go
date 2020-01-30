@@ -20,18 +20,16 @@ package beater
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/management"
-	"github.com/elastic/beats/libbeat/paths"
-
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
@@ -44,18 +42,13 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}  // Channel used to initiate shutdown.
-	modules      []staticModule // Active list of modules.
+	done         chan struct{}   // Channel used to initiate shutdown.
+	runners      []module.Runner // Active list of module runners.
 	config       Config
 	autodiscover *autodiscover.Autodiscover
 
 	// Options
 	moduleOptions []module.Option
-}
-
-type staticModule struct {
-	connector *module.Connector
-	module    *module.Wrapper
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -162,46 +155,28 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
-	var errs multierror.Errors
+
+	factory := module.NewFactory(b.Info, moduleOptions...)
+
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
 			continue
 		}
 
-		failed := false
-
-		connector, err := module.NewConnector(b.Info, b.Publisher, moduleCfg, nil)
+		runner, err := factory.Create(b.Publisher, moduleCfg, nil)
 		if err != nil {
-			errs = append(errs, err)
-			failed = true
+			return nil, err
 		}
 
-		module, err := module.NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
-		if err != nil {
-			errs = append(errs, err)
-			failed = true
-		}
-
-		if failed {
-			continue
-		}
-
-		metricbeat.modules = append(metricbeat.modules, staticModule{
-			connector: connector,
-			module:    module,
-		})
+		metricbeat.runners = append(metricbeat.runners, runner)
 	}
 
-	if err := errs.Err(); err != nil {
-		return nil, err
-	}
-	if len(metricbeat.modules) == 0 && !dynamicCfgEnabled {
+	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
 		return nil, mb.ErrAllModulesDisabled
 	}
 
 	if config.Autodiscover != nil {
 		var err error
-		factory := module.NewFactory(b.Info, metricbeat.moduleOptions...)
 		adapter := autodiscover.NewFactoryAdapter(factory)
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
@@ -220,20 +195,16 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	// Static modules (metricbeat.modules)
-	for _, m := range bt.modules {
-		client, err := m.connector.Connect()
-		if err != nil {
-			return err
-		}
-
-		r := module.NewRunner(client, m.module)
+	// Static modules (metricbeat.runners)
+	for _, r := range bt.runners {
 		r.Start()
 		wg.Add(1)
+
+		thatRunner := r
 		go func() {
 			defer wg.Done()
 			<-bt.done
-			r.Stop()
+			thatRunner.Stop()
 		}()
 	}
 
@@ -293,8 +264,12 @@ func (bt *Metricbeat) Stop() {
 // under dynamic config settings.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
 	var modules []*module.Wrapper
-	for _, m := range bt.modules {
-		modules = append(modules, m.module)
+	for _, moduleCfg := range bt.config.Modules {
+		module, err := module.NewWrapper(moduleCfg, mb.Registry, nil)
+		if err != nil {
+			return nil, err
+		}
+		modules = append(modules, module)
 	}
 
 	// Add dynamic modules
