@@ -76,27 +76,14 @@ var xpackMetricSets = []string{
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
-
 	host := service.Host()
-	err := createIndex(host)
-	assert.NoError(t, err)
 
 	version, err := getElasticsearchVersion(host)
 	if err != nil {
 		t.Fatal("getting elasticsearch version", err)
 	}
 
-	err = enableTrialLicense(host, version)
-	assert.NoError(t, err)
-
-	err = createMLJob(host, version)
-	assert.NoError(t, err)
-
-	err = createCCRStats(host)
-	assert.NoError(t, err)
-
-	err = createEnrichStats(host)
-	assert.NoError(t, err)
+	setupTest(t, host, version)
 
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
@@ -144,6 +131,23 @@ func getConfig(metricset string, host string) map[string]interface{} {
 		"hosts":                      []string{host},
 		"index_recovery.active_only": false,
 	}
+}
+
+func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
+	err := createIndex(esHost)
+	assert.NoError(t, err)
+
+	err = enableTrialLicense(esHost, esVersion)
+	assert.NoError(t, err)
+
+	err = createMLJob(esHost, esVersion)
+	assert.NoError(t, err)
+
+	err = createCCRStats(esHost)
+	assert.NoError(t, err)
+
+	err = createEnrichStats(esHost)
+	assert.NoError(t, err)
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
