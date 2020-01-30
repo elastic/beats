@@ -57,7 +57,11 @@ func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		if err != nil {
 			return nil, err
 		}
-		connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
+
+		err = connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
+		if err != nil {
+			return nil, err
+		}
 
 		client, err := connector.Connect()
 		if err != nil {
