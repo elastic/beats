@@ -159,7 +159,7 @@ func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName stri
 	}
 	metricSet, ok := module.MetricSets[metricSetName]
 	if !ok {
-		return nil, errors.Wrapf(err, "unknown metricset '%s' in module '%s'", metricSetName, moduleName)
+		return nil, fmt.Errorf("unknown metricset '%s' in module '%s'", metricSetName, moduleName)
 	}
 	return processors.New(metricSet.Processors)
 }

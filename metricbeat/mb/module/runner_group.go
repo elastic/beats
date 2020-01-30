@@ -23,6 +23,8 @@ import (
 )
 
 type runnerGroup struct {
+	Runner
+
 	runners []Runner
 
 	startOnce sync.Once

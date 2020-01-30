@@ -303,6 +303,22 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.True(t, called, "module factory must be called if registered")
 }
 
+func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "nonexisting", "fake")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "nonexisting")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
 type metricSetWithOption struct {
 	BaseMetricSet
 	Option string
