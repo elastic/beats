@@ -72,7 +72,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	eventList := map[string]common.MapStr{}
 	if err != nil {
 		m.addUpEvent(eventList, 0)
-		for _, evt := range eventList{
+		for _, evt := range eventList {
 			reporter.Event(mb.Event{
 				RootFields: common.MapStr{"prometheus": evt},
 			})
