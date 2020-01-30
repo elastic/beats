@@ -260,42 +260,7 @@ func (bt *Metricbeat) Stop() {
 	close(bt.done)
 }
 
-// Modules return a list of all configured modules, including anyone present
-// under dynamic config settings.
+// Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	var modules []*module.Wrapper
-	for _, moduleCfg := range bt.config.Modules {
-		module, err := module.NewWrapper(moduleCfg, mb.Registry, nil)
-		if err != nil {
-			return nil, err
-		}
-		modules = append(modules, module)
-	}
-
-	// Add dynamic modules
-	if bt.config.ConfigModules.Enabled() {
-		config := cfgfile.DefaultDynamicConfig
-		bt.config.ConfigModules.Unpack(&config)
-
-		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
-		if err != nil {
-			return nil, errors.Wrap(err, "initialization error")
-		}
-
-		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
-			if err != nil {
-				return nil, errors.Wrap(err, "error loading config files")
-			}
-			for _, conf := range confs {
-				m, err := module.NewWrapper(conf, mb.Registry, bt.moduleOptions...)
-				if err != nil {
-					return nil, errors.Wrap(err, "module initialization error")
-				}
-				modules = append(modules, m)
-			}
-		}
-	}
-
-	return modules, nil
+	return module.ConfiguredModules(bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
 }
