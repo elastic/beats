@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   logstash:
-    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.5.0}-1
+    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.5.2}-1
     build:
       context: ./_meta
       args:
-        LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.5.0}
+        LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.5.2}
     ports:
       - 9600
