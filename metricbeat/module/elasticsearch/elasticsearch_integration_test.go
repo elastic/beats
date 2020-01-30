@@ -62,6 +62,18 @@ var metricSets = []string{
 	"shard",
 }
 
+var xpackMetricSets = []string{
+	"ccr",
+	"enrich",
+	"cluster_stats",
+	"index",
+	"index_recovery",
+	"index_summary",
+	"ml_job",
+	"node_stats",
+	"shard",
+}
+
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 
