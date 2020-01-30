@@ -201,7 +201,6 @@ func TestXPackEnabled(t *testing.T) {
 			}
 
 			for i, event := range events {
-				fmt.Println(metricSet.Name())
 				assert.Equal(t, types[i], event.RootFields["type"])
 				assert.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
 			}
