@@ -23,11 +23,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/processors"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.
@@ -123,7 +122,7 @@ type ModulesSource interface {
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	ModulesInfo(r *Register) string
-	ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error)
+	ProcessorsForMetricSet(r *Register, module, name string) (*processors.Processors, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -366,25 +365,25 @@ func (r *Register) MetricSets(module string) []string {
 }
 
 // ProcessorsForMetricSet returns a list of processors defined in manifest of the registered metricset.
-func (r *Register) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error) {
+func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Processors, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	moduleName = strings.ToLower(moduleName)
-	metricSetName = strings.ToLower(metricSetName)
+	module = strings.ToLower(module)
+	name = strings.ToLower(name)
 
-	metricSets, exists := r.metricSets[moduleName]
+	metricSets, exists := r.metricSets[module]
 	if exists {
-		_, exists := metricSets[metricSetName]
+		_, exists := metricSets[name]
 		if exists {
 			return nil, nil // Standard metric sets don't have processor definitions.
 		}
 	}
 
 	if source := r.secondarySource; source != nil {
-		return source.ProcessorsForMetricSet(r, moduleName, metricSetName)
+		return source.ProcessorsForMetricSet(r, module, name)
 	}
-	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, metricSetName, moduleName)
+	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, name, module)
 }
 
 // SetSecondarySource sets an additional source of modules

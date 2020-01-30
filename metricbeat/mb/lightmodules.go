@@ -24,12 +24,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/processors"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 const (
@@ -155,6 +154,9 @@ type lightModuleConfig struct {
 // ProcessorsForMetricSet returns processors defined for the light metricset.
 func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error) {
 	module, err := s.loadModule(r, moduleName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "reading processors for metricset '%s' in module '%s' failed", metricSetName, moduleName)
+	}
 	metricSet, ok := module.MetricSets[metricSetName]
 	if !ok {
 		return nil, errors.Wrapf(err, "unknown metricset '%s' in module '%s'", metricSetName, moduleName)
