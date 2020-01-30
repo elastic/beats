@@ -25,9 +25,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -44,16 +45,21 @@ var debugf = logp.MakeDebug("scheduler")
 // ErrInvalidTransition is returned from start/stop when making an invalid state transition, say from preRunning to stopped
 var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
+type identifiableTimer struct {
+	id uuid.UUID
+	t  time.Timer
+}
+
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit      int64
-	limitSem   *semaphore.Weighted
-	state      atomic.Int
-	location   *time.Location
-	timerQueue *timerqueue.TimerQueue
-	ctx        context.Context
-	cancelCtx  context.CancelFunc
-	stats      schedulerStats
+	limit     int64
+	limitSem  *semaphore.Weighted
+	state     atomic.Int
+	location  *time.Location
+	ctx       context.Context
+	cancelCtx context.CancelFunc
+	stats     schedulerStats
+	timers    sync.Map
 }
 
 type schedulerStats struct {
@@ -102,8 +108,7 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 		limitSem:  semaphore.NewWeighted(limit),
-
-		timerQueue: timerqueue.NewTimerQueue(ctx),
+		timers:    sync.Map{},
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
@@ -124,8 +129,6 @@ func (s *Scheduler) Start() error {
 	if !s.state.CAS(statePreRunning, stateRunning) {
 		return nil // we already running, just exit
 	}
-
-	s.timerQueue.Start()
 
 	// Missed deadline reporter
 	go s.missedDeadlineReporter()
@@ -185,13 +188,17 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
 	lastRanAt := time.Now().In(s.location)
 
-	var taskFn timerqueue.TimerTaskFn
+	timerCancelMtx := sync.Mutex{}
+	var timerCancel func()
 
-	taskFn = func(_ time.Time) {
+	var taskFn func()
+	taskFn = func() {
 		s.stats.activeJobs.Inc()
 		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
 		s.stats.activeJobs.Dec()
-		s.runOnce(sched.Next(lastRanAt), taskFn)
+		timerCancelMtx.Lock()
+		defer timerCancelMtx.Unlock()
+		timerCancel = s.runOnce(id, sched.Next(lastRanAt), taskFn)
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
@@ -200,18 +207,21 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	// however, that would caused the missed deadline stats to be incremented. Given that, it's easier
 	// and slightly more efficient to simply run these tasks immediately in a goroutine.
 	if sched.RunOnInit() {
-		go taskFn(time.Now())
+		go taskFn()
 	} else {
-		s.runOnce(sched.Next(lastRanAt), taskFn)
+		s.runOnce(id, sched.Next(lastRanAt), taskFn)
 	}
 
 	return func() {
 		debugf("Remove scheduler job '%v'", id)
+		if timerCancel != nil {
+			timerCancel()
+		}
 		jobCtxCancel()
 	}, nil
 }
 
-func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
+func (s *Scheduler) runOnce(id string, runAt time.Time, taskFn func()) (cancelFn func()) {
 	now := time.Now().In(s.location)
 	if runAt.Before(now) {
 		// Our last invocation went long!
@@ -220,8 +230,22 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 
 	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
 	// block the timer thread.
-	asyncTask := func(now time.Time) { go taskFn(now) }
-	s.timerQueue.Push(runAt, asyncTask)
+	mtx := sync.Mutex{}
+	mtx.Lock()
+	t := time.AfterFunc(runAt.Sub(now), func() {
+		taskFn()
+		mtx.Lock()
+		s.timers.Delete(id)
+		mtx.Unlock()
+	})
+	s.timers.Store(id, t)
+	mtx.Unlock()
+
+	return func() {
+		if !t.Stop() {
+			<-t.C
+		}
+	}
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
