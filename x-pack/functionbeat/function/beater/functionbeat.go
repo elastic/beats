@@ -96,7 +96,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	}
 
 	if outputName == "elasticsearch" {
-		licenser.Enforce(logp.NewLogger("license"), b.Info.Name, licenser.BasicAndAboveOrTrial)
+		licenser.Enforce(b.Info.Name, licenser.BasicAndAboveOrTrial)
 	}
 
 	bt.log.Info("Functionbeat is running")
