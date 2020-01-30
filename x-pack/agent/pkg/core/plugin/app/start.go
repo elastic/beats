@@ -115,10 +115,10 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 
 func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
 	const (
-		rounds           int           = 3
-		roundsTimeoutSec time.Duration = 30 * time.Second
-		retries          int           = 5
-		retryTimeoutSec  time.Duration = 2 * time.Second
+		rounds        int           = 3
+		roundsTimeout time.Duration = 30 * time.Second
+		retries       int           = 5
+		retryTimeout  time.Duration = 2 * time.Second
 	)
 
 	// no need to wait, program is configured by file
@@ -126,8 +126,8 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 		return nil
 	}
 
-	var checkFn func(context.Context, string) error = func(ctx context.Context, address string) error {
-		return a.checkGrpcHttp(ctx, address, ca)
+	checkFn := func(ctx context.Context, address string) error {
+		return a.checkGrpcHTTP(ctx, address, ca)
 	}
 	if isPipe(a.state.ProcessInfo.Address) {
 		checkFn = a.checkGrpcPipe
@@ -135,7 +135,7 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 	for round := 1; round <= rounds; round++ {
 		for retry := 1; retry <= retries; retry++ {
-			c, cancelFn := context.WithTimeout(context.Background(), retryTimeoutSec)
+			c, cancelFn := context.WithTimeout(context.Background(), retryTimeout)
 			err := checkFn(c, a.state.ProcessInfo.Address)
 			if err == nil {
 				cancelFn()
@@ -145,12 +145,12 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 			// do not wait on last
 			if retry != retries {
-				<-time.After(retryTimeoutSec)
+				<-time.After(retryTimeout)
 			}
 		}
 		// do not wait on last
 		if round != rounds {
-			time.After(time.Duration(round) * roundsTimeoutSec)
+			time.After(time.Duration(round) * roundsTimeout)
 		}
 	}
 
@@ -172,7 +172,7 @@ func (a *Application) checkGrpcPipe(ctx context.Context, address string) error {
 	return nil
 }
 
-func (a *Application) checkGrpcHttp(ctx context.Context, address string, ca *authority.CertificateAuthority) error {
+func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *authority.CertificateAuthority) error {
 	grpcClient, err := generateClient(ConfigurableGrpc, a.state.ProcessInfo.Address, a.clientFactory, ca)
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
