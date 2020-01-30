@@ -97,7 +97,7 @@ func TestXPackEnabled(t *testing.T) {
 
 func getConfig(metricSet string, host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     ModuleName,
+		"module":     logstash.ModuleName,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{host},
 	}
