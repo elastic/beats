@@ -1,11 +1,7 @@
 This is the Istio module. The Istio module collects metrics from the
 Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
-<<<<<<< HEAD
-The default metricsets are `mesh`, `mixer`, `galley`.
-=======
-The default metricsets are `mesh`, `mixer`, `pilot`.
->>>>>>> upstream/master
+The default metricsets are `mesh`, `mixer`, `pilot`, `galley`.
 
 [float]
 === Compatibility
