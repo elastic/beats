@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration windows
+// +build integration
+// +build windows
 
 package perfmon
 
