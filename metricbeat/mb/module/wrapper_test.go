@@ -282,10 +282,8 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 	select {
 	case _, ok := <-output:
 		if !ok {
-			// Channel is closed.
-			return
-		} else {
-			assert.Fail(t, "received unexpected event")
+			return // Channel is closed.
 		}
+		assert.Fail(t, "received unexpected event")
 	}
 }
