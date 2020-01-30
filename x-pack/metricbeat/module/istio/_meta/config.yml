@@ -11,3 +11,10 @@
   period: 10s
   # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kuberentes cluster
   hosts: ["localhost:15014"]
+
+# Istio pilot. To collect all Pilot-generated metrics.
+- module: istio
+  metricsets: ["pilot"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kuberentes cluster
+  hosts: ["localhost:15014"]

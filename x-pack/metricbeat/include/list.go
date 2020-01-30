@@ -32,6 +32,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/istio"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/istio/mesh"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/istio/mixer"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/istio/pilot"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/performance"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/transaction_log"
