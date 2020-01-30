@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/kibana"
+	_ "github.com/elastic/beats/metricbeat/module/kibana/stats"
 )
 
 var xpackMetricSets = []string{
