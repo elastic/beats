@@ -16622,7 +16622,7 @@ type: keyword
 *`istio.galley.namespace`*::
 +
 --
-The Kubernates namespace of the resource
+The Kubernetes namespace of the resource
 
 
 type: keyword

@@ -11,7 +11,7 @@
     - name: namespace
       type: keyword
       description: >
-        The Kubernates namespace of the resource
+        The Kubernetes namespace of the resource
     - name: version
       type: keyword
       description: >
