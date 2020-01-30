@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 
 - Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
 - Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
+- Fix license detection, when a beats successfully connect to Elasticsearch the detected license will be show in the log at info level. {pull}15834[15834]
 
 *Filebeat*
 
