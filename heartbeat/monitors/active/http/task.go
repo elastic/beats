@@ -188,10 +188,6 @@ func createPingFactory(
 	})
 }
 
-func makeIPClient() {
-
-}
-
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
 	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
@@ -326,9 +322,6 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 	}
 
 	return func(r *http.Request, via []*http.Request) error {
-		if via == nil {
-			redirects = nil
-		}
 		if redirects != nil {
 			*redirects = append(*redirects, r.URL.String())
 		}
