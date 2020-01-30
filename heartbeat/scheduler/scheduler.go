@@ -25,8 +25,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
-
 	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -44,11 +42,6 @@ var debugf = logp.MakeDebug("scheduler")
 
 // ErrInvalidTransition is returned from start/stop when making an invalid state transition, say from preRunning to stopped
 var ErrInvalidTransition = fmt.Errorf("invalid state transition")
-
-type identifiableTimer struct {
-	id uuid.UUID
-	t  time.Timer
-}
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
