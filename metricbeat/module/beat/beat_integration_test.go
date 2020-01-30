@@ -75,8 +75,9 @@ func TestXPackEnabled(t *testing.T) {
 		}
 
 		event := events[0]
-		assert.Equal(t, "beat_"+metricSet.Name(), event.RootFields["type"])
-		assert.Regexp(t, `^.monitoring-beat-\d-mb`, event.Index)
+		assert.Equal(t, "beats_"+metricSet.Name(), event.RootFields["type"])
+		assert.Equal(t, event.RootFields["cluster_uuid"], "foobar")
+		assert.Regexp(t, `^.monitoring-beats-\d-mb`, event.Index)
 	}
 }
 
