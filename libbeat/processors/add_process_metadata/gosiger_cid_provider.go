@@ -50,7 +50,7 @@ func newCidProvider(hostPath string, cgroupPrefix string) gosigarCidProvider {
 // of them are associated with Kubernetes. Kubernetes uses /kubepods/<quality>/<podId>/<cid> when
 // naming cgroups and we use this to determine the container ID. If no container
 // ID is found then an empty string is returned.
-// Example: 
+// Example:
 // /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
 func (p gosigarCidProvider) getCid(cgroups map[string]string) string {
 	for _, path := range cgroups {
