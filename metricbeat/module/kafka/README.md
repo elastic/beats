@@ -47,7 +47,7 @@ listeners = INSIDE://localhost:9091,OUTSIDE://0.0.0.0:9092
 
 So here the advertised addressed to be used in the config is `172.26.0.2:9092`.
 
-This difference comes from here: https://github.com/elastic/beats/blob/master/libbeat/tests/compose/wrapper.go#L137
+This difference comes from here: https://github.com/elastic/beats/blob/v7.5.2/libbeat/tests/compose/wrapper.go#L137
 
 This was needed before moving the metricbeat docker used in CI to host network, we can maybe remove this now if it complicates things.
 
