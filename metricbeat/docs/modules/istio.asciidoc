@@ -47,7 +47,8 @@ metricbeat.modules:
   metricsets: ["pilot"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
-  hosts: ["localhost:15014"]----
+  hosts: ["localhost:15014"]
+----
 
 [float]
 === Metricsets
