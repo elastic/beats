@@ -121,6 +121,7 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 		retryTimeoutSec  time.Duration = 2 * time.Second
 	)
 
+	// no need to wait, program is configured by file
 	if spec.Configurable != ConfigurableGrpc {
 		return nil
 	}
