@@ -23,13 +23,13 @@ import (
 )
 
 type runnerGroup struct {
-	Runner
-
 	runners []Runner
 
 	startOnce sync.Once
 	stopOnce  sync.Once
 }
+
+var _ Runner = new(runnerGroup)
 
 func newRunnerGroup(runners []Runner) Runner {
 	return &runnerGroup{
