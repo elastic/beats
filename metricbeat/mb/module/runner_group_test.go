@@ -84,5 +84,5 @@ func TestString(t *testing.T) {
 		})
 	}
 	runnerGroup := newRunnerGroup(runners)
-	assert.Equal(t, "RunnerGroup: fakeRunner-0, fakeRunner-1, fakeRunner-2", runnerGroup.String())
+	assert.Equal(t, "RunnerGroup{fakeRunner-0, fakeRunner-1, fakeRunner-2}", runnerGroup.String())
 }

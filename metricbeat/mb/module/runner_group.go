@@ -58,5 +58,5 @@ func (rg *runnerGroup) String() string {
 	for _, runner := range rg.runners {
 		entries = append(entries, runner.String())
 	}
-	return "RunnerGroup: " + strings.Join(entries, ", ")
+	return "RunnerGroup{" + strings.Join(entries, ", ") + "}"
 }
