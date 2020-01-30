@@ -38,10 +38,11 @@
       }
     },
     {
-      "set": {
-        "field": "tls.established",
-        "value": "{{zeek.smtp.tls}}",
-        "if": "ctx.zeek?.smtp.tls != null"
+      "convert": {
+        "field": "zeek.smtp.tls",
+        "target_field": "tls.established",
+        "type": "boolean",
+        "ignore_missing": true
       }
     },
     {

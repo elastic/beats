@@ -224,14 +224,16 @@ processors:
     field: tls.curve
     value: '{{zeek.ssl.curve}}'
     if: ctx.zeek?.ssl.curve != null
-- set:
-    field: tls.established
-    value: '{{zeek.ssl.established}}'
-    if: ctx.zeek?.ssl.established != null
-- set:
-    field: tls.resumed
-    value: '{{zeek.ssl.resumed}}'
-    if: ctx.zeek?.ssl.resumed != null
+- convert:
+    target_field: tls.established
+    field: zeek.ssl.established
+    type: boolean
+    ignore_missing: true
+- convert:
+    target_field: tls.resumed
+    field: zeek.ssl.resumed
+    type: boolean
+    ignore_missing: true
 - script:
     lang: painless
     if: ctx.zeek?.ssl.version != null

@@ -26,10 +26,11 @@
       }
     },
     {
-      "set": {
-        "field": "tls.established",
-        "value": "{{zeek.rdp.ssl}}",
-        "if": "ctx.zeek?.rdp.ssl != null"
+      "convert": {
+        "field": "zeek.rdp.ssl",
+        "target_field": "tls.established",
+        "type": "boolean",
+        "ignore_missing": true
       }
     },
     {

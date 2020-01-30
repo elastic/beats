@@ -20,7 +20,7 @@
         "tags": [
             "zeek.rdp"
         ],
-        "tls.established": "true",
+        "tls.established": true,
         "zeek.rdp.cert.count": 0,
         "zeek.rdp.result": "encrypted",
         "zeek.rdp.security_protocol": "HYBRID",
