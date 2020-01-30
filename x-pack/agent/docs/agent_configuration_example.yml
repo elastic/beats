@@ -24,18 +24,19 @@ settings.monitoring:
 
 datasources:
   # use the nginx package
-  - id: nginx-x1
-    title: "This is a nice title for human"
+  - id?: nginx-x1
+    title?: "This is a nice title for human"
     # Package this config group is coming from. On importing, we know where it belongs
     # The package tells the UI which application to link to
-    package:
+    package?:
       name: epm/nginx
       version: 1.7.0
     namespace?: prod
-    constraints:
+    constraints?:
       # Contraints look are not final
       - os.platform: { in: "windows" }
       - agent.version: { ">=": "8.0.0" }
+    use_output: long_term_storage
     inputs:
       - type: logs
         processors?:
@@ -70,7 +71,7 @@ datasources:
 
   #################################################################################################
   # System EPM package
-  - id: system
+  - id?: system
     title: Collect system information and metrics
     package:
       name: epm/system
@@ -116,7 +117,7 @@ datasources:
 
 #################################################################################################
 ### suggestion 1
- - id: myendpoint-x1
+ - id?: myendpoint-x1
    title: Endpoint configuration
    package:
      name: endpoint
@@ -171,7 +172,7 @@ datasources:
 
 #################################################################################################
 ### suggestion 2
- - id: myendpoint-1
+ - id?: myendpoint-1
    title: Endpoint configuration
    package:
      name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
