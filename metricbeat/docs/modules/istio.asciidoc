@@ -11,7 +11,11 @@ beta[]
 This is the Istio module. The Istio module collects metrics from the
 Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
+<<<<<<< HEAD
 The default metricsets are `mesh`, `mixer`, `galley`.
+=======
+The default metricsets are `mesh`, `mixer`, `pilot`.
+>>>>>>> upstream/master
 
 [float]
 === Compatibility
@@ -48,6 +52,13 @@ metricbeat.modules:
   period: 10s
   # use istio-galley.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
+
+# Istio pilot. To collect all Pilot-generated metrics.
+- module: istio
+  metricsets: ["pilot"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kuberentes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
 ----
 
 [float]
@@ -61,9 +72,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-istio-mixer,mixer>>
 
+* <<metricbeat-metricset-istio-pilot,pilot>>
+
 include::istio/galley.asciidoc[]
 
 include::istio/mesh.asciidoc[]
 
 include::istio/mixer.asciidoc[]
+
+include::istio/pilot.asciidoc[]
 

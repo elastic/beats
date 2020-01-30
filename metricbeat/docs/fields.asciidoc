@@ -17469,6 +17469,203 @@ type: long
 
 --
 
+[float]
+=== pilot
+
+Contains statistics related to the Istio pilot service
+
+
+
+*`istio.pilot.xds.count`*::
++
+--
+Count of concurrent xDS client connections for Pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.pushes`*::
++
+--
+Count of xDS messages sent, as well as errors building or sending xDS messages for lds, rds, cds and eds.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.push.time.sec`*::
++
+--
+Total time in seconds Pilot takes to push lds, rds, cds and eds.
+
+
+type: long
+
+--
+
+*`istio.pilot.xds.eds.instances`*::
++
+--
+Instances for each cluster, as of last push. Zero instances is an error.
+
+
+type: object
+
+--
+
+*`istio.pilot.xds.push.context.errors`*::
++
+--
+Number of errors (timeouts) initiating push context.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.internal.errors`*::
++
+--
+Total number of internal XDS errors in pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.inbound`*::
++
+--
+Number of conflicting inbound listeners.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.current.tcp`*::
++
+--
+Number of conflicting wildcard http listeners with current wildcard tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.https`*::
++
+--
+Number of conflicting HTTP listeners with well known HTTPS ports.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.http`*::
++
+--
+Number of conflicting wildcard tcp listeners with current wildcard http listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.tcp`*::
++
+--
+Number of conflicting tcp listeners with current tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.bucket.*`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram buckets in milliseconds.
+
+
+type: object
+
+--
+
+*`istio.pilot.proxy.conv.ms.sum`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram sum of times in milliseconds.
+
+
+type: long
+
+--
+
+*`istio.pilot.services`*::
++
+--
+Total services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.virt.services`*::
++
+--
+Total virtual services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.count`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram count of times.
+
+
+type: long
+
+--
+
+*`istio.pilot.no.ip`*::
++
+--
+Pods not found in the endpoint table, possibly invalid.
+
+
+type: object
+
+--
+
+*`istio.pilot.cluster`*::
++
+--
+The instance FQDN.
+
+
+type: text
+
+--
+
+*`istio.pilot.type`*::
++
+--
+The Envoy proxy configuration type.
+
+
+type: text
+
+--
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
