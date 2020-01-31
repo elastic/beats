@@ -82,7 +82,7 @@ class Test(BaseTest):
         self.nasa_logs()
 
         self.render_config_template(
-            logstash={"host": "does.not.exist:12345"},
+            logstash={"host": "does.not.exist:12345", "timeout": 1},
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="1s",

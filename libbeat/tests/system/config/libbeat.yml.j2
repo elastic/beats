@@ -91,6 +91,9 @@ output:
 {% if logstash %}
 output.logstash:
   hosts: ["{{ logstash.host }}"]
+  {% if logstash.timeout %}
+  timeout: {{logstash.timeout}}
+  {% endif %}
 {%- endif %}
 
 {% if not (console or elasticsearch or logstash) -%}
