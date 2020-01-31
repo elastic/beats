@@ -33,3 +33,8 @@ class Test(XPackTest):
             self.assert_fields_are_documented(evt)
             self.assertIn("prometheus", evt.keys(), evt)
             self.assertIn("metrics", evt["prometheus"].keys(), evt)
+            self.assertGreater(len(evt["prometheus"]["metrics"].keys()), 0)
+
+            # Verify if processors are correctly setup.
+            for metric in evt["prometheus"]["metrics"].keys():
+                assert metric.startswith("ibmmq_")
