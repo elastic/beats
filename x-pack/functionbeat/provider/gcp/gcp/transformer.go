@@ -33,7 +33,7 @@ func transformPubSub(mData *metadata.Metadata, msg pubsub.Message) (beat.Event, 
 			"message":        string(msg.Data),
 			"attributes":     msg.Attributes,
 			"id":             mData.EventID,
-			"resource": common.MapStr{
+			"pubsub_resource": common.MapStr{
 				"service":    mData.Resource.Service,
 				"name":       mData.Resource.Name,
 				"event_type": mData.Resource.Type,
@@ -50,17 +50,17 @@ func transformStorage(mData *metadata.Metadata, evt StorageEvent) (beat.Event, e
 		Fields: common.MapStr{
 			"read_timestamp": time.Now(),
 			"id":             mData.EventID,
-			"resource": common.MapStr{
+			"storage_resource": common.MapStr{
 				"service":    mData.Resource.Service,
 				"name":       mData.Resource.Name,
 				"event_type": mData.Resource.Type,
 				"state":      evt.ResourceState,
 			},
-			"bucket":         evt.Bucket,
-			"file":           evt.Name,
+			"storage_bucket": evt.Bucket,
+			"file_name":      evt.Name,
 			"metageneration": evt.Metageneration,
-			"updated":        evt.Updated,
-			"created":        evt.Created,
+			"update_time":    evt.Updated,
+			"create_time":    evt.Created,
 		},
 	}, nil
 }
