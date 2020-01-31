@@ -4,6 +4,8 @@
 - module: iis
   metricsets:
     - webserver
+    - website
+      hosts: ["local.test"]
   enabled: true
-  period: 30s
+  period: 10s
 

@@ -42,8 +42,8 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-ibmmq>>
-* <<exported-fields-istio>>
 * <<exported-fields-iis>>
+* <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -15863,6 +15863,31 @@ IBM MQ module
 
 
 
+[[exported-fields-iis]]
+== iis fields
+
+iis module
+
+
+
+[float]
+=== iis
+
+
+
+
+[float]
+=== webserver
+
+webserver
+
+
+[float]
+=== website
+
+website
+
+
 [[exported-fields-istio]]
 == istio fields
 
@@ -16175,31 +16200,6 @@ This identifies the service authentication policy of the request. It is set to m
 type: keyword
 
 --
-
-[[exported-fields-iis]]
-== iis fields
-
-iis module
-
-
-
-[float]
-=== iis
-
-
-
-
-[float]
-=== webserver
-
-webserver
-
-
-[float]
-=== website
-
-website
-
 
 [[exported-fields-jolokia]]
 == Jolokia fields

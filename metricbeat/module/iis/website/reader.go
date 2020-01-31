@@ -20,18 +20,26 @@
 package website
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/pkg/errors"
 	"strings"
 )
 
 // Reader will contain the config options
 type Reader struct {
-	query pdh.Query // PDH Query
-	hosts []string      // Mapping of counter path to key used for the label (e.g. processor.name)
-	log   *logp.Logger  // logger
+	query  pdh.Query    // PDH Query
+	hosts  []Host       // Mapping of counter path to key used for the label (e.g. processor.name)
+	log    *logp.Logger // logger
 	hasRun bool         // will check if the reader has run a first time
+}
+
+type Host struct {
+	name      string
+	processId int
+	counters  map[string]string
 }
 
 // NewReader creates a new instance of Reader.
@@ -59,13 +67,30 @@ func (this *Reader) InitCounters(hosts []string) error {
 	}
 	this.hosts = filterOnInstances(hosts, instances)
 	var newQueries []string
-	for _, instance := range this.hosts {
-		for _, value := range webserverCounters {
-			value = strings.Replace(value, "*", instance, 1)
+	for i, instance := range this.hosts {
+		this.hosts[i].counters = make(map[string]string)
+		for key, value := range webserverCounters {
+			value = strings.Replace(value, "*", instance.name, 1)
 			if err := this.query.AddCounter(value, "", "float", true); err != nil {
 				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 			}
 			newQueries = append(newQueries, value)
+			this.hosts[i].counters[value] = key
+		}
+		var processId int
+		processId, err = GetProcessId(instance.name)
+		this.hosts[i].processId = processId
+		if err != nil {
+			this.log.Errorf("Cannot find attached worker process %s", err)
+			continue
+		}
+		for key, value := range processCounters {
+			value = strings.Replace(value, "*", string(processId), 1)
+			if err := this.query.AddCounter(value, "", "float", true); err != nil {
+				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
+			}
+			newQueries = append(newQueries, value)
+			this.hosts[i].counters[value] = key
 		}
 	}
 
@@ -77,34 +102,48 @@ func (this *Reader) InitCounters(hosts []string) error {
 }
 
 // Read executes a query and returns those values in an event.
-func (this *Reader) Fetch() error {
+func (this *Reader) Fetch() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := this.query.CollectData(); err != nil {
-		return errors.Wrap(err, "failed querying counter values")
+		return nil, errors.Wrap(err, "failed querying counter values")
 	}
 
 	// Get the values.
 	values, err := this.query.GetFormattedCounterValues()
 	if err != nil {
-		return errors.Wrap(err, "failed formatting counter values")
+		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
-
-	for counterPath, values := range values {
-		for _, val := range values {
-			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-
-			if val.Err != nil && !this.hasRun {
-				this.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-				continue
+	events := make(map[string]mb.Event)
+	for _, host := range this.hosts {
+		events[host.name] = mb.Event{
+			MetricSetFields: common.MapStr{
+				"name":              host.name,
+				"worker_process_id": host.processId,
+			},
+		}
+		for counterPath, values := range values {
+			for _, val := range values {
+				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+				if val.Err != nil && !this.hasRun {
+					this.log.Debugw("Ignoring the first measurement because the data isn't ready",
+						"error", val.Err, logp.Namespace("website"), "query", counterPath)
+					continue
+				}
+				if val.Instance == host.name || val.Instance == string(host.processId) {
+					events[host.name].MetricSetFields.Put(host.counters[counterPath], val.Measurement)
+				}
 			}
-
 		}
 	}
+
 	this.hasRun = true
-	return nil
+	results := make([]mb.Event, 0, len(events))
+	for _, val := range events {
+		results = append(results, val)
+	}
+	return results, nil
 }
 
 // Close will close the PDH query for now.
@@ -112,15 +151,15 @@ func (this *Reader) Close() error {
 	return this.query.Close()
 }
 
-func filterOnInstances(hosts []string, instances []string) []string {
-	var filtered []string
+func filterOnInstances(hosts []string, instances []string) []Host {
+	filtered := make([]Host, 0)
 	// remove _Total and empty instances
 	for _, instance := range instances {
 		if instance == "_Total" || instance == "" {
 			continue
 		}
 		if containsHost(instance, hosts) {
-			filtered = append(filtered, instance)
+			filtered = append(filtered, Host{name: instance})
 		}
 	}
 	return filtered
@@ -139,3 +178,10 @@ func containsHost(item string, array []string) bool {
 	return false
 }
 
+func GetProcessId(host string) (int, error) {
+	appPool, err := GetApplicationPool(host)
+	if err != nil {
+		return 0, err
+	}
+	return GetWorkerProcessId(appPool)
+}
