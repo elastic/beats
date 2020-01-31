@@ -2195,10 +2195,34 @@ type: long
 
 --
 
-*`aws.rds.volume_used.bytes`*::
+*`aws.rds.volume.used.bytes`*::
 +
 --
 The amount of storage used by your Aurora DB instance, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.volume.read_io_per_sec`*::
++
+--
+The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.volume.write_io_per_sec`*::
++
+--
+The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.
 
 
 type: long
@@ -2445,6 +2469,18 @@ format: duration
 
 --
 
+*`aws.rds.latency.delete`*::
++
+--
+The amount of latency for delete queries, in milliseconds.
+
+
+type: float
+
+format: duration
+
+--
+
 *`aws.rds.disk_usage.bin_log.bytes`*::
 +
 --
@@ -2524,6 +2560,196 @@ Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
 
 
 type: keyword
+
+--
+
+*`aws.rds.aurora_bin_log_replica_lag`*::
++
+--
+The amount of time a replica DB cluster running on Aurora with MySQL compatibility lags behind the source DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.replicated_write_io.bytes`*::
++
+--
+In an Aurora Global Database, the number of write I/O operations replicated from the primary AWS Region to the cluster volume in a secondary AWS Region.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.data_transfer.bytes`*::
++
+--
+In an Aurora Global Database, the amount of redo log data transferred from the master AWS Region to a secondary AWS Region.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.replication_lag.ms`*::
++
+--
+For an Aurora Global Database, the amount of lag when replicating updates from the primary AWS Region, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag.ms`*::
++
+--
+For an Aurora Replica, the amount of lag when replicating updates from the primary instance, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag_max.ms`*::
++
+--
+The maximum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag_min.ms`*::
++
+--
+The minimum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_change_records.creation_rate`*::
++
+--
+The number of backtrack change records created over five minutes for your DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_change_records.stored`*::
++
+--
+The actual number of backtrack change records used by your DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_window.actual`*::
++
+--
+The difference between the target backtrack window and the actual backtrack window.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_window.alert`*::
++
+--
+The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.
+
+
+type: long
+
+--
+
+*`aws.rds.storage_used.backup_retention_period.bytes`*::
++
+--
+The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
+
+
+type: long
+
+--
+
+*`aws.rds.storage_used.snapshot.bytes`*::
++
+--
+The total amount of backup storage in bytes consumed by all Aurora snapshots for an Aurora DB cluster outside its backup retention window.
+
+
+type: long
+
+--
+
+*`aws.rds.cache_hit_ratio.buffer`*::
++
+--
+The percentage of requests that are served by the buffer cache.
+
+
+type: long
+
+--
+
+*`aws.rds.cache_hit_ratio.result_set`*::
++
+--
+The percentage of requests that are served by the Resultset cache.
+
+
+type: long
+
+--
+
+*`aws.rds.engine_uptime.sec`*::
++
+--
+The amount of time that the instance has been running, in seconds.
+
+
+type: long
+
+--
+
+*`aws.rds.rds_to_aurora_postgresql_replica_lag.sec`*::
++
+--
+The amount of lag in seconds when replicating updates from the primary RDS PostgreSQL instance to other nodes in the cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backup_storage_billed_total.bytes`*::
++
+--
+The total amount of backup storage in bytes for which you are billed for a given Aurora DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_volume_left_total.bytes`*::
++
+--
+The remaining available space for the cluster volume, measured in bytes.
+
+
+type: long
 
 --
 
