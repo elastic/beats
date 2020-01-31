@@ -79,9 +79,7 @@ func TestFetch(t *testing.T) {
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
 	setupTest(t, host, version)
 
@@ -105,18 +103,14 @@ func TestData(t *testing.T) {
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-			if err != nil {
-				t.Fatal("write", err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }

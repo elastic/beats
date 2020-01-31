@@ -41,14 +41,10 @@ func TestFetch(t *testing.T) {
 	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
@@ -70,14 +66,10 @@ func TestData(t *testing.T) {
 	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
@@ -85,9 +77,7 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err = mbtest.WriteEventsReporterV2Error(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	require.NoError(t, err)
 }
 
 func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {

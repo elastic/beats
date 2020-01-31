@@ -57,8 +57,6 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))
 		err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-		if err != nil {
-			t.Fatal("write", err)
-		}
+		require.NoError(t, err)
 	}
 }
