@@ -49,7 +49,8 @@ forwarded to the address set in `var.syslog_host` in format CEF and
 service UDP on `var.syslog_port`.  Instructions can be found in
 https://support.forcepoint.com/KBArticle?id=000015002[KB 15002] for
 configuring the SMC.  Testing was done with CEF logs from SMC version
-6.6.1
+6.6.1 and custom string mappings were taken from 'CEF Connector
+Configuration Guide' dated December 5, 2011.
 
 
 :has-dashboards!:
