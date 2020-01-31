@@ -22,13 +22,12 @@ package beat_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/beat"
 	_ "github.com/elastic/beats/metricbeat/module/beat/state"
 	_ "github.com/elastic/beats/metricbeat/module/beat/stats"
+	"github.com/stretchr/testify/require"
 )
 
 var metricSets = []string{
@@ -43,10 +42,8 @@ func TestFetch(t *testing.T) {
 		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))
 		events, errs := mbtest.ReportingFetchV2Error(f)
 
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
 
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 			events[0].BeatEvent("beat", metricSet).Fields.StringToPrint())
