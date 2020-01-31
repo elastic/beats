@@ -9,7 +9,7 @@
             "filter": [],
             "query": {
               "language": "kuery",
-              "query": "STAN Metricbeats"
+              "query": ""
             }
           }
         },
@@ -22,56 +22,56 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "e7171c3e-936d-4549-b913-1a8651ef55b8",
+              "i": "98c9a793-903a-47af-900b-8becd2493d0a",
               "w": 24,
-              "x": 0,
+              "x": 24,
               "y": 0
             },
-            "panelIndex": "e7171c3e-936d-4549-b913-1a8651ef55b8",
+            "panelIndex": "98c9a793-903a-47af-900b-8becd2493d0a",
             "panelRefName": "panel_0",
-            "version": "7.5.1"
+            "version": "7.5.2"
           },
           {
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "370515c5-80da-4288-aec4-7dca8107ef8e",
+              "i": "d11727cf-8d05-45ae-9ae0-2f3b79ab7eda",
               "w": 24,
-              "x": 24,
+              "x": 0,
               "y": 0
             },
-            "panelIndex": "370515c5-80da-4288-aec4-7dca8107ef8e",
+            "panelIndex": "d11727cf-8d05-45ae-9ae0-2f3b79ab7eda",
             "panelRefName": "panel_1",
-            "version": "7.5.1"
+            "version": "7.5.2"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat Stan] Channel Overview Metrics",
         "version": 1
       },
-      "id": "dbf2e220-37ce-11ea-a9c8-152a657da3ab",
+      "id": "b6a60340-4371-11ea-b0c6-cb14c0977bd1",
       "migrationVersion": {
         "dashboard": "7.3.0"
       },
       "references": [
         {
-          "id": "fbc095e0-37cc-11ea-a9c8-152a657da3ab",
+          "id": "46a07ac0-436d-11ea-b0c6-cb14c0977bd1",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "9385f9a0-33f0-11ea-a9c8-152a657da3ab",
+          "id": "0e412fe0-4371-11ea-b0c6-cb14c0977bd1",
           "name": "panel_1",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-01-15T19:40:18.114Z",
-      "version": "WzQ5LDFd"
+      "updated_at": "2020-01-30T15:03:46.292Z",
+      "version": "WzI0MTMsMV0="
     },
     {
       "attributes": {
-        "description": "Total number of messages in each channel / subject",
+        "description": "Number of messages in each channel / subject",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
@@ -87,23 +87,6 @@
         "visState": {
           "aggs": [],
           "params": {
-            "annotations": [
-              {
-                "color": "#F00",
-                "fields": "",
-                "icon": "fa-tag",
-                "id": "f876b980-37b5-11ea-a566-c550422d89d4",
-                "ignore_global_filters": 1,
-                "ignore_panel_filters": 1,
-                "index_pattern": "metricbeat-*",
-                "query_string": {
-                  "language": "kuery",
-                  "query": ""
-                },
-                "template": "",
-                "time_field": "@timestamp"
-              }
-            ],
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
@@ -127,15 +110,14 @@
                   {
                     "field": "stan.channels.messages",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
-                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "stan.channels.name.keyword",
+                "terms_field": "stan.channels.name",
                 "type": "timeseries"
               }
             ],
@@ -148,14 +130,14 @@
           "type": "metrics"
         }
       },
-      "id": "fbc095e0-37cc-11ea-a9c8-152a657da3ab",
+      "id": "46a07ac0-436d-11ea-b0c6-cb14c0977bd1",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-15T19:34:50.914Z",
-      "version": "WzQ2LDFd"
+      "updated_at": "2020-01-30T15:01:38.606Z",
+      "version": "WzI0MDcsMV0="
     },
     {
       "attributes": {
@@ -178,33 +160,8 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
-            "background_color_rules": [
-              {
-                "id": "1cfde3b0-33f0-11ea-a5a9-419b0c5b7a83"
-              }
-            ],
-            "bar_color_rules": [
-              {
-                "id": "1e324500-33f0-11ea-a5a9-419b0c5b7a83",
-                "operator": "gt",
-                "value": 10
-              }
-            ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drilldown_url": "",
-            "filter": {
-              "language": "kuery",
-              "query": ""
-            },
-            "gauge_color_rules": [
-              {
-                "id": "9caf12a0-3634-11ea-a566-c550422d89d4"
-              }
-            ],
-            "gauge_inner_width": 10,
-            "gauge_style": "half",
-            "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "",
@@ -215,10 +172,6 @@
                 "chart_type": "bar",
                 "color": "#68BC00",
                 "fill": 0.5,
-                "filter": {
-                  "language": "kuery",
-                  "query": ""
-                },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Queue Depth",
@@ -227,14 +180,14 @@
                   {
                     "field": "stan.channels.depth",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "stan.channels.name.keyword",
+                "terms_field": "stan.channels.name",
                 "type": "timeseries"
               }
             ],
@@ -247,15 +200,15 @@
           "type": "metrics"
         }
       },
-      "id": "9385f9a0-33f0-11ea-a9c8-152a657da3ab",
+      "id": "0e412fe0-4371-11ea-b0c6-cb14c0977bd1",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-15T19:34:29.870Z",
-      "version": "WzQ1LDFd"
+      "updated_at": "2020-01-30T15:02:01.289Z",
+      "version": "WzI0MDgsMV0="
     }
   ],
-  "version": "7.5.1"
+  "version": "7.5.2"
 }
