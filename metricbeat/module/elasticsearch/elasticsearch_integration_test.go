@@ -31,6 +31,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -150,26 +151,19 @@ func TestXPackEnabled(t *testing.T) {
 		t.Run(metricSet.Name(), func(t *testing.T) {
 			checkSkip(t, metricSet.Name(), version)
 			events, errs := mbtest.ReportingFetchV2Error(metricSet)
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
-			}
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
 
 			// Special case: the `index` metricset generates as many events
 			// as there are distinct indices in Elasticsearch
 			if metricSet.Name() == "index" {
 				numIndices, err := countIndices(host)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-
-				if !assert.Len(t, events, numIndices) {
-					t.FailNow()
-				}
+				require.NoError(t, err)
+				require.Len(t, events, numIndices)
 
 				for _, event := range events {
-					assert.Equal(t, "index_stats", event.RootFields["type"])
-					assert.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+					require.Equal(t, "index_stats", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
 				}
 
 				return
@@ -179,30 +173,23 @@ func TestXPackEnabled(t *testing.T) {
 			// as there are distinct shards in Elasticsearch
 			if metricSet.Name() == "shard" {
 				numShards, err := countShards(host)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-
-				if !assert.Len(t, events, numShards) {
-					t.FailNow()
-				}
+				require.NoError(t, err)
+				require.Len(t, events, numShards)
 
 				for _, event := range events {
-					assert.Equal(t, "shards", event.RootFields["type"])
-					assert.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+					require.Equal(t, "shards", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
 				}
 
 				return
 			}
 
 			types := metricSetToTypesMap[metricSet.Name()]
-			if !assert.Len(t, events, len(types)) {
-				t.FailNow()
-			}
+			require.Len(t, events, len(types))
 
 			for i, event := range events {
-				assert.Equal(t, types[i], event.RootFields["type"])
-				assert.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+				require.Equal(t, types[i], event.RootFields["type"])
+				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
 			}
 		})
 	}
@@ -229,19 +216,19 @@ func getXPackConfig(host string) map[string]interface{} {
 
 func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
 	err := createIndex(esHost)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = enableTrialLicense(esHost, esVersion)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = createMLJob(esHost, esVersion)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = createCCRStats(esHost)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = createEnrichStats(esHost)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
