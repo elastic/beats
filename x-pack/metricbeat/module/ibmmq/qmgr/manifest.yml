@@ -14,6 +14,10 @@ processors:
       source: >
         function process(event) {
           var metrics = event.Get("prometheus.metrics");
+          if (metrics == null) {
+            event.Cancel();
+            return;
+          }
           Object.keys(metrics).forEach(function(key) {
             if (!(key.match(/^ibmmq_.*$/))) {
               event.Delete("prometheus.metrics." + key);
