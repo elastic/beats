@@ -62,7 +62,7 @@ func TestData(t *testing.T) {
 			config := getConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-			require.NoError(err)
+			require.NoError(t, err)
 		})
 	}
 }
