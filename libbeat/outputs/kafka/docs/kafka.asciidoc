@@ -123,12 +123,12 @@ the specified string:
 ------------------------------------------------------------------------------
 output.kafka:
   hosts: ["localhost:9092"]
-  topic: "logs-%{[beat.version]}" 
+  topic: "logs-%{[agent.version]}"
   topics:
-    - topic: "critical-%{[beat.version]}"
+    - topic: "critical-%{[agent.version]}"
       when.contains:
         message: "CRITICAL"
-    - topic: "error-%{[beat.version]}"
+    - topic: "error-%{[agent.version]}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
