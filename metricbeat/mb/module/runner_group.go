@@ -15,13 +15,48 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
+package module
 
-// GetConfig for Logstash
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{host},
+import (
+	"strings"
+	"sync"
+)
+
+type runnerGroup struct {
+	runners []Runner
+
+	startOnce sync.Once
+	stopOnce  sync.Once
+}
+
+var _ Runner = new(runnerGroup)
+
+func newRunnerGroup(runners []Runner) Runner {
+	return &runnerGroup{
+		runners: runners,
 	}
+}
+
+func (rg *runnerGroup) Start() {
+	rg.startOnce.Do(func() {
+		for _, runner := range rg.runners {
+			runner.Start()
+		}
+	})
+}
+
+func (rg *runnerGroup) Stop() {
+	rg.stopOnce.Do(func() {
+		for _, runner := range rg.runners {
+			runner.Stop()
+		}
+	})
+}
+
+func (rg *runnerGroup) String() string {
+	var entries []string
+	for _, runner := range rg.runners {
+		entries = append(entries, runner.String())
+	}
+	return "RunnerGroup{" + strings.Join(entries, ", ") + "}"
 }
