@@ -444,7 +444,7 @@ func (h *Harvester) onMessage(
 
 		if id != "" {
 			meta = common.MapStr{
-				"id": id,
+				"_id": id,
 			}
 		}
 	} else if &text != nil {
