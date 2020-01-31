@@ -115,7 +115,7 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 	assert.Equal(t, expected.AvgWriteAwaitTime, got.AvgWriteAwaitTime)
 }
 
-func TestSeparateTopLevelCounters(t *testing.T) {
+func TestTopLevelCounters(t *testing.T) {
 	stats := map[string]disk.IOCountersStat{
 		"md":         disk.IOCountersStat{},
 		"md1":        disk.IOCountersStat{},
@@ -129,7 +129,7 @@ func TestSeparateTopLevelCounters(t *testing.T) {
 		"nvme0n1p10": disk.IOCountersStat{},
 	}
 
-	topCounters := separateTopLevelCounters(stats)
+	topCounters := topLevelCounters(stats)
 
 	assert.Contains(t, topCounters, "md")
 	assert.Contains(t, topCounters, "sda")

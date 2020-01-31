@@ -38,17 +38,20 @@ func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	if err != nil {
 		return nil, err
 	}
-	//Process `stats`, as `names` might be empty
-	topCounters := separateTopLevelCounters(stats)
-	stats["summary"] = summaryIOCounter(topCounters)
+
+	// Use `stats`, as `names` might be empty
+	stats["summary"] = summaryIOCounter(stats)
 	return stats, nil
 }
 
 func summaryIOCounter(stats map[string]disk.IOCountersStat) disk.IOCountersStat {
+
+	topCounters := topLevelCounters(stats)
+
 	sum := disk.IOCountersStat{}
 	sum.Name = "summary"
 
-	for _, counter := range stats {
+	for _, counter := range topCounters {
 		sum.ReadCount += counter.ReadCount
 		sum.ReadBytes += counter.ReadBytes
 		sum.ReadTime += counter.ReadTime
@@ -64,60 +67,45 @@ func summaryIOCounter(stats map[string]disk.IOCountersStat) disk.IOCountersStat 
 	return sum
 }
 
-// separateTopLevelCounters will return a map of top level counters,
+// topLevelCounters will return a map of top level counters,
 // and it removes only aggregate counters from the given map `stats`.
 // For example, when `stats` with keys {"hda","hda1","sda1","sdb"} is given,
 // it will return a map with keys {"hda","sda1","sdb"},
 // and `stats` will remain elements with keys {"hda1","sda1","sdb"}
-func separateTopLevelCounters(stats map[string]disk.IOCountersStat) map[string]disk.IOCountersStat {
-	separated := map[string]disk.IOCountersStat{}
+func topLevelCounters(stats map[string]disk.IOCountersStat) map[string]disk.IOCountersStat {
 
+	result := map[string]disk.IOCountersStat{}
+
+	hasChild := make(map[string]struct{})
+
+Outer:
 	for name := range stats {
 		i := len(name)
 
-		// Skip the partition number if there is, and this also
-		// handles the situation with 10 or more partitions in one disk
-		for name[i-1] <= '9' && name[i-1] >= '0' {
+		// Skip tailing numbers
+		for c := name[i-1]; c <= '9' && c >= '0'; c = name[i-1] {
 			i--
 		}
 
-		// a) If nothing skipped, the name represents a disk.
-		// Not to remove `name` from `stats`, as it may not have any children.
-		// NVMe disks are handled below in c) instead.
+		// a) If nothing skipped, the name represents a disk (Not NVMe).
 		if i == len(name) {
-			separated[name] = stats[name]
+			result[name] = stats[name]
 			continue
 		}
 
-		// Assume that it is a partition name.
-		// It could be a NVMe disk name.
-		foundStem := false
-
 		// b) Search the stem for `name`.
 		// Loop a bit as there are two naming conventions:
-		// - For SATA and IDE devices(as well as RAID), a partition name of the disk "sda" would be "sda#",
-		//   replacing '#' with a number.
+		// - For SATA and IDE devices(as well as RAID), a partition name of the disk "sda" would be "sda#"(# stands for numbers),
 		// - For NVMe devices, the names would be like `nvme0n1`(disk) and `nvme0n1p1`(partition)
-		for j := i; j > i-2 && !foundStem; j-- {
+		for j := i; j > i-2; j-- {
 
-			// Check if possible stem exists in `separated`,
-			// in case that it has been deleted from `stats`.
-			if _, ok := separated[name[:j]]; ok {
-				foundStem = true
+			if _, ok := hasChild[name[:j]]; ok {
+				continue Outer
 			}
 
-			// This is entered at most once for each disk.
 			if _, ok := stats[name[:j]]; ok {
-
-				// Only copy the stem to `separated` if it does not exist.
-				// The stem could have already copied itself to `separated` in previous loops
-				if !foundStem {
-					separated[name[:j]] = stats[name[:j]]
-					foundStem = true
-				}
-
-				// remove `name[:j]` from `stats`, since it has at least one child `name`,
-				delete(stats, name[:j])
+				hasChild[name[:j]] = struct{}{}
+				continue Outer
 			}
 		}
 
@@ -125,12 +113,17 @@ func separateTopLevelCounters(stats map[string]disk.IOCountersStat) map[string]d
 		// This happens when:
 		//   i) the stem is not contained,
 		//   ii) it is a NVMe disk name.
-		if !foundStem {
-			separated[name] = stats[name]
-		}
-
+		result[name] = stats[name]
 	}
-	return separated
+
+	for name := range hasChild {
+		if _, ok := result[name]; !ok {
+			result[name] = stats[name]
+		}
+		delete(stats, name)
+	}
+
+	return result
 }
 
 // NewDiskIOStat :init DiskIOStat object.
