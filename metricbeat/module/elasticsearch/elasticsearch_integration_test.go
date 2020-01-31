@@ -128,9 +128,7 @@ func TestXPackEnabled(t *testing.T) {
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(err)
 
 	setupTest(t, host, version)
 
