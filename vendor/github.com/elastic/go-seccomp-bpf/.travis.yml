@@ -1,0 +1,25 @@
+sudo: false
+
+language: go
+
+os:
+- linux
+
+go:
+- 1.12.x
+
+env:
+- GO111MODULE=on
+
+go_import_path: github.com/elastic/go-seccomp-bpf
+
+before_install:
+- GO111MODULE=off go get -u github.com/elastic/go-licenser
+
+script:
+- go mod verify
+- go-licenser -d
+- go run .ci/scripts/check_format.go
+- go test -v ./...
+- go build -o ./cmd/sandbox/sandbox ./cmd/sandbox
+- go build -o ./cmd/seccomp-profiler/seccomp-profiler ./cmd/seccomp-profiler
