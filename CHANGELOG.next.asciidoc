@@ -90,6 +90,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 - Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
+- Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 
 *Heartbeat*
 
