@@ -128,8 +128,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 	upPromEvent := PromEvent{
 		labels: common.MapStr{
-			"job": "prometheus",
-			"url": m.HostData().SanitizedURI,
+			"instance": m.Host(),
+			"job":      "prometheus",
 		},
 	}
 	eventList[upPromEvent.LabelsHash()] = common.MapStr{
@@ -138,4 +138,5 @@ func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 		},
 		"labels": upPromEvent.labels,
 	}
+
 }
