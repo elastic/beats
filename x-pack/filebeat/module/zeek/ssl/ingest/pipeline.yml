@@ -219,11 +219,11 @@ processors:
 - set:
     field: tls.cipher
     value: '{{zeek.ssl.cipher}}'
-    if: ctx.zeek?.ssl.cipher != null
+    if: ctx.zeek?.ssl?.cipher != null
 - set:
     field: tls.curve
     value: '{{zeek.ssl.curve}}'
-    if: ctx.zeek?.ssl.curve != null
+    if: ctx.zeek?.ssl?.curve != null
 - convert:
     target_field: tls.established
     field: zeek.ssl.established
@@ -236,7 +236,7 @@ processors:
     ignore_missing: true
 - script:
     lang: painless
-    if: ctx.zeek?.ssl.version != null
+    if: ctx.zeek?.ssl?.version != null
     source: >-
       def parts = ctx.zeek.ssl.version.splitOnToken("v");
       if (parts.length != 2) {

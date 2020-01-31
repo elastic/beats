@@ -33,11 +33,11 @@ processors:
   - set:
       field: tls.cipher
       value: '{{aws.s3access.cipher_suite}}'
-      if: ctx.aws?.s3access.cipher_suite != null
+      if: ctx.aws?.s3access?.cipher_suite != null
 
   - script:
       lang: painless
-      if: ctx.aws?.s3access.tls_version != null
+      if: ctx.aws?.s3access?.tls_version != null
       source: >-
         def parts = ctx.aws.s3access.tls_version.toLowerCase().splitOnToken("v");
         if (parts.length != 2) {

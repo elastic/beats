@@ -142,11 +142,11 @@ processors:
   - set:
       field: tls.cipher
       value: '{{aws.elb.ssl_cipher}}'
-      if: ctx.aws?.elb.ssl_cipher != null
+      if: ctx.aws?.elb?.ssl_cipher != null
 
   - script:
       lang: painless
-      if: ctx.aws?.elb.ssl_protocol != null
+      if: ctx.aws?.elb?.ssl_protocol != null
       source: >-
         def parts = ctx.aws.elb.ssl_protocol.splitOnToken("v");
         if (parts.length != 2) {
