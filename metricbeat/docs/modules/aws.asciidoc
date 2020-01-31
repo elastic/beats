@@ -56,8 +56,8 @@ image::./images/metricbeat-aws-billing-overview.png[]
 
 [float]
 === `cloudwatch`
-This metricset gives users the freedom to query metrics from AWS CloudWatch with
-any given namespaces or specific instance with a given period.
+This metricset allows users to query metrics from AWS CloudWatch with any given
+namespaces or specific instance with a given period.
 Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html[AWS Services That Publish CloudWatch Metrics]
 for a list of AWS services that publish metrics to CloudWatch.
 
