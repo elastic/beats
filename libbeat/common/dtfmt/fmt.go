@@ -55,6 +55,16 @@ func releaseCtx(c *ctx) {
 	ctxPool.Put(c)
 }
 
+// MustNewFormatter creates a new time formatter based on the provided pattern.
+// The functions panics if the pattern is invalid
+func MustNewFormatter(pattern string) *Formatter {
+	f, err := NewFormatter(pattern)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 // NewFormatter creates a new time formatter based on provided pattern.
 // If pattern is invalid an error is returned.
 func NewFormatter(pattern string) (*Formatter, error) {
