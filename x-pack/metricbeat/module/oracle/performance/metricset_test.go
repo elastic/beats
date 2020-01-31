@@ -9,7 +9,7 @@ package performance
 import (
 	"testing"
 
-	_ "gopkg.in/goracle.v2"
+	_ "github.com/godror/godror"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
