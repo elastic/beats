@@ -25,8 +25,41 @@ import (
 	"unicode"
 )
 
+// Config allows enabling and disabling parser features.
+type Config struct {
+	Array        bool
+	Object       bool
+	StringDQuote bool
+	StringSQuote bool
+}
+
+// DefaultConfig is the default config with all parser features enabled.
+var DefaultConfig = Config{
+	Array:        true,
+	Object:       true,
+	StringDQuote: true,
+	StringSQuote: true,
+}
+
+// EnvConfig is configuration for parser when the value comes from environmental variable.
+var EnvConfig = Config{
+	Array:        true,
+	Object:       false,
+	StringDQuote: true,
+	StringSQuote: true,
+}
+
+// NoopConfig is configuration for parser that disables all options.
+var NoopConfig = Config{
+	Array:        false,
+	Object:       false,
+	StringDQuote: false,
+	StringSQuote: false,
+}
+
 type flagParser struct {
 	input string
+	cfg   Config
 }
 
 // stopSet definitions for handling unquoted strings
@@ -42,22 +75,50 @@ const (
 //
 // The parser implements a superset of JSON, but only a subset of YAML by
 // allowing for arrays and objects having a trailing comma. In addition 3
-// strings types are supported:
+// string types are supported:
 //
 // 1. single quoted string (no unescaping of any characters)
 // 2. double quoted strings (characters are escaped)
-// 3. strings without quotes. String parsing stops in
+// 3. strings without quotes. String parsing stops at
 //   special characters like '[]{},:'
 //
 // In addition, top-level values can be separated by ',' to build arrays
 // without having to use [].
 func Value(content string) (interface{}, error) {
-	p := &flagParser{strings.TrimSpace(content)}
+	return ValueWithConfig(content, DefaultConfig)
+}
+
+// ValueWithConfig parses command line arguments, supporting
+// boolean, numbers, strings, arrays, objects when enabled.
+//
+// The parser implements a superset of JSON, but only a subset of YAML by
+// allowing for arrays and objects having a trailing comma. In addition 3
+// string types are supported:
+//
+// 1. single quoted string (no unescaping of any characters)
+// 2. double quoted strings (characters are escaped)
+// 3. strings without quotes. String parsing stops at
+//   special characters like '[]{},:'
+//
+// In addition, top-level values can be separated by ',' to build arrays
+// without having to use [].
+func ValueWithConfig(content string, cfg Config) (interface{}, error) {
+	p := &flagParser{strings.TrimSpace(content), cfg}
+	if err := p.validateConfig(); err != nil {
+		return nil, err
+	}
 	v, err := p.parse()
 	if err != nil {
 		return nil, fmt.Errorf("%v when parsing '%v'", err.Error(), content)
 	}
 	return v, nil
+}
+
+func (p *flagParser) validateConfig() error {
+	if !p.cfg.Array && p.cfg.Object {
+		return fmt.Errorf("cfg.Array cannot be disabled when cfg.Object is enabled")
+	}
+	return nil
 }
 
 func (p *flagParser) parse() (interface{}, error) {
@@ -99,13 +160,25 @@ func (p *flagParser) parseValue(stopSet string) (interface{}, error) {
 
 	switch in[0] {
 	case '[':
-		return p.parseArray()
+		if p.cfg.Array {
+			return p.parseArray()
+		}
+		return p.parsePrimitive(stopSet)
 	case '{':
-		return p.parseObj()
+		if p.cfg.Object {
+			return p.parseObj()
+		}
+		return p.parsePrimitive(stopSet)
 	case '"':
-		return p.parseStringDQuote()
+		if p.cfg.StringDQuote {
+			return p.parseStringDQuote()
+		}
+		return p.parsePrimitive(stopSet)
 	case '\'':
-		return p.parseStringSQuote()
+		if p.cfg.StringSQuote {
+			return p.parseStringSQuote()
+		}
+		return p.parsePrimitive(stopSet)
 	default:
 		return p.parsePrimitive(stopSet)
 	}
