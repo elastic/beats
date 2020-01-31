@@ -93,17 +93,17 @@
       type: long
       description: >
         The average number of deadlocks in the database per second.
-    - name: volume.used.bytes
+    - name: volume_used.bytes
       type: long
       format: bytes
       description: >
         The amount of storage used by your Aurora DB instance, in bytes.
-    - name: volume.read_io_per_sec
+    - name: volume_read_io_per_sec
       type: long
       format: bytes
       description: >
         The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
-    - name: volume.write_io_per_sec
+    - name: volume_write_io_per_sec
       type: long
       format: bytes
       description: >

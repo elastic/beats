@@ -2195,7 +2195,7 @@ type: long
 
 --
 
-*`aws.rds.volume.used.bytes`*::
+*`aws.rds.volume_used.bytes`*::
 +
 --
 The amount of storage used by your Aurora DB instance, in bytes.
@@ -2207,7 +2207,7 @@ format: bytes
 
 --
 
-*`aws.rds.volume.read_io_per_sec`*::
+*`aws.rds.volume_read_io_per_sec`*::
 +
 --
 The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
@@ -2219,7 +2219,7 @@ format: bytes
 
 --
 
-*`aws.rds.volume.write_io_per_sec`*::
+*`aws.rds.volume_write_io_per_sec`*::
 +
 --
 The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.

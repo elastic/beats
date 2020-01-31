@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add STAN dashboard {pull}15654[15654]
 - Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
 - Add support for processors in light modules. {issue}14740[14740] {pull}15923[15923]
+- Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 
 *Packetbeat*
 
