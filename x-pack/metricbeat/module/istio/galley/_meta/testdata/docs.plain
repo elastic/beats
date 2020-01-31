@@ -1,0 +1,156 @@
+# HELP galley_istio_authentication_meshpolicies The number of valid istio/authentication/meshpolicies known to galley at a point in time
+# TYPE galley_istio_authentication_meshpolicies gauge
+galley_istio_authentication_meshpolicies{name="default",namespace="",version="v1alpha1"} 1
+# HELP galley_istio_authentication_policies The number of valid istio/authentication/policies known to galley at a point in time
+# TYPE galley_istio_authentication_policies gauge
+galley_istio_authentication_policies{name="grafana-ports-mtls-disabled",namespace="istio-system",version="v1alpha1"} 1
+# HELP galley_istio_mesh_MeshConfig The number of valid istio/mesh/MeshConfig known to galley at a point in time
+# TYPE galley_istio_mesh_MeshConfig gauge
+galley_istio_mesh_MeshConfig{name="meshconfig",namespace="istio-system",version="v1alpha1"} 1
+# HELP galley_istio_networking_destinationrules The number of valid istio/networking/destinationrules known to galley at a point in time
+# TYPE galley_istio_networking_destinationrules gauge
+galley_istio_networking_destinationrules{name="istio-multicluster-destinationrule",namespace="istio-system",version="v1alpha3"} 1
+galley_istio_networking_destinationrules{name="istio-policy",namespace="istio-system",version="v1alpha3"} 1
+galley_istio_networking_destinationrules{name="istio-telemetry",namespace="istio-system",version="v1alpha3"} 1
+# HELP galley_istio_networking_envoyfilters The number of valid istio/networking/envoyfilters known to galley at a point in time
+# TYPE galley_istio_networking_envoyfilters gauge
+galley_istio_networking_envoyfilters{name="istio-multicluster-egressgateway",namespace="istio-system",version="v1alpha3"} 1
+# HELP galley_istio_networking_gateways The number of valid istio/networking/gateways known to galley at a point in time
+# TYPE galley_istio_networking_gateways gauge
+galley_istio_networking_gateways{name="bookinfo-gateway",namespace="default",version="v1alpha3"} 1
+galley_istio_networking_gateways{name="ingressgateway",namespace="istio-system",version="v1alpha3"} 1
+galley_istio_networking_gateways{name="istio-multicluster-egressgateway",namespace="istio-system",version="v1alpha3"} 1
+# HELP galley_istio_networking_sidecars The number of valid istio/networking/sidecars known to galley at a point in time
+# TYPE galley_istio_networking_sidecars gauge
+galley_istio_networking_sidecars{name="default",namespace="istio-system",version="v1alpha3"} 1
+# HELP galley_istio_networking_virtualservices The number of valid istio/networking/virtualservices known to galley at a point in time
+# TYPE galley_istio_networking_virtualservices gauge
+galley_istio_networking_virtualservices{name="bookinfo",namespace="default",version="v1alpha3"} 1
+galley_istio_networking_virtualservices{name="istio-multicluster-egressgateway",namespace="istio-system",version="v1alpha3"} 1
+# HELP galley_istio_policy_attributemanifests The number of valid istio/policy/attributemanifests known to galley at a point in time
+# TYPE galley_istio_policy_attributemanifests gauge
+galley_istio_policy_attributemanifests{name="istioproxy",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_attributemanifests{name="kubernetes",namespace="istio-system",version="v1beta1"} 1
+# HELP galley_istio_policy_handlers The number of valid istio/policy/handlers known to galley at a point in time
+# TYPE galley_istio_policy_handlers gauge
+galley_istio_policy_handlers{name="kubernetesenv",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_handlers{name="prometheus",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_handlers{name="stdio",namespace="istio-system",version="v1beta1"} 1
+# HELP galley_istio_policy_instances The number of valid istio/policy/instances known to galley at a point in time
+# TYPE galley_istio_policy_instances gauge
+galley_istio_policy_instances{name="accesslog",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="attributes",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="requestcount",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="requestduration",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="requestsize",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="responsesize",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="tcpaccesslog",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="tcpbytereceived",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="tcpbytesent",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="tcpconnectionsclosed",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_instances{name="tcpconnectionsopened",namespace="istio-system",version="v1beta1"} 1
+# HELP galley_istio_policy_rules The number of valid istio/policy/rules known to galley at a point in time
+# TYPE galley_istio_policy_rules gauge
+galley_istio_policy_rules{name="kubeattrgenrulerule",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="promhttp",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="promtcp",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="promtcpconnectionclosed",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="promtcpconnectionopen",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="stdio",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="stdiotcp",namespace="istio-system",version="v1beta1"} 1
+galley_istio_policy_rules{name="tcpkubeattrgenrulerule",namespace="istio-system",version="v1beta1"} 1
+# HELP galley_runtime_processor_event_span_duration_milliseconds The duration between each incoming event
+# TYPE galley_runtime_processor_event_span_duration_milliseconds histogram
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="0"} 0
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="1"} 65
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="2"} 69
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="4"} 71
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="8"} 71
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="16"} 72
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="32"} 75
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="64"} 80
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="128"} 90
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="256"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="512"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="1024"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="2048"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="4096"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="8193"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="16384"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="32768"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="65536"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="131072"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="262144"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="524288"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="1.048576e+06"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="2.097152e+06"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="4.194304e+06"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="8.388608e+06"} 99
+galley_runtime_processor_event_span_duration_milliseconds_bucket{le="+Inf"} 99
+galley_runtime_processor_event_span_duration_milliseconds_sum 2784.0000000000005
+galley_runtime_processor_event_span_duration_milliseconds_count 99
+# HELP galley_runtime_processor_events_processed_total The number of events that have been processed
+# TYPE galley_runtime_processor_events_processed_total counter
+galley_runtime_processor_events_processed_total 99
+# HELP galley_runtime_processor_snapshot_events_total The number of events per snapshot
+# TYPE galley_runtime_processor_snapshot_events_total histogram
+galley_runtime_processor_snapshot_events_total_bucket{le="0"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="1"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="2"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="4"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="8"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="16"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="32"} 0
+galley_runtime_processor_snapshot_events_total_bucket{le="64"} 2
+galley_runtime_processor_snapshot_events_total_bucket{le="128"} 2
+galley_runtime_processor_snapshot_events_total_bucket{le="256"} 2
+galley_runtime_processor_snapshot_events_total_bucket{le="+Inf"} 2
+galley_runtime_processor_snapshot_events_total_sum 99
+galley_runtime_processor_snapshot_events_total_count 2
+# HELP galley_runtime_processor_snapshot_lifetime_duration_milliseconds The duration of each snapshot
+# TYPE galley_runtime_processor_snapshot_lifetime_duration_milliseconds histogram
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="0"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="1"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="2"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="4"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="8"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="16"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="32"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="64"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="128"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="256"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="512"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="1024"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="2048"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="4096"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="8193"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="16384"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="32768"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="65536"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="131072"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="262144"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="524288"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="1.048576e+06"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="2.097152e+06"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="4.194304e+06"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="8.388608e+06"} 0
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_bucket{le="+Inf"} 2
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_sum 1.8446744073708e+13
+galley_runtime_processor_snapshot_lifetime_duration_milliseconds_count 2
+# HELP galley_runtime_processor_snapshots_published_total The number of snapshots that have been published
+# TYPE galley_runtime_processor_snapshots_published_total counter
+galley_runtime_processor_snapshots_published_total 2
+# HELP galley_runtime_state_type_instances_total The number of type instances per type URL
+# TYPE galley_runtime_state_type_instances_total gauge
+galley_runtime_state_type_instances_total{collection="istio/authentication/v1alpha1/meshpolicies"} 1
+galley_runtime_state_type_instances_total{collection="istio/authentication/v1alpha1/policies"} 1
+galley_runtime_state_type_instances_total{collection="istio/mesh/v1alpha1/MeshConfig"} 1
+galley_runtime_state_type_instances_total{collection="istio/networking/v1alpha3/destinationrules"} 3
+galley_runtime_state_type_instances_total{collection="istio/networking/v1alpha3/envoyfilters"} 1
+galley_runtime_state_type_instances_total{collection="istio/networking/v1alpha3/gateways"} 3
+galley_runtime_state_type_instances_total{collection="istio/networking/v1alpha3/sidecars"} 1
+galley_runtime_state_type_instances_total{collection="istio/networking/v1alpha3/virtualservices"} 2
+galley_runtime_state_type_instances_total{collection="istio/policy/v1beta1/attributemanifests"} 2
+galley_runtime_state_type_instances_total{collection="istio/policy/v1beta1/handlers"} 3
+galley_runtime_state_type_instances_total{collection="istio/policy/v1beta1/instances"} 11
+galley_runtime_state_type_instances_total{collection="istio/policy/v1beta1/rules"} 8
