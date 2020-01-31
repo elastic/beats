@@ -25,6 +25,7 @@ settings.monitoring:
 datasources:
   # use the nginx package
   - id?: nginx-x1
+    enabled?: true # default to true
     title?: "This is a nice title for human"
     # Package this config group is coming from. On importing, we know where it belongs
     # The package tells the UI which application to link to
@@ -42,14 +43,17 @@ datasources:
         processors?:
         streams:
           - id?: {id}
+            enabled?: true # default to true
             dataset: nginx.acccess
             paths: /var/log/nginx/access.log
           - id?: {id}
+            enabled?: true # default to true
             dataset: nginx.error
             paths: /var/log/nginx/error.log
       - type: metrics/nginx
         streams:
           - id?: {id}
+            enabled?: true # default to true
             dataset: nginx.stub_status
             metricset: stub_status
 
