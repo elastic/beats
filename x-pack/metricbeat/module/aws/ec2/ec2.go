@@ -201,8 +201,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					}
 				}
 
+				// By default, replace dot "." using under bar "_" for tag keys and values
 				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
