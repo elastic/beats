@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 )
@@ -88,7 +87,6 @@ func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 		config.Path = defaultPath
 	}
 
-	logp.Debug("keystore", "Loading file keystore from %s", config.Path)
 	keystore, err := NewFileKeystore(config.Path)
 	return keystore, err
 }
@@ -123,7 +121,6 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 			return "", parse.DefaultConfig, err
 		}
 
-		logp.Debug("keystore", "accessing key '%s' from the keystore", keyName)
 		return string(v), parse.DefaultConfig, nil
 	}
 }
