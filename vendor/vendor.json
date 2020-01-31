@@ -3268,12 +3268,12 @@
 			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "b91TSC0atoGVSMZdKuWTYsMOGiM=",
+			"checksumSHA1": "a1x0prr3ix+QFOdJpNfM3Q4G6Es=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
