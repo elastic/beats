@@ -69,15 +69,13 @@ func TestXPackEnabled(t *testing.T) {
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
 		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
 
 		event := events[0]
-		assert.Equal(t, "beats_"+metricSet.Name(), event.RootFields["type"])
-		assert.Equal(t, event.RootFields["cluster_uuid"], "foobar")
-		assert.Regexp(t, `^.monitoring-beats-\d-mb`, event.Index)
+		require.Equal(t, "beats_"+metricSet.Name(), event.RootFields["type"])
+		require.Equal(t, event.RootFields["cluster_uuid"], "foobar")
+		require.Regexp(t, `^.monitoring-beats-\d-mb`, event.Index)
 	}
 }
 
