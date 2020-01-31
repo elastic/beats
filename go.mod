@@ -51,6 +51,7 @@ require (
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/elastic/ecs v1.4.0
 	github.com/elastic/go-libaudit v0.4.0
+	github.com/elastic/go-licenser v0.2.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
@@ -98,14 +99,14 @@ require (
 	github.com/mattn/go-isatty v0.0.2 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/miekg/dns v1.1.15
-	github.com/mitchellh/gox v1.0.1 // indirect
+	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
 	github.com/opencontainers/runc v1.0.0-rc9 // indirect
-	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338 // indirect
+	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
 	github.com/pkg/errors v0.8.1
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
@@ -121,6 +122,7 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/objx v0.1.2-0.20180702103455-b8b73a35e983 // indirect
 	github.com/stretchr/testify v1.4.0
+	github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 	github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
@@ -140,7 +142,6 @@ require (
 	google.golang.org/appengine v1.6.5 // indirect
 	google.golang.org/genproto v0.0.0-20191115221424-83cc0476cb11
 	google.golang.org/grpc v1.25.1 // indirect
-	gopkg.in/goracle.v2 v2.16.3 // indirect
 	gopkg.in/inf.v0 v0.9.0
 	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
@@ -162,4 +163,5 @@ replace (
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
+	golang.org/x/tools => golang.org/x/tools v0.0.0-20191115202509-3a792d9c32b2 // go1.13 release branch
 )

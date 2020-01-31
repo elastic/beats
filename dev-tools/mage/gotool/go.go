@@ -37,6 +37,19 @@ type Args struct {
 // ArgOpt is a functional option adding info to Args once executed.
 type ArgOpt func(args *Args)
 
+type goInstall func(opts ...ArgOpt) error
+
+// Install
+var Install goInstall = runGoInstall
+
+func runGoInstall(opts ...ArgOpt) error {
+	args := buildArgs(opts)
+	return runVGo("install", args)
+}
+
+func (goInstall) Package(pkg string) ArgOpt { return posArg(pkg) }
+func (goInstall) Vendored() ArgOpt          { return flagArg("-mod", "vendor") }
+
 type goTest func(opts ...ArgOpt) error
 
 // Test runs `go test` and provides optionals for adding command line arguments.

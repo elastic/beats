@@ -15,36 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+// +build tools
+
+package tools
 
 import (
-	"path/filepath"
+	_ "github.com/magefile/mage"
+	_ "github.com/mitchellh/gox"
+	_ "github.com/pierrre/gotestcover"
+	_ "github.com/tsg/go-daemon"
+	_ "golang.org/x/tools/cmd/goimports"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	_ "github.com/elastic/go-licenser"
 )
-
-var (
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
-)
-
-// InstallVendored uses go get to install a command from its vendored source
-func InstallVendored(importPath string) error {
-	beatDir, err := ElasticBeatsDir()
-	if err != nil {
-		return errors.Wrap(err, "failed to obtain beats repository path")
-	}
-
-	install := gotool.Install
-	return install(
-		install.Vendored(),
-		install.Package(filepath.Join(beatDir, "vendor", importPath)),
-	)
-}
-
-// InstallGoLicenser target installs go-licenser
-func InstallGoLicenser() error {
-	return InstallVendored(GoLicenserImportPath)
-}

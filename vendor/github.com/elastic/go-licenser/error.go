@@ -15,36 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+package main
 
-import (
-	"path/filepath"
-
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/dev-tools/mage/gotool"
-)
-
-var (
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
-)
-
-// InstallVendored uses go get to install a command from its vendored source
-func InstallVendored(importPath string) error {
-	beatDir, err := ElasticBeatsDir()
-	if err != nil {
-		return errors.Wrap(err, "failed to obtain beats repository path")
-	}
-
-	install := gotool.Install
-	return install(
-		install.Vendored(),
-		install.Package(filepath.Join(beatDir, "vendor", importPath)),
-	)
+// Error wraps a normal error with an Exitcode.
+type Error struct {
+	err  error
+	code int
 }
 
-// InstallGoLicenser target installs go-licenser
-func InstallGoLicenser() error {
-	return InstallVendored(GoLicenserImportPath)
+func (e Error) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return "<nil>"
+}
+
+// Code returns the exitcode for the error
+func Code(e error) int {
+	if err, ok := e.(*Error); ok {
+		return err.code
+	}
+	return 0
 }

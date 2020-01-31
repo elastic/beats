@@ -15,36 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+package main
 
 import (
-	"path/filepath"
-
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	"os"
+	"strings"
 )
 
-var (
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
-)
-
-// InstallVendored uses go get to install a command from its vendored source
-func InstallVendored(importPath string) error {
-	beatDir, err := ElasticBeatsDir()
-	if err != nil {
-		return errors.Wrap(err, "failed to obtain beats repository path")
+func needsExclusion(path string, exclude []string) bool {
+	for _, excluded := range exclude {
+		excluded = cleanPathSuffixes(excluded, []string{"*", string(os.PathSeparator)})
+		if strings.HasPrefix(path, excluded) {
+			return true
+		}
 	}
 
-	install := gotool.Install
-	return install(
-		install.Vendored(),
-		install.Package(filepath.Join(beatDir, "vendor", importPath)),
-	)
+	return false
 }
 
-// InstallGoLicenser target installs go-licenser
-func InstallGoLicenser() error {
-	return InstallVendored(GoLicenserImportPath)
+func cleanPathSuffixes(path string, sufixes []string) string {
+	for _, suffix := range sufixes {
+		for strings.HasSuffix(path, suffix) && len(path) > 0 {
+			path = path[:len(path)-len(suffix)]
+		}
+	}
+
+	return path
+}
+
+func cleanPathPrefixes(path string, prefixes []string) string {
+	for _, prefix := range prefixes {
+		for strings.HasPrefix(path, prefix) && len(path) > 0 {
+			path = path[len(prefix):]
+		}
+	}
+
+	return path
 }
