@@ -1,7 +1,6 @@
 package dbus
 
 import (
-	"context"
 	"errors"
 	"strings"
 )
@@ -10,13 +9,8 @@ import (
 // invoked.
 type BusObject interface {
 	Call(method string, flags Flags, args ...interface{}) *Call
-	CallWithContext(ctx context.Context, method string, flags Flags, args ...interface{}) *Call
 	Go(method string, flags Flags, ch chan *Call, args ...interface{}) *Call
-	GoWithContext(ctx context.Context, method string, flags Flags, ch chan *Call, args ...interface{}) *Call
-	AddMatchSignal(iface, member string, options ...MatchOption) *Call
-	RemoveMatchSignal(iface, member string, options ...MatchOption) *Call
 	GetProperty(p string) (Variant, error)
-	SetProperty(p string, v interface{}) error
 	Destination() string
 	Path() ObjectPath
 }
@@ -30,50 +24,16 @@ type Object struct {
 
 // Call calls a method with (*Object).Go and waits for its reply.
 func (o *Object) Call(method string, flags Flags, args ...interface{}) *Call {
-	return <-o.createCall(context.Background(), method, flags, make(chan *Call, 1), args...).Done
+	return <-o.Go(method, flags, make(chan *Call, 1), args...).Done
 }
 
-// CallWithContext acts like Call but takes a context
-func (o *Object) CallWithContext(ctx context.Context, method string, flags Flags, args ...interface{}) *Call {
-	return <-o.createCall(ctx, method, flags, make(chan *Call, 1), args...).Done
-}
-
-// AddMatchSignal subscribes BusObject to signals from specified interface,
-// method (member). Additional filter rules can be added via WithMatch* option constructors.
-// Note: To filter events by object path you have to specify this path via an option.
-//
-// Deprecated: use (*Conn) AddMatchSignal instead.
-func (o *Object) AddMatchSignal(iface, member string, options ...MatchOption) *Call {
-	base := []MatchOption{
-		withMatchType("signal"),
-		WithMatchInterface(iface),
-		WithMatchMember(member),
-	}
-
-	options = append(base, options...)
-	return o.conn.BusObject().Call(
+// AddMatchSignal subscribes BusObject to signals from specified interface and
+// method (member).
+func (o *Object) AddMatchSignal(iface, member string) *Call {
+	return o.Call(
 		"org.freedesktop.DBus.AddMatch",
 		0,
-		formatMatchOptions(options),
-	)
-}
-
-// RemoveMatchSignal unsubscribes BusObject from signals from specified interface,
-// method (member). Additional filter rules can be added via WithMatch* option constructors
-//
-// Deprecated: use (*Conn) RemoveMatchSignal instead.
-func (o *Object) RemoveMatchSignal(iface, member string, options ...MatchOption) *Call {
-	base := []MatchOption{
-		withMatchType("signal"),
-		WithMatchInterface(iface),
-		WithMatchMember(member),
-	}
-
-	options = append(base, options...)
-	return o.conn.BusObject().Call(
-		"org.freedesktop.DBus.RemoveMatch",
-		0,
-		formatMatchOptions(options),
+		"type='signal',interface='"+iface+"',member='"+member+"'",
 	)
 }
 
@@ -89,18 +49,6 @@ func (o *Object) RemoveMatchSignal(iface, member string, options ...MatchOption)
 // If the method parameter contains a dot ('.'), the part before the last dot
 // specifies the interface on which the method is called.
 func (o *Object) Go(method string, flags Flags, ch chan *Call, args ...interface{}) *Call {
-	return o.createCall(context.Background(), method, flags, ch, args...)
-}
-
-// GoWithContext acts like Go but takes a context
-func (o *Object) GoWithContext(ctx context.Context, method string, flags Flags, ch chan *Call, args ...interface{}) *Call {
-	return o.createCall(ctx, method, flags, ch, args...)
-}
-
-func (o *Object) createCall(ctx context.Context, method string, flags Flags, ch chan *Call, args ...interface{}) *Call {
-	if ctx == nil {
-		panic("nil context")
-	}
 	iface := ""
 	i := strings.LastIndex(method, ".")
 	if i != -1 {
@@ -124,32 +72,32 @@ func (o *Object) createCall(ctx context.Context, method string, flags Flags, ch 
 	}
 	if msg.Flags&FlagNoReplyExpected == 0 {
 		if ch == nil {
-			ch = make(chan *Call, 1)
+			ch = make(chan *Call, 10)
 		} else if cap(ch) == 0 {
 			panic("dbus: unbuffered channel passed to (*Object).Go")
 		}
-		ctx, cancel := context.WithCancel(ctx)
 		call := &Call{
 			Destination: o.dest,
 			Path:        o.path,
 			Method:      method,
 			Args:        args,
 			Done:        ch,
-			ctxCanceler: cancel,
-			ctx:         ctx,
 		}
-		o.conn.calls.track(msg.serial, call)
-		o.conn.sendMessageAndIfClosed(msg, func() {
-			o.conn.calls.handleSendError(msg, ErrClosed)
-			cancel()
-		})
-		go func() {
-			<-ctx.Done()
-			o.conn.calls.handleSendError(msg, ctx.Err())
-		}()
-
+		o.conn.callsLck.Lock()
+		o.conn.calls[msg.serial] = call
+		o.conn.callsLck.Unlock()
+		o.conn.outLck.RLock()
+		if o.conn.closed {
+			call.Err = ErrClosed
+			call.Done <- call
+		} else {
+			o.conn.out <- msg
+		}
+		o.conn.outLck.RUnlock()
 		return call
 	}
+	o.conn.outLck.RLock()
+	defer o.conn.outLck.RUnlock()
 	done := make(chan *Call, 1)
 	call := &Call{
 		Err:  nil,
@@ -159,13 +107,15 @@ func (o *Object) createCall(ctx context.Context, method string, flags Flags, ch 
 		call.Done <- call
 		close(done)
 	}()
-	o.conn.sendMessageAndIfClosed(msg, func() {
+	if o.conn.closed {
 		call.Err = ErrClosed
-	})
+		return call
+	}
+	o.conn.out <- msg
 	return call
 }
 
-// GetProperty calls org.freedesktop.DBus.Properties.Get on the given
+// GetProperty calls org.freedesktop.DBus.Properties.GetProperty on the given
 // object. The property name must be given in interface.member notation.
 func (o *Object) GetProperty(p string) (Variant, error) {
 	idx := strings.LastIndex(p, ".")
@@ -184,20 +134,6 @@ func (o *Object) GetProperty(p string) (Variant, error) {
 	}
 
 	return result, nil
-}
-
-// SetProperty calls org.freedesktop.DBus.Properties.Set on the given
-// object. The property name must be given in interface.member notation.
-func (o *Object) SetProperty(p string, v interface{}) error {
-	idx := strings.LastIndex(p, ".")
-	if idx == -1 || idx+1 == len(p) {
-		return errors.New("dbus: invalid property " + p)
-	}
-
-	iface := p[:idx]
-	prop := p[idx+1:]
-
-	return o.Call("org.freedesktop.DBus.Properties.Set", 0, iface, prop, v).Err
 }
 
 // Destination returns the destination that calls on (o *Object) are sent to.
