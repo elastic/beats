@@ -4688,8 +4688,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------
 Dependency: github.com/magefile/mage
-Version: v1.8.0
-Revision: aedfce64c122eef47009b7f80c9771044753215d
+Version: v1.9.0
+Revision: 1c36bf78a98209d91af71354deb001cca75e11fc
 License type (autodetected): Apache-2.0
 ./vendor/github.com/magefile/mage/LICENSE:
 --------------------------------------------------------------------
