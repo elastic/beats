@@ -83,6 +83,9 @@ output:
   {% if elasticsearch.ilm %}
     ilm.enabled: {{elasticsearch.ilm}}
   {% endif %}
+  {% if elasticsearch.timeout %}
+    timeout: {{elasticsearch.timeout}}
+  {% endif %}
 {%- endif %}
 
 {% if logstash %}
