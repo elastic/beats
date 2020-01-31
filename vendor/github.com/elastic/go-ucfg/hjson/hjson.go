@@ -15,38 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package keystore
+package hjson
 
 import (
-	"os"
-	"testing"
+	"io/ioutil"
 
-	"github.com/stretchr/testify/assert"
+	"gopkg.in/hjson/hjson-go.v3"
 
-	ucfg "github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/parse"
+	"github.com/elastic/go-ucfg"
 )
 
-func TestResolverWhenTheKeyDoesntExist(t *testing.T) {
-	path := GetTemporaryKeystoreFile()
-	defer os.Remove(path)
+// NewConfig creates a new configuration object from the HJSON string passed via in.
+func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
+	var m interface{}
+	if err := hjson.Unmarshal(in, &m); err != nil {
+		return nil, err
+	}
 
-	keystore := CreateAnExistingKeystore(path)
-
-	resolver := ResolverWrap(keystore)
-	_, _, err := resolver("donotexist")
-	assert.Equal(t, err, ucfg.ErrMissing)
+	return ucfg.NewFrom(m, opts...)
 }
 
-func TestResolverWhenTheKeyExist(t *testing.T) {
-	path := GetTemporaryKeystoreFile()
-	defer os.Remove(path)
+// NewConfigWithFile loads a new configuration object from an external HJSON file.
+func NewConfigWithFile(name string, opts ...ucfg.Option) (*ucfg.Config, error) {
+	input, err := ioutil.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
 
-	keystore := CreateAnExistingKeystore(path)
-
-	resolver := ResolverWrap(keystore)
-	v, pCfg, err := resolver("output.elasticsearch.password")
-	assert.NoError(t, err)
-	assert.Equal(t, pCfg, parse.DefaultConfig)
-	assert.Equal(t, v, "secret")
+	opts = append([]ucfg.Option{
+		ucfg.MetaData(ucfg.Meta{Source: name}),
+	}, opts...)
+	return NewConfig(input, opts...)
 }
