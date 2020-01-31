@@ -22,10 +22,11 @@ package status
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
-	"github.com/stretchr/testify/require"
 )
 
 func TestFetch(t *testing.T) {

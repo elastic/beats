@@ -22,12 +22,13 @@ package beat_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/beat"
 	_ "github.com/elastic/beats/metricbeat/module/beat/state"
 	_ "github.com/elastic/beats/metricbeat/module/beat/stats"
-	"github.com/stretchr/testify/require"
 )
 
 var metricSets = []string{
