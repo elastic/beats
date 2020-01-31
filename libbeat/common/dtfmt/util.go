@@ -110,7 +110,7 @@ func appendFractPadded(bs []byte, val, digits, fractSz int) []byte {
 	begin := initalLen + ((digits-1)/fractSz)*fractSz
 
 	// remove trailing zeros, such that a multiple of fractSz digits will be
-	// presend in the final buffer. At minimum fractSz digits will always be
+	// present in the final buffer. At minimum fractSz digits will always be
 	// reported.
 	for {
 		if !allZero(bs[begin:end]) {
