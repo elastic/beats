@@ -11,6 +11,14 @@
     },
     "env":[
       {
+        "description": "debug level",
+        "name": "LOG_DRIVER_LEVEL",
+        "value": "info",
+        "Settable": [
+          "value"
+        ]
+      },
+      {
         "description": "libbeat env hack",
         "name": "BEAT_STRICT_PERMS",
         "value": "false"
