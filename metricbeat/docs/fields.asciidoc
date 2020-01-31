@@ -16603,6 +16603,135 @@ istio Module
 
 
 [float]
+=== citadel
+
+Contains statistics related to the Istio Citadel service
+
+
+
+*`istio.citadel.grpc.method`*::
++
+--
+The grpc method
+
+
+type: keyword
+
+--
+
+*`istio.citadel.grpc.service`*::
++
+--
+The grpc service
+
+
+type: keyword
+
+--
+
+*`istio.citadel.grpc.type`*::
++
+--
+The type of the respective grpc service
+
+
+type: keyword
+
+--
+
+*`istio.citadel.secret_controller_svc_acc_created_cert_count`*::
++
+--
+The number of certificates created due to service account creation.
+
+
+type: long
+
+--
+
+*`istio.citadel.server_root_cert_expiry_timestamp`*::
++
+--
+The unix timestamp, in seconds, when Citadel root cert will expire. We set it to negative in case of internal error.
+
+
+type: float
+
+--
+
+*`istio.citadel.grpc.server.handled`*::
++
+--
+Total number of RPCs completed on the server, regardless of success or failure.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.msg.received`*::
++
+--
+Total number of RPC stream messages received on the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.msg.sent`*::
++
+--
+Total number of gRPC stream messages sent by the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.started`*::
++
+--
+Total number of RPCs started on the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.bucket.*`*::
++
+--
+The response latency (milliseconds) of gRPC that had been application-level handled by the server.
+
+
+type: object
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.sum`*::
++
+--
+The response latency of gRPC, sum of latencies in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.count`*::
++
+--
+The response latency of gRPC, number of metrics
+
+
+type: long
+
+--
+
+[float]
 === galley
 
 Contains statistics related to the Istio galley service

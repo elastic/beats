@@ -1,0 +1,131 @@
+[
+    {
+        "event": {
+            "dataset": "istio.citadel",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "citadel": {
+                "secret_controller_svc_acc_created_cert_count": 58,
+                "server_root_cert_expiry_timestamp": 1894287345
+            }
+        },
+        "metricset": {
+            "name": "citadel",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.citadel",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "citadel": {
+                "grpc": {
+                    "method": "HandleCSR",
+                    "server": {
+                        "handled": 0,
+                        "handling": {
+                            "latency": {
+                                "ms": {
+                                    "bucket": {
+                                        "+Inf": 0,
+                                        "10": 0,
+                                        "100": 0,
+                                        "1000": 0,
+                                        "10000": 0,
+                                        "25": 0,
+                                        "250": 0,
+                                        "2500": 0,
+                                        "5": 0,
+                                        "50": 0,
+                                        "500": 0,
+                                        "5000": 0
+                                    },
+                                    "count": 0,
+                                    "sum": 0
+                                }
+                            }
+                        },
+                        "msg": {
+                            "received": 0,
+                            "sent": 0
+                        },
+                        "started": 0
+                    },
+                    "service": "istio.v1.auth.IstioCAService",
+                    "type": "unary"
+                }
+            }
+        },
+        "metricset": {
+            "name": "citadel",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.citadel",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "citadel": {
+                "grpc": {
+                    "method": "CreateCertificate",
+                    "server": {
+                        "handled": 0,
+                        "handling": {
+                            "latency": {
+                                "ms": {
+                                    "bucket": {
+                                        "+Inf": 0,
+                                        "10": 0,
+                                        "100": 0,
+                                        "1000": 0,
+                                        "10000": 0,
+                                        "25": 0,
+                                        "250": 0,
+                                        "2500": 0,
+                                        "5": 0,
+                                        "50": 0,
+                                        "500": 0,
+                                        "5000": 0
+                                    },
+                                    "count": 0,
+                                    "sum": 0
+                                }
+                            }
+                        },
+                        "msg": {
+                            "received": 0,
+                            "sent": 0
+                        },
+                        "started": 0
+                    },
+                    "service": "istio.v1.auth.IstioCertificateService",
+                    "type": "unary"
+                }
+            }
+        },
+        "metricset": {
+            "name": "citadel",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    }
+]

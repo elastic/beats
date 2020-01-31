@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "istio.citadel",
+        "duration": 115000,
+        "module": "istio"
+    },
+    "istio": {
+        "citadel": {
+            "secret_controller_svc_acc_created_cert_count": 58,
+            "server_root_cert_expiry_timestamp": 1894287345
+        }
+    },
+    "metricset": {
+        "name": "citadel",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "istio"
+    }
+}
