@@ -213,9 +213,10 @@ func NewClient(
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
-					Proxy:   proxy,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: s.TLS.ToConfig(),
+					Proxy:           proxy,
 				},
 				Timeout: s.Timeout,
 			},
@@ -436,7 +437,7 @@ func createEventBulkMeta(
 
 	var id string
 	if m := event.Meta; m != nil {
-		if tmp := m["id"]; tmp != nil {
+		if tmp := m["_id"]; tmp != nil {
 			if s, ok := tmp.(string); ok {
 				id = s
 			} else {

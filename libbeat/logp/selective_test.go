@@ -15,13 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
+package logp
 
-// GetConfig for Logstash
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{host},
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestHasSelector(t *testing.T) {
+	DevelopmentSetup(WithSelectors("*", "config"))
+	assert.True(t, HasSelector("config"))
+	assert.False(t, HasSelector("publish"))
+}
+
+func TestLoggerSelectors(t *testing.T) {
+	if err := DevelopmentSetup(WithSelectors("good", " padded "), ToObserverOutput()); err != nil {
+		t.Fatal(err)
 	}
+
+	assert.True(t, HasSelector("padded"))
+
+	good := NewLogger("good")
+	bad := NewLogger("bad")
+
+	good.Debug("is logged")
+	logs := ObserverLogs().TakeAll()
+	assert.Len(t, logs, 1)
+
+	// Selectors only apply to debug level logs.
+	bad.Debug("not logged")
+	logs = ObserverLogs().TakeAll()
+	assert.Len(t, logs, 0)
+
+	bad.Info("is also logged")
+	logs = ObserverLogs().TakeAll()
+	assert.Len(t, logs, 1)
 }

@@ -16603,6 +16603,337 @@ istio Module
 
 
 [float]
+=== galley
+
+Contains statistics related to the Istio galley service
+
+
+
+*`istio.galley.name`*::
++
+--
+The name of the resource the metric is related to
+
+
+type: keyword
+
+--
+
+*`istio.galley.namespace`*::
++
+--
+The Kubernetes namespace of the resource
+
+
+type: keyword
+
+--
+
+*`istio.galley.version`*::
++
+--
+The version of the object
+
+
+type: keyword
+
+--
+
+*`istio.galley.collection`*::
++
+--
+The collection of the instance
+
+
+type: keyword
+
+--
+
+*`istio.galley.istio.authentication.meshpolicies`*::
++
+--
+The number of valid istio/authentication/meshpolicies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.authentication.policies`*::
++
+--
+The number of valid istio/authentication/policies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.mesh.MeshConfig`*::
++
+--
+The number of valid istio/mesh/MeshConfig known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.destinationrules`*::
++
+--
+The number of valid istio/networking/destinationrules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.envoyfilters`*::
++
+--
+The number of valid istio/networking/envoyfilters known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.gateways`*::
++
+--
+The number of valid istio/networking/gateways known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.sidecars`*::
++
+--
+The number of valid istio/networking/sidecars known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.virtualservices`*::
++
+--
+The number of valid istio/networking/virtualservices known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.attributemanifests`*::
++
+--
+The number of valid istio/policy/attributemanifests known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.handlers`*::
++
+--
+The number of valid istio/policy/handlers known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.instances`*::
++
+--
+The number of valid istio/policy/instances known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.rules`*::
++
+--
+The number of valid istio/policy/rules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.bucket.*`*::
++
+--
+The duration between each incoming event as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.sum`*::
++
+--
+The duration between each incoming event, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.bucket.*`*::
++
+--
+The number of events that have been processed as histogram buckets
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.sum`*::
++
+--
+The number of events that have been processed, sum of events
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.bucket.*`*::
++
+--
+The duration of each snapshot as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.sum`*::
++
+--
+The duration of each snapshot, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.count`*::
++
+--
+The duration of each snapshot, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.state_type_instances`*::
++
+--
+The number of type instances per type URL
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.on_change`*::
++
+--
+The number of times the strategy's onChange has been called
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.timer_quiesce_reached`*::
++
+--
+The number of times a quiesce has been reached
+
+
+type: long
+
+--
+
+*`istio.galley.source_kube_event_success_total`*::
++
+--
+The number of times a kubernetes source successfully handled an event
+
+
+type: long
+
+--
+
+*`istio.galley.validation.cert_key.updates`*::
++
+--
+Galley validation webhook certificate updates
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.load`*::
++
+--
+k8s webhook configuration (re)loads
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.updates`*::
++
+--
+k8s webhook configuration updates
+
+
+type: long
+
+--
+
+[float]
 === mesh
 
 Contains statistics related to the Istio mesh service
@@ -16898,6 +17229,440 @@ This identifies the service authentication policy of the request. It is set to m
 
 
 type: keyword
+
+--
+
+[float]
+=== mixer
+
+Contains statistics related to the Istio mixer service
+
+
+
+*`istio.mixer.istio.mcp.request.acks`*::
++
+--
+The number of request acks received by the source.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.errors.config`*::
++
+--
+The number of errors encountered during processing of the adapter info configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.configs`*::
++
+--
+The number of known adapters in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.attributes`*::
++
+--
+The number of known attributes in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.configs`*::
++
+--
+The number of known handlers in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.errors.validation`*::
++
+--
+The number of errors encountered because handler validation returned error.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.errors.config`*::
++
+--
+The number of errors encountered during processing of the instance configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.configs`*::
++
+--
+The number of known instances in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.config`*::
++
+--
+The number of errors encountered during processing of the rule configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.match`*::
++
+--
+The number of rule conditions that was not parseable.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.configs`*::
++
+--
+The number of known rules in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.errors.config`*::
++
+--
+The number of errors encountered during processing of the template configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.configs`*::
++
+--
+The number of known templates in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.unsatisfied.action_handler`*::
++
+--
+The number of actions that failed due to handlers being unavailable.
+
+
+type: long
+
+--
+
+*`istio.mixer.dispatcher_destinations_per_variety_total`*::
++
+--
+The number of Mixer adapter destinations by template variety type.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.closed`*::
++
+--
+The number of handlers that were closed during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.daemons`*::
++
+--
+The current number of active daemon routines in a given adapter environment.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.build`*::
++
+--
+The number of handlers that failed creation during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.close`*::
++
+--
+The number of errors encountered while closing handlers during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.new`*::
++
+--
+The number of handlers that were newly created during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.reused`*::
++
+--
+The number of handlers that were re-used during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler`*::
++
+--
+The name of the daemon  handler
+
+
+type: long
+
+--
+
+*`istio.mixer.variety`*::
++
+--
+The name of the variety
+
+
+type: long
+
+--
+
+[float]
+=== pilot
+
+Contains statistics related to the Istio pilot service
+
+
+
+*`istio.pilot.xds.count`*::
++
+--
+Count of concurrent xDS client connections for Pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.pushes`*::
++
+--
+Count of xDS messages sent, as well as errors building or sending xDS messages for lds, rds, cds and eds.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.push.time.sec`*::
++
+--
+Total time in seconds Pilot takes to push lds, rds, cds and eds.
+
+
+type: long
+
+--
+
+*`istio.pilot.xds.eds.instances`*::
++
+--
+Instances for each cluster, as of last push. Zero instances is an error.
+
+
+type: object
+
+--
+
+*`istio.pilot.xds.push.context.errors`*::
++
+--
+Number of errors (timeouts) initiating push context.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.internal.errors`*::
++
+--
+Total number of internal XDS errors in pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.inbound`*::
++
+--
+Number of conflicting inbound listeners.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.current.tcp`*::
++
+--
+Number of conflicting wildcard http listeners with current wildcard tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.https`*::
++
+--
+Number of conflicting HTTP listeners with well known HTTPS ports.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.http`*::
++
+--
+Number of conflicting wildcard tcp listeners with current wildcard http listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.tcp`*::
++
+--
+Number of conflicting tcp listeners with current tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.bucket.*`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram buckets in milliseconds.
+
+
+type: object
+
+--
+
+*`istio.pilot.proxy.conv.ms.sum`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram sum of times in milliseconds.
+
+
+type: long
+
+--
+
+*`istio.pilot.services`*::
++
+--
+Total services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.virt.services`*::
++
+--
+Total virtual services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.count`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram count of times.
+
+
+type: long
+
+--
+
+*`istio.pilot.no.ip`*::
++
+--
+Pods not found in the endpoint table, possibly invalid.
+
+
+type: object
+
+--
+
+*`istio.pilot.cluster`*::
++
+--
+The instance FQDN.
+
+
+type: text
+
+--
+
+*`istio.pilot.type`*::
++
+--
+The Envoy proxy configuration type.
+
+
+type: text
 
 --
 
