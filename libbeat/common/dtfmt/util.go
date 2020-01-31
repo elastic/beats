@@ -21,10 +21,19 @@ import (
 	"strconv"
 )
 
+// appendUnpadded appends the string representation of the integer value to the
+// buffer.
 func appendUnpadded(bs []byte, i int) []byte {
 	return strconv.AppendInt(bs, int64(i), 10)
 }
 
+// appendPadded appends a number value as string to the buffer. The string will
+// be prefixed with '0' in case the encoded string value is takes less then
+// 'digits' bytes.
+//
+// for example:
+//   appendPadded(..., 10, 5) -> 00010
+//   appendPadded(..., 12345, 5) -> 12345
 func appendPadded(bs []byte, val, digits int) []byte {
 	if val < 0 {
 		bs = append(bs, '-')
@@ -69,6 +78,19 @@ func appendPadded(bs []byte, val, digits int) []byte {
 	return strconv.AppendInt(bs, int64(val), 10)
 }
 
+// appendFractPadded appends a number value as string to the buffer.
+// The string will be prefixed with '0' in case the value is smaller than
+// a value that can be represented with 'digits'.
+// Trailing zeroes at the end will be removed, such that only a multiple of fractSz
+// digits will be printed. If the value is 0, a total of 'fractSz' zeros will
+// be printed.
+//
+// for example:
+//    appendFractPadded(..., 0, 9, 3) -> "000"
+//    appendFractPadded(..., 123000, 9, 3) -> "000123"
+//    appendFractPadded(..., 120000, 9, 3) -> "000120"
+//    appendFractPadded(..., 120000010, 9, 3) -> "000120010"
+//    appendFractPadded(..., 123456789, 6, 3) -> "123456"
 func appendFractPadded(bs []byte, val, digits, fractSz int) []byte {
 	if fractSz == 0 || digits <= fractSz {
 		return appendPadded(bs, val, digits)
