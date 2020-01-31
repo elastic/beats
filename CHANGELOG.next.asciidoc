@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
-
+- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
 
 *Auditbeat*
 
@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 
 *Auditbeat*
 
