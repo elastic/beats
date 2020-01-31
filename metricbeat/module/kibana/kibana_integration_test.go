@@ -22,7 +22,7 @@ package kibana_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -46,14 +46,12 @@ func TestXPackEnabled(t *testing.T) {
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
 		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
 
 		event := events[0]
-		assert.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-		assert.Regexp(t, `^.monitoring-kibana-\d-mb`, event.Index)
+		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		require.Regexp(t, `^.monitoring-kibana-\d-mb`, event.Index)
 	}
 }
 
