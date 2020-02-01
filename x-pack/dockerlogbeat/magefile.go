@@ -109,14 +109,14 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
+	if err != nil {
+		return errors.Wrap(err, "error building final container image")
+	}
 	defer buildResp.Body.Close()
-	buf, errBufRead := ioutil.ReadAll(buildResp.Body)
+	// This blocks until the build operation completes
+	_, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return errors.Wrap(err, "error reading from docker output")
-	}
-	if err != nil {
-		fmt.Printf("Docker response: \n %s\n", string(buf))
-		return errors.Wrap(err, "error building final container image")
 	}
 
 	// move back to the x-pack dir

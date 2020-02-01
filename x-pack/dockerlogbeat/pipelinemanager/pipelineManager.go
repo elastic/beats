@@ -43,8 +43,7 @@ type PipelineManager struct {
 // NewPipelineManager creates a new Pipeline map
 func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 	return &PipelineManager{
-		Logger: logp.NewLogger("PipelineManager"),
-		//mu:        new(sync.Mutex),
+		Logger:    logp.NewLogger("PipelineManager"),
 		pipelines: make(map[string]*Pipeline),
 		clients:   make(map[string]*ClientLogger),
 	}
