@@ -20,7 +20,6 @@
   metricsets:
     - ebs
     - ec2
-    - lambda
     - rds
     - sns
     - sqs

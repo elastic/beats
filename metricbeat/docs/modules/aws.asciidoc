@@ -105,13 +105,6 @@ The elb metricset comes with a predefined dashboard:
 image::./images/metricbeat-aws-elb-overview.png[]
 
 [float]
-=== `lambda`
-When an invocation completes, Lambda sends a set of metrics to CloudWatch for that invocation.
-The lambda metricset comes with a predefined dashboard:
-
-image::./images/metricbeat-aws-lambda-overview.png[]
-
-[float]
 === `rds`
 `period` for `rds` metricset is recommended to be `60s` or multiples of `60s` because Amazon RDS sends metrics and
 dimensions to Amazon CloudWatch every minute.
