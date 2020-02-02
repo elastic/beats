@@ -4,6 +4,7 @@
 - module: aws
   period: 1m
   metricsets:
+    - elb
     - usage
 - module: aws
   period: 5m
@@ -22,7 +23,12 @@
   metricsets:
     - ebs
     - ec2
+<<<<<<< HEAD
     - elb
+=======
+    - lambda
+    - rds
+>>>>>>> 7aa2f7a8d... [Metricbeat] Update aws module documentation (#15964)
     - sns
     - sqs
     - rds
