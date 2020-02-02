@@ -168,12 +168,12 @@
       },
       "references": [
         {
-          "id": "3fbda200-447b-11ea-ad63-791a5dc86f10",
+          "id": "filebeat-*",
           "name": "layer_1_source_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "3fbda200-447b-11ea-ad63-791a5dc86f10",
+          "id": "filebeat-*",
           "name": "layer_2_source_index_pattern",
           "type": "index-pattern"
         }

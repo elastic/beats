@@ -20,11 +20,22 @@ that represent actions taken by a user, role or AWS service.
 [float]
 === Example dashboard
 
-This module comes with several predefined dashboards. For example, here is the
-dashboard for `s3access` fileset:
+This module comes with several predefined dashboards.
+
+Dashboard for `elb` fileset:
+
+[role="screenshot"]
+image::./images/filebeat-aws-elb-overview.png[]
+
+Dashboard for `s3access` fileset:
 
 [role="screenshot"]
 image::./images/filebeat-aws-s3access-overview.png[]
+
+Dashboard for `vpcflow` fileset:
+
+[role="screenshot"]
+image::./images/filebeat-aws-vpcflow-overview.png[]
 
 [float]
 === Module configuration
