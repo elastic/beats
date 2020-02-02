@@ -58,15 +58,6 @@ Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-se
 for a list of AWS services that publish metrics to CloudWatch.
 
 [float]
-=== `dynamodb`
-DynamoDB sends metrics to CloudWatch periodically for better monitoring how web
-application or service is performing.
-
-The dynamodb metricset comes with a predefined dashboard:
-
-image::./images/metricbeat-aws-dynamodb-overview.png[]
-
-[float]
 === `ebs`
 For basic monitoring in AWS EBS volumes, data is available automatically in
 5-minute periods at no charge. This includes data for the root device volumes
