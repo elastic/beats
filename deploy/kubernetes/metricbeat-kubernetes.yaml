@@ -65,7 +65,7 @@ data:
         - fsstat
       processors:
       - drop_event.when.regexp:
-          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
   kubernetes.yml: |-
     - module: kubernetes
       metricsets:
@@ -339,6 +339,7 @@ rules:
   resources:
   - statefulsets
   - deployments
+  - replicasets
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

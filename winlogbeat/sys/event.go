@@ -20,6 +20,7 @@ package sys
 import (
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -36,7 +37,7 @@ type Event struct {
 	// System
 	Provider        Provider        `xml:"System>Provider"`
 	EventIdentifier EventIdentifier `xml:"System>EventID"`
-	Version         uint8           `xml:"System>Version"`
+	Version         Version         `xml:"System>Version"`
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
 	OpcodeRaw       uint8           `xml:"System>Opcode"`
@@ -201,5 +202,26 @@ func (kv *KeyValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 	kv.Value = elem.Value
 
+	return nil
+}
+
+// Version contains the version number of the event's definition.
+type Version uint8
+
+// UnmarshalXML unmarshals the version number as an xsd:unsignedByte. Invalid
+// values are ignored an no error is returned.
+func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+
+	version, err := strconv.ParseUint(s, 10, 8)
+	if err != nil {
+		// Ignore invalid version values.
+		return nil
+	}
+
+	*v = Version(version)
 	return nil
 }

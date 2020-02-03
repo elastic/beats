@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	_ "github.com/elastic/beats/libbeat/processors/add_id"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -193,18 +194,22 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
+			expectedQuery:  QueryParams{},
 		},
 		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
 			expectedOption: "test",
+			expectedQuery:  QueryParams{},
 		},
 		"light module default metricset": {
 			config:         common.MapStr{"module": "service"},
 			expectedOption: "test",
+			expectedQuery:  QueryParams{},
 		},
 		"light module override option": {
 			config:         common.MapStr{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
+			expectedQuery:  QueryParams{},
 		},
 		"light module with query": {
 			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
@@ -215,6 +220,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config:         common.MapStr{"module": "service", "period": "42s"},
 			expectedOption: "test",
 			expectedPeriod: 42 * time.Second,
+			expectedQuery:  QueryParams{},
 		},
 		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
@@ -231,6 +237,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"mixed module with standard and light metricsets": {
 			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
 			expectedOption: "default",
+			expectedQuery:  QueryParams{},
 		},
 		"mixed module with unregistered and light metricsets": {
 			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
@@ -300,6 +307,31 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
+}
+
+func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "nonexisting", "fake")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "nonexisting")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
+	require.NoError(t, err)
+	require.NotNil(t, procs)
+	require.Len(t, procs.List, 1)
 }
 
 type metricSetWithOption struct {
