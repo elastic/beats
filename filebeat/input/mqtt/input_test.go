@@ -72,9 +72,9 @@ func TestNewInput_Run(t *testing.T) {
 		"qos":    2,
 	})
 
-	events := make(chan beat.Event)
+	eventsCh := make(chan beat.Event)
 	outlet := &mockedOutleter{
-		events: events,
+		events: eventsCh,
 	}
 	connector := &mockedConnector{
 		outlet: outlet,
@@ -117,7 +117,7 @@ func TestNewInput_Run(t *testing.T) {
 	require.Equal(t, 1, client.subscribeMultipleCount)
 	require.ElementsMatch(t, []string{"first", "second"}, client.subscriptions)
 
-	for _, event := range []beat.Event{<-events, <-events} {
+	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
 		topic, err := event.GetValue("mqtt.topic")
 		require.NoError(t, err)
 
@@ -127,6 +127,57 @@ func TestNewInput_Run(t *testing.T) {
 			assertEventMatches(t, secondMessage, event)
 		}
 	}
+}
+
+func TestNewInput_Run_Stop(t *testing.T) {
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":  "tcp://mocked:1234",
+		"topics": []string{"first", "second"},
+		"qos":    2,
+	})
+
+	eventsCh := make(chan beat.Event)
+	outlet := &mockedOutleter{
+		events: eventsCh,
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+	var inputContext finput.Context
+
+	const numMessages = 5
+	var messages []mockedMessage
+	for i := 0; i < numMessages; i++ {
+		messages = append(messages, mockedMessage{
+			duplicate: false,
+			messageID: 1,
+			qos:       2,
+			retained:  false,
+			topic:     "first",
+			payload:   []byte("first-message"),
+		})
+	}
+
+	var client *mockedClient
+	newMqttClient = func(o *libmqtt.ClientOptions) libmqtt.Client {
+		client = &mockedClient{
+			onConnectHandler: o.OnConnect,
+			messages:         messages,
+		}
+		return client
+	}
+
+	input, err := NewInput(config, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input)
+
+	input.Run()
+
+	go func() {
+		for range eventsCh {}
+	}()
+
+	input.Stop()
 }
 
 func TestRun_Once(t *testing.T) {
