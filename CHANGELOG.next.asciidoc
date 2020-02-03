@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
+- Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 
 *Auditbeat*
 
