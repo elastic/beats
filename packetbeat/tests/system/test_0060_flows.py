@@ -19,8 +19,8 @@ def parse_timestamp(ts):
     ts = ts[:-1]
     parts = ts.split(".")
     ts = datetime.strptime(parts[0], "%Y-%m-%dT%H:%M:%S")
-    if len(parts[0]) > 6:
-        parts[0] = parts[0][:6]  # ensure we always parse microseconds
+    if len(parts[1]) > 6:
+        parts[1] = parts[1][:6]  # ensure we always parse microseconds
     return ts + timedelta(microseconds=datetime.strptime(parts[1], "%f").microsecond)
 
 
