@@ -30,6 +30,21 @@ processors:
       ignore_failure: true
       formats:
         - "dd/MMM/yyyy:H:m:s Z"
+  - set:
+      field: tls.cipher
+      value: '{{aws.s3access.cipher_suite}}'
+      if: ctx.aws?.s3access?.cipher_suite != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.s3access?.tls_version != null
+      source: >-
+        def parts = ctx.aws.s3access.tls_version.toLowerCase().splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        ctx.tls.version = parts[1];
+        ctx.tls.version_protocol = parts[0]
 
   #
   # Remove temporary fields
