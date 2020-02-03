@@ -36,7 +36,7 @@ func TestDefaultTargetField(t *testing.T) {
 	newEvent, err := p.Run(testEvent)
 	assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("@metadata.id")
+	v, err := newEvent.GetValue("@metadata._id")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
 }
@@ -59,7 +59,7 @@ func TestNonDefaultTargetField(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
 
-	v, err = newEvent.GetValue("@metadata.id")
+	v, err = newEvent.GetValue("@metadata._id")
 	assert.NoError(t, err)
 	assert.Empty(t, v)
 }

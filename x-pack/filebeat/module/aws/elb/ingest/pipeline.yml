@@ -139,6 +139,26 @@ processors:
       target_field: source.as.organization.name
       ignore_missing: true
 
+  - set:
+      field: tls.cipher
+      value: '{{aws.elb.ssl_cipher}}'
+      if: ctx.aws?.elb?.ssl_cipher != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.elb?.ssl_protocol != null
+      source: >-
+        def parts = ctx.aws.elb.ssl_protocol.splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        if (parts[1].contains(".")) {
+          ctx.tls.version = parts[1];
+        } else {
+          ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
+        }
+        ctx.tls.version_protocol = parts[0].toLowerCase();
+
   - remove:
       field:
         - message
