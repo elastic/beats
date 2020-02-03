@@ -21,7 +21,7 @@ type config struct {
 	HTTPHeaders       common.MapStr     `config:"http_headers"`
 	HTTPMethod        string            `config:"http_method" validate:"required"`
 	HTTPRequestBody   common.MapStr     `config:"http_request_body"`
-	Interval          time.Duration     `config:"interval" validate:"required"`
+	Interval          time.Duration     `config:"interval"`
 	JSONObjects       string            `config:"json_objects_array"`
 	Pagination        *Pagination       `config:"pagination"`
 	TLS               *tlscommon.Config `config:"ssl"`

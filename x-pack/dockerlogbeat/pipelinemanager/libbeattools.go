@@ -245,21 +245,21 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 func openRegular(filename string) (*os.File, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		return f, errors.Wrapf(err, "error opening file %s", filename)
+		return f, err
 	}
 
 	info, err := f.Stat()
 	if err != nil {
 		f.Close()
-		return nil, errors.Wrapf(err, "error statting %s", filename)
+		return nil, err
 	}
 
 	if !info.Mode().IsRegular() {
 		f.Close()
 		if info.IsDir() {
-			return nil, fmt.Errorf("%s is a directory", filename)
+			return nil, err
 		}
-		return nil, fmt.Errorf("%s is not a regular file", filename)
+		return nil, err
 	}
 
 	return f, nil

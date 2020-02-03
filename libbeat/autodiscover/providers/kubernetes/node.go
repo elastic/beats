@@ -188,12 +188,17 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		},
 	}
 	n.publish(event)
-
 }
 
 func getAddress(node *kubernetes.Node) string {
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeExternalIP && address.Address != "" {
+			return address.Address
+		}
+	}
+
+	for _, address := range node.Status.Addresses {
+		if address.Type == v1.NodeInternalIP && address.Address != "" {
 			return address.Address
 		}
 	}
