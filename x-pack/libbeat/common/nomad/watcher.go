@@ -52,6 +52,9 @@ type WatchOptions struct {
 	// AllowStale allows any Nomad server (non-leader) to service
 	// a read. This allows for lower latency and higher throughput
 	AllowStale bool
+	// InitialWaitIndex specify the initial WaitIndex to send in the first request
+	// to the Nomad API
+	InitialWaitIndex uint64
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
@@ -61,7 +64,7 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 		client:    client,
 		options:   options,
 		logger:    logp.NewLogger("nomad"),
-		waitIndex: 1,
+		waitIndex: options.InitialWaitIndex,
 		lastFetch: time.Now(),
 		done:      make(chan struct{}),
 	}
@@ -168,6 +171,13 @@ func (w *watcher) sync() error {
 		case AllocClientStatusComplete, AllocClientStatusFailed, api.AllocClientStatusLost:
 			w.handler.OnDelete(*alloc)
 		case AllocClientStatusRunning:
+			// Handle in-place allocation updates (like adding tags to a service definition) that
+			// don't trigger a new allocation
+			if (alloc.CreateIndex < alloc.AllocModifyIndex) && (w.waitIndex > 1) {
+				w.handler.OnUpdate(*alloc)
+				continue
+			}
+
 			w.handler.OnAdd(*alloc)
 		}
 	}

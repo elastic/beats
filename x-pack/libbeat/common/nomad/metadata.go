@@ -7,8 +7,6 @@ package nomad
 import (
 	"regexp"
 
-	"github.com/imdario/mergo"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
@@ -89,8 +87,10 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 			meta[k] = v
 		}
 
-		mergo.Merge(&meta, group.Meta, mergo.WithOverride)
-		group.Meta = meta
+		// override with the meta values from the group
+		for k, v := range group.Meta {
+			meta[k] = v
+		}
 
 		tasks := g.tasksMeta(group)
 		tasksMeta = append(tasksMeta, tasks...)
@@ -141,8 +141,15 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 				service.CanaryTags...)
 		}
 
-		joinMeta := group.Meta
-		mergo.Merge(&joinMeta, task.Meta, mergo.WithOverride)
+		joinMeta := make(map[string]string, len(group.Meta)+len(task.Meta))
+
+		for k, v := range group.Meta {
+			joinMeta[k] = v
+		}
+
+		for k, v := range task.Meta {
+			joinMeta[k] = v
+		}
 
 		meta := common.MapStr{
 			"name":    task.Name,
