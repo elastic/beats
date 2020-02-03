@@ -77,10 +77,10 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	}
 
 	// change back to the root beats dir so we can send the proper build context to docker
-	err = os.Chdir("../..")
-	if err != nil {
-		return errors.Wrap(err, "error changing directory")
-	}
+	// err = os.Chdir("../..")
+	// if err != nil {
+	// 	return errors.Wrap(err, "error changing directory")
+	// }
 
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
@@ -102,10 +102,10 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	defer buildContext.Close()
 
 	buildOpts := types.ImageBuildOptions{
-		BuildArgs:  map[string]*string{"versionString": &goVersion},
-		Target:     "final",
+		BuildArgs: map[string]*string{"versionString": &goVersion},
+		//Target:     "final",
 		Tags:       []string{rootImageName},
-		Dockerfile: "x-pack/dockerlogbeat/Dockerfile",
+		Dockerfile: "Dockerfile",
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
@@ -325,14 +325,30 @@ func Export() error {
 	return nil
 }
 
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return devtools.CrossBuild(devtools.ForPlatforms("linux/amd64"))
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.CGO = false
+	buildArgs.Static = true
+	buildArgs.OutputDir = "build"
+	return devtools.GolangCrossBuild(buildArgs)
+}
+
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
-	mg.SerialDeps(Build, Export)
+	mg.SerialDeps(CrossBuild, Build, Export)
 }
 
 // BuildAndInstall builds and installs the plugin
 func BuildAndInstall() {
-	mg.SerialDeps(Build, Install)
+	mg.SerialDeps(CrossBuild, Build, Install)
 }
 
 // IntegTest is currently a dummy test for the `testsuite` target
