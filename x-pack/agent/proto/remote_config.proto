@@ -9,7 +9,14 @@ message ConfigRequest {
 message ConfigResponse {
 }
 
+message StatusRequest{
+}
+
+message StatusResponse {
+    string Status = 1;
+}
 
 service Configurator {
     rpc Config(ConfigRequest) returns (ConfigResponse) {}
+    rpc Status(StatusRequest) returns (StatusResponse) {}
 }

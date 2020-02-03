@@ -99,24 +99,98 @@ func (m *ConfigResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ConfigResponse proto.InternalMessageInfo
 
+type StatusRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *StatusRequest) Reset()         { *m = StatusRequest{} }
+func (m *StatusRequest) String() string { return proto.CompactTextString(m) }
+func (*StatusRequest) ProtoMessage()    {}
+func (*StatusRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_16fc0d99571fe457, []int{2}
+}
+
+func (m *StatusRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StatusRequest.Unmarshal(m, b)
+}
+func (m *StatusRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StatusRequest.Marshal(b, m, deterministic)
+}
+func (m *StatusRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StatusRequest.Merge(m, src)
+}
+func (m *StatusRequest) XXX_Size() int {
+	return xxx_messageInfo_StatusRequest.Size(m)
+}
+func (m *StatusRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_StatusRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StatusRequest proto.InternalMessageInfo
+
+type StatusResponse struct {
+	Status               string   `protobuf:"bytes,1,opt,name=Status,proto3" json:"Status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *StatusResponse) Reset()         { *m = StatusResponse{} }
+func (m *StatusResponse) String() string { return proto.CompactTextString(m) }
+func (*StatusResponse) ProtoMessage()    {}
+func (*StatusResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_16fc0d99571fe457, []int{3}
+}
+
+func (m *StatusResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StatusResponse.Unmarshal(m, b)
+}
+func (m *StatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StatusResponse.Marshal(b, m, deterministic)
+}
+func (m *StatusResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StatusResponse.Merge(m, src)
+}
+func (m *StatusResponse) XXX_Size() int {
+	return xxx_messageInfo_StatusResponse.Size(m)
+}
+func (m *StatusResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_StatusResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StatusResponse proto.InternalMessageInfo
+
+func (m *StatusResponse) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*ConfigRequest)(nil), "remoteconfig.ConfigRequest")
 	proto.RegisterType((*ConfigResponse)(nil), "remoteconfig.ConfigResponse")
+	proto.RegisterType((*StatusRequest)(nil), "remoteconfig.StatusRequest")
+	proto.RegisterType((*StatusResponse)(nil), "remoteconfig.StatusResponse")
 }
 
 func init() { proto.RegisterFile("remote_config.proto", fileDescriptor_16fc0d99571fe457) }
 
 var fileDescriptor_16fc0d99571fe457 = []byte{
-	// 131 bytes of a gzipped FileDescriptorProto
+	// 175 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2e, 0x4a, 0xcd, 0xcd,
 	0x2f, 0x49, 0x8d, 0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
 	0xe2, 0x81, 0x08, 0x42, 0xc4, 0x94, 0xd4, 0xb9, 0x78, 0x9d, 0xc1, 0xac, 0xa0, 0xd4, 0xc2, 0xd2,
 	0xd4, 0xe2, 0x12, 0x21, 0x31, 0x2e, 0x36, 0x88, 0x94, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10,
-	0x94, 0xa7, 0x24, 0xc0, 0xc5, 0x07, 0x53, 0x58, 0x5c, 0x90, 0x9f, 0x57, 0x9c, 0x6a, 0x14, 0xca,
-	0xc5, 0x03, 0x11, 0x29, 0x2d, 0x4a, 0x2c, 0xc9, 0x2f, 0x12, 0x72, 0xe5, 0x62, 0x83, 0xf0, 0x85,
-	0xa4, 0xf5, 0x90, 0xed, 0xd0, 0x43, 0xb1, 0x40, 0x4a, 0x06, 0xbb, 0x24, 0xc4, 0x50, 0x25, 0x86,
-	0x24, 0x36, 0xb0, 0x33, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x08, 0x73, 0xde, 0x26, 0xbd,
-	0x00, 0x00, 0x00,
+	0x94, 0xa7, 0x24, 0xc0, 0xc5, 0x07, 0x53, 0x58, 0x5c, 0x90, 0x9f, 0x57, 0x9c, 0xaa, 0xc4, 0xcf,
+	0xc5, 0x1b, 0x5c, 0x92, 0x58, 0x52, 0x5a, 0x0c, 0xd5, 0xaa, 0xa4, 0xc1, 0xc5, 0x07, 0x13, 0x80,
+	0x28, 0x01, 0x19, 0x06, 0x11, 0x81, 0x19, 0x06, 0xe1, 0x19, 0xcd, 0x61, 0xe4, 0xe2, 0x81, 0x98,
+	0x56, 0x5a, 0x94, 0x58, 0x92, 0x5f, 0x24, 0xe4, 0xca, 0xc5, 0x06, 0xe1, 0x0b, 0x49, 0xeb, 0x21,
+	0xbb, 0x4f, 0x0f, 0xc5, 0x71, 0x52, 0x32, 0xd8, 0x25, 0xa1, 0x0e, 0x62, 0x00, 0x19, 0x03, 0xb1,
+	0x01, 0xdd, 0x18, 0x14, 0x87, 0xa2, 0x1b, 0x83, 0xea, 0x68, 0x25, 0x86, 0x24, 0x36, 0x70, 0x48,
+	0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x06, 0x93, 0xe1, 0x10, 0x40, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -132,6 +206,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ConfiguratorClient interface {
 	Config(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error)
+	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 }
 
 type configuratorClient struct {
@@ -151,9 +226,19 @@ func (c *configuratorClient) Config(ctx context.Context, in *ConfigRequest, opts
 	return out, nil
 }
 
+func (c *configuratorClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/remoteconfig.Configurator/Status", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConfiguratorServer is the server API for Configurator service.
 type ConfiguratorServer interface {
 	Config(context.Context, *ConfigRequest) (*ConfigResponse, error)
+	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 }
 
 // UnimplementedConfiguratorServer can be embedded to have forward compatible implementations.
@@ -162,6 +247,9 @@ type UnimplementedConfiguratorServer struct {
 
 func (*UnimplementedConfiguratorServer) Config(ctx context.Context, req *ConfigRequest) (*ConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Config not implemented")
+}
+func (*UnimplementedConfiguratorServer) Status(ctx context.Context, req *StatusRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
 }
 
 func RegisterConfiguratorServer(s *grpc.Server, srv ConfiguratorServer) {
@@ -186,6 +274,24 @@ func _Configurator_Config_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Configurator_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConfiguratorServer).Status(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/remoteconfig.Configurator/Status",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConfiguratorServer).Status(ctx, req.(*StatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Configurator_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "remoteconfig.Configurator",
 	HandlerType: (*ConfiguratorServer)(nil),
@@ -193,6 +299,10 @@ var _Configurator_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Config",
 			Handler:    _Configurator_Config_Handler,
+		},
+		{
+			MethodName: "Status",
+			Handler:    _Configurator_Status_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

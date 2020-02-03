@@ -54,3 +54,8 @@ func (s *Server) Config(ctx context.Context, req *grpc.ConfigRequest) (*grpc.Con
 	}
 	return &grpc.ConfigResponse{}, nil
 }
+
+// Status returns OK.
+func (s *Server) Status(ctx context.Context, req *grpc.StatusRequest) (*grpc.StatusResponse, error) {
+	return &grpc.StatusResponse{Status: "ok"}, nil
+}
