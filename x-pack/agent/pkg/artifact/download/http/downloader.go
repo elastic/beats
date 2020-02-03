@@ -5,6 +5,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -50,9 +51,9 @@ func NewDownloaderWithClient(config *artifact.Config, client http.Client) *Downl
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(programName, version string) (string, error) {
+func (e *Downloader) Download(ctx context.Context, programName, version string) (string, error) {
 	// download from source to dest
-	path, err := e.download(e.config.OS(), programName, version)
+	path, err := e.download(ctx, e.config.OS(), programName, version)
 	if err != nil {
 		os.Remove(path)
 	}
@@ -77,7 +78,7 @@ func (e *Downloader) composeURI(programName, packageName string) (string, error)
 	return uri.String(), nil
 }
 
-func (e *Downloader) download(operatingSystem, programName, version string) (string, error) {
+func (e *Downloader) download(ctx context.Context, operatingSystem, programName, version string) (string, error) {
 	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
@@ -93,7 +94,12 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 		return "", err
 	}
 
-	resp, err := e.client.Get(sourceURI)
+	req, err := http.NewRequest("GET", sourceURI, nil)
+	if err != nil {
+		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+	}
+
+	resp, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}

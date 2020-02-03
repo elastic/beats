@@ -4,8 +4,10 @@
 
 package reporter
 
+import "context"
+
 // Backend defines a actual implementation of reporting.
 type Backend interface {
-	Report(Event) error
+	Report(context.Context, Event) error
 	Close() error
 }

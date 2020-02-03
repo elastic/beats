@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 )
 
 func TestHTTPClient(t *testing.T) {
+	ctx := context.Background()
 	t.Run("API Key is valid", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
@@ -38,7 +40,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -67,7 +69,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+			_, err = client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.Error(t, err)
 		},
 	))
@@ -92,7 +94,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -111,12 +113,12 @@ func TestHTTPClient(t *testing.T) {
 			return NewFleetAuthRoundTripper(wrapped, "abc123")
 		})
 
-		_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+		_, err = client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 		require.Error(t, err)
 	})
 }
 
-// NOTE(ph): Usually I would be agaisnt testing private methods as much as possible but in this
+// NOTE(ph): Usually I would be against testing private methods as much as possible but in this
 // case since we might deal with different format or error I make sense to test this method in
 // isolation.
 func TestExtract(t *testing.T) {

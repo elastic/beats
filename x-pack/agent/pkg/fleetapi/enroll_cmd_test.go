@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -84,7 +85,7 @@ func TestEnroll(t *testing.T) {
 			}
 
 			cmd := &EnrollCmd{client: client}
-			resp, err := cmd.Execute(req)
+			resp, err := cmd.Execute(context.Background(), req)
 			require.NoError(t, err)
 
 			require.Equal(t, "my-access-api-key", resp.Item.AccessAPIKey)
@@ -123,7 +124,7 @@ func TestEnroll(t *testing.T) {
 			}
 
 			cmd := &EnrollCmd{client: client}
-			_, err = cmd.Execute(req)
+			_, err = cmd.Execute(context.Background(), req)
 			require.Error(t, err)
 
 			require.True(t, strings.Index(err.Error(), "500") > 0)

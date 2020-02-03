@@ -5,6 +5,8 @@
 package operation
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 )
@@ -22,15 +24,15 @@ type operation interface {
 	// - Fetch does not need to run if package is already present
 	Check() (bool, error)
 	// Run runs the operation
-	Run(application Application) error
+	Run(ctx context.Context, application Application) error
 }
 
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
-	Start(cfg map[string]interface{}) error
+	Start(ctx context.Context, cfg map[string]interface{}) error
 	Stop()
-	Configure(config map[string]interface{}) error
+	Configure(ctx context.Context, config map[string]interface{}) error
 	State() state.State
 	Monitor() monitoring.Monitor
 }

@@ -7,6 +7,7 @@
 package operation
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -406,7 +407,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(l, "p1", cfg, fetcher, installer, stateResolver, nil)
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, installer, stateResolver, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -437,7 +438,7 @@ type TestConfig struct {
 type DummyDownloader struct {
 }
 
-func (*DummyDownloader) Download(p, v string) (string, error) {
+func (*DummyDownloader) Download(_ context.Context, p, v string) (string, error) {
 	return "", nil
 }
 

@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -66,7 +67,7 @@ func TestAck(t *testing.T) {
 				},
 			}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(context.Background(), &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 			require.Equal(t, "ack", r.Action)

@@ -4,7 +4,11 @@
 
 package operation
 
-import "github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+import (
+	"context"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+)
 
 // operationRemove uninstall and removes all the bits related to the artifact
 type operationRemove struct {
@@ -29,10 +33,10 @@ func (o *operationRemove) Check() (bool, error) {
 }
 
 // Run runs the operation
-func (o *operationRemove) Run(application Application) (err error) {
+func (o *operationRemove) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			o.eventProcessor.OnFailing(application.Name(), err)
+			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 			err = errors.New(err,
 				o.Name(),
 				errors.TypeApplication,

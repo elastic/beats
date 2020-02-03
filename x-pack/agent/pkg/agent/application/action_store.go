@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 
 	yaml "gopkg.in/yaml.v2"
@@ -124,15 +125,15 @@ type actionStoreAcker struct {
 	store *actionStore
 }
 
-func (a *actionStoreAcker) Ack(action fleetapi.Action) error {
-	if err := a.acker.Ack(action); err != nil {
+func (a *actionStoreAcker) Ack(ctx context.Context, action fleetapi.Action) error {
+	if err := a.acker.Ack(ctx, action); err != nil {
 		return err
 	}
 	a.store.Add(action)
 	return a.store.Save()
 }
 
-func (a *actionStoreAcker) Commit() error {
+func (a *actionStoreAcker) Commit(ctx context.Context) error {
 	return nil
 }
 

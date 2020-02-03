@@ -6,6 +6,7 @@ package fleetapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -73,7 +74,7 @@ func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
 }
 
 // Execute enroll the Agent in the Fleet.
-func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
+func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinResponse, error) {
 	if err := r.Validate(); err != nil {
 		return nil, err
 	}
@@ -86,7 +87,7 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 	}
 
 	cp := fmt.Sprintf(checkingPath, e.info.AgentID())
-	resp, err := e.client.Send("POST", cp, nil, nil, bytes.NewBuffer(b))
+	resp, err := e.client.Send(ctx, "POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to checkin to fleet",

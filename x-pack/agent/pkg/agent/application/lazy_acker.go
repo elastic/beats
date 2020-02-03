@@ -4,10 +4,14 @@
 
 package application
 
-import "github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+import (
+	"context"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+)
 
 type batchAcker interface {
-	AckBatch(actions []fleetapi.Action) error
+	AckBatch(ctx context.Context, actions []fleetapi.Action) error
 }
 
 type ackForcer interface {
@@ -26,18 +30,18 @@ func newLazyAcker(baseAcker batchAcker) *lazyAcker {
 	}
 }
 
-func (f *lazyAcker) Ack(action fleetapi.Action) error {
+func (f *lazyAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	f.queue = append(f.queue, action)
 
 	if _, isAckForced := action.(ackForcer); isAckForced {
-		return f.Commit()
+		return f.Commit(ctx)
 	}
 
 	return nil
 }
 
-func (f *lazyAcker) Commit() error {
-	err := f.acker.AckBatch(f.queue)
+func (f *lazyAcker) Commit(ctx context.Context) error {
+	err := f.acker.AckBatch(ctx, f.queue)
 	if err != nil {
 		// do not cleanup on error
 		return err

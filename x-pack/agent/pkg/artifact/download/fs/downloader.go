@@ -5,6 +5,7 @@
 package fs
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -35,7 +36,7 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(programName, version string) (string, error) {
+func (e *Downloader) Download(_ context.Context, programName, version string) (string, error) {
 	// create a destination directory root/program
 	destinationDir := filepath.Join(e.config.TargetDirectory, programName)
 	if err := os.MkdirAll(destinationDir, os.ModeDir); err != nil {

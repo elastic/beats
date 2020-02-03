@@ -4,7 +4,11 @@
 
 package noop
 
-import "github.com/elastic/beats/x-pack/agent/pkg/reporter"
+import (
+	"context"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
+)
 
 // Reporter is a reporter without any effects, serves just as a showcase for further implementations.
 type Reporter struct{}
@@ -15,7 +19,7 @@ func NewReporter() *Reporter {
 }
 
 // Report in noop reporter does nothing
-func (*Reporter) Report(_ reporter.Event) error { return nil }
+func (*Reporter) Report(_ context.Context, _ reporter.Event) error { return nil }
 
 // Close stops all the background jobs reporter is running.
 func (*Reporter) Close() error { return nil }
