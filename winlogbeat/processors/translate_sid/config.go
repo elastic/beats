@@ -15,25 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package translate_sid
 
-import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+import "github.com/pkg/errors"
 
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
+type config struct {
+	Field             string `config:"field"  validate:"required"`
+	AccountNameTarget string `config:"account_name_target"`
+	AccountTypeTarget string `config:"account_type_target"`
+	DomainTarget      string `config:"domain_target"`
+	IgnoreMissing     bool   `config:"ignore_missing"`
+	IgnoreFailure     bool   `config:"ignore_failure"`
+}
 
-	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
-	_ "github.com/elastic/beats/winlogbeat/processors/translate_sid"
-)
+func (c *config) Validate() error {
+	if c.AccountNameTarget == "" && c.AccountTypeTarget == "" && c.DomainTarget == "" {
+		return errors.New("at least one target field must be configured " +
+			"(set account_name_target, account_type_target, and/or domain_target)")
+	}
+	return nil
+}
 
-// Name of this beat
-var Name = "winlogbeat"
-
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: true})
+func defaultConfig() config {
+	return config{}
+}
