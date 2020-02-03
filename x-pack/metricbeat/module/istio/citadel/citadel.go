@@ -24,8 +24,8 @@ var (
 
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
-		"citadel_secret_controller_svc_acc_created_cert_count": prometheus.Metric("secret_controller_svc_acc_created_cert_count"),
-		"citadel_server_root_cert_expiry_timestamp":            prometheus.Metric("server_root_cert_expiry_timestamp"),
+		"citadel_secret_controller_svc_acc_created_cert_count": prometheus.Metric("secret_controller_svc_acc_created_cert.count"),
+		"citadel_server_root_cert_expiry_timestamp":            prometheus.Metric("server_root_cert_expiry_seconds"),
 		"grpc_server_handled_total":                            prometheus.Metric("grpc.server.handled"),
 		"grpc_server_handling_seconds":                         prometheus.Metric("grpc.server.handling.latency.ms", prometheus.OpMultiplyBuckets(1000)),
 		"grpc_server_msg_received_total":                       prometheus.Metric("grpc.server.msg.received"),

@@ -7,8 +7,10 @@
         },
         "istio": {
             "citadel": {
-                "secret_controller_svc_acc_created_cert_count": 58,
-                "server_root_cert_expiry_timestamp": 1894287345
+                "secret_controller_svc_acc_created_cert": {
+                    "count": 58
+                },
+                "server_root_cert_expiry_seconds": 1894287345
             }
         },
         "metricset": {

@@ -17,11 +17,11 @@
       description: >
         The type of the respective grpc service
 
-    - name: secret_controller_svc_acc_created_cert_count
+    - name: secret_controller_svc_acc_created_cert.count
       type: long
       description: >
         The number of certificates created due to service account creation.
-    - name: server_root_cert_expiry_timestamp
+    - name: server_root_cert_expiry_seconds
       type: float
       description: >
         The unix timestamp, in seconds, when Citadel root cert will expire. We set it to negative in case of internal error.

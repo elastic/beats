@@ -16639,7 +16639,7 @@ type: keyword
 
 --
 
-*`istio.citadel.secret_controller_svc_acc_created_cert_count`*::
+*`istio.citadel.secret_controller_svc_acc_created_cert.count`*::
 +
 --
 The number of certificates created due to service account creation.
@@ -16649,7 +16649,7 @@ type: long
 
 --
 
-*`istio.citadel.server_root_cert_expiry_timestamp`*::
+*`istio.citadel.server_root_cert_expiry_seconds`*::
 +
 --
 The unix timestamp, in seconds, when Citadel root cert will expire. We set it to negative in case of internal error.
