@@ -26,7 +26,7 @@ var (
 		"free_storage.bytes":             c.Float("FreeStorageSpace"),
 		"maximum_used_transaction_ids":   c.Float("MaximumUsedTransactionIDs"),
 		"oldest_replication_slot_lag.mb": c.Float("OldestReplicationSlotLag"),
-		"read.iops":            c.Float("ReadIOPS"),
+		"read.iops":                      c.Float("ReadIOPS"),
 		"throughput": s.Object{
 			"commit":           c.Float("CommitThroughput"),
 			"delete":           c.Float("DeleteThroughput"),
@@ -60,7 +60,7 @@ var (
 		},
 		"swap_usage.bytes":            c.Float("SwapUsage"),
 		"transaction_logs_generation": c.Float("TransactionLogsGeneration"),
-		"write.iops":        c.Float("WriteIOPS"),
+		"write.iops":                  c.Float("WriteIOPS"),
 		"queries":                     c.Float("Queries"),
 		"deadlocks":                   c.Float("Deadlocks"),
 		"volume_used.bytes":           c.Float("VolumeBytesUsed"),
@@ -100,8 +100,8 @@ var (
 		"cache_hit_ratio.result_set": c.Float("ResultSetCacheHitRatio"),
 
 		"engine_uptime.sec":                        c.Float("EngineUptime"),
-		"volume.read.iops":                   c.Float("VolumeReadIOPs"),
-		"volume.write.iops":                  c.Float("VolumeWriteIOPs"),
+		"volume.read.iops":                         c.Float("VolumeReadIOPs"),
+		"volume.write.iops":                        c.Float("VolumeWriteIOPs"),
 		"rds_to_aurora_postgresql_replica_lag.sec": c.Float("RDSToAuroraPostgreSQLReplicaLag"),
 		"backup_storage_billed_total.bytes":        c.Float("TotalBackupStorageBilled"),
 		"aurora_volume_left_total.bytes":           c.Float("AuroraVolumeBytesLeftTotal"),
