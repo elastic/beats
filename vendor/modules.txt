@@ -524,8 +524,6 @@ github.com/googleapis/gnostic/extensions
 github.com/gorhill/cronexpr
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
-# github.com/hashicorp/go-version v1.0.0
-github.com/hashicorp/go-version
 # github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
@@ -588,12 +586,8 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 github.com/miekg/dns
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
-# github.com/mitchellh/gox v1.0.1
-github.com/mitchellh/gox
 # github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 github.com/mitchellh/hashstructure
-# github.com/mitchellh/iochan v1.0.0
-github.com/mitchellh/iochan
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
