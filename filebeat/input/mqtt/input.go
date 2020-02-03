@@ -173,7 +173,7 @@ func (mi *mqttInput) Stop() {
 	mi.Wait()
 }
 
-// Wait method waits until event processing is finished and stops the input.
+// Wait method waits until event processing is finished.
 func (mi *mqttInput) Wait() {
 	mi.logger.Debug("Wait for the input to finish processing.")
 	mi.inflightMessages.Wait()
