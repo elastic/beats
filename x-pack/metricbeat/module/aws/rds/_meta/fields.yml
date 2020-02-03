@@ -63,7 +63,7 @@
       type: long
       description: >
         The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
-    - name: read_io.ops_per_sec
+    - name: read.iops
       type: float
       description: >
         The average number of disk read I/O operations per second.
@@ -81,7 +81,7 @@
       type: long
       description: >
         The disk space used by transaction logs. Applies to PostgreSQL.
-    - name: write_io.ops_per_sec
+    - name: write.iops
       type: float
       description: >
         The average number of disk write I/O operations per second.
@@ -98,12 +98,12 @@
       format: bytes
       description: >
         The amount of storage used by your Aurora DB instance, in bytes.
-    - name: volume_read_io_per_sec
+    - name: volume.read.iops
       type: long
       format: bytes
       description: >
         The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
-    - name: volume_write_io_per_sec
+    - name: volume.write.iops
       type: long
       format: bytes
       description: >
