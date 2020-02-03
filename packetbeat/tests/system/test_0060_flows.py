@@ -1,6 +1,6 @@
 from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
 from pprint import PrettyPrinter
-from datetime import datetime
+from datetime import datetime, timedelta
 import six
 import os
 
@@ -14,7 +14,14 @@ def check_fields(flow, fields):
 
 
 def parse_timestamp(ts):
-    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ")
+    if ts[-1] != 'Z':
+        raise Exception("missing time zone marker Z")
+    ts = ts[:-1]
+    parts = ts.split(".")
+    ts = datetime.strptime(parts[0], "%Y-%m-%dT%H:%M:%S")
+    if len(parts[0]) > 6:
+        parts[0] = parts[0][:6]  # ensure we always parse microseconds
+    return ts + timedelta(microseconds=datetime.strptime(parts[1], "%f").microsecond)
 
 
 class Test(BaseTest):
