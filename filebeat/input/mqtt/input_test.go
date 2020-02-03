@@ -21,6 +21,7 @@ import (
 	"errors"
 	"sync"
 	"testing"
+	"time"
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/require"
@@ -74,7 +75,10 @@ func TestNewInput_Run(t *testing.T) {
 
 	eventsCh := make(chan beat.Event)
 	outlet := &mockedOutleter{
-		events: eventsCh,
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
 	}
 	connector := &mockedConnector{
 		outlet: outlet,
@@ -136,16 +140,23 @@ func TestNewInput_Run_Stop(t *testing.T) {
 		"qos":    2,
 	})
 
+	const numMessages = 5
+
+	var eventProcessing sync.WaitGroup
+	eventProcessing.Add(numMessages)
 	eventsCh := make(chan beat.Event)
 	outlet := &mockedOutleter{
-		events: eventsCh,
+		onEventHandler: func(event beat.Event) bool {
+			eventProcessing.Done()
+			eventsCh <- event
+			return true
+		},
 	}
 	connector := &mockedConnector{
 		outlet: outlet,
 	}
 	var inputContext finput.Context
 
-	const numMessages = 5
 	var messages []mockedMessage
 	for i := 0; i < numMessages; i++ {
 		messages = append(messages, mockedMessage{
@@ -153,8 +164,8 @@ func TestNewInput_Run_Stop(t *testing.T) {
 			messageID: 1,
 			qos:       2,
 			retained:  false,
-			topic:     "first",
-			payload:   []byte("first-message"),
+			topic:     "topic",
+			payload:   []byte("a-message"),
 		})
 	}
 
@@ -172,9 +183,12 @@ func TestNewInput_Run_Stop(t *testing.T) {
 	require.NotNil(t, input)
 
 	input.Run()
+	eventProcessing.Wait()
 
 	go func() {
-		for range eventsCh {}
+		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+		for range eventsCh {
+		}
 	}()
 
 	input.Stop()

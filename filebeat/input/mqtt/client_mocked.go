@@ -134,11 +134,13 @@ func (m *mockedClient) SubscribeMultiple(filters map[string]byte, callback libmq
 	}
 	m.onMessageHandler = callback
 
-	go func() {
-		for _, msg := range m.messages {
-			m.onMessageHandler(m, &msg)
-		}
-	}()
+	for _, msg := range m.messages {
+		var thatMsg = msg
+		go func() {
+			m.onMessageHandler(m, &thatMsg)
+		}()
+	}
+
 	return new(mockedToken)
 }
 
@@ -173,7 +175,7 @@ func (m *mockedConnector) ConnectWith(*common.Config, beat.ClientConfig) (channe
 }
 
 type mockedOutleter struct {
-	events chan<- beat.Event
+	onEventHandler func(event beat.Event) bool
 }
 
 var _ channel.Outleter = new(mockedOutleter)
@@ -187,6 +189,5 @@ func (m mockedOutleter) Done() <-chan struct{} {
 }
 
 func (m mockedOutleter) OnEvent(event beat.Event) bool {
-	m.events <- event
-	return true
+	return m.onEventHandler(event)
 }
