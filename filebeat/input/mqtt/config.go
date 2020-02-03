@@ -19,57 +19,34 @@ package mqtt
 
 import (
 	"errors"
-	"fmt"
-	"time"
+
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
 type mqttInputConfig struct {
-	Host           string        `config:"host"`
-	Topics         []string      `config:"topics"`
-	Username       string        `config:"user"`
-	Password       string        `config:"password"`
-	QoS            int           `config:"QoS"`
-	DecodePayload  bool          `config:"decode_payload"`
-	SSL            bool          `config:"ssl"`
-	CA             string        `config:"CA"`
-	ClientCert     string        `config:"clientCert"`
-	ClientKey      string        `config:"clientKey"`
-	ClientID       string        `config:"clientID"`
-	WaitClose      time.Duration `config:"wait_close" validate:"min=0"`
-	ConnectBackoff time.Duration `config:"connect_backoff" validate:"min=0"`
+	Hosts  []string `config:"hosts" validate:"required,min=1"`
+	Topics []string `config:"topics" validate:"nonzero,min=1"`
+	QoS    int      `config:"qos" validate:"nonzero,min=0,max=2"`
+
+	ClientID string `config:"clientID" validate:"nonzero"`
+	Username string `config:"user"`
+	Password string `config:"password"`
+
+	TLS *tlscommon.Config `config:"ssl"`
 }
 
-// The default config for the mqtt input
+// The default config for the mqtt input.
 func defaultConfig() mqttInputConfig {
 	return mqttInputConfig{
-		Host:           "localhost",
-		Topics:         []string{"#"},
-		ClientID:       "Filebeat",
-		Username:       "",
-		Password:       "",
-		DecodePayload:  true,
-		QoS:            0,
-		SSL:            false,
-		CA:             "",
-		ClientCert:     "",
-		ClientKey:      "",
-		WaitClose:      5 * time.Second,
-		ConnectBackoff: 30 * time.Second,
+		ClientID: "filebeat",
+		Topics:   []string{"#"},
 	}
 }
 
 // Validate validates the config.
-func (c *mqttInputConfig) Validate() error {
-	if c.Host == "" {
-		return errors.New("no host configured")
-	}
-
-	if c.Username != "" && c.Password == "" {
-		return fmt.Errorf("password must be set when username is configured")
-	}
-
-	if len(c.ClientID) > 23 || len(c.ClientID) < 1 {
-		return fmt.Errorf("client id must be between 1 and 23 characters long")
+func (mic *mqttInputConfig) Validate() error {
+	if len(mic.ClientID) < 1 || len(mic.ClientID) > 23 {
+		return errors.New("ClientID must be between 1 and 23 characters long")
 	}
 	return nil
 }

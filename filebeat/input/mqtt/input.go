@@ -18,7 +18,12 @@
 package mqtt
 
 import (
+	"strings"
 	"sync"
+	"time"
+
+	libmqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
@@ -26,11 +31,24 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/pkg/errors"
-
-	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
+
+const (
+	disconnectTimeout = 3 * 1000 // 3000 ms = 3 sec
+
+	subscribeTimeout       = 35 * time.Second // in client: subscribeWaitTimeout = 30s
+	subscribeRetryInterval = 1 * time.Second
+)
+
+// Input contains the input and its config
+type mqttInput struct {
+	once sync.Once
+
+	logger *logp.Logger
+
+	client           libmqtt.Client
+	inflightMessages *sync.WaitGroup
+}
 
 func init() {
 	err := input.Register("mqtt", NewInput)
@@ -39,24 +57,12 @@ func init() {
 	}
 }
 
-// Input contains the input and its config
-type mqttInput struct {
-	config        mqttInputConfig
-	context       input.Context
-	outlet        channel.Outleter
-	log           *logp.Logger
-	mqttWaitGroup sync.WaitGroup
-	runOnce       sync.Once
-	client        MQTT.Client
-}
-
-// NewInput creates a new mqtt input
+// NewInput method creates a new mqtt input,
 func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
-
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading mqtt input config")
@@ -66,65 +72,109 @@ func NewInput(
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
 		},
-		//		ACKEvents: func(events []interface{}) {
-		//			for _, event := range events {
-		//				if meta, ok := event.(eventMeta); ok {
-		//					meta.handler.ack(meta.message)
-		//				}
-		//			}
-		//		},
-		WaitClose: config.WaitClose,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	input := &mqttInput{
-		config:  config,
-		context: inputContext,
-		outlet:  out,
-		log:     logp.NewLogger("mqtt input").With("host", config.Host),
-	}
+	logger := logp.NewLogger("mqtt input").With("hosts", config.Hosts)
+	setupLibraryLogging()
 
-	err = input.setupMqttClient()
+	inflightMessages := new(sync.WaitGroup)
+	clientSubscriptions := createClientSubscriptions(config)
+	onMessageHandler := createOnMessageHandler(logger, out, inflightMessages)
+	onConnectHandler := createOnConnectHandler(logger, &inputContext, onMessageHandler, clientSubscriptions)
+	clientOptions, err := createClientOptions(config, onConnectHandler)
 	if err != nil {
 		return nil, err
 	}
 
-	return input, nil
+	return &mqttInput{
+		client:           libmqtt.NewClient(clientOptions),
+		inflightMessages: inflightMessages,
+		logger:           logp.NewLogger("mqtt input").With("hosts", config.Hosts),
+	}, nil
 }
 
-// Run starts the input by scanning for incoming messages and errors.
-func (input *mqttInput) Run() {
-	input.runOnce.Do(func() {
-		go func() {
+func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflightMessages *sync.WaitGroup) func(client libmqtt.Client, message libmqtt.Message) {
+	return func(client libmqtt.Client, message libmqtt.Message) {
+		inflightMessages.Add(1)
 
-			// If the consumer fails to connect, we use exponential backoff with
-			// jitter up to 8 * the initial backoff interval.
-			backoff := backoff.NewEqualJitterBackoff(
-				input.context.Done,
-				input.config.ConnectBackoff,
-				8*input.config.ConnectBackoff)
+		logger.Debugf("Received message on topic '%s', messageID: %d, size: %d", message.Topic(),
+			message.MessageID(), len(message.Payload()))
 
-			for !input.client.IsConnected() {
-				err := input.connect()
-				if err != nil {
-					logp.Error(err)
-					backoff.Wait()
+		mqttFields := common.MapStr{
+			"duplicate":  message.Duplicate(),
+			"message_id": message.MessageID(),
+			"qos":        message.Qos(),
+			"retained":   message.Retained(),
+			"topic":      message.Topic(),
+		}
+		outlet.OnEvent(beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"message": string(message.Payload()),
+				"mqtt":    mqttFields,
+			},
+		})
+
+		inflightMessages.Done()
+	}
+}
+
+func createOnConnectHandler(logger *logp.Logger, inputContext *input.Context, onMessageHandler func(client libmqtt.Client, message libmqtt.Message), clientSubscriptions map[string]byte) func(client libmqtt.Client) {
+	// The function subscribes the client to the specific topics (with retry backoff in case of failure).
+	return func(client libmqtt.Client) {
+		backoff := backoff.NewEqualJitterBackoff(
+			inputContext.Done,
+			subscribeRetryInterval,
+			8*subscribeRetryInterval)
+
+		var topics []string
+		for topic := range clientSubscriptions {
+			topics = append(topics, topic)
+		}
+
+		var success bool
+		for !success {
+			logger.Debugf("Try subscribe to topics: %v", strings.Join(topics, ", "))
+
+			token := client.SubscribeMultiple(clientSubscriptions, onMessageHandler)
+			if !token.WaitTimeout(subscribeTimeout) {
+				if token.Error() != nil {
+					logger.Warnf("Subscribing to topics failed due to error: %v", token.Error())
 				}
+
+				if !backoff.Wait() {
+					backoff.Reset()
+					success = true
+				}
+			} else {
+				backoff.Reset()
+				success = true
 			}
-			//All the rest is working asynchronously within the MQTT client
-		}()
+		}
+	}
+}
+
+// Run method starts the mqtt input and processing.
+// The mqtt client starts in auto-connect mode (with connection retries and resuming topic subscriptions).
+func (mi *mqttInput) Run() {
+	mi.once.Do(func() {
+		mi.logger.Debug("Run the input once.")
+		mi.client.Connect()
 	})
 }
 
-// Stop disconnects the MQTT client
-func (input *mqttInput) Stop() {
-	input.client.Disconnect(250)
+// Stop method stops the input.
+func (mi *mqttInput) Stop() {
+	mi.logger.Debug("Stop the input.")
+	mi.client.Disconnect(disconnectTimeout)
+	mi.Wait()
 }
 
-// Wait should shut down the input and wait for it to complete
-// The disconnect of the client will do this for us
-func (input *mqttInput) Wait() {
-	input.Stop()
+// Wait method waits until event processing is finished and stops the input.
+func (mi *mqttInput) Wait() {
+	mi.logger.Debug("Wait for the input to finish processing.")
+	mi.inflightMessages.Wait()
 }
