@@ -40,6 +40,8 @@ const (
 	subscribeRetryInterval = 1 * time.Second
 )
 
+var newMqttClient = libmqtt.NewClient
+
 // Input contains the input and its config
 type mqttInput struct {
 	once sync.Once
@@ -90,7 +92,7 @@ func NewInput(
 	}
 
 	return &mqttInput{
-		client:           libmqtt.NewClient(clientOptions),
+		client:           newMqttClient(clientOptions),
 		inflightMessages: inflightMessages,
 		logger:           logp.NewLogger("mqtt input").With("hosts", config.Hosts),
 	}, nil
