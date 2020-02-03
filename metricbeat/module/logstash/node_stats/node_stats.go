@@ -18,7 +18,7 @@
 package node_stats
 
 import (
-	"strings"
+	"sync"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -50,6 +50,7 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
+	initialized sync.Once
 }
 
 // New create a new instance of the MetricSet
@@ -60,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		ms,
+		MetricSet: ms,
 	}, nil
 }
 
@@ -68,7 +69,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	err := m.init()
+	var err error
+	m.initialized.Do(func() {
+		err = m.init()
+	})
 	if err != nil {
 		if m.XPack {
 			m.Logger().Error(err)
@@ -105,11 +109,7 @@ func (m *MetricSet) init() error {
 			return err
 		}
 
-		const verticesParam = "vertices=true"
-		currentURI := m.HTTP.GetURI()
-		if !strings.Contains(currentURI, verticesParam) {
-			m.HTTP.SetURI(currentURI + "?" + verticesParam)
-		}
+		m.HTTP.SetURI(m.HTTP.GetURI() + "?vertices=true")
 	}
 
 	return nil
