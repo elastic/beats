@@ -17,11 +17,11 @@ For example, this configuration:
 ------------------------------------------------------------------------------
 processors:
 - copy_fields:
-  fields:
-  - from: message
-    to: event.original
-  fail_on_error: false
-  ignore_missing: true
+    fields:
+    - from: message
+      to: event.original
+    fail_on_error: false
+    ignore_missing: true
 ------------------------------------------------------------------------------
 
 Copies the original `message` field to `event.original`:

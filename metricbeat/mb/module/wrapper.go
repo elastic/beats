@@ -78,30 +78,37 @@ type stats struct {
 	events   *monitoring.Int // Total events published.
 }
 
-// NewWrapper create a new Module and its associated MetricSets based
-// on the given configuration.
+// NewWrapper creates a new module and its associated metricsets based on the given configuration.
 func NewWrapper(config *common.Config, r *mb.Register, options ...Option) (*Wrapper, error) {
-	module, metricsets, err := mb.NewModule(config, r)
+	module, metricSets, err := mb.NewModule(config, r)
 	if err != nil {
 		return nil, err
 	}
+	return createWrapper(module, metricSets, options...)
+}
 
+// NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
+func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, options ...Option) (*Wrapper, error) {
+	return createWrapper(module, []mb.MetricSet{metricSet}, options...)
+}
+
+func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Option) (*Wrapper, error) {
 	wrapper := &Wrapper{
 		Module:     module,
-		metricSets: make([]*metricSetWrapper, len(metricsets)),
+		metricSets: make([]*metricSetWrapper, len(metricSets)),
 	}
+
 	for _, applyOption := range options {
 		applyOption(wrapper)
 	}
 
-	for i, ms := range metricsets {
+	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
-			MetricSet: ms,
+			MetricSet: metricSet,
 			module:    wrapper,
-			stats:     getMetricSetStats(wrapper.Name(), ms.Name()),
+			stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
 		}
 	}
-
 	return wrapper, nil
 }
 
