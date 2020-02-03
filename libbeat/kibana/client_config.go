@@ -36,6 +36,7 @@ type ClientConfig struct {
 	IgnoreVersion bool
 }
 
+// DefaultClientConfig connects to a locally running kibana over HTTP
 func DefaultClientConfig() *ClientConfig {
 	return &ClientConfig{
 		Protocol: "http",
