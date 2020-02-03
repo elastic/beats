@@ -100,7 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
-
+- Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 
 *Heartbeat*
 
@@ -127,7 +127,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
 - Add STAN dashboard {pull}15654[15654]
 - Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
+- Add citadel metricset for Istio Metricbeat module {pull}15990[15990]
 - Add support for processors in light modules. {issue}14740[14740] {pull}15923[15923]
+- Reuse connections in SQL module. {pull}16001[16001]
 
 *Packetbeat*
 
