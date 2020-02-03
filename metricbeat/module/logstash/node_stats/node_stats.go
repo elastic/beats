@@ -18,6 +18,8 @@
 package node_stats
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -103,7 +105,11 @@ func (m *MetricSet) init() error {
 			return err
 		}
 
-		m.HTTP.SetURI(m.HTTP.GetURI() + "?vertices=true")
+		const verticesParam = "vertices=true"
+		currentURI := m.HTTP.GetURI()
+		if !strings.Contains(currentURI, verticesParam) {
+			m.HTTP.SetURI(currentURI + "?" + verticesParam)
+		}
 	}
 
 	return nil
