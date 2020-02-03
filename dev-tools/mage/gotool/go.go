@@ -39,7 +39,7 @@ type ArgOpt func(args *Args)
 
 type goInstall func(opts ...ArgOpt) error
 
-// Install
+// Install runs `go install` and provides optionals for adding command line arguments.
 var Install goInstall = runGoInstall
 
 func runGoInstall(opts ...ArgOpt) error {
