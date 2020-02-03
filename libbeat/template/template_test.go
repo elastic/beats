@@ -106,11 +106,28 @@ func TestNumberOfRoutingShards(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	currentVersion := getVersion("7.0.0")
-	template := createTestTemplate(t, currentVersion, currentVersion, DefaultConfig())
-	template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
-	template.Assert("order", 1)
-	template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	currentVersion := getVersion("")
+
+	t.Run("for ES 6.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "6.4.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
+
+	t.Run("for ES 7.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "7.2.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
+
+	t.Run("for ES 8.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
 }
 
 func createTestTemplate(t *testing.T, beatVersion, esVersion string, config TemplateConfig) *testTemplate {
