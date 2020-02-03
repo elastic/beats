@@ -4,6 +4,7 @@
 - module: aws
   period: 1m
   metricsets:
+    - elb
     - usage
 - module: aws
   period: 5m
@@ -22,7 +23,6 @@
   metricsets:
     - ebs
     - ec2
-    - elb
     - sns
     - sqs
     - rds
