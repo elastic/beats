@@ -15,6 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// package translate_sid provides a Beat processor for converting Windows
+// Package translate_sid provides a Beat processor for converting Windows
 // security identifiers (SIDs) to account names.
 package translate_sid
