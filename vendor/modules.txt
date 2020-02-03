@@ -433,12 +433,12 @@ github.com/elastic/go-txfile/internal/vfs/osfs/osfstest
 github.com/elastic/go-txfile/pq
 github.com/elastic/go-txfile/txerr
 github.com/elastic/go-txfile/txfiletest
-# github.com/elastic/go-ucfg v0.7.0
+# github.com/elastic/go-ucfg v0.8.1
 github.com/elastic/go-ucfg
 github.com/elastic/go-ucfg/cfgutil
 github.com/elastic/go-ucfg/flag
-github.com/elastic/go-ucfg/internal/parse
 github.com/elastic/go-ucfg/json
+github.com/elastic/go-ucfg/parse
 github.com/elastic/go-ucfg/yaml
 # github.com/elastic/go-windows v1.0.1
 github.com/elastic/go-windows
