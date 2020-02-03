@@ -106,7 +106,7 @@ type Instance struct {
 type Discovery struct {
 	sync.Mutex
 
-	Logger *logp.Logger
+	log *logp.Logger
 
 	ProviderUUID uuid.UUID
 
@@ -123,8 +123,8 @@ func (d *Discovery) Start() {
 	d.instances = make(map[string]*Instance)
 	d.events = make(chan Event)
 	d.stop = make(chan struct{})
-	if d.Logger == nil {
-		d.Logger = logp.NewLogger("jolokia")
+	if d.log == nil {
+		d.log = logp.NewLogger("jolokia")
 	}
 	go d.run()
 }
@@ -203,7 +203,7 @@ var discoveryAddress = net.UDPAddr{IP: net.IPv4(239, 192, 48, 84), Port: 24884}
 var queryMessage = []byte(`{"type":"query"}`)
 
 func (d *Discovery) sendProbe(config InterfaceConfig) {
-	log := d.Logger
+	log := d.log
 
 	interfaces, err := d.interfaces(config.Name)
 	if err != nil {
@@ -273,7 +273,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 }
 
 func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
-	log := d.Logger
+	log := d.log
 
 	v, err := message.GetValue("agent.id")
 	if err != nil {
