@@ -7,7 +7,7 @@ beta[]
 -------------------------------------------------------------------------------
 processors:
 - add_observer_metadata:
-    netinfo.enabled: false
+    netinfo.enabled: true
     cache.ttl: 5m
     geo:
       name: nyc-dc1-rack1
