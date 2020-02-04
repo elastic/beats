@@ -68,7 +68,7 @@
           },
           {
             "embeddableConfig": {
-              "title": "Top 5 Estimated Billing Per Service Name"
+              "title": "Top 10 Estimated Billing Per Service Name"
             },
             "gridData": {
               "h": 15,
@@ -79,7 +79,7 @@
             },
             "panelIndex": "21e91e6b-0ff0-42ba-9132-6f30c5c6bbb7",
             "panelRefName": "panel_3",
-            "title": "Top 5 Estimated Billing Per Service Name",
+            "title": "Top 10 Estimated Billing Per Service Name",
             "version": "7.4.0"
           }
         ],
@@ -114,8 +114,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-02-03T23:51:15.840Z",
-      "version": "WzY3NDQsMV0="
+      "updated_at": "2020-02-04T15:57:47.353Z",
+      "version": "WzY3NjQsMV0="
     },
     {
       "attributes": {
@@ -406,7 +406,7 @@
             }
           }
         },
-        "title": "Top 5 Billing per Service Name [Metricbeat AWS]",
+        "title": "Top 10 Billing per Service Name [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -445,7 +445,7 @@
                   {
                     "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
-                    "type": "avg"
+                    "type": "sum"
                   }
                 ],
                 "override_index_pattern": 0,
@@ -459,7 +459,8 @@
                 "terms_field": "aws.dimensions.ServiceName",
                 "terms_include": "",
                 "terms_order_by": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
-                "terms_size": "5",
+                "terms_size": "10",
+                "type": "timeseries",
                 "value_template": "${{value}}"
               }
             ],
@@ -468,7 +469,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Top 5 Billing per Service Name [Metricbeat AWS]",
+          "title": "Top 10 Billing per Service Name [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -478,8 +479,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-30T15:07:10.443Z",
-      "version": "WzUxNjEsMV0="
+      "updated_at": "2020-02-04T13:56:47.812Z",
+      "version": "WzY3NjMsMV0="
     }
   ],
   "version": "7.4.0"
