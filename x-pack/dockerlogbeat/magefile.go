@@ -76,12 +76,6 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
 	}
 
-	// change back to the root beats dir so we can send the proper build context to docker
-	// err = os.Chdir("../..")
-	// if err != nil {
-	// 	return errors.Wrap(err, "error changing directory")
-	// }
-
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
@@ -102,8 +96,7 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	defer buildContext.Close()
 
 	buildOpts := types.ImageBuildOptions{
-		BuildArgs: map[string]*string{"versionString": &goVersion},
-		//Target:     "final",
+		BuildArgs:  map[string]*string{"versionString": &goVersion},
 		Tags:       []string{rootImageName},
 		Dockerfile: "Dockerfile",
 	}
@@ -128,14 +121,14 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	return nil
 }
 
-// Build builds docker rootfs container root
+// BuildContainer builds docker rootfs container root
 // There's a somewhat complicated process for this:
 // * Create a container to build the plugin itself
 // * Copy that to a bare-bones container that will become the runc container used by docker
 // * Export that container
 // * Unpack the tar from the exported container
 // * send this to the plugin create API endpoint
-func Build(ctx context.Context) error {
+func BuildContainer(ctx context.Context) error {
 	// setup
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -330,6 +323,11 @@ func CrossBuild() error {
 	return devtools.CrossBuild(devtools.ForPlatforms("linux/amd64"))
 }
 
+// Build builds the base container used by the docker plugin
+func Build() {
+	mg.SerialDeps(CrossBuild, BuildContainer)
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -343,12 +341,12 @@ func GolangCrossBuild() error {
 
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
-	mg.SerialDeps(CrossBuild, Build, Export)
+	mg.SerialDeps(Build, Export)
 }
 
 // BuildAndInstall builds and installs the plugin
 func BuildAndInstall() {
-	mg.SerialDeps(CrossBuild, Build, Install)
+	mg.SerialDeps(Build, Install)
 }
 
 // IntegTest is currently a dummy test for the `testsuite` target
