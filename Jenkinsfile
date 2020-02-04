@@ -36,22 +36,7 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         dir("${BASE_DIR}"){
-          script {
-            env.GO_VERSION = readFile(".go-version").trim()
-            env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
-            env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
-            env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
-            env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
-            env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
-            env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
-            env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
-            env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
-            env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
-            env.BUILD_GENERATOR = isChanged(["^generator/.*"])
-            env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-            env.BUILD_DOCS = isGitRegionMatch(patterns: ["^docs/.*"], comparator: 'regexp') || params.runAllStages
-            env.BUILD_LIBBEAT = isGitRegionMatch(patterns: ["^libbeat/.*","^x-pack/filebeat./*"], comparator: 'regexp') || params.runAllStages
-          }
+          loadConfigEnvVars()
         }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
@@ -84,7 +69,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false"
+              return env.BUILD_FILEBEAT_XPACK != "false"
             }
           }
           steps {
@@ -155,7 +140,7 @@ pipeline {
             }
           }
         }
-        stage('Auditbeat'){
+        stage('Auditbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -165,7 +150,7 @@ pipeline {
             }
           }
           stages {
-            stage('Auditbeat oss'){
+            stage('Auditbeat Linux'){
               steps {
                 makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
               }
@@ -173,11 +158,6 @@ pipeline {
             stage('Auditbeat crosscompile'){
               steps {
                 makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
-              }
-            }
-            stage('Auditbeat x-pack'){
-              steps {
-                makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
               }
             }
             stage('Auditbeat Mac OS X'){
@@ -201,6 +181,19 @@ pipeline {
                 //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
               }
             }
+          }
+        }
+        stage('Auditbeat x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
           }
         }
         stage('Libbeat'){
@@ -228,11 +221,19 @@ pipeline {
                 makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
               }
             }
-            stage('Libbeat x-pack'){
-              steps {
-                makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
-              }
+          }
+        }
+        stage('Libbeat x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_LIBBEAT_XPACK != "false"
             }
+          }
+          steps {
+            makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
         stage('Metricbeat Unit tests'){
@@ -274,13 +275,13 @@ pipeline {
             makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
           }
         }
-        stage('Metricbeat oss'){
+        stage('Metricbeat x-pack'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false"
+              return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
           steps {
@@ -350,7 +351,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_DOCKERLOGBEAT != "false"
+              return env.BUILD_DOCKERLOGBEAT_XPACK != "false"
             }
           }
           stages {
@@ -397,7 +398,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FUNCTIONBEAT != "false"
+              return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
           stages {
@@ -627,4 +628,72 @@ def isChanged(patterns){
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
     || isGitRegionMatch(patterns: ["^libbeat/.*"], comparator: 'regexp')
   )
+}
+
+def loadConfigEnvVars(){
+  env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
+  env.BUILD_AUDITBEAT_XPACK = isChanged([
+    "^auditbeat/.*",
+    "^x-pack/auditbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChanged([
+    "^x-pack/dockerlogbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_DOCS = isGitRegionMatch(
+    patterns: ["^docs/.*"],
+    comparator: 'regexp'
+  ) || params.runAllStages
+  env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
+  env.BUILD_FILEBEAT_XPACK = isChanged([
+    "^filebeat/.*",
+    "^x-pack/filebeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_FUNCTIONBEAT_XPACK = isChanged([
+    "^x-pack/functionbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
+  env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
+  env.BUILD_HEARTBEAT_XPACK = isChanged([
+    "^heartbeat/.*",
+    "^x-pack/heartbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
+  env.BUILD_JOURNALBEAT_XPACK = isChanged([
+    "^journalbeat/.*",
+    "^x-pack/journalbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+  env.BUILD_LIBBEAT = isGitRegionMatch(
+    patterns: ["^libbeat/.*"],
+    comparator: 'regexp'
+  ) || params.runAllStages
+  env.BUILD_LIBBEAT_XPACK = isChanged([
+    "^libbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = isChanged([
+    "^metricbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/metricbeat/.*",
+  ])
+  env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
+  env.BUILD_PACKETBEAT_XPACK = isChanged([
+    "^packetbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/packetbeat/.*",
+  ])
+  env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+  env.BUILD_WINLOGBEAT_XPACK = isChanged([
+    "^winlogbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/winlogbeat/.*",
+  ])
+  env.GO_VERSION = readFile(".go-version").trim()
 }
