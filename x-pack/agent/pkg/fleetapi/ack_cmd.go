@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
-const ackPath = "/api/fleet/agents/%s/acks"
+const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
 
 // AckRequest consists of multiple actions acked to fleet ui.
 // POST /agents/{agentId}/acks

@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 )
 
-const checkingPath = "/api/fleet/agents/%s/checkin"
+const checkingPath = "/api/ingest_manager/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
