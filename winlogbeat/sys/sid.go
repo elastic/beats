@@ -74,6 +74,8 @@ var sidTypeToString = map[SIDType]string{
 func (st SIDType) String() string {
 	if typ, found := sidTypeToString[st]; found {
 		return typ
+	} else if st > 0 {
+		return strconv.FormatUint(uint64(st), 10)
 	}
-	return strconv.FormatUint(uint64(st), 10)
+	return ""
 }
