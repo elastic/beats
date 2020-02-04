@@ -26,7 +26,7 @@ func TestAck(t *testing.T) {
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/acks", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/acks", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 

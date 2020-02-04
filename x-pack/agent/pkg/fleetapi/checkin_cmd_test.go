@@ -30,7 +30,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, raw)
@@ -81,7 +81,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -143,7 +143,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -181,7 +181,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -210,7 +210,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				type Request struct {
 					Metadata map[string]interface{} `json:"local_metadata"`
@@ -260,7 +260,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				req := make(map[string]interface{})
 

@@ -47,7 +47,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
@@ -99,7 +99,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll with TLS and save access api key in the store", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
@@ -159,7 +159,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll without TLS and save access api key in the store", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
@@ -217,7 +217,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("fail to enroll without TLS", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`
 {

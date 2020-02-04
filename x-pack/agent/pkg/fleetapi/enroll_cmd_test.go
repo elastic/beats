@@ -21,7 +21,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("Successful enroll", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 
@@ -96,7 +96,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("Raise back any server errors", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(`{"statusCode": 500, "error":"Something is really bad here"}`))
