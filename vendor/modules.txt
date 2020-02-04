@@ -266,8 +266,8 @@ github.com/bsm/sarama-cluster
 # github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
 github.com/cavaliercoder/go-rpm
 github.com/cavaliercoder/go-rpm/version
-# github.com/cespare/xxhash v1.1.0
-github.com/cespare/xxhash
+# github.com/cespare/xxhash/v2 v2.1.1
+github.com/cespare/xxhash/v2
 # github.com/containerd/containerd v1.3.0
 github.com/containerd/containerd/errdefs
 # github.com/containerd/continuity v0.0.0-20200107194136-26c1120b8d41
@@ -279,10 +279,12 @@ github.com/containerd/continuity/sysx
 github.com/containerd/fifo
 # github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
 github.com/coreos/bbolt
-# github.com/coreos/go-systemd v0.0.0-20190620071333-e64a0ec8b42a
+# github.com/coreos/go-systemd v0.0.0-00010101000000-000000000000 => github.com/coreos/go-systemd/v22 v22.0.0
 github.com/coreos/go-systemd/activation
-github.com/coreos/go-systemd/dbus
-github.com/coreos/go-systemd/sdjournal
+# github.com/coreos/go-systemd/v22 v22.0.0
+github.com/coreos/go-systemd/v22/dbus
+github.com/coreos/go-systemd/v22/internal/dlopen
+github.com/coreos/go-systemd/v22/sdjournal
 # github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
 github.com/coreos/pkg/dlopen
 # github.com/davecgh/go-spew v1.1.1
@@ -470,8 +472,8 @@ github.com/go-sourcemap/sourcemap/internal/base64vlq
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
-# github.com/godbus/dbus v4.1.0+incompatible
-github.com/godbus/dbus
+# github.com/godbus/dbus/v5 v5.0.3
+github.com/godbus/dbus/v5
 # github.com/godror/godror v0.10.4
 github.com/godror/godror
 # github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b

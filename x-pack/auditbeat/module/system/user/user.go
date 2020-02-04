@@ -18,7 +18,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cespare/xxhash"
+	xxhash "github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"

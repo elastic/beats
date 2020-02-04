@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cespare/xxhash"
+	xxhash "github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 

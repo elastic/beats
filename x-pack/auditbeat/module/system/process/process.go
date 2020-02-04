@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cespare/xxhash"
+	xxhash "github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 

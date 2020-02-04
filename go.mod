@@ -24,16 +24,17 @@ require (
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
 	github.com/awslabs/goformation/v4 v4.1.0
+	github.com/biogo/ragel v0.0.0-20150921014543-a540c87b28a1 // indirect
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
 	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
 	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
-	github.com/cespare/xxhash v1.1.0
+	github.com/cespare/xxhash/v2 v2.1.1
 	github.com/containerd/containerd v1.3.0 // indirect
 	github.com/containerd/continuity v0.0.0-20200107194136-26c1120b8d41 // indirect
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
-	github.com/coreos/go-systemd v0.0.0-20190620071333-e64a0ec8b42a
+	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f
@@ -70,7 +71,6 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
-	github.com/godbus/dbus v4.1.0+incompatible // indirect
 	github.com/godror/godror v0.10.4
 	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
 	github.com/gofrs/uuid v3.2.0+incompatible
@@ -129,7 +129,7 @@ require (
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
 	go.uber.org/zap v1.7.1
-	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413
+	golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
