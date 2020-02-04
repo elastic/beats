@@ -1,5 +1,0 @@
-#include "label/index.c"
-#include "label/node.c"
-#include "label/rectangle.c"
-#include "label/split.q.c"
-#include "label/xlabels.c"

@@ -1,7 +1,0 @@
-#include "ortho/fPQ.c"
-#include "ortho/maze.c"
-#include "ortho/ortho.c"
-#include "ortho/partition.c"
-#include "ortho/rawgraph.c"
-#include "ortho/sgraph.c"
-#include "ortho/trapezoid.c"

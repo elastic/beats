@@ -259,8 +259,6 @@ github.com/awslabs/goformation/v4/cloudformation/workspaces
 github.com/awslabs/goformation/v4/intrinsics
 # github.com/beorn7/perks v1.0.1
 github.com/beorn7/perks/quantile
-# github.com/biogo/ragel v0.0.0-20150921014543-a540c87b28a1
-github.com/biogo/ragel
 # github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 github.com/blakesmith/ar
 # github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
@@ -455,8 +453,6 @@ github.com/elastic/gosigar/sys/linux
 github.com/elastic/gosigar/sys/windows
 # github.com/fatih/color v1.5.0
 github.com/fatih/color
-# github.com/fogleman/gg v1.3.0
-github.com/fogleman/gg
 # github.com/fsnotify/fsevents v0.0.0-00010101000000-000000000000 => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 github.com/fsnotify/fsevents
 # github.com/fsnotify/fsnotify v1.4.7 => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
@@ -474,12 +470,6 @@ github.com/go-sourcemap/sourcemap/internal/base64vlq
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
-# github.com/goccy/go-graphviz v0.0.0-20200203131343-2684d8702f4d
-github.com/goccy/go-graphviz
-github.com/goccy/go-graphviz/cdt
-github.com/goccy/go-graphviz/cgraph
-github.com/goccy/go-graphviz/gvc
-github.com/goccy/go-graphviz/internal/ccall
 # github.com/godbus/dbus v4.1.0+incompatible
 github.com/godbus/dbus
 # github.com/godror/godror v0.10.4
@@ -491,9 +481,6 @@ github.com/gofrs/uuid
 # github.com/gogo/protobuf v1.2.2-0.20190818160850-4c00d2f19fb9
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
-# github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-github.com/golang/freetype/raster
-github.com/golang/freetype/truetype
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go
@@ -757,13 +744,6 @@ golang.org/x/crypto/ssh/terminal
 # golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136
 golang.org/x/exp/apidiff
 golang.org/x/exp/cmd/apidiff
-# golang.org/x/image v0.0.0-20200119044424-58c23975cae1
-golang.org/x/image/draw
-golang.org/x/image/font
-golang.org/x/image/font/basicfont
-golang.org/x/image/font/gofont/gobold
-golang.org/x/image/math/f64
-golang.org/x/image/math/fixed
 # golang.org/x/lint v0.0.0-20190930215403-16217165b5de
 golang.org/x/lint
 golang.org/x/lint/golint

@@ -13,7 +13,7 @@ import (
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G1 cef.rl -o parser.go
-//go:generate imports -l -w parser.go
+//go:generate goimports -l -w parser.go
 
 // An SVG rendering of the state machine can be viewed by opening cef.svg in
 // Chrome / Firefox.
