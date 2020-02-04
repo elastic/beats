@@ -23,6 +23,7 @@ package tools
 
 import (
 	_ "github.com/biogo/ragel"
+	_ "github.com/goccy/go-graphviz"
 	_ "github.com/magefile/mage"
 	_ "github.com/pierrre/gotestcover"
 	_ "github.com/tsg/go-daemon"
