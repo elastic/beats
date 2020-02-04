@@ -19,6 +19,7 @@ package outil
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -188,11 +189,14 @@ func EmptySelectorExpr() SelectorExpr {
 }
 
 func ConstSelectorExpr(s string) SelectorExpr {
-	return &constSelector{s}
+	if s == "" {
+		return nilSelector
+	}
+	return &constSelector{strings.ToLower(s)}
 }
 
 func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) SelectorExpr {
-	return &fmtSelector{*fmt, fallback}
+	return &fmtSelector{*fmt, strings.ToLower(fallback)}
 }
 
 func ConcatSelectorExpr(s ...SelectorExpr) SelectorExpr {
@@ -207,11 +211,36 @@ func ConditionalSelectorExpr(
 }
 
 func LookupSelectorExpr(
-	s SelectorExpr,
+	evtfmt *fmtstr.EventFormatString,
 	table map[string]string,
 	fallback string,
-) SelectorExpr {
-	return &mapSelector{s, fallback, table}
+) (SelectorExpr, error) {
+	if evtfmt.IsConst() {
+		str, err := evtfmt.Run(nil)
+		if err != nil {
+			return nil, err
+		}
+
+		str = table[strings.ToLower(str)]
+		if str == "" {
+			str = fallback
+		}
+		return ConstSelectorExpr(str), nil
+	}
+
+	return &mapSelector{
+		from:      FmtSelectorExpr(evtfmt, ""),
+		to:        table,
+		otherwise: fallback,
+	}, nil
+}
+
+func lowercaseTable(table map[string]string) map[string]string {
+	tmp := make(map[string]string, len(table))
+	for k, v := range table {
+		tmp[strings.ToLower(k)] = strings.ToLower(v)
+	}
+	return tmp
 }
 
 func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
@@ -239,7 +268,7 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 		if err != nil {
 			return nil, err
 		}
-		otherwise = tmp
+		otherwise = strings.ToLower(tmp)
 	}
 
 	// 3. extract optional `mapping`
@@ -276,28 +305,10 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	// 5. build selector from available fields
 	var sel SelectorExpr
 	if len(mapping.Table) > 0 {
-		if evtfmt.IsConst() {
-			str, err := evtfmt.Run(nil)
-			if err != nil {
-				return nil, err
-			}
-
-			str = mapping.Table[str]
-			if str == "" {
-				str = otherwise
-			}
-
-			if str == "" {
-				sel = nilSelector
-			} else {
-				sel = ConstSelectorExpr(str)
-			}
-		} else {
-			sel = &mapSelector{
-				from:      FmtSelectorExpr(evtfmt, ""),
-				to:        mapping.Table,
-				otherwise: otherwise,
-			}
+		var err error
+		sel, err = LookupSelectorExpr(evtfmt, lowercaseTable(mapping.Table), otherwise)
+		if err != nil {
+			return nil, err
 		}
 	} else {
 		if evtfmt.IsConst() {
@@ -305,16 +316,12 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 			if err != nil {
 				return nil, err
 			}
-
-			if str == "" {
-				sel = nilSelector
-			} else {
-				sel = ConstSelectorExpr(str)
-			}
+			sel = ConstSelectorExpr(str)
 		} else {
 			sel = FmtSelectorExpr(evtfmt, otherwise)
 		}
 	}
+
 	if cond != nil && sel != nilSelector {
 		sel = ConditionalSelectorExpr(sel, cond)
 	}
@@ -363,7 +370,7 @@ func (s *fmtSelector) sel(evt *beat.Event) (string, error) {
 	if n == "" {
 		return s.otherwise, nil
 	}
-	return n, nil
+	return strings.ToLower(n), nil
 }
 
 func (s *mapSelector) sel(evt *beat.Event) (string, error) {
