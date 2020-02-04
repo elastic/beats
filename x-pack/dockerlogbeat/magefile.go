@@ -114,11 +114,11 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	}
 	defer buildResp.Body.Close()
 	// This blocks until the build operation completes
-	_, errBufRead := ioutil.ReadAll(buildResp.Body)
+	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return errors.Wrap(err, "error reading from docker output")
 	}
-
+	fmt.Printf("%s\n", string(buildStr))
 	// move back to the x-pack dir
 	err = os.Chdir(dockerLogBeatDir)
 	if err != nil {
