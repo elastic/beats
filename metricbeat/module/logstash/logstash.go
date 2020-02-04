@@ -181,6 +181,27 @@ func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
 	return nil
 }
 
+// GetVertexClusterUUID returns the correct cluster UUID value for the given Elasticsearch
+// vertex from a Logstash pipeline. If the vertex has no cluster UUID associated with it,
+// the given override cluster UUID is returned.
+func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
+	c, ok := vertex["cluster_uuid"]
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	if clusterUUID == "" {
+		return overrideClusterUUID
+	}
+
+	return clusterUUID
+}
+
 func (m *MetricSet) getVersion() (*common.Version, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
@@ -212,22 +233,4 @@ func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, erro
 	// Http helper includes the HostData with username and password
 	httpHelper.SetURI(u.String())
 	return httpHelper.FetchContent()
-}
-
-func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
-	c, ok := vertex["cluster_uuid"]
-	if !ok {
-		return overrideClusterUUID
-	}
-
-	clusterUUID, ok := c.(string)
-	if !ok {
-		return overrideClusterUUID
-	}
-
-	if clusterUUID == "" {
-		return overrideClusterUUID
-	}
-
-	return clusterUUID
 }
