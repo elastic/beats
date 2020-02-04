@@ -40,12 +40,12 @@
             },
             "gridData": {
               "h": 16,
-              "i": "632595ea-b8bb-401d-9d69-a21e009cb07c",
+              "i": "26670498-b079-4447-bbc8-e4ca8215898c",
               "w": 32,
               "x": 16,
               "y": 0
             },
-            "panelIndex": "632595ea-b8bb-401d-9d69-a21e009cb07c",
+            "panelIndex": "26670498-b079-4447-bbc8-e4ca8215898c",
             "panelRefName": "panel_1",
             "title": "Estimated Billing Chart",
             "version": "7.4.0"
@@ -98,7 +98,7 @@
           "type": "visualization"
         },
         {
-          "id": "35934980-4122-11ea-93eb-13c5950b2c9e",
+          "id": "749cd470-1530-11ea-841c-01bf20a6c8ba",
           "name": "panel_1",
           "type": "visualization"
         },
@@ -114,8 +114,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-01-27T20:51:32.061Z",
-      "version": "WzM4NjAsMV0="
+      "updated_at": "2020-02-03T23:51:15.840Z",
+      "version": "WzY3NDQsMV0="
     },
     {
       "attributes": {
@@ -172,8 +172,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T19:32:04.671Z",
-      "version": "WzMzODUsMV0="
+      "updated_at": "2020-01-27T21:33:20.219Z",
+      "version": "WzQ2OTAsMV0="
     },
     {
       "attributes": {
@@ -189,7 +189,18 @@
           }
         },
         "title": "Estimated Billing Pie Chart [Metricbeat AWS]",
-        "uiStateJSON": {},
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "16": "#629E51",
+              "272": "#DEDAF7",
+              "80": "#E24D42",
+              "running": "#7EB26D",
+              "stopped": "#E24D42"
+            },
+            "legendOpen": true
+          }
+        },
         "version": 1,
         "visState": {
           "aggs": [
@@ -197,6 +208,7 @@
               "enabled": true,
               "id": "1",
               "params": {
+                "customLabel": "",
                 "field": "aws.billing.metrics.EstimatedCharges.max"
               },
               "schema": "metric",
@@ -206,11 +218,21 @@
               "enabled": true,
               "id": "2",
               "params": {
+                "customLabel": "",
                 "field": "aws.dimensions.ServiceName",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
-                "orderBy": "1",
+                "orderAgg": {
+                  "enabled": true,
+                  "id": "2-orderAgg",
+                  "params": {
+                    "field": "aws.billing.metrics.EstimatedCharges.max"
+                  },
+                  "schema": "orderAgg",
+                  "type": "avg"
+                },
+                "orderBy": "custom",
                 "otherBucket": true,
                 "otherBucketLabel": "Other",
                 "size": 10
@@ -261,7 +283,7 @@
           "type": "pie"
         }
       },
-      "id": "35934980-4122-11ea-93eb-13c5950b2c9e",
+      "id": "749cd470-1530-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
@@ -273,8 +295,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T19:31:53.402Z",
-      "version": "WzMyNzUsMV0="
+      "updated_at": "2020-01-27T21:33:08.924Z",
+      "version": "WzQ1ODAsMV0="
     },
     {
       "attributes": {
@@ -340,7 +362,7 @@
                   {
                     "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
+                    "type": "sum"
                   }
                 ],
                 "override_index_pattern": 0,
@@ -357,7 +379,6 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "time_range_mode": "last_value",
             "type": "metric"
           },
           "title": "Total Estimated Charges [Metricbeat AWS]",
@@ -370,8 +391,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-27T20:51:25.785Z",
-      "version": "WzM4NTksMV0="
+      "updated_at": "2020-02-03T23:52:07.805Z",
+      "version": "WzY3NDUsMV0="
     },
     {
       "attributes": {
@@ -395,7 +416,7 @@
             "axis_min": 0,
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": {
@@ -427,8 +448,10 @@
                     "type": "avg"
                   }
                 ],
+                "override_index_pattern": 0,
                 "point_size": "4",
                 "separate_axis": 0,
+                "series_drop_last_bucket": 0,
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
@@ -455,8 +478,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-27T19:31:53.402Z",
-      "version": "WzMyNzcsMV0="
+      "updated_at": "2020-01-30T15:07:10.443Z",
+      "version": "WzUxNjEsMV0="
     }
   ],
   "version": "7.4.0"
