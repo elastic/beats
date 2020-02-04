@@ -157,17 +157,13 @@ func BuildSelectorFromConfig(
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
 
-		if fmtstr.IsConst() {
-			str, err := fmtstr.Run(nil)
-			if err != nil {
-				return Selector{}, err
-			}
+		fmtsel, err := fmtSelectorExpr(fmtstr, "")
+		if err != nil {
+			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
+		}
 
-			if str != "" {
-				sel = append(sel, constSelectorExpr(str))
-			}
-		} else {
-			sel = append(sel, fmtSelectorExpr(fmtstr, ""))
+		if fmtsel != nilSelector {
+			sel = append(sel, fmtsel)
 		}
 	}
 
@@ -195,8 +191,19 @@ func constSelectorExpr(s string) selectorExpr {
 	return &constSelector{strings.ToLower(s)}
 }
 
-func fmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) selectorExpr {
-	return &fmtSelector{*fmt, strings.ToLower(fallback)}
+func fmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (selectorExpr, error) {
+	if fmt.IsConst() {
+		str, err := fmt.Run(nil)
+		if err != nil {
+			return nil, err
+		}
+		if str == "" {
+			str = fallback
+		}
+		return constSelectorExpr(str), nil
+	}
+
+	return &fmtSelector{*fmt, strings.ToLower(fallback)}, nil
 }
 
 func concatSelectorExpr(s ...selectorExpr) selectorExpr {
@@ -229,7 +236,7 @@ func lookupSelectorExpr(
 	}
 
 	return &mapSelector{
-		from:      fmtSelectorExpr(evtfmt, ""),
+		from:      &fmtSelector{f: *evtfmt},
 		to:        table,
 		otherwise: fallback,
 	}, nil
@@ -305,21 +312,12 @@ func buildSingle(cfg *common.Config, key string) (selectorExpr, error) {
 	// 5. build selector from available fields
 	var sel selectorExpr
 	if len(mapping.Table) > 0 {
-		var err error
 		sel, err = lookupSelectorExpr(evtfmt, lowercaseTable(mapping.Table), otherwise)
-		if err != nil {
-			return nil, err
-		}
 	} else {
-		if evtfmt.IsConst() {
-			str, err := evtfmt.Run(nil)
-			if err != nil {
-				return nil, err
-			}
-			sel = constSelectorExpr(str)
-		} else {
-			sel = fmtSelectorExpr(evtfmt, otherwise)
-		}
+		sel, err = fmtSelectorExpr(evtfmt, otherwise)
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	if cond != nil && sel != nilSelector {
