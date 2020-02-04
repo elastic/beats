@@ -23,7 +23,7 @@
       ]
     },
     {
-      "description": "libbeat env hack",
+      "description": "Remove strict config file checking, as there is no config file",
       "name": "BEAT_STRICT_PERMS",
       "value": "false"
     },

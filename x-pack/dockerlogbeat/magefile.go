@@ -112,11 +112,6 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 		return errors.Wrap(err, "error reading from docker output")
 	}
 	fmt.Printf("%s\n", string(buildStr))
-	// move back to the x-pack dir
-	err = os.Chdir(dockerLogBeatDir)
-	if err != nil {
-		return errors.Wrap(err, "error returning to dockerlogbeat dir")
-	}
 
 	return nil
 }
@@ -335,7 +330,7 @@ func GolangCrossBuild() error {
 	buildArgs := devtools.DefaultBuildArgs()
 	buildArgs.CGO = false
 	buildArgs.Static = true
-	buildArgs.OutputDir = "build"
+	buildArgs.OutputDir = "build/plugin"
 	return devtools.GolangCrossBuild(buildArgs)
 }
 
