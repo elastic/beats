@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
 - Change lookup_fields from metricset.host to service.address {pull}15883[15883]
 - Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
 
 *Packetbeat*
 
