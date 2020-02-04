@@ -49,5 +49,6 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/stan/subscriptions"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd/server"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/tikv"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/tomcat"
 )

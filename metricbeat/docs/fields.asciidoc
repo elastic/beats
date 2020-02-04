@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-stan>>
 * <<exported-fields-statsd>>
 * <<exported-fields-system>>
+* <<exported-fields-tikv>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -35868,6 +35869,14 @@ type: long
 format: duration
 
 --
+
+[[exported-fields-tikv]]
+== tikv fields
+
+tikv module
+
+
+
 
 [[exported-fields-tomcat]]
 == Tomcat fields

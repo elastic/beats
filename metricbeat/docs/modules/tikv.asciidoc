@@ -1,0 +1,56 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-tikv]]
+[role="xpack"]
+== tikv module
+
+beta[]
+
+This module periodically fetches metrics from tikv.
+
+[float]
+=== Compatibility
+
+The tikv `pd` metricset is compatible with any tikv version
+exposing metrics in Prometheus format.
+
+
+[float]
+=== Example configuration
+
+The tikv module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: tikv
+  metricsets: ['pd']
+  period: 10s
+  hosts: ['localhost:2379']
+
+- module: tikv
+  metricsets: ['server']
+  period: 10s
+  hosts: ['localhost:20160']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  #metrics_path: /_status/vars
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-tikv-pd,pd>>
+
+* <<metricbeat-metricset-tikv-server,server>>
+
+include::tikv/pd.asciidoc[]
+
+include::tikv/server.asciidoc[]
+

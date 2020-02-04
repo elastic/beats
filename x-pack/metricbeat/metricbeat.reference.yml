@@ -977,6 +977,21 @@ metricbeat.modules:
   enabled: false
   #ttl: "30s"
 
+#--------------------------------- Tikv Module ---------------------------------
+- module: tikv
+  metricsets: ['pd']
+  period: 10s
+  hosts: ['localhost:2379']
+
+- module: tikv
+  metricsets: ['server']
+  period: 10s
+  hosts: ['localhost:20160']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  #metrics_path: /_status/vars
+
 #-------------------------------- Tomcat Module --------------------------------
 - module: tomcat
   metricsets: ['threading', 'cache', 'memory', 'requests']

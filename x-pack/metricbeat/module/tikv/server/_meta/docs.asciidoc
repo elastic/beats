@@ -1,0 +1,16 @@
+The tikv `server` metricset collects metrics exposed by the
+https://tikv.org/docs/3.0/tasks/monitor/tikv-cluster/[Prometheus endpoint]
+of tikv.
+
+WARNING: This metricset collects a large number of metrics, what can
+significantly impact disk usage. Processors can be used to drop unused metrics
+before they are stored. For example the following configuration will drop all
+histogram buckets:
+[source,yaml]
+------------------------------------------------------------------------------
+- module: tikv
+  metricsets: ['server']
+  hosts: ['${data.host}:20160']
+  processors:
+    - drop_event.when.has_fields: ['prometheus.labels.le']
+------------------------------------------------------------------------------

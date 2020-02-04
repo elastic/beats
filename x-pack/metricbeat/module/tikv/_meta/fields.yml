@@ -1,0 +1,10 @@
+- key: tikv
+  title: 'tikv'
+  release: beta
+  description: >
+    tikv module
+  settings: ["pd", "server"]
+  fields:
+    - name: tikv
+      type: group
+      fields:
