@@ -456,6 +456,24 @@
 			"revisionTime": "2017-06-12T17:41:08Z"
 		},
 		{
+			"checksumSHA1": "Y71DWZxVHxm5RKQDF2807roHrv4=",
+			"path": "github.com/akavel/rsrc/binutil",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
+		},
+		{
+			"checksumSHA1": "dY6sByHSXr76sRhg42HvGqYhU5I=",
+			"path": "github.com/akavel/rsrc/coff",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
+		},
+		{
+			"checksumSHA1": "8FHKm/Sc+zlYExn/UkdoG0Mk2cw=",
+			"path": "github.com/akavel/rsrc/ico",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
+		},
+		{
 			"checksumSHA1": "QZeGe47LzTo4drKys2X2DNGtPFA=",
 			"path": "github.com/andrewkroh/sys/windows/svc/eventlog",
 			"revision": "287798fe3e430efeb9318b95ff52353aaa2b59b1",
@@ -3936,6 +3954,12 @@
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
 			"revisionTime": "2014-01-24T17:37:10Z"
+		},
+		{
+			"checksumSHA1": "6oDcHNyION8grmQpUBnUnk+G6YA=",
+			"path": "github.com/josephspurrier/goversioninfo",
+			"revision": "63e6d1acd3dd857ec6b8c54fbf52e10ce24a8786",
+			"revisionTime": "2019-02-09T21:06:21Z"
 		},
 		{
 			"checksumSHA1": "eH5fWNpm9ZUA195fLBNe7gyUU9k=",
