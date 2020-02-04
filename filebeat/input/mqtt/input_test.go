@@ -29,6 +29,7 @@ import (
 	finput "github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -107,6 +108,9 @@ func TestNewInput_Run(t *testing.T) {
 		client = &mockedClient{
 			onConnectHandler: o.OnConnect,
 			messages:         []mockedMessage{firstMessage, secondMessage},
+			tokens: []libmqtt.Token{&mockedToken{
+				timeout: true,
+			}},
 		}
 		return client
 	}
@@ -174,6 +178,9 @@ func TestNewInput_Run_Stop(t *testing.T) {
 		client = &mockedClient{
 			onConnectHandler: o.OnConnect,
 			messages:         messages,
+			tokens: []libmqtt.Token{&mockedToken{
+				timeout: true,
+			}},
 		}
 		return client
 	}
@@ -241,6 +248,74 @@ func TestWait(t *testing.T) {
 	}
 
 	input.Wait()
+}
+
+func TestOnCreateHandler_SubscribeMultiple_Succeeded(t *testing.T) {
+	inputContext := new(finput.Context)
+	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
+	var clientSubscriptions map[string]byte
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
+
+	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
+	}
+
+	client := &mockedClient{
+		tokens: []libmqtt.Token{&mockedToken{
+			timeout: true,
+		}},
+	}
+	handler(client)
+
+	require.Equal(t, 1, client.subscribeMultipleCount)
+}
+
+func TestOnCreateHandler_SubscribeMultiple_BackoffSucceeded(t *testing.T) {
+	inputContext := new(finput.Context)
+	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
+	var clientSubscriptions map[string]byte
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
+
+	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
+	}
+
+	client := &mockedClient{
+		tokens: []libmqtt.Token{&mockedToken{
+			timeout: false,
+		}, &mockedToken{
+			timeout: true,
+		}},
+	}
+	handler(client)
+
+	require.Equal(t, 2, client.subscribeMultipleCount)
+}
+
+func TestOnCreateHandler_SubscribeMultiple_BackoffSignalDone(t *testing.T) {
+	inputContext := new(finput.Context)
+	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
+	var clientSubscriptions map[string]byte
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
+
+	mockedBackoff := &mockedBackoff{
+		waits: []bool{true, false},
+	}
+	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+		return mockedBackoff
+	}
+
+	client := &mockedClient{
+		tokens: []libmqtt.Token{&mockedToken{
+			timeout: false,
+		}, &mockedToken{
+			timeout: false,
+		}},
+	}
+	handler(client)
+
+	require.Equal(t, 2, client.subscribeMultipleCount)
+	require.Equal(t, 1, mockedBackoff.resetCount)
 }
 
 func assertEventMatches(t *testing.T, expected mockedMessage, got beat.Event) {

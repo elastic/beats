@@ -40,7 +40,10 @@ const (
 	subscribeRetryInterval = 1 * time.Second
 )
 
-var newMqttClient = libmqtt.NewClient
+var (
+	newMqttClient = libmqtt.NewClient
+	newBackoff    = backoff.NewEqualJitterBackoff
+)
 
 // Input contains the input and its config
 type mqttInput struct {
@@ -127,7 +130,7 @@ func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflig
 func createOnConnectHandler(logger *logp.Logger, inputContext *input.Context, onMessageHandler func(client libmqtt.Client, message libmqtt.Message), clientSubscriptions map[string]byte) func(client libmqtt.Client) {
 	// The function subscribes the client to the specific topics (with retry backoff in case of failure).
 	return func(client libmqtt.Client) {
-		backoff := backoff.NewEqualJitterBackoff(
+		backoff := newBackoff(
 			inputContext.Done,
 			subscribeRetryInterval,
 			8*subscribeRetryInterval)

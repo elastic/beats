@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 )
 
 type mockedMessage struct {
@@ -67,7 +68,28 @@ func (m *mockedMessage) Ack() {
 	panic("implement me")
 }
 
-type mockedToken struct{}
+type mockedBackoff struct {
+	resetCount int
+
+	waits     []bool
+	waitIndex int
+}
+
+var _ backoff.Backoff = new(mockedBackoff)
+
+func (m *mockedBackoff) Wait() bool {
+	wait := m.waits[m.waitIndex]
+	m.waitIndex++
+	return wait
+}
+
+func (m *mockedBackoff) Reset() {
+	m.resetCount++
+}
+
+type mockedToken struct {
+	timeout bool
+}
 
 var _ libmqtt.Token = new(mockedToken)
 
@@ -76,11 +98,11 @@ func (m *mockedToken) Wait() bool {
 }
 
 func (m *mockedToken) WaitTimeout(time.Duration) bool {
-	return true
+	return m.timeout
 }
 
 func (m *mockedToken) Error() error {
-	panic("implement me")
+	return nil
 }
 
 type mockedClient struct {
@@ -90,6 +112,9 @@ type mockedClient struct {
 
 	subscriptions []string
 	messages      []mockedMessage
+
+	tokens     []libmqtt.Token
+	tokenIndex int
 
 	onConnectHandler func(client libmqtt.Client)
 	onMessageHandler func(client libmqtt.Client, message libmqtt.Message)
@@ -141,7 +166,9 @@ func (m *mockedClient) SubscribeMultiple(filters map[string]byte, callback libmq
 		}()
 	}
 
-	return new(mockedToken)
+	token := m.tokens[m.tokenIndex]
+	m.tokenIndex++
+	return token
 }
 
 func (m *mockedClient) Unsubscribe(topics ...string) libmqtt.Token {
