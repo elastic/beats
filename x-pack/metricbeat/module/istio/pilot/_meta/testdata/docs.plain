@@ -1,0 +1,335 @@
+# HELP endpoint_no_pod Endpoints without an associated pod.
+# TYPE endpoint_no_pod gauge
+endpoint_no_pod 0
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 5.984e-05
+go_gc_duration_seconds{quantile="0.25"} 0.000155621
+go_gc_duration_seconds{quantile="0.5"} 0.000403166
+go_gc_duration_seconds{quantile="0.75"} 0.088281143
+go_gc_duration_seconds{quantile="1"} 0.289008297
+go_gc_duration_seconds_sum 16.146093959
+go_gc_duration_seconds_count 377
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 145
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.10.4"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 9.312208e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.788295928e+09
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 2.186316e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 3.1980158e+07
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction 0.0012551863919405206
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 1.978368e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 9.312208e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 2.7598848e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 1.8997248e+07
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 68864
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 0
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 4.6596096e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.57964879027918e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 15416
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 3.2049022e+07
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 6944
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 16384
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 377112
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 737280
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 1.8021456e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 896172
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.6384e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.6384e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 5.4049016e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 17
+# HELP istio_build Istio component build info
+# TYPE istio_build gauge
+istio_build{component="pilot",tag="1.1.5-11-g04850e1"} 1
+# HELP pilot_conflict_inbound_listener Number of conflicting inbound listeners.
+# TYPE pilot_conflict_inbound_listener gauge
+pilot_conflict_inbound_listener 0
+# HELP pilot_conflict_outbound_listener_http_over_current_tcp Number of conflicting wildcard http listeners with current wildcard tcp listener.
+# TYPE pilot_conflict_outbound_listener_http_over_current_tcp gauge
+pilot_conflict_outbound_listener_http_over_current_tcp 0
+# HELP pilot_conflict_outbound_listener_tcp_over_current_http Number of conflicting wildcard tcp listeners with current wildcard http listener.
+# TYPE pilot_conflict_outbound_listener_tcp_over_current_http gauge
+pilot_conflict_outbound_listener_tcp_over_current_http 0
+# HELP pilot_conflict_outbound_listener_tcp_over_current_tcp Number of conflicting tcp listeners with current tcp listener.
+# TYPE pilot_conflict_outbound_listener_tcp_over_current_tcp gauge
+pilot_conflict_outbound_listener_tcp_over_current_tcp 0
+# HELP pilot_destrule_subsets Duplicate subsets across destination rules for same host
+# TYPE pilot_destrule_subsets gauge
+pilot_destrule_subsets 0
+# HELP pilot_duplicate_envoy_clusters Duplicate envoy clusters caused by service entries with same hostname
+# TYPE pilot_duplicate_envoy_clusters gauge
+pilot_duplicate_envoy_clusters 0
+# HELP pilot_eds_no_instances Number of clusters without instances.
+# TYPE pilot_eds_no_instances gauge
+pilot_eds_no_instances 0
+# HELP pilot_endpoint_not_ready Endpoint found in unready state.
+# TYPE pilot_endpoint_not_ready gauge
+pilot_endpoint_not_ready 0
+# HELP pilot_info Pilot version and build information.
+# TYPE pilot_info gauge
+pilot_info{version="root@1844d064-72cc-11e9-a0d5-0a580a2c0304-docker.io/istio-1.1.6-04850e14d38a69a38c16c800e237b1108056513e-dirty-Modified"} 1
+# HELP pilot_invalid_out_listeners Number of invalid outbound listeners.
+# TYPE pilot_invalid_out_listeners gauge
+pilot_invalid_out_listeners 0
+# HELP pilot_k8s_reg_events Events from k8s registry.
+# TYPE pilot_k8s_reg_events counter
+pilot_k8s_reg_events{event="add",type="Endpoints"} 30
+pilot_k8s_reg_events{event="add",type="Nodes"} 1
+pilot_k8s_reg_events{event="add",type="Pod"} 41
+pilot_k8s_reg_events{event="add",type="Services"} 28
+pilot_k8s_reg_events{event="delete",type="Endpoints"} 1
+pilot_k8s_reg_events{event="delete",type="Pod"} 5
+pilot_k8s_reg_events{event="delete",type="Services"} 1
+pilot_k8s_reg_events{event="update",type="Endpoints"} 46
+pilot_k8s_reg_events{event="update",type="Nodes"} 409
+pilot_k8s_reg_events{event="update",type="Pod"} 169
+pilot_k8s_reg_events{event="update",type="Services"} 1
+pilot_k8s_reg_events{event="updateSame",type="Endpoints"} 35043
+pilot_k8s_reg_events{event="updateSame",type="Nodes"} 410
+pilot_k8s_reg_events{event="updateSame",type="Pod"} 12944
+pilot_k8s_reg_events{event="updateSame",type="Services"} 9729
+# HELP pilot_mcp_sink_reconnections The number of times the sink has reconnected.
+# TYPE pilot_mcp_sink_reconnections counter
+pilot_mcp_sink_reconnections 5
+# HELP pilot_mcp_sink_recv_failures_total The number of recv failures in the source.
+# TYPE pilot_mcp_sink_recv_failures_total counter
+pilot_mcp_sink_recv_failures_total{code="14",error="rpc error: code = Unavailable desc = transport is closing"} 8
+# HELP pilot_mcp_sink_request_acks_total The number of request acks received by the source.
+# TYPE pilot_mcp_sink_request_acks_total counter
+pilot_mcp_sink_request_acks_total{collection="istio/authentication/v1alpha1/meshpolicies",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/authentication/v1alpha1/policies",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/config/v1alpha2/httpapispecbindings",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/config/v1alpha2/httpapispecs",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/mixer/v1/config/client/quotaspecbindings",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/mixer/v1/config/client/quotaspecs",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/destinationrules",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/envoyfilters",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/gateways",connectionID="0"} 6
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/serviceentries",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/sidecars",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/networking/v1alpha3/virtualservices",connectionID="0"} 6
+pilot_mcp_sink_request_acks_total{collection="istio/rbac/v1alpha1/clusterrbacconfigs",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/rbac/v1alpha1/rbacconfigs",connectionID="0"} 5
+pilot_mcp_sink_request_acks_total{collection="istio/rbac/v1alpha1/servicerolebindings",connectionID="0"} 7
+pilot_mcp_sink_request_acks_total{collection="istio/rbac/v1alpha1/serviceroles",connectionID="0"} 7
+# HELP pilot_no_ip Pods not found in the endpoint table, possibly invalid.
+# TYPE pilot_no_ip gauge
+pilot_no_ip 0
+# HELP pilot_proxy_convergence_time Delay between config change and all proxies converging.
+# TYPE pilot_proxy_convergence_time histogram
+pilot_proxy_convergence_time_bucket{le="1"} 9
+pilot_proxy_convergence_time_bucket{le="3"} 13
+pilot_proxy_convergence_time_bucket{le="5"} 24
+pilot_proxy_convergence_time_bucket{le="10"} 27
+pilot_proxy_convergence_time_bucket{le="20"} 29
+pilot_proxy_convergence_time_bucket{le="30"} 29
+pilot_proxy_convergence_time_bucket{le="50"} 29
+pilot_proxy_convergence_time_bucket{le="100"} 29
+pilot_proxy_convergence_time_bucket{le="+Inf"} 29
+pilot_proxy_convergence_time_sum 103.05756475999998
+pilot_proxy_convergence_time_count 29
+# HELP pilot_rds_expired_nonce Total number of RDS messages with an expired nonce.
+# TYPE pilot_rds_expired_nonce counter
+pilot_rds_expired_nonce 27
+# HELP pilot_services Total services known to pilot.
+# TYPE pilot_services gauge
+pilot_services 27
+# HELP pilot_total_xds_internal_errors Total number of internal XDS errors in pilot (check logs).
+# TYPE pilot_total_xds_internal_errors counter
+pilot_total_xds_internal_errors 0
+# HELP pilot_total_xds_rejects Total number of XDS responses from pilot rejected by proxy.
+# TYPE pilot_total_xds_rejects counter
+pilot_total_xds_rejects 0
+# HELP pilot_virt_services Total virtual services known to pilot.
+# TYPE pilot_virt_services gauge
+pilot_virt_services 0
+# HELP pilot_vservice_dup_domain Virtual services with dup domains.
+# TYPE pilot_vservice_dup_domain gauge
+pilot_vservice_dup_domain 0
+# HELP pilot_xds Number of endpoints connected to this pilot using XDS.
+# TYPE pilot_xds gauge
+pilot_xds 12
+# HELP pilot_xds_eds_instances Instances for each cluster, as of last push. Zero instances is an error.
+# TYPE pilot_xds_eds_instances gauge
+pilot_xds_eds_instances{cluster="outbound_.14267_._.jaeger-collector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.14268_._.jaeger-collector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15004_._.istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15004_._.istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15010_._.istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15011_._.istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15014_._.istio-citadel.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15014_._.istio-galley.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15014_._.istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15014_._.istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15014_._.istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15020_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15029_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15030_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15031_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15032_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15443_._.istio-egressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.15443_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.16686_._.jaeger-query.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.20001_._.kiali.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.3000_._.grafana.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.31400_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.42422_._.istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.443_._.istio-egressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.443_._.istio-galley.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.443_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.443_._.istio-sidecar-injector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.443_._.kubernetes.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.53_._.kube-dns.kube-system.svc.cluster.local"} 2
+pilot_xds_eds_instances{cluster="outbound_.5432_._.postgresql.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.8060_._.istio-citadel.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.8080_._.istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.80_._.default-http-backend.kube-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.80_._.httpbin.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.80_._.istio-egressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.80_._.istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.80_._.tracing.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9080_._.details.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9080_._.productpage.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9080_._.ratings.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9080_._.reviews.default.svc.cluster.local"} 3
+pilot_xds_eds_instances{cluster="outbound_.9090_._.prometheus.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9091_._.istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9091_._.istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9153_._.kube-dns.kube-system.svc.cluster.local"} 2
+pilot_xds_eds_instances{cluster="outbound_.9411_._.zipkin.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound_.9901_._.istio-galley.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|14267||jaeger-collector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|14268||jaeger-collector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15004||istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15004||istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15010||istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15011||istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15014||istio-citadel.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15014||istio-galley.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15014||istio-pilot.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15014||istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15014||istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15020||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15029||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15030||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15031||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15032||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15443||istio-egressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|15443||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|16686||jaeger-query.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|20001||kiali.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|3000||grafana.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|31400||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|42422||istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|443||istio-egressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|443||istio-galley.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|443||istio-ingressgateway.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|443||istio-sidecar-injector.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|443||kubernetes.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|80||tracing.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9080||details.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9080||productpage.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9080||ratings.default.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9080||reviews.default.svc.cluster.local"} 3
+pilot_xds_eds_instances{cluster="outbound|9090||prometheus.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9091||istio-policy.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9091||istio-telemetry.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9153||kube-dns.kube-system.svc.cluster.local"} 2
+pilot_xds_eds_instances{cluster="outbound|9411||zipkin.istio-system.svc.cluster.local"} 1
+pilot_xds_eds_instances{cluster="outbound|9901||istio-galley.istio-system.svc.cluster.local"} 1
+# HELP pilot_xds_push_context_errors Number of errors (timeouts) initiating push context.
+# TYPE pilot_xds_push_context_errors counter
+pilot_xds_push_context_errors 0
+# HELP pilot_xds_push_errors Number of errors (timeouts) pushing to sidecars.
+# TYPE pilot_xds_push_errors counter
+pilot_xds_push_errors{type="retry"} 10
+# HELP pilot_xds_push_timeout Pilot push timeout, will retry.
+# TYPE pilot_xds_push_timeout counter
+pilot_xds_push_timeout 15
+# HELP pilot_xds_push_timeout_failures Pilot push timeout failures after repeated attempts.
+# TYPE pilot_xds_push_timeout_failures counter
+pilot_xds_push_timeout_failures 0
+# HELP pilot_xds_pushes Pilot build and send errors for lds, rds, cds and eds.
+# TYPE pilot_xds_pushes counter
+pilot_xds_pushes{type="cds"} 250
+pilot_xds_pushes{type="eds"} 309
+pilot_xds_pushes{type="lds"} 248
+pilot_xds_pushes{type="lds_senderr"} 2
+pilot_xds_pushes{type="rds"} 181
+# HELP pilot_xds_write_timeout Pilot XDS response write timeouts.
+# TYPE pilot_xds_write_timeout counter
+pilot_xds_write_timeout 0
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 103.12
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 29
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 8.0949248e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.57962419182e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 9.4363648e+07
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes -1

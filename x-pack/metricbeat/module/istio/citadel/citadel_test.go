@@ -4,7 +4,7 @@
 
 // +build !integration
 
-package mixer
+package citadel
 
 import (
 	"testing"
@@ -15,5 +15,5 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "istio", "mixer")
+	mbtest.TestDataFiles(t, "istio", "citadel")
 }
