@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/module/logstash"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -212,17 +214,10 @@ func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID st
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
 		for _, vertex := range pipeline.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs = append(clusterUUIDs, clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one

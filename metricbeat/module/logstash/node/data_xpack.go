@@ -66,25 +66,13 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 	var clusterToPipelinesMap map[string][]logstash.PipelineState
 	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
 
-	if overrideClusterUUID != "" {
-		clusterToPipelinesMap[overrideClusterUUID] = pipelines
-		return clusterToPipelinesMap
-	}
-
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
 		for _, vertex := range pipeline.Graph.Graph.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs = append(clusterUUIDs, clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one

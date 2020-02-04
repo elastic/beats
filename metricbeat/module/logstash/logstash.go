@@ -213,3 +213,21 @@ func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, erro
 	httpHelper.SetURI(u.String())
 	return httpHelper.FetchContent()
 }
+
+func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
+	c, ok := vertex["cluster_uuid"]
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	if clusterUUID == "" {
+		return overrideClusterUUID
+	}
+
+	return clusterUUID
+}
