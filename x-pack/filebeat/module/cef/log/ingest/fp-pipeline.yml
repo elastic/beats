@@ -1,0 +1,27 @@
+---
+description: Pipeline for Forcepoint CEF
+
+processors:
+  # cs1 is ruleID
+  - set:
+      field: rule.id
+      value: "{{cef.extensions.deviceCustomString1}}"
+      if: "ctx.cef?.extensions?.deviceCustomString1 != null"
+
+  # cs2 is natRuleID
+  - set:
+      field: rule.id
+      value: "{{cef.extensions.deviceCustomString2}}"
+      if: "ctx.cef?.extensions?.deviceCustomString2 != null"
+
+  # cs3 is VulnerabilityReference
+  - set:
+      field: vulnerability.reference
+      value: "{{cef.extensions.deviceCustomString3}}"
+      if: "ctx.cef?.extensions?.deviceCustomString3 != null"
+
+  # cs4 is virusID
+  - set:
+      field: cef.forcepoint.virus_id
+      value: "{{cef.extensions.deviceCustomString4}}"
+      if: "ctx.cef?.extensions?.deviceCustomString4 != null"            
