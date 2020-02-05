@@ -103,7 +103,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_5",
-            "title": "Disabled Users",
+            "title": "Disabled Users [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -117,7 +117,7 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_6",
-            "title": "Deleted Users",
+            "title": "Deleted Users [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -141,7 +141,7 @@
             },
             "panelIndex": "8",
             "panelRefName": "panel_7",
-            "title": "Actions performed over Users",
+            "title": "Actions performed over Users [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -155,7 +155,7 @@
             },
             "panelIndex": "9",
             "panelRefName": "panel_8",
-            "title": "Passwords Changes",
+            "title": "Passwords Changes [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -239,7 +239,7 @@
             },
             "panelIndex": "15",
             "panelRefName": "panel_14",
-            "title": "Unlocked Users",
+            "title": "Unlocked Users [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -253,7 +253,7 @@
             },
             "panelIndex": "16",
             "panelRefName": "panel_15",
-            "title": "Users Changes",
+            "title": "Users Changes [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -309,7 +309,7 @@
             },
             "panelIndex": "20",
             "panelRefName": "panel_19",
-            "title": "Locked-out Users",
+            "title": "Locked-out Users [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -323,7 +323,7 @@
             },
             "panelIndex": "21",
             "panelRefName": "panel_20",
-            "title": "User Management Actions Distributions over Time",
+            "title": "User Management Actions Distributions over Time [Winlogbeat Security]",
             "version": "7.3.0"
           },
           {
@@ -4253,7 +4253,7 @@
             "desc"
           ]
         ],
-        "title": "Logon Details",
+        "title": "Logon Details [Winlogbeat Security]",
         "version": 1
       },
       "id": "7e178c80-fee1-11e9-8405-516218e3d268",
@@ -4391,7 +4391,7 @@
             "desc"
           ]
         ],
-        "title": "User management Details - Search",
+        "title": "User management Details - Search [Winlogbeat Security]",
         "version": 1
       },
       "id": "324686c0-fefb-11e9-8405-516218e3d268",

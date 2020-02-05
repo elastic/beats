@@ -47,7 +47,7 @@
             },
             "panelIndex": "23",
             "panelRefName": "panel_1",
-            "title": "Group Managment Actions",
+            "title": "Group Managment Actions [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -61,7 +61,7 @@
             },
             "panelIndex": "25",
             "panelRefName": "panel_2",
-            "title": "Event Codes",
+            "title": "Event Codes [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -169,7 +169,7 @@
             },
             "panelIndex": "35",
             "panelRefName": "panel_9",
-            "title": "Actions performed over Groups",
+            "title": "Actions performed over Groups [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -183,7 +183,7 @@
             },
             "panelIndex": "36",
             "panelRefName": "panel_10",
-            "title": "Group Creation Summary",
+            "title": "Group Creation Summary [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -197,7 +197,7 @@
             },
             "panelIndex": "37",
             "panelRefName": "panel_11",
-            "title": "Group Changes Summary",
+            "title": "Group Changes Summary [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -211,7 +211,7 @@
             },
             "panelIndex": "38",
             "panelRefName": "panel_12",
-            "title": "Group Deletion Summary",
+            "title": "Group Deletion Summary [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -225,7 +225,7 @@
             },
             "panelIndex": "39",
             "panelRefName": "panel_13",
-            "title": "Users Added to Group  Summary",
+            "title": "Users Added to Group  Summary [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -239,7 +239,7 @@
             },
             "panelIndex": "40",
             "panelRefName": "panel_14",
-            "title": "Users Removed From Group Summary",
+            "title": "Users Removed From Group Summary [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -253,7 +253,7 @@
             },
             "panelIndex": "42",
             "panelRefName": "panel_15",
-            "title": "Group Enumeration - Table",
+            "title": "Group Enumeration - Table [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -267,7 +267,7 @@
             },
             "panelIndex": "43",
             "panelRefName": "panel_16",
-            "title": "Logon Details ",
+            "title": "Logon Details  [Winlogbeat Security]",
             "version": "7.3.1"
           },
           {
@@ -294,7 +294,7 @@
             },
             "panelIndex": "45",
             "panelRefName": "panel_18",
-            "title": "Group Management Operations Details",
+            "title": "Group Management Operations Details [Winlogbeat Security]",
             "version": "7.3.1"
           }
         ],
@@ -3312,7 +3312,7 @@
             "desc"
           ]
         ],
-        "title": "Logon Details",
+        "title": "Logon Details [Winlogbeat Security]",
         "version": 1
       },
       "id": "7e178c80-fee1-11e9-8405-516218e3d268",
@@ -3829,7 +3829,7 @@
             "desc"
           ]
         ],
-        "title": "Group Management Details - Search View",
+        "title": "Group Management Details - Search View [Winlogbeat Security]",
         "version": 1
       },
       "id": "9066d5b0-fef2-11e9-8405-516218e3d268",

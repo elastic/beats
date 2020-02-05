@@ -3277,7 +3277,7 @@
             "desc"
           ]
         ],
-        "title": "Logon Details",
+        "title": "Logon Details [Winlogbeat Security]",
         "version": 1
       },
       "id": "7e178c80-fee1-11e9-8405-516218e3d268",
@@ -3415,7 +3415,7 @@
             "desc"
           ]
         ],
-        "title": "User management Details - Search",
+        "title": "User management Details - Search [Winlogbeat Security]",
         "version": 1
       },
       "id": "324686c0-fefb-11e9-8405-516218e3d268",
