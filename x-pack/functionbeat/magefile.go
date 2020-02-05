@@ -161,10 +161,7 @@ func GoTestUnit() {
 func BuildPkgForFunctions() error {
 	mg.Deps(Update, Build)
 
-	err := os.MkdirAll("pkg", 700)
-	if err != nil {
-		return err
-	}
+	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
 		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),

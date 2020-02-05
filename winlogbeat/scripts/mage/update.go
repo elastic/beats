@@ -56,7 +56,12 @@ func (Update) Config() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func (Update) Dashboards() error {
 	mg.Deps(fb.FieldsYML)
-	return devtools.KibanaDashboards()
+	switch SelectLogic {
+	case devtools.XPackProject:
+		return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), devtools.XPackBeatDir("module"))
+	default:
+		return devtools.KibanaDashboards(devtools.OSSBeatDir("module"))
+	}
 }
 
 // Fields updates all fields files (.go, .yml).

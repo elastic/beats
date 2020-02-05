@@ -31,6 +31,15 @@ output.elasticsearch:
   password: "{pwd}"
 ------------------------------------------------------------------------------
 
+To use an API key to connect to {es}, use `api_key`.
+
+["source","yaml",subs="attributes,callouts"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["https://localhost:9200"]
+  api_key: "KnR6yE41RrSowb0kQ0HWoA"
+------------------------------------------------------------------------------
+
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
 
 ["source","yaml",subs="attributes,callouts"]
@@ -117,6 +126,12 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
 The default value is 1.
+
+===== `api_key`
+
+Instead of using usernames and passwords,
+you can use API keys to secure communication with {es}.
+For more information, see <<beats-api-keys>>.
 
 ===== `username`
 

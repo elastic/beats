@@ -3268,52 +3268,76 @@
 			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "b91TSC0atoGVSMZdKuWTYsMOGiM=",
+			"checksumSHA1": "a1x0prr3ix+QFOdJpNfM3Q4G6Es=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
-			"checksumSHA1": "/pq8HNEdzHmky9S9HSo1WofXQ4Y=",
+			"checksumSHA1": "B58nBBiUIstpkXfr9yaYN9GzdLE=",
+			"path": "github.com/elastic/go-ucfg/diff",
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
+		},
+		{
+			"checksumSHA1": "E6k6DWkpI+LOKDIFRqRmNH9GORc=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
+		},
+		{
+			"checksumSHA1": "NhiQQjYMs/ViCbmEq9tll2uCaYo=",
+			"path": "github.com/elastic/go-ucfg/hjson",
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
 			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
 			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
 			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
 			"checksumSHA1": "cfMNsyQm0gZOV0hRJrBSdKDQSBo=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
-			"checksumSHA1": "PJCBACDGPhnRAEqjGPMPCMjbj4o=",
+			"checksumSHA1": "ZISq+zzSb0OLzvwLlf1ObdgnFmM=",
+			"path": "github.com/elastic/go-ucfg/parse",
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
+		},
+		{
+			"checksumSHA1": "cnJVnptTvXNLzxVhd266k19/pQg=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
-			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
+			"revisionTime": "2020-01-31T13:55:22Z",
+			"version": "v0.8.1",
+			"versionExact": "v0.8.1"
 		},
 		{
 			"checksumSHA1": "iI1JCWsrAPpoKcEo/i6G3lRLIVs=",
@@ -3986,60 +4010,60 @@
 			"revisionTime": "2019-05-07T19:18:18Z"
 		},
 		{
-			"checksumSHA1": "ASXhLVfIA2mzHf+7muYxT38JaHU=",
+			"checksumSHA1": "ZcE3YAClBwbAQWRcgp31Qsrii/M=",
 			"path": "github.com/magefile/mage",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"checksumSHA1": "fHpo/9Tke6VFfZZAT+PRnoNOiiY=",
 			"path": "github.com/magefile/mage/internal",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "RVSwuhHOfojhN74rfwRe4AktDIA=",
+			"checksumSHA1": "a5Sja7VEvuyh6gJTZCTJ8W26kOI=",
 			"path": "github.com/magefile/mage/mage",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "irRTBkCBnOGMX+PZhOdHFUckgBY=",
+			"checksumSHA1": "eNlaZsWRGHEIkiX4kkQClBU+Q7s=",
 			"path": "github.com/magefile/mage/mg",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"checksumSHA1": "QGt/JRmNp+D+lO0hHZsUUyH7y5U=",
 			"path": "github.com/magefile/mage/parse",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "4JzH55TcYdctQksrCafgKT8lZRU=",
+			"checksumSHA1": "i3NX8AtbllkQLVYYUyhvb5GZGgg=",
 			"path": "github.com/magefile/mage/sh",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "91U4Tlwnjdmwjd0w/XNw3+fxFKo=",
+			"checksumSHA1": "iL3ochY7eRpRxqij1wXklQKw6pQ=",
 			"path": "github.com/magefile/mage/target",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"path": "github.com/magefile/mage^",
@@ -6414,6 +6438,12 @@
 			"revisionTime": "2019-11-08T18:22:05Z",
 			"version": "v1.25.1",
 			"versionExact": "v1.25.1"
+		},
+		{
+			"checksumSHA1": "cEgwzgGEO4v4ARZB2EjDd2VjB64=",
+			"path": "gopkg.in/hjson/hjson-go.v3",
+			"revision": "8f44e1182a33737b57cb6855fe656ece998e9b3c",
+			"revisionTime": "2019-11-06T16:53:36Z"
 		},
 		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
