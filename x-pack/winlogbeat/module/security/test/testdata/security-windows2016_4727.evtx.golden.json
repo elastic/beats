@@ -1,12 +1,16 @@
 [
   {
-    "@timestamp": "2019-11-07T15:22:57.6553291Z",
+    "@timestamp": "2019-10-22T11:26:12.4955445Z",
     "event": {
-      "action": "changed-audit-config",
-      "code": 4719,
+      "action": "added-group-account",
+      "code": 4727,
       "kind": "event",
       "module": "security",
       "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "group": {
+      "domain": "WLBEAT",
+      "name": "DnsUpdateProxy"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -23,44 +27,39 @@
       "name": "WIN-41OB2LO92CR$"
     },
     "winlog": {
-      "activity_id": "{3eef0a0d-9551-0000-140c-ef3e5195d501}",
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
-        "AuditPolicyChanges": "%%8449, %%8451",
-        "AuditPolicyChangesDescription": [
-          "Success Added",
-          "Failure Added"
-        ],
-        "Category": "Logon/Logoff",
-        "CategoryId": "%%8273",
-        "SubCategory": "Network Policy Server",
-        "SubcategoryGuid": "{0cce9243-69ae-11d9-bed3-505054503030}",
-        "SubcategoryId": "%%12552",
+        "PrivilegeList": "-",
+        "SamAccountName": "DnsUpdateProxy",
+        "SidHistory": "-",
         "SubjectDomainName": "WLBEAT",
-        "SubjectLogonId": "0x3e7",
+        "SubjectLogonId": "0x27438",
         "SubjectUserName": "WIN-41OB2LO92CR$",
-        "SubjectUserSid": "S-1-5-18"
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "WLBEAT",
+        "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1110",
+        "TargetUserName": "DnsUpdateProxy"
       },
-      "event_id": 4719,
+      "event_id": 4727,
       "keywords": [
         "Audit Success"
       ],
       "logon": {
-        "id": "0x3e7"
+        "id": "0x27438"
       },
       "opcode": "Info",
       "process": {
         "pid": 772,
         "thread": {
-          "id": 2944
+          "id": 1664
         }
       },
       "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
-      "record_id": 17154,
-      "task": "Audit Policy Change"
+      "record_id": 4105,
+      "task": "Security Group Management"
     }
   }
 ]

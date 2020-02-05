@@ -14,14 +14,9 @@
     "log": {
       "level": "error"
     },
-    "message": "The security log is now full.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
-      "computer": {
-        "domain": "wlbeat",
-        "name": "WIN-41OB2LO92CR"
-      },
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_id": 1104,
       "keywords": [

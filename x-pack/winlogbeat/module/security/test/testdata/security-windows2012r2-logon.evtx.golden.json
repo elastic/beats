@@ -23,9 +23,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -102,9 +100,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -181,9 +177,7 @@
       "pid": 448
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -263,9 +257,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -342,9 +334,7 @@
       "pid": 0
     },
     "related": {
-      "user": [
-        "ANONYMOUS LOGON"
-      ]
+      "user": "ANONYMOUS LOGON"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -421,9 +411,7 @@
       "pid": 0
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
@@ -500,9 +488,7 @@
       "pid": 0
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
@@ -579,9 +565,7 @@
       "pid": 0
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
@@ -658,9 +642,7 @@
       "pid": 0
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "source": {
       "domain": "127.0.0.1"
@@ -740,9 +722,7 @@
       "pid": 2812
     },
     "related": {
-      "user": [
-        "DWM-2"
-      ]
+      "user": "DWM-2"
     },
     "user": {
       "domain": "Window Manager",
@@ -819,9 +799,7 @@
       "pid": 2812
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -901,9 +879,7 @@
       "pid": 2188
     },
     "related": {
-      "user": [
-        "DWM-3"
-      ]
+      "user": "DWM-3"
     },
     "user": {
       "domain": "Window Manager",
@@ -980,9 +956,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1059,9 +1033,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1138,9 +1110,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1217,9 +1187,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1296,9 +1264,7 @@
       "pid": 508
     },
     "related": {
-      "user": [
-        "SYSTEM"
-      ]
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1375,9 +1341,7 @@
       "pid": 836
     },
     "related": {
-      "user": [
-        "bosch"
-      ]
+      "user": "bosch"
     },
     "source": {
       "domain": "VAGRANT-2012-R2",

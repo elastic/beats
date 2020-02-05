@@ -14,11 +14,8 @@
     "log": {
       "level": "information"
     },
-    "message": "A computer account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nNew Computer Account:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2902\n\tAccount Name:\t\tTESTCOMPUTEROBJ$\n\tAccount Domain:\t\tTEST\n\nAttributes:\n\tSAM Account Name:\tTESTCOMPUTEROBJ$\n\tDisplay Name:\t\t-\n\tUser Principal Name:\t-\n\tHome Directory:\t\t-\n\tHome Drive:\t\t-\n\tScript Path:\t\t-\n\tProfile Path:\t\t-\n\tUser Workstations:\t-\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t515\n\tAllowedToDelegateTo:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x85\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Workstation Trust Account' - Enabled\n\tUser Parameters:\t-\n\tSID History:\t\t-\n\tLogon Hours:\t\t\u003cvalue not set\u003e\n\tDNS Host Name:\t\t-\n\tService Principal Names:\t-\n\nAdditional Information:\n\tPrivileges\t\t-",
     "related": {
-      "user": [
-        "at_adm"
-      ]
+      "user": "at_adm"
     },
     "user": {
       "domain": "TEST",
@@ -42,7 +39,7 @@
         "HomeDirectory": "-",
         "HomePath": "-",
         "LogonHours": "%%1793",
-        "NewUACList": [
+        "NewUacList": [
           "SCRIPT",
           "ENCRYPTED_TEXT_PWD_ALLOWED"
         ],

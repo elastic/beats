@@ -14,11 +14,8 @@
     "log": {
       "level": "information"
     },
-    "message": "A computer account was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nComputer Account That Was Changed:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2902\n\tAccount Name:\t\tTESTCOMPUTEROBJ$\n\tAccount Domain:\t\tTEST\n\nChanged Attributes:\n\tSAM Account Name:\t-\n\tDisplay Name:\t\t-\n\tUser Principal Name:\t-\n\tHome Directory:\t\t-\n\tHome Drive:\t\t-\n\tScript Path:\t\t-\n\tProfile Path:\t\t-\n\tUser Workstations:\t-\n\tPassword Last Set:\t-\n\tAccount Expires:\t\t-\n\tPrimary Group ID:\t-\n\tAllowedToDelegateTo:\t-\n\tOld UAC Value:\t\t0x85\n\tNew UAC Value:\t\t0x84\n\tUser Account Control:\t\n\t\tAccount Enabled\n\tUser Parameters:\t-\n\tSID History:\t\t-\n\tLogon Hours:\t\t-\n\tDNS Host Name:\t\t-\n\tService Principal Names:\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "related": {
-      "user": [
-        "at_adm"
-      ]
+      "user": "at_adm"
     },
     "user": {
       "domain": "TEST",
@@ -43,7 +40,7 @@
         "HomeDirectory": "-",
         "HomePath": "-",
         "LogonHours": "-",
-        "NewUACList": [
+        "NewUacList": [
           "ENCRYPTED_TEXT_PWD_ALLOWED"
         ],
         "NewUacValue": "0x84",

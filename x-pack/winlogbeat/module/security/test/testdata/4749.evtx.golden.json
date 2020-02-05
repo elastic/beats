@@ -18,11 +18,8 @@
     "log": {
       "level": "information"
     },
-    "message": "A security-disabled global group was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2904\n\tGroup Name:\t\ttestglobal\n\tGroup Domain:\t\tTEST\n\nAttributes:\n\tSAM Account Name:\ttestglobal\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "related": {
-      "user": [
-        "at_adm"
-      ]
+      "user": "at_adm"
     },
     "user": {
       "domain": "TEST",

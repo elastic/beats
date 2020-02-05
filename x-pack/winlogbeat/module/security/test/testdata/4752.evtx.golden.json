@@ -18,11 +18,8 @@
     "log": {
       "level": "information"
     },
-    "message": "A member was removed from a security-disabled global group.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nMember:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-500\n\tAccount Name:\t\tCN=Administrator,CN=Users,DC=TEST,DC=SAAS\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2904\n\tGroup Name:\t\ttestglobal1\n\tGroup Domain:\t\tTEST\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "related": {
-      "user": [
-        "at_adm"
-      ]
+      "user": "at_adm"
     },
     "user": {
       "domain": "TEST",

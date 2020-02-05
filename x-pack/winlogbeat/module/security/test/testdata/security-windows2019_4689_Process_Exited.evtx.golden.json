@@ -22,9 +22,7 @@
       "pid": 5412
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT",
@@ -82,9 +80,7 @@
       "pid": 3988
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT",
@@ -142,9 +138,7 @@
       "pid": 2760
     },
     "related": {
-      "user": [
-        "vagrant"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT",
