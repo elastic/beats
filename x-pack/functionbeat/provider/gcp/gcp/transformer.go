@@ -56,11 +56,14 @@ func transformStorage(mData *metadata.Metadata, evt StorageEvent) (beat.Event, e
 				"event_type": mData.Resource.Type,
 				"state":      evt.ResourceState,
 			},
-			"bucket":         evt.Bucket,
-			"file":           evt.Name,
-			"metageneration": evt.Metageneration,
-			"updated":        evt.Updated,
-			"created":        evt.Created,
+			"storage_bucket": evt.Bucket,
+			"file": common.MapStr{
+				"name":    evt.Name,
+				"mtime":   evt.Updated,
+				"ctime":   evt.Updated,
+				"created": evt.Created,
+			},
+			"meta-generation": evt.Metageneration,
 		},
 	}, nil
 }

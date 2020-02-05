@@ -69,11 +69,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 
+	eventList := map[string]common.MapStr{}
 	if err != nil {
+		m.addUpEvent(eventList, 0)
+		for _, evt := range eventList {
+			reporter.Event(mb.Event{
+				RootFields: common.MapStr{"prometheus": evt},
+			})
+		}
 		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
 	}
-
-	eventList := map[string]common.MapStr{}
 
 	for _, family := range families {
 		promEvents := getPromEventsFromMetricFamily(family)
@@ -105,6 +110,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
+	m.addUpEvent(eventList, 1)
+
 	// Converts hash list to slice
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
@@ -116,4 +123,20 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
+	upPromEvent := PromEvent{
+		labels: common.MapStr{
+			"instance": m.Host(),
+			"job":      "prometheus",
+		},
+	}
+	eventList[upPromEvent.LabelsHash()] = common.MapStr{
+		"metrics": common.MapStr{
+			"up": up,
+		},
+		"labels": upPromEvent.labels,
+	}
+
 }
