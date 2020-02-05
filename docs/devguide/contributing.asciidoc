@@ -172,11 +172,29 @@ your browser with the docs for preview.
 [[dependencies]]
 === Dependencies
 
+==== Golang
+
 To manage the `vendor/` folder we use
 https://github.com/kardianos/govendor[govendor]. Please see
 the govendor documentation on how to add or update vendored dependencies.
 
 In most cases `govendor fetch your/dependency@version +out` will get the job done.
+
+==== Non-Golang dependencies
+
+Besides Go libraries, we are using development tools to generate parsers for inputs and processors.
+
+The following packages are required to run `go generate` by Beat:
+
+===== Auditbeat
+
+* Flatbuffers
+
+===== Filebeat
+
+* Graphviz >= 2.43.0
+* Ragel >= 6.10
+
 
 [float]
 [[changelog]]
