@@ -392,6 +392,25 @@ pipeline {
             }
           }
         }
+        stage('Winlogbeat Windows x-pack'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_WINLOGBEAT_XPACK != "false"
+            }
+          }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Winlogbeat Windows Unit test", "-d x-pack/winlogbeat goUnitTest")
+          }
+        }
         stage('Functionbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -624,7 +643,8 @@ def reportCoverage(){
 }
 
 def isChanged(patterns){
-  return (params.runAllStages
+  return (
+    params.runAllStages
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
   )
 }
