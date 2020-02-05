@@ -30,7 +30,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -80,9 +79,7 @@ func TestFetch(t *testing.T) {
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
 	setupTest(t, host, version)
 
@@ -92,10 +89,9 @@ func TestFetch(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
-			}
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
+
 			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
 		})
@@ -107,18 +103,14 @@ func TestData(t *testing.T) {
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, version)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-			if err != nil {
-				t.Fatal("write", err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
