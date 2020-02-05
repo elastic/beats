@@ -172,6 +172,9 @@ your browser with the docs for preview.
 [[dependencies]]
 === Dependencies
 
+In order to create Beats we rely on Golang libraries and other
+external tools.
+
 ==== Golang
 
 To manage the `vendor/` folder we use
@@ -180,11 +183,11 @@ the govendor documentation on how to add or update vendored dependencies.
 
 In most cases `govendor fetch your/dependency@version +out` will get the job done.
 
-==== Non-Golang dependencies
+==== Other dependencies
 
 Besides Go libraries, we are using development tools to generate parsers for inputs and processors.
 
-The following packages are required to run `go generate` by Beat:
+The following packages are required to run `go generate`:
 
 ===== Auditbeat
 
