@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Make use of secure port when accessing Kubelet API {pull}16063[16063]
 
 *Packetbeat*
 

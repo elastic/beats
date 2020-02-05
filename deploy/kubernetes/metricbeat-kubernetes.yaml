@@ -79,7 +79,7 @@ data:
       hosts: ["https://${HOSTNAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.verification_mode: "none"
-      # If using Red Hat OpenShift remove the previous hosts entry and
+      # If using Red Hat OpenShift remove ssl.verification_mode entry and
       # uncomment these settings:
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
