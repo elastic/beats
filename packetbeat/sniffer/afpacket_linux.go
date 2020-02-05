@@ -139,5 +139,8 @@ func setPromiscMode(device string, enabled bool) error {
 		return nil
 	}
 
+	// SetLsfPromisc is marked as deprecated but used to improve readability (bpf)
+	// and avoid Cgo (pcap)
+	// TODO: replace with x/net/bpf or pcap
 	return syscall.SetLsfPromisc(device, enabled)
 }
