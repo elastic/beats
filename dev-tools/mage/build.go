@@ -215,7 +215,7 @@ func MakeWindowsSysoFile() (string, error) {
 
 	vi.Build()
 	vi.Walk()
-	sysoFile := BeatName + "_windows.syso"
+	sysoFile := BeatName + "_windows_" + GOARCH + ".syso"
 	if err = vi.WriteSyso(sysoFile, GOARCH); err != nil {
 		return "", errors.Wrap(err, "failed to generate syso file with Windows metadata")
 	}
