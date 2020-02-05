@@ -102,6 +102,9 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
+	if err != nil {
+		return errors.Wrap(err, "error building final container image")
+	}
 	defer buildResp.Body.Close()
 	// This blocks until the build operation completes
 	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
