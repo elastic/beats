@@ -402,7 +402,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "-d x-pack/winlogbeat goUnitTest")
+            mageTargetWin("Winlogbeat Windows Unit test", "-d x-pack/winlogbeat  update:fields goUnitTest")
           }
         }
         stage('Functionbeat'){
