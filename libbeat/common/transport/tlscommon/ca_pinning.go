@@ -25,13 +25,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ErrCAPingMatch is returned when no CA pin is matched in the verified chain.
+// ErrCAPingMatch is returned when no pin is matched in the verified chain.
 var ErrCAPingMatch = errors.New("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate")
 
 type pins []string
 
-func (p *pins) Matches(candidate string) bool {
-	for _, pin := range *p {
+func (p pins) Matches(candidate string) bool {
+	for _, pin := range p {
 		if pin == candidate {
 			return true
 		}
@@ -43,13 +43,12 @@ func (p *pins) Matches(candidate string) bool {
 // TLS connection is used.
 type verifyPeerCertFunc func([][]byte, [][]*x509.Certificate) error
 
-// MakeCAPinCallback loops throught the verified chains and make sure we have a match in the CA
-// that validate the remote chain.
+// MakeCAPinCallback loops through the verified chains and will try to match the certificates pin.
 func MakeCAPinCallback(hashes pins) func([][]byte, [][]*x509.Certificate) error {
 	return func(_ [][]byte, verifiedChains [][]*x509.Certificate) error {
 		// The chain of trust has been already established before the call to the VerifyPeerCertificate
-		// function, after we go through the chain to make sure we have CA certificate that match the provided
-		// pin.
+		// function, after we go through the chain to make sure we have at least a certificate certificate
+		//	that match the provided pin.
 		for _, chain := range verifiedChains {
 			for _, certificate := range chain {
 				h := Fingerprint(certificate)
@@ -65,7 +64,6 @@ func MakeCAPinCallback(hashes pins) func([][]byte, [][]*x509.Certificate) error 
 
 // Fingerprint takes a certificate and create a hash of the DER encoded public key.
 func Fingerprint(certificate *x509.Certificate) string {
-	// uses the DER encoded version of the public key to generate the pin.
 	hash := sha256.Sum256(certificate.RawSubjectPublicKeyInfo)
 	return base64.StdEncoding.EncodeToString(hash[:])
 }
