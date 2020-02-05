@@ -3961,60 +3961,60 @@
 			"revisionTime": "2019-05-07T19:18:18Z"
 		},
 		{
-			"checksumSHA1": "ASXhLVfIA2mzHf+7muYxT38JaHU=",
+			"checksumSHA1": "ZcE3YAClBwbAQWRcgp31Qsrii/M=",
 			"path": "github.com/magefile/mage",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"checksumSHA1": "fHpo/9Tke6VFfZZAT+PRnoNOiiY=",
 			"path": "github.com/magefile/mage/internal",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "RVSwuhHOfojhN74rfwRe4AktDIA=",
+			"checksumSHA1": "a5Sja7VEvuyh6gJTZCTJ8W26kOI=",
 			"path": "github.com/magefile/mage/mage",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "irRTBkCBnOGMX+PZhOdHFUckgBY=",
+			"checksumSHA1": "eNlaZsWRGHEIkiX4kkQClBU+Q7s=",
 			"path": "github.com/magefile/mage/mg",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"checksumSHA1": "QGt/JRmNp+D+lO0hHZsUUyH7y5U=",
 			"path": "github.com/magefile/mage/parse",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "4JzH55TcYdctQksrCafgKT8lZRU=",
+			"checksumSHA1": "i3NX8AtbllkQLVYYUyhvb5GZGgg=",
 			"path": "github.com/magefile/mage/sh",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
-			"checksumSHA1": "91U4Tlwnjdmwjd0w/XNw3+fxFKo=",
+			"checksumSHA1": "iL3ochY7eRpRxqij1wXklQKw6pQ=",
 			"path": "github.com/magefile/mage/target",
-			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
-			"revisionTime": "2018-12-11T21:18:45Z",
-			"version": "v1.8.0",
-			"versionExact": "v1.8.0"
+			"revision": "1c36bf78a98209d91af71354deb001cca75e11fc",
+			"revisionTime": "2019-09-12T19:43:23Z",
+			"version": "v1.9.0",
+			"versionExact": "v1.9.0"
 		},
 		{
 			"path": "github.com/magefile/mage^",

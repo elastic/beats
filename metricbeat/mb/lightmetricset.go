@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 // LightMetricSet contains the definition of a non-registered metric set
@@ -33,6 +34,7 @@ type LightMetricSet struct {
 		MetricSet string      `config:"metricset" validate:"required"`
 		Defaults  interface{} `config:"defaults"`
 	} `config:"input" validate:"required"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 // Registration obtains a metric set registration for this light metric set, this registration

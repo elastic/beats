@@ -24,7 +24,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 0,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.1",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-02-06T00:00:38.000Z",
@@ -51,7 +54,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 471,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.1",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-02-06T00:00:38.000Z",
@@ -79,7 +85,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 944,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.1",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-02-06T00:01:00.000Z",
@@ -106,7 +115,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 1431,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.1",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-02-06T00:01:57.000Z",
@@ -135,6 +147,9 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 1903,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.1",
+        "tls.version_protocol": "tls"
     }
 ]
