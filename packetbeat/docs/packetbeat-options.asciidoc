@@ -182,6 +182,8 @@ packetbeat.interfaces.buffer_size_mb: 100
 With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
 This option does not work with `any` interface device.
 The default option is false and requires manual set-up of promiscuous mode.
+Warning: under some circumstances (e.g beat crash) promiscuous mode
+can stay enabled even after beat is shut down.
 
 Example:
 
