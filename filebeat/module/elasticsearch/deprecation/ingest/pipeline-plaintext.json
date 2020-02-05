@@ -16,7 +16,7 @@
                     "GREEDYMULTILINE": "(.|\n)*"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}*\\]\\[%{DATA:elasticsearch.component}%{SPACE}*\\] %{GREEDYMULTILINE:message}"
+                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}\\]\\[%{DATA:elasticsearch.component}%{SPACE}\\] %{GREEDYMULTILINE:message}"
                 ]
             }
         },

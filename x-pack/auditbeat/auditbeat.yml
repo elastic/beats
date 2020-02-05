@@ -49,9 +49,14 @@ auditbeat.modules:
 
 - module: system
   datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 2m # The frequency at which the datasets check for changes
+
+- module: system
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - login   # User logins, logouts, and system boots.
-    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information

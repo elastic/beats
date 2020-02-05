@@ -4,7 +4,7 @@
 
 // +build !integration
 
-package mesh
+package mixer
 
 import (
 	"testing"

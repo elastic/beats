@@ -17,7 +17,7 @@ See the {es} API key documentation for more information:
 information to {es}. If you are sending both to the same cluster, you can use the same
 API key. For different clusters, you need to use an API key per cluster.
 
-NOTE: For security reasons, we recommend using a unique API key per Beat instance.
+NOTE: For security reasons, we recommend using a unique API key per {beatname_uc} instance.
 You can create as many API keys per user as necessary.
 
 [[beats-api-key-publish]]

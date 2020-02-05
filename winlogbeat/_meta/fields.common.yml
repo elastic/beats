@@ -162,6 +162,10 @@
               type: keyword
             - name: MaximumPerformancePercent
               type: keyword
+            - name: MemberName
+              type: keyword
+            - name: MemberSid
+              type: keyword
             - name: MinimumPerformancePercent
               type: keyword
             - name: MinimumThrottlePercent
