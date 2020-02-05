@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"iis",
+        "name":"application_pool",
+        "rtt":44269
+    },
+    "iis":{
+        "application_pool":{
+            "example": "application_pool"
+        }
+    },
+    "type":"metricsets"
+}

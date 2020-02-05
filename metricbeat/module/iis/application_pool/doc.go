@@ -15,6 +15,4 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package iis is a Metricbeat module that contains MetricSets.
-
-package iis
+package application_pool

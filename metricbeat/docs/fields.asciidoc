@@ -15877,6 +15877,23 @@ iis module
 
 
 [float]
+=== application_pool
+
+application_pool
+
+
+
+*`iis.application_pool.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
 === webserver
 
 webserver

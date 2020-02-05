@@ -32,5 +32,5 @@ func init() {
 // AssetIis returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/iis.
 func AssetIis() string {
-	return "eJykz0kOwjAMheG9T/HUfS/gBXdp6QNZpINiF9TbozKJSGGFl4n1/XKLCzeFmQsQFomKxswbAQb6MdsSNk+KgwDY9zDOw5ooQGZi51T0jE4EOBnT4PrYbDF1I9/yPrEtVJzzvC6vl0qgRL6hG3tnvjJ/fmrkT/Y5NaQ8o5a14L/Rkqgn5R4AAP//OjVpIQ=="
+	return "eJykkD1uxCAUhHtOMdp+L0CRLueI2GUSPRkbBDiObx9h8oMd5BQ7JTx932iuGLhqiCQFZMmOGheRdFGAZbpHCVn8pPGkAJQ7jN7OjgqIdDSJGjdmoxTwKnQ26e3yismM/CaX5DVQ4y36OXy9dAR7SAsyITi5m3L8Erx3Pwc9csm+3u9711pz4jjWaqvxw4xhm6RNbTVwXXy0h7+TDiXPFVilf5ZYeEuM74z/TnCi6UH6i7VayXxUukf0leozAAD//xsprTU="
 }

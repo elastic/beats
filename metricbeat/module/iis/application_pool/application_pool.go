@@ -17,7 +17,7 @@
 
 // +build windows
 
-package website
+package application_pool
 
 import (
 	"github.com/pkg/errors"
@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/iis"
+	"github.com/elastic/go-sysinfo"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -33,7 +34,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.AddMetricSet("iis", "website", New)
+	mb.Registry.MustAddMetricSet("iis", "application_pool", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -48,35 +49,33 @@ type MetricSet struct {
 
 // Config for the iis website metricset.
 type Config struct {
-	Sites []string `config:"site"`
+	Names []string `config:"name"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The website metricset is beta")
-
+	cfgwarn.Beta("The iis application_pool metricset is beta.")
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	// init reader object
+
 	reader, err := iis.NewReader()
 	if err != nil {
 		return nil, err
 	}
-	// get instances will retrieve the websites running in iis and also filter on the sites configured by users
-	instances, err := getInstances(reader, config.Sites)
+	instances, err := getInstances(config.Names)
 	if err != nil {
 		return nil, err
 	}
 	reader.Instances = instances
-	if err := reader.InitCounters(iis.WebsiteCounters, nil); err != nil {
+	if err := reader.InitCounters(nil, iis.AppPoolCounters); err != nil {
 		return nil, err
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger("website"),
+		log:           logp.NewLogger("application pool"),
 		reader:        reader,
 	}, nil
 }
@@ -89,12 +88,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err := m.Module().UnpackConfig(&config); err != nil {
 		return nil
 	}
-	instances, err := getInstances(m.reader, config.Sites)
+	instances, err := getInstances(config.Names)
 	if err != nil {
 		return err
 	}
 	m.reader.Instances = instances
-	events, err := m.reader.Fetch(iis.WebsiteCounters, nil)
+	events, err := m.reader.Fetch(nil, iis.AppPoolCounters)
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
@@ -109,41 +108,41 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-// getInstances will retrieve the websites running in iis and also filter on the sites configured by users
-func getInstances(reader *iis.Reader, sites []string) ([]iis.Instance, error) {
-	_, instances, err := reader.Query.GetCountersAndInstances("Web Service")
+// getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
+func getInstances(names []string) ([]iis.Instance, error) {
+	processes, err := sysinfo.Processes()
 	if err != nil {
-		reader.Query.Close()
 		return nil, err
 	}
-	return filterOnInstances(sites, instances), nil
-}
-
-// filterOnInstances will filter on the sites configured by users
-func filterOnInstances(hosts []string, instances []string) []iis.Instance {
-	filtered := make([]iis.Instance, 0)
-	// remove _Total and empty instances
-	for _, instance := range instances {
-		if instance == "_Total" || instance == "" {
+	var w3processes []iis.Instance
+	for _, p := range processes {
+		info, err := p.Info()
+		if err != nil {
 			continue
 		}
-		if containsHost(instance, hosts) {
-			filtered = append(filtered, iis.Instance{Name: instance})
+		if info.Name == "w3wp.exe" {
+			var app string
+			if len(info.Args) > 0 {
+				for i, ar := range info.Args {
+					if ar == "-ap" {
+						app = info.Args[i+1]
+						continue
+					}
+				}
+			}
+			w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
 		}
 	}
-	return filtered
-}
-
-// containsHost checks if array contains site/hostname
-func containsHost(item string, array []string) bool {
-	// if no hosts specified all instances are selected
-	if len(array) == 0 {
-		return true
+	if len(names) == 0 {
+		return w3processes, nil
 	}
-	for _, i := range array {
-		if i == item {
-			return true
+	var filtered []iis.Instance
+	for _, n := range names {
+		for _, w3 := range w3processes {
+			if n == w3.Name {
+				filtered = append(filtered, w3)
+			}
 		}
 	}
-	return false
+	return filtered, nil
 }

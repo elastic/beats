@@ -24,10 +24,9 @@ metricbeat.modules:
   metricsets:
     - webserver
     - website
-      hosts: ["local.test"]
+    - application_pool
   enabled: true
   period: 10s
-
 ----
 
 [float]
@@ -35,9 +34,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-iis-application_pool,application_pool>>
+
 * <<metricbeat-metricset-iis-webserver,webserver>>
 
 * <<metricbeat-metricset-iis-website,website>>
+
+include::iis/application_pool.asciidoc[]
 
 include::iis/webserver.asciidoc[]
 

@@ -347,10 +347,9 @@ metricbeat.modules:
   metricsets:
     - webserver
     - website
-      hosts: ["local.test"]
+    - application_pool
   enabled: true
   period: 10s
-
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

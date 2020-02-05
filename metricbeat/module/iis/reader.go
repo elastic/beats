@@ -17,84 +17,69 @@
 
 // +build windows
 
-package website
+package iis
 
 import (
+	"strings"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
-	"strings"
 )
 
 // Reader will contain the config options
 type Reader struct {
-	query  pdh.Query    // PDH Query
-	hosts  []Host       // Mapping of counter path to key used for the label (e.g. processor.name)
-	log    *logp.Logger // logger
-	hasRun bool         // will check if the reader has run a first time
+	Query     pdh.Query    // PDH Query
+	Instances []Instance   // Mapping of counter path to key used for the label (e.g. processor.name)
+	log       *logp.Logger // logger
+	hasRun    bool         // will check if the reader has run a first time
 }
 
-type Host struct {
-	name      string
-	processId int
+type Instance struct {
+	Name      string
+	ProcessId int
 	counters  map[string]string
 }
 
 // NewReader creates a new instance of Reader.
-func NewReader(config Config) (*Reader, error) {
+func NewReader() (*Reader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
 	reader := &Reader{
-		query: query,
+		Query: query,
 		log:   logp.NewLogger("website"),
 	}
-	if err := reader.InitCounters(config.Hosts); err != nil {
-		return nil, err
-	}
+
 	return reader, nil
 }
 
-func (this *Reader) InitCounters(hosts []string) error {
-	counters, instances, err := this.query.GetCountersAndInstances("Web Service")
-	_ = counters
-	if err != nil {
-		this.query.Close()
-		return err
-	}
-	this.hosts = filterOnInstances(hosts, instances)
+func (re *Reader) InitCounters(nameCounters map[string]string, processIdCounters map[string]string) error {
 	var newQueries []string
-	for i, instance := range this.hosts {
-		this.hosts[i].counters = make(map[string]string)
-		for key, value := range webserverCounters {
-			value = strings.Replace(value, "*", instance.name, 1)
-			if err := this.query.AddCounter(value, "", "float", true); err != nil {
+	for i, instance := range re.Instances {
+		re.Instances[i].counters = make(map[string]string)
+		for key, value := range nameCounters {
+			value = strings.Replace(value, "*", instance.Name, 1)
+			if err := re.Query.AddCounter(value, "", "float", true); err != nil {
 				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 			}
 			newQueries = append(newQueries, value)
-			this.hosts[i].counters[value] = key
+			re.Instances[i].counters[value] = key
 		}
-		var processId int
-		processId, err = GetProcessId(instance.name)
-		this.hosts[i].processId = processId
-		if err != nil {
-			this.log.Errorf("Cannot find attached worker process %s", err)
-			continue
-		}
-		for key, value := range processCounters {
-			value = strings.Replace(value, "*", string(processId), 1)
-			if err := this.query.AddCounter(value, "", "float", true); err != nil {
+		for key, value := range processIdCounters {
+			value = strings.Replace(value, "*", string(instance.ProcessId), 1)
+			if err := re.Query.AddCounter(value, "", "float", true); err != nil {
 				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 			}
 			newQueries = append(newQueries, value)
-			this.hosts[i].counters[value] = key
+			re.Instances[i].counters[value] = key
 		}
 	}
-
-	err = this.query.RemoveUnusedCounters(newQueries)
+	err := re.Query.RemoveUnusedCounters(newQueries)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
@@ -102,43 +87,59 @@ func (this *Reader) InitCounters(hosts []string) error {
 }
 
 // Read executes a query and returns those values in an event.
-func (this *Reader) Fetch() ([]mb.Event, error) {
+func (re *Reader) Fetch(nameCounters map[string]string, processIdCounters map[string]string) ([]mb.Event, error) {
+	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
+	if len(re.Query.Counters) == 0 {
+		return nil, errors.New("no counters to read")
+	}
+
+	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	if err := this.query.CollectData(); err != nil {
+	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
+	if re.hasRun {
+		err := re.InitCounters(nameCounters, processIdCounters)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed retrieving counters")
+		}
+	}
+
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+	if err := re.Query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}
 
 	// Get the values.
-	values, err := this.query.GetFormattedCounterValues()
+	values, err := re.Query.GetFormattedCounterValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	events := make(map[string]mb.Event)
-	for _, host := range this.hosts {
-		events[host.name] = mb.Event{
+	for _, host := range re.Instances {
+		events[host.Name] = mb.Event{
 			MetricSetFields: common.MapStr{
-				"name":              host.name,
-				"worker_process_id": host.processId,
+				"name":              host.Name,
+				"worker_process_id": host.ProcessId,
 			},
 		}
 		for counterPath, values := range values {
 			for _, val := range values {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-				if val.Err != nil && !this.hasRun {
-					this.log.Debugw("Ignoring the first measurement because the data isn't ready",
+				if val.Err != nil && !re.hasRun {
+					re.log.Debugw("Ignoring the first measurement because the data isn't ready",
 						"error", val.Err, logp.Namespace("website"), "query", counterPath)
 					continue
 				}
-				if val.Instance == host.name || val.Instance == string(host.processId) {
-					events[host.name].MetricSetFields.Put(host.counters[counterPath], val.Measurement)
+				if val.Instance == host.Name || val.Instance == string(host.ProcessId) {
+					events[host.Name].MetricSetFields.Put(host.counters[counterPath], val.Measurement)
 				}
 			}
 		}
 	}
 
-	this.hasRun = true
+	re.hasRun = true
 	results := make([]mb.Event, 0, len(events))
 	for _, val := range events {
 		results = append(results, val)
@@ -147,41 +148,6 @@ func (this *Reader) Fetch() ([]mb.Event, error) {
 }
 
 // Close will close the PDH query for now.
-func (this *Reader) Close() error {
-	return this.query.Close()
-}
-
-func filterOnInstances(hosts []string, instances []string) []Host {
-	filtered := make([]Host, 0)
-	// remove _Total and empty instances
-	for _, instance := range instances {
-		if instance == "_Total" || instance == "" {
-			continue
-		}
-		if containsHost(instance, hosts) {
-			filtered = append(filtered, Host{name: instance})
-		}
-	}
-	return filtered
-}
-
-func containsHost(item string, array []string) bool {
-	// if no hosts specified all instances are selected
-	if len(array) == 0 {
-		return true
-	}
-	for _, i := range array {
-		if i == item {
-			return true
-		}
-	}
-	return false
-}
-
-func GetProcessId(host string) (int, error) {
-	appPool, err := GetApplicationPool(host)
-	if err != nil {
-		return 0, err
-	}
-	return GetWorkerProcessId(appPool)
+func (re *Reader) Close() error {
+	return re.Query.Close()
 }
