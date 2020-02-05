@@ -30,7 +30,7 @@ import (
 func Module() error {
 	targetModule := os.Getenv("MODULE")
 	if targetModule == "" {
-		return fmt.Errorf("You must specify the module: MODULE=name mage generate:module")
+		return fmt.Errorf("you must specify the module: MODULE=name mage generate:module")
 	}
 
 	ossDir := devtools.OSSBeatDir()

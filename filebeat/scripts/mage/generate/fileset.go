@@ -33,7 +33,7 @@ func Fileset() error {
 	targetFileset := os.Getenv("FILESET")
 
 	if targetModule == "" || targetFileset == "" {
-		return fmt.Errorf("You must specify the module and fileset: MODULE=module FILESET=fileset createFileset")
+		return fmt.Errorf("you must specify the module and fileset: MODULE=module FILESET=fileset createFileset")
 	}
 
 	ossDir := devtools.OSSBeatDir()

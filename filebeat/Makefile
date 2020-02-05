@@ -14,15 +14,15 @@ update: mage
 
 # Creates a new module. Requires the params MODULE.
 .PHONY: create-module
-create-module:
+create-module: mage
 	mage generate:module
 
 # Creates a new fileset. Requires the params MODULE and FILESET.
 .PHONY: create-fileset
-create-fileset:
+create-fileset: mage
 	mage generate:fileset
 
 # Creates a fields.yml based on a pipeline.json file. Requires the params MODULE and FILESET.
 .PHONY: create-fields
-create-fields:
+create-fields: mage
 	mage generate:fields
