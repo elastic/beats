@@ -123,9 +123,14 @@ auditbeat.modules:
 # or stops).
 - module: system
   datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 2m # The frequency at which the datasets check for changes
+
+- module: system
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - login   # User logins, logouts, and system boots.
-    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -1111,7 +1116,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
