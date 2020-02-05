@@ -25,8 +25,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ErrCAPingMatch is returned when no pin is matched in the verified chain.
-var ErrCAPingMatch = errors.New("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate")
+// ErrCAPinMissmatch is returned when no pin is matched in the verified chain.
+var ErrCAPinMissmatch = errors.New("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate")
 
 type pins []string
 
@@ -58,7 +58,7 @@ func MakeCAPinCallback(hashes pins) func([][]byte, [][]*x509.Certificate) error 
 			}
 		}
 
-		return ErrCAPingMatch
+		return ErrCAPinMissmatch
 	}
 }
 
