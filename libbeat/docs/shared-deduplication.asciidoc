@@ -61,7 +61,7 @@ processors:
       target_field: "@metadata._id"
 ----
 
-* *`decode_json_field` processor*
+* *`decode_json_fields` processor*
 +
 Use the `document_id` setting in the <<decode-json-fields,`decode_json_fields`>>
 processor when you're decoding a JSON string that contains a natural key field.
