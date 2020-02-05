@@ -84,8 +84,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-- Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
-- Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 - Enable setting promiscuous mode automatically. {pull}11366[11366]
 
 *Winlogbeat*
