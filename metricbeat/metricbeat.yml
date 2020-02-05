@@ -134,9 +134,9 @@ setup.kibana:
   #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
-output.logstash:
+#output.logstash:
   # The Logstash hosts
-  hosts: ["localhost:5000"]
+#  hosts: ["localhost:5000"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -147,6 +147,22 @@ output.logstash:
 
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
+
+output.kafka:
+  hosts: ["kafka:9092"]
+  topic: beats
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 10000000
+
+
+
+
+
+
+
 
 #================================ Processors =====================================
 
