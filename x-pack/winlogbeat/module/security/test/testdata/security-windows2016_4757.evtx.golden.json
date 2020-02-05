@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-10-22T11:35:09.0701919Z",
     "event": {
-      "action": "deleted-group-account-from",
+      "action": "removed-member-from-group",
       "code": 4757,
       "kind": "event",
       "module": "security",
@@ -18,8 +18,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",
