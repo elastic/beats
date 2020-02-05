@@ -113,7 +113,6 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	}
 	fmt.Printf("%s\n", string(buildStr))
 
-
 	return nil
 }
 
