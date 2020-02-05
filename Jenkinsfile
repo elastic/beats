@@ -626,7 +626,6 @@ def reportCoverage(){
 def isChanged(patterns){
   return (params.runAllStages
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
-    || isGitRegionMatch(patterns: ["^libbeat/.*"], comparator: 'regexp')
   )
 }
 
@@ -641,10 +640,10 @@ def loadConfigEnvVars(){
     "^x-pack/dockerlogbeat/.*",
     "^x-pack/libbeat/.*",
   ])
-  env.BUILD_DOCS = isGitRegionMatch(
+  env.BUILD_DOCS = isChanged(
     patterns: ["^docs/.*"],
     comparator: 'regexp'
-  ) || params.runAllStages
+  )
   env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
   env.BUILD_FILEBEAT_XPACK = isChanged([
     "^filebeat/.*",
@@ -669,10 +668,10 @@ def loadConfigEnvVars(){
     "^x-pack/libbeat/.*",
   ])
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-  env.BUILD_LIBBEAT = isGitRegionMatch(
+  env.BUILD_LIBBEAT = isChanged(
     patterns: ["^libbeat/.*"],
     comparator: 'regexp'
-  ) || params.runAllStages
+  )
   env.BUILD_LIBBEAT_XPACK = isChanged([
     "^libbeat/.*",
     "^x-pack/libbeat/.*",
