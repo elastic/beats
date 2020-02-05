@@ -1,0 +1,21 @@
+ARG CEPH_VERSION
+FROM ceph/daemon:${CEPH_VERSION}
+
+RUN yum -q install -y jq && yum clean all && rm -fr /var/cache/yum
+
+# Wait for the health endpoint to have monitors information
+HEALTHCHECK --interval=1s --retries=300 \
+    CMD ceph health | grep HEALTH_OK && \
+    ceph restful list-keys > /opt/ceph-container/sree/static/restful-list-keys.json && \
+    curl -s localhost:5000 >/dev/null
+
+EXPOSE 5000 8003
+
+ENV NETWORK_AUTO_DETECT 4
+ENV CEPH_DAEMON demo
+ENV CEPH_DEMO_UID beats
+ENV CEPH_DEMO_BUCKET beats
+ENV CEPH_DEMO_ACCESS_KEY demo
+ENV CEPH_DEMO_SECRET_KEY demo
+
+CMD ["demo"]
