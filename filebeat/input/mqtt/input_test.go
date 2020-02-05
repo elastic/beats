@@ -226,7 +226,7 @@ func TestRun_Twice(t *testing.T) {
 	require.Equal(t, 1, client.connectCount)
 }
 
-func TestStop(t *testing.T) {
+func TestWait(t *testing.T) {
 	inflightMessages := new(sync.WaitGroup)
 	client := new(mockedClient)
 	input := &mqttInput{
@@ -235,19 +235,19 @@ func TestStop(t *testing.T) {
 		inflightMessages: inflightMessages,
 	}
 
-	input.Stop()
+	input.Wait()
 
 	require.Equal(t, 1, client.disconnectCount)
 }
 
-func TestWait(t *testing.T) {
-	inflightMessages := new(sync.WaitGroup)
+func TestStop(t *testing.T) {
+	client := new(mockedClient)
 	input := &mqttInput{
-		logger:           logger,
-		inflightMessages: inflightMessages,
+		client: client,
+		logger: logger,
 	}
 
-	input.Wait()
+	input.Stop()
 }
 
 func TestOnCreateHandler_SubscribeMultiple_Succeeded(t *testing.T) {

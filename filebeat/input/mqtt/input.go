@@ -34,7 +34,7 @@ import (
 )
 
 const (
-	disconnectTimeout = 3 * 1000 // 3000 ms = 3 sec
+	disconnectTimeout = 3 * time.Second
 
 	subscribeTimeout       = 35 * time.Second // in client: subscribeWaitTimeout = 30s
 	subscribeRetryInterval = 1 * time.Second
@@ -174,12 +174,12 @@ func (mi *mqttInput) Run() {
 // Stop method stops the input.
 func (mi *mqttInput) Stop() {
 	mi.logger.Debug("Stop the input.")
-	mi.client.Disconnect(disconnectTimeout)
-	mi.Wait()
+	mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
 }
 
-// Wait method waits until event processing is finished.
+// Wait method stops the input and waits until event processing is finished.
 func (mi *mqttInput) Wait() {
+	mi.Stop()
 	mi.logger.Debug("Wait for the input to finish processing.")
 	mi.inflightMessages.Wait()
 }
