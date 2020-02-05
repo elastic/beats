@@ -188,7 +188,7 @@ The following packages are required to run `go generate` by Beat:
 
 ===== Auditbeat
 
-* Flatbuffers >= 1.9
+* FlatBuffers >= 1.9
 
 ===== Filebeat
 
