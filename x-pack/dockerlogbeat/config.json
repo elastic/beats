@@ -1,24 +1,36 @@
 {
-    "description": "A beat for docker logs",
-    "documentation": "https://docs.docker.com/engine/extend/plugin_api/",
-    "entrypoint": ["/usr/bin/dockerlogbeat"],
-    "network": {
-      "type": "host"
+  "description": "A beat for docker logs",
+  "documentation": "https://docs.docker.com/engine/extend/plugin_api/",
+  "entrypoint": [
+    "/usr/bin/dockerlogbeat"
+  ],
+  "network": {
+    "type": "host"
+  },
+  "interface": {
+    "types": [
+      "docker.logdriver/1.0"
+    ],
+    "socket": "beatSocket.sock"
+  },
+  "env": [
+    {
+      "description": "debug level",
+      "name": "LOG_DRIVER_LEVEL",
+      "value": "info",
+      "Settable": [
+        "value"
+      ]
     },
-    "interface": {
-      "types": ["docker.logdriver/1.0"],
-      "socket": "beatSocket.sock"
+    {
+      "description": "Remove strict config file checking, as there is no config file",
+      "name": "BEAT_STRICT_PERMS",
+      "value": "false"
     },
-    "env":[
-      {
-        "description": "libbeat env hack",
-        "name": "BEAT_STRICT_PERMS",
-        "value": "false"
-      }, 
-      {
-        "description": "config for dockerlogbeat",
-        "name": "BEAT_UNIX_SOCK_PATH",
-        "value": "/contmount/controller.sock"
-      }
-    ]
-  }
+    {
+      "description": "config for dockerlogbeat",
+      "name": "BEAT_UNIX_SOCK_PATH",
+      "value": "/contmount/controller.sock"
+    }
+  ]
+}
