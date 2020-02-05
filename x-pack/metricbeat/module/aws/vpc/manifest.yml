@@ -13,3 +13,32 @@ input:
         name:
           - TunnelDataIn
           - TunnelDataOut
+      - namespace: AWS/TransitGateway
+        statistic: ["Sum"]
+        name:
+          - BytesIn
+          - BytesOut
+          - PacketsIn
+          - PacketsOut
+          - PacketDropCountBlackhole
+          - PacketDropCountNoRoute
+      - namespace: AWS/NATGateway
+        statistic: ["Sum"]
+        name:
+          - BytesInFromDestination
+          - BytesInFromSource
+          - BytesOutToDestination
+          - BytesOutToSource
+          - ConnectionAttemptCount
+          - ConnectionEstablishedCount
+          - ErrorPortAllocation
+          - IdleTimeoutCount
+          - PacketsDropCount
+          - PacketsInFromDestination
+          - PacketsInFromSource
+          - PacketsOutToDestination
+          - PacketsOutToSource
+      - namespace: AWS/NATGateway
+        statistic: ["Maximum"]
+        name:
+          - ActiveConnectionCount
