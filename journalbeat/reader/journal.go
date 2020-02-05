@@ -288,8 +288,14 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 	if fc.isInteger {
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
-			return value
+			// Failed to convert to integer, try to strip ',\w*' from the
+			// end of of the value and try again.
+			s := strings.Split(value, ",")
+			v, err = strconv.ParseInt(s[0], 10, 64)
+			if err != nil {
+				r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+				return value
+			}
 		}
 		return v
 	}
