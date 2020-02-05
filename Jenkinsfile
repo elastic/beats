@@ -398,13 +398,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_WINLOGBEAT_XPACK != "false"
-            }
-          }
-          when {
-            beforeAgent true
-            expression {
-              return params.windowsTest
+              return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
             }
           }
           steps {
