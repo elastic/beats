@@ -238,6 +238,10 @@ to as part of the verified chain.
 
 The pin is a base64 encoded string of the SHA-256 of the certificate.
 
+NOTE: This check is not a replacement for the normal SSL validation but it add additional validation.
+If this option is used with  `verification_mode` set to `none`, the check will always fail because
+it will not receive any verified chains.
+
 
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]
