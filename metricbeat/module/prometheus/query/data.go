@@ -19,35 +19,37 @@ package query
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
 )
 
 // ArrayResponse is for "scalar", "string" type.
 type ArrayResponse struct {
-	Status string       `json:"status"`
-	Data   arrayData	`json:"data"`
+	Status string    `json:"status"`
+	Data   arrayData `json:"data"`
 }
 type arrayData struct {
-	ResultType string   		`json:"resultType"`
-	Results    []interface{} 	`json:"result"`
+	ResultType string        `json:"resultType"`
+	Results    []interface{} `json:"result"`
 }
+
 // MapResponse is for "vector", "matrix" type from Prometheus Query API Request
 type MapResponse struct {
-	Status string  	`json:"status"`
-	Data   mapData 	`json:"data"`
+	Status string  `json:"status"`
+	Data   mapData `json:"data"`
 }
 type mapData struct {
-	ResultType string   		`json:"resultType"`
-	Results    []mapResult 	`json:"result"`
+	ResultType string      `json:"resultType"`
+	Results    []mapResult `json:"result"`
 }
 type mapResult struct {
-	Metric	map[string]string	`json:"metric"`
-	Vector	[]interface{}		`json:"value"`
-	Vectors [][]interface{}		`json:"values"`
+	Metric  map[string]string `json:"metric"`
+	Vector  []interface{}     `json:"value"`
+	Vectors [][]interface{}   `json:"values"`
 }
 
 func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
@@ -62,8 +64,8 @@ func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Even
 		events = append(events, mb.Event{
 			Timestamp: getTimestamp(res.Data.Results[0].(float64)),
 			MetricSetFields: common.MapStr{
-				"dataType": resultType,
-				pathConfig.Name: res.Data.Results[1], 
+				"dataType":      resultType,
+				pathConfig.Name: convertToNumeric(res.Data.Results[1].(string)),
 			},
 		})
 	case "vector":
@@ -72,9 +74,9 @@ func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Even
 			events = append(events, mb.Event{
 				Timestamp: getTimestamp(result.Vector[0].(float64)),
 				MetricSetFields: common.MapStr{
-					"labels": result.Metric,
-					"dataType": resultType,
-					pathConfig.Name: result.Vector[1],
+					"labels":        result.Metric,
+					"dataType":      resultType,
+					pathConfig.Name: convertToNumeric(result.Vector[1].(string)),
 				},
 			})
 		}
@@ -85,9 +87,9 @@ func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Even
 				events = append(events, mb.Event{
 					Timestamp: getTimestamp(vector[0].(float64)),
 					MetricSetFields: common.MapStr{
-						"labels": result.Metric,
-						"dataType": resultType,
-						pathConfig.Name: vector[1],
+						"labels":        result.Metric,
+						"dataType":      resultType,
+						pathConfig.Name: convertToNumeric(vector[1].(string)),
 					},
 				})
 			}
@@ -104,7 +106,7 @@ func convertJSONToStruct(body []byte) (interface{}, string, error) {
 		return nil, "", errors.Wrap(err, "Failed to parse api response")
 	}
 
-	if arrayBody.Data.ResultType == "vector" ||  arrayBody.Data.ResultType == "matrix" {
+	if arrayBody.Data.ResultType == "vector" || arrayBody.Data.ResultType == "matrix" {
 		mapBody := MapResponse{}
 		if err := json.Unmarshal(body, &mapBody); err != nil {
 			return nil, arrayBody.Data.ResultType, errors.Wrap(err, "Failed to parse api response")
@@ -116,6 +118,16 @@ func convertJSONToStruct(body []byte) (interface{}, string, error) {
 
 func getTimestamp(num float64) time.Time {
 	sec := int64(num)
-	ns := int64((num - float64(sec))*1000)
+	ns := int64((num - float64(sec)) * 1000)
 	return time.Unix(sec, ns)
+}
+
+func convertToNumeric(str string) interface{} {
+	if res, err := strconv.Atoi(str); err == nil {
+		return res
+	} else if res, err := strconv.ParseFloat(str, 64); err == nil {
+		return res
+	} else {
+		return str
+	}
 }
