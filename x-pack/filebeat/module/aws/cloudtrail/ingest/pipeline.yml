@@ -108,8 +108,8 @@ processors:
   - script:
       lang: painless
       source: |
-        if (ctx.json.additionalEventdata != null) {
-          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventdata.toString();
+        if (ctx.json.additionalEventData != null) {
+          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
         }
       ignore_failure: true
   - rename:
