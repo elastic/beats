@@ -229,6 +229,16 @@ are `never`, `once`, and `freely`. The default value is never.
 * `once` - Allows a remote server to request renegotiation once per connection.
 * `freely` - Allows a remote server to repeatedly request renegotiation.
 
+
+[float]
+==== `ca_sha256`
+
+This configure a certificate pin can that ca be used to ensure that a specific certificate is used
+to as part of the verified chain.
+
+The pin is a base64 encoded string of the SHA-256 of the certificate.
+
+
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]
 ==== `client_authentication`
