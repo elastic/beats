@@ -312,8 +312,9 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	}
 
 	// number_of_routing shards is only supported for ES version >= 6.1
+	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) {
+	if !ver.LessThan(version61) && ver.Major < 7 {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 

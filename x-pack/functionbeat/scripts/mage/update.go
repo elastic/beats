@@ -5,6 +5,7 @@
 package mage
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -55,6 +56,10 @@ func (Update) IncludeFields() error {
 func (Update) VendorBeats() error {
 	for _, f := range []string{"pubsub", "storage"} {
 		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
+		err := os.RemoveAll(gcpVendorPath)
+		if err != nil {
+			return err
+		}
 
 		deps, err := gotool.ListDeps("github.com/elastic/beats/x-pack/functionbeat/provider/gcp/" + f)
 		if err != nil {
