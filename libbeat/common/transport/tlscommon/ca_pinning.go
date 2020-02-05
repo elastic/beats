@@ -44,6 +44,10 @@ func (p pins) Matches(candidate string) bool {
 type verifyPeerCertFunc func([][]byte, [][]*x509.Certificate) error
 
 // MakeCAPinCallback loops through the verified chains and will try to match the certificates pin.
+//
+// NOTE: Defining a PIN to check certificates is not a replacement for the normal TLS validations it's
+// an additional validation. In fact if you set `InsecureSkipVerify` to true and a PIN, the
+// verifiedChains variable will be empty and the added validation will fail.
 func MakeCAPinCallback(hashes pins) func([][]byte, [][]*x509.Certificate) error {
 	return func(_ [][]byte, verifiedChains [][]*x509.Certificate) error {
 		// The chain of trust has been already established before the call to the VerifyPeerCertificate
