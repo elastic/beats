@@ -99,6 +99,7 @@ Filename of AWS credential file.
 
 AWS credential profile name.
 
+[float]
 === cloudtrail fileset
 
 CloudTrail monitors events for the account. If user creates a trail, it
@@ -107,6 +108,7 @@ The `cloudtrail` fileset does not read the CloudTrail Digest files
 that are delivered to the S3 bucket when Log File Integrity is turned
 on, it only reads the CloudTrail logs.
 
+[float]
 === elb fileset
 
 Elastic Load Balancing provides access logs that capture detailed information
@@ -125,6 +127,7 @@ This fileset comes with a predefined dashboard:
 [role="screenshot"]
 image::./images/filebeat-aws-elb-overview.png[]
 
+[float]
 === s3access fileset
 
 Server access logging provides detailed records for the requests that are made
@@ -140,6 +143,7 @@ This fileset comes with a predefined dashboard:
 [role="screenshot"]
 image::./images/filebeat-aws-s3access-overview.png[]
 
+[float]
 === vpcflow fileset
 
 VPC Flow Logs is a feature in AWS that enables users to capture information

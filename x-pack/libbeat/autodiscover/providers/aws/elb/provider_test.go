@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type testEventAccumulator struct {
@@ -60,10 +61,11 @@ func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, t
 }
 
 func Test_internalBuilder(t *testing.T) {
+	log := logp.NewLogger("elb")
 	lbl := fakeLbl()
 	lbls := []*lbListener{lbl}
 	fetcher := newMockFetcher(lbls, nil)
-	pBus := bus.New("test")
+	pBus := bus.New(log, "test")
 
 	cfg := &Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
