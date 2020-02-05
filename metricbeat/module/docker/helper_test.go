@@ -23,6 +23,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/stretchr/testify/assert"
+
+	helpers "github.com/elastic/beats/libbeat/common/docker"
 )
 
 func TestDeDotLabels(t *testing.T) {
@@ -33,7 +35,7 @@ func TestDeDotLabels(t *testing.T) {
 	}
 
 	t.Run("dedot enabled", func(t *testing.T) {
-		result := DeDotLabels(labels, true)
+		result := helpers.DeDotLabels(labels, true)
 		assert.Equal(t, common.MapStr{
 			"com_docker_swarm_task":      "",
 			"com_docker_swarm_task_id":   "1",
@@ -42,7 +44,7 @@ func TestDeDotLabels(t *testing.T) {
 	})
 
 	t.Run("dedot disabled", func(t *testing.T) {
-		result := DeDotLabels(labels, false)
+		result := helpers.DeDotLabels(labels, false)
 		assert.Equal(t, common.MapStr{
 			"com": common.MapStr{
 				"docker": common.MapStr{

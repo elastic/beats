@@ -21,11 +21,22 @@ by default, as you may want to avoid exposing this info.
 The HTTP endpoint has the following configuration settings:
 
 `http.enabled`:: (Optional) Enable the HTTP endpoint. Default is `false`.
-`http.host`:: (Optional) Bind to this hostname or IP address.
+`http.host`:: (Optional) Bind to this hostname, IP address, unix socket (unix:///var/run/{beatname_lc}.sock) or Windows named pipe (npipe:///{beatname_lc}).
 It is recommended to use only localhost. Default is `localhost`
 `http.port`:: (Optional) Port on which the HTTP endpoint will bind. Default is `5066`.
+`http.named_pipe.user`:: (Optional) User to use to create the named pipe, only work on Windows, Default to the
+current user.
+`http.named_pipe.security_descriptor`:: (Optional) Windows Security descriptor string defined in the SDDL format. Default to
+read and write permission for the current user.
 
 This is the list of paths you can access. For pretty JSON output append ?pretty to the URL.
+
+You can query a unix socket using the `CURL` command and the `--unix-socket` flag.
+
+[source,js]
+----
+curl -XGET --unix-socket '/var/run/{beatname_lc}.sock' 'http:/stats/?pretty'
+----
 
 
 [float]
@@ -95,6 +106,9 @@ curl -XGET 'localhost:5066/stats?pretty'
       "memory_alloc": 9433384,
       "memory_total": 492478864,
       "rss": 50405376
+    },
+    "runtime": {
+      "goroutines": 22
     }
   },
   "libbeat": {

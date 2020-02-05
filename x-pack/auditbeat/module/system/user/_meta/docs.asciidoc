@@ -12,4 +12,4 @@ It is implemented for Linux only.
 The dataset comes with a sample dashboard:
 
 [role="screenshot"]
-image:./images/auditbeat-system-user-dashboard.png[Auditbeat System User Dashboard]
+image::./images/auditbeat-system-user-dashboard.png[Auditbeat System User Dashboard]

@@ -5,7 +5,6 @@
         "destination.domain": "example.com",
         "destination.ip": "::1",
         "destination.port": 80,
-        "ecs.version": "1.0.0",
         "event.dataset": "iis.access",
         "event.duration": 789000000,
         "event.module": "iis",
@@ -35,6 +34,6 @@
         "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.0",
-        "user_agent.version": "70.0.3538"
+        "user_agent.version": "70.0.3538.102"
     }
 ]

@@ -20,9 +20,13 @@ package docker
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 // Client for Docker
@@ -32,16 +36,18 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient() (Client, error) {
-	c, err := client.NewEnvClient()
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	return Client{cli: c}, err
 }
 
 // ContainerStart pulls and starts the given container
 func (c Client) ContainerStart(image string, cmd []string, labels map[string]string) (string, error) {
 	ctx := context.Background()
-	if _, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{}); err != nil {
-		return "", err
+	respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	if err != nil {
+		return "", errors.Wrapf(err, "pullling image %s", image)
 	}
+	defer respBody.Close()
 
 	resp, err := c.cli.ContainerCreate(ctx, &container.Config{
 		Image:  image,
@@ -49,11 +55,11 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		Labels: labels,
 	}, nil, nil, "")
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "creating container")
 	}
 
 	if err := c.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "starting container")
 	}
 
 	return resp.ID, nil
@@ -62,8 +68,13 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 // ContainerWait waits for a container to finish
 func (c Client) ContainerWait(ID string) error {
 	ctx := context.Background()
-	_, err := c.cli.ContainerWait(ctx, ID)
-	return err
+	waitC, errC := c.cli.ContainerWait(ctx, ID, container.WaitConditionNotRunning)
+	select {
+	case <-waitC:
+	case err := <-errC:
+		return err
+	}
+	return nil
 }
 
 // ContainerKill kills the given container

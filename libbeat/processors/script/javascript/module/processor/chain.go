@@ -42,7 +42,7 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 		}
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
-		for name, fn := range constructors {
+		for name, fn := range registry.Constructors() {
 			c.this.Set(name, c.makeBuilderFunc(fn))
 		}
 		call.This.Set("Add", c.Add)
@@ -83,7 +83,7 @@ func (b *chainBuilder) Add(call goja.FunctionCall) goja.Value {
 	case *beatProcessor:
 		b.procs = append(b.procs, v.p)
 	case func(goja.FunctionCall) goja.Value:
-		b.procs = append(b.procs, &jsProcessor{fn: v})
+		b.procs = append(b.procs, newJSProcessor(v))
 	default:
 		panic(b.runtime.NewGoError(errors.Errorf("arg0 must be a processor object, but got %T", a0.Export())))
 	}
@@ -98,9 +98,7 @@ func (b *chainBuilder) Build(call goja.FunctionCall) goja.Value {
 	}
 
 	p := &beatProcessor{b.runtime, &b.chain}
-	o := b.runtime.NewObject()
-	o.Set("Run", p.Run)
-	return o
+	return b.runtime.ToValue(p)
 }
 
 type gojaCall interface {
@@ -119,10 +117,14 @@ type jsProcessor struct {
 	call goja.FunctionCall
 }
 
+func newJSProcessor(fn jsFunction) *jsProcessor {
+	return &jsProcessor{fn: fn, call: goja.FunctionCall{Arguments: make([]goja.Value, 1)}}
+}
+
 func (p *jsProcessor) run(event javascript.Event) error {
-	p.call.Arguments = p.call.Arguments[0:]
-	p.call.Arguments = append(p.call.Arguments, event.JSObject())
+	p.call.Arguments[0] = event.JSObject()
 	p.fn(p.call)
+	p.call.Arguments[0] = nil
 	return nil
 }
 

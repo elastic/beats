@@ -33,8 +33,30 @@ processors:
         - from: "zeek.ssl.uid"
           to: "zeek.session_id"
 
+        - from: "zeek.ssl.server_name"
+          to: "zeek.ssl.server.name"
+
+        - from: "zeek.ssl.cert_chain"
+          to: "zeek.ssl.server.cert_chain"
+
+        - from: "zeek.ssl.cert_chain_fuids"
+          to: "zeek.ssl.server.cert_chain_fuids"
+
+        - from: "zeek.ssl.client_cert_chain"
+          to: "zeek.ssl.client.cert_chain"
+
+        - from: "zeek.ssl.client_cert_chain_fuids"
+          to: "zeek.ssl.client.cert_chain_fuids"
+
+        - from: "zeek.ssl.validation_status"
+          to: "zeek.ssl.validation.status"
+
+        - from: "zeek.ssl.validation_code"
+          to: "zeek.ssl.validation.code"
+
       ignore_missing: true
       fail_on_error: false
+
 {{ if .community_id }}
   - community_id:
       fields:

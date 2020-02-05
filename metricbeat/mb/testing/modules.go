@@ -54,6 +54,7 @@ that Metricbeat does it and with the same validations.
 package testing
 
 import (
+	"context"
 	"sync"
 	"testing"
 	"time"
@@ -85,6 +86,22 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.
 func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
+	metricsets := NewMetricSets(t, config)
+
+	if len(metricsets) != 1 {
+		t.Fatal("invalid number of metricsets instantiated")
+	}
+
+	metricset := metricsets[0]
+	if metricset == nil {
+		t.Fatal("metricset is nil")
+	}
+	return metricset
+}
+
+// NewMetricSets instantiates a list of new MetricSets using the given
+// module configuration.
+func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	c, err := common.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
@@ -97,15 +114,7 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 		t.Fatal("no module instantiated")
 	}
 
-	if len(metricsets) != 1 {
-		t.Fatal("invalid number of metricsets instantiated")
-	}
-
-	metricset := metricsets[0]
-	if metricset == nil {
-		t.Fatal("metricset is nil")
-	}
-	return metricset
+	return metricsets
 }
 
 // NewEventFetcher instantiates a new EventFetcher using the given
@@ -181,6 +190,35 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 	return reportingMetricSetV2Error
 }
 
+// NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
+func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
+	metricSets := NewMetricSets(t, config)
+	var reportingMetricSets []mb.ReportingMetricSetV2Error
+	for _, metricSet := range metricSets {
+		rMS, ok := metricSet.(mb.ReportingMetricSetV2Error)
+		if !ok {
+			t.Fatalf("MetricSet %v does not implement ReportingMetricSetV2Error", metricSet.Name())
+		}
+
+		reportingMetricSets = append(reportingMetricSets, rMS)
+	}
+
+	return reportingMetricSets
+}
+
+// NewReportingMetricSetV2WithContext returns a new ReportingMetricSetV2WithContext instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2WithContext(t testing.TB, config interface{}) mb.ReportingMetricSetV2WithContext {
+	metricSet := NewMetricSet(t, config)
+
+	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSetV2WithContext)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2WithContext")
+	}
+
+	return reportingMetricSet
+}
+
 // CapturingReporterV2 is a reporter used for testing which stores all events and errors
 type CapturingReporterV2 struct {
 	events []mb.Event
@@ -222,6 +260,17 @@ func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, []error) {
 	r := &CapturingReporterV2{}
 	err := metricSet.Fetch(r)
+	if err != nil {
+		r.errs = append(r.errs, err)
+	}
+	return r.events, r.errs
+}
+
+// ReportingFetchV2WithContext runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) ([]mb.Event, []error) {
+	r := &CapturingReporterV2{}
+	err := metricSet.Fetch(context.Background(), r)
 	if err != nil {
 		r.errs = append(r.errs, err)
 	}
@@ -301,7 +350,21 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
 	if !ok {
-		t.Fatal("MetricSet does not implement PushMetricSet")
+		t.Fatal("MetricSet does not implement PushMetricSetV2")
+	}
+
+	return pushMetricSet
+}
+
+// NewPushMetricSetV2WithContext instantiates a new PushMetricSetV2WithContext
+// using the given configuration. The ModuleFactory and MetricSetFactory are
+// obtained from the global Registry.
+func NewPushMetricSetV2WithContext(t testing.TB, config interface{}) mb.PushMetricSetV2WithContext {
+	metricSet := NewMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2WithContext)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSetV2WithContext")
 	}
 
 	return pushMetricSet
@@ -310,15 +373,19 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 // capturingPushReporterV2 stores all the events and errors from a metricset's
 // Run method.
 type capturingPushReporterV2 struct {
-	doneC   chan struct{}
+	context.Context
 	eventsC chan mb.Event
+}
+
+func newCapturingPushReporterV2(ctx context.Context) *capturingPushReporterV2 {
+	return &capturingPushReporterV2{Context: ctx, eventsC: make(chan mb.Event)}
 }
 
 // report writes an event to the output channel and returns true. If the output
 // is closed it returns false.
 func (r *capturingPushReporterV2) report(event mb.Event) bool {
 	select {
-	case <-r.doneC:
+	case <-r.Done():
 		// Publisher is stopped.
 		return false
 	case r.eventsC <- event:
@@ -336,54 +403,42 @@ func (r *capturingPushReporterV2) Error(err error) bool {
 	return r.report(mb.Event{Error: err})
 }
 
-// Done returns the Done channel for this reporter.
-func (r *capturingPushReporterV2) Done() <-chan struct{} {
-	return r.doneC
+func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
+	var events []mb.Event
+	for {
+		select {
+		case <-r.Done():
+			// Timeout
+			return events
+		case e := <-r.eventsC:
+			events = append(events, e)
+			if waitEvents > 0 && len(events) >= waitEvents {
+				return events
+			}
+		}
+	}
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
-	var (
-		r      = &capturingPushReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
-		wg     sync.WaitGroup
-		events []mb.Event
-	)
-	wg.Add(2)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
-	// Producer
-	go func() {
-		defer wg.Done()
-		defer close(r.eventsC)
-		if closer, ok := metricSet.(mb.Closer); ok {
-			defer closer.Close()
-		}
-		metricSet.Run(r)
-	}()
+	r := newCapturingPushReporterV2(ctx)
 
-	// Consumer
-	go func() {
-		defer wg.Done()
-		defer close(r.doneC)
+	go metricSet.Run(r)
+	return r.capture(waitEvents)
+}
 
-		timer := time.NewTimer(timeout)
-		defer timer.Stop()
-		for {
-			select {
-			case <-timer.C:
-				return
-			case e, ok := <-r.eventsC:
-				if !ok {
-					return
-				}
-				events = append(events, e)
-				if waitEvents > 0 && waitEvents <= len(events) {
-					return
-				}
-			}
-		}
-	}()
+// RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
+// time and returns all of the events that occur during that period.
+func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2WithContext) []mb.Event {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
-	wg.Wait()
-	return events
+	r := newCapturingPushReporterV2(ctx)
+
+	go metricSet.Run(ctx, r)
+	return r.capture(waitEvents)
 }

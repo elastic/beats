@@ -24,23 +24,36 @@ package ecs
 // These fields help you find and correlate logs for a specific service and
 // version.
 type Service struct {
-	// Unique identifier of the running service.
-	// This id should uniquely identify this service. This makes it possible to
-	// correlate logs and metrics for one specific service.
-	// Example: If you are experiencing issues with one redis instance, you can
-	// filter on that id to see metrics and logs for that single instance.
+	// Unique identifier of the running service. If the service is comprised of
+	// many nodes, the `service.id` should be the same for all nodes.
+	// This id should uniquely identify the service. This makes it possible to
+	// correlate logs and metrics for one specific service, no matter which
+	// particular node emitted the event.
+	// Note that if you need to see the events from one specific host of the
+	// service, you should filter on that `host.name` or `host.id` instead.
 	ID string `ecs:"id"`
 
 	// Name of the service data is collected from.
-	// The name of the service is normally user given. This allows if two
-	// instances of the same service are running on the same machine they can
-	// be differentiated by the `service.name`.
-	// Also it allows for distributed services that run on multiple hosts to
-	// correlate the related instances based on the name.
-	// In the case of Elasticsearch the service.name could contain the cluster
-	// name. For Beats the service.name is by default a copy of the
+	// The name of the service is normally user given. This allows for
+	// distributed services that run on multiple hosts to correlate the related
+	// instances based on the name.
+	// In the case of Elasticsearch the `service.name` could contain the
+	// cluster name. For Beats the `service.name` is by default a copy of the
 	// `service.type` field if no name is specified.
 	Name string `ecs:"name"`
+
+	// Name of a service node.
+	// This allows for two nodes of the same service running on the same host
+	// to be differentiated. Therefore, `service.node.name` should typically be
+	// unique across nodes of a given service.
+	// In the case of Elasticsearch, the `service.node.name` could contain the
+	// unique node name within the Elasticsearch cluster. In cases where the
+	// service doesn't have the concept of a node name, the host name or
+	// container name can be used to distinguish running instances that make up
+	// this service. If those do not provide uniqueness (e.g. multiple
+	// instances of the service running on the same host) - the node name can
+	// be manually set.
+	NodeName string `ecs:"node.name"`
 
 	// The type of the service data is collected from.
 	// The type can be used to group and correlate logs and metrics from one

@@ -1,4 +1,0 @@
-# Hosts file for Domain: my.domain.elastic
-# Place entries below in standard hosts file format: ipaddress hostname fqdn
-
-127.0.0.1 my.domain.elastic

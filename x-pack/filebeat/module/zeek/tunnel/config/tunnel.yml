@@ -1,0 +1,38 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.tunnel"
+
+        - from: "zeek.tunnel.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.tunnel.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.tunnel.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.tunnel.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.tunnel.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.tunnel.tunnel_type"
+          to: "zeek.tunnel.type"
+
+      ignore_missing: true
+      fail_on_error: false

@@ -1,0 +1,130 @@
+- name: controllermanager
+  type: group
+  description: >
+    Controller manager metrics
+  release: ga
+  fields:
+    - name: handler
+      type: keyword
+      description: >
+        Request handler
+    - name: code
+      type: keyword
+      description: >
+        HTTP code
+    - name: method
+      type: keyword
+      description: >
+        HTTP method
+    - name: host
+      type: keyword
+      description: >
+        Request host
+    - name: name
+      type: keyword
+      description: >
+        Name for the resource
+    - name: zone
+      type: keyword
+      description: >
+        Infrastructure zone
+    - name: process
+      type: group
+      fields:
+        - name: cpu.sec
+          type: double
+          description: CPU seconds
+        - name: memory.resident.bytes
+          type: long
+          format: bytes
+          description: Bytes in resident memory
+        - name: memory.virtual.bytes
+          type: long
+          format: bytes
+          description: Bytes in virtual memory
+        - name: fds.open.count
+          type: long
+          description: Number of open file descriptors
+        - name: started.sec
+          type: double
+          description: Seconds since the process started
+    - name: http
+      type: group
+      fields:
+        - name: request.duration.us.percentile.*
+          type: object
+          object_type: double
+          description: Request duration microseconds percentiles
+        - name: request.duration.us.sum
+          type: double
+          description: Request duration microseconds cumulative sum
+        - name: request.duration.us.count
+          type: long
+          description: Request count for duration
+        - name: request.size.bytes.percentile.*
+          type: object
+          object_type: long
+          description: Request size percentiles
+        - name: request.size.bytes.sum
+          type: long
+          format: bytes
+          description: Request size cumulative sum
+        - name: request.size.bytes.count
+          type: long
+          description: Request count for size
+        - name: response.size.bytes.percentile.*
+          type: object
+          object_type: long
+          description: Response size percentiles
+        - name: response.size.bytes.sum
+          type: long
+          format: bytes
+          description: Response size cumulative sum
+        - name: response.size.bytes.count
+          type: long
+          description: Response count
+        - name: request.count
+          type: long
+          description: Request count for response
+    - name: client.request.count
+      type: long
+      description: >
+        Number of requests as client
+    - name: workqueue
+      type: group
+      fields:
+        - name: longestrunning.sec
+          type: double
+          description: Longest running processors
+        - name: unfinished.sec
+          type: double
+          description: Unfinished processors
+        - name: adds.count
+          type: long
+          description: Workqueue add count
+        - name: depth.count
+          type: long
+          description: Workqueue depth count
+        - name: retries.count
+          type: long
+          description: Workqueue number of retries
+    - name: node.collector
+      type: group
+      fields:
+        - name: eviction.count
+          type: long
+          description: Number of node evictions
+        - name: unhealthy.count
+          type: long
+          description: Number of unhealthy nodes
+        - name: count
+          type: long
+          description: Number of nodes
+        - name: health.pct
+          type: long
+          description: Percentage of healthy nodes
+    - name: leader.is_master
+      type: boolean
+      description: >
+        Whether the node is master
+

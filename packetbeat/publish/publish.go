@@ -86,6 +86,7 @@ func (p *TransactionPublisher) CreateReporter(
 	meta := struct {
 		Event      common.EventMetadata    `config:",inline"`
 		Processors processors.PluginConfig `config:"processors"`
+		KeepNull   bool                    `config:"keep_null"`
 	}{}
 	if err := config.Unpack(&meta); err != nil {
 		return nil, err
@@ -100,6 +101,7 @@ func (p *TransactionPublisher) CreateReporter(
 		Processing: beat.ProcessingConfig{
 			EventMetadata: meta.Event,
 			Processor:     processors,
+			KeepNull:      meta.KeepNull,
 		},
 	}
 	if p.canDrop {

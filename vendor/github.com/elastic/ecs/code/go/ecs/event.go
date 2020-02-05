@@ -37,20 +37,32 @@ type Event struct {
 	// Unique ID to describe the event.
 	ID string `ecs:"id"`
 
-	// The kind of the event.
-	// This gives information about what type of information the event
-	// contains, without being specific to the contents of the event.  Examples
-	// are `event`, `state`, `alarm`. Warning: In future versions of ECS, we
-	// plan to provide a list of acceptable values for this field, please use
-	// with caution.
+	// Identification code for this event, if one exists.
+	// Some event sources use event codes to identify messages unambiguously,
+	// regardless of message language or wording adjustments over time. An
+	// example of this is the Windows Event ID.
+	Code string `ecs:"code"`
+
+	// This is one of four ECS Categorization Fields, and indicates the highest
+	// level in the ECS category hierarchy.
+	// `event.kind` gives high-level information about what type of information
+	// the event contains, without being specific to the contents of the event.
+	// For example, values of this field distinguish alert events from metric
+	// events.
+	// The value of this field can be used to inform how these kinds of events
+	// should be handled. They may warrant different retention, different
+	// access control, it may also help understand whether the data coming in
+	// at a regular interval or not.
 	Kind string `ecs:"kind"`
 
-	// Event category.
-	// This contains high-level information about the contents of the event. It
-	// is more generic than `event.action`, in the sense that typically a
-	// category contains multiple actions. Warning: In future versions of ECS,
-	// we plan to provide a list of acceptable values for this field, please
-	// use with caution.
+	// This is one of four ECS Categorization Fields, and indicates the second
+	// level in the ECS category hierarchy.
+	// `event.category` represents the "big buckets" of ECS categories. For
+	// example, filtering on `event.category:process` yields all events
+	// relating to process activity. This field is closely related to
+	// `event.type`, which is used as a subcategory.
+	// This field is an array. This will allow proper categorization of some
+	// events that fall in multiple categories.
 	Category string `ecs:"category"`
 
 	// The action captured by the event.
@@ -59,31 +71,53 @@ type Event struct {
 	// `file-created`. The value is normally defined by the implementer.
 	Action string `ecs:"action"`
 
-	// The outcome of the event.
-	// If the event describes an action, this fields contains the outcome of
-	// that action. Examples outcomes are `success` and `failure`. Warning: In
-	// future versions of ECS, we plan to provide a list of acceptable values
-	// for this field, please use with caution.
+	// This is one of four ECS Categorization Fields, and indicates the lowest
+	// level in the ECS category hierarchy.
+	// `event.outcome` simply denotes whether the event represent a success or
+	// a failure. Note that not all events will have an associated outcome. For
+	// example, this field is generally not populated for metric events or
+	// events with `event.type:info`.
 	Outcome string `ecs:"outcome"`
 
-	// Reserved for future usage.
-	// Please avoid using this field for user data.
+	// This is one of four ECS Categorization Fields, and indicates the third
+	// level in the ECS category hierarchy.
+	// `event.type` represents a categorization "sub-bucket" that, when used
+	// along with the `event.category` field values, enables filtering events
+	// down to a level appropriate for single visualization.
+	// This field is an array. This will allow proper categorization of some
+	// events that fall in multiple event types.
 	Type string `ecs:"type"`
 
 	// Name of the module this data is coming from.
-	// This information is coming from the modules used in Beats or Logstash.
+	// If your monitoring agent supports the concept of modules or plugins to
+	// process events of a given source (e.g. Apache logs), `event.module`
+	// should contain the name of this module.
 	Module string `ecs:"module"`
 
 	// Name of the dataset.
-	// The concept of a `dataset` (fileset / metricset) is used in Beats as a
-	// subset of modules. It contains the information which is currently stored
-	// in metricset.name and metricset.module or fileset.name.
+	// If an event source publishes more than one type of log or events (e.g.
+	// access log, error log), the dataset is used to specify which one the
+	// event comes from.
+	// It's recommended but not required to start the dataset name with the
+	// module name, followed by a dot, then the dataset name.
 	Dataset string `ecs:"dataset"`
 
-	// Severity describes the original severity of the event. What the
-	// different severity values mean can very different between use cases.
-	// It's up to the implementer to make sure severities are consistent across
-	// events.
+	// Source of the event.
+	// Event transports such as Syslog or the Windows Event Log typically
+	// mention the source of an event. It can be the name of the software that
+	// generated the event (e.g. Sysmon, httpd), or of a subsystem of the
+	// operating system (kernel, Microsoft-Windows-Security-Auditing).
+	Provider string `ecs:"provider"`
+
+	// The numeric severity of the event according to your event source.
+	// What the different severity values mean can be different between sources
+	// and use cases. It's up to the implementer to make sure severities are
+	// consistent across events from the same source.
+	// The Syslog severity belongs in `log.syslog.severity.code`.
+	// `event.severity` is meant to represent the severity according to the
+	// event source (e.g. firewall, IDS). If the event source does not publish
+	// its own severity, you may optionally copy the `log.syslog.severity.code`
+	// to `event.severity`.
 	Severity int64 `ecs:"severity"`
 
 	// Raw text message of entire event. Used to demonstrate log integrity.
@@ -99,6 +133,12 @@ type Event struct {
 	// If event.start and event.end are known this value should be the
 	// difference between the end and start time.
 	Duration time.Duration `ecs:"duration"`
+
+	// Sequence number of the event.
+	// The sequence number is a value published by some event sources, to make
+	// the exact ordering of events unambiguous, regarless of the timestamp
+	// precision.
+	Sequence int64 `ecs:"sequence"`
 
 	// This field should be populated when the event's timestamp does not
 	// include timezone information already (e.g. default Syslog timestamps).
@@ -136,4 +176,13 @@ type Event struct {
 	// This is mainly useful if you use more than one system that assigns risk
 	// scores, and you want to see a normalized value across all systems.
 	RiskScoreNorm float64 `ecs:"risk_score_norm"`
+
+	// Timestamp when an event arrived in the central data store.
+	// This is different from `@timestamp`, which is when the event originally
+	// occurred.  It's also different from `event.created`, which is meant to
+	// capture the first time an agent saw the event.
+	// In normal conditions, assuming no tampering, the timestamps should
+	// chronologically look like this: `@timestamp` < `event.created` <
+	// `event.ingested`.
+	Ingested time.Time `ecs:"ingested"`
 }

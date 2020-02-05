@@ -127,11 +127,11 @@ func (p *messagePartitioner) Partition(
 	}
 
 	msg.partition = partition
-	event := &msg.data.Content
-	if event.Meta == nil {
-		event.Meta = map[string]interface{}{}
+
+	if _, err := msg.data.Cache.Put("partition", partition); err != nil {
+		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %v", err)
 	}
-	event.Meta["partition"] = partition
+
 	p.partitions = numPartitions
 	return msg.partition, nil
 }

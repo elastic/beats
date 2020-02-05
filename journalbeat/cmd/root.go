@@ -23,12 +23,13 @@ import (
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 
-	// Import the script processor.
+	// Import processors.
 	_ "github.com/elastic/beats/libbeat/processors/script"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
 // Name of this beat
 var Name = "journalbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: false})

@@ -1,9 +1,5 @@
 # Zeek (Bro) module
 
-## Caveats
-
-* Module is to be considered _beta_.
-
 ## Install and Configure Zeek/Bro
 
 ### Install Zeek/Bro (for MacOS with Brew)

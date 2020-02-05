@@ -23,16 +23,18 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/beats/heartbeat/hbtestllext"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 type MockBeatClient struct {
@@ -95,26 +97,27 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
-func mockEventMonitorValidator(id string) mapval.Validator {
-	var idMatcher mapval.IsDef
+func mockEventMonitorValidator(id string) validator.Validator {
+	var idMatcher isdef.IsDef
 	if id == "" {
-		idMatcher = mapval.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
+		idMatcher = isdef.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
 	} else {
-		idMatcher = mapval.IsEqual(id)
+		idMatcher = isdef.IsEqual(id)
 	}
-	return mapval.Strict(mapval.Compose(
-		mapval.MustCompile(mapval.Map{
-			"monitor": mapval.Map{
+	return lookslike.Strict(lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
 				"id":          idMatcher,
 				"name":        "",
 				"type":        "test",
-				"duration.us": mapval.IsDuration,
+				"duration.us": isdef.IsDuration,
 				"status":      "up",
-				"check_group": mapval.IsString,
+				"check_group": isdef.IsString,
 			},
 		}),
+		hbtestllext.MonitorTimespanValidator,
 		hbtest.SummaryChecks(1, 0),
-		mapval.MustCompile(mockEventCustomFields()),
+		lookslike.MustCompile(mockEventCustomFields()),
 	))
 }
 
@@ -135,6 +138,14 @@ func mockPluginBuilder() pluginBuilder {
 	reg := monitoring.NewRegistry()
 
 	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
+		// Declare a real config block with a required attr so we can see what happens when it doesn't work
+		unpacked := struct {
+			URLs []string `config:"urls" validate:"required"`
+		}{}
+		err := config.Unpack(&unpacked)
+		if err != nil {
+			return nil, 0, err
+		}
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err
@@ -156,6 +167,38 @@ func mockPluginConf(t *testing.T, id string, schedule string, url string) *commo
 
 	if id != "" {
 		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+// mockBadPluginConf returns a conf with an invalid plugin config.
+// This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
+func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+	confMap := map[string]interface{}{
+		"type":        "test",
+		"notanoption": []string{"foo"},
+		"schedule":    schedule,
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+// mockInvalidPlugin conf returns a config that invalid at the basic level of
+// what's expected in heartbeat, i.e. no type.
+func mockInvalidPluginConf(t *testing.T) *common.Config {
+	confMap := map[string]interface{}{
+		"hoeutnheou": "oueanthoue",
 	}
 
 	conf, err := common.NewConfigFrom(confMap)

@@ -27,70 +27,87 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 
+	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/conditions"
 )
 
-type RespCheck func(*http.Response) error
+// multiValidator combines multiple validations of each type into a single easy to use object.
+type multiValidator struct {
+	respValidators []respValidator
+	bodyValidators []bodyValidator
+}
+
+func (rv multiValidator) wantsBody() bool {
+	return len(rv.bodyValidators) > 0
+}
+
+func (rv multiValidator) validate(resp *http.Response, body string) reason.Reason {
+	for _, respValidator := range rv.respValidators {
+		if err := respValidator(resp); err != nil {
+			return reason.ValidateFailed(err)
+		}
+	}
+
+	for _, bodyValidator := range rv.bodyValidators {
+		if err := bodyValidator(resp, body); err != nil {
+			return reason.ValidateFailed(err)
+		}
+	}
+
+	return nil
+}
+
+// respValidator is used for validating using only the non-body fields of the *http.Response.
+// Accessing the body of the response in such a validator should not be done due, use bodyValidator
+// for those purposes instead.
+type respValidator func(*http.Response) error
+
+// bodyValidator lets you validate a stringified version of the body along with other metadata in
+// *http.Response.
+type bodyValidator func(*http.Response, string) error
 
 var (
 	errBodyMismatch = errors.New("body mismatch")
 )
 
-func makeValidateResponse(config *responseParameters) (RespCheck, error) {
-	var checks []RespCheck
+func makeValidateResponse(config *responseParameters) (multiValidator, error) {
+	var respValidators []respValidator
+	var bodyValidators []bodyValidator
 
-	if config.Status > 0 {
-		checks = append(checks, checkStatus(config.Status))
+	if len(config.Status) > 0 {
+		respValidators = append(respValidators, checkStatus(config.Status))
 	} else {
-		checks = append(checks, checkStatusOK)
+		respValidators = append(respValidators, checkStatusOK)
 	}
 
 	if len(config.RecvHeaders) > 0 {
-		checks = append(checks, checkHeaders(config.RecvHeaders))
+		respValidators = append(respValidators, checkHeaders(config.RecvHeaders))
 	}
 
 	if len(config.RecvBody) > 0 {
-		checks = append(checks, checkBody(config.RecvBody))
+		bodyValidators = append(bodyValidators, checkBody(config.RecvBody))
 	}
 
 	if len(config.RecvJSON) > 0 {
 		jsonChecks, err := checkJSON(config.RecvJSON)
 		if err != nil {
-			return nil, err
+			return multiValidator{}, err
 		}
-		checks = append(checks, jsonChecks)
+		bodyValidators = append(bodyValidators, jsonChecks)
 	}
 
-	return checkAll(checks...), nil
+	return multiValidator{respValidators, bodyValidators}, nil
 }
 
-func checkOK(_ *http.Response) error { return nil }
-
-// TODO: collect all errors into on error message.
-func checkAll(checks ...RespCheck) RespCheck {
-	switch len(checks) {
-	case 0:
-		return checkOK
-	case 1:
-		return checks[0]
-	}
-
+func checkStatus(status []uint16) respValidator {
 	return func(r *http.Response) error {
-		for _, check := range checks {
-			if err := check(r); err != nil {
-				return err
+		for _, v := range status {
+			if r.StatusCode == int(v) {
+				return nil
 			}
-		}
-		return nil
-	}
-}
-
-func checkStatus(status uint16) RespCheck {
-	return func(r *http.Response) error {
-		if r.StatusCode == int(status) {
-			return nil
 		}
 		return fmt.Errorf("received status code %v expecting %v", r.StatusCode, status)
 	}
@@ -103,7 +120,7 @@ func checkStatusOK(r *http.Response) error {
 	return nil
 }
 
-func checkHeaders(headers map[string]string) RespCheck {
+func checkHeaders(headers map[string]string) respValidator {
 	return func(r *http.Response) error {
 		for k, v := range headers {
 			value := r.Header.Get(k)
@@ -115,14 +132,10 @@ func checkHeaders(headers map[string]string) RespCheck {
 	}
 }
 
-func checkBody(body []match.Matcher) RespCheck {
-	return func(r *http.Response) error {
-		content, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			return err
-		}
-		for _, m := range body {
-			if m.Match(content) {
+func checkBody(matcher []match.Matcher) bodyValidator {
+	return func(r *http.Response, body string) error {
+		for _, m := range matcher {
+			if m.MatchString(body) {
 				return nil
 			}
 		}
@@ -130,7 +143,7 @@ func checkBody(body []match.Matcher) RespCheck {
 	}
 }
 
-func checkJSON(checks []*jsonResponseCheck) (RespCheck, error) {
+func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 	type compiledCheck struct {
 		description string
 		condition   conditions.Condition
@@ -146,14 +159,18 @@ func checkJSON(checks []*jsonResponseCheck) (RespCheck, error) {
 		compiledChecks = append(compiledChecks, compiledCheck{check.Description, cond})
 	}
 
-	return func(r *http.Response) error {
+	return func(r *http.Response, body string) error {
 		decoded := &common.MapStr{}
-		err := json.NewDecoder(r.Body).Decode(decoded)
+		decoder := json.NewDecoder(strings.NewReader(body))
+		decoder.UseNumber()
+		err := decoder.Decode(decoded)
 
 		if err != nil {
 			body, _ := ioutil.ReadAll(r.Body)
 			return pkgerrors.Wrapf(err, "could not parse JSON for body check with condition. Source: %s", body)
 		}
+
+		jsontransform.TransformNumbers(*decoded)
 
 		var errorDescs []string
 		for _, compiledCheck := range compiledChecks {

@@ -22,37 +22,23 @@ import (
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
-	"github.com/elastic/beats/libbeat/processors/add_docker_metadata"
-	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
-	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
-	"github.com/elastic/beats/libbeat/processors/add_locale"
-	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
-	"github.com/elastic/beats/libbeat/processors/communityid"
-	"github.com/elastic/beats/libbeat/processors/dissect"
-	"github.com/elastic/beats/libbeat/processors/dns"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 )
 
 // Create constructors for most of the Beat processors.
 // Note that script is omitted to avoid nesting.
-var constructors = map[string]processors.Constructor{
-	"AddCloudMetadata":      add_cloud_metadata.New,
-	"AddDockerMetadata":     add_docker_metadata.New,
-	"AddFields":             actions.CreateAddFields,
-	"AddHostMetadata":       add_host_metadata.New,
-	"AddKubernetesMetadata": add_kubernetes_metadata.New,
-	"AddLocale":             add_locale.New,
-	"AddProcessMetadata":    add_process_metadata.New,
-	"CommunityID":           communityid.New,
-	"CopyFields":            actions.NewCopyFields,
-	"DecodeJSONFields":      actions.NewDecodeJSONFields,
-	"Dissect":               dissect.NewProcessor,
-	"DNS":                   dns.New,
-	"Rename":                actions.NewRenameFields,
-	"TruncateFields":        actions.NewTruncateFields,
+var registry = processors.NewNamespace()
+
+// RegisterPlugin registeres processor plugins for the javascript processor.
+func RegisterPlugin(name string, c processors.Constructor) {
+	logp.L().Named("javascript").Debugf("Register script processor %s", name)
+
+	err := registry.Register(name, c)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // beatProcessor wraps a processor for javascript.
@@ -127,7 +113,7 @@ func newConstructor(
 func Require(runtime *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
 
-	for name, fn := range constructors {
+	for name, fn := range registry.Constructors() {
 		o.Set(name, newConstructor(runtime, fn))
 	}
 

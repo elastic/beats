@@ -56,6 +56,7 @@ type Flows struct {
 	Period        string                  `config:"period"`
 	EventMetadata common.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
+	KeepNull      bool                    `config:"keep_null"`
 }
 
 type ProtocolCommon struct {

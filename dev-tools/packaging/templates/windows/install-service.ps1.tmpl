@@ -11,10 +11,10 @@ $workdir = Split-Path $MyInvocation.MyCommand.Path
 # Create the new service.
 New-Service -name {{.BeatName}} `
   -displayName {{.BeatName | title}} `
-  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" -c `"$workdir\{{.BeatName}}.yml`" -path.home `"$workdir`" -path.data `"C:\ProgramData\{{.BeatName}}`" -path.logs `"C:\ProgramData\{{.BeatName}}\logs`""
+  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" -environment=windows_service -c `"$workdir\{{.BeatName}}.yml`" -path.home `"$workdir`" -path.data `"C:\ProgramData\{{.BeatName}}`" -path.logs `"C:\ProgramData\{{.BeatName}}\logs`" -E logging.files.redirect_stderr=true"
 
 # Attempt to set the service to delayed start using sc config.
 Try {
-  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start=delayed-auto'
+  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start= delayed-auto'
 }
-Catch { Write-Host "An error occured setting the service to delayed start." -ForegroundColor Red }
+Catch { Write-Host -f red "An error occured setting the service to delayed start." }

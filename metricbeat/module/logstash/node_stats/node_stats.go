@@ -18,8 +18,7 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"sync"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -36,18 +35,22 @@ func init() {
 	)
 }
 
+const (
+	nodeStatsPath = "/_node/stats"
+)
+
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   "_node/stats",
+		DefaultPath:   nodeStatsPath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	http *helper.HTTP
+	initialized sync.Once
 }
 
 // New create a new instance of the MetricSet
@@ -57,29 +60,57 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
 	return &MetricSet{
-		ms,
-		http,
+		MetricSet: ms,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	var err error
+	m.initialized.Do(func() {
+		err = m.init()
+	})
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		if m.XPack {
+			m.Logger().Error(err)
+			return nil
+		}
+		return err
 	}
 
-	err = eventMapping(r, content)
+	content, err := m.HTTP.FetchContent()
+	if err != nil {
+		if m.XPack {
+			m.Logger().Error(err)
+			return nil
+		}
+		return err
+	}
+
+	if !m.XPack {
+		return eventMapping(r, content)
+	}
+
+	err = eventMappingXPack(r, m, content)
 	if err != nil {
 		m.Logger().Error(err)
-		return
 	}
+
+	return nil
+}
+
+func (m *MetricSet) init() error {
+	if m.XPack {
+		err := m.CheckPipelineGraphAPIsAvailable()
+		if err != nil {
+			return err
+		}
+
+		m.HTTP.SetURI(m.HTTP.GetURI() + "?vertices=true")
+	}
+
+	return nil
 }

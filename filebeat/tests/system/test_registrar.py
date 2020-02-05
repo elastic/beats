@@ -206,7 +206,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home=registry_home,
-            registry_file_permissions=0644,
+            registry_file_permissions=0640,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -223,7 +223,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0644")
+        self.assertEqual(self.file_permissions(registry_file), "0640")
 
     def test_registry_file_update_permissions(self):
         """
@@ -262,7 +262,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home="a/b/c/registry_x",
-            registry_file_permissions=0644
+            registry_file_permissions=0640
         )
 
         filebeat = self.start_beat()
@@ -280,7 +280,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0644")
+        self.assertEqual(self.file_permissions(registry_file), "0640")
 
     def test_rotating_file(self):
         """
@@ -773,7 +773,7 @@ class Test(BaseTest):
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/8102')
+    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin", 'flaky test https://github.com/elastic/beats/issues/8102')
     def test_clean_inactive(self):
         """
         Checks that states are properly removed after clean_inactive
@@ -820,7 +820,6 @@ class Test(BaseTest):
         # Make sure the last file in the registry is the correct one and has the correct offset
         assert data[0]["offset"] == self.input_logs.size(file3)
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/7690')
     def test_clean_removed(self):
         """
         Checks that files which were removed, the state is removed

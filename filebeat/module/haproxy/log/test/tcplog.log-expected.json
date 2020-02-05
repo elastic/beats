@@ -1,9 +1,9 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 1000000,
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "app",
         "haproxy.backend_queue": 0,

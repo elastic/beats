@@ -66,11 +66,11 @@ type TLSConfig struct {
 	ClientAuth tls.ClientAuthType
 }
 
-// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
-func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
+// ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
+// ServerName set, use that method for servers with SNI.
+func (c *TLSConfig) ToConfig() *tls.Config {
 	if c == nil {
-		// use default TLS settings, if config is empty.
-		return &tls.Config{ServerName: host}
+		return &tls.Config{}
 	}
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
@@ -80,7 +80,6 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	}
 
 	return &tls.Config{
-		ServerName:         host,
 		MinVersion:         minVersion,
 		MaxVersion:         maxVersion,
 		Certificates:       c.Certificates,
@@ -89,6 +88,19 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		InsecureSkipVerify: insecure,
 		CipherSuites:       c.CipherSuites,
 		CurvePreferences:   c.CurvePreferences,
+		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 	}
+}
+
+// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
+func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
+	if c == nil {
+		// use default TLS settings, if config is empty.
+		return &tls.Config{ServerName: host}
+	}
+
+	config := c.ToConfig()
+	config.ServerName = host
+	return config
 }

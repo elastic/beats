@@ -1,0 +1,15 @@
+---
+description: Pipeline for parsing ActiveMQ audit logs.
+processors:
+  - grok:
+      field: message
+      pattern_definitions:
+        NOPIPEGREEDYDATA: "((?! \\|).)*"
+        THREAD_NAME: "((?! \n).)*"
+      patterns:
+        - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{WORD:activemq.user}%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}"
+      ignore_missing: true
+on_failure:
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

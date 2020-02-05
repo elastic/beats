@@ -1,0 +1,64 @@
+{
+    "@timestamp": "2019-09-16T11:24:36.957Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "event": {
+        "duration": 7677063,
+        "dataset": "tomcat.threading",
+        "module": "tomcat"
+    },
+    "metricset": {
+        "name": "threading",
+        "period": 10000
+    },
+    "service": {
+        "type": "tomcat",
+        "address": "localhost:8080"
+    },
+    "tomcat": {
+        "threading": {
+            "total": 35,
+            "started": {
+                "total": 35
+            },
+            "user": {
+                "time": {
+                    "ms": 6e+07
+                }
+            },
+            "peak": 35,
+            "cpu": {
+                "time": {
+                    "ms": 6.9719161e+07
+                }
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.1.0"
+    },
+    "host": {
+        "hostname": "mcastro",
+        "architecture": "x86_64",
+        "os": {
+            "name": "Antergos Linux",
+            "kernel": "5.0.13-arch1-1-ARCH",
+            "platform": "antergos",
+            "version": "",
+            "family": ""
+        },
+        "id": "54f70115bae545cbac2b150f254472a0",
+        "containerized": false,
+        "name": "mcastro"
+    },
+    "agent": {
+        "ephemeral_id": "a4cc9624-50c1-462c-b254-fa45896ebdfb",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    }
+}

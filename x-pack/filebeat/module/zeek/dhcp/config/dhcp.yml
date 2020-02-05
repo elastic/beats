@@ -1,0 +1,102 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: udp
+  network.protocol: dhcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.dhcp"
+
+        - from: "zeek.dhcp.uids"
+          to: "zeek.session_id"
+
+        - from: "zeek.dhcp.assigned_addr"
+          to: "zeek.dhcp.address.assigned"
+
+        - from: "zeek.dhcp.client_addr"
+          to: "zeek.dhcp.address.client"
+
+        - from: "zeek.dhcp.mac"
+          to: "zeek.dhcp.address.mac"
+
+        - from: "zeek.dhcp.requested_addr"
+          to: "zeek.dhcp.address.requested"
+
+        - from: "zeek.dhcp.server_addr"
+          to: "zeek.dhcp.address.server"
+
+        - from: "zeek.dhcp.host_name"
+          to: "zeek.dhcp.hostname"
+
+        - from: "zeek.dhcp.client_message"
+          to: "zeek.dhcp.msg.client"
+
+        - from: "zeek.dhcp.server_message"
+          to: "zeek.dhcp.msg.server"
+
+        - from: "zeek.dhcp.msg_types"
+          to: "zeek.dhcp.msg.types"
+
+        - from: "zeek.dhcp.msg_orig"
+          to: "zeek.dhcp.msg.origin"
+
+        - from: "zeek.dhcp.client_software"
+          to: "zeek.dhcp.software.client"
+
+        - from: "zeek.dhcp.server_software"
+          to: "zeek.dhcp.software.server"
+
+        - from: "zeek.dhcp.circuit_id"
+          to: "zeek.dhcp.id.circuit"
+
+        - from: "zeek.dhcp.agent_remote_id"
+          to: "zeek.dhcp.id.remote_agent"
+
+        - from: "zeek.dhcp.subscriber_id"
+          to: "zeek.dhcp.id.subscriber"
+
+        - from: "zeek.dhcp.client_port"
+          to: "source.port"
+
+        - from: "zeek.dhcp.server_port"
+          to: "destination.port"
+
+      ignore_missing: true
+      fail_on_error: false
+
+  - if:
+      not:
+        has_fields: ["source.port"]
+    then:
+      - add_fields:
+          target: source
+          fields:
+            port: 68
+
+  - if:
+      not:
+        has_fields: ["destination.port"]
+    then:
+      - add_fields:
+          target: destination
+          fields:
+            port: 67
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source.address: zeek.dhcp.address.client
+        destination.address: zeek.dhcp.address.server
+{{ end }}

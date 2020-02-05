@@ -17,7 +17,9 @@
 
 package logp
 
-import "time"
+import (
+	"time"
+)
 
 // Config contains the configuration options for the logger. To create a Config
 // from a common.Config use logp/config.Build.
@@ -42,28 +44,49 @@ type Config struct {
 
 // FileConfig contains the configuration options for the file output.
 type FileConfig struct {
-	Path           string        `config:"path"`
-	Name           string        `config:"name"`
-	MaxSize        uint          `config:"rotateeverybytes" validate:"min=1"`
-	MaxBackups     uint          `config:"keepfiles" validate:"max=1024"`
-	Permissions    uint32        `config:"permissions"`
-	Interval       time.Duration `config:"interval"`
-	RedirectStderr bool          `config:"redirect_stderr"`
+	Path            string        `config:"path"`
+	Name            string        `config:"name"`
+	MaxSize         uint          `config:"rotateeverybytes" validate:"min=1"`
+	MaxBackups      uint          `config:"keepfiles" validate:"max=1024"`
+	Permissions     uint32        `config:"permissions"`
+	Interval        time.Duration `config:"interval"`
+	RotateOnStartup bool          `config:"rotateonstartup"`
+	RedirectStderr  bool          `config:"redirect_stderr"`
 }
 
-var defaultConfig = Config{
-	Level:   InfoLevel,
-	ToFiles: true,
-	Files: FileConfig{
-		MaxSize:     10 * 1024 * 1024,
-		MaxBackups:  7,
-		Permissions: 0600,
-		Interval:    0,
-	},
-	addCaller: true,
+// DefaultConfig returns the default config options for a given environment the
+// Beat is supposed to be run within.
+func DefaultConfig(environment Environment) Config {
+	switch environment {
+	case SystemdEnvironment, ContainerEnvironment:
+		return defaultToStderrConfig()
+
+	case MacOSServiceEnvironment, WindowsServiceEnvironment:
+		fallthrough
+	default:
+		return defaultToFileConfig()
+	}
 }
 
-// DefaultConfig returns the default config options.
-func DefaultConfig() Config {
-	return defaultConfig
+func defaultToStderrConfig() Config {
+	return Config{
+		Level:     InfoLevel,
+		ToStderr:  true,
+		addCaller: true,
+	}
+}
+
+func defaultToFileConfig() Config {
+	return Config{
+		Level:   InfoLevel,
+		ToFiles: true,
+		Files: FileConfig{
+			MaxSize:         10 * 1024 * 1024,
+			MaxBackups:      7,
+			Permissions:     0600,
+			Interval:        0,
+			RotateOnStartup: true,
+		},
+		addCaller: true,
+	}
 }

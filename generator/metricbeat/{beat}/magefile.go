@@ -1,70 +1,39 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 // +build mage
 
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/dev-tools/mage/target/collectors"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/dev-tools/mage/target/update"
+	"github.com/elastic/beats/generator/common/beatgen"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
-	mage.SetBuildVariableSources(mage.DefaultBeatBuildVariableSources)
+	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
-	mage.BeatDescription = "One sentence description of the Beat."
+	devtools.BeatDescription = "One sentence description of the Beat."
+	devtools.BeatVendor = "{full_name}"
 }
 
-// Build builds the Beat binary.
-func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+// VendorUpdate updates elastic/beats in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
-// Do not use directly, use crossBuild instead.
-func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
-}
-
-// CrossBuild cross-builds the beat for all target platforms.
-func CrossBuild() error {
-	return mage.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+// CollectAll generates the docs and the fields.
+func CollectAll() {
+	mg.Deps(collectors.CollectDocs, FieldsDocs)
 }
 
 // Package packages the Beat for distribution.
@@ -74,51 +43,95 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseCommunityBeatPackaging()
+	devtools.UseCommunityBeatPackaging()
 
-	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
-}
-
-// TestPackages tests the generated packages (i.e. file modes, owners, groups).
-func TestPackages() error {
-	return mage.TestPackages()
-}
-
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
-}
-
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return mage.GenerateFieldsYAML("module")
+	mg.Deps(update.Update)
+	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
 func FieldsDocs() error {
 	inputs := []string{
-		mage.OSSBeatDir("module"),
+		devtools.OSSBeatDir("module"),
 	}
-	output := mage.CreateDir("build/fields/fields.all.yml")
-	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
 		return err
 	}
-	return mage.Docs.FieldDocs(output)
+	return devtools.Docs.FieldDocs(output)
 }
 
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	return devtools.GenerateFieldsYAML("module")
 }
 
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+// Config generates both the short/reference/docker configs.
+func Config() {
+	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+func configYML() error {
+	customDeps := devtools.ConfigFileParams{
+		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
+		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
+		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
+		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
+	}
+	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
+}
+
+// Update updates the generated files (aka make update).
+func Update() error {
+	return update.Update()
+}
+
+// Imports generates an include/list.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return devtools.GenerateModuleIncludeListGo()
+}
+
+// Test runs all available tests
+func Test() {
+	mg.Deps(unittest.GoUnitTest)
+}
+
+// Build builds the Beat binary.
+func Build() error {
+	return build.Build()
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return build.CrossBuild()
+}
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return build.BuildGoDaemon()
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return build.GolangCrossBuild()
 }

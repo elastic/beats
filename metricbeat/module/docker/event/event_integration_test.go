@@ -20,6 +20,7 @@
 package event
 
 import (
+	"context"
 	"io"
 	"os"
 	"testing"
@@ -28,19 +29,19 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2WithContext(10*time.Second, 1, ms)
 		close(done)
 	}()
 
@@ -69,20 +70,20 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	client, err := client.NewEnvClient()
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer c.Close()
 
-	reader, err := client.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	reader, err := c.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
 	io.Copy(os.Stdout, reader)
 	reader.Close()
 
-	resp, err := client.ContainerCreate(context.Background(), &container.Config{
+	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
 	}, nil, nil, "")
@@ -90,7 +91,7 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	client.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
+	c.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {

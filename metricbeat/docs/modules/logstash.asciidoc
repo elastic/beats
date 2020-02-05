@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-logstash]]
@@ -10,7 +10,7 @@ This is the Logstash module.
 The default metricsets are `node` and `node_stats`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The logstash module is tested with logstash 6.3.
 

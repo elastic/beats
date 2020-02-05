@@ -1,0 +1,28 @@
+[
+    {
+        "@timestamp": "2015-05-13T23:39:43.945Z",
+        "aws.elb.backend.ip": "10.0.0.1",
+        "aws.elb.backend.port": "80",
+        "aws.elb.backend_processing_time.sec": 1.5e-05,
+        "aws.elb.name": "my-loadbalancer",
+        "aws.elb.protocol": "tcp",
+        "aws.elb.request_processing_time.sec": 0.001065,
+        "aws.elb.response_processing_time.sec": 2.3e-05,
+        "aws.elb.ssl_cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+        "aws.elb.ssl_protocol": "TLSv1.2",
+        "destination.bytes": 502,
+        "event.dataset": "aws.elb",
+        "event.end": "2015-05-13T23:39:43.945Z",
+        "event.module": "aws",
+        "fileset.name": "elb",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "aws",
+        "source.bytes": 57,
+        "source.ip": "192.168.131.39",
+        "source.port": "2817",
+        "tls.cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
+    }
+]

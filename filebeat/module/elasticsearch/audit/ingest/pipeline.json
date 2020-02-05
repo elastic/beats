@@ -31,17 +31,6 @@
             }
         },
         {
-            "date": {
-                "field": "elasticsearch.audit.@timestamp",
-                "target_field": "@timestamp",
-                "formats": [
-                    "ISO8601"
-                ],
-                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
-                "ignore_failure": true
-            }
-        },
-        {
             "remove": {
                 "field": "elasticsearch.audit.@timestamp"
             }

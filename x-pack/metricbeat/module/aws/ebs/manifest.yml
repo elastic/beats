@@ -1,0 +1,14 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/EBS
+        statistic: ["Average"]
+        name: ["VolumeReadBytes", "VolumeWriteBytes", "VolumeReadOps", "VolumeWriteOps", "VolumeQueueLength", "VolumeThroughputPercentage", "VolumeConsumedReadWriteOps", "BurstBalance"]
+        tags.resource_type_filter: ec2
+      - namespace: AWS/EBS
+        statistic: ["Sum"]
+        name: ["VolumeTotalReadTime", "VolumeTotalWriteTime", "VolumeIdleTime"]
+        tags.resource_type_filter: ec2

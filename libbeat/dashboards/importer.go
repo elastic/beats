@@ -298,17 +298,17 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 
 	versionPath := "7"
 
+	// Loads the internal index pattern
+	if imp.fields != nil {
+		imp.loader.ImportIndex(imp.fields)
+	}
+
 	dir = path.Join(dir, versionPath)
 
 	imp.loader.statusMsg("Importing directory %v", dir)
 
 	if _, err := os.Stat(dir); err != nil {
 		return newErrNotFound("No directory %s", dir)
-	}
-
-	// Loads the internal index pattern
-	if imp.fields != nil {
-		imp.loader.ImportIndex(imp.fields)
 	}
 	check := []string{}
 	if !imp.cfg.OnlyDashboards {

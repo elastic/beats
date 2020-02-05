@@ -30,14 +30,32 @@ import (
 // services). File fields provide details about the affected file associated
 // with the event or metric.
 type File struct {
-	// Path to the file.
+	// Name of the file including the extension, without the directory.
+	Name string `ecs:"name"`
+
+	// Array of file attributes.
+	// Attributes names will vary by platform. Here's a non-exhaustive list of
+	// values that are expected in this field: archive, compressed, directory,
+	// encrypted, execute, hidden, read, readonly, system, write.
+	Attributes string `ecs:"attributes"`
+
+	// Directory where the file is located. It should include the drive letter,
+	// when appropriate.
+	Directory string `ecs:"directory"`
+
+	// Drive letter where the file is located. This field is only relevant on
+	// Windows.
+	// The value should be uppercase, and not include the colon.
+	DriveLetter string `ecs:"drive_letter"`
+
+	// Full path to the file, including the file name. It should include the
+	// drive letter, when appropriate.
 	Path string `ecs:"path"`
 
 	// Target path for symlinks.
 	TargetPath string `ecs:"target_path"`
 
 	// File extension.
-	// This should allow easy filtering by file extensions.
 	Extension string `ecs:"extension"`
 
 	// File type (file, dir, or symlink).
@@ -64,12 +82,24 @@ type File struct {
 	// Mode of the file in octal representation.
 	Mode string `ecs:"mode"`
 
-	// File size in bytes (field is only added when `type` is `file`).
+	// File size in bytes.
+	// Only relevant when `file.type` is "file".
 	Size int64 `ecs:"size"`
 
-	// Last time file content was modified.
+	// Last time the file content was modified.
 	Mtime time.Time `ecs:"mtime"`
 
-	// Last time file metadata changed.
+	// Last time the file attributes or metadata changed.
+	// Note that changes to the file content will update `mtime`. This implies
+	// `ctime` will be adjusted at the same time, since `mtime` is an attribute
+	// of the file.
 	Ctime time.Time `ecs:"ctime"`
+
+	// File creation time.
+	// Note that not all filesystems store the creation time.
+	Created time.Time `ecs:"created"`
+
+	// Last time the file was accessed.
+	// Note that not all filesystems keep track of access time.
+	Accessed time.Time `ecs:"accessed"`
 }

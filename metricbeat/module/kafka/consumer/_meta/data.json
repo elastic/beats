@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2019-10-31T13:22:06.700Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "kafka": {
+        "consumer": {
+            "bytes_consumed": 2.9521300228e+10,
+            "fetch_rate": 0,
+            "records_consumed": 1.23075656e+08,
+            "mbean": "kafka.consumer:client-id=consumer-1,type=consumer-fetch-manager-metrics"
+        }
+    },
+    "event": {
+        "dataset": "kafka.consumer",
+        "module": "kafka",
+        "duration": 7042831
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "host": {
+        "name": "pr.local",
+        "hostname": "pr.local",
+        "architecture": "x86_64",
+        "os": {
+            "kernel": "18.7.0",
+            "build": "18G95",
+            "platform": "darwin",
+            "version": "10.14.6",
+            "family": "darwin",
+            "name": "Mac OS X"
+        },
+        "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84"
+    },
+    "agent": {
+        "hostname": "pr.local",
+        "id": "79dd1677-1bea-4efd-9131-e8ca464eddf0",
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "e40f5843-d3aa-4bdc-a100-64022b70851b"
+    },
+    "metricset": {
+        "name": "consumer",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:8774",
+        "type": "kafka"
+    }
+}

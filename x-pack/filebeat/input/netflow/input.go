@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -64,16 +63,40 @@ func init() {
 	}
 }
 
+// An adapter so that logp.Logger can be used as a log.Logger.
+type logDebugWrapper struct {
+	sync.Mutex
+	Logger *logp.Logger
+	buf    []byte
+}
+
+// Write writes messages to the log.
+func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
+	w.Lock()
+	defer w.Unlock()
+	n = len(p)
+	w.buf = append(w.buf, p...)
+	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
+		w.Logger.Debug(string(w.buf[:endl]))
+		w.buf = w.buf[endl+1:]
+	}
+	return n, nil
+}
+
 // NewInput creates a new Netflow input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +118,9 @@ func NewInput(
 	decoder, err := decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(config.Protocols...).
 		WithExpiration(config.ExpirationTimeout).
-		WithCustomFields(customFields...))
+		WithLogOutput(&logDebugWrapper{Logger: logger}).
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(config.DetectSequenceReset))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}
@@ -113,10 +138,8 @@ func NewInput(
 }
 
 func (p *netflowInput) Publish(events []beat.Event) error {
-	for _, ev := range events {
-		e := util.NewData()
-		e.Event = ev
-		p.forwarder.Send(e)
+	for _, evt := range events {
+		p.forwarder.Send(evt)
 	}
 	return nil
 }

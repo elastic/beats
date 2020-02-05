@@ -18,7 +18,7 @@ implement and deploy a log monitoring solution.
 * <<enable-modules-cli>>
 * <<enable-modules-config-file>>
 
-include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
 
 When you enable modules, you can also
 <<specify-variable-settings,specify variable settings>> to change the default
@@ -136,7 +136,7 @@ to <<specify-variable-settings,specify variable settings>>.
 include::./include/set-paths.asciidoc[]
 
 [[advanced-settings]]
-=== Advanced settings
+=== Override input settings
 
 Behind the scenes, each module starts a {beatname_uc} input. Advanced users
 can add or override any input settings. For example, you can set

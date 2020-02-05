@@ -9,35 +9,5 @@
     "mode": "platinum",
     "status": "active",
     "expiry_date_in_millis": 1588291199999
-  },
-  "features": {
-    "graph": {
-      "available": false,
-      "enabled": true
-    },
-    "logstash": {
-      "available": false,
-      "enabled": true
-    },
-    "ml": {
-      "available": false,
-      "enabled": true
-    },
-    "monitoring": {
-      "available": true,
-      "enabled": true
-    },
-    "rollup": {
-      "available": true,
-      "enabled": true
-    },
-    "security": {
-      "available": false,
-      "enabled": true
-    },
-    "watcher": {
-      "available": false,
-      "enabled": true
-    }
   }
 }

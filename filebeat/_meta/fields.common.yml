@@ -35,12 +35,6 @@
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
-    - name: event.sequence
-      type: long
-      required: false
-      description: >
-        The sequence number of this event.
-
     - name: syslog.facility
       type: long
       required: false
@@ -103,3 +97,89 @@
       type: alias
       path: event.created
       migration: true
+
+    - name: docker.attrs
+      type: object
+      object_type: keyword
+      description: >
+        docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
+        These fields are only available when they are configured in the logging driver options.
+
+    - name: icmp.code
+      type: keyword
+      description: >
+        ICMP code.
+
+    - name: icmp.type
+      type: keyword
+      description: >
+        ICMP type.
+
+    - name: igmp.type
+      type: keyword
+      description: >
+        IGMP type.
+
+
+    - name: azure
+      type: group
+      fields:
+        - name: eventhub
+          type: keyword
+          description: >
+            Name of the eventhub.
+        - name: offset
+          type: long
+          description: >
+            The offset.
+        - name: enqueued_time
+          type: date
+          description: >
+            The enqueued time.
+        - name: partition_id
+          type: long
+          description: >
+            The partition id.
+        - name: consumer_group
+          type: keyword
+          description: >
+            The consumer group.
+        - name: sequence_number
+          type: long
+          description: >
+            The sequence number.
+
+
+    - name: kafka
+      type: group
+      fields:
+        - name: topic
+          type: keyword
+          description: >
+            Kafka topic
+
+        - name: partition
+          type: long
+          description: >
+            Kafka partition number
+
+        - name: offset
+          type: long
+          description: >
+            Kafka offset of this message
+
+        - name: key
+          type: keyword
+          description: >
+            Kafka key, corresponding to the Kafka value stored in the message
+
+        - name: block_timestamp
+          type: date
+          description: >
+            Kafka outer (compressed) block timestamp
+
+        - name: headers
+          type: array
+          description: >
+            An array of Kafka header strings for this message, in the form
+            "<key>: <value>".

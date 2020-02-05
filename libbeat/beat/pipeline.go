@@ -48,6 +48,8 @@ type ClientConfig struct {
 
 	Processing ProcessingConfig
 
+	CloseRef CloseRef
+
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
@@ -78,6 +80,13 @@ type ClientConfig struct {
 	ACKLastEvent func(interface{})
 }
 
+// CloseRef allows users to close the client asynchronously.
+// A CloseReg implements a subset of function required for context.Context.
+type CloseRef interface {
+	Done() <-chan struct{}
+	Err() error
+}
+
 // ProcessingConfig provides additional event processing settings a client can
 // pass to the publisher pipeline on Connect.
 type ProcessingConfig struct {
@@ -97,6 +106,9 @@ type ProcessingConfig struct {
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool
 
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
@@ -129,6 +141,7 @@ type PipelineACKHandler struct {
 }
 
 type ProcessorList interface {
+	Processor
 	All() []Processor
 }
 
@@ -144,9 +157,15 @@ type Processor interface {
 type PublishMode uint8
 
 const (
-	// DefaultGuarantees are up to the pipeline configuration, as configured by the
-	// operator.
+	// DefaultGuarantees are up to the pipeline configuration itself.
 	DefaultGuarantees PublishMode = iota
+
+	// OutputChooses mode fully depends on the output and its configuration.
+	// Events might be dropped based on the users output configuration.
+	// In this mode no events are dropped within the pipeline. Events are only removed
+	// after the output has ACKed the events to the pipeline, even if the output
+	// did drop the events.
+	OutputChooses
 
 	// GuaranteedSend ensures events are retried until acknowledged by the output.
 	// Normally guaranteed sending should be used with some client ACK-handling

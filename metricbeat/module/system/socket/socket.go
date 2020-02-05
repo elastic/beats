@@ -77,9 +77,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	if os.Geteuid() != 0 {
-		logp.Info("socket process info will only be available for " +
-			"metricbeat because the process is running as a non-root user")
+	if !ptable.Privileged() {
+		logp.Info("socket process info will only be available for processes owned by the %v user "+
+			"because this Beat is not running with enough privileges", os.Geteuid())
 	}
 
 	m := &MetricSet{
@@ -110,7 +110,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch socket metrics from the system
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
 		debugf("process table refresh had failures: %v", err)
@@ -118,8 +118,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed requesting socket dump"))
-		return
+		return errors.Wrap(err, "failed requesting socket dump")
 	}
 	debugf("netlink returned %d sockets", len(sockets))
 
@@ -133,10 +132,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 		root, metricSet := c.ToMapStr()
 
-		r.Event(mb.Event{
+		isOpen := r.Event(mb.Event{
 			RootFields:      root,
 			MetricSetFields: metricSet,
 		})
+		if !isOpen {
+			return nil
+		}
 	}
 
 	// Set the "previous" connections set to the "current" connections.
@@ -146,6 +148,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Reset the listeners for the next iteration.
 	m.listeners.Reset()
+
+	return nil
 }
 
 // filterAndRememberSockets filters sockets to remove sockets that were seen
@@ -191,7 +195,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 	c.User = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
-	c.Direction = m.listeners.Direction(uint8(syscall.IPPROTO_TCP),
+	c.Direction = m.listeners.Direction(uint8(c.Family), uint8(syscall.IPPROTO_TCP),
 		c.LocalIP, c.LocalPort, c.RemoteIP, c.RemotePort)
 
 	// Reverse DNS lookup on the remote IP.
@@ -212,7 +216,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.Command = proc.Command
 		c.CmdLine = proc.CmdLine
 		c.Args = proc.Args
-	} else if m.euid == 0 {
+	} else if m.ptable.Privileged() {
 		if c.Inode == 0 {
 			c.ProcessError = fmt.Errorf("process has exited. inode=%v, tcp_state=%v",
 				c.Inode, c.State)

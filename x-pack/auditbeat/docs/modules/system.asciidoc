@@ -2,9 +2,10 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:modulename: system
+
 [id="{beatname_lc}-module-system"]
 [role="xpack"]
-
 == System Module
 
 beta[]
@@ -42,7 +43,7 @@ parameter.
 The module comes with a sample dashboard:
 
 [role="screenshot"]
-image:./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
+image::./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
 
 [float]
 === Configuration options
@@ -66,11 +67,15 @@ sample suggested configuration.
     - user
   period: 10s
   state.period: 12h
+
+  socket.include_localhost: false
+
   user.detect_password_changes: true
 ----
 
-*`period`*:: The frequency at which the datasets check for changes. For most
-datasets - esp. `process` and `socket` - a shorter period is recommended.
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
 
 *`state.period`*:: The frequency at which the datasets send full state information.
 This option can be overridden per dataset using `{dataset}.state.period`.
@@ -81,6 +86,8 @@ and `/etc/shadow` to detect password changes. A hash will be kept locally in
 the `beat.db` file to detect changes between Auditbeat restarts. The `beat.db` file
 should be readable only by the root user and be treated similar to the shadow file
 itself.
+
+include::{docdir}/auditbeat-options.asciidoc[]
 
 [float]
 === Suggested configuration
@@ -100,6 +107,7 @@ so a longer polling interval can be used.
     - package
     - user
   period: 1m
+
   user.detect_password_changes: true
 
 - module: system
@@ -122,9 +130,14 @@ is an example configuration:
 auditbeat.modules:
 - module: system
   datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 2m # The frequency at which the datasets check for changes
+
+- module: system
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - login   # User logins, logouts, and system boots.
-    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -143,6 +156,9 @@ auditbeat.modules:
   login.wtmp_file_pattern: /var/log/wtmp*
   login.btmp_file_pattern: /var/log/btmp*
 ----
+
+
+:modulename!:
 
 [float]
 === Datasets

@@ -1,9 +1,9 @@
-{{ if .Reference -}}
+{{- if .Reference -}}
 # The file integrity module sends events when files are changed (created,
 # updated, deleted). The events contain file metadata and hashes.
 {{ end -}}
 - module: file_integrity
-  {{ if eq .GOOS "darwin" -}}
+  {{- if eq .GOOS "darwin" }}
   paths:
   - /bin
   - /usr/bin
@@ -11,33 +11,34 @@
   - /sbin
   - /usr/sbin
   - /usr/local/sbin
-  {{ else if eq .GOOS "windows" -}}
+{{ else if eq .GOOS "windows" }}
   paths:
   - C:/windows
   - C:/windows/system32
   - C:/Program Files
   - C:/Program Files (x86)
-  {{ else -}}
+{{ else }}
   paths:
   - /bin
   - /usr/bin
   - /sbin
   - /usr/sbin
   - /etc
-  {{- end }}
-{{ if .Reference }}
+{{ end -}}
+
+{{- if .Reference }}
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
-  {{ if eq .GOOS "darwin" -}}
+  {{- if eq .GOOS "darwin" }}
   exclude_files:
   - '\.DS_Store$'
   - '\.swp$'
-  {{ else if eq .GOOS "windows" -}}
+  {{- else if eq .GOOS "windows" }}
   exclude_files:
   - '(?i)\.lnk$'
   - '(?i)\.swp$'
-  {{ else -}}
+  {{- else }}
   exclude_files:
   - '(?i)\.sw[nop]$'
   - '~$'
@@ -46,10 +47,10 @@
 
   # List of regular expressions used to explicitly include files. When configured,
   # Auditbeat will ignore files unless they match a pattern.
-  {{ if eq .GOOS "windows" -}}
+  {{- if eq .GOOS "windows" }}
   #include_files:
   #- '\\\.ssh($|\\)'
-  {{ else -}}
+  {{- else }}
   #include_files:
   #- '/\.ssh($|/)'
   {{- end }}
@@ -74,4 +75,7 @@
 
   # Detect changes to files included in subdirectories. Disabled by default.
   recursive: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 {{ end }}

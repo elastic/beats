@@ -54,12 +54,12 @@ type Field struct {
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
 	MigrationAlias bool        `config:"migration"`
+	Dimension      *bool       `config:"dimension"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
 	ScalingFactor         int             `config:"scaling_factor"`
 	ObjectTypeParams      []ObjectTypeCfg `config:"object_type_params"`
-
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
 	Count        int    `config:"count"`
@@ -76,8 +76,9 @@ type Field struct {
 	UrlTemplate          []VersionizedString `config:"url_template"`
 	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
-	Overwrite bool `config:"overwrite"`
-	Path      string
+	Overwrite    bool  `config:"overwrite"`
+	DefaultField *bool `config:"default_field"`
+	Path         string
 }
 
 // ObjectTypeCfg defines type and configuration of object attributes
@@ -110,13 +111,72 @@ func (d *DynamicType) Unpack(s string) error {
 
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
-	if len(f.ObjectTypeParams) == 0 {
-		return nil
+	if err := f.validateType(); err != nil {
+		return errors.Wrapf(err, "incorrect type configuration for field '%s'", f.Name)
 	}
-	if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
-		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
+	if len(f.ObjectTypeParams) > 0 {
+		if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
+			return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
+		}
 	}
 	return nil
+}
+
+func (f *Field) validateType() error {
+	switch strings.ToLower(f.Type) {
+	case "text", "keyword":
+		return stringType.validate(f.Format)
+	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
+		return numberType.validate(f.Format)
+	case "date", "date_nanos":
+		return dateType.validate(f.Format)
+	case "geo_point":
+		return geoPointType.validate(f.Format)
+	case "date_range":
+		return dateRangeType.validate(f.Format)
+	case "boolean", "binary", "ip", "alias", "array":
+		if f.Format != "" {
+			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
+		}
+	case "object", "group", "nested":
+		// No check for them yet
+	case "":
+		// Module keys, not used as fields
+	default:
+		// There are more types, not being used by beats, to be added if needed
+		return fmt.Errorf("unexpected type '%s' for field '%s'", f.Type, f.Name)
+	}
+	return nil
+}
+
+type fieldTypeGroup struct {
+	name string
+
+	// formatters used in Kibana, taken from https://www.elastic.co/guide/en/kibana/7.3/managing-fields.html
+	// Value shown in Kibana docs and UI is not always the same as the
+	// internal value, e.g. `percent` appears as `Percentage` in docs
+	// and UI. We have to use here the internal value.
+	formatters []string
+}
+
+var (
+	stringType    = fieldTypeGroup{"string", []string{"string", "url"}}
+	numberType    = fieldTypeGroup{"number", []string{"string", "url", "bytes", "duration", "number", "percent", "color"}}
+	dateType      = fieldTypeGroup{"date", []string{"string", "url", "date"}}
+	geoPointType  = fieldTypeGroup{"geo_point", []string{"geo_point"}}
+	dateRangeType = fieldTypeGroup{"date_range", []string{"date_range"}}
+)
+
+func (g *fieldTypeGroup) validate(formatter string) error {
+	if formatter == "" {
+		return nil
+	}
+	for _, expected := range g.formatters {
+		if expected == formatter {
+			return nil
+		}
+	}
+	return fmt.Errorf("unexpected formatter for %s type, expected one of: %s", g.name, strings.Join(g.formatters, ", "))
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
@@ -126,7 +186,10 @@ func LoadFieldsYaml(path string) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 
@@ -144,7 +207,10 @@ func LoadFields(f []byte) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 	for _, key := range keys {

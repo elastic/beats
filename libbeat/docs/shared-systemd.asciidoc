@@ -5,18 +5,23 @@ The DEB and RPM packages include a service unit for Linux systems with
 systemd. On these systems, you can manage {beatname_uc} by using the usual
 systemd commands.
 
+ifdef::apm-server[]
+We recommend that the {beatname_lc} process is run as a non-root user.
+Therefore, that is the default setup for {beatname_uc}'s DEB package and RPM installation.
+endif::apm-server[]
+
 ==== Start and stop {beatname_uc}
 
 Use `systemctl` to start or stop {beatname_uc}:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl start {beatname_lc}
+sudo systemctl start {beatname_lc}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl stop {beatname_lc}
+sudo systemctl stop {beatname_lc}
 ------------------------------------------------
 
 By default, the {beatname_uc} service starts automatically when the system
@@ -24,12 +29,12 @@ boots. To enable or disable auto start use:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl enable {beatname_lc}
+sudo systemctl enable {beatname_lc}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl disable {beatname_lc}
+sudo systemctl disable {beatname_lc}
 ------------------------------------------------
 
 
@@ -49,10 +54,6 @@ Logs are stored by default in journald. To view the Logs, use `journalctl`:
 journalctl -u {beatname_lc}.service
 ------------------------------------------------
 
-NOTE: The unit file included in the packages sets the `-e` flag by default.
-This flag makes {beatname_uc} log to stderr and disables other log outputs.
-Systemd stores all output sent to stderr in journald.
-
 [float]
 === Customize systemd unit for {beatname_uc}
 
@@ -62,7 +63,7 @@ override to change the default options.
 [cols="<h,<,<m",options="header",]
 |=======================================
 | Variable | Description | Default value
-| BEAT_LOG_OPTS | Log options | `-e`
+| BEAT_LOG_OPTS | Log options |
 | BEAT_CONFIG_OPTS | Flags for configuration file path | +-c /etc/{beatname_lc}/{beatname_lc}.yml+
 | BEAT_PATH_OPTS | Other paths | +-path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}+
 |=======================================
@@ -77,16 +78,7 @@ would override `BEAT_LOG_OPTS` to enable debug for Elasticsearch output.
 ["source", "systemd", subs="attributes"]
 ------------------------------------------------
 [Service]
-Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
-------------------------------------------------
-
-To use settings from the {beatname_uc} file, empty the environment
-variable. For example:
-
-["source", "systemd", subs="attributes"]
-------------------------------------------------
-[Service]
-Environment="BEAT_LOG_OPTS="
+Environment="BEAT_LOG_OPTS=-d elasticsearch"
 ------------------------------------------------
 
 To apply your changes, reload the systemd configuration and restart
@@ -101,3 +93,7 @@ systemctl restart {beatname_lc}
 NOTE: It is recommended that you use a configuration management tool to
 include drop-in unit files. If you need to add a drop-in manually, use
 +systemctl edit {beatname_lc}.service+.
+
+ifdef::apm-server[]
+include::{docdir}/config-ownership.asciidoc[]
+endif::apm-server[]

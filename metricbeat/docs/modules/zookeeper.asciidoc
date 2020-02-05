@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-zookeeper]]
@@ -43,9 +43,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-zookeeper-connection,connection>>
+
 * <<metricbeat-metricset-zookeeper-mntr,mntr>>
 
 * <<metricbeat-metricset-zookeeper-server,server>>
+
+include::zookeeper/connection.asciidoc[]
 
 include::zookeeper/mntr.asciidoc[]
 

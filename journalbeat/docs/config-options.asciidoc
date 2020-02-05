@@ -101,7 +101,7 @@ The maximum number of seconds to wait before attempting to read again from
 journals. The default is 60s.
 
 [float]
-[id="{beatname_lc}-seek"]
+[id="seek"]
 ==== `seek`
 
 The position to start reading the journal from. Valid settings are:
@@ -124,7 +124,7 @@ If you have old log files and want to skip lines, start {beatname_uc} with
 {beatname_uc}.
 
 [float]
-[id="{beatname_lc}-include-matches"]
+[id="include-matches"]
 ==== `include_matches`
 
 A list of filter expressions used to match fields. The format of the expression
@@ -215,3 +215,16 @@ available:
 `CONTAINER_NAME`::            `container.name`
 `CONTAINER_PARTIAL_MESSAGE`:: `container.partial`
 `CONTAINER_TAG`::             `container.image.tag`
+
+[float]
+[id="index"]
+==== `index`
+
+If present, this formatted string overrides the index for events from this input
+(for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"journalbeat-myindex-2019.12.13"`.

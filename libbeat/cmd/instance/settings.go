@@ -20,7 +20,7 @@ package instance
 import (
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -32,9 +32,10 @@ type Settings struct {
 	Name            string
 	IndexPrefix     string
 	Version         string
+	HasDashboards   bool
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
-	ConfigOverrides *common.Config
+	ConfigOverrides []cfgfile.ConditionalOverride
 
 	DisableConfigResolver bool
 
@@ -43,4 +44,6 @@ type Settings struct {
 	ILM             ilm.SupportFactory
 
 	Processing processing.SupportFactory
+
+	Umask *int
 }

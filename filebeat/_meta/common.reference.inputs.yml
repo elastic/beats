@@ -62,6 +62,9 @@ filebeat.inputs:
   # fields.
   #fields_under_root: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Ignore files which were modified more then the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
@@ -79,6 +82,10 @@ filebeat.inputs:
   # All bytes after max_bytes are discarded and not sent. The default is 10MB.
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
 
   ### Recursive glob configuration
 
@@ -241,6 +248,10 @@ filebeat.inputs:
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
+  # Size of the UDP read buffer in bytes
+  #read_buffer: 0
+
+
 #------------------------------ TCP input --------------------------------
 # Experimental: Config options for the TCP input
 #- type: tcp
@@ -254,6 +265,9 @@ filebeat.inputs:
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
+
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
 
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
@@ -285,7 +299,8 @@ filebeat.inputs:
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
-  # are `none`, `optional`, and `required`. Default is required.
+  # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+  # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
@@ -344,20 +359,18 @@ filebeat.inputs:
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
-    # are `none`, `optional`, and `required`. Default is required.
+    # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+    # default to `required` otherwise it will be set to `none`.
     #ssl.client_authentication: "required"
 
-#------------------------------ Docker input --------------------------------
-# Experimental: Docker input reads and parses `json-file` logs from Docker
-#- type: docker
+#------------------------------ Container input --------------------------------
+#- type: container
   #enabled: false
 
-  # Combine partial lines flagged by `json-file` format
-  #combine_partials: true
+  # Paths for container logs that should be crawled and fetched.
+  #paths:
+  #  -/var/lib/docker/containers/*/*.log
 
-  # Use this to read from all containers, replace * with a container id to read from one:
-  #containers:
-  #  stream: all # can be all, stdout or stderr
-  #  ids:
-  #    - '*'
+  # Configure stream to filter to a specific stream: stdout, stderr or all (default)
+  #stream: all
 

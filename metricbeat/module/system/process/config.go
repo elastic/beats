@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/metric/system/process"
 )
 
+// Config stores the system/process config options
 type Config struct {
 	Procs           []string                 `config:"processes"`
 	Cgroups         *bool                    `config:"process.cgroups.enabled"`
@@ -33,9 +34,10 @@ type Config struct {
 	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
 }
 
+// Validate checks for depricated config options
 func (c Config) Validate() error {
 	if c.CPUTicks != nil {
-		cfgwarn.Deprecate("6.1", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
+		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
 	}
 	return nil
 }

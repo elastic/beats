@@ -1,0 +1,2 @@
+Oct 10 2019 10:21:36 localhost: %ASA-6-302021: Teardown ICMP connection for faddr target.destination.hostname.local/10005 gaddr 10.0.55.66/0 laddr Prod-host.name.addr/0
+Jun 04 2011 21:59:52 MYHOSTNAME : %ASA-6-302021: Teardown ICMP connection for faddr 192.0.2.15/0 gaddr 192.0.2.134/57808 laddr 192.0.2.134/57808 type 8 code 0

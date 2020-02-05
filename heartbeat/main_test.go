@@ -24,11 +24,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/heartbeat/cmd"
+	"github.com/elastic/beats/libbeat/tests/system/template"
 )
 
 var systemTest *bool
 
 func init() {
+	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
@@ -39,4 +41,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, cmd.Name)
 }

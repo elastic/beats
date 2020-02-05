@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -69,31 +69,31 @@ func (action eventAction) String() string {
 
 // Host represents information about a host.
 type Host struct {
-	info types.HostInfo
+	Info types.HostInfo
 	// Uptime() in types.HostInfo recalculates the uptime every time it is called -
 	// so storing it permanently here.
-	uptime time.Duration
-	ips    []net.IP
-	macs   []net.HardwareAddr
+	Uptime time.Duration
+	Ips    []net.IP
+	Macs   []net.HardwareAddr
 }
 
 // changeDetectionHash creates a hash of selected parts of the host information.
 // This is used later to detect changes to a host over time.
 func (host *Host) changeDetectionHash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 
-	if host.info.Containerized != nil {
-		h.WriteString(strconv.FormatBool(*host.info.Containerized))
+	if host.Info.Containerized != nil {
+		h.WriteString(strconv.FormatBool(*host.Info.Containerized))
 	}
 
-	h.WriteString(host.info.Timezone)
-	binary.Write(h, binary.BigEndian, int32(host.info.TimezoneOffsetSec))
-	h.WriteString(host.info.Architecture)
-	h.WriteString(host.info.OS.Platform)
-	h.WriteString(host.info.OS.Name)
-	h.WriteString(host.info.OS.Family)
-	h.WriteString(host.info.OS.Version)
-	h.WriteString(host.info.KernelVersion)
+	h.WriteString(host.Info.Timezone)
+	binary.Write(h, binary.BigEndian, int32(host.Info.TimezoneOffsetSec))
+	h.WriteString(host.Info.Architecture)
+	h.WriteString(host.Info.OS.Platform)
+	h.WriteString(host.Info.OS.Name)
+	h.WriteString(host.Info.OS.Family)
+	h.WriteString(host.Info.OS.Version)
+	h.WriteString(host.Info.KernelVersion)
 
 	return h.Sum64()
 }
@@ -101,36 +101,40 @@ func (host *Host) changeDetectionHash() uint64 {
 func (host *Host) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
 		// https://github.com/elastic/ecs#-host-fields
-		"uptime":              host.uptime,
-		"boottime":            host.info.BootTime,
-		"timezone.name":       host.info.Timezone,
-		"timezone.offset.sec": host.info.TimezoneOffsetSec,
-		"hostname":            host.info.Hostname,
-		"id":                  host.info.UniqueID,
-		"architecture":        host.info.Architecture,
+		"uptime":              host.Uptime,
+		"boottime":            host.Info.BootTime,
+		"timezone.name":       host.Info.Timezone,
+		"timezone.offset.sec": host.Info.TimezoneOffsetSec,
+		"hostname":            host.Info.Hostname,
+		"id":                  host.Info.UniqueID,
+		"architecture":        host.Info.Architecture,
 
 		// https://github.com/elastic/ecs#-operating-system-fields
 		"os": common.MapStr{
-			"platform": host.info.OS.Platform,
-			"name":     host.info.OS.Name,
-			"family":   host.info.OS.Family,
-			"version":  host.info.OS.Version,
-			"kernel":   host.info.KernelVersion,
+			"platform": host.Info.OS.Platform,
+			"name":     host.Info.OS.Name,
+			"family":   host.Info.OS.Family,
+			"version":  host.Info.OS.Version,
+			"kernel":   host.Info.KernelVersion,
 		},
 	}
 
-	if host.info.Containerized != nil {
-		mapstr.Put("containerized", host.info.Containerized)
+	if host.Info.Containerized != nil {
+		mapstr.Put("containerized", host.Info.Containerized)
+	}
+
+	if host.Info.OS.Codename != "" {
+		mapstr.Put("os.codename", host.Info.OS.Codename)
 	}
 
 	var ipStrings []string
-	for _, ip := range host.ips {
+	for _, ip := range host.Ips {
 		ipStrings = append(ipStrings, ip.String())
 	}
 	mapstr.Put("ip", ipStrings)
 
 	var macStrings []string
-	for _, mac := range host.macs {
+	for _, mac := range host.Macs {
 		macStr := mac.String()
 		if macStr != "" {
 			macStrings = append(macStrings, macStr)
@@ -249,27 +253,29 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	var events []mb.Event
 
 	// Report ID changes as a separate, special event.
-	if ms.lastHost.info.UniqueID != currentHost.info.UniqueID {
+	if ms.lastHost.Info.UniqueID != currentHost.Info.UniqueID {
 		/*
 		 Issue two events - one for the host with the old ID, one for the new
 		 - to link them (since the unique ID is what identifies a host).
 		*/
 		eventOldHost := hostEvent(ms.lastHost, eventTypeEvent, eventActionIDChanged)
-		eventOldHost.MetricSetFields.Put("new_id", currentHost.info.UniqueID)
+		eventOldHost.MetricSetFields.Put("new_id", currentHost.Info.UniqueID)
 		events = append(events, eventOldHost)
 
 		eventNewHost := hostEvent(currentHost, eventTypeEvent, eventActionIDChanged)
-		eventNewHost.MetricSetFields.Put("old_id", ms.lastHost.info.UniqueID)
+		eventNewHost.MetricSetFields.Put("old_id", ms.lastHost.Info.UniqueID)
 		events = append(events, eventNewHost)
 	}
 
 	// Report reboots separately
-	if !currentHost.info.BootTime.Equal(ms.lastHost.info.BootTime) {
+	// On Windows, BootTime is not fully accurate and can vary by a few milliseconds.
+	// So we only report a reboot if the new BootTime is at least 1 second after the old.
+	if currentHost.Info.BootTime.After(ms.lastHost.Info.BootTime.Add(1 * time.Second)) {
 		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionReboot))
 	}
 
 	// Report hostname changes separately
-	if currentHost.info.Hostname != ms.lastHost.info.Hostname {
+	if currentHost.Info.Hostname != ms.lastHost.Info.Hostname {
 		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionHostnameChanged))
 	}
 
@@ -301,17 +307,19 @@ func getHost() (*Host, error) {
 	}
 
 	host := &Host{
-		info:   sysinfoHost.Info(),
-		uptime: sysinfoHost.Info().Uptime(),
-		ips:    ips,
-		macs:   macs,
+		Info:   sysinfoHost.Info(),
+		Uptime: sysinfoHost.Info().Uptime(),
+		Ips:    ips,
+		Macs:   macs,
 	}
 
 	return host, nil
 }
 
 func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
-	return mb.Event{
+	hostFields := host.toMapStr()
+
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
@@ -319,24 +327,43 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 			},
 			"message": hostMessage(host, action),
 		},
-		MetricSetFields: host.toMapStr(),
+		MetricSetFields: hostFields,
 	}
+
+	// Copy select host.* fields in case add_host_metadata is not configured.
+	hostTopLevel := common.MapStr{}
+	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
+	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
+	hostFields.CopyFieldsTo(hostTopLevel, "hostname")
+	hostFields.CopyFieldsTo(hostTopLevel, "id")
+	hostFields.CopyFieldsTo(hostTopLevel, "ip")
+	hostFields.CopyFieldsTo(hostTopLevel, "mac")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.codename")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.family")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.kernel")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.name")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.platform")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.version")
+
+	event.RootFields.Put("host", hostTopLevel)
+
+	return event
 }
 
 func hostMessage(host *Host, action eventAction) string {
 	var firstIP string
-	if len(host.ips) > 0 {
-		firstIP = host.ips[0].String()
+	if len(host.Ips) > 0 {
+		firstIP = host.Ips[0].String()
 	}
 
 	// Hostname + IP of the first non-loopback interface.
-	hostString := fmt.Sprintf("%v (IP: %v)", host.info.Hostname, firstIP)
+	hostString := fmt.Sprintf("%v (IP: %v)", host.Info.Hostname, firstIP)
 
 	var message string
 	switch action {
 	case eventActionHost:
 		message = fmt.Sprintf("%v host %v is up for %v",
-			host.info.OS.Name, hostString, fmtDuration(host.uptime))
+			host.Info.OS.Name, hostString, fmtDuration(host.Uptime))
 	case eventActionIDChanged:
 		message = fmt.Sprintf("ID of host %v has changed", hostString)
 	case eventActionReboot:

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-01-29T07:31:40.426Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "oqKkg2eoQh2P_KrKliI3DA",
         "elasticsearch.component": "i.s.s.query",
@@ -22,7 +21,6 @@
     },
     {
         "@timestamp": "2019-01-29T07:36:01.675Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "oqKkg2eoQh2P_KrKliI3DA",
         "elasticsearch.component": "i.s.s.query",
@@ -43,7 +41,6 @@
     },
     {
         "@timestamp": "2019-01-29T07:36:01.685Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "oqKkg2eoQh2P_KrKliI3DA",
         "elasticsearch.component": "i.s.s.fetch",

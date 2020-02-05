@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type includeFields struct {
@@ -34,9 +35,9 @@ type includeFields struct {
 
 func init() {
 	processors.RegisterPlugin("include_fields",
-		configChecked(newIncludeFields,
-			requireFields("fields"),
-			allowedFields("fields", "when")))
+		checks.ConfigChecked(newIncludeFields,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "when")))
 }
 
 func newIncludeFields(c *common.Config) (processors.Processor, error) {

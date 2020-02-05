@@ -159,6 +159,11 @@ func implementsUnpacker(t reflect.Type) bool {
 }
 
 func unpackWith(opts *options, v reflect.Value, with value) Error {
+	// short circuit nil values
+	if isNil(with) {
+		return nil
+	}
+
 	ctx := with.Context()
 	meta := with.meta()
 

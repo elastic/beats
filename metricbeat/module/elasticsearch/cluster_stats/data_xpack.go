@@ -33,11 +33,6 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-type clusterStatsLicense struct {
-	*elasticsearch.License
-	ClusterNeedsTLS bool `json:"cluster_needs_tls"`
-}
-
 func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
 	if !license.IsOneOf("trial") {
@@ -161,6 +156,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	}
 
 	clusterStats := common.MapStr(data)
+	clusterStats.Delete("_nodes")
 
 	value, err := clusterStats.GetValue("cluster_name")
 	if err != nil {
@@ -182,6 +178,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
+	clusterState.Delete("cluster_name")
 
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")
@@ -203,7 +200,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
 	}
 
-	l := clusterStatsLicense{license, clusterNeedsTLS}
+	l := license.ToMapStr()
+	l["cluster_needs_tls"] = clusterNeedsTLS
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {

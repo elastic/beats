@@ -18,7 +18,7 @@
 package collector
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -46,11 +46,13 @@ func init() {
 	)
 }
 
+// MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 }
 
+// New creates a new metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
@@ -63,15 +65,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+// Fetch fetches data and reports it
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 
-	if err != nil {
-		reporter.Error(fmt.Errorf("Unable to decode response from prometheus endpoint"))
-		return
-	}
-
 	eventList := map[string]common.MapStr{}
+	if err != nil {
+		m.addUpEvent(eventList, 0)
+		for _, evt := range eventList {
+			reporter.Event(mb.Event{
+				RootFields: common.MapStr{"prometheus": evt},
+			})
+		}
+		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
+	}
 
 	for _, family := range families {
 		promEvents := getPromEventsFromMetricFamily(family)
@@ -83,6 +90,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 					"metrics": common.MapStr{},
 				}
 
+				// Add default instance label if not already there
+				if exists, _ := promEvent.labels.HasKey("instance"); !exists {
+					promEvent.labels.Put("instance", m.Host())
+				}
+				// Add default job label if not already there
+				if exists, _ := promEvent.labels.HasKey("job"); !exists {
+					promEvent.labels.Put("job", m.Module().Name())
+				}
 				// Add labels
 				if len(promEvent.labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.labels
@@ -95,8 +110,33 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
+	m.addUpEvent(eventList, 1)
+
 	// Converts hash list to slice
 	for _, e := range eventList {
-		reporter.Event(mb.Event{ModuleFields: e})
+		isOpen := reporter.Event(mb.Event{
+			RootFields: common.MapStr{"prometheus": e},
+		})
+		if !isOpen {
+			break
+		}
 	}
+
+	return nil
+}
+
+func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
+	upPromEvent := PromEvent{
+		labels: common.MapStr{
+			"instance": m.Host(),
+			"job":      "prometheus",
+		},
+	}
+	eventList[upPromEvent.LabelsHash()] = common.MapStr{
+		"metrics": common.MapStr{
+			"up": up,
+		},
+		"labels": upPromEvent.labels,
+	}
+
 }

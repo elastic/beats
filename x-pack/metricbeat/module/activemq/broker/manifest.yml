@@ -1,0 +1,49 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: 'broker'
+    jmx.mappings:
+    - mbean: 'org.apache.activemq:brokerName=*,type=Broker'
+      attributes:
+      - attr: BrokerName
+        field: name
+      - attr: MemoryPercentUsage
+        field: memory.broker.pct
+      - attr: StorePercentUsage
+        field: memory.store.pct
+      - attr: TempPercentUsage
+        field: memory.temp.pct
+      - attr: TotalConnectionsCount
+        field: connections.count
+      - attr: TotalConsumerCount
+        field: consumers.count
+      - attr: TotalDequeueCount
+        field: messages.dequeue.count
+      - attr: TotalEnqueueCount
+        field: messages.enqueue.count
+      - attr: TotalMessageCount
+        field: messages.count
+      - attr: TotalProducerCount
+        field: producers.count
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
+          if (broker_memory_broker_pct != null) {
+            event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
+          }
+
+          var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
+          if (broker_memory_temp_pct != null) {
+            event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
+          }
+
+          var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
+          if (broker_memory_store_pct != null) {
+            event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
+          }
+        }

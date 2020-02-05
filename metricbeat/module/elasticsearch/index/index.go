@@ -20,7 +20,6 @@ package index
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -55,42 +54,41 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers stats for each index from the _stats API
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
 	// Not master, no event sent
 	if !isMaster {
 		m.Logger().Debug("trying to fetch index stats from a non-master node")
-		return
+		return nil
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return err
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get info from Elasticsearch")
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
 	if m.XPack {
 		err = eventsMappingXPack(r, m, *info, content)
+		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
+		}
 	} else {
-		err = eventsMapping(r, *info, content)
+		return eventsMapping(r, *info, content)
 	}
 
-	if err != nil {
-		m.Logger().Error(err)
-		return
-	}
+	return nil
 }

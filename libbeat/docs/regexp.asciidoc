@@ -110,7 +110,7 @@ The following patterns are supported:
 |`[[:blank:]]`    |blank (same as `[\t ]`)
 |`[[:cntrl:]]`    |control (same as `[\x00-\x1F\x7F]`)
 |`[[:digit:]]`    |digits (same as `[0-9]`)
-|`[[:graph:]]`    |graphical (same as `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\\]^_`` `{\|}~]`)
+|`[[:graph:]]`    |graphical (same as `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_`` `{\|}~]`)
 |`[[:lower:]]`    |lower case (same as `[a-z]`)
 |`[[:print:]]`    |printable (same as `[ -~] == [ [:graph:]]`)
 |`[[:punct:]]`    |punctuation (same as ++[!-/:-@[-`{-~]++)

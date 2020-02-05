@@ -37,8 +37,8 @@ func TestFetchEventContents(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
-	events, errs := mbtest.ReportingFetchV2Error(f)
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
@@ -48,7 +48,8 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	assert.EqualValues(t, "ha-host", event["host"])
+	assert.EqualValues(t, "ha-host", event["host.id"])
+	assert.EqualValues(t, "localhost.localdomain", event["host.hostname"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
 
 	cpu := event["cpu"].(common.MapStr)
@@ -82,9 +83,9 @@ func TestData(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

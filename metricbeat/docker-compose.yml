@@ -4,261 +4,56 @@ services:
   beat:
     build: ${PWD}/.
     environment:
+      - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
-      # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
     command: make
-    env_file:
-      - ./module/aerospike/_meta/env
-      - ./module/apache/_meta/env
-      - ./module/ceph/_meta/env
-      - ./module/consul/_meta/env
-      - ./module/coredns/_meta/env
-      - ./module/couchbase/_meta/env
-      - ./module/couchdb/_meta/env
-      - ./module/dropwizard/_meta/env
-      - ./module/elasticsearch/_meta/env
-      - ./module/envoyproxy/_meta/env
-      - ./module/etcd/_meta/env
-      - ./module/golang/_meta/env
-      - ./module/haproxy/_meta/env
-      - ./module/http/_meta/env
-      - ./module/jolokia/_meta/env
-      - ./module/kafka/_meta/env
-      - ./module/kibana/_meta/env
-      #- ./module/kubernetes/_meta/env
-      - ./module/logstash/_meta/env
-      - ./module/memcached/_meta/env
-      - ./module/mongodb/_meta/env
-      - ./module/munin/_meta/env
-      - ./module/mysql/_meta/env
-      - ./module/nats/_meta/env
-      - ./module/nginx/_meta/env
-      - ./module/php_fpm/_meta/env
-      - ./module/postgresql/_meta/env
-      - ./module/prometheus/_meta/env
-      - ./module/rabbitmq/_meta/env
-      - ./module/redis/_meta/env
-      - ./module/traefik/_meta/env
-      - ./module/uwsgi/_meta/env
-      - ./module/zookeeper/_meta/env
 
-  # Modules
-  aerospike:
-    build: ./module/aerospike/_meta
-
-  apache:
-    build: ./module/apache/_meta
-
-  apache_2_4_12:
-    build:
-      context: ./module/apache/_meta
-      dockerfile: Dockerfile.2.4.12
-
-  ceph:
-    build: ./module/ceph/_meta
-
-  consul:
-    build: ./module/consul/_meta
-
-  coredns:
-    build: ./module/coredns/_meta
-
-  couchbase:
-    build: ./module/couchbase/_meta
-
-  couchdb:
-    build: ./module/couchdb/_meta
-
-  # Dummy container for docker tests, so there is a container with
-  # healthcheck generating events
-  docker:
-    image: alpine
-    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
-    healthcheck:
-      interval: 1s
-      test: ["CMD", "true"]
-
-  dropwizard:
-    build: ./module/dropwizard/_meta
-
+  # Used by base tests
   elasticsearch:
-    build: ./module/elasticsearch/_meta
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.5.2}-1
+    build:
+      context: ./module/elasticsearch/_meta
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.5.2}
     environment:
-      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
+    ports:
+      - 9200
 
-  envoyproxy:
-    build: ./module/envoyproxy/_meta
-
-  etcd:
-    build: ./module/etcd/_meta
-
-  etcd_3_2:
-    build:
-      context: ./module/etcd/_meta
-      args:
-        ETCD_VERSION: v3.2.25
-
-  golang:
-    build: ./module/golang/_meta
-
-  haproxy:
-    build: ./module/haproxy/_meta
-
-  haproxy_1_6:
-    build:
-      context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.6
-
-  haproxy_1_7:
-    build:
-      context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.7
-
-  http:
-    build: ./module/http/_meta
-
+  # Used by autodiscover tests
   jolokia:
-    build: ./module/jolokia/_meta
+    extends:
+      file: ./module/jolokia/docker-compose.yml
+      service: jolokia
 
-  kafka:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 2.1.1
-
-  kafka_1_1_0:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 1.1.0
-
-  kafka_0_10_2:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 0.10.2.1
-
+  # Used by base tests
   kibana:
-    build: ./module/kibana/_meta
-
-  #kubernetes:
-  #  build: ./module/kubernetes/_meta
-  #  network_mode: host
-  #  pid: host
-  #  privileged: true
-  #  volumes:
-  #    - /:/rootfs:ro
-  #    - /sys:/sys
-  #    - /var/lib/docker:/var/lib/docker
-  #    - /var/run:/var/run
-
-  #kubestate:
-  #  build:
-  #    context: ./module/kubernetes/_meta/
-  #    dockerfile: Dockerfile.kube-state
-  #  depends_on:
-  #    - kubernetes
-
-  logstash:
-    build: ./module/logstash/_meta
-
-  memcached:
-    build: ./module/memcached/_meta
-
-  mongodb:
-    build: ./module/mongodb/_meta
-    command: mongod --replSet beats
-
-  munin:
-    build: ./module/munin/_meta
-
-  mysql:
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.5.2}-1
     build:
-      context: ./module/mysql/_meta
+      context: ./module/kibana/_meta
       args:
-        MYSQL_IMAGE: mysql:5.7.24
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.5.2}
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601
 
-  mysql_8_0:
+  # Used by base tests
+  metricbeat:
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.3.0}-1
     build:
-      context: ./module/mysql/_meta
+      context: ./module/beat/_meta
       args:
-        MYSQL_IMAGE: mysql:8.0.13
-
-  percona_5_7:
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: percona:5.7.24
-
-  percona_8_0:
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: percona:8.0.13-4
-
-  mariadb_10_2:
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: mariadb:10.2.17
-
-  mariadb_10_3:
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: mariadb:10.3.12
-
-  nats:
-    build: ./module/nats/_meta
-
-  nginx:
-    build: ./module/nginx/_meta
-
-  phpfpm:
-    build: ./module/php_fpm/_meta
-
-  postgresql:
-    build: ./module/postgresql/_meta
-
-  prometheus:
-    build: ./module/prometheus/_meta
-
-  rabbitmq:
-    build: ./module/rabbitmq/_meta
-
-  redis:
-    build: ./module/redis/_meta
-
-  redis_4:
-    build:
-      context: ./module/redis/_meta
-      args:
-        REDIS_VERSION: 4.0.11
-
-  redis_5:
-    build:
-      context: ./module/redis/_meta
-      args:
-        REDIS_VERSION: 5.0-rc4
-
-  traefik:
-    build: ./module/traefik/_meta
-
-  uwsgi_tcp:
-    build: ./module/uwsgi/_meta
-    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
-
-  uwsgi_http:
-    build: ./module/uwsgi/_meta
-    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py
-
-  zookeeper:
-    build: ./module/zookeeper/_meta
+        BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    command: '-e'
+    ports:
+      - 5066

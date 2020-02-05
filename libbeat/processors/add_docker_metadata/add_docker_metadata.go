@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_docker_metadata
 
 import (
@@ -35,6 +37,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -49,6 +52,7 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
+	jsprocessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {
@@ -57,30 +61,38 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor processors.Processor
 
-	pidFields []string      // Field names that contain PIDs.
-	cgroups   *common.Cache // Cache of PID (int) to cgropus (map[string]string).
-	hostFS    string        // Directory where /proc is found
-	dedot     bool          // If set to true, replace dots in labels with `_`.
+	pidFields       []string      // Field names that contain PIDs.
+	cgroups         *common.Cache // Cache of PID (int) to cgropus (map[string]string).
+	hostFS          string        // Directory where /proc is found
+	dedot           bool          // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool          // If Docker exists in env, then it is set to true
 }
+
+const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
+	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
-	if err != nil {
-		return nil, err
-	}
+	var dockerAvailable bool
 
-	if err = watcher.Start(); err != nil {
-		return nil, err
+	watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
+	if err != nil {
+		dockerAvailable = false
+		log.Debugf("%v: docker environment not detected: %+v", processorName, err)
+	} else {
+		dockerAvailable = true
+		log.Debugf("%v: docker environment detected", processorName)
+		if err = watcher.Start(); err != nil {
+			return nil, errors.Wrap(err, "failed to start watcher")
+		}
 	}
 
 	// Use extract_field processor to get container ID from source file path.
@@ -99,13 +111,14 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	}
 
 	return &addDockerMetadata{
-		log:             logp.NewLogger(processorName),
+		log:             log,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		hostFS:          config.HostFS,
 		dedot:           config.DeDot,
+		dockerAvailable: dockerAvailable,
 	}, nil
 }
 
@@ -121,8 +134,12 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	if !d.dockerAvailable {
+		return event, nil
+	}
 	var cid string
 	var err error
+
 	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
 		lfp, _ := event.Fields.GetValue("log.file.path")

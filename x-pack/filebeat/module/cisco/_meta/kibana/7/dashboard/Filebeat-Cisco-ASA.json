@@ -133,7 +133,7 @@
           }
         ],
         "timeRestore": false,
-        "title": " [Filebeat Cisco] ASA Firewall",
+        "title": "[Filebeat Cisco] ASA Firewall",
         "version": 1
       },
       "id": "a555b160-4987-11e9-b8ce-ed898b5ef295",
@@ -764,7 +764,7 @@
               "id": "2",
               "params": {
                 "customLabel": "ACL ID",
-                "field": "cisco.asa.list_id",
+                "field": "cisco.asa.rule_name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -878,7 +878,7 @@
               "params": {
                 "aggregate": "concat",
                 "customLabel": "Sample message",
-                "field": "log.original",
+                "field": "event.original",
                 "size": 1,
                 "sortField": "@timestamp",
                 "sortOrder": "desc"

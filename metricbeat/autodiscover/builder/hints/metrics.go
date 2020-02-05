@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -37,13 +36,16 @@ func init() {
 }
 
 const (
-	module     = "module"
-	namespace  = "namespace"
-	hosts      = "hosts"
-	metricsets = "metricsets"
-	period     = "period"
-	timeout    = "timeout"
-	ssl        = "ssl"
+	module      = "module"
+	namespace   = "namespace"
+	hosts       = "hosts"
+	metricsets  = "metricsets"
+	period      = "period"
+	timeout     = "timeout"
+	ssl         = "ssl"
+	metricspath = "metrics_path"
+	username    = "username"
+	password    = "password"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
@@ -56,7 +58,6 @@ type metricHints struct {
 
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -101,18 +102,25 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
-	hsts := m.getHostsWithPort(hints, port)
+	hosts, ok := m.getHostsWithPort(hints, port)
+	if !ok {
+		return config
+	}
+
 	ns := m.getNamespace(hints)
 	msets := m.getMetricSets(hints, mod)
 	tout := m.getTimeout(hints)
 	ival := m.getPeriod(hints)
 	sslConf := m.getSSLConfig(hints)
 	procs := m.getProcessors(hints)
+	metricspath := m.getMetricPath(hints)
+	username := m.getUsername(hints)
+	password := m.getPassword(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
 		"metricsets": msets,
-		"hosts":      hsts,
+		"hosts":      hosts,
 		"timeout":    tout,
 		"period":     ival,
 		"enabled":    true,
@@ -123,15 +131,24 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if ns != "" {
 		moduleConfig["namespace"] = ns
 	}
+	if metricspath != "" {
+		moduleConfig["metrics_path"] = metricspath
+	}
+	if username != "" {
+		moduleConfig["username"] = username
+	}
+	if password != "" {
+		moduleConfig["password"] = password
+	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: +%v", *cfg)
+	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
@@ -161,7 +178,7 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
@@ -175,11 +192,28 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
 		}
 	}
 
-	return result
+	if len(thosts) > 0 && len(result) == 0 {
+		logp.Debug("hints.builder", "no hosts selected for port %d with hints: %+v", port, thosts)
+		return nil, false
+	}
+
+	return result, true
 }
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, namespace)
+}
+
+func (m *metricHints) getMetricPath(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, metricspath)
+}
+
+func (m *metricHints) getUsername(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, username)
+}
+
+func (m *metricHints) getPassword(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, password)
 }
 
 func (m *metricHints) getPeriod(hints common.MapStr) string {

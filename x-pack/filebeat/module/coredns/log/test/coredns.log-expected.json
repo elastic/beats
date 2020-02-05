@@ -14,7 +14,16 @@
             "RA"
         ],
         "coredns.response.size": 136,
-        "ecs.version": "1.0.0",
+        "dns.header_flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "dns.id": "21583",
+        "dns.question.class": "IN",
+        "dns.question.name": "httpbin.org.cluster.local",
+        "dns.question.type": "A",
+        "dns.response_code": "NXDOMAIN",
         "event.dataset": "coredns.log",
         "event.duration": 102078,
         "event.module": "coredns",
@@ -47,7 +56,16 @@
             "RA"
         ],
         "coredns.response.size": 188,
-        "ecs.version": "1.0.0",
+        "dns.header_flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "dns.id": "14639",
+        "dns.question.class": "IN",
+        "dns.question.name": "www.yahoo.com",
+        "dns.question.type": "A",
+        "dns.response_code": "NOERROR",
         "event.dataset": "coredns.log",
         "event.duration": 20948545,
         "event.module": "coredns",

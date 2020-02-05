@@ -11,9 +11,11 @@
     - process
     - process_summary
     - socket_summary
+    #- entropy
     #- core
     #- diskio
     #- socket
+    #- services
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
@@ -25,7 +27,7 @@
     - fsstat
   processors:
   - drop_event.when.regexp:
-      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
 
 - module: system
   period: 15m

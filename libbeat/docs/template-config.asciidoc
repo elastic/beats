@@ -8,7 +8,7 @@ mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is Logstash, you must <<load-template-manually,load the template
@@ -24,18 +24,18 @@ you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
-name, so the final name is +{beatname_lc}-%\{[{beat_version_key}]\}+.
+name, so the final name is +{beatname_lc}-%{[{beat_version_key}]}+.
 
 // Maintainers: a backslash character is required to escape curly braces and
 // asterisks in inline code examples that contain asciidoc attributes. You'll
 // note that a backslash does not appear before the asterisk
-// in +{beatname_lc}-%\{[{beat_version_key}]\}-*+. This is intentional and formats
+// in +{beatname_lc}-%{[{beat_version_key}]}-*+. This is intentional and formats
 // the example as expected.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
 settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beat_default_index_prefix}-%\{[{beat_version_key}]\}-*+. The wildcard character `-*` is used to
++{beat_default_index_prefix}-%{[{beat_version_key}]}-*+. The wildcard character `-*` is used to
 match all daily indices.
 +
 Example:
@@ -69,11 +69,6 @@ setup.template.settings:
   index.number_of_replicas: 1
 ----------------------------------------------------------------------
 
-NOTE: If you want to use {stack-ov}/xpack-ccr.html[{ccr}] to replicate {beatname_uc}
-indices to another cluster, you will need to add additional template settings to
-{stack-ov}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
-underlying indices.
-
 *`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
 please see the Elasticsearch {ref}/mapping-source-field.html[reference].
 +
@@ -88,7 +83,6 @@ setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
 
-ifeval::["{beatname_lc}"!="apm-server"]
 *`setup.template.append_fields`* experimental[]:: A list of fields to be added
 to the template and {kib} index pattern. This setting adds new fields. It does
 not overwrite or change existing fields. 
@@ -134,5 +128,3 @@ setup.template.json.name: "template-name
 
 NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
 generation.
-
-endif::[]

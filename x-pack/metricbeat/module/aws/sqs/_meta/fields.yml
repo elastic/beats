@@ -2,10 +2,11 @@
   type: group
   description: >
     `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
-  release: beta
+  release: ga
   fields:
     - name: oldest_message_age.sec
       type: long
+      format: duration
       description: >
         The approximate age of the oldest non-deleted message in the queue.
     - name: messages.delayed

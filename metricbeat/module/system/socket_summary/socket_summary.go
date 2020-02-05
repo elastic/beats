@@ -20,6 +20,7 @@ package socket_summary
 import (
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -43,6 +44,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sockstat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -62,6 +64,12 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		tcpClosewait   = 0
 		tcpEstablished = 0
 		tcpTimewait    = 0
+		tcpSynsent     = 0
+		tcpSynrecv     = 0
+		tcpFinwait1    = 0
+		tcpFinwait2    = 0
+		tcpLastack     = 0
+		tcpClosing     = 0
 		udpConns       = 0
 	)
 
@@ -84,6 +92,24 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 			if conn.Status == "LISTEN" {
 				tcpListening++
 			}
+			if conn.Status == "SYN_SENT" {
+				tcpSynsent++
+			}
+			if conn.Status == "SYN_RECV" {
+				tcpSynrecv++
+			}
+			if conn.Status == "FIN_WAIT1" {
+				tcpFinwait1++
+			}
+			if conn.Status == "FIN_WAIT2" {
+				tcpFinwait2++
+			}
+			if conn.Status == "LAST_ACK" {
+				tcpLastack++
+			}
+			if conn.Status == "CLOSING" {
+				tcpClosing++
+			}
 		case syscall.SOCK_DGRAM:
 			udpConns++
 		}
@@ -101,6 +127,12 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 				"established": tcpEstablished,
 				"close_wait":  tcpClosewait,
 				"time_wait":   tcpTimewait,
+				"syn_sent":    tcpSynsent,
+				"syn_recv":    tcpSynrecv,
+				"fin_wait1":   tcpFinwait1,
+				"fin_wait2":   tcpFinwait2,
+				"last_ack":    tcpLastack,
+				"closing":     tcpClosing,
 			},
 		},
 		"udp": common.MapStr{
@@ -114,17 +146,24 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
-
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// all network connections
-	conns, err := net.Connections("inet")
+	conns, err := connections("inet")
 
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error getting connections")
+	}
+
+	stats := calculateConnStats(conns)
+	newStats, err := applyEnhancements(stats, m)
+	if err != nil {
+		m.Logger().Debugf("error applying enhancements: %s", err)
+		newStats = stats
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: calculateConnStats(conns),
+		MetricSetFields: newStats,
 	})
+
+	return nil
 }

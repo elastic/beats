@@ -37,31 +37,77 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
-		f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet))
-		events, errs := mbtest.ReportingFetchV2(f)
+		t.Run(metricSet, func(t *testing.T) {
+			config := getConfig(metricSet, service.Host())
+			f := mbtest.NewReportingMetricSetV2Error(t, config)
+			events, errs := mbtest.ReportingFetchV2Error(f)
 
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
+				t.FailNow()
+			}
+
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+		})
+	}
+}
+
+func TestData(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
+
+	for _, metricSet := range metricSets {
+		t.Run(metricSet, func(t *testing.T) {
+			config := getConfig(metricSet, service.Host())
+			f := mbtest.NewReportingMetricSetV2Error(t, config)
+			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		})
+	}
+}
+
+func TestXPackEnabled(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
+
+	metricSetToTypeMap := map[string]string{
+		"node":       "logstash_state",
+		"node_stats": "logstash_stats",
+	}
+
+	config := getXPackConfig(service.Host())
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
 		assert.Empty(t, errs)
 		if !assert.NotEmpty(t, events) {
 			t.FailNow()
 		}
 
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+		event := events[0]
+		assert.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		assert.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
 	}
 }
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+func getConfig(metricSet string, host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     logstash.ModuleName,
+		"metricsets": []string{metricSet},
+		"hosts":      []string{host},
+	}
+}
 
-	for _, metricSet := range metricSets {
-		config := logstash.GetConfig(metricSet)
-		f := mbtest.NewReportingMetricSetV2(t, config)
-		err := mbtest.WriteEventsReporterV2(f, t, metricSet)
-		if err != nil {
-			t.Fatal("write", err)
-		}
+func getXPackConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":        logstash.ModuleName,
+		"metricsets":    metricSets,
+		"hosts":         []string{host},
+		"xpack.enabled": true,
 	}
 }

@@ -22,10 +22,12 @@
       description: BLAKE2b-512 hash of the file.
 
     - name: md5
+      overwrite: true
       type: keyword
       description: MD5 hash of the file.
 
     - name: sha1
+      overwrite: true
       type: keyword
       description: SHA1 hash of the file.
 
@@ -34,6 +36,7 @@
       description: SHA224 hash of the file.
 
     - name: sha256
+      overwrite: true
       type: keyword
       description: SHA256 hash of the file.
 
@@ -58,6 +61,7 @@
       description: SHA3_512 hash of the file.
 
     - name: sha512
+      overwrite: true
       type: keyword
       description: SHA512 hash of the file.
 

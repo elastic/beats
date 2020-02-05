@@ -63,8 +63,3 @@
     - name: certificate.sha256
       type: keyword
       description: SHA256 hash of code signing certificate.
-
-    # Auditbeat FIM is using this field for the same purpose.
-    - name: hash.sha256
-      type: keyword
-      description: Hash of process executable.

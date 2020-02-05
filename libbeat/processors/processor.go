@@ -40,10 +40,18 @@ type Processor interface {
 	String() string
 }
 
-func New(config PluginConfig) (*Processors, error) {
-	procs := &Processors{
-		log: logp.NewLogger(logName),
+// NewList creates a new empty processor list.
+// Additional processors can be added to the List field.
+func NewList(log *logp.Logger) *Processors {
+	if log == nil {
+		log = logp.NewLogger(logName)
 	}
+	return &Processors{log: log}
+}
+
+// New creates a list of processors from a list of free user configurations.
+func New(config PluginConfig) (*Processors, error) {
+	procs := NewList(nil)
 
 	for _, procConfig := range config {
 		// Handle if/then/else processor which has multiple top-level keys.
@@ -52,7 +60,7 @@ func New(config PluginConfig) (*Processors, error) {
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to make if/then/else processor")
 			}
-			procs.add(p)
+			procs.AddProcessor(p)
 			continue
 		}
 
@@ -71,7 +79,12 @@ func New(config PluginConfig) (*Processors, error) {
 
 		gen, exists := registry.reg[actionName]
 		if !exists {
-			return nil, errors.Errorf("the processor action %s does not exist", actionName)
+			var validActions []string
+			for k := range registry.reg {
+				validActions = append(validActions, k)
+
+			}
+			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
 		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)
@@ -81,7 +94,7 @@ func New(config PluginConfig) (*Processors, error) {
 			return nil, err
 		}
 
-		procs.add(plugin)
+		procs.AddProcessor(plugin)
 	}
 
 	if len(procs.List) > 0 {
@@ -90,8 +103,25 @@ func New(config PluginConfig) (*Processors, error) {
 	return procs, nil
 }
 
-func (procs *Processors) add(p Processor) {
+// AddProcessor adds a single Processor to Processors
+func (procs *Processors) AddProcessor(p Processor) {
 	procs.List = append(procs.List, p)
+}
+
+// AddProcessors adds more Processors to Processors
+func (procs *Processors) AddProcessors(p Processors) {
+	// Subtlety: it is important here that we append the individual elements of
+	// p, rather than p itself, even though
+	// p implements the processors.Processor interface. This is
+	// because the contents of what we return are later pulled out into a
+	// processing.group rather than a processors.Processors, and the two have
+	// different error semantics: processors.Processors aborts processing on
+	// any error, whereas processing.group only aborts on fatal errors. The
+	// latter is the most common behavior, and the one we are preserving here for
+	// backwards compatibility.
+	// We are unhappy about this and have plans to fix this inconsistency at a
+	// higher level, but for now we need to respect the existing semantics.
+	procs.List = append(procs.List, p.List...)
 }
 
 // RunBC (run backwards-compatible) applies the processors, by providing the

@@ -28,4 +28,5 @@ type Config struct {
 	Host           string           `config:"host"`
 	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"positive,nonzero"`
 	Timeout        time.Duration    `config:"timeout"`
+	ReadBuffer     cfgtype.ByteSize `config:"read_buffer" validate:"positive"`
 }

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-01-07T21:25:21.871Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
         "fileset.name": "log",
@@ -28,7 +27,6 @@
     },
     {
         "@timestamp": "2019-01-07T21:25:22.538Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
         "fileset.name": "log",
@@ -44,7 +42,6 @@
     },
     {
         "@timestamp": "2019-01-07T21:25:22.594Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
         "fileset.name": "log",

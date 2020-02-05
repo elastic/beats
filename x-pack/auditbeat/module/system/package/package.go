@@ -14,12 +14,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"
@@ -29,8 +31,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/x-pack/auditbeat/module/system"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 const (
@@ -38,20 +38,18 @@ const (
 	metricsetName = "package"
 	namespace     = "system.audit.package"
 
-	redhat = "redhat"
-	suse   = "suse"
-	debian = "debian"
-	darwin = "darwin"
-
-	dpkgStatusFile     = "/var/lib/dpkg/status"
-	homebrewCellarPath = "/usr/local/Cellar"
-
 	bucketName              = "package.v1"
 	bucketKeyPackages       = "packages"
 	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
+)
+
+var (
+	rpmPath            = "/var/lib/rpm"
+	dpkgPath           = "/var/lib/dpkg"
+	homebrewCellarPath = "/usr/local/Cellar"
 )
 
 type eventAction uint8
@@ -93,7 +91,8 @@ type MetricSet struct {
 	cache     *cache.Cache
 	bucket    datastore.Bucket
 	lastState time.Time
-	osFamily  string
+
+	suppressNoPackageWarnings bool
 }
 
 // Package represents information for a package.
@@ -112,7 +111,7 @@ type Package struct {
 
 // Hash creates a hash for Package.
 func (pkg Package) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(pkg.Name)
 	h.WriteString(pkg.Version)
 	h.WriteString(pkg.Release)
@@ -166,20 +165,6 @@ func (pkg Package) entityID(hostID string) string {
 	return h.Sum()
 }
 
-func getOS() (*types.OSInfo, error) {
-	host, err := sysinfo.Host()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting the OS")
-	}
-
-	hostInfo := host.Info()
-	if hostInfo.OS == nil {
-		return nil, errors.New("no host info")
-	}
-
-	return hostInfo.OS, nil
-}
-
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
@@ -200,26 +185,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:             logp.NewLogger(metricsetName),
 		cache:           cache.New(),
 		bucket:          bucket,
-	}
-
-	osInfo, err := getOS()
-	if err != nil {
-		return nil, errors.Wrap(err, "error determining operating system")
-	}
-	ms.osFamily = osInfo.Family
-	switch osInfo.Family {
-	case redhat, suse:
-		// ok
-	case debian:
-		if _, err := os.Stat(dpkgStatusFile); err != nil {
-			return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
-		}
-	case darwin:
-		if _, err := os.Stat(homebrewCellarPath); err != nil {
-			return nil, errors.Wrapf(err, "error looking up %s - is Homebrew installed?", homebrewCellarPath)
-		}
-	default:
-		return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
 	}
 
 	// Load from disk: Time when state was last sent
@@ -252,17 +217,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Close cleans up the MetricSet when it finishes.
 func (ms *MetricSet) Close() error {
+	var errs multierror.Errors
+
+	errs = append(errs, closeDataset())
+
 	if ms.bucket != nil {
-		return ms.bucket.Close()
+		errs = append(errs, ms.bucket.Close())
 	}
-	return nil
+
+	return errs.Err()
 }
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
-	if needsStateUpdate || ms.cache.IsEmpty() {
-		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+	if needsStateUpdate {
+		ms.log.Debug("Sending state")
 		err := ms.reportState(report)
 		if err != nil {
 			ms.log.Error(err)
@@ -282,11 +252,10 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.lastState = time.Now()
 
-	packages, err := getPackages(ms.osFamily)
+	packages, err := ms.getPackages()
 	if err != nil {
 		return errors.Wrap(err, "failed to get packages")
 	}
-	ms.log.Debugf("Found %v packages", len(packages))
 
 	stateID, err := uuid.NewV4()
 	if err != nil {
@@ -316,11 +285,10 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 // reportChanges detects and reports any changes to installed packages on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
-	packages, err := getPackages(ms.osFamily)
+	packages, err := ms.getPackages()
 	if err != nil {
 		return errors.Wrap(err, "failed to get packages")
 	}
-	ms.log.Debugf("Found %v packages", len(packages))
 
 	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 	newPackages := convertToPackage(newInCache)
@@ -383,7 +351,9 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 		MetricSetFields: pkg.toMapStr(),
 	}
 
-	event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+	}
 
 	if pkg.Error != nil {
 		event.RootFields.Put("error.message", pkg.Error.Error())
@@ -470,31 +440,68 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 	return nil
 }
 
-func getPackages(osFamily string) (packages []*Package, err error) {
-	switch osFamily {
-	case redhat, suse:
-		packages, err = listRPMPackages()
+func (ms *MetricSet) getPackages() (packages []*Package, err error) {
+	var foundPackageManager bool
+
+	_, err = os.Stat(rpmPath)
+	if err == nil {
+		foundPackageManager = true
+
+		rpmPackages, err := listRPMPackages()
 		if err != nil {
-			err = errors.Wrap(err, "error getting RPM packages")
+			return nil, errors.Wrap(err, "error getting RPM packages")
 		}
-	case debian:
-		packages, err = listDebPackages()
-		if err != nil {
-			err = errors.Wrap(err, "error getting DEB packages")
-		}
-	case darwin:
-		packages, err = listBrewPackages()
-		if err != nil {
-			err = errors.Wrap(err, "error getting Homebrew packages")
-		}
-	default:
-		err = errors.Errorf("unknown OS %v - this should not have happened", osFamily)
+		ms.log.Debugf("RPM packages: %v", len(rpmPackages))
+
+		packages = append(packages, rpmPackages...)
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, errors.Wrapf(err, "error opening %v", rpmPath)
 	}
 
-	return
+	_, err = os.Stat(dpkgPath)
+	if err == nil {
+		foundPackageManager = true
+
+		dpkgPackages, err := listDebPackages()
+		if err != nil {
+			return nil, errors.Wrap(err, "error getting DEB packages")
+		}
+		ms.log.Debugf("DEB packages: %v", len(dpkgPackages))
+
+		packages = append(packages, dpkgPackages...)
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, errors.Wrapf(err, "error opening %v", dpkgPath)
+	}
+
+	_, err = os.Stat(homebrewCellarPath)
+	if err == nil {
+		foundPackageManager = true
+
+		homebrewPackages, err := listBrewPackages()
+		if err != nil {
+			return nil, errors.Wrap(err, "error getting Homebrew packages")
+		}
+		ms.log.Debugf("Homebrew packages: %v", len(homebrewPackages))
+
+		packages = append(packages, homebrewPackages...)
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, errors.Wrapf(err, "error opening %v", homebrewCellarPath)
+	}
+
+	if !foundPackageManager && !ms.suppressNoPackageWarnings {
+		ms.log.Warnf("No supported package managers found. None of %v, %v, %v exist.",
+			rpmPath, dpkgPath, homebrewCellarPath)
+
+		// Only warn once at the start of Auditbeat.
+		ms.suppressNoPackageWarnings = true
+	}
+
+	return packages, nil
 }
 
 func listDebPackages() ([]*Package, error) {
+	dpkgStatusFile := filepath.Join(dpkgPath, "status")
+
 	file, err := os.Open(dpkgStatusFile)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening %s", dpkgStatusFile)
@@ -503,7 +510,7 @@ func listDebPackages() ([]*Package, error) {
 
 	var packages []*Package
 	var skipPackage bool
-	pkg := &Package{}
+	var pkg *Package
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -513,7 +520,7 @@ func listDebPackages() ([]*Package, error) {
 				packages = append(packages, pkg)
 			}
 			skipPackage = false
-			pkg = &Package{}
+			pkg = nil
 			continue
 		} else if skipPackage {
 			// Skipping this package - read on.
@@ -529,6 +536,11 @@ func listDebPackages() ([]*Package, error) {
 			return nil, fmt.Errorf("the following line was unexpected (no ':' found): '%s'", line)
 		}
 		value := strings.TrimSpace(words[1])
+
+		if pkg == nil {
+			pkg = &Package{}
+		}
+
 		switch strings.ToLower(words[0]) {
 		case "package":
 			pkg.Name = value
@@ -548,12 +560,21 @@ func listDebPackages() ([]*Package, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error converting %s to int", value)
 			}
+		case "homepage":
+			pkg.URL = value
 		default:
 			continue
 		}
 	}
+
 	if err = scanner.Err(); err != nil {
 		return nil, errors.Wrapf(err, "error scanning file %v", dpkgStatusFile)
 	}
+
+	// Append last package if file ends without newline
+	if pkg != nil && !skipPackage {
+		packages = append(packages, pkg)
+	}
+
 	return packages, nil
 }

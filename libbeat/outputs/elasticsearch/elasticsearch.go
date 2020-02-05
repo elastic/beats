@@ -20,6 +20,7 @@ package elasticsearch
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"sync"
 
 	"github.com/gofrs/uuid"
@@ -163,12 +164,15 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	proxyURL, err := parseProxyURL(config.ProxyURL)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-	if proxyURL != nil {
-		logp.Info("Using proxy URL: %s", proxyURL)
+	var proxyURL *url.URL
+	if !config.ProxyDisable {
+		proxyURL, err = parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+		if proxyURL != nil {
+			logp.Info("Using proxy URL: %s", proxyURL)
+		}
 	}
 
 	params := config.Params
@@ -190,9 +194,11 @@ func makeES(
 			Index:            index,
 			Pipeline:         pipeline,
 			Proxy:            proxyURL,
+			ProxyDisable:     config.ProxyDisable,
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,
+			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,
@@ -283,12 +289,15 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
-	proxyURL, err := parseProxyURL(config.ProxyURL)
-	if err != nil {
-		return nil, err
-	}
-	if proxyURL != nil {
-		logp.Info("Using proxy URL: %s", proxyURL)
+	var proxyURL *url.URL
+	if !config.ProxyDisable {
+		proxyURL, err = parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return nil, err
+		}
+		if proxyURL != nil {
+			logp.Info("Using proxy URL: %s", proxyURL)
+		}
 	}
 
 	params := config.Params
@@ -307,9 +316,11 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		client, err := NewClient(ClientSettings{
 			URL:              esURL,
 			Proxy:            proxyURL,
+			ProxyDisable:     config.ProxyDisable,
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,
+			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,

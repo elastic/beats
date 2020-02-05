@@ -15,6 +15,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -96,16 +97,28 @@ Options:
 		{{with .Description}}fmt.Println(` + "`{{.}}\n`" + `)
 		{{- end}}
 		{{- $default := .DefaultFunc}}
-		w := tabwriter.NewWriter(os.Stdout, 0, 4, 4, ' ', 0)
-		fmt.Println("Targets:")
+		targets := map[string]string{
 		{{- range .Funcs}}
-			fmt.Fprintln(w, "  {{lowerFirst .TargetName}}{{if and (eq .Name $default.Name) (eq .Receiver $default.Receiver)}}*{{end}}\t" + {{printf "%q" .Synopsis}})
+			"{{lowerFirst .TargetName}}{{if and (eq .Name $default.Name) (eq .Receiver $default.Receiver)}}*{{end}}": {{printf "%q" .Synopsis}},
 		{{- end}}
 		{{- range .Imports}}{{$imp := .}}
 			{{- range .Info.Funcs}}
-			fmt.Fprintln(w, "  {{lowerFirst .TargetName}}{{if and (eq .Name $default.Name) (eq .Receiver $default.Receiver)}}*{{end}}\t" + {{printf "%q" .Synopsis}})
-			{{end}}
+			"{{lowerFirst .TargetName}}{{if and (eq .Name $default.Name) (eq .Receiver $default.Receiver)}}*{{end}}": {{printf "%q" .Synopsis}},
+			{{- end}}
 		{{- end}}
+		}
+
+		keys := make([]string, 0, len(targets))
+		for name := range targets {
+			keys = append(keys, name)
+		}
+		sort.Strings(keys)
+
+		fmt.Println("Targets:")
+		w := tabwriter.NewWriter(os.Stdout, 0, 4, 4, ' ', 0)
+		for _, name := range keys {
+			fmt.Fprintf(w, "  %v\t%v\n", name, targets[name])
+		}
 		err := w.Flush()
 		{{- if .DefaultFunc.Name}}
 			if err == nil {

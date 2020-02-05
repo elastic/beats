@@ -1,9 +1,9 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,
@@ -36,10 +36,10 @@
         "source.port": 35982
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,
@@ -72,10 +72,10 @@
         "source.port": 43738
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,

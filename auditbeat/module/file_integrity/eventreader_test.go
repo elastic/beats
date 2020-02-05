@@ -32,6 +32,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	underTest = true
+}
+
 // ErrorSharingViolation is a Windows ERROR_SHARING_VIOLATION. It means "The
 // process cannot access the file because it is being used by another process."
 const ErrorSharingViolation syscall.Errno = 32

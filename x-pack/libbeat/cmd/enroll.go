@@ -18,16 +18,10 @@ import (
 )
 
 func getBeat(name, version string) (*instance.Beat, error) {
-	b, err := instance.NewBeat(name, "", version)
-
+	b, err := instance.NewInitializedBeat(instance.Settings{Name: name, Version: version})
 	if err != nil {
 		return nil, fmt.Errorf("error creating beat: %s", err)
 	}
-
-	if err = b.Init(); err != nil {
-		return nil, fmt.Errorf("error initializing beat: %s", err)
-	}
-
 	return b, nil
 }
 

@@ -40,7 +40,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -108,17 +107,11 @@ func (fs *Fileset) Read(beatVersion string) error {
 // manifest structure is the representation of the manifest.yml file from the
 // fileset.
 type manifest struct {
-	ModuleVersion   string                   `config:"module_version"`
-	Vars            []map[string]interface{} `config:"var"`
-	IngestPipeline  []string                 `config:"ingest_pipeline"`
-	Input           string                   `config:"input"`
-	MachineLearning []struct {
-		Name       string `config:"name"`
-		Job        string `config:"job"`
-		Datafeed   string `config:"datafeed"`
-		MinVersion string `config:"min_version"`
-	} `config:"machine_learning"`
-	Requires struct {
+	ModuleVersion  string                   `config:"module_version"`
+	Vars           []map[string]interface{} `config:"var"`
+	IngestPipeline []string                 `config:"ingest_pipeline"`
+	Input          string                   `config:"input"`
+	Requires       struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
 }
@@ -173,10 +166,9 @@ func (fs *Fileset) evaluateVars(beatVersion string) (map[string]interface{}, err
 			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
 		}
 
-		value, exists := vals["default"]
-		if !exists {
-			return nil, fmt.Errorf("Variable %s doesn't have a 'default' key", name)
-		}
+		// Variables are not required to have a default. Templates should
+		// handle null default values as necessary.
+		value := vals["default"]
 
 		// evaluate OS specific vars
 		osVals, exists := vals["os"].(map[string]interface{})
@@ -268,7 +260,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 // the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
 func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
-	tpl := template.New("text")
+	tpl := template.New("text").Option("missingkey=error")
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
 	}
@@ -350,6 +342,11 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 	cfg, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
 		return nil, fmt.Errorf("Error reading input config: %v", err)
+	}
+
+	cfg, err = mergePathDefaults(cfg)
+	if err != nil {
+		return nil, err
 	}
 
 	// overrides
@@ -512,19 +509,4 @@ func removeExt(path string) string {
 // fileset depends.
 func (fs *Fileset) GetRequiredProcessors() []ProcessorRequirement {
 	return fs.manifest.Requires.Processors
-}
-
-// GetMLConfigs returns the list of machine-learning configurations declared
-// by this fileset.
-func (fs *Fileset) GetMLConfigs() []mlimporter.MLConfig {
-	var mlConfigs []mlimporter.MLConfig
-	for _, ml := range fs.manifest.MachineLearning {
-		mlConfigs = append(mlConfigs, mlimporter.MLConfig{
-			ID:           fmt.Sprintf("filebeat-%s-%s-%s_ecs", fs.mcfg.Module, fs.name, ml.Name),
-			JobPath:      filepath.Join(fs.modulePath, fs.name, ml.Job),
-			DatafeedPath: filepath.Join(fs.modulePath, fs.name, ml.Datafeed),
-			MinVersion:   ml.MinVersion,
-		})
-	}
-	return mlConfigs
 }

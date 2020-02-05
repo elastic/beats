@@ -33,10 +33,11 @@ const FlagField = "log.flags"
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
-	Timestamp time.Time
-	Meta      common.MapStr
-	Fields    common.MapStr
-	Private   interface{} // for beats private use
+	Timestamp  time.Time
+	Meta       common.MapStr
+	Fields     common.MapStr
+	Private    interface{} // for beats private use
+	TimeSeries bool        // true if the event contains timeseries data
 }
 
 var (
@@ -50,7 +51,7 @@ func (e *Event) SetID(id string) {
 	if e.Meta == nil {
 		e.Meta = common.MapStr{}
 	}
-	e.Meta["id"] = id
+	e.Meta["_id"] = id
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
@@ -75,6 +76,7 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		default:
 			return nil, errNoTimestamp
 		}
+		return nil, nil
 	} else if subKey, ok := metadataKey(key); ok {
 		if subKey == "" {
 			switch meta := v.(type) {
@@ -121,4 +123,11 @@ func metadataKey(key string) (string, bool) {
 		return subKey[1:], true
 	}
 	return "", false
+}
+
+// SetErrorWithOption sets jsonErr value in the event fields according to addErrKey value.
+func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
+	if addErrKey {
+		e.Fields["error"] = jsonErr
+	}
 }

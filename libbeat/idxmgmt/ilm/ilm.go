@@ -36,15 +36,20 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // Supporter implements ILM support. For loading the policies and creating
 // write alias a manager instance must be generated.
 type Supporter interface {
+	// Query settings
 	Mode() Mode
 	Alias() Alias
 	Policy() Policy
-	Manager(h APIHandler) Manager
+	Overwrite() bool
+
+	// Manager creates a new Manager instance for checking and installing
+	// resources.
+	Manager(h ClientHandler) Manager
 }
 
-// Manager uses an APIHandler to install a policy.
+// Manager uses a ClientHandler to install a policy.
 type Manager interface {
-	Enabled() (bool, error)
+	CheckEnabled() (bool, error)
 
 	EnsureAlias() error
 
@@ -55,22 +60,11 @@ type Manager interface {
 	EnsurePolicy(overwrite bool) (created bool, err error)
 }
 
-// APIHandler defines the interface between a remote service and the Manager.
-type APIHandler interface {
-	ILMEnabled(Mode) (bool, error)
-
-	HasAlias(name string) (bool, error)
-	CreateAlias(alias Alias) error
-
-	HasILMPolicy(name string) (bool, error)
-	CreateILMPolicy(policy Policy) error
-}
-
 // Policy describes a policy to be loaded into Elasticsearch.
 // See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
 type Policy struct {
 	Name string
-	Body map[string]interface{}
+	Body common.MapStr
 }
 
 // Alias describes the alias to be created in Elasticsearch.
@@ -81,6 +75,22 @@ type Alias struct {
 
 // DefaultSupport configures a new default ILM support implementation.
 func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+	cfg := defaultConfig(info)
+	if config != nil {
+		if err := config.Unpack(&cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	if cfg.Mode == ModeDisabled {
+		return NewNoopSupport(info, config)
+	}
+
+	return StdSupport(log, info, config)
+}
+
+// StdSupport configures a new std ILM support implementation.
+func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
@@ -94,17 +104,18 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		}
 	}
 
-	if cfg.Mode == ModeDisabled {
-		return NoopSupport(info, config)
-	}
-
 	name, err := applyStaticFmtstr(info, &cfg.PolicyName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
+	rolloverAlias, err := applyStaticFmtstr(info, &cfg.RolloverAlias)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read the ilm rollover alias")
+	}
+
 	alias := Alias{
-		Name:    cfg.RolloverAlias,
+		Name:    rolloverAlias,
 		Pattern: cfg.Pattern,
 	}
 
@@ -126,28 +137,19 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		policy.Body = body
 	}
 
-	log.Infof("Policy name: %v", name)
-	return NewDefaultSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
+	return NewStdSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
+}
+
+// NoopSupport configures a new noop ILM support implementation,
+// should be used when ILM is disabled
+func NoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+	return NewNoopSupport(info, config)
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {
-	return fmt.Run(&beat.Event{
-		Fields: common.MapStr{
-			// beat object was left in for backward compatibility reason for older configs.
-			"beat": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			"agent": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			// For the Beats that have an observer role
-			"observer": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-		},
-		Timestamp: time.Now(),
-	})
+	return fmt.Run(
+		&beat.Event{
+			Fields:    fmtstr.FieldsForBeat(info.Beat, info.Version),
+			Timestamp: time.Now(),
+		})
 }

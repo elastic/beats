@@ -1,0 +1,48 @@
+- name: topic
+  type: group
+  description: Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
+  release: beta
+  fields:
+  - name: mbean
+    description: Mbean that this event is related to
+    type: keyword
+  - name: name
+    description: Topic name
+    type: keyword
+  - name: messages.enqueue.time.avg
+    description: Average time a message was held on this destination.
+    type: double
+  - name: messages.size.avg
+    description: Average message size on this destination.
+    type: long
+  - name: consumers.count
+    description: Number of consumers subscribed to this destination.
+    type: long
+  - name: messages.dequeue.count
+    description: Number of messages that has been acknowledged (and removed) from the destination.
+    type: long
+  - name: messages.dispatch.count
+    description: Number of messages that has been delivered to consumers, including those not acknowledged.
+    type: long
+  - name: messages.enqueue.count
+    description: Number of messages that have been sent to the destination.
+    type: long
+  - name: messages.expired.count
+    description: Number of messages that have been expired.
+    type: long
+  - name: messages.inflight.count
+    description: Number of messages that have been dispatched to, but not acknowledged by, consumers.
+    type: long
+  - name: messages.enqueue.time.max
+    description: The longest time a message was held on this destination.
+    type: long
+  - name: memory.broker.pct
+    description: Percent of memory limit used.
+    type: scaled_float
+    format: percent
+  - name: messages.enqueue.time.min
+    description: The shortest time a message was held on this destination.
+    type: long
+  - name: producers.count
+    description: Number of producers attached to this destination.
+    type: long

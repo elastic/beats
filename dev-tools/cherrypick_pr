@@ -28,7 +28,9 @@ This script does the following:
   remote
 * if the --create_pr flag is used, it uses the GitHub API to create the PR
   for you. Note that this requires you to have a Github token with the
-  public_repo scope in the `~/.elastic/github.token` file
+  public_repo scope in the `~/.elastic/github.token` file. This token
+  should be also authorized to Elastic organization so as to work with single-sign-on.
+  (see https://help.github.com/en/articles/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on)
 
 Note that you need to take the commit hashes from `git log` on the
 from_branch, copying the IDs from Github doesn't work in case we squashed the
@@ -60,6 +62,12 @@ def main():
                         "(requires token in ~/.elastic/github.token)")
     parser.add_argument("--diff", action="store_true",
                         help="Display the diff before pushing the PR")
+    parser.add_argument("--remote", default="",
+                        help="Which remote to push the backport branch to")
+    parser.add_argument("--zube-team", default="",
+                        help="Team the PR belongs to")
+    parser.add_argument("--keep-backport-label", action="store_true",
+                        help="Preserve label needs_backport in original PR")
     args = parser.parse_args()
 
     print(args)
@@ -107,7 +115,10 @@ def main():
             return 1
 
     print("Ready to push branch.")
-    remote = raw_input("To which remote should I push? (your fork): ")
+
+    remote = args.remote
+    if not remote:
+        remote = raw_input("To which remote should I push? (your fork): ")
     call("git push {} :{} > /dev/null".format(remote, tmp_branch),
          shell=True)
     check_call("git push --set-upstream {} {}"
@@ -143,11 +154,24 @@ def main():
         new_pr = request.json()
 
         # add labels
-        session.post(
-            base + "/issues/{}/labels".format(new_pr["number"]), json=["backport", "review"])
+        labels = ["backport"]
 
-        # remove needs backport label from the original PR
-        session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
+        if args.zube_team:
+            resp = session.get(base + "/labels/Team:"+args.zube_team)
+            if resp.status_code != 200:
+                print("Cannot find team label", resp.text)
+                sys.exit(1)
+            labels.append("Team:"+args.zube_team)
+            labels.append("[zube]: In Review")
+        else:
+            labels.append("review")
+
+        session.post(
+            base + "/issues/{}/labels".format(new_pr["number"]), json=labels)
+
+        if not args.keep_backport_label:
+            # remove needs backport label from the original PR
+            session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
 
         # get version and set a version label on the original PR
         version = get_version(os.getcwd())

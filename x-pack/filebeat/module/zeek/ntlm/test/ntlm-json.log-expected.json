@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2017-10-25T19:18:37.814Z",
+        "destination.address": "192.168.10.31",
+        "destination.ip": "192.168.10.31",
+        "destination.port": 445,
+        "event.dataset": "zeek.ntlm",
+        "event.id": "CHphiNUKDC20fsy09",
+        "event.module": "zeek",
+        "fileset.name": "ntlm",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:zxnXAE/Cme5fQhh6sJLs7GItc08=",
+        "network.protocol": "ntlm",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.10.50",
+        "source.ip": "192.168.10.50",
+        "source.port": 46785,
+        "tags": [
+            "zeek.ntlm"
+        ],
+        "zeek.ntlm.domain": "contoso.local",
+        "zeek.ntlm.hostname": "ybaARon55QykXrgu",
+        "zeek.ntlm.server.name.dns": "Victim-PC.contoso.local",
+        "zeek.ntlm.server.name.netbios": "VICTIM-PC",
+        "zeek.ntlm.server.name.tree": "contoso.local",
+        "zeek.ntlm.username": "JeffV",
+        "zeek.session_id": "CHphiNUKDC20fsy09"
+    }
+]

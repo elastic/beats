@@ -15,18 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_kubernetes_metadata
 
 import (
-	"errors"
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
+	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -34,14 +41,19 @@ const (
 )
 
 type kubernetesAnnotator struct {
-	watcher  kubernetes.Watcher
-	indexers *Indexers
-	matchers *Matchers
-	cache    *cache
+	log                 *logp.Logger
+	watcher             kubernetes.Watcher
+	indexers            *Indexers
+	matchers            *Matchers
+	cache               *cache
+	kubernetesAvailable bool
 }
+
+const selector = "kubernetes"
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
+	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -52,18 +64,24 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
+func isKubernetesAvailable(client k8sclient.Interface) bool {
+	server, err := client.Discovery().ServerVersion()
+	if err != nil {
+		logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+		return false
+	}
+	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
+	return true
+}
+
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultKubernetesAnnotatorConfig()
+	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
 
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
-	}
-
-	err = validate(config)
-	if err != nil {
-		return nil, err
 	}
 
 	//Load default indexer configs
@@ -84,56 +102,71 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
+	processor := &kubernetesAnnotator{
+		log:                 log,
+		cache:               newCache(config.CleanupTimeout),
+		kubernetesAvailable: false,
 	}
 
-	indexers := NewIndexers(config.Indexers, metaGen)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	if err != nil {
+		if kubernetes.IsInCluster(config.KubeConfig) {
+			log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
+		} else if config.KubeConfig == "" {
+			log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
+		} else {
+			log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
+		}
+		return processor, nil
+	}
+
+	if !isKubernetesAvailable(client) {
+		return processor, nil
+	}
 
 	matchers := NewMatchers(config.Matchers)
 
 	if matchers.Empty() {
-		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
+		log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
+		return processor, nil
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
-	if err != nil {
-		return nil, err
-	}
+	processor.matchers = matchers
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+	config.Host = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-	logp.Debug("kubernetes", "Using host: %s", config.Host)
-	logp.Debug("kubernetes", "Initializing watcher")
+	log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Host,
 		Namespace:   config.Namespace,
-	})
+	}, nil)
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
+		log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 
-	processor := &kubernetesAnnotator{
-		watcher:  watcher,
-		indexers: indexers,
-		matchers: matchers,
-		cache:    newCache(config.CleanupTimeout),
-	}
+	metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+	processor.indexers = NewIndexers(config.Indexers, metaGen)
+	processor.watcher = watcher
+	processor.kubernetesAvailable = true
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj kubernetes.Resource) {
-			processor.addPod(obj.(*kubernetes.Pod))
+		AddFunc: func(obj interface{}) {
+			pod := obj.(*kubernetes.Pod)
+			log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+			processor.addPod(pod)
 		},
-		UpdateFunc: func(obj kubernetes.Resource) {
-			processor.removePod(obj.(*kubernetes.Pod))
-			processor.addPod(obj.(*kubernetes.Pod))
+		UpdateFunc: func(obj interface{}) {
+			pod := obj.(*kubernetes.Pod)
+			log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+			processor.updatePod(pod)
 		},
-		DeleteFunc: func(obj kubernetes.Resource) {
-			processor.removePod(obj.(*kubernetes.Pod))
+		DeleteFunc: func(obj interface{}) {
+			pod := obj.(*kubernetes.Pod)
+			log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
+			processor.removePod(pod)
 		},
 	})
 
@@ -145,6 +178,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
+	if !k.kubernetesAvailable {
+		return event, nil
+	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		return event, nil
@@ -169,6 +205,18 @@ func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	}
 }
 
+func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
+	k.removePod(pod)
+
+	// Add it again only if it is not being deleted
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		k.log.Debugf("Removing kubernetes pod being terminated: %s/%s", pod.GetNamespace(), pod.GetName())
+		return
+	}
+
+	k.addPod(pod)
+}
+
 func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 	indexes := k.indexers.GetIndexes(pod)
 	for _, idx := range indexes {
@@ -178,11 +226,4 @@ func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 
 func (*kubernetesAnnotator) String() string {
 	return "add_kubernetes_metadata"
-}
-
-func validate(config kubeAnnotatorConfig) error {
-	if !config.InCluster && config.KubeConfig == "" {
-		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
-	}
-	return nil
 }

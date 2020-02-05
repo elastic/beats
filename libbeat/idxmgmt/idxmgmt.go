@@ -39,15 +39,8 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // A manager instantiated via Supporter is responsible for instantiating/configuring
 // the index throughout the Elastic Stack.
 type Supporter interface {
-	// Enalbed checks if index management is configured to configure templates,
-	// ILM, or aliases.
+	// Enabled checks if index management is configured to setup templates or ILM
 	Enabled() bool
-
-	// ILM provides access to the configured ILM support.
-	ILM() ilm.Supporter
-
-	// TemplateConfig returns the template configuration used by the index supporter.
-	TemplateConfig(withILM bool) (template.TemplateConfig, error)
 
 	// BuildSelector create an index selector.
 	// The defaultIndex string is interpreted as format string. It is used
@@ -57,7 +50,7 @@ type Supporter interface {
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.
-	Manager(client ESClient, assets Asseter) Manager
+	Manager(client ClientHandler, assets Asseter) Manager
 }
 
 // Asseter provides access to beats assets required to load the template.
@@ -65,17 +58,37 @@ type Asseter interface {
 	Fields(name string) []byte
 }
 
-// ESClient defines the minimal interface required for the index manager to
-// prepare an index.
-type ESClient interface {
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
-}
-
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	Setup(forceTemplate, forcePolicy bool) error
+	VerifySetup(template, ilm LoadMode) (bool, string)
+	// When supporting index lifecycle management, ensure templates and policies
+	// are created before write aliases, to ensure templates are applied to the indices.
+	Setup(template, ilm LoadMode) error
+}
+
+// LoadMode defines the mode to be used for loading idxmgmt related information.
+// It will be used in combination with idxmgmt configuration settings.
+type LoadMode uint8
+
+//go:generate stringer -linecomment -type LoadMode
+const (
+	// LoadModeUnset indicates that no specific mode is set.
+	// Instead the decision about loading data will be derived from the config or their respective default values.
+	LoadModeUnset LoadMode = iota //unset
+	// LoadModeDisabled indicates no loading
+	LoadModeDisabled //disabled
+	// LoadModeEnabled indicates loading if not already available
+	LoadModeEnabled //enabled
+	// LoadModeOverwrite indicates overwriting existing components, if loading is not generally disabled.
+	LoadModeOverwrite //overwrite
+	// LoadModeForce indicates forcing to load components in any case, independent of general loading configurations.
+	LoadModeForce //force
+)
+
+// Enabled returns whether or not the LoadMode should be considered enabled
+func (m *LoadMode) Enabled() bool {
+	return m == nil || *m != LoadModeDisabled
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.

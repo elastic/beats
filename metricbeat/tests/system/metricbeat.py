@@ -1,10 +1,12 @@
 import re
 import sys
 import os
+import yaml
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
 
 from beat.beat import TestCase
+from parameterized import parameterized_class
 
 COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
                  "metricset.module", "metricset.rtt", "host.name", "service.name", "event", "ecs"]
@@ -26,6 +28,12 @@ class BaseTest(TestCase):
             self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 
         super(BaseTest, self).setUpClass()
+
+    def setUp(self):
+        super(BaseTest, self).setUp()
+
+    def tearDown(self):
+        super(BaseTest, self).tearDown()
 
     def de_dot(self, existing_fields):
         fields = {}
@@ -99,3 +107,35 @@ class BaseTest(TestCase):
         self.assertItemsEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
+
+
+def supported_versions(path):
+    """
+    Returns variants information as expected by parameterized_class,
+    that is as a list of lists with an only element that is used to
+    override the value of COMPOSE_ENV.
+    """
+    if not os.path.exists(path):
+        # Return an empty variant so a class is instantiated with defaults
+        return [[{}]]
+
+    variants = []
+    with open(path) as f:
+        versions_info = yaml.safe_load(f)
+
+        for variant in versions_info['variants']:
+            variants += [[variant]]
+
+    return variants
+
+
+def parameterized_with_supported_versions(base_class):
+    """
+    Decorates a class so instead of the base class, multiple copies
+    of it are registered, one for each supported version.
+    """
+    class_dir = os.path.abspath(os.path.dirname(sys.modules[base_class.__module__].__file__))
+    versions_path = os.path.join(class_dir, '_meta', 'supported-versions.yml')
+    variants = supported_versions(versions_path)
+    decorator = parameterized_class(['COMPOSE_ENV'], variants)
+    decorator(base_class)

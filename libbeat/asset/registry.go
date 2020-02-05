@@ -29,7 +29,7 @@ import (
 // As each entry is an array of bytes multiple fields.yml can be added under one path.
 // This can become useful as we don't have to generate anymore the fields.yml but can
 // package each local fields.yml from things like processors.
-var FieldsRegistry = map[string]map[int]map[string]string{}
+var FieldsRegistry = map[string]map[int]map[string][]string{}
 
 // SetFields sets the fields for a given beat and asset name
 func SetFields(beat, name string, p Priority, asset func() string) error {
@@ -38,14 +38,14 @@ func SetFields(beat, name string, p Priority, asset func() string) error {
 	priority := int(p)
 
 	if _, ok := FieldsRegistry[beat]; !ok {
-		FieldsRegistry[beat] = map[int]map[string]string{}
+		FieldsRegistry[beat] = map[int]map[string][]string{}
 	}
 
 	if _, ok := FieldsRegistry[beat][priority]; !ok {
-		FieldsRegistry[beat][priority] = map[string]string{}
+		FieldsRegistry[beat][priority] = map[string][]string{}
 	}
 
-	FieldsRegistry[beat][priority][name] = data
+	FieldsRegistry[beat][priority][name] = append(FieldsRegistry[beat][priority][name], data)
 
 	return nil
 }
@@ -74,13 +74,15 @@ func GetFields(beat string) ([]byte, error) {
 		sort.Strings(entries)
 
 		for _, entry := range entries {
-			data := priorityRegistry[entry]
-			output, err := DecodeData(data)
-			if err != nil {
-				return nil, err
-			}
+			list := priorityRegistry[entry]
+			for _, data := range list {
+				output, err := DecodeData(data)
+				if err != nil {
+					return nil, err
+				}
 
-			fields = append(fields, output...)
+				fields = append(fields, output...)
+			}
 		}
 	}
 	return fields, nil

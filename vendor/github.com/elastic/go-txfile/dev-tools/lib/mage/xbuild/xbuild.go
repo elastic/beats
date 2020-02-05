@@ -20,7 +20,7 @@ package xbuild
 import (
 	"fmt"
 
-	"github.com/magefile/mage/mg"
+	"github.com/urso/magetools/clitool"
 )
 
 // Registry of available cross build environment providers.
@@ -30,11 +30,17 @@ type Registry struct {
 
 // Provider defines available functionality all cross build providers MUST implement.
 type Provider interface {
-	// Build the environment
-	Build() error
+	// Start prepare/starts up the provider
+	Start() error
 
-	// Run command within environment.
-	Run(env map[string]string, cmdAndArgs ...string) error
+	// Stop shuts down the provider and cleans up resources if possible
+	Stop() error
+
+	// Executor creates the execution environment
+	Executor(verbose bool) (clitool.Executor, error)
+
+	// Shell starts an interactive shell if possible
+	Shell() error
 }
 
 // OSArch tuple.
@@ -58,14 +64,16 @@ func (r *Registry) Find(os, arch string) (Provider, error) {
 	return p, nil
 }
 
-// With calls fn with a provider matching the requires OS and ARCH. Returns
-// and error if no provider can be found or function itself errors.
 func (r *Registry) With(os, arch string, fn func(Provider) error) error {
 	p, err := r.Find(os, arch)
 	if err != nil {
 		return err
 	}
 
-	mg.Deps(p.Build)
+	if err := p.Start(); err != nil {
+		return err
+	}
+	defer p.Stop()
+
 	return fn(p)
 }

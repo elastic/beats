@@ -20,11 +20,14 @@ package main
 import (
 	"flag"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/tests/system/template"
 )
 
 var systemTest *bool
 
 func init() {
+	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
@@ -36,4 +39,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, "mockbeat")
 }

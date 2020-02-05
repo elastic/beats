@@ -110,11 +110,8 @@ func TestPid(t *testing.T) {
 		m := dummyMetadata()
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
-		v, err := event.GetValue("process")
-		if !assert.NoError(t, err) {
-			return
-		}
-		assert.Equal(t, common.MapStr{}, v)
+		_, err := event.GetValue("process")
+		assert.Equal(t, common.ErrKeyNotFound, err)
 	})
 }
 
@@ -165,12 +162,8 @@ func TestProgram(t *testing.T) {
 		m := dummyMetadata()
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
-		v, err := event.GetValue("process")
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		assert.Equal(t, common.MapStr{}, v)
+		_, err := event.GetValue("process")
+		assert.Equal(t, common.ErrKeyNotFound, err)
 	})
 }
 
@@ -198,6 +191,58 @@ func TestSequence(t *testing.T) {
 		_, err := event.GetValue("event.sequence")
 		assert.Error(t, err)
 	})
+}
+
+func TestParseAndCreateEvent(t *testing.T) {
+	cases := map[string]struct {
+		data     []byte
+		expected common.MapStr
+	}{
+		"valid data": {
+			data: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
+			expected: common.MapStr{
+				"event":    common.MapStr{"severity": 2},
+				"hostname": "mymachine",
+				"log": common.MapStr{
+					"source": common.MapStr{
+						"address": "127.0.0.1",
+					},
+				},
+				"message": "'su root' failed for lonvick on /dev/pts/8",
+				"process": common.MapStr{"pid": 230, "program": "su"},
+				"syslog": common.MapStr{
+					"facility":       4,
+					"facility_label": "security/authorization",
+					"priority":       34,
+					"severity_label": "Critical",
+				},
+			},
+		},
+
+		"invalid data": {
+			data: []byte("invalid"),
+			expected: common.MapStr{
+				"log": common.MapStr{
+					"source": common.MapStr{
+						"address": "127.0.0.1",
+					},
+				},
+				"message": "invalid",
+			},
+		},
+	}
+
+	tz := time.Local
+	log := logp.NewLogger("syslog")
+	metadata := dummyMetadata()
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			event := parseAndCreateEvent(c.data, metadata, tz, log)
+			assert.Equal(t, c.expected, event.Fields)
+			assert.Equal(t, metadata.Truncated, event.Meta["truncated"])
+		})
+	}
 }
 
 func dummyMetadata() inputsource.NetworkMetadata {
