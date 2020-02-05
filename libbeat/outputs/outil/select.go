@@ -27,10 +27,14 @@ import (
 	"github.com/elastic/beats/libbeat/conditions"
 )
 
+// Selector is used to produce a string based on the contents of a Beats event.
+// A selector supports multiple rules that need to be configured.
 type Selector struct {
-	sel selectorExpr
+	sel SelectorExpr
 }
 
+// Settings configures how BuildSelectorFromConfig creates a Selector from
+// a given configuration object.
 type Settings struct {
 	// single selector key and default option keyword
 	Key string
@@ -45,18 +49,20 @@ type Settings struct {
 	FailEmpty bool
 }
 
-type selectorExpr interface {
+// SelectorExpr represents an expression object that can be composed with other
+// expressions in order to build a Selector.
+type SelectorExpr interface {
 	sel(evt *beat.Event) (string, error)
 }
 
 type emptySelector struct{}
 
 type listSelector struct {
-	selectors []selectorExpr
+	selectors []SelectorExpr
 }
 
 type condSelector struct {
-	s    selectorExpr
+	s    SelectorExpr
 	cond conditions.Condition
 }
 
@@ -70,21 +76,22 @@ type fmtSelector struct {
 }
 
 type mapSelector struct {
-	from      selectorExpr
+	from      SelectorExpr
 	otherwise string
 	to        map[string]string
 }
 
-var nilSelector selectorExpr = &emptySelector{}
+var nilSelector SelectorExpr = &emptySelector{}
 
-func MakeSelector(es ...selectorExpr) Selector {
+// MakeSelector creates a selector from a set of selector expressions.
+func MakeSelector(es ...SelectorExpr) Selector {
 	switch len(es) {
 	case 0:
 		return Selector{nilSelector}
 	case 1:
 		return Selector{es[0]}
 	default:
-		return Selector{concatSelectorExpr(es...)}
+		return Selector{ConcatSelectorExpr(es...)}
 	}
 }
 
@@ -96,10 +103,12 @@ func (s Selector) Select(evt *beat.Event) (string, error) {
 	return s.sel.sel(evt)
 }
 
+// IsEmpty checks if the selector is not configured and will always return an empty string.
 func (s Selector) IsEmpty() bool {
 	return s.sel == nilSelector || s.sel == nil
 }
 
+// IsConst checks if the selector will always return the same string.
 func (s Selector) IsConst() bool {
 	if s.sel == nilSelector {
 		return true
@@ -109,11 +118,12 @@ func (s Selector) IsConst() bool {
 	return ok
 }
 
+// BuildSelectorFromConfig creates a selector from a configuration object.
 func BuildSelectorFromConfig(
 	cfg *common.Config,
 	settings Settings,
 ) (Selector, error) {
-	var sel []selectorExpr
+	var sel []SelectorExpr
 
 	key := settings.Key
 	multiKey := settings.MultiKey
@@ -157,7 +167,7 @@ func BuildSelectorFromConfig(
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
 
-		fmtsel, err := fmtSelectorExpr(fmtstr, "")
+		fmtsel, err := FmtSelectorExpr(fmtstr, "")
 		if err != nil {
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
@@ -180,18 +190,22 @@ func BuildSelectorFromConfig(
 	return MakeSelector(sel...), nil
 }
 
-func emptySelectorExpr() selectorExpr {
+// EmptySelectorExpr create a selector expression that returns an empty string.
+func EmptySelectorExpr() SelectorExpr {
 	return nilSelector
 }
 
-func constSelectorExpr(s string) selectorExpr {
+// ConstSelectorExpr creates a selector expression that always returns the configured string.
+func ConstSelectorExpr(s string) SelectorExpr {
 	if s == "" {
-		return emptySelectorExpr()
+		return EmptySelectorExpr()
 	}
 	return &constSelector{strings.ToLower(s)}
 }
 
-func fmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (selectorExpr, error) {
+// FmtSelectorExpr creates a selector expression using a format string. If the
+// event can not be applied the default fallback constant string will be returned.
+func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (SelectorExpr, error) {
 	if fmt.IsConst() {
 		str, err := fmt.Run(nil)
 		if err != nil {
@@ -200,28 +214,34 @@ func fmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (selectorEx
 		if str == "" {
 			str = fallback
 		}
-		return constSelectorExpr(str), nil
+		return ConstSelectorExpr(str), nil
 	}
 
 	return &fmtSelector{*fmt, strings.ToLower(fallback)}, nil
 }
 
-func concatSelectorExpr(s ...selectorExpr) selectorExpr {
+// ConcatSelectorExpr combines multiple expressions that are run one after the other.
+// The first expression that returns a string wins.
+func ConcatSelectorExpr(s ...SelectorExpr) SelectorExpr {
 	return &listSelector{s}
 }
 
-func conditionalSelectorExpr(
-	s selectorExpr,
+// ConditionalSelectorExpr executes the given expression only if the event
+// matches the given condition.
+func ConditionalSelectorExpr(
+	s SelectorExpr,
 	cond conditions.Condition,
-) selectorExpr {
+) SelectorExpr {
 	return &condSelector{s, cond}
 }
 
-func lookupSelectorExpr(
+// LookupSelectorExpr replaces the produced string with an table entry.
+// If there is no entry in the table the default fallback string will be reported.
+func LookupSelectorExpr(
 	evtfmt *fmtstr.EventFormatString,
 	table map[string]string,
 	fallback string,
-) (selectorExpr, error) {
+) (SelectorExpr, error) {
 	if evtfmt.IsConst() {
 		str, err := evtfmt.Run(nil)
 		if err != nil {
@@ -232,7 +252,7 @@ func lookupSelectorExpr(
 		if str == "" {
 			str = fallback
 		}
-		return constSelectorExpr(str), nil
+		return ConstSelectorExpr(str), nil
 	}
 
 	return &mapSelector{
@@ -250,7 +270,7 @@ func lowercaseTable(table map[string]string) map[string]string {
 	return tmp
 }
 
-func buildSingle(cfg *common.Config, key string) (selectorExpr, error) {
+func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	// TODO: check for unknown fields
 
 	// 1. extract required key-word handler
@@ -310,18 +330,18 @@ func buildSingle(cfg *common.Config, key string) (selectorExpr, error) {
 	}
 
 	// 5. build selector from available fields
-	var sel selectorExpr
+	var sel SelectorExpr
 	if len(mapping.Table) > 0 {
-		sel, err = lookupSelectorExpr(evtfmt, lowercaseTable(mapping.Table), otherwise)
+		sel, err = LookupSelectorExpr(evtfmt, lowercaseTable(mapping.Table), otherwise)
 	} else {
-		sel, err = fmtSelectorExpr(evtfmt, otherwise)
+		sel, err = FmtSelectorExpr(evtfmt, otherwise)
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	if cond != nil && sel != nilSelector {
-		sel = conditionalSelectorExpr(sel, cond)
+		sel = ConditionalSelectorExpr(sel, cond)
 	}
 
 	return sel, nil
