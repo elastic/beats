@@ -61,6 +61,27 @@ processors:
       target_field: "@metadata._id"
 ----
 
+* *`decode_json_field` processor*
++
+Use the `document_id` setting in the <<decode-json-fields,`decode_json_fields`>>
+processor when you're decoding a JSON string that contains a natural key field.
++
+For this example, assume that the `message` field contains the JSON string
+`{"myid": "100", "text": "Some text"}`. This example takes the value of `myid`
+from the JSON string and stores it in the `@metadata._id` field:
++
+[source,yaml]
+----
+processors:
+ - decode_json_fields:
+     document_id: "myid"
+     fields: ["message"]
+     max_depth: 1
+     target: ""
+----
++
+The resulting document ID is `100`.
+
 * *JSON input settings*
 +
 Use the `json.document_id` input setting if you’re ingesting JSON-formatted
@@ -83,9 +104,9 @@ filebeat.inputs:
 === {ls} pipeline example
 
 For this example, assume that you've used one of the approaches described
-earlier to store the document ID in the {beats} `@metadata._id` field. In
-the {logstash-ref}/plugins-outputs-elasticsearch.html[{es} output], set
-the `document_id` field based on the `@metadata._id` field:
+earlier to store the document ID in the {beats} `@metadata._id` field. To
+preserve the ID when you send {beats} data through {ls} en route to {es},
+set the `document_id` field in the {ls} pipeline:
 
 [source,json]
 ----
@@ -93,7 +114,7 @@ input {
   beats {
     port => 5044
   }
-}
+}}
 
 output {
   if [@metadata][_id] {
@@ -110,7 +131,9 @@ output {
   }
 }
 ----
-<1> Sets the `document_id` field to the value stored in `@metadata._id`.
+<1> Sets the `document_id` field in the
+{logstash-ref}/plugins-outputs-elasticsearch.html[{es} output] to the value
+stored in `@metadata._id`.
 
 When {es} indexes the document, it sets the document ID to the specified value,
 preserving the ID passed from {beats}.
