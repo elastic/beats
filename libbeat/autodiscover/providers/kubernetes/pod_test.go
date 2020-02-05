@@ -474,7 +474,7 @@ func TestEmitEvent(t *testing.T) {
 			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}
