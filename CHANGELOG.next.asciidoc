@@ -71,7 +71,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 
 *Auditbeat*
