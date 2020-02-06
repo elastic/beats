@@ -378,7 +378,7 @@ for more information. If you do not wish to use these, you may explicitly set th
 `secret_access_key` variables.
 
 These are the available fields during within config templating.
-The `ec2.*` fields and `cloud.*` fields will be available on each emitted event.
+The `aws.ec2.*` fields and `cloud.*` fields will be available on each emitted event.
 
 * cloud.availability_zone
 * cloud.instance.id
@@ -386,20 +386,20 @@ The `ec2.*` fields and `cloud.*` fields will be available on each emitted event.
 * cloud.provider
 * cloud.region
 
-* ec2.architecture
-* ec2.image.id
-* ec2.kernel.id
-* ec2.monitoring.state
-* ec2.private.dns_name
-* ec2.private.ip
-* ec2.public.dns_name
-* ec2.public.ip
-* ec2.root_device_name
-* ec2.state.code
-* ec2.state.name
-* ec2.subnet.id
-* ec2.tags
-* ec2.vpc.id
+* aws.ec2.architecture
+* aws.ec2.image.id
+* aws.ec2.kernel.id
+* aws.ec2.monitoring.state
+* aws.ec2.private.dns_name
+* aws.ec2.private.ip
+* aws.ec2.public.dns_name
+* aws.ec2.public.ip
+* aws.ec2.root_device_name
+* aws.ec2.state.code
+* aws.ec2.state.name
+* aws.ec2.subnet.id
+* aws.ec2.tags
+* aws.ec2.vpc.id
 
 include::../../{beatname_lc}/docs/autodiscover-aws-ec2-config.asciidoc[]
 
