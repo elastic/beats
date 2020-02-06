@@ -58,8 +58,6 @@ services:
     build: ${ES_BEATS}/testing/environments/docker/mosquitto
     expose:
       - 1883
-    ports:
-      - "127.0.0.1:1883:1883"
 
   redis:
     build: ${PWD}/input/redis/_meta

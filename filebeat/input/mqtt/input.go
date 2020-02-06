@@ -119,7 +119,7 @@ func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflig
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
 				"message": string(message.Payload()),
-				"mqtt":        mqttFields,
+				"mqtt":    mqttFields,
 			},
 		})
 
