@@ -77,7 +77,7 @@ func (w *watcher) once() error {
 	if err != nil {
 		return err
 	}
-	w.logger.Debugf("autodiscover-ec2", "fetched %d ec2 instances from AWS for autodiscovery", len(fetchedEC2s))
+	w.logger.Debugf("fetched %d ec2 instances from AWS for autodiscover", len(fetchedEC2s))
 
 	oldGen := w.gen
 	w.gen++

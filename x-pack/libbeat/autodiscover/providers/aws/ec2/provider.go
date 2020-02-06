@@ -119,7 +119,9 @@ func (p *Provider) onWatcherStart(instanceID string, instance *ec2Instance) {
 		"provider": p.uuid,
 		"id":       instanceID,
 		"meta": common.MapStr{
-			"ec2":   instance.toMap(),
+			"aws": common.MapStr{
+				"ec2":   instance.toMap(),
+			},
 			"cloud": instance.toCloudMap(),
 		},
 	}

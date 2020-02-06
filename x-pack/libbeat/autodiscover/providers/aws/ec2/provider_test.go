@@ -8,22 +8,23 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
+	"github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/test"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
-	"github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/test"
 )
 
 func Test_internalBuilder(t *testing.T) {
 	instance := fakeEC2Instance()
 	instances := []*ec2Instance{instance}
 	fetcher := newMockFetcher(instances, nil)
-	pBus := bus.New("test")
+	log := logp.NewLogger("ec2")
+	pBus := bus.New(log, "test")
 
 	cfg := &awsauto.Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
@@ -66,7 +67,9 @@ func Test_internalBuilder(t *testing.T) {
 		"provider": uuid,
 		"start":    true,
 		"meta": common.MapStr{
-			"ec2":   instance.toMap(),
+			"aws": common.MapStr{
+				"ec2":   instance.toMap(),
+			},
 			"cloud": instance.toCloudMap(),
 		},
 	}
