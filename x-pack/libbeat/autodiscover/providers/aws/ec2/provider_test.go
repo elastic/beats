@@ -66,9 +66,13 @@ func Test_internalBuilder(t *testing.T) {
 		"id":       instance.instanceID(),
 		"provider": uuid,
 		"start":    true,
+		"aws": common.MapStr{
+			"ec2": instance.toMap(),
+		},
+		"cloud": instance.toCloudMap(),
 		"meta": common.MapStr{
 			"aws": common.MapStr{
-				"ec2":   instance.toMap(),
+				"ec2": instance.toMap(),
 			},
 			"cloud": instance.toCloudMap(),
 		},

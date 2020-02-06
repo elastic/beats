@@ -10,12 +10,12 @@ metricbeat.autodiscover:
       templates:
         - condition:
             equals:
-              meta.aws.ec2.tags.service: "mysql"
+              aws.ec2.tags.service: "mysql"
           config:
             - module: mysql
               metricsets: ["status", "galera_status"]
               period: 10s
-              hosts: ["root:password@tcp(${data.meta.aws.ec2.public.ip}:3306)/"]
+              hosts: ["root:password@tcp(${data.aws.ec2.public.ip}:3306)/"]
               username: root
               password: password
 -------------------------------------------------------------------------------------
