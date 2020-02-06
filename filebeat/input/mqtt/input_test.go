@@ -75,6 +75,8 @@ func TestNewInput_Run(t *testing.T) {
 	})
 
 	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
+
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
 			eventsCh <- event
@@ -137,7 +139,7 @@ func TestNewInput_Run(t *testing.T) {
 	}
 }
 
-func TestNewInput_Run_Stop(t *testing.T) {
+func TestNewInput_Run_Wait(t *testing.T) {
 	config := common.MustNewConfigFrom(common.MapStr{
 		"hosts":  "tcp://mocked:1234",
 		"topics": []string{"first", "second"},
@@ -148,7 +150,10 @@ func TestNewInput_Run_Stop(t *testing.T) {
 
 	var eventProcessing sync.WaitGroup
 	eventProcessing.Add(numMessages)
+
 	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
+
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
 			eventProcessing.Done()
@@ -198,7 +203,7 @@ func TestNewInput_Run_Stop(t *testing.T) {
 		}
 	}()
 
-	input.Stop()
+	input.Wait()
 }
 
 func TestRun_Once(t *testing.T) {
