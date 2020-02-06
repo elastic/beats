@@ -116,7 +116,7 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/objx v0.1.2-0.20180702103455-b8b73a35e983 // indirect
 	github.com/stretchr/testify v1.4.0
-	github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f
+	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 	github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41

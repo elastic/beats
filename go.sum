@@ -198,8 +198,6 @@ github.com/elastic/go-lumber v0.1.0 h1:HUjpyg36v2HoKtXlEC53EJ3zDFiDRn65d7B8dBHNi
 github.com/elastic/go-lumber v0.1.0/go.mod h1:8YvjMIRYypWuPvpxx7WoijBYdbB7XIh/9FqSYQZTtxQ=
 github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595 h1:q8n4QjcLa4q39Q3fqHRknTBXBtegjriHFrB42YKgXGI=
 github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595/go.mod h1:s09U1b4P1ZxnKx2OsqY7KlHdCesqZWIhyq0Gs/QC/Us=
-github.com/elastic/go-plugins-helpers v0.0.0-20200207102828-cc042ea4398b h1:5z0BBLStphRqCJ+Is+zffk3VMYJYPiAHeNV2TL5VKFo=
-github.com/elastic/go-plugins-helpers v0.0.0-20200207102828-cc042ea4398b/go.mod h1:iGCSxHE5Imw4J1o5ekix2eO6wRD2bnSismiKxxZyTDw=
 github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f h1:FvsqAVIFZtJtK+koSvFU+/KoNQo1m14kgV5qJ8ImN+U=
 github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f/go.mod h1:OPGqFNdTS34kMReS5hPFtBhD9J8itmSDurs1ix2wx7c=
 github.com/elastic/go-seccomp-bpf v1.1.0 h1:jUzzDc6LyCtdolZdvL/26dad6rZ9vsc7xZ2eadKECAU=
@@ -518,8 +516,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
-github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f h1:lODuUEyjN6TVt5qpv6ILzsVDcIkeV2DCbX63GdevhQ8=
-github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f/go.mod h1:jAqhj/JBVC1PwcLTWd6rjQyGyItxxrhpiBl8LSuAGmw=
+github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b h1:X/8hkb4rQq3+QuOxpJK7gWmAXmZucF0EI1s1BfBLq6U=
+github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b/go.mod h1:jAqhj/JBVC1PwcLTWd6rjQyGyItxxrhpiBl8LSuAGmw=
 github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a h1:vVmCas8T0lbxAI1GuQO45L0o/OrWJSXtiK6vH27Qspg=
 github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a/go.mod h1:RIkfovP3Y7my19aXEjjbNd9E5TlHozzAyt7B8AaEcwg=
 github.com/urfave/cli v0.0.0-20171014202726-7bc6a0acffa5/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=

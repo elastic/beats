@@ -15,19 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build tools
+package gotool
 
-// This package contains the tool dependencies of the project.
+// Mod is the command go mod.
+var Mod = goMod{
+	Tidy:   modCommand{"tidy"}.run,
+	Verify: modCommand{"verify"}.run,
+	Vendor: modCommand{"vendor"}.run,
+}
 
-package tools
+type modCommand struct {
+	method string
+}
 
-import (
-	_ "github.com/magefile/mage"
-	_ "github.com/pierrre/gotestcover"
-	_ "github.com/stretchr/testify/assert"
-	_ "github.com/tsg/go-daemon"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
+func (cmd modCommand) run(opts ...ArgOpt) error {
+	o := make([]ArgOpt, len(opts)+1)
+	o[0] = posArg(cmd.method)
+	for i, opt := range opts {
+		o[i+1] = opt
+	}
+	args := buildArgs(o)
+	return runVGo("mod", args)
+}
 
-	_ "github.com/elastic/go-licenser"
-)
+type goMod struct {
+	Tidy   ModTidy
+	Verify ModVerify
+	Vendor ModVendor
+}
+
+// Tidy cleans the go.mod file
+type ModTidy func(opts ...ArgOpt) error
+
+// Vendor downloads and copies dependencies under the folder vendor.
+type ModVerify func(opts ...ArgOpt) error
+
+// Verify check that deps have the expected content.
+type ModVendor func(opts ...ArgOpt) error
