@@ -65,5 +65,6 @@ exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test 
 
 if (Test-Path "tests\system") {
     echo "Running python tests"
+    $env:PYTHON_EXE = "python3"
     exec { mage pythonUnitTest } "System test FAILURE"
 }
