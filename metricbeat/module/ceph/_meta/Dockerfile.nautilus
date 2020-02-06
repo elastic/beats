@@ -9,7 +9,7 @@ HEALTHCHECK --interval=1s --retries=300 \
     ceph restful list-keys > /opt/ceph-container/sree/static/restful-list-keys.json && \
     curl -s localhost:5000 >/dev/null
 
-EXPOSE 5000 8003
+EXPOSE 5000 8003 9283
 
 ENV NETWORK_AUTO_DETECT 4
 ENV CEPH_DAEMON demo
