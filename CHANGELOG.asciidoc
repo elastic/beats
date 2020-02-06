@@ -227,7 +227,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 *Affecting all Beats*
 
 - Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
-- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files. {pull}13374[13374]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 - Use less restrictive API to check if template exists. {pull}13847[13847]
 - Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
