@@ -2,22 +2,23 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package elb
+package ec2
 
 import (
 	"context"
 	"sync"
 
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
-// fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.
+// fetcher is an interface that can fetch a list of ec2Instance objects without pagination being necessary.
 type fetcher interface {
-	fetch(ctx context.Context) ([]*lbListener, error)
+	fetch(ctx context.Context) ([]*ec2Instance, error)
 }
 
 // apiMultiFetcher fetches results from multiple clients concatenating their results together
@@ -26,23 +27,23 @@ type apiMultiFetcher struct {
 	fetchers []fetcher
 }
 
-func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
-	fetchResults := make(chan []*lbListener)
+func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
+	fetchResults := make(chan []*ec2Instance)
 	fetchErr := make(chan error)
 
 	// Simultaneously fetch all from each region
 	for _, f := range amf.fetchers {
 		go func(f fetcher) {
-			fres, ferr := f.fetch(ctx)
-			if ferr != nil {
-				fetchErr <- ferr
+			res, err := f.fetch(ctx)
+			if err != nil {
+				fetchErr <- err
 			} else {
-				fetchResults <- fres
+				fetchResults <- res
 			}
 		}(f)
 	}
 
-	var results []*lbListener
+	var results []*ec2Instance
 	var errs []error
 
 	for pending := len(amf.fetchers); pending > 0; pending-- {
@@ -59,10 +60,10 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client elasticloadbalancingv2iface.ClientAPI
+	client ec2iface.ClientAPI
 }
 
-func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
+func newAPIFetcher(clients []ec2iface.ClientAPI) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{client}
@@ -70,24 +71,25 @@ func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
 	return &apiMultiFetcher{fetchers}
 }
 
-// fetch attempts to request the full list of lbListener objects.
-// It accomplishes this by fetching a page of load balancers, then one go routine
+// fetch attempts to request the full list of ec2Instance objects.
+// It accomplishes this by fetching a page of EC2 instances, then one go routine
 // per listener API request. Each page of results has O(n)+1 perf since we need that
-// additional fetch per lb. We let the goroutine scheduler sort things out, and use
+// additional fetch per EC2. We let the goroutine scheduler sort things out, and use
 // a sync.Pool to limit the number of in-flight requests.
-func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
-	var pageSize int64 = 50
+func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
+	var MaxResults int64 = 50
 
-	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
+	describeInstanceInput := &ec2.DescribeInstancesInput{MaxResults: &MaxResults}
+	req := f.client.DescribeInstancesRequest(describeInstanceInput)
 
 	ctx, cancel := context.WithCancel(ctx)
 	ir := &fetchRequest{
-		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
+		paginator: ec2.NewDescribeInstancesPaginator(req),
 		client:    f.client,
 		taskPool:  sync.Pool{},
 		context:   ctx,
 		cancel:    cancel,
-		logger:    logp.NewLogger("autodiscover-elb-fetch"),
+		logger:    logp.NewLogger("autodiscover-ec2-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -100,11 +102,11 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 }
 
 // fetchRequest provides a way to get all pages from a
-// elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
+// ec2.DescribeInstancesPaginator and all listeners for the given EC2 instance.
 type fetchRequest struct {
-	paginator    elasticloadbalancingv2.DescribeLoadBalancersPaginator
-	client       elasticloadbalancingv2iface.ClientAPI
-	lbListeners  []*lbListener
+	paginator    ec2.DescribeInstancesPaginator
+	client       ec2iface.ClientAPI
+	ec2Instances []*ec2Instance
 	errs         []error
 	resultsLock  sync.Mutex
 	taskPool     sync.Pool
@@ -114,7 +116,7 @@ type fetchRequest struct {
 	logger       *logp.Logger
 }
 
-func (p *fetchRequest) fetch() ([]*lbListener, error) {
+func (p *fetchRequest) fetch() ([]*ec2Instance, error) {
 	p.dispatch(p.fetchAllPages)
 
 	// Only fetch future pages when there are no longer requests in-flight from a previous page
@@ -130,7 +132,7 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 		return nil, multierr.Combine(p.errs...)
 	}
 
-	return p.lbListeners, nil
+	return p.ec2Instances, nil
 }
 
 func (p *fetchRequest) fetchAllPages() {
@@ -138,14 +140,14 @@ func (p *fetchRequest) fetchAllPages() {
 	for {
 		select {
 		case <-p.context.Done():
-			p.logger.Debug("done fetching ELB pages, context cancelled")
+			p.logger.Debug("done fetching EC2 instances, context cancelled")
 			return
 		default:
 			if !p.fetchNextPage() {
-				p.logger.Debug("fetched all ELB pages")
+				p.logger.Debug("fetched all EC2 instances")
 				return
 			}
-			p.logger.Debug("fetched ELB page")
+			p.logger.Debug("fetched EC2 instance")
 		}
 	}
 }
@@ -154,8 +156,10 @@ func (p *fetchRequest) fetchNextPage() (more bool) {
 	success := p.paginator.Next(p.context)
 
 	if success {
-		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
-			p.dispatch(func() { p.fetchListeners(lb) })
+		for _, reservation := range p.paginator.CurrentPage().Reservations {
+			for _, instance := range reservation.Instances {
+				p.dispatch(func() { p.fetchInstances(instance) })
+			}
 		}
 	}
 
@@ -181,9 +185,10 @@ func (p *fetchRequest) dispatch(fn func()) {
 	}()
 }
 
-func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
-	listenReq := p.client.DescribeListenersRequest(&elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
-	listen := elasticloadbalancingv2.NewDescribeListenersPaginator(listenReq)
+func (p *fetchRequest) fetchInstances(instance ec2.Instance) {
+	describeInstancesInput := &ec2.DescribeInstancesInput{InstanceIds: []string{awsauto.SafeString(instance.InstanceId)}}
+	req := p.client.DescribeInstancesRequest(describeInstancesInput)
+	listen := ec2.NewDescribeInstancesPaginator(req)
 
 	if listen.Err() != nil {
 		p.recordErrResult(listen.Err())
@@ -198,19 +203,21 @@ func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
 				return
 			}
 
-			for _, listener := range listen.CurrentPage().Listeners {
-				p.recordGoodResult(&lb, &listener)
+			for _, reservation := range listen.CurrentPage().Reservations {
+				for _, instance := range reservation.Instances {
+					p.recordGoodResult(instance)
+				}
 			}
 		}
 
 	}
 }
 
-func (p *fetchRequest) recordGoodResult(lb *elasticloadbalancingv2.LoadBalancer, lbl *elasticloadbalancingv2.Listener) {
+func (p *fetchRequest) recordGoodResult(instance ec2.Instance) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 
-	p.lbListeners = append(p.lbListeners, &lbListener{lb, lbl})
+	p.ec2Instances = append(p.ec2Instances, &ec2Instance{instance})
 }
 
 func (p *fetchRequest) recordErrResult(err error) {
