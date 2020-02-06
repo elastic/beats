@@ -62,5 +62,5 @@ func (c Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	Metrics: []string{percentages},
+	Metrics: []string{percentages, normalizedPercentages},
 }

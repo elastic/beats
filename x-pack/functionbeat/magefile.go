@@ -60,6 +60,14 @@ func Build() error {
 		params.InputFiles = []string{inputFiles}
 		params.Name = devtools.BeatName + "-" + provider.Name
 		params.OutputDir = filepath.Join("provider", provider.Name)
+		params.CGO = false
+		params.Env = make(map[string]string)
+		if provider.GOOS != "" {
+			params.Env["GOOS"] = provider.GOOS
+		}
+		if provider.GOARCH != "" {
+			params.Env["GOARCH"] = provider.GOARCH
+		}
 		err := devtools.Build(params)
 		if err != nil {
 			return err
@@ -153,10 +161,7 @@ func GoTestUnit() {
 func BuildPkgForFunctions() error {
 	mg.Deps(Update, Build)
 
-	err := os.MkdirAll("pkg", 700)
-	if err != nil {
-		return err
-	}
+	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
 		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),

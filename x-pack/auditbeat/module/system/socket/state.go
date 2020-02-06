@@ -541,13 +541,26 @@ func (s *state) getProcess(pid uint32) *process {
 	return s.processes[pid]
 }
 
+type threadEnterError struct {
+	tid      uint32
+	existing event
+}
+
+// Error is the error message string.
+func (t threadEnterError) Error() string {
+	return fmt.Sprintf("thread already had an event. tid=%d existing=%v", t.tid, t.existing)
+}
+
 func (s *state) ThreadEnter(tid uint32, ev event) error {
 	s.Lock()
 	prev, hasPrev := s.threads[tid]
 	s.threads[tid] = ev
 	s.Unlock()
 	if hasPrev {
-		return fmt.Errorf("thread already had an event. tid=%d existing=%v", tid, prev)
+		return threadEnterError{
+			tid:      tid,
+			existing: prev,
+		}
 	}
 	return nil
 }

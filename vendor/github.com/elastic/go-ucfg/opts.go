@@ -19,6 +19,8 @@ package ucfg
 
 import (
 	"os"
+
+	"github.com/elastic/go-ucfg/parse"
 )
 
 // Option type implementing additional options to be passed
@@ -31,7 +33,7 @@ type options struct {
 	pathSep      string
 	meta         *Meta
 	env          []*Config
-	resolvers    []func(name string) (string, error)
+	resolvers    []func(name string) (string, parse.Config, error)
 	varexp       bool
 	noParse      bool
 
@@ -104,7 +106,7 @@ func Env(e *Config) Option {
 // Resolve option adds a callback used by variable name expansion. The callback
 // will be called if a variable can not be resolved from within the actual configuration
 // or any of its environments.
-func Resolve(fn func(name string) (string, error)) Option {
+func Resolve(fn func(name string) (string, parse.Config, error)) Option {
 	return func(o *options) {
 		o.resolvers = append(o.resolvers, fn)
 	}
@@ -115,12 +117,12 @@ func Resolve(fn func(name string) (string, error)) Option {
 var ResolveEnv Option = doResolveEnv
 
 func doResolveEnv(o *options) {
-	o.resolvers = append(o.resolvers, func(name string) (string, error) {
+	o.resolvers = append(o.resolvers, func(name string) (string, parse.Config, error) {
 		value := os.Getenv(name)
 		if value == "" {
-			return "", ErrMissing
+			return "", parse.EnvConfig, ErrMissing
 		}
-		return value, nil
+		return value, parse.EnvConfig, nil
 	})
 }
 
@@ -132,8 +134,8 @@ func doResolveEnv(o *options) {
 var ResolveNOOP Option = doResolveNOOP
 
 func doResolveNOOP(o *options) {
-	o.resolvers = append(o.resolvers, func(name string) (string, error) {
-		return "${" + name + "}", nil
+	o.resolvers = append(o.resolvers, func(name string) (string, parse.Config, error) {
+		return "${" + name + "}", parse.NoopConfig, nil
 	})
 }
 

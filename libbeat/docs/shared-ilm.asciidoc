@@ -81,7 +81,7 @@ overwrite the template to apply the changes.
 ==== `setup.ilm.policy_name`
 
 The name to use for the lifecycle policy. The default is
-+{beatname_lc}-%{[{beat_version_key}]}+.
++{beatname_lc}+.
 
 [float]
 [[setup-ilm-policy_file-option]]

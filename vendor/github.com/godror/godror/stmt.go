@@ -285,8 +285,8 @@ func (st *statement) ExecContext(ctx context.Context, args []driver.NamedValue) 
 	}
 	st.isReturning = false
 
-	st.conn.RLock()
-	defer st.conn.RUnlock()
+	st.conn.mu.RLock()
+	defer st.conn.mu.RUnlock()
 
 	// bind variables
 	if err = st.bindVars(args, Log); err != nil {
@@ -304,6 +304,7 @@ func (st *statement) ExecContext(ctx context.Context, args []driver.NamedValue) 
 	// execute
 	go func() {
 		defer close(done)
+		var err error
 	Loop:
 		for i := 0; i < 3; i++ {
 			if err = ctx.Err(); err != nil {
@@ -339,7 +340,7 @@ func (st *statement) ExecContext(ctx context.Context, args []driver.NamedValue) 
 					err = errors.Errorf("getInfo: %w", st.getError())
 				}
 				st.isReturning = info.isReturning != 0
-				return
+				break
 			}
 			var cdr interface{ Code() int }
 			if !errors.As(err, &cdr) {
@@ -379,7 +380,9 @@ func (st *statement) ExecContext(ctx context.Context, args []driver.NamedValue) 
 				Log("msg", "BREAK statement")
 			}
 			_ = st.Break()
-			st.close(false)
+			// For some reasons this SIGSEGVs if not not keepDpiStmt (try to close it),
+			st.close(true)
+			// so we hope that the following conn.Close closes the dpiStmt, too.
 			if err := st.conn.Close(); err != nil {
 				return nil, err
 			}
@@ -465,8 +468,8 @@ func (st *statement) QueryContext(ctx context.Context, args []driver.NamedValue)
 	st.Lock()
 	defer st.Unlock()
 	st.isReturning = false
-	st.conn.RLock()
-	defer st.conn.RUnlock()
+	st.conn.mu.RLock()
+	defer st.conn.mu.RUnlock()
 
 	switch st.query {
 	case getConnection:
@@ -539,7 +542,9 @@ func (st *statement) QueryContext(ctx context.Context, args []driver.NamedValue)
 				Log("msg", "BREAK query")
 			}
 			_ = st.Break()
-			st.close(false)
+			// For some reasons this SIGSEGVs if not not keepDpiStmt (try to close it),
+			st.close(true)
+			// so we hope that the following conn.Close closes the dpiStmt, too.
 			if err := st.conn.Close(); err != nil {
 				return nil, err
 			}
@@ -1920,13 +1925,13 @@ func (c *conn) dataGetObject(v interface{}, data []C.dpiData) error {
 	case *Object:
 		d := Data{
 			ObjectType: out.ObjectType,
-			dpiData:    &data[0],
+			dpiData:    data[0],
 		}
 		*out = *d.GetObject()
 	case ObjectScanner:
 		d := Data{
 			ObjectType: out.ObjectRef().ObjectType,
-			dpiData:    &data[0],
+			dpiData:    data[0],
 		}
 		return out.Scan(d.GetObject())
 	default:
