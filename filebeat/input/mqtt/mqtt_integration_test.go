@@ -37,7 +37,7 @@ import (
 )
 
 const (
-	message      = "hello-world"
+	message = "hello-world"
 
 	waitTimeout = 30 * time.Second
 )
@@ -180,4 +180,3 @@ func getOrDefault(s, defaultString string) string {
 	}
 	return s
 }
-
