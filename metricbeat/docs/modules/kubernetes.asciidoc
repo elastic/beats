@@ -196,6 +196,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
 
+* <<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>>
+
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
@@ -235,6 +237,8 @@ include::kubernetes/state_resourcequota.asciidoc[]
 include::kubernetes/state_service.asciidoc[]
 
 include::kubernetes/state_statefulset.asciidoc[]
+
+include::kubernetes/state_storageclass.asciidoc[]
 
 include::kubernetes/system.asciidoc[]
 
