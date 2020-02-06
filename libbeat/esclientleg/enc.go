@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package esclientleg
 
 import (
 	"bytes"
@@ -31,20 +31,20 @@ import (
 	"github.com/elastic/go-structform/json"
 )
 
-type bodyEncoder interface {
+type BodyEncoder interface {
 	bulkBodyEncoder
 	Reader() io.Reader
 	Marshal(doc interface{}) error
 }
 
 type bulkBodyEncoder interface {
-	bulkWriter
+	BulkWriter
 
 	AddHeader(*http.Header)
 	Reset()
 }
 
-type bulkWriter interface {
+type BulkWriter interface {
 	Add(meta, obj interface{}) error
 	AddRaw(raw interface{}) error
 }
@@ -69,7 +69,7 @@ type event struct {
 	Fields    common.MapStr `struct:",inline"`
 }
 
-func newJSONEncoder(buf *bytes.Buffer, escapeHTML bool) *jsonEncoder {
+func NewJSONEncoder(buf *bytes.Buffer, escapeHTML bool) *jsonEncoder {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}
@@ -142,7 +142,7 @@ func (b *jsonEncoder) Add(meta, obj interface{}) error {
 	return nil
 }
 
-func newGzipEncoder(level int, buf *bytes.Buffer, escapeHTML bool) (*gzipEncoder, error) {
+func NewGzipEncoder(level int, buf *bytes.Buffer, escapeHTML bool) (*gzipEncoder, error) {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}

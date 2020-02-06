@@ -20,10 +20,8 @@ package elasticsearch
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -34,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -43,7 +42,7 @@ import (
 
 // Client is an elasticsearch client.
 type Client struct {
-	Connection
+	esclientleg.Connection
 	tlsConfig *tlscommon.TLSConfig
 
 	index    outputs.IndexSelector
@@ -52,7 +51,7 @@ type Client struct {
 	timeout  time.Duration
 
 	// buffered bulk requests
-	bulkRequ *bulkRequest
+	bulkRequ *esclientleg.BulkRequest
 
 	// buffered json response reader
 	json JSONReader
@@ -84,23 +83,6 @@ type ClientSettings struct {
 
 // ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
 type ConnectCallback func(client *Client) error
-
-// Connection manages the connection for a given client.
-type Connection struct {
-	log *logp.Logger
-
-	URL      string
-	Username string
-	Password string
-	APIKey   string
-	Headers  map[string]string
-
-	http              *http.Client
-	onConnectCallback func() error
-
-	encoder bodyEncoder
-	version common.Version
-}
 
 type bulkIndexAction struct {
 	Index bulkEventMeta `json:"index" struct:"index"`
@@ -193,31 +175,30 @@ func NewClient(
 	}
 
 	params := s.Parameters
-	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
+	bulkRequ, err := esclientleg.NewBulkRequest(s.URL, "", "", params, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var encoder bodyEncoder
+	var encoder esclientleg.BodyEncoder
 	compression := s.CompressionLevel
 	if compression == 0 {
-		encoder = newJSONEncoder(nil, s.EscapeHTML)
+		encoder = esclientleg.NewJSONEncoder(nil, s.EscapeHTML)
 	} else {
-		encoder, err = newGzipEncoder(compression, nil, s.EscapeHTML)
+		encoder, err = esclientleg.NewGzipEncoder(compression, nil, s.EscapeHTML)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	client := &Client{
-		Connection: Connection{
-			log:      log,
+		Connection: esclientleg.Connection{
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
 			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 			Headers:  s.Headers,
-			http: &http.Client{
+			HTTP: &http.Client{
 				Transport: &http.Transport{
 					Dial:            dialer.Dial,
 					DialTLS:         tlsDialer.Dial,
@@ -226,7 +207,7 @@ func NewClient(
 				},
 				Timeout: s.Timeout,
 			},
-			encoder: encoder,
+			Encoder: encoder,
 		},
 		tlsConfig: s.TLS,
 		index:     s.Index,
@@ -241,7 +222,7 @@ func NewClient(
 		observer:         s.Observer,
 	}
 
-	client.Connection.onConnectCallback = func() error {
+	client.Connection.OnConnectCallback = func() error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
@@ -292,7 +273,7 @@ func (client *Client) Clone() *Client {
 			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
-			Timeout:          client.http.Timeout,
+			Timeout:          client.HTTP.Timeout,
 			CompressionLevel: client.compressionLevel,
 		},
 		nil, // XXX: do not pass connection callback?
@@ -328,7 +309,7 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	body := client.encoder
+	body := client.Encoder
 	body.Reset()
 
 	// encode events into bulk request buffer, dropping failed elements from
@@ -351,7 +332,7 @@ func (client *Client) publishEvents(
 
 	requ := client.bulkRequ
 	requ.Reset(body)
-	status, result, sendErr := client.sendBulkRequest(requ)
+	status, result, sendErr := client.SendBulkRequest(requ)
 	if sendErr != nil {
 		client.Connection.log.Error("Failed to perform any bulk index operations: %+v", sendErr)
 		return data, sendErr
@@ -399,7 +380,7 @@ func (client *Client) publishEvents(
 func bulkEncodePublishRequest(
 	log *logp.Logger,
 	version common.Version,
-	body bulkWriter,
+	body esclientleg.BulkWriter,
 	index outputs.IndexSelector,
 	pipeline *outil.Selector,
 	eventType string,
@@ -666,11 +647,6 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
-// GetVersion returns the elasticsearch version the client is connected to.
-func (client *Client) GetVersion() common.Version {
-	return client.Connection.version
-}
-
 func (client *Client) Test(d testing.Driver) {
 	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
 		u, err := url.Parse(client.URL)
@@ -697,177 +673,11 @@ func (client *Client) Test(d testing.Driver) {
 
 		err = client.Connect()
 		d.Fatal("talk to server", err)
-		d.Info("version", client.version.String())
+		version := client.GetVersion()
+		d.Info("version", version.String())
 	})
 }
 
 func (client *Client) String() string {
 	return "elasticsearch(" + client.Connection.URL + ")"
-}
-
-// Connect connects the client. It runs a GET request against the root URL of
-// the configured host, updates the known Elasticsearch version and calls
-// globally configured handlers.
-func (client *Client) Connect() error {
-	return client.Connection.Connect()
-}
-
-// Connect connects the client. It runs a GET request against the root URL of
-// the configured host, updates the known Elasticsearch version and calls
-// globally configured handlers.
-func (conn *Connection) Connect() error {
-	versionString, err := conn.Ping()
-	if err != nil {
-		return err
-	}
-
-	if version, err := common.NewVersion(versionString); err != nil {
-		conn.log.Errorf("Invalid version from Elasticsearch: %s", versionString)
-		conn.version = common.Version{}
-	} else {
-		conn.version = *version
-	}
-
-	err = conn.onConnectCallback()
-	if err != nil {
-		return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
-	}
-	return nil
-}
-
-// Ping sends a GET request to the Elasticsearch.
-func (conn *Connection) Ping() (string, error) {
-	conn.log.Debugf("ES Ping(url=%v)", conn.URL)
-
-	status, body, err := conn.execRequest("GET", conn.URL, nil)
-	if err != nil {
-		conn.log.Debugf("Ping request failed with: %+v", err)
-		return "", err
-	}
-
-	if status >= 300 {
-		return "", fmt.Errorf("Non 2xx response code: %d", status)
-	}
-
-	var response struct {
-		Version struct {
-			Number string
-		}
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
-	}
-
-	conn.log.Debugf("Ping status code: %v", status)
-	conn.log.Infof("Attempting to connect to Elasticsearch version %s", response.Version.Number)
-	return response.Version.Number, nil
-}
-
-// Close closes a connection.
-func (conn *Connection) Close() error {
-	return nil
-}
-
-// Request sends a request via the connection.
-func (conn *Connection) Request(
-	method, path string,
-	pipeline string,
-	params map[string]string,
-	body interface{},
-) (int, []byte, error) {
-
-	url := addToURL(conn.URL, path, pipeline, params)
-	conn.log.Debugf("%s %s %s %v", method, url, pipeline, body)
-
-	return conn.RequestURL(method, url, body)
-}
-
-// RequestURL sends a request with the connection object to an alternative url
-func (conn *Connection) RequestURL(
-	method, url string,
-	body interface{},
-) (int, []byte, error) {
-
-	if body == nil {
-		return conn.execRequest(method, url, nil)
-	}
-
-	if err := conn.encoder.Marshal(body); err != nil {
-		conn.log.Warnf("Failed to json encode body (%+v): %#v", err, body)
-		return 0, nil, ErrJSONEncodeFailed
-	}
-	return conn.execRequest(method, url, conn.encoder.Reader())
-}
-
-func (conn *Connection) execRequest(
-	method, url string,
-	body io.Reader,
-) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		conn.log.Warnf("Failed to create request %+v", err)
-		return 0, nil, err
-	}
-	if body != nil {
-		conn.encoder.AddHeader(&req.Header)
-	}
-	return conn.execHTTPRequest(req)
-}
-
-func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
-	req.Header.Add("Accept", "application/json")
-
-	if conn.Username != "" || conn.Password != "" {
-		req.SetBasicAuth(conn.Username, conn.Password)
-	}
-
-	if conn.APIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
-	}
-
-	for name, value := range conn.Headers {
-		req.Header.Add(name, value)
-	}
-
-	// The stlib will override the value in the header based on the configured `Host`
-	// on the request which default to the current machine.
-	//
-	// We use the normalized key header to retrieve the user configured value and assign it to the host.
-	if host := req.Header.Get("Host"); host != "" {
-		req.Host = host
-	}
-
-	resp, err := conn.http.Do(req)
-	if err != nil {
-		return 0, nil, err
-	}
-	defer closing(conn.log, resp.Body)
-
-	status := resp.StatusCode
-	obj, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return status, nil, err
-	}
-
-	if status >= 300 {
-		// add the response body with the error returned by Elasticsearch
-		err = fmt.Errorf("%v: %s", resp.Status, obj)
-	}
-
-	return status, obj, err
-}
-
-// GetVersion returns the elasticsearch version the client is connected to.
-// The version is read and updated on 'Connect'.
-func (conn *Connection) GetVersion() common.Version {
-	return conn.version
-}
-
-func closing(log *logp.Logger, c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		log.Warnf("Close failed with: %+v", err)
-	}
 }

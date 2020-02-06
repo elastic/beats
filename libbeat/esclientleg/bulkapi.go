@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package esclientleg
 
 import (
 	"bytes"
@@ -32,7 +32,7 @@ import (
 // MetaBuilder creates meta data for bulk requests
 type MetaBuilder func(interface{}) interface{}
 
-type bulkRequest struct {
+type BulkRequest struct {
 	requ *http.Request
 }
 
@@ -62,18 +62,18 @@ func (conn *Connection) BulkWith(
 		return nil, nil
 	}
 
-	enc := conn.encoder
+	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, metaBuilder, body); err != nil {
 		return nil, err
 	}
 
-	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
+	requ, err := NewBulkRequest(conn.URL, index, docType, params, enc)
 	if err != nil {
 		return nil, err
 	}
 
-	_, result, err := conn.sendBulkRequest(requ)
+	_, result, err := conn.SendBulkRequest(requ)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (conn *Connection) SendMonitoringBulk(
 		return nil, nil
 	}
 
-	enc := conn.encoder
+	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
 		return nil, err
@@ -103,24 +103,24 @@ func (conn *Connection) SendMonitoringBulk(
 		}
 	}
 
-	requ, err := newMonitoringBulkRequest(conn.version, conn.URL, params, enc)
+	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, params, enc)
 	if err != nil {
 		return nil, err
 	}
 
-	_, result, err := conn.sendBulkRequest(requ)
+	_, result, err := conn.SendBulkRequest(requ)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func newBulkRequest(
+func NewBulkRequest(
 	urlStr string,
 	index, docType string,
 	params map[string]string,
-	body bodyEncoder,
-) (*bulkRequest, error) {
+	body BodyEncoder,
+) (*BulkRequest, error) {
 	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
 		return nil, err
@@ -133,8 +133,8 @@ func newMonitoringBulkRequest(
 	esVersion common.Version,
 	urlStr string,
 	params map[string]string,
-	body bodyEncoder,
-) (*bulkRequest, error) {
+	body BodyEncoder,
+) (*BulkRequest, error) {
 	var path string
 	var err error
 	if esVersion.Major < 7 {
@@ -154,8 +154,8 @@ func newBulkRequestWithPath(
 	urlStr string,
 	path string,
 	params map[string]string,
-	body bodyEncoder,
-) (*bulkRequest, error) {
+	body BodyEncoder,
+) (*BulkRequest, error) {
 	url := addToURL(urlStr, path, "", params)
 
 	var reader io.Reader
@@ -172,12 +172,12 @@ func newBulkRequestWithPath(
 		body.AddHeader(&requ.Header)
 	}
 
-	return &bulkRequest{
+	return &BulkRequest{
 		requ: requ,
 	}, nil
 }
 
-func (r *bulkRequest) Reset(body bodyEncoder) {
+func (r *BulkRequest) Reset(body BodyEncoder) {
 	bdy := body.Reader()
 
 	rc, ok := bdy.(io.ReadCloser)
@@ -200,12 +200,12 @@ func (r *bulkRequest) Reset(body bodyEncoder) {
 	body.AddHeader(&r.requ.Header)
 }
 
-func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, error) {
+func (conn *Connection) SendBulkRequest(requ *BulkRequest) (int, BulkResult, error) {
 	status, resp, err := conn.execHTTPRequest(requ.requ)
 	return status, BulkResult(resp), err
 }
 
-func bulkEncode(log *logp.Logger, out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
+func bulkEncode(log *logp.Logger, out BulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
 	if metaBuilder == nil {
 		for _, obj := range body {
 			if err := out.AddRaw(obj); err != nil {

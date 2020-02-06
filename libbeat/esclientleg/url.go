@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package esclientleg
 
 import (
 	"fmt"
@@ -75,7 +75,7 @@ func makePath(index string, docType string, id string) (string, error) {
 }
 
 // TODO: make this reusable. Same definition in elasticsearch monitoring module
-func parseProxyURL(raw string) (*url.URL, error) {
+func ParseProxyURL(raw string) (*url.URL, error) {
 	if raw == "" {
 		return nil, nil
 	}

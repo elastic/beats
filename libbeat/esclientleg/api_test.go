@@ -16,12 +16,14 @@
 // under the License.
 
 // Need for unit and integration tests
-package elasticsearch
+package esclientleg
 
 import (
 	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
 	"github.com/stretchr/testify/assert"
 
@@ -172,8 +174,8 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestClient(url string) *Client {
-	client, err := NewClient(ClientSettings{
+func newTestClient(url string) *elasticsearch.Client {
+	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
 		URL:              url,
 		Index:            outil.MakeSelector(),
 		Timeout:          60 * time.Second,

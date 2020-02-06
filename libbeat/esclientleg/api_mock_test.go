@@ -17,11 +17,13 @@
 
 // +build !integration
 
-package elasticsearch
+package esclientleg
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
@@ -29,29 +31,35 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func TestOneHostSuccessResp_Bulk(t *testing.T) {
+func ElasticsearchMock(code int, body []byte) *httptest.Server {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" { // send ok and a minimal JSON on ping
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			return
+		}
+
+		w.WriteHeader(code)
+		if body != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(body)
+		}
+	}))
+
+	return server
+}
+
+func TestOneHostSuccessResp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	expectedResp := []byte(`{"took":7,"errors":false,"items":[]}`)
-
-	ops := []map[string]interface{}{
-		{
-			"index": map[string]interface{}{
-				"_index": index,
-				"_type":  "type1",
-				"_id":    "1",
-			},
-		},
-		{
-			"field1": "value1",
-		},
+	body := map[string]interface{}{
+		"user":      "test",
+		"post_date": "2009-11-15T14:12:12",
+		"message":   "trying out",
 	}
-
-	body := make([]interface{}, 0, 10)
-	for _, op := range ops {
-		body = append(body, op)
-	}
+	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", ID: "1", Version: 1, Created: true})
 
 	server := ElasticsearchMock(200, expectedResp)
 
@@ -60,45 +68,40 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
-		t.Errorf("Bulk() returns error: %s", err)
+		t.Errorf("Index() returns error: %s", err)
+	}
+	if !resp.Created {
+		t.Errorf("Index() fails: %s", resp)
 	}
 }
 
-func TestOneHost500Resp_Bulk(t *testing.T) {
+func TestOneHost500Resp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-
-	ops := []map[string]interface{}{
-		{
-			"index": map[string]interface{}{
-				"_index": index,
-				"_type":  "type1",
-				"_id":    "1",
-			},
-		},
-		{
-			"field1": "value1",
-		},
-	}
-
-	body := make([]interface{}, 0, 10)
-	for _, op := range ops {
-		body = append(body, op)
+	body := map[string]interface{}{
+		"user":      "test",
+		"post_date": "2009-11-15T14:12:12",
+		"message":   "trying out",
 	}
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
 	client := newTestClient(server.URL)
+	err := client.Connect()
+	if err != nil {
+		t.Fatalf("Failed to connect: %v", err)
+	}
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err = client.Index(index, "test", "1", params, body)
+
 	if err == nil {
-		t.Errorf("Bulk() should return error.")
+		t.Errorf("Index() should return error.")
 	}
 
 	if !strings.Contains(err.Error(), "500 Internal Server Error") {
@@ -106,27 +109,14 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 	}
 }
 
-func TestOneHost503Resp_Bulk(t *testing.T) {
+func TestOneHost503Resp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-
-	ops := []map[string]interface{}{
-		{
-			"index": map[string]interface{}{
-				"_index": index,
-				"_type":  "type1",
-				"_id":    "1",
-			},
-		},
-		{
-			"field1": "value1",
-		},
-	}
-
-	body := make([]interface{}, 0, 10)
-	for _, op := range ops {
-		body = append(body, op)
+	body := map[string]interface{}{
+		"user":      "test",
+		"post_date": "2009-11-15T14:12:12",
+		"message":   "trying out",
 	}
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
@@ -136,9 +126,9 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err := client.Index(index, "test", "1", params, body)
 	if err == nil {
-		t.Errorf("Bulk() should return error.")
+		t.Errorf("Index() should return error.")
 	}
 
 	if !strings.Contains(err.Error(), "503 Service Unavailable") {

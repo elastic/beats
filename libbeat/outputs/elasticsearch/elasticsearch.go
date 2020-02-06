@@ -18,7 +18,6 @@
 package elasticsearch
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"sync"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -36,17 +36,6 @@ import (
 func init() {
 	outputs.RegisterType("elasticsearch", makeES)
 }
-
-var (
-	// ErrNotConnected indicates failure due to client having no valid connection
-	ErrNotConnected = errors.New("not connected")
-
-	// ErrJSONEncodeFailed indicates encoding failures
-	ErrJSONEncodeFailed = errors.New("json encode failed")
-
-	// ErrResponseRead indicates error parsing Elasticsearch response
-	ErrResponseRead = errors.New("bulk item status parse failed")
-)
 
 const logSelector = "elasticsearch"
 
@@ -165,7 +154,7 @@ func makeES(
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err = parseProxyURL(config.ProxyURL)
+		proxyURL, err = esclientleg.ParseProxyURL(config.ProxyURL)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -291,7 +280,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 	log := logp.NewLogger(logSelector)
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err = parseProxyURL(config.ProxyURL)
+		proxyURL, err = esclientleg.ParseProxyURL(config.ProxyURL)
 		if err != nil {
 			return nil, err
 		}

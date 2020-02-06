@@ -23,6 +23,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/elastic/beats/libbeat/esclientleg"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -247,7 +249,7 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result esout.BulkResult, events []report.Event) {
+func logBulkFailures(log *logp.Logger, result esclientleg.BulkResult, events []report.Event) {
 	reader := esout.NewJSONReader(result)
 	err := esout.BulkReadToItems(reader)
 	if err != nil {

@@ -17,7 +17,7 @@
 
 // +build integration
 
-package elasticsearch
+package esclientleg
 
 import (
 	"fmt"

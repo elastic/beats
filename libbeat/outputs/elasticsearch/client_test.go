@@ -340,7 +340,7 @@ func TestAddToURL(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		url := addToURL(test.url, test.path, test.pipeline, test.params)
+		url := esclientleg.addToURL(test.url, test.path, test.pipeline, test.params)
 		assert.Equal(t, url, test.expected)
 	}
 }
