@@ -417,8 +417,7 @@ env-logs:
 	${DOCKER_COMPOSE} logs -f
 
 fix-permissions:
-	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
+	sh ${ES_BEATS}/script/fix_permissions.sh "${PWD}"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
