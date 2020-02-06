@@ -1,5 +1,6 @@
 outputs:
   default:
+    type: elasticsearch
     api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
     hosts: ["localhost:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
@@ -8,6 +9,7 @@ outputs:
       type: disk
 
   long_term_storage:
+    type: elasticsearch
     api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
     hosts: ["localhost:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
@@ -15,6 +17,7 @@ outputs:
       type: disk
 
   monitoring:
+    type: elasticsearch
     api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
     hosts: ["localhost:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
