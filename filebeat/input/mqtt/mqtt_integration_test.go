@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// + build integration
+// +build integration
 
 package mqtt
 
@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -83,6 +84,9 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
+	newMqttClient = libmqtt.NewClient
+	newBackoff = backoff.NewEqualJitterBackoff
+
 	// Setup the input config.
 	config := common.MustNewConfigFrom(common.MapStr{
 		"hosts":  []string{hostPort},
@@ -90,7 +94,7 @@ func TestInput(t *testing.T) {
 	})
 
 	// Route input events through our captor instead of sending through ES.
-	eventsCh := make(chan beat.Event, 100)
+	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
 	captor := newEventCaptor(eventsCh)
@@ -117,13 +121,18 @@ func TestInput(t *testing.T) {
 	// Create Publisher
 	publisher := createPublisher(t)
 
-	var wg sync.WaitGroup
-	wg.Add(2)
+	// Verify that event has been received
+	verifiedCh := make(chan struct{})
+	defer close(verifiedCh)
 
-	verifiedCh := verifyEventReceived(t, &wg, eventsCh)
-	emitInputData(t, &wg, verifiedCh, publisher)
+	emitInputData(t, verifiedCh, publisher)
 
-	wg.Wait()
+	event := <-eventsCh
+	verifiedCh <- struct{}{}
+
+	val, err := event.GetValue("message")
+	require.NoError(t, err)
+	require.Equal(t, message, val)
 }
 
 func createPublisher(t *testing.T) libmqtt.Client {
@@ -139,32 +148,14 @@ func createPublisher(t *testing.T) libmqtt.Client {
 	return client
 }
 
-func verifyEventReceived(t *testing.T, wg *sync.WaitGroup, eventsCh <-chan beat.Event) <-chan struct{} {
-	verifiedCh := make(chan struct{}, 1)
-
+func emitInputData(t *testing.T, verifiedCh <-chan struct{}, publisher libmqtt.Client) {
 	go func() {
-		event := <-eventsCh
-
-		val, err := event.GetValue("message")
-		require.NoError(t, err)
-		require.Equal(t, message, val)
-
-		verifiedCh <- struct{}{}
-
-		wg.Done()
-	}()
-	return verifiedCh
-}
-
-func emitInputData(t *testing.T, wg *sync.WaitGroup, verifiedCh <-chan struct{}, publisher libmqtt.Client) {
-	go func() {
-		ticker := time.NewTicker(10 * time.Second)
+		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-verifiedCh:
-				wg.Done()
 				return
 			case <-ticker.C:
 				token := publisher.Publish(topic, 1, false, []byte(message))
