@@ -5,7 +5,6 @@
 -------------------------------------------------------------------------------
 processors:
 - add_host_metadata:
-    netinfo.enabled: true
     cache.ttl: 5m
     geo:
       name: nyc-dc1-rack1
