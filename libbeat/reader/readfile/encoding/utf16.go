@@ -20,7 +20,6 @@ package encoding
 import (
 	"errors"
 	"io"
-	"os"
 
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -68,14 +67,14 @@ func utf16BOM(e endianness) EncodingFactory {
 
 func utf16Seekable(in io.ReadSeeker, endianness endianness) (Encoding, error) {
 	// remember file offset in case we have to back off
-	offset, err := in.Seek(0, os.SEEK_CUR)
+	offset, err := in.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return nil, err
 	}
 
 	// goto beginning of file
 	keepOffset := offset == 0
-	if _, err = in.Seek(0, os.SEEK_SET); err != nil {
+	if _, err = in.Seek(0, io.SeekStart); err != nil {
 		return nil, err
 	}
 
@@ -83,11 +82,11 @@ func utf16Seekable(in io.ReadSeeker, endianness endianness) (Encoding, error) {
 	var buf [2]byte
 	n, err := in.Read(buf[:])
 	if err != nil {
-		in.Seek(offset, os.SEEK_SET)
+		in.Seek(offset, io.SeekStart)
 		return nil, err
 	}
 	if n < 2 {
-		in.Seek(offset, os.SEEK_SET)
+		in.Seek(offset, io.SeekStart)
 		return nil, transform.ErrShortSrc
 	}
 
@@ -103,7 +102,7 @@ func utf16Seekable(in io.ReadSeeker, endianness endianness) (Encoding, error) {
 	// restore offset if BOM is missing or this function was not
 	// called with read pointer at beginning of file
 	if !keepOffset || inEndianness == unknownEndianness {
-		if _, err = in.Seek(offset, os.SEEK_SET); err != nil {
+		if _, err = in.Seek(offset, io.SeekStart); err != nil {
 			return nil, err
 		}
 	}
