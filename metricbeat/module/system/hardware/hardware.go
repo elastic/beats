@@ -1,9 +1,7 @@
 package hardware
 
 import (
-	"io/ioutil"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/StackExchange/wmi"
@@ -33,6 +31,7 @@ type MetricSet struct {
 	hardwareMonitorQuery []queryKey
 }
 
+// Define the fields that return from the query
 type queryKey struct {
 	Type              string
 	Name              string
@@ -64,29 +63,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func getData() {
-	resp, err := http.Get("https://jsonplaceholder.typicode.com/users")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println(string(body))
-}
-
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// Read the data from the hardware.yml file
 	var cfg util.ConfigYaml
 	util.ReadFile(&cfg)
 	for _, value := range cfg.Query {
+		// Regular wmi query with default namespace
 		if value.TypeOf != "WmiMonitorID" {
 			var dst []queryKey
 			wmi.Query("Select * from "+value.TypeOf, &dst)
@@ -94,7 +79,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.hardwareQuery = append(m.hardwareQuery, queryKey{Name: v.Name, Description: v.Description, DeviceID: v.DeviceID, Manufacturer: v.Manufacturer, Type: value.Name, Output: cfg.Format, Index: i + 1})
 			}
 		} else {
-			// Special ability to handle WmiMonitorID
+			// Special ability to handle WmiMonitorID on root\\WMI namespace
 			var dst []queryKey
 			err := wmi.QueryNamespace("select * from "+value.TypeOf, &dst, "root\\WMI")
 			if err != nil {
@@ -107,6 +92,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	metricSetFields := common.MapStr{}
 	for _, hard := range m.hardwareQuery {
+		// Define the regular output
 		rootFields := common.MapStr{
 			"type":         hard.Type,
 			"name":         hard.Name,
@@ -118,6 +104,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		sendEventHardware(hard, m.hardwareQuery, rootFields, metricSetFields, report)
 	}
 	for _, hard := range m.hardwareMonitorQuery {
+		// Define the MonitorId output
 		rootFields := common.MapStr{
 			"type":             hard.Type,
 			"name":             util.B2s(hard.UserFriendlyName),
@@ -137,6 +124,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func sendEventHardware(hard queryKey, hardware []queryKey, rootFields common.MapStr, metricSetFields common.MapStr, report mb.ReporterV2) {
+	// Set the key to data
 	if hard.Output.UseConst == true {
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
@@ -145,13 +133,13 @@ func sendEventHardware(hard queryKey, hardware []queryKey, rootFields common.Map
 		})
 	}
 	if hard.Output.UseType == true {
-		if len(hardware) == 1 {
-			metricSetFields[hard.Type] = rootFields
-		} else if hard.Index == 1 {
+		// If there is only one item
+		if hard.Index == 1 {
 			metricSetFields[hard.Type] = common.MapStr{
 				strconv.Itoa(hard.Index): rootFields,
 			}
 		} else {
+			// If there is more then one item
 			newMap := metricSetFields[hard.Type].(common.MapStr)
 			newMap[strconv.Itoa(hard.Index)] = rootFields
 		}
