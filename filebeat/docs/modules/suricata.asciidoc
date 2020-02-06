@@ -27,10 +27,13 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard. For example:
+This module comes with sample dashboards. For example:
 
 [role="screenshot"]
-image::./images/kibana-suricata.png[]
+image::./images/filebeat-suricata-events.png[]
+
+[role="screenshot"]
+image::./images/filebeat-suricata-alerts.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
