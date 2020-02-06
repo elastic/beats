@@ -32,6 +32,9 @@
         "source.geo.region_iso_code": "US-VA",
         "source.geo.region_name": "Virginia",
         "source.ip": "72.21.218.154",
-        "source.port": "51341"
+        "source.port": "51341",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     }
 ]

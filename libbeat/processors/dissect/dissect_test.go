@@ -59,10 +59,17 @@ func init() {
 		os.Exit(1)
 	}
 
-	json.Unmarshal(content, &tests)
+	if err := json.Unmarshal(content, &tests); err != nil {
+		fmt.Printf("could not parse the content of 'dissect_tests', error: %s", err)
+		os.Exit(1)
+	}
 }
 
 func TestDissect(t *testing.T) {
+	if len(tests) == 0 {
+		t.Error("No test cases were loaded")
+	}
+
 	for _, test := range tests {
 		if test.Skip {
 			continue

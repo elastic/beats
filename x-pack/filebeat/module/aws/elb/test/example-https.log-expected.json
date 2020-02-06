@@ -26,6 +26,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tls.cipher": "DHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
         "user_agent.original": "curl/7.38.0"
     }
 ]
