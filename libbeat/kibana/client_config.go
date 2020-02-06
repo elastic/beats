@@ -36,8 +36,9 @@ type ClientConfig struct {
 	IgnoreVersion bool
 }
 
-var (
-	defaultClientConfig = ClientConfig{
+// DefaultClientConfig connects to a locally running kibana over HTTP
+func DefaultClientConfig() ClientConfig {
+	return ClientConfig{
 		Protocol: "http",
 		Host:     "localhost:5601",
 		Path:     "",
@@ -47,4 +48,4 @@ var (
 		Timeout:  90 * time.Second,
 		TLS:      nil,
 	}
-)
+}
