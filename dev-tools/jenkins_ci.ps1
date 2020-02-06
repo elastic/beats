@@ -64,5 +64,6 @@ $packages = ($packages|group|Select -ExpandProperty Name) -join ","
 exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
 
 if (Test-Path "tests\system") {
+    echo "Running python tests"
     exec { mage pythonUnitTest } "System test FAILURE"
 }
