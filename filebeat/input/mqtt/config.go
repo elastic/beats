@@ -28,8 +28,8 @@ type mqttInputConfig struct {
 	Topics []string `config:"topics" validate:"required,min=1"`
 	QoS    int      `config:"qos" validate:"nonzero,min=0,max=2"`
 
-	ClientID string `config:"clientID" validate:"nonzero"`
-	Username string `config:"user"`
+	ClientID string `config:"client_id" validate:"nonzero"`
+	Username string `config:"username"`
 	Password string `config:"password"`
 
 	TLS *tlscommon.Config `config:"ssl"`
