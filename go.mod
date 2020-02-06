@@ -46,6 +46,7 @@ require (
 	github.com/dop251/goja v0.0.0-00010101000000-000000000000
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
+	github.com/eclipse/paho.mqtt.golang v1.2.0 // indirect
 	github.com/elastic/ecs v1.4.0
 	github.com/elastic/go-libaudit v0.4.0
 	github.com/elastic/go-licenser v0.2.1
