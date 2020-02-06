@@ -91,10 +91,10 @@ func TestInput(t *testing.T) {
 	})
 
 	// Route input events through our captor instead of sending through ES.
-	events := make(chan beat.Event, messageCount)
-	defer close(events)
+	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
 
-	captor := newEventCaptor(events)
+	captor := newEventCaptor(eventsCh)
 	defer captor.Close()
 
 	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
@@ -120,8 +120,9 @@ func TestInput(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go verifyEventsReceived(t, &wg, events)
-	go emitInputData(t, &wg, publisher)
+
+	verifiedCh := verifyEventReceived(t, &wg, eventsCh)
+	emitInputData(t, &wg, verifiedCh, publisher)
 
 	wg.Wait()
 }
@@ -139,24 +140,39 @@ func createPublisher(t *testing.T) libmqtt.Client {
 	return client
 }
 
-func verifyEventsReceived(t *testing.T, wg *sync.WaitGroup, events <-chan beat.Event) {
-	for i := 0; i < messageCount; i++ {
-		event := <-events
+func verifyEventReceived(t *testing.T, wg *sync.WaitGroup, eventsCh <-chan beat.Event) <-chan struct{} {
+	verifiedCh := make(chan struct{})
+	go func() {
+		event := <-eventsCh
 
 		val, err := event.GetValue("message")
 		require.NoError(t, err)
 		require.Equal(t, message, val)
-	}
-	wg.Done()
+
+		verifiedCh <- struct{}{}
+
+		wg.Done()
+	}()
+	return verifiedCh
 }
 
-func emitInputData(t *testing.T, wg *sync.WaitGroup, publisher libmqtt.Client) {
-	for i := 0; i < messageCount; i++ {
-		token := publisher.Publish(topic, 2, false, []byte(message))
-		require.True(t, token.WaitTimeout(waitTimeout))
-		require.NoError(t, token.Error())
-	}
-	wg.Done()
+func emitInputData(t *testing.T, wg *sync.WaitGroup, verifiedCh <-chan struct{}, publisher libmqtt.Client) {
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-verifiedCh:
+				wg.Done()
+				return
+			case <-ticker.C:
+				token := publisher.Publish(topic, 1, false, []byte(message))
+				require.True(t, token.WaitTimeout(waitTimeout))
+				require.NoError(t, token.Error())
+			}
+		}
+	}()
 }
 
 func getOrDefault(s, defaultString string) string {
@@ -165,3 +181,4 @@ func getOrDefault(s, defaultString string) string {
 	}
 	return s
 }
+
