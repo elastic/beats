@@ -63,7 +63,10 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:9200", "--insecure"]
+      test: ["CMD", "curl", "-u", "admin:changeme", "-f", "https://localhost:9200", "--insecure"]
+      retries: 1200
+      interval: 5s
+      start_period: 60s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
