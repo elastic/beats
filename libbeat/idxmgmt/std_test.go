@@ -46,7 +46,7 @@ type mockCreateOp uint8
 
 const (
 	mockCreatePolicy mockCreateOp = iota
-	mockCreateDefaultPipeline
+	mockCreateFinalPipeline
 	mockCreateTemplate
 	mockCreateAlias
 )
@@ -315,8 +315,8 @@ func TestIndexManager_Setup(t *testing.T) {
 	defaultCfg := template.DefaultConfig()
 
 	cases := map[string]struct {
-		cfg                                        common.MapStr
-		loadTemplate, loadILM, loadDefaultPipeline LoadMode
+		cfg                                      common.MapStr
+		loadTemplate, loadILM, loadFinalPipeline LoadMode
 
 		err           bool
 		tmplCfg       *template.TemplateConfig
@@ -431,7 +431,7 @@ func TestIndexManager_Setup(t *testing.T) {
 
 			clientHandler := newMockClientHandler()
 			manager := im.Manager(clientHandler, BeatsAssets([]byte("testbeat fields")))
-			err = manager.Setup(test.loadTemplate, test.loadILM, test.loadDefaultPipeline)
+			err = manager.Setup(test.loadTemplate, test.loadILM, test.loadFinalPipeline)
 			clientHandler.assertInvariants(t)
 			if test.err {
 				assert.Error(t, err)
@@ -451,7 +451,7 @@ func TestIndexManager_Setup(t *testing.T) {
 }
 
 func (op mockCreateOp) String() string {
-	names := []string{"create-policy", "create-default-pipeline", "create-template", "create-alias"}
+	names := []string{"create-policy", "create-final-pipeline", "create-template", "create-alias"}
 	if int(op) > len(names) {
 		return "unknown"
 	}
@@ -469,8 +469,8 @@ func (h *mockClientHandler) Load(config template.TemplateConfig, _ beat.Info, fi
 	return nil
 }
 
-func (h *mockClientHandler) LoadDefaultPipeline(config template.TemplateConfig, _ beat.Info) error {
-	h.recordOp(mockCreateDefaultPipeline)
+func (h *mockClientHandler) LoadFinalPipeline(config template.TemplateConfig, _ beat.Info) error {
+	h.recordOp(mockCreateFinalPipeline)
 	return nil
 }
 

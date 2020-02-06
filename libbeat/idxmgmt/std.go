@@ -70,9 +70,9 @@ type componentType uint8
 
 //go:generate stringer -linecomment -type componentType
 const (
-	componentTemplate        componentType = iota //template
-	componentILM                                  //ilm
-	componentDefaultPipeline                      //default_pipeline
+	componentTemplate      componentType = iota //template
+	componentILM                                //ilm
+	componentFinalPipeline                      //final_pipeline
 )
 
 type feature struct {
@@ -136,8 +136,8 @@ func (s *indexSupport) enabled(c componentType) bool {
 		return s.templateCfg.Enabled
 	case componentILM:
 		return s.ilm.Mode() != ilm.ModeDisabled
-	case componentDefaultPipeline:
-		return s.templateCfg.DefaultPipeline.Enabled
+	case componentFinalPipeline:
+		return s.templateCfg.FinalPipeline.Enabled
 	}
 	return false
 }
@@ -250,7 +250,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 }
 
 //
-func (m *indexManager) Setup(loadTemplate, loadILM, loadDefaultPipeline LoadMode) error {
+func (m *indexManager) Setup(loadTemplate, loadILM, loadFinalPipeline LoadMode) error {
 	log := m.support.log
 
 	withILM, err := m.setupWithILM()
@@ -264,8 +264,8 @@ func (m *indexManager) Setup(loadTemplate, loadILM, loadDefaultPipeline LoadMode
 	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
-	defaultPipelineComponent := newFeature(componentDefaultPipeline, m.support.enabled(componentDefaultPipeline),
-		false, loadDefaultPipeline)
+	finalPipelineComponent := newFeature(componentFinalPipeline, m.support.enabled(componentFinalPipeline),
+		false, loadFinalPipeline)
 
 	if ilmComponent.load {
 		// install ilm policy
@@ -281,10 +281,10 @@ func (m *indexManager) Setup(loadTemplate, loadILM, loadDefaultPipeline LoadMode
 		}
 	}
 
-	if defaultPipelineComponent.load {
-		err = m.clientHandler.LoadDefaultPipeline(m.support.templateCfg, m.support.info)
+	if finalPipelineComponent.load {
+		err = m.clientHandler.LoadFinalPipeline(m.support.templateCfg, m.support.info)
 		if err != nil {
-			return fmt.Errorf("error loading default pipeline: %v", err)
+			return fmt.Errorf("error loading final pipeline: %v", err)
 		}
 	}
 

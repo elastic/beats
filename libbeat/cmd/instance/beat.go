@@ -501,7 +501,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
-			var loadTemplate, loadILM, loadDefaultPipeline = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
+			var loadTemplate, loadILM, loadFinalPipeline = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 			if setup.IndexManagement || setup.Template {
 				loadTemplate = idxmgmt.LoadModeOverwrite
 			}
@@ -509,14 +509,14 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 			if setup.IndexManagement {
-				loadDefaultPipeline = idxmgmt.LoadModeOverwrite
+				loadFinalPipeline = idxmgmt.LoadModeOverwrite
 			}
 
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
 				fmt.Println(warn)
 			}
-			if err = m.Setup(loadTemplate, loadILM, loadDefaultPipeline); err != nil {
+			if err = m.Setup(loadTemplate, loadILM, loadFinalPipeline); err != nil {
 				return err
 			}
 			fmt.Println("Index setup finished.")

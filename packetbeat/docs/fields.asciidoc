@@ -504,15 +504,6 @@ type: keyword
 
 --
 
-*`event.ingested`*::
-+
---
-Ingest timestamp
-
-type: date
-
---
-
 [[exported-fields-cassandra]]
 == Cassandra fields
 

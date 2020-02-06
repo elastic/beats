@@ -35,7 +35,7 @@ func genExportCmd(settings instance.Settings) *cobra.Command {
 	exportCmd.AddCommand(export.GenIndexPatternConfigCmd(settings))
 	exportCmd.AddCommand(export.GenDashboardCmd(settings))
 	exportCmd.AddCommand(export.GenGetILMPolicyCmd(settings))
-	exportCmd.AddCommand(export.GenExportDefaultPipelineCmd(settings))
+	exportCmd.AddCommand(export.GenExportFinalPipelineCmd(settings))
 
 	return exportCmd
 }

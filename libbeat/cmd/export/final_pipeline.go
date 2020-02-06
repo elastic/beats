@@ -24,11 +24,11 @@ import (
 	"github.com/elastic/beats/libbeat/idxmgmt"
 )
 
-// GenExportDefaultPipelineCmd writes out the default ingest pipeline.
-func GenExportDefaultPipelineCmd(settings instance.Settings) *cobra.Command {
+// GenExportFinalPipelineCmd writes out the final ingest pipeline.
+func GenExportFinalPipelineCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
-		Use:   "default-pipeline",
-		Short: "Export Elasticsearch default ingest pipeline to stdout",
+		Use:   "final-pipeline",
+		Short: "Export Elasticsearch final ingest pipeline to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 			dir, _ := cmd.Flags().GetString("dir")
@@ -41,7 +41,7 @@ func GenExportDefaultPipelineCmd(settings instance.Settings) *cobra.Command {
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
-				fatalf("Error exporting default-pipeline: %+v.", err)
+				fatalf("Error exporting final-pipeline: %+v.", err)
 			}
 		},
 	}

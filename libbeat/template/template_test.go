@@ -181,30 +181,30 @@ func getVersion(in string) string {
 	return in
 }
 
-func TestDefaultPipeline(t *testing.T) {
-	beatVersion := "6.7.0"
+func TestFinalPipeline(t *testing.T) {
+	beatVersion := "7.5.0"
 	beatName := "testbeat"
 	config := DefaultConfig()
 
-	// Test it exists in 6.7
-	ver := common.MustNewVersion("6.7.0")
+	// Test it exists in 7.5
+	ver := common.MustNewVersion("7.5.0")
 	template, err := New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
 	t.Logf("data: %v", data)
-	pipeline, err := data.GetValue("settings.index.default_pipeline")
+	pipeline, err := data.GetValue("settings.index.final_pipeline")
 	assert.NoError(t, err)
 
-	assert.Equal(t, "testbeat-6.7.0", pipeline)
+	assert.Equal(t, "testbeat-7.5.0", pipeline)
 
-	// Test it does not exist in 6.6
-	ver = common.MustNewVersion("6.6.0")
+	// Test it does not exist in 7.4
+	ver = common.MustNewVersion("7.4.0")
 	template, err = New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data = template.Generate(nil, nil)
-	pipeline, err = data.GetValue("settings.index.default_pipeline")
+	pipeline, err = data.GetValue("settings.index.final_pipeline")
 	assert.Error(t, err)
 	assert.Equal(t, nil, pipeline)
 }

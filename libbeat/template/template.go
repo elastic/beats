@@ -54,7 +54,7 @@ type Template struct {
 	migration   bool
 	order       int
 
-	defaultPipelineName string
+	finalPipelineName string
 }
 
 // New creates a new template instance
@@ -102,10 +102,10 @@ func New(
 		return nil, err
 	}
 
-	// Default pipeline name expansion
-	var defaultPipelineName string
-	if config.DefaultPipeline.Enabled {
-		defaultPipelineName, err = fmtstr.EventFormat(config.DefaultPipeline.Name, event)
+	// Final pipeline name expansion
+	var finalPipelineName string
+	if config.FinalPipeline.Enabled {
+		finalPipelineName, err = fmtstr.EventFormat(config.FinalPipeline.Name, event)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func New(
 		migration:   migration,
 		order:       config.Order,
 
-		defaultPipelineName: defaultPipelineName,
+		finalPipelineName: finalPipelineName,
 	}, nil
 }
 
@@ -208,9 +208,9 @@ func (t *Template) GetPattern() string {
 	return t.pattern
 }
 
-// GetDefaultPipelineName returns the name of the default pipeline
-func (t *Template) GetDefaultPipelineName() string {
-	return t.defaultPipelineName
+// GetFinalPipelineName returns the name of the final pipeline
+func (t *Template) GetFinalPipelineName() string {
+	return t.finalPipelineName
 }
 
 // Generate generates the full template
@@ -309,17 +309,16 @@ func (t *Template) buildIdxSettings() common.MapStr {
 		},
 	}
 
-	// The built-in default pipeline uses the geoip processor that is only
-	// bundled with Elasticsearch since version 6.7.0.
-	version67, _ := common.NewVersion("6.7.0")
-	if t.config.DefaultPipeline.Enabled && !t.esVersion.LessThan(version67) {
-		indexSettings.Put("default_pipeline", t.defaultPipelineName)
+	// The final_pipeline index setting is only available since Elasticsearch 7.5.0.
+	version75, _ := common.NewVersion("7.5.0")
+	if t.config.FinalPipeline.Enabled && !t.esVersion.LessThan(version75) {
+		indexSettings.Put("final_pipeline", t.finalPipelineName)
 	}
 
 	// number_of_routing shards is only supported for ES version >= 6.1
 	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) && ver.Major < 7 {
+	if !t.esVersion.LessThan(version61) && t.esVersion.Major < 7 {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 

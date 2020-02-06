@@ -34,7 +34,7 @@ import (
 //Loader interface for loading templates
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
-	LoadDefaultPipeline(config TemplateConfig, info beat.Info) error
+	LoadFinalPipeline(config TemplateConfig, info beat.Info) error
 }
 
 // ESLoader implements Loader interface for loading templates to Elasticsearch.
@@ -103,16 +103,16 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	return nil
 }
 
-// LoadDefaultPipeline loads the default pipeline.
-func (l *ESLoader) LoadDefaultPipeline(config TemplateConfig, info beat.Info) error {
+// LoadFinalPipeline loads the final pipeline.
+func (l *ESLoader) LoadFinalPipeline(config TemplateConfig, info beat.Info) error {
 	//build template from config
 	tmpl, err := template(config, info, l.client.GetVersion(), false)
 	if err != nil || tmpl == nil {
 		return err
 	}
 
-	pipelineName := tmpl.GetDefaultPipelineName()
-	loadPipeline := config.DefaultPipeline.Overwrite
+	pipelineName := tmpl.GetFinalPipelineName()
+	loadPipeline := config.FinalPipeline.Overwrite
 	if !loadPipeline {
 		exists, err := l.ingestPipelineExists(pipelineName)
 		if err != nil {
@@ -125,7 +125,7 @@ func (l *ESLoader) LoadDefaultPipeline(config TemplateConfig, info beat.Info) er
 	}
 
 	if loadPipeline {
-		// load default ingest pipeline to ES
+		// load final ingest pipeline to ES
 		if err := l.loadIngestPipeline(pipelineName, config); err != nil {
 			return err
 		}
@@ -186,22 +186,22 @@ func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, 
 	return nil
 }
 
-// LoadDefaultPipeline prints the default pipeline to the configured file.
-func (l *FileLoader) LoadDefaultPipeline(config TemplateConfig, info beat.Info) error {
+// LoadFinalPipeline prints the final pipeline to the configured file.
+func (l *FileLoader) LoadFinalPipeline(config TemplateConfig, info beat.Info) error {
 	//build template from config
 	tmpl, err := template(config, info, l.client.GetVersion(), false)
 	if err != nil || tmpl == nil {
 		return err
 	}
 
-	pipeline, err := getDefaultPipeline(config)
+	pipeline, err := getFinalPipeline(config)
 	if err != nil {
 		return err
 	}
 
 	str := fmt.Sprintf("%s\n", pipeline.StringToPrint())
-	if err := l.client.Write("default-pipeline", tmpl.GetDefaultPipelineName(), str); err != nil {
-		return fmt.Errorf("error printing default-pipeline: %v", err)
+	if err := l.client.Write("final-pipeline", tmpl.GetFinalPipelineName(), str); err != nil {
+		return fmt.Errorf("error printing final-pipeline: %v", err)
 	}
 	return nil
 }

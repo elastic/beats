@@ -31,8 +31,8 @@ import (
 var (
 	esIngestPipelinePath = "/_ingest/pipeline/"
 
-	beatsDefaultPipeline = common.MapStr{
-		"description": "Beats default pipeline for enrichment with ingest timestamp, GeoIP, and ASN",
+	beatsFinalPipeline = common.MapStr{
+		"description": "Beats final pipeline for enrichment with ingest timestamp, GeoIP, and ASN",
 		"processors": []common.MapStr{
 			common.MapStr{
 				"geoip": common.MapStr{
@@ -122,18 +122,18 @@ type PipelineConfig struct {
 	File      string `config:"file"`
 }
 
-func getDefaultPipeline(config TemplateConfig) (common.MapStr, error) {
-	pipeline := beatsDefaultPipeline
+func getFinalPipeline(config TemplateConfig) (common.MapStr, error) {
+	pipeline := beatsFinalPipeline
 
-	if len(config.DefaultPipeline.File) > 0 {
-		fileContents, err := ioutil.ReadFile(config.DefaultPipeline.File)
+	if len(config.FinalPipeline.File) > 0 {
+		fileContents, err := ioutil.ReadFile(config.FinalPipeline.File)
 		if err != nil {
-			return nil, fmt.Errorf("could not read pipeline file '%s'. Error: %v", config.DefaultPipeline.File, err)
+			return nil, fmt.Errorf("could not read pipeline file '%s'. Error: %v", config.FinalPipeline.File, err)
 		}
 
-		pipeline, err = commonP.UnmarshalPipeline(config.DefaultPipeline.File, fileContents)
+		pipeline, err = commonP.UnmarshalPipeline(config.FinalPipeline.File, fileContents)
 		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal pipeline file '%s'. Error: %v", config.DefaultPipeline.File, err)
+			return nil, fmt.Errorf("could not unmarshal pipeline file '%s'. Error: %v", config.FinalPipeline.File, err)
 		}
 	}
 
@@ -147,7 +147,7 @@ func getDefaultPipeline(config TemplateConfig) (common.MapStr, error) {
 func (l *ESLoader) loadIngestPipeline(pipelineName string, config TemplateConfig) error {
 	logp.Info("Try loading ingest pipeline '%s' into Elasticsearch", pipelineName)
 
-	pipeline, err := getDefaultPipeline(config)
+	pipeline, err := getFinalPipeline(config)
 	if err != nil {
 		return err
 	}
@@ -160,16 +160,19 @@ func (l *ESLoader) loadIngestPipeline(pipelineName string, config TemplateConfig
 	return nil
 }
 
-// ingestPipelineExists checks if the default ingest pipeline already exists.
+// ingestPipelineExists checks if the final ingest pipeline already exists.
 func (l *ESLoader) ingestPipelineExists(name string) (bool, error) {
 	if l.client == nil {
 		return false, nil
 	}
 
 	status, body, err := l.client.Request("GET", esIngestPipelinePath+name, "", nil, nil)
-	if status != http.StatusOK || err != nil {
+	if status == http.StatusNotFound {
+		return false, nil
+	} else if status == http.StatusOK && err == nil {
+		return strings.Contains(string(body), name), nil
+	} else {
 		return false, fmt.Errorf("failed to check if ingest pipeline '%s' exists. Status: %v. Error: %v. Response body: %s",
 			name, status, err, body)
 	}
-	return strings.Contains(string(body), name), nil
 }

@@ -1763,17 +1763,17 @@ setup.template.settings:
   #_source:
     #enabled: false
 
-# Set to false to disable using a default pipeline.
-#setup.template.default_pipeline.enabled: true
+# Set to false to disable using a final pipeline.
+#setup.template.final_pipeline.enabled: true
 
-# Overwrite any existing default pipeline.
-#setup.template.default_pipeline.overwrite: false
+# Overwrite any existing final pipeline.
+#setup.template.final_pipeline.overwrite: false
 
-# Specify a custom name for the default pipeline.
-#setup.template.default_pipeline.name: "%{[agent.name]}-%{[agent.version]}"
+# Specify a custom name for the final pipeline.
+#setup.template.final_pipeline.name: "%{[agent.name]}-%{[agent.version]}"
 
-# Load a custom default pipeline from a file.
-#setup.template.default_pipeline.file:
+# Load a custom final pipeline from a file.
+#setup.template.final_pipeline.file:
 
 #============================== Setup ILM =====================================
 
