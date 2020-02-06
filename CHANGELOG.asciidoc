@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 - Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
+- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 
 *Filebeat*
 
@@ -40,10 +41,8 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
 - Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
-- Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516[$15516]
-- Do not load dashboards where not available. {pull}15802[15802]
-- Update replicaset group to apps/v1 {pull}15854[15802]
+- Beats no longer attempts to load dashboards if they are unavailable. {pull}15802[15802]
 
 *Auditbeat*
 
@@ -61,14 +60,14 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 - Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
-- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
+- Add shared_credential_file to cloudtrail config. {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
 
 *Heartbeat*
 
-- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
+- Fix excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Metricbeat*
 
