@@ -22,7 +22,7 @@ SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
-MAGE_IMPORT_PATH?=github.com/elastic/beats/vendor/github.com/magefile/mage
+MAGE_IMPORT_PATH?=github.com/magefile/mage
 export MAGE_IMPORT_PATH
 
 space:=$() #

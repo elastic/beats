@@ -383,6 +383,9 @@ github.com/elastic/go-libaudit/aucoalesce
 github.com/elastic/go-libaudit/auparse
 github.com/elastic/go-libaudit/rule
 github.com/elastic/go-libaudit/rule/flags
+# github.com/elastic/go-licenser v0.2.1
+github.com/elastic/go-licenser
+github.com/elastic/go-licenser/licensing
 # github.com/elastic/go-lookslike v0.3.0
 github.com/elastic/go-lookslike
 github.com/elastic/go-lookslike/internal/llreflect
@@ -564,7 +567,11 @@ github.com/lib/pq
 github.com/lib/pq/oid
 github.com/lib/pq/scram
 # github.com/magefile/mage v1.9.0
+github.com/magefile/mage
+github.com/magefile/mage/internal
+github.com/magefile/mage/mage
 github.com/magefile/mage/mg
+github.com/magefile/mage/parse
 github.com/magefile/mage/sh
 github.com/magefile/mage/target
 # github.com/mattn/go-colorable v0.0.8
@@ -600,7 +607,9 @@ github.com/opencontainers/runc/libcontainer/user
 # github.com/pierrec/lz4 v2.2.6+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
-# github.com/pkg/errors v0.8.1
+# github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
+github.com/pierrre/gotestcover
+# github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
@@ -644,6 +653,8 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
+# github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f
+github.com/tsg/go-daemon
 # github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 github.com/tsg/gopacket
 github.com/tsg/gopacket/afpacket
@@ -803,6 +814,7 @@ golang.org/x/text/unicode/norm
 golang.org/x/time/rate
 # golang.org/x/tools v0.0.0-20191115202509-3a792d9c32b2
 golang.org/x/tools/cmd/goimports
+golang.org/x/tools/cmd/stringer
 golang.org/x/tools/go/analysis
 golang.org/x/tools/go/analysis/passes/inspect
 golang.org/x/tools/go/ast/astutil

@@ -37,9 +37,10 @@ func InstallVendored(importPath string) error {
 		return errors.Wrap(err, "failed to obtain beats repository path")
 	}
 
-	get := gotool.Get
-	return get(
-		get.Package(filepath.Join(beatDir, "vendor", importPath)),
+	install := gotool.Install
+	return install(
+		install.Vendored(),
+		install.Package(filepath.Join(beatDir, "vendor", importPath)),
 	)
 }
 
