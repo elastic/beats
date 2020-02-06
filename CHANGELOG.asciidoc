@@ -13,8 +13,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
-- Libbeat: Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
-- Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
+- Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
 
 *Filebeat*
 
@@ -40,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+- Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
 
 *Filebeat*
 
@@ -78,7 +78,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
-- Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
+- Add support to kubernetes autodiscovery to add additional metadata from other source to events. {pull}14875[14875]
 - Update to ECS 1.4.0. {pull}14844[14844]
 
 *Filebeat*
@@ -227,7 +227,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 *Affecting all Beats*
 
 - Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
-- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files. {pull}13374[13374]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 - Use less restrictive API to check if template exists. {pull}13847[13847]
 - Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
