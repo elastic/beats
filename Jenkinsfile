@@ -480,7 +480,7 @@ def makeTarget(context, target, clean = true){
   withGithubNotify(context: "${context}") {
     sh(label: "Make ${target}", script: "make ${target}")
     if(clean) {
-      sh(script: 'script/fix_permissions.sh $(pwd)/build')
+      sh(script: 'script/fix_permissions.sh ${HOME}')
     }
   }
 }
