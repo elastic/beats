@@ -19,7 +19,6 @@ package log
 
 import (
 	"io"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -45,7 +44,7 @@ func NewLog(
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
 		var err error
-		offset, err = seeker.Seek(0, os.SEEK_CUR)
+		offset, err = seeker.Seek(0, io.SeekCurrent)
 		if err != nil {
 			return nil, err
 		}

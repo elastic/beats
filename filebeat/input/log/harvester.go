@@ -566,12 +566,12 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	// continue from last known offset
 	if h.state.Offset > 0 {
 		logp.Debug("harvester", "Set previous offset for file: %s. Offset: %d ", h.state.Source, h.state.Offset)
-		return file.Seek(h.state.Offset, os.SEEK_SET)
+		return file.Seek(h.state.Offset, io.SeekStart)
 	}
 
 	// get offset from file in case of encoding factory was required to read some data.
 	logp.Debug("harvester", "Setting offset for file based on seek: %s", h.state.Source)
-	return file.Seek(0, os.SEEK_CUR)
+	return file.Seek(0, io.SeekCurrent)
 }
 
 // getState returns an updated copy of the harvester state
