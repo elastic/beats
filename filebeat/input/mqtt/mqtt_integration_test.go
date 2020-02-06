@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// + build integration
 
 package mqtt
 
@@ -90,7 +90,7 @@ func TestInput(t *testing.T) {
 	})
 
 	// Route input events through our captor instead of sending through ES.
-	eventsCh := make(chan beat.Event)
+	eventsCh := make(chan beat.Event, 100)
 	defer close(eventsCh)
 
 	captor := newEventCaptor(eventsCh)
@@ -140,7 +140,8 @@ func createPublisher(t *testing.T) libmqtt.Client {
 }
 
 func verifyEventReceived(t *testing.T, wg *sync.WaitGroup, eventsCh <-chan beat.Event) <-chan struct{} {
-	verifiedCh := make(chan struct{})
+	verifiedCh := make(chan struct{}, 1)
+
 	go func() {
 		event := <-eventsCh
 
@@ -157,7 +158,7 @@ func verifyEventReceived(t *testing.T, wg *sync.WaitGroup, eventsCh <-chan beat.
 
 func emitInputData(t *testing.T, wg *sync.WaitGroup, verifiedCh <-chan struct{}, publisher libmqtt.Client) {
 	go func() {
-		ticker := time.NewTicker(time.Second)
+		ticker := time.NewTicker(10 * time.Second)
 		defer ticker.Stop()
 
 		for {
