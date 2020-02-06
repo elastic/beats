@@ -38,7 +38,6 @@ import (
 
 const (
 	message      = "hello-world"
-	messageCount = 100
 
 	waitTimeout = 30 * time.Second
 )
