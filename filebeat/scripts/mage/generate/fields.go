@@ -15,32 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package generate
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/filebeat/generator/module"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	genfields "github.com/elastic/beats/filebeat/generator/fields"
 )
 
-func main() {
-	moduleName := flag.String("module", "", "Name of the module")
-	modulePath := flag.String("path", ".", "Path to the generated fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	flag.Parse()
+// Fields creates a new fields.yml for an existing Filebeat fileset.
+// Use MODULE=module to specify the name of the existing module
+// Use FILESET=fileset to specify the name of the existing fileset
+func Fields() error {
+	targetModule := os.Getenv("MODULE")
+	targetFileset := os.Getenv("FILESET")
 
-	if *moduleName == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
+	if targetModule == "" || targetFileset == "" {
+		return fmt.Errorf("you must specify the module and fileset: MODULE=module FILESET=fileset mage generate:fields")
 	}
 
-	err := module.Generate(*moduleName, *modulePath, *beatsPath)
-	if err != nil {
-		fmt.Printf("Cannot generate module: %v\n", err)
-		os.Exit(2)
-	}
+	curDir := devtools.CWD()
 
-	fmt.Println("New module was generated, now you can start creating filesets by create-fileset command.")
+	return genfields.Generate(curDir, targetModule, targetFileset, false)
 }

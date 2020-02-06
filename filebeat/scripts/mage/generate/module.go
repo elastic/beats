@@ -15,38 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package generate
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/filebeat/generator/fields"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	genmod "github.com/elastic/beats/filebeat/generator/module"
 )
 
-func main() {
-	module := flag.String("module", "", "Name of the module")
-	fileset := flag.String("fileset", "", "Name of the fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	noDoc := flag.Bool("nodoc", false, "Generate documentation for fields")
-	flag.Parse()
-
-	if *module == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
+// Module creates a new Filebeat module.
+// Use MODULE=module to specify the name of the new module
+func Module() error {
+	targetModule := os.Getenv("MODULE")
+	if targetModule == "" {
+		return fmt.Errorf("you must specify the module: MODULE=name mage generate:module")
 	}
 
-	if *fileset == "" {
-		fmt.Println("Missing parameter: fileset")
-		os.Exit(1)
-	}
+	ossDir := devtools.OSSBeatDir()
+	xPackDir := devtools.XPackBeatDir()
 
-	err := fields.Generate(*beatsPath, *module, *fileset, *noDoc)
-	if err != nil {
-		fmt.Printf("Error while generating fields.yml: %v\n", err)
-		os.Exit(2)
+	switch devtools.CWD() {
+	case ossDir:
+		return genmod.Generate(targetModule, ossDir, ossDir)
+	case xPackDir:
+		return genmod.Generate(targetModule, xPackDir, ossDir)
+	default:
+		return fmt.Errorf("you must be in a filebeat directory")
 	}
-
-	fmt.Printf("Fields.yml generated for %s/%s\n", *module, *fileset)
 }
