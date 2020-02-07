@@ -210,7 +210,7 @@ func getTestingElasticsearch(t TestLogger) *Connection {
 }
 
 func getURL() string {
-	return fmt.Sprintf("http://%v:%v", GetEsHost(), GetEsPort())
+	return fmt.Sprintf("http://%v:%v", getEsHost(), getEsPort())
 }
 
 func getEsHost() string {
