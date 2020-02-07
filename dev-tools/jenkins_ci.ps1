@@ -67,7 +67,7 @@ if (Test-Path "tests\system") {
     echo "Running python tests"
     choco install python -y -r --no-progress --version 3.8.1.20200110
     refreshenv
-    $env:PATH = "C:\\Python38;C:\\Python38\\Scripts;$env:PATH"
+    $env:PATH = "C:\Python38;C:\Python38\Scripts;$env:PATH"
     python --version
     exec { mage pythonUnitTest } "System test FAILURE"
 }
