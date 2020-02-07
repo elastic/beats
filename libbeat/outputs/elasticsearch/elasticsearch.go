@@ -18,7 +18,6 @@
 package elasticsearch
 
 import (
-	"fmt"
 	"net/url"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -145,98 +144,4 @@ func buildSelectors(
 	}
 
 	return index, pipeline, err
-}
-
-// NewConnectedClient creates a new Elasticsearch client based on the given config.
-// It uses the NewElasticsearchClients to create a list of clients then returns
-// the first from the list that successfully connects.
-func NewConnectedClient(cfg *common.Config) (*Client, error) {
-	clients, err := NewElasticsearchClients(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	errors := []string{}
-
-	for _, client := range clients {
-		err = client.Connect()
-		if err != nil {
-			client.Connection.log.Errorf("Error connecting to Elasticsearch at %v: %+v", client.Connection.URL, err)
-			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
-			errors = append(errors, err.Error())
-			continue
-		}
-		return &client, nil
-	}
-	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
-}
-
-// NewElasticsearchClients returns a list of Elasticsearch clients based on the given
-// configuration. It accepts the same configuration parameters as the output,
-// except for the output specific configuration options (index, pipeline,
-// template) .If multiple hosts are defined in the configuration, a client is returned
-// for each of them.
-func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
-	hosts, err := outputs.ReadHostList(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	config := defaultConfig
-	if err = cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	log := logp.NewLogger(logSelector)
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = esclientleg.ParseProxyURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-		if proxyURL != nil {
-			log.Infof("Using proxy URL: %s", proxyURL)
-		}
-	}
-
-	params := config.Params
-	if len(params) == 0 {
-		params = nil
-	}
-
-	clients := []Client{}
-	for _, host := range hosts {
-		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
-		if err != nil {
-			log.Errorf("Invalid host param set: %s, Error: %+v", host, err)
-			return nil, err
-		}
-
-		client, err := NewClient(ClientSettings{
-			URL:              esURL,
-			Proxy:            proxyURL,
-			ProxyDisable:     config.ProxyDisable,
-			TLS:              tlsConfig,
-			Username:         config.Username,
-			Password:         config.Password,
-			APIKey:           config.APIKey,
-			Parameters:       params,
-			Headers:          config.Headers,
-			Timeout:          config.Timeout,
-			CompressionLevel: config.CompressionLevel,
-		}, nil)
-		if err != nil {
-			return clients, err
-		}
-		clients = append(clients, *client)
-	}
-	if len(clients) == 0 {
-		return clients, fmt.Errorf("No hosts defined in the Elasticsearch output")
-	}
-	return clients, nil
 }
