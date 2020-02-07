@@ -23,11 +23,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/libbeat/esclientleg"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -250,15 +249,15 @@ func getMonitoringIndexName() string {
 }
 
 func logBulkFailures(log *logp.Logger, result esclientleg.BulkResult, events []report.Event) {
-	reader := esout.NewJSONReader(result)
-	err := esout.BulkReadToItems(reader)
+	reader := esclientleg.NewJSONReader(result)
+	err := esclientleg.BulkReadToItems(reader)
 	if err != nil {
 		log.Errorf("failed to parse monitoring bulk items: %+v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := esout.BulkReadItemStatus(log, reader)
+		status, msg, err := esclientleg.BulkReadItemStatus(log, reader)
 		if err != nil {
 			log.Errorf("failed to parse monitoring bulk item status: %+v", err)
 			return

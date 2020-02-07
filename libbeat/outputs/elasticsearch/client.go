@@ -18,7 +18,6 @@
 package elasticsearch
 
 import (
-	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -53,9 +52,6 @@ type Client struct {
 	// buffered bulk requests
 	bulkRequ *esclientleg.BulkRequest
 
-	// buffered json response reader
-	json JSONReader
-
 	// additional configs
 	compressionLevel int
 	proxyURL         *url.URL
@@ -84,21 +80,6 @@ type ClientSettings struct {
 // ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
 type ConnectCallback func(client *Client) error
 
-type bulkIndexAction struct {
-	Index bulkEventMeta `json:"index" struct:"index"`
-}
-
-type bulkCreateAction struct {
-	Create bulkEventMeta `json:"create" struct:"create"`
-}
-
-type bulkEventMeta struct {
-	Index    string `json:"_index" struct:"_index"`
-	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
-	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
-	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
-}
-
 type bulkResultStats struct {
 	acked        int // number of events ACKed by Elasticsearch
 	duplicates   int // number of events failed with `create` due to ID already being indexed
@@ -106,21 +87,6 @@ type bulkResultStats struct {
 	nonIndexable int // number of failed events (not indexable -> must be dropped)
 	tooMany      int // number of events receiving HTTP 429 Too Many Requests
 }
-
-var (
-	nameItems  = []byte("items")
-	nameStatus = []byte("status")
-	nameError  = []byte("error")
-)
-
-var (
-	errExpectedItemsArray    = errors.New("expected items array")
-	errExpectedItemObject    = errors.New("expected item response object")
-	errExpectedStatusCode    = errors.New("expected item status code")
-	errUnexpectedEmptyObject = errors.New("empty object")
-	errExpectedObjectEnd     = errors.New("expected end of object")
-	errTempBulkFailure       = errors.New("temporary bulk send failure")
-)
 
 const (
 	defaultEventType = "doc"
@@ -321,7 +287,7 @@ func (client *Client) publishEvents(
 	}
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(client.Connection.log, client.GetVersion(), body, client.index, client.pipeline, eventType, data)
+	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -349,8 +315,7 @@ func (client *Client) publishEvents(
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		client.json.init(result)
-		failedEvents, stats = bulkCollectPublishFails(client.Connection.log, &client.json, data)
+		failedEvents, stats = bulkCollectPublishFails(result, data)
 	}
 
 	failed := len(failedEvents)
@@ -368,7 +333,7 @@ func (client *Client) publishEvents(
 
 	if failed > 0 {
 		if sendErr == nil {
-			sendErr = errTempBulkFailure
+			sendErr = esclientleg.ErrTempBulkFailure
 		}
 		return failedEvents, sendErr
 	}
@@ -435,7 +400,7 @@ func createEventBulkMeta(
 		}
 	}
 
-	meta := bulkEventMeta{
+	meta := esclientleg.BulkMeta{
 		Index:    index,
 		DocType:  eventType,
 		Pipeline: pipeline,
@@ -443,9 +408,9 @@ func createEventBulkMeta(
 	}
 
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		return bulkCreateAction{meta}, nil
+		return esclientleg.BulkCreateAction{meta}, nil
 	}
-	return bulkIndexAction{meta}, nil
+	return esclientleg.BulkIndexAction{meta}, nil
 }
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
@@ -470,11 +435,12 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // the event will be dropped.
 func bulkCollectPublishFails(
 	log *logp.Logger,
-	reader *JSONReader,
+	result esclientleg.BulkResult,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
-	if err := BulkReadToItems(reader); err != nil {
-		log.Errorf("failed to parse bulk response: %+v", err)
+	reader := esclientleg.NewJSONReader(result)
+	if err := esclientleg.BulkReadToItems(reader); err != nil {
+		log.Errorf("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
 
@@ -482,7 +448,7 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := BulkReadItemStatus(log, reader)
+		status, msg, err := esclientleg.BulkReadItemStatus(log, reader)
 		if err != nil {
 			log.Error(err)
 			return nil, bulkResultStats{}
@@ -517,121 +483,6 @@ func bulkCollectPublishFails(
 	}
 
 	return failed, stats
-}
-
-// BulkReadToItems reads the bulk response up to (but not including) items
-func BulkReadToItems(reader *JSONReader) error {
-	if err := reader.ExpectDict(); err != nil {
-		return errExpectedObject
-	}
-
-	// find 'items' field in response
-	for {
-		kind, name, err := reader.nextFieldName()
-		if err != nil {
-			return err
-		}
-
-		if kind == dictEnd {
-			return errExpectedItemsArray
-		}
-
-		// found items array -> continue
-		if bytes.Equal(name, nameItems) {
-			break
-		}
-
-		reader.ignoreNext()
-	}
-
-	// check items field is an array
-	if err := reader.ExpectArray(); err != nil {
-		return errExpectedItemsArray
-	}
-
-	return nil
-}
-
-// BulkReadItemStatus reads the status and error fields from the bulk item
-func BulkReadItemStatus(log *logp.Logger, reader *JSONReader) (int, []byte, error) {
-	// skip outer dictionary
-	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
-	}
-
-	// find first field in outer dictionary (e.g. 'create')
-	kind, _, err := reader.nextFieldName()
-	parserErr := func(err error) error {
-		return errors.Wrapf(err, "Failed to parse bulk response item")
-	}
-	if err != nil {
-		return 0, nil, parserErr(err)
-	}
-	if kind == dictEnd {
-		err = errUnexpectedEmptyObject
-		return 0, nil, parserErr(err)
-	}
-
-	// parse actual item response code and error message
-	status, msg, err := itemStatusInner(log, reader)
-	if err != nil {
-		return 0, nil, parserErr(err)
-	}
-
-	// close dictionary. Expect outer dictionary to have only one element
-	kind, _, err = reader.step()
-	if err != nil {
-		return 0, nil, parserErr(err)
-	}
-	if kind != dictEnd {
-		err = errExpectedObjectEnd
-		return 0, nil, parserErr(err)
-	}
-
-	return status, msg, nil
-}
-
-func itemStatusInner(log *logp.Logger, reader *JSONReader) (int, []byte, error) {
-	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
-	}
-
-	status := -1
-	var msg []byte
-	for {
-		kind, name, err := reader.nextFieldName()
-		if err != nil {
-			log.Errorf("Failed to parse bulk response item: %+v", err)
-		}
-		if kind == dictEnd {
-			break
-		}
-
-		switch {
-		case bytes.Equal(name, nameStatus): // name == "status"
-			status, err = reader.nextInt()
-			if err != nil {
-				return 0, nil, err
-			}
-
-		case bytes.Equal(name, nameError): // name == "error"
-			msg, err = reader.ignoreNext() // collect raw string for "error" field
-			if err != nil {
-				return 0, nil, err
-			}
-
-		default: // ignore unknown fields
-			_, err = reader.ignoreNext()
-			if err != nil {
-				return 0, nil, err
-			}
-		}
-	}
-
-	if status < 0 {
-		return 0, nil, errExpectedStatusCode
-	}
-	return status, msg, nil
 }
 
 // LoadJSON creates a PUT request based on a JSON document.

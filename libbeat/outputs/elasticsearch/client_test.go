@@ -40,57 +40,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
-func readStatusItem(in []byte) (int, string, error) {
-	reader := NewJSONReader(in)
-	code, msg, err := BulkReadItemStatus(logp.L(), reader)
-	return code, string(msg), err
-}
-
-func TestESNoErrorStatus(t *testing.T) {
-	response := []byte(`{"create": {"status": 200}}`)
-	code, msg, err := readStatusItem(response)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 200, code)
-	assert.Equal(t, "", msg)
-}
-
-func TestES1StyleErrorStatus(t *testing.T) {
-	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
-	code, msg, err := readStatusItem(response)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
-	assert.Equal(t, `"test error"`, msg)
-}
-
-func TestES2StyleErrorStatus(t *testing.T) {
-	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
-	code, msg, err := readStatusItem(response)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
-	assert.Equal(t, `{"reason": "test_error"}`, msg)
-}
-
-func TestES2StyleExtendedErrorStatus(t *testing.T) {
-	response := []byte(`
-    {
-      "create": {
-        "status": 400,
-        "error": {
-          "reason": "test_error",
-          "transient": false,
-          "extra": null
-        }
-      }
-    }`)
-	code, _, err := readStatusItem(response)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
-}
-
 func TestCollectPublishFailsNone(t *testing.T) {
 	N := 100
 	item := `{"create": {"status": 200}},`
@@ -102,8 +51,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
-	reader := NewJSONReader(response)
-	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+	res, _ := bulkCollectPublishFails(logp.L(), response, events)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -120,8 +68,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	reader := NewJSONReader(response)
-	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
+	res, stats := bulkCollectPublishFails(logp.L(), response, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
@@ -141,8 +88,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := NewJSONReader(response)
-	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
+	res, stats := bulkCollectPublishFails(logp.L(), response, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
@@ -183,8 +129,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event}
 
-	reader := NewJSONReader(response)
-	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+	res, _ := bulkCollectPublishFails(logp.L(), response, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
@@ -201,10 +146,8 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -224,10 +167,8 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -246,10 +187,8 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
 		if len(res) != 3 {
 			b.Fail()
 		}
@@ -401,56 +340,4 @@ func TestClientWithAPIKey(t *testing.T) {
 
 	client.Ping()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
-}
-
-func TestBulkReadToItems(t *testing.T) {
-	response := []byte(`{
-		"errors": false,
-		"items": [
-			{"create": {"status": 200}},
-			{"create": {"status": 300}},
-			{"create": {"status": 400}}
-    ]}`)
-
-	reader := NewJSONReader(response)
-
-	err := BulkReadToItems(reader)
-	assert.NoError(t, err)
-
-	for status := 200; status <= 400; status += 100 {
-		err = reader.ExpectDict()
-		assert.NoError(t, err)
-
-		kind, raw, err := reader.nextFieldName()
-		assert.NoError(t, err)
-		assert.Equal(t, mapKeyEntity, kind)
-		assert.Equal(t, []byte("create"), raw)
-
-		err = reader.ExpectDict()
-		assert.NoError(t, err)
-
-		kind, raw, err = reader.nextFieldName()
-		assert.NoError(t, err)
-		assert.Equal(t, mapKeyEntity, kind)
-		assert.Equal(t, []byte("status"), raw)
-
-		code, err := reader.nextInt()
-		assert.NoError(t, err)
-		assert.Equal(t, status, code)
-
-		_, _, err = reader.endDict()
-		assert.NoError(t, err)
-
-		_, _, err = reader.endDict()
-		assert.NoError(t, err)
-	}
-}
-
-func TestBulkReadItemStatus(t *testing.T) {
-	response := []byte(`{"create": {"status": 200}}`)
-
-	reader := NewJSONReader(response)
-	code, _, err := BulkReadItemStatus(logp.L(), reader)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, code)
 }
