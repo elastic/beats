@@ -172,8 +172,8 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestConnection(url string) Connection {
-	return Connection{
+func newTestConnection(url string) *Connection {
+	return NewConnection(ConnectionSettings{
 		URL: url,
 		HTTP: &http.Client{
 			Transport: &http.Transport{
@@ -182,7 +182,7 @@ func newTestConnection(url string) Connection {
 			Timeout: 0,
 		},
 		Encoder: NewJSONEncoder(nil, false),
-	}
+	})
 }
 
 func (r QueryResult) String() string {
