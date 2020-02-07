@@ -446,7 +446,6 @@ func bulkEncodePublishRequest(
 	pipeline *outil.Selector,
 	eventType string,
 	data []publisher.Event,
-	logger *logp.Logger,
 ) []publisher.Event {
 	okEvents := data[:0]
 	for i := range data {
