@@ -20,6 +20,8 @@ package esclientleg
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,7 +72,7 @@ func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 
 	reader := NewJSONReader(response)
-	code, _, err := BulkReadItemStatus(reader)
+	code, _, err := BulkReadItemStatus(reader, testLogger())
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
@@ -122,6 +124,10 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
 
 func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
-	code, msg, err := BulkReadItemStatus(reader)
+	code, msg, err := BulkReadItemStatus(reader, testLogger())
 	return code, string(msg), err
+}
+
+func testLogger() *logp.Logger {
+	return logp.NewLogger("test_esclientleg")
 }
