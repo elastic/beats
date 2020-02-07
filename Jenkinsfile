@@ -40,6 +40,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
+    booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
   }
   stages {
     stage('Checkout') {
@@ -57,6 +58,7 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
@@ -174,6 +176,9 @@ def k8sTest(Map args = [:]) {
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
                 sh(label: 'Delete cluster', script: 'kind delete cluster')
+              }
+              steps {
+                mageTargetWin("Functionbeat Windows Unit test", "-d x-pack/functionbeat goUnitTest")
               }
             }
           }
@@ -633,8 +638,76 @@ class GetProjectDependencies extends co.elastic.beats.BeatsFunction {
 }
 
 def isChanged(patterns){
-  return (params.runAllStages
+  return (
+    params.runAllStages
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
-    || isGitRegionMatch(patterns: ["^libbeat/.*"], comparator: 'regexp')
   )
+}
+
+def loadConfigEnvVars(){
+  env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
+  env.BUILD_AUDITBEAT_XPACK = isChanged([
+    "^auditbeat/.*",
+    "^x-pack/auditbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChanged([
+    "^x-pack/dockerlogbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_DOCS = isChanged(
+    patterns: ["^docs/.*"],
+    comparator: 'regexp'
+  )
+  env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
+  env.BUILD_FILEBEAT_XPACK = isChanged([
+    "^filebeat/.*",
+    "^x-pack/filebeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_FUNCTIONBEAT_XPACK = isChanged([
+    "^x-pack/functionbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
+  env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
+  env.BUILD_HEARTBEAT_XPACK = isChanged([
+    "^heartbeat/.*",
+    "^x-pack/heartbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
+  env.BUILD_JOURNALBEAT_XPACK = isChanged([
+    "^journalbeat/.*",
+    "^x-pack/journalbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+  env.BUILD_LIBBEAT = isChanged(
+    patterns: ["^libbeat/.*"],
+    comparator: 'regexp'
+  )
+  env.BUILD_LIBBEAT_XPACK = isChanged([
+    "^libbeat/.*",
+    "^x-pack/libbeat/.*",
+  ])
+  env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = isChanged([
+    "^metricbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/metricbeat/.*",
+  ])
+  env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
+  env.BUILD_PACKETBEAT_XPACK = isChanged([
+    "^packetbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/packetbeat/.*",
+  ])
+  env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+  env.BUILD_WINLOGBEAT_XPACK = isChanged([
+    "^winlogbeat/.*",
+    "^x-pack/libbeat/.*",
+    "^x-pack/winlogbeat/.*",
+  ])
+  env.GO_VERSION = readFile(".go-version").trim()
 }
