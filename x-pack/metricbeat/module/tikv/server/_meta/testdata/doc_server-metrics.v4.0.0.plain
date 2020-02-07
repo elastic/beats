@@ -1,0 +1,1589 @@
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 6.51
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 82920
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 201
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 521928704
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1580842273.81
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1395716096
+# HELP tikv_allocator_stats Allocator stats
+# TYPE tikv_allocator_stats gauge
+tikv_allocator_stats{type="active"} 519110656
+tikv_allocator_stats{type="allocated"} 511441472
+tikv_allocator_stats{type="dirty"} 130464656
+tikv_allocator_stats{type="fragmentation"} 7669184
+tikv_allocator_stats{type="mapped"} 765173760
+tikv_allocator_stats{type="metadata"} 10900592
+tikv_allocator_stats{type="resident"} 660475904
+tikv_allocator_stats{type="retained"} 284450816
+# HELP tikv_config_raftstore Config information of raftstore
+# TYPE tikv_config_raftstore gauge
+tikv_config_raftstore{name="abnormal_leader_missing_duration"} 600
+tikv_config_raftstore{name="allow_remove_leader"} 0
+tikv_config_raftstore{name="apply_max_batch_size"} 1024
+tikv_config_raftstore{name="apply_pool_size"} 2
+tikv_config_raftstore{name="capacity"} 0
+tikv_config_raftstore{name="clean_stale_peer_delay"} 660
+tikv_config_raftstore{name="cleanup_import_sst_interval"} 600
+tikv_config_raftstore{name="consistency_check_interval_seconds"} 0
+tikv_config_raftstore{name="future_poll_size"} 1
+tikv_config_raftstore{name="leader_transfer_max_log_lag"} 10
+tikv_config_raftstore{name="local_read_batch_size"} 1024
+tikv_config_raftstore{name="lock_cf_compact_bytes_threshold"} 268435456
+tikv_config_raftstore{name="lock_cf_compact_interval"} 600
+tikv_config_raftstore{name="max_leader_missing_duration"} 7200
+tikv_config_raftstore{name="max_peer_down_duration"} 300
+tikv_config_raftstore{name="merge_check_tick_interval"} 10
+tikv_config_raftstore{name="merge_max_log_gap"} 10
+tikv_config_raftstore{name="messages_per_tick"} 4096
+tikv_config_raftstore{name="notify_capacity"} 40960
+tikv_config_raftstore{name="pd_heartbeat_tick_interval"} 60
+tikv_config_raftstore{name="pd_store_heartbeat_tick_interval"} 10
+tikv_config_raftstore{name="peer_stale_state_check_interval"} 300
+tikv_config_raftstore{name="prevote"} 1
+tikv_config_raftstore{name="raft_base_tick_interval"} 1
+tikv_config_raftstore{name="raft_election_timeout_ticks"} 10
+tikv_config_raftstore{name="raft_entry_cache_life_time"} 30
+tikv_config_raftstore{name="raft_entry_max_size"} 8388608
+tikv_config_raftstore{name="raft_heartbeat_ticks"} 2
+tikv_config_raftstore{name="raft_log_gc_count_limit"} 73728
+tikv_config_raftstore{name="raft_log_gc_size_limit"} 75497472
+tikv_config_raftstore{name="raft_log_gc_threshold"} 50
+tikv_config_raftstore{name="raft_log_gc_tick_interval"} 10
+tikv_config_raftstore{name="raft_max_election_timeout_ticks"} 20
+tikv_config_raftstore{name="raft_max_inflight_msgs"} 256
+tikv_config_raftstore{name="raft_max_size_per_msg"} 1048576
+tikv_config_raftstore{name="raft_min_election_timeout_ticks"} 10
+tikv_config_raftstore{name="raft_reject_transfer_leader_duration"} 3
+tikv_config_raftstore{name="raft_store_max_leader_lease"} 9
+tikv_config_raftstore{name="region_compact_check_interval"} 300
+tikv_config_raftstore{name="region_compact_check_step"} 100
+tikv_config_raftstore{name="region_compact_min_tombstones"} 10000
+tikv_config_raftstore{name="region_compact_tombstones_percent"} 30
+tikv_config_raftstore{name="region_split_check_diff"} 6291456
+tikv_config_raftstore{name="report_region_flow_interval"} 60
+tikv_config_raftstore{name="right_derive_when_split"} 1
+tikv_config_raftstore{name="snap_apply_batch_size"} 10485760
+tikv_config_raftstore{name="snap_gc_timeout"} 14400
+tikv_config_raftstore{name="snap_mgr_gc_tick_interval"} 60
+tikv_config_raftstore{name="split_region_check_tick_interval"} 10
+tikv_config_raftstore{name="store_max_batch_size"} 1024
+tikv_config_raftstore{name="store_pool_size"} 2
+tikv_config_raftstore{name="sync_log"} 1
+tikv_config_raftstore{name="use_delete_range"} 0
+# HELP tikv_config_rocksdb Config information of rocksdb
+# TYPE tikv_config_rocksdb gauge
+tikv_config_rocksdb{cf="default",name="block_based_bloom_filter"} 0
+tikv_config_rocksdb{cf="default",name="block_cache_size"} 8324644864
+tikv_config_rocksdb{cf="default",name="block_size"} 65536
+tikv_config_rocksdb{cf="default",name="bloom_filter_bits_per_key"} 10
+tikv_config_rocksdb{cf="default",name="cache_index_and_filter_blocks"} 1
+tikv_config_rocksdb{cf="default",name="disable_auto_compactions"} 0
+tikv_config_rocksdb{cf="default",name="disable_block_cache"} 0
+tikv_config_rocksdb{cf="default",name="dynamic_level_bytes"} 1
+tikv_config_rocksdb{cf="default",name="enable_doubly_skiplist"} 1
+tikv_config_rocksdb{cf="default",name="force_consistency_checks"} 1
+tikv_config_rocksdb{cf="default",name="hard_pending_compaction_bytes_limit"} 274877906944
+tikv_config_rocksdb{cf="default",name="level0_file_num_compaction_trigger"} 4
+tikv_config_rocksdb{cf="default",name="level0_slowdown_writes_trigger"} 20
+tikv_config_rocksdb{cf="default",name="level0_stop_writes_trigger"} 36
+tikv_config_rocksdb{cf="default",name="max_bytes_for_level_base"} 536870912
+tikv_config_rocksdb{cf="default",name="max_bytes_for_level_multiplier"} 10
+tikv_config_rocksdb{cf="default",name="max_compaction_bytes"} 2147483648
+tikv_config_rocksdb{cf="default",name="max_write_buffer_number"} 5
+tikv_config_rocksdb{cf="default",name="min_write_buffer_number_to_merge"} 1
+tikv_config_rocksdb{cf="default",name="num_levels"} 7
+tikv_config_rocksdb{cf="default",name="optimize_filters_for_hits"} 1
+tikv_config_rocksdb{cf="default",name="pin_l0_filter_and_index_blocks"} 1
+tikv_config_rocksdb{cf="default",name="read_amp_bytes_per_bit"} 0
+tikv_config_rocksdb{cf="default",name="soft_pending_compaction_bytes_limit"} 68719476736
+tikv_config_rocksdb{cf="default",name="target_file_size_base"} 8388608
+tikv_config_rocksdb{cf="default",name="titan_blob_cache_size"} 0
+tikv_config_rocksdb{cf="default",name="titan_discardable_ratio"} 0.5
+tikv_config_rocksdb{cf="default",name="titan_max_gc_batch_size"} 67108864
+tikv_config_rocksdb{cf="default",name="titan_merge_small_file_threshold"} 8388608
+tikv_config_rocksdb{cf="default",name="titan_min_blob_size"} 1024
+tikv_config_rocksdb{cf="default",name="titan_min_gc_batch_size"} 16777216
+tikv_config_rocksdb{cf="default",name="titan_sample_ratio"} 0.1
+tikv_config_rocksdb{cf="default",name="use_bloom_filter"} 1
+tikv_config_rocksdb{cf="default",name="whole_key_filtering"} 1
+tikv_config_rocksdb{cf="default",name="write_buffer_size"} 134217728
+tikv_config_rocksdb{cf="lock",name="block_based_bloom_filter"} 0
+tikv_config_rocksdb{cf="lock",name="block_cache_size"} 665845760
+tikv_config_rocksdb{cf="lock",name="block_size"} 16384
+tikv_config_rocksdb{cf="lock",name="bloom_filter_bits_per_key"} 10
+tikv_config_rocksdb{cf="lock",name="cache_index_and_filter_blocks"} 1
+tikv_config_rocksdb{cf="lock",name="disable_auto_compactions"} 0
+tikv_config_rocksdb{cf="lock",name="disable_block_cache"} 0
+tikv_config_rocksdb{cf="lock",name="dynamic_level_bytes"} 1
+tikv_config_rocksdb{cf="lock",name="enable_doubly_skiplist"} 1
+tikv_config_rocksdb{cf="lock",name="force_consistency_checks"} 1
+tikv_config_rocksdb{cf="lock",name="hard_pending_compaction_bytes_limit"} 274877906944
+tikv_config_rocksdb{cf="lock",name="level0_file_num_compaction_trigger"} 1
+tikv_config_rocksdb{cf="lock",name="level0_slowdown_writes_trigger"} 20
+tikv_config_rocksdb{cf="lock",name="level0_stop_writes_trigger"} 36
+tikv_config_rocksdb{cf="lock",name="max_bytes_for_level_base"} 134217728
+tikv_config_rocksdb{cf="lock",name="max_bytes_for_level_multiplier"} 10
+tikv_config_rocksdb{cf="lock",name="max_compaction_bytes"} 2147483648
+tikv_config_rocksdb{cf="lock",name="max_write_buffer_number"} 5
+tikv_config_rocksdb{cf="lock",name="min_write_buffer_number_to_merge"} 1
+tikv_config_rocksdb{cf="lock",name="num_levels"} 7
+tikv_config_rocksdb{cf="lock",name="optimize_filters_for_hits"} 0
+tikv_config_rocksdb{cf="lock",name="pin_l0_filter_and_index_blocks"} 1
+tikv_config_rocksdb{cf="lock",name="read_amp_bytes_per_bit"} 0
+tikv_config_rocksdb{cf="lock",name="soft_pending_compaction_bytes_limit"} 68719476736
+tikv_config_rocksdb{cf="lock",name="target_file_size_base"} 8388608
+tikv_config_rocksdb{cf="lock",name="titan_blob_cache_size"} 0
+tikv_config_rocksdb{cf="lock",name="titan_discardable_ratio"} 0.5
+tikv_config_rocksdb{cf="lock",name="titan_max_gc_batch_size"} 67108864
+tikv_config_rocksdb{cf="lock",name="titan_merge_small_file_threshold"} 8388608
+tikv_config_rocksdb{cf="lock",name="titan_min_blob_size"} 1024
+tikv_config_rocksdb{cf="lock",name="titan_min_gc_batch_size"} 16777216
+tikv_config_rocksdb{cf="lock",name="titan_sample_ratio"} 0.1
+tikv_config_rocksdb{cf="lock",name="use_bloom_filter"} 1
+tikv_config_rocksdb{cf="lock",name="whole_key_filtering"} 1
+tikv_config_rocksdb{cf="lock",name="write_buffer_size"} 33554432
+tikv_config_rocksdb{cf="raft",name="block_based_bloom_filter"} 0
+tikv_config_rocksdb{cf="raft",name="block_cache_size"} 134217728
+tikv_config_rocksdb{cf="raft",name="block_size"} 16384
+tikv_config_rocksdb{cf="raft",name="bloom_filter_bits_per_key"} 10
+tikv_config_rocksdb{cf="raft",name="cache_index_and_filter_blocks"} 1
+tikv_config_rocksdb{cf="raft",name="disable_auto_compactions"} 0
+tikv_config_rocksdb{cf="raft",name="disable_block_cache"} 0
+tikv_config_rocksdb{cf="raft",name="dynamic_level_bytes"} 1
+tikv_config_rocksdb{cf="raft",name="enable_doubly_skiplist"} 1
+tikv_config_rocksdb{cf="raft",name="force_consistency_checks"} 1
+tikv_config_rocksdb{cf="raft",name="hard_pending_compaction_bytes_limit"} 274877906944
+tikv_config_rocksdb{cf="raft",name="level0_file_num_compaction_trigger"} 1
+tikv_config_rocksdb{cf="raft",name="level0_slowdown_writes_trigger"} 20
+tikv_config_rocksdb{cf="raft",name="level0_stop_writes_trigger"} 36
+tikv_config_rocksdb{cf="raft",name="max_bytes_for_level_base"} 134217728
+tikv_config_rocksdb{cf="raft",name="max_bytes_for_level_multiplier"} 10
+tikv_config_rocksdb{cf="raft",name="max_compaction_bytes"} 2147483648
+tikv_config_rocksdb{cf="raft",name="max_write_buffer_number"} 5
+tikv_config_rocksdb{cf="raft",name="min_write_buffer_number_to_merge"} 1
+tikv_config_rocksdb{cf="raft",name="num_levels"} 7
+tikv_config_rocksdb{cf="raft",name="optimize_filters_for_hits"} 1
+tikv_config_rocksdb{cf="raft",name="pin_l0_filter_and_index_blocks"} 1
+tikv_config_rocksdb{cf="raft",name="read_amp_bytes_per_bit"} 0
+tikv_config_rocksdb{cf="raft",name="soft_pending_compaction_bytes_limit"} 68719476736
+tikv_config_rocksdb{cf="raft",name="target_file_size_base"} 8388608
+tikv_config_rocksdb{cf="raft",name="titan_blob_cache_size"} 0
+tikv_config_rocksdb{cf="raft",name="titan_discardable_ratio"} 0.5
+tikv_config_rocksdb{cf="raft",name="titan_max_gc_batch_size"} 67108864
+tikv_config_rocksdb{cf="raft",name="titan_merge_small_file_threshold"} 8388608
+tikv_config_rocksdb{cf="raft",name="titan_min_blob_size"} 1024
+tikv_config_rocksdb{cf="raft",name="titan_min_gc_batch_size"} 16777216
+tikv_config_rocksdb{cf="raft",name="titan_sample_ratio"} 0.1
+tikv_config_rocksdb{cf="raft",name="use_bloom_filter"} 1
+tikv_config_rocksdb{cf="raft",name="whole_key_filtering"} 1
+tikv_config_rocksdb{cf="raft",name="write_buffer_size"} 134217728
+tikv_config_rocksdb{cf="write",name="block_based_bloom_filter"} 0
+tikv_config_rocksdb{cf="write",name="block_cache_size"} 4994367488
+tikv_config_rocksdb{cf="write",name="block_size"} 65536
+tikv_config_rocksdb{cf="write",name="bloom_filter_bits_per_key"} 10
+tikv_config_rocksdb{cf="write",name="cache_index_and_filter_blocks"} 1
+tikv_config_rocksdb{cf="write",name="disable_auto_compactions"} 0
+tikv_config_rocksdb{cf="write",name="disable_block_cache"} 0
+tikv_config_rocksdb{cf="write",name="dynamic_level_bytes"} 1
+tikv_config_rocksdb{cf="write",name="enable_doubly_skiplist"} 1
+tikv_config_rocksdb{cf="write",name="force_consistency_checks"} 1
+tikv_config_rocksdb{cf="write",name="hard_pending_compaction_bytes_limit"} 274877906944
+tikv_config_rocksdb{cf="write",name="level0_file_num_compaction_trigger"} 4
+tikv_config_rocksdb{cf="write",name="level0_slowdown_writes_trigger"} 20
+tikv_config_rocksdb{cf="write",name="level0_stop_writes_trigger"} 36
+tikv_config_rocksdb{cf="write",name="max_bytes_for_level_base"} 536870912
+tikv_config_rocksdb{cf="write",name="max_bytes_for_level_multiplier"} 10
+tikv_config_rocksdb{cf="write",name="max_compaction_bytes"} 2147483648
+tikv_config_rocksdb{cf="write",name="max_write_buffer_number"} 5
+tikv_config_rocksdb{cf="write",name="min_write_buffer_number_to_merge"} 1
+tikv_config_rocksdb{cf="write",name="num_levels"} 7
+tikv_config_rocksdb{cf="write",name="optimize_filters_for_hits"} 0
+tikv_config_rocksdb{cf="write",name="pin_l0_filter_and_index_blocks"} 1
+tikv_config_rocksdb{cf="write",name="read_amp_bytes_per_bit"} 0
+tikv_config_rocksdb{cf="write",name="soft_pending_compaction_bytes_limit"} 68719476736
+tikv_config_rocksdb{cf="write",name="target_file_size_base"} 8388608
+tikv_config_rocksdb{cf="write",name="titan_blob_cache_size"} 0
+tikv_config_rocksdb{cf="write",name="titan_discardable_ratio"} 0.5
+tikv_config_rocksdb{cf="write",name="titan_max_gc_batch_size"} 67108864
+tikv_config_rocksdb{cf="write",name="titan_merge_small_file_threshold"} 8388608
+tikv_config_rocksdb{cf="write",name="titan_min_blob_size"} 1024
+tikv_config_rocksdb{cf="write",name="titan_min_gc_batch_size"} 16777216
+tikv_config_rocksdb{cf="write",name="titan_sample_ratio"} 0.1
+tikv_config_rocksdb{cf="write",name="use_bloom_filter"} 1
+tikv_config_rocksdb{cf="write",name="whole_key_filtering"} 0
+tikv_config_rocksdb{cf="write",name="write_buffer_size"} 134217728
+# HELP tikv_engine_blob_file_read_micros_seconds Histogram of blob file read micros
+# TYPE tikv_engine_blob_file_read_micros_seconds gauge
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_average"} 0
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_max"} 0
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_median"} 0
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_percentile95"} 0
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_percentile99"} 0
+tikv_engine_blob_file_read_micros_seconds{db="kv",type="blob_file_read_micros_standard_deviation"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_average"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_max"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_median"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_percentile95"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_percentile99"} 0
+tikv_engine_blob_file_read_micros_seconds{db="raft",type="blob_file_read_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_file_sync_micros_seconds Histogram of blob file sync micros
+# TYPE tikv_engine_blob_file_sync_micros_seconds gauge
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_average"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_max"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_median"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_percentile95"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_percentile99"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="kv",type="blob_file_sync_micros_standard_deviation"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_average"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_max"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_median"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_percentile95"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_percentile99"} 0
+tikv_engine_blob_file_sync_micros_seconds{db="raft",type="blob_file_sync_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_file_synced Number of times blob file sync is done
+# TYPE tikv_engine_blob_file_synced counter
+tikv_engine_blob_file_synced{db="kv"} 0
+tikv_engine_blob_file_synced{db="raft"} 0
+# HELP tikv_engine_blob_file_write_micros_seconds Histogram of blob file write micros
+# TYPE tikv_engine_blob_file_write_micros_seconds gauge
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_average"} 0
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_max"} 0
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_median"} 0
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_percentile95"} 0
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_percentile99"} 0
+tikv_engine_blob_file_write_micros_seconds{db="kv",type="blob_file_write_micros_standard_deviation"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_average"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_max"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_median"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_percentile95"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_percentile99"} 0
+tikv_engine_blob_file_write_micros_seconds{db="raft",type="blob_file_write_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_flow_bytes Bytes and keys of blob read/written
+# TYPE tikv_engine_blob_flow_bytes counter
+tikv_engine_blob_flow_bytes{db="kv",type="bytes_read"} 0
+tikv_engine_blob_flow_bytes{db="kv",type="bytes_written"} 0
+tikv_engine_blob_flow_bytes{db="kv",type="keys_read"} 0
+tikv_engine_blob_flow_bytes{db="kv",type="keys_written"} 0
+tikv_engine_blob_flow_bytes{db="raft",type="bytes_read"} 0
+tikv_engine_blob_flow_bytes{db="raft",type="bytes_written"} 0
+tikv_engine_blob_flow_bytes{db="raft",type="keys_read"} 0
+tikv_engine_blob_flow_bytes{db="raft",type="keys_written"} 0
+# HELP tikv_engine_blob_gc_file_count Number of blob file involved in gc
+# TYPE tikv_engine_blob_gc_file_count counter
+tikv_engine_blob_gc_file_count{db="kv",type="gc_input_files_count"} 0
+tikv_engine_blob_gc_file_count{db="kv",type="gc_output_files_count"} 0
+tikv_engine_blob_gc_file_count{db="raft",type="gc_input_files_count"} 0
+tikv_engine_blob_gc_file_count{db="raft",type="gc_output_files_count"} 0
+# HELP tikv_engine_blob_gc_flow_bytes Bytes and keys of blob gc read/written
+# TYPE tikv_engine_blob_gc_flow_bytes counter
+tikv_engine_blob_gc_flow_bytes{db="kv",type="bytes_overwritten"} 0
+tikv_engine_blob_gc_flow_bytes{db="kv",type="bytes_read"} 0
+tikv_engine_blob_gc_flow_bytes{db="kv",type="bytes_relocated"} 0
+tikv_engine_blob_gc_flow_bytes{db="kv",type="bytes_written"} 0
+tikv_engine_blob_gc_flow_bytes{db="kv",type="keys_overwritten"} 0
+tikv_engine_blob_gc_flow_bytes{db="kv",type="keys_relocated"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="bytes_overwritten"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="bytes_read"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="bytes_relocated"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="bytes_written"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="keys_overwritten"} 0
+tikv_engine_blob_gc_flow_bytes{db="raft",type="keys_relocated"} 0
+# HELP tikv_engine_blob_gc_micros_seconds Histogram of blob gc micros
+# TYPE tikv_engine_blob_gc_micros_seconds gauge
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_average"} 0
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_max"} 0
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_median"} 0
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_percentile95"} 0
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_percentile99"} 0
+tikv_engine_blob_gc_micros_seconds{db="kv",type="blob_gc_micros_standard_deviation"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_average"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_max"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_median"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_percentile95"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_percentile99"} 0
+tikv_engine_blob_gc_micros_seconds{db="raft",type="blob_gc_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_key_size Histogram of blob key size
+# TYPE tikv_engine_blob_key_size gauge
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_average"} 0
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_max"} 0
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_median"} 0
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_percentile95"} 0
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_percentile99"} 0
+tikv_engine_blob_key_size{db="kv",type="blob_key_size_standard_deviation"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_average"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_max"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_median"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_percentile95"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_percentile99"} 0
+tikv_engine_blob_key_size{db="raft",type="blob_key_size_standard_deviation"} 0
+# HELP tikv_engine_blob_locate Number of calls to blob seek/next/prev
+# TYPE tikv_engine_blob_locate counter
+tikv_engine_blob_locate{db="kv",type="number_blob_next"} 0
+tikv_engine_blob_locate{db="kv",type="number_blob_prev"} 0
+tikv_engine_blob_locate{db="kv",type="number_blob_seek"} 0
+tikv_engine_blob_locate{db="raft",type="number_blob_next"} 0
+tikv_engine_blob_locate{db="raft",type="number_blob_prev"} 0
+tikv_engine_blob_locate{db="raft",type="number_blob_seek"} 0
+# HELP tikv_engine_blob_next_micros_seconds Histogram of blob read micros for calling next
+# TYPE tikv_engine_blob_next_micros_seconds gauge
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_average"} 0
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_max"} 0
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_median"} 0
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_percentile95"} 0
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_percentile99"} 0
+tikv_engine_blob_next_micros_seconds{db="kv",type="blob_next_micros_standard_deviation"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_average"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_max"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_median"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_percentile95"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_percentile99"} 0
+tikv_engine_blob_next_micros_seconds{db="raft",type="blob_next_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_prev_micros_seconds Histogram of blob read micros for calling prev
+# TYPE tikv_engine_blob_prev_micros_seconds gauge
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_average"} 0
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_max"} 0
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_median"} 0
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_percentile95"} 0
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_percentile99"} 0
+tikv_engine_blob_prev_micros_seconds{db="kv",type="blob_prev_micros_standard_deviation"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_average"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_max"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_median"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_percentile95"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_percentile99"} 0
+tikv_engine_blob_prev_micros_seconds{db="raft",type="blob_prev_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_seek_micros_seconds Histogram of blob read micros for calling seek
+# TYPE tikv_engine_blob_seek_micros_seconds gauge
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_average"} 0
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_max"} 0
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_median"} 0
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_percentile95"} 0
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_percentile99"} 0
+tikv_engine_blob_seek_micros_seconds{db="kv",type="blob_seek_micros_standard_deviation"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_average"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_max"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_median"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_percentile95"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_percentile99"} 0
+tikv_engine_blob_seek_micros_seconds{db="raft",type="blob_seek_micros_standard_deviation"} 0
+# HELP tikv_engine_blob_value_size Histogram of blob value size
+# TYPE tikv_engine_blob_value_size gauge
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_average"} 0
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_max"} 0
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_median"} 0
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_percentile95"} 0
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_percentile99"} 0
+tikv_engine_blob_value_size{db="kv",type="blob_value_size_standard_deviation"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_average"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_max"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_median"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_percentile95"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_percentile99"} 0
+tikv_engine_blob_value_size{db="raft",type="blob_value_size_standard_deviation"} 0
+# HELP tikv_engine_block_cache_size_bytes Usage of each column families' block cache
+# TYPE tikv_engine_block_cache_size_bytes gauge
+tikv_engine_block_cache_size_bytes{cf="all",db="kv"} 352
+tikv_engine_block_cache_size_bytes{cf="all",db="raft"} 352
+# HELP tikv_engine_bloom_efficiency Efficiency of rocksdb's bloom filter
+# TYPE tikv_engine_bloom_efficiency counter
+tikv_engine_bloom_efficiency{db="kv",type="bloom_prefix_checked"} 0
+tikv_engine_bloom_efficiency{db="kv",type="bloom_prefix_useful"} 0
+tikv_engine_bloom_efficiency{db="kv",type="bloom_useful"} 0
+tikv_engine_bloom_efficiency{db="raft",type="bloom_prefix_checked"} 0
+tikv_engine_bloom_efficiency{db="raft",type="bloom_prefix_useful"} 0
+tikv_engine_bloom_efficiency{db="raft",type="bloom_useful"} 0
+# HELP tikv_engine_bytes_compressed Histogram of bytes compressed
+# TYPE tikv_engine_bytes_compressed gauge
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_average"} 0
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_max"} 0
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_median"} 0
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_percentile95"} 0
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_percentile99"} 0
+tikv_engine_bytes_compressed{db="kv",type="bytes_compressed_standard_deviation"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_average"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_max"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_median"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_percentile95"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_percentile99"} 0
+tikv_engine_bytes_compressed{db="raft",type="bytes_compressed_standard_deviation"} 0
+# HELP tikv_engine_bytes_decompressed Histogram of bytes decompressed
+# TYPE tikv_engine_bytes_decompressed gauge
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_average"} 0
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_max"} 0
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_median"} 0
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_percentile95"} 0
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_percentile99"} 0
+tikv_engine_bytes_decompressed{db="kv",type="bytes_decompressed_standard_deviation"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_average"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_max"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_median"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_percentile95"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_percentile99"} 0
+tikv_engine_bytes_decompressed{db="raft",type="bytes_decompressed_standard_deviation"} 0
+# HELP tikv_engine_bytes_per_read Histogram of bytes per read
+# TYPE tikv_engine_bytes_per_read gauge
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_average"} 6
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_max"} 12
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_median"} 1
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_percentile95"} 12
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_percentile99"} 12
+tikv_engine_bytes_per_read{db="kv",type="bytes_per_read_standard_deviation"} 6
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_average"} 0
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_max"} 0
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_median"} 0
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_percentile95"} 0
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_percentile99"} 0
+tikv_engine_bytes_per_read{db="raft",type="bytes_per_read_standard_deviation"} 0
+# HELP tikv_engine_bytes_per_write Histogram of bytes per write
+# TYPE tikv_engine_bytes_per_write gauge
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_average"} 0
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_max"} 0
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_median"} 0
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_percentile95"} 0
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_percentile99"} 0
+tikv_engine_bytes_per_write{db="kv",type="bytes_per_write_standard_deviation"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_average"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_max"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_median"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_percentile95"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_percentile99"} 0
+tikv_engine_bytes_per_write{db="raft",type="bytes_per_write_standard_deviation"} 0
+# HELP tikv_engine_cache_efficiency Efficiency of rocksdb's block cache
+# TYPE tikv_engine_cache_efficiency counter
+tikv_engine_cache_efficiency{db="kv",type="block_cache_add"} 3
+tikv_engine_cache_efficiency{db="kv",type="block_cache_add_failures"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_data_add"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_data_bytes_insert"} 128
+tikv_engine_cache_efficiency{db="kv",type="block_cache_data_hit"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_data_miss"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_filter_add"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_filter_bytes_evict"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_filter_bytes_insert"} 112
+tikv_engine_cache_efficiency{db="kv",type="block_cache_filter_hit"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_filter_miss"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_hit"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_index_add"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_index_bytes_evict"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_index_bytes_insert"} 112
+tikv_engine_cache_efficiency{db="kv",type="block_cache_index_hit"} 0
+tikv_engine_cache_efficiency{db="kv",type="block_cache_index_miss"} 1
+tikv_engine_cache_efficiency{db="kv",type="block_cache_miss"} 3
+tikv_engine_cache_efficiency{db="raft",type="block_cache_add"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_add_failures"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_data_add"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_data_bytes_insert"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_data_hit"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_data_miss"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_filter_add"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_filter_bytes_evict"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_filter_bytes_insert"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_filter_hit"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_filter_miss"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_hit"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_index_add"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_index_bytes_evict"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_index_bytes_insert"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_index_hit"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_index_miss"} 0
+tikv_engine_cache_efficiency{db="raft",type="block_cache_miss"} 0
+# HELP tikv_engine_compaction_flow_bytes Bytes of read/written during compaction
+# TYPE tikv_engine_compaction_flow_bytes counter
+tikv_engine_compaction_flow_bytes{db="kv",type="bytes_read"} 0
+tikv_engine_compaction_flow_bytes{db="kv",type="bytes_written"} 0
+tikv_engine_compaction_flow_bytes{db="raft",type="bytes_read"} 0
+tikv_engine_compaction_flow_bytes{db="raft",type="bytes_written"} 0
+# HELP tikv_engine_compaction_key_drop Count the reasons for key drop during compaction
+# TYPE tikv_engine_compaction_key_drop counter
+tikv_engine_compaction_key_drop{db="kv",type="compaction_key_drop_newer_entry"} 0
+tikv_engine_compaction_key_drop{db="kv",type="compaction_key_drop_obsolete"} 0
+tikv_engine_compaction_key_drop{db="kv",type="compaction_key_drop_range_del"} 0
+tikv_engine_compaction_key_drop{db="kv",type="range_del_drop_obsolete"} 0
+tikv_engine_compaction_key_drop{db="raft",type="compaction_key_drop_newer_entry"} 0
+tikv_engine_compaction_key_drop{db="raft",type="compaction_key_drop_obsolete"} 0
+tikv_engine_compaction_key_drop{db="raft",type="compaction_key_drop_range_del"} 0
+tikv_engine_compaction_key_drop{db="raft",type="range_del_drop_obsolete"} 0
+# HELP tikv_engine_compaction_outfile_sync_micro_seconds Histogram of compaction outfile sync micros
+# TYPE tikv_engine_compaction_outfile_sync_micro_seconds gauge
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_average"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_max"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_median"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_percentile95"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_percentile99"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="kv",type="compaction_outfile_sync_standard_deviation"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_average"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_max"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_median"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_percentile95"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_percentile99"} 0
+tikv_engine_compaction_outfile_sync_micro_seconds{db="raft",type="compaction_outfile_sync_standard_deviation"} 0
+# HELP tikv_engine_compaction_time Histogram of compaction time
+# TYPE tikv_engine_compaction_time gauge
+tikv_engine_compaction_time{db="kv",type="compaction_time_average"} 0
+tikv_engine_compaction_time{db="kv",type="compaction_time_max"} 0
+tikv_engine_compaction_time{db="kv",type="compaction_time_median"} 0
+tikv_engine_compaction_time{db="kv",type="compaction_time_percentile95"} 0
+tikv_engine_compaction_time{db="kv",type="compaction_time_percentile99"} 0
+tikv_engine_compaction_time{db="kv",type="compaction_time_standard_deviation"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_average"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_max"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_median"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_percentile95"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_percentile99"} 0
+tikv_engine_compaction_time{db="raft",type="compaction_time_standard_deviation"} 0
+# HELP tikv_engine_compression_ratio Compression ratio at different levels
+# TYPE tikv_engine_compression_ratio gauge
+tikv_engine_compression_ratio{cf="default",db="kv",level="0"} 0.021442
+# HELP tikv_engine_compression_time_nanos Histogram of compression time nanos
+# TYPE tikv_engine_compression_time_nanos gauge
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_average"} 0
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_max"} 0
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_median"} 0
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_percentile95"} 0
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_percentile99"} 0
+tikv_engine_compression_time_nanos{db="kv",type="compression_time_nanos_standard_deviation"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_average"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_max"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_median"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_percentile95"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_percentile99"} 0
+tikv_engine_compression_time_nanos{db="raft",type="compression_time_nanos_standard_deviation"} 0
+# HELP tikv_engine_decompression_time_nanos Histogram of decompression time nanos
+# TYPE tikv_engine_decompression_time_nanos gauge
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_average"} 0
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_max"} 0
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_median"} 0
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_percentile95"} 0
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_percentile99"} 0
+tikv_engine_decompression_time_nanos{db="kv",type="decompression_time_nanos_standard_deviation"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_average"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_max"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_median"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_percentile95"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_percentile99"} 0
+tikv_engine_decompression_time_nanos{db="raft",type="decompression_time_nanos_standard_deviation"} 0
+# HELP tikv_engine_estimate_num_keys Estimate num keys of each column families
+# TYPE tikv_engine_estimate_num_keys gauge
+tikv_engine_estimate_num_keys{cf="default",db="kv"} 1
+tikv_engine_estimate_num_keys{cf="default",db="raft"} 0
+tikv_engine_estimate_num_keys{cf="lock",db="kv"} 0
+tikv_engine_estimate_num_keys{cf="raft",db="kv"} 0
+tikv_engine_estimate_num_keys{cf="write",db="kv"} 0
+# HELP tikv_engine_file_status Number of different status of files
+# TYPE tikv_engine_file_status counter
+tikv_engine_file_status{db="kv",type="no_file_closes"} 0
+tikv_engine_file_status{db="kv",type="no_file_errors"} 0
+tikv_engine_file_status{db="kv",type="no_file_opens"} 1
+tikv_engine_file_status{db="raft",type="no_file_closes"} 0
+tikv_engine_file_status{db="raft",type="no_file_errors"} 0
+tikv_engine_file_status{db="raft",type="no_file_opens"} 0
+# HELP tikv_engine_flow_bytes Bytes and keys of read/written
+# TYPE tikv_engine_flow_bytes counter
+tikv_engine_flow_bytes{db="kv",type="block_cache_byte_read"} 0
+tikv_engine_flow_bytes{db="kv",type="block_cache_byte_write"} 352
+tikv_engine_flow_bytes{db="kv",type="bytes_read"} 12
+tikv_engine_flow_bytes{db="kv",type="bytes_written"} 0
+tikv_engine_flow_bytes{db="kv",type="flush_write_bytes"} 0
+tikv_engine_flow_bytes{db="kv",type="iter_bytes_read"} 0
+tikv_engine_flow_bytes{db="kv",type="keys_read"} 2
+tikv_engine_flow_bytes{db="kv",type="keys_written"} 0
+tikv_engine_flow_bytes{db="kv",type="wal_file_bytes"} 0
+tikv_engine_flow_bytes{db="raft",type="block_cache_byte_read"} 0
+tikv_engine_flow_bytes{db="raft",type="block_cache_byte_write"} 0
+tikv_engine_flow_bytes{db="raft",type="bytes_read"} 0
+tikv_engine_flow_bytes{db="raft",type="bytes_written"} 0
+tikv_engine_flow_bytes{db="raft",type="flush_write_bytes"} 0
+tikv_engine_flow_bytes{db="raft",type="iter_bytes_read"} 0
+tikv_engine_flow_bytes{db="raft",type="keys_read"} 0
+tikv_engine_flow_bytes{db="raft",type="keys_written"} 0
+tikv_engine_flow_bytes{db="raft",type="wal_file_bytes"} 0
+# HELP tikv_engine_get_micro_seconds Histogram of get micros
+# TYPE tikv_engine_get_micro_seconds gauge
+tikv_engine_get_micro_seconds{db="kv",type="get_average"} 24.5
+tikv_engine_get_micro_seconds{db="kv",type="get_max"} 47
+tikv_engine_get_micro_seconds{db="kv",type="get_median"} 2
+tikv_engine_get_micro_seconds{db="kv",type="get_percentile95"} 47
+tikv_engine_get_micro_seconds{db="kv",type="get_percentile99"} 47
+tikv_engine_get_micro_seconds{db="kv",type="get_standard_deviation"} 22.5
+tikv_engine_get_micro_seconds{db="raft",type="get_average"} 0
+tikv_engine_get_micro_seconds{db="raft",type="get_max"} 0
+tikv_engine_get_micro_seconds{db="raft",type="get_median"} 0
+tikv_engine_get_micro_seconds{db="raft",type="get_percentile95"} 0
+tikv_engine_get_micro_seconds{db="raft",type="get_percentile99"} 0
+tikv_engine_get_micro_seconds{db="raft",type="get_standard_deviation"} 0
+# HELP tikv_engine_get_served Get queries served by engine
+# TYPE tikv_engine_get_served counter
+tikv_engine_get_served{db="kv",type="get_hit_l0"} 1
+tikv_engine_get_served{db="kv",type="get_hit_l1"} 0
+tikv_engine_get_served{db="kv",type="get_hit_l2_and_up"} 0
+tikv_engine_get_served{db="raft",type="get_hit_l0"} 0
+tikv_engine_get_served{db="raft",type="get_hit_l1"} 0
+tikv_engine_get_served{db="raft",type="get_hit_l2_and_up"} 0
+# HELP tikv_engine_hard_rate_limit_delay_count Histogram of hard rate limit delay count
+# TYPE tikv_engine_hard_rate_limit_delay_count gauge
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_average"} 0
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_max"} 0
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_median"} 0
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_percentile95"} 0
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_percentile99"} 0
+tikv_engine_hard_rate_limit_delay_count{db="kv",type="hard_rate_limit_delay_standard_deviation"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_average"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_max"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_median"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_percentile95"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_percentile99"} 0
+tikv_engine_hard_rate_limit_delay_count{db="raft",type="hard_rate_limit_delay_standard_deviation"} 0
+# HELP tikv_engine_locate Number of calls to seek/next/prev
+# TYPE tikv_engine_locate counter
+tikv_engine_locate{db="kv",type="number_db_next"} 0
+tikv_engine_locate{db="kv",type="number_db_next_found"} 0
+tikv_engine_locate{db="kv",type="number_db_prev"} 0
+tikv_engine_locate{db="kv",type="number_db_prev_found"} 0
+tikv_engine_locate{db="kv",type="number_db_seek"} 1
+tikv_engine_locate{db="kv",type="number_db_seek_found"} 0
+tikv_engine_locate{db="raft",type="number_db_next"} 0
+tikv_engine_locate{db="raft",type="number_db_next_found"} 0
+tikv_engine_locate{db="raft",type="number_db_prev"} 0
+tikv_engine_locate{db="raft",type="number_db_prev_found"} 0
+tikv_engine_locate{db="raft",type="number_db_seek"} 0
+tikv_engine_locate{db="raft",type="number_db_seek_found"} 0
+# HELP tikv_engine_manifest_file_sync_micro_seconds Histogram of manifest file sync micros
+# TYPE tikv_engine_manifest_file_sync_micro_seconds gauge
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_average"} 1629.5
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_max"} 1747
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_median"} 1600
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_percentile95"} 1747
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_percentile99"} 1747
+tikv_engine_manifest_file_sync_micro_seconds{db="kv",type="manifest_file_sync_standard_deviation"} 115.35705440067373
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_average"} 1721
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_max"} 1721
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_median"} 1721
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_percentile95"} 1721
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_percentile99"} 1721
+tikv_engine_manifest_file_sync_micro_seconds{db="raft",type="manifest_file_sync_standard_deviation"} 0
+# HELP tikv_engine_memory_bytes Sizes of each column families
+# TYPE tikv_engine_memory_bytes gauge
+tikv_engine_memory_bytes{cf="default",db="kv",type="mem-tables"} 832
+tikv_engine_memory_bytes{cf="default",db="kv",type="readers-mem"} 112
+tikv_engine_memory_bytes{cf="default",db="raft",type="mem-tables"} 832
+tikv_engine_memory_bytes{cf="default",db="raft",type="readers-mem"} 0
+tikv_engine_memory_bytes{cf="lock",db="kv",type="mem-tables"} 3670856
+tikv_engine_memory_bytes{cf="lock",db="kv",type="readers-mem"} 0
+tikv_engine_memory_bytes{cf="raft",db="kv",type="mem-tables"} 14680904
+tikv_engine_memory_bytes{cf="raft",db="kv",type="readers-mem"} 0
+tikv_engine_memory_bytes{cf="write",db="kv",type="mem-tables"} 14680904
+tikv_engine_memory_bytes{cf="write",db="kv",type="readers-mem"} 0
+# HELP tikv_engine_memtable_efficiency Hit and miss of memtable
+# TYPE tikv_engine_memtable_efficiency counter
+tikv_engine_memtable_efficiency{db="kv",type="memtable_hit"} 0
+tikv_engine_memtable_efficiency{db="kv",type="memtable_miss"} 2
+tikv_engine_memtable_efficiency{db="raft",type="memtable_hit"} 0
+tikv_engine_memtable_efficiency{db="raft",type="memtable_miss"} 0
+# HELP tikv_engine_num_files_at_level Number of files at each level
+# TYPE tikv_engine_num_files_at_level gauge
+tikv_engine_num_files_at_level{cf="default",db="kv",level="0"} 1
+tikv_engine_num_files_at_level{cf="default",db="kv",level="1"} 0
+tikv_engine_num_files_at_level{cf="default",db="kv",level="2"} 0
+tikv_engine_num_files_at_level{cf="default",db="kv",level="3"} 0
+tikv_engine_num_files_at_level{cf="default",db="kv",level="4"} 0
+tikv_engine_num_files_at_level{cf="default",db="kv",level="5"} 0
+tikv_engine_num_files_at_level{cf="default",db="kv",level="6"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="0"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="1"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="2"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="3"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="4"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="5"} 0
+tikv_engine_num_files_at_level{cf="default",db="raft",level="6"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="0"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="1"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="2"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="3"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="4"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="5"} 0
+tikv_engine_num_files_at_level{cf="lock",db="kv",level="6"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="0"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="1"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="2"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="3"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="4"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="5"} 0
+tikv_engine_num_files_at_level{cf="raft",db="kv",level="6"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="0"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="1"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="2"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="3"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="4"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="5"} 0
+tikv_engine_num_files_at_level{cf="write",db="kv",level="6"} 0
+# HELP tikv_engine_num_files_in_single_compaction Histogram of number of files in single compaction
+# TYPE tikv_engine_num_files_in_single_compaction gauge
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_average"} 0
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_max"} 0
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_median"} 0
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_percentile95"} 0
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_percentile99"} 0
+tikv_engine_num_files_in_single_compaction{db="kv",type="num_files_in_single_compaction_standard_deviation"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_average"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_max"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_median"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_percentile95"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_percentile99"} 0
+tikv_engine_num_files_in_single_compaction{db="raft",type="num_files_in_single_compaction_standard_deviation"} 0
+# HELP tikv_engine_num_immutable_mem_table Number of immutable mem-table
+# TYPE tikv_engine_num_immutable_mem_table gauge
+tikv_engine_num_immutable_mem_table{cf="default",db="kv"} 0
+tikv_engine_num_immutable_mem_table{cf="default",db="raft"} 0
+tikv_engine_num_immutable_mem_table{cf="lock",db="kv"} 0
+tikv_engine_num_immutable_mem_table{cf="raft",db="kv"} 0
+tikv_engine_num_immutable_mem_table{cf="write",db="kv"} 0
+# HELP tikv_engine_num_snapshots Number of unreleased snapshots
+# TYPE tikv_engine_num_snapshots gauge
+tikv_engine_num_snapshots{db="kv"} 0
+tikv_engine_num_snapshots{db="raft"} 0
+# HELP tikv_engine_num_subcompaction_scheduled Histogram of number of subcompaction scheduled
+# TYPE tikv_engine_num_subcompaction_scheduled gauge
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_average"} 0
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_max"} 0
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_median"} 0
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_percentile95"} 0
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_percentile99"} 0
+tikv_engine_num_subcompaction_scheduled{db="kv",type="num_subcompaction_scheduled_standard_deviation"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_average"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_max"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_median"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_percentile95"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_percentile99"} 0
+tikv_engine_num_subcompaction_scheduled{db="raft",type="num_subcompaction_scheduled_standard_deviation"} 0
+# HELP tikv_engine_oldest_snapshot_duration Oldest unreleased snapshot duration in seconds
+# TYPE tikv_engine_oldest_snapshot_duration gauge
+tikv_engine_oldest_snapshot_duration{db="kv"} 0
+tikv_engine_oldest_snapshot_duration{db="raft"} 0
+# HELP tikv_engine_pending_compaction_bytes Pending compaction bytes
+# TYPE tikv_engine_pending_compaction_bytes gauge
+tikv_engine_pending_compaction_bytes{cf="default",db="kv"} 0
+tikv_engine_pending_compaction_bytes{cf="default",db="raft"} 0
+tikv_engine_pending_compaction_bytes{cf="lock",db="kv"} 0
+tikv_engine_pending_compaction_bytes{cf="raft",db="kv"} 0
+tikv_engine_pending_compaction_bytes{cf="write",db="kv"} 0
+# HELP tikv_engine_read_amp_flow_bytes Bytes of read amplification
+# TYPE tikv_engine_read_amp_flow_bytes counter
+tikv_engine_read_amp_flow_bytes{db="kv",type="read_amp_estimate_useful_bytes"} 0
+tikv_engine_read_amp_flow_bytes{db="kv",type="read_amp_total_read_bytes"} 0
+tikv_engine_read_amp_flow_bytes{db="raft",type="read_amp_estimate_useful_bytes"} 0
+tikv_engine_read_amp_flow_bytes{db="raft",type="read_amp_total_read_bytes"} 0
+# HELP tikv_engine_seek_micro_seconds Histogram of seek micros
+# TYPE tikv_engine_seek_micro_seconds gauge
+tikv_engine_seek_micro_seconds{db="kv",type="seek_average"} 2
+tikv_engine_seek_micro_seconds{db="kv",type="seek_max"} 2
+tikv_engine_seek_micro_seconds{db="kv",type="seek_median"} 2
+tikv_engine_seek_micro_seconds{db="kv",type="seek_percentile95"} 2
+tikv_engine_seek_micro_seconds{db="kv",type="seek_percentile99"} 2
+tikv_engine_seek_micro_seconds{db="kv",type="seek_standard_deviation"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_average"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_max"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_median"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_percentile95"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_percentile99"} 0
+tikv_engine_seek_micro_seconds{db="raft",type="seek_standard_deviation"} 0
+# HELP tikv_engine_size_bytes Sizes of each column families
+# TYPE tikv_engine_size_bytes gauge
+tikv_engine_size_bytes{db="kv",type="default"} 1858
+tikv_engine_size_bytes{db="kv",type="lock"} 3670856
+tikv_engine_size_bytes{db="kv",type="raft"} 14680904
+tikv_engine_size_bytes{db="kv",type="write"} 14680904
+tikv_engine_size_bytes{db="raft",type="default"} 832
+# HELP tikv_engine_soft_rate_limit_delay_count Histogram of soft rate limit delay count
+# TYPE tikv_engine_soft_rate_limit_delay_count gauge
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_average"} 0
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_max"} 0
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_median"} 0
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_percentile95"} 0
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_percentile99"} 0
+tikv_engine_soft_rate_limit_delay_count{db="kv",type="soft_rate_limit_delay_standard_deviation"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_average"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_max"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_median"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_percentile95"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_percentile99"} 0
+tikv_engine_soft_rate_limit_delay_count{db="raft",type="soft_rate_limit_delay_standard_deviation"} 0
+# HELP tikv_engine_sst_read_micros Histogram of SST read micros
+# TYPE tikv_engine_sst_read_micros gauge
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_average"} 2.6666666666666665
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_max"} 4
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_median"} 2.3333333333333335
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_percentile95"} 3.6999999999999993
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_percentile99"} 3.9399999999999995
+tikv_engine_sst_read_micros{db="kv",type="sst_read_micros_standard_deviation"} 0.9428090415820634
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_average"} 0
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_max"} 0
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_median"} 0
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_percentile95"} 0
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_percentile99"} 0
+tikv_engine_sst_read_micros{db="raft",type="sst_read_micros_standard_deviation"} 0
+# HELP tikv_engine_stall_l0_num_files_count Histogram of stall l0 num files count
+# TYPE tikv_engine_stall_l0_num_files_count gauge
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_average"} 0
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_max"} 0
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_median"} 0
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_percentile95"} 0
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_percentile99"} 0
+tikv_engine_stall_l0_num_files_count{db="kv",type="stall_l0_num_files_count_standard_deviation"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_average"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_max"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_median"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_percentile95"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_percentile99"} 0
+tikv_engine_stall_l0_num_files_count{db="raft",type="stall_l0_num_files_count_standard_deviation"} 0
+# HELP tikv_engine_stall_l0_slowdown_count Histogram of stall l0 slowdown count
+# TYPE tikv_engine_stall_l0_slowdown_count gauge
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_average"} 0
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_max"} 0
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_median"} 0
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_percentile95"} 0
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_percentile99"} 0
+tikv_engine_stall_l0_slowdown_count{db="kv",type="stall_l0_slowdown_count_standard_deviation"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_average"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_max"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_median"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_percentile95"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_percentile99"} 0
+tikv_engine_stall_l0_slowdown_count{db="raft",type="stall_l0_slowdown_count_standard_deviation"} 0
+# HELP tikv_engine_stall_memtable_compaction_count Histogram of stall memtable compaction count
+# TYPE tikv_engine_stall_memtable_compaction_count gauge
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_average"} 0
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_max"} 0
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_median"} 0
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_percentile95"} 0
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_percentile99"} 0
+tikv_engine_stall_memtable_compaction_count{db="kv",type="stall_memtable_compaction_count_standard_deviation"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_average"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_max"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_median"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_percentile95"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_percentile99"} 0
+tikv_engine_stall_memtable_compaction_count{db="raft",type="stall_memtable_compaction_count_standard_deviation"} 0
+# HELP tikv_engine_stall_micro_seconds Stall micros
+# TYPE tikv_engine_stall_micro_seconds counter
+tikv_engine_stall_micro_seconds{db="kv"} 0
+tikv_engine_stall_micro_seconds{db="raft"} 0
+# HELP tikv_engine_table_sync_micro_seconds Histogram of table sync micros
+# TYPE tikv_engine_table_sync_micro_seconds gauge
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_average"} 0
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_max"} 0
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_median"} 0
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_percentile95"} 0
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_percentile99"} 0
+tikv_engine_table_sync_micro_seconds{db="kv",type="table_sync_standard_deviation"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_average"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_max"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_median"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_percentile95"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_percentile99"} 0
+tikv_engine_table_sync_micro_seconds{db="raft",type="table_sync_standard_deviation"} 0
+# HELP tikv_engine_wal_file_sync_micro_seconds Histogram of WAL file sync micros
+# TYPE tikv_engine_wal_file_sync_micro_seconds gauge
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_average"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_max"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_median"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_percentile95"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_percentile99"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="kv",type="wal_file_sync_standard_deviation"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_average"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_max"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_median"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_percentile95"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_percentile99"} 0
+tikv_engine_wal_file_sync_micro_seconds{db="raft",type="wal_file_sync_standard_deviation"} 0
+# HELP tikv_engine_wal_file_synced Number of times WAL sync is done
+# TYPE tikv_engine_wal_file_synced counter
+tikv_engine_wal_file_synced{db="kv"} 0
+tikv_engine_wal_file_synced{db="raft"} 0
+# HELP tikv_engine_write_micro_seconds Histogram of write micros
+# TYPE tikv_engine_write_micro_seconds gauge
+tikv_engine_write_micro_seconds{db="kv",type="write_average"} 0
+tikv_engine_write_micro_seconds{db="kv",type="write_max"} 0
+tikv_engine_write_micro_seconds{db="kv",type="write_median"} 0
+tikv_engine_write_micro_seconds{db="kv",type="write_percentile95"} 0
+tikv_engine_write_micro_seconds{db="kv",type="write_percentile99"} 0
+tikv_engine_write_micro_seconds{db="kv",type="write_standard_deviation"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_average"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_max"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_median"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_percentile95"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_percentile99"} 0
+tikv_engine_write_micro_seconds{db="raft",type="write_standard_deviation"} 0
+# HELP tikv_engine_write_served Write queries served by engine
+# TYPE tikv_engine_write_served counter
+tikv_engine_write_served{db="kv",type="write_done_by_other"} 0
+tikv_engine_write_served{db="kv",type="write_done_by_self"} 0
+tikv_engine_write_served{db="kv",type="write_timeout"} 0
+tikv_engine_write_served{db="kv",type="write_with_wal"} 0
+tikv_engine_write_served{db="raft",type="write_done_by_other"} 0
+tikv_engine_write_served{db="raft",type="write_done_by_self"} 0
+tikv_engine_write_served{db="raft",type="write_timeout"} 0
+tikv_engine_write_served{db="raft",type="write_with_wal"} 0
+# HELP tikv_engine_write_stall Histogram of write stall
+# TYPE tikv_engine_write_stall gauge
+tikv_engine_write_stall{db="kv",type="write_stall_average"} 0
+tikv_engine_write_stall{db="kv",type="write_stall_max"} 0
+tikv_engine_write_stall{db="kv",type="write_stall_median"} 0
+tikv_engine_write_stall{db="kv",type="write_stall_percentile95"} 0
+tikv_engine_write_stall{db="kv",type="write_stall_percentile99"} 0
+tikv_engine_write_stall{db="kv",type="write_stall_standard_deviation"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_average"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_max"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_median"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_percentile95"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_percentile99"} 0
+tikv_engine_write_stall{db="raft",type="write_stall_standard_deviation"} 0
+# HELP tikv_engine_write_stall_reason QPS of each reason which cause tikv write stall
+# TYPE tikv_engine_write_stall_reason gauge
+tikv_engine_write_stall_reason{db="kv",type="level0_file_limit_slowdown"} 0
+tikv_engine_write_stall_reason{db="kv",type="level0_file_limit_stop"} 0
+tikv_engine_write_stall_reason{db="kv",type="memtable_count_limit_slowdown"} 0
+tikv_engine_write_stall_reason{db="kv",type="memtable_count_limit_stop"} 0
+tikv_engine_write_stall_reason{db="kv",type="pending_compaction_bytes_slowdown"} 0
+tikv_engine_write_stall_reason{db="kv",type="pending_compaction_bytes_stop"} 0
+tikv_engine_write_stall_reason{db="raft",type="level0_file_limit_slowdown"} 0
+tikv_engine_write_stall_reason{db="raft",type="level0_file_limit_stop"} 0
+tikv_engine_write_stall_reason{db="raft",type="memtable_count_limit_slowdown"} 0
+tikv_engine_write_stall_reason{db="raft",type="memtable_count_limit_stop"} 0
+tikv_engine_write_stall_reason{db="raft",type="pending_compaction_bytes_slowdown"} 0
+tikv_engine_write_stall_reason{db="raft",type="pending_compaction_bytes_stop"} 0
+# HELP tikv_futurepool_handled_task_total Total number of future_pool handled tasks.
+# TYPE tikv_futurepool_handled_task_total counter
+tikv_futurepool_handled_task_total{name="cop-high"} 0
+tikv_futurepool_handled_task_total{name="cop-low"} 0
+tikv_futurepool_handled_task_total{name="cop-normal"} 0
+tikv_futurepool_handled_task_total{name="sched-high-pri-pool"} 0
+tikv_futurepool_handled_task_total{name="sched-worker-pool"} 0
+tikv_futurepool_handled_task_total{name="store-read-high"} 0
+tikv_futurepool_handled_task_total{name="store-read-low"} 0
+tikv_futurepool_handled_task_total{name="store-read-normal"} 0
+# HELP tikv_futurepool_pending_task_total Current future_pool pending + running tasks.
+# TYPE tikv_futurepool_pending_task_total gauge
+tikv_futurepool_pending_task_total{name="cop-high"} 0
+tikv_futurepool_pending_task_total{name="cop-low"} 0
+tikv_futurepool_pending_task_total{name="cop-normal"} 0
+tikv_futurepool_pending_task_total{name="sched-high-pri-pool"} 0
+tikv_futurepool_pending_task_total{name="sched-worker-pool"} 0
+tikv_futurepool_pending_task_total{name="store-read-high"} 0
+tikv_futurepool_pending_task_total{name="store-read-low"} 0
+tikv_futurepool_pending_task_total{name="store-read-normal"} 0
+# HELP tikv_gcworker_autogc_processed_regions Processed regions by auto gc
+# TYPE tikv_gcworker_autogc_processed_regions gauge
+tikv_gcworker_autogc_processed_regions{type="gc"} 0
+tikv_gcworker_autogc_processed_regions{type="scan"} 0
+# HELP tikv_gcworker_autogc_status State of the auto gc manager
+# TYPE tikv_gcworker_autogc_status gauge
+tikv_gcworker_autogc_status{state="idle"} 1
+tikv_gcworker_autogc_status{state="initializing"} 0
+tikv_gcworker_autogc_status{state="working"} 0
+# HELP tikv_pd_request_duration_seconds Bucketed histogram of PD requests duration
+# TYPE tikv_pd_request_duration_seconds histogram
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.005"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.01"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.025"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.05"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.1"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.25"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="0.5"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="1"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="2.5"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="5"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="10"} 2
+tikv_pd_request_duration_seconds_bucket{type="get_gc_safe_point",le="+Inf"} 2
+tikv_pd_request_duration_seconds_sum{type="get_gc_safe_point"} 0.000943853
+tikv_pd_request_duration_seconds_count{type="get_gc_safe_point"} 2
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.005"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.01"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.025"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.05"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.1"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.25"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="0.5"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="1"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="2.5"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="5"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="10"} 1
+tikv_pd_request_duration_seconds_bucket{type="is_cluster_bootstrapped",le="+Inf"} 1
+tikv_pd_request_duration_seconds_sum{type="is_cluster_bootstrapped"} 0
+tikv_pd_request_duration_seconds_count{type="is_cluster_bootstrapped"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.005"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.01"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.025"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.05"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.1"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.25"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="0.5"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="1"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="2.5"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="5"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="10"} 1
+tikv_pd_request_duration_seconds_bucket{type="put_store",le="+Inf"} 1
+tikv_pd_request_duration_seconds_sum{type="put_store"} 0
+tikv_pd_request_duration_seconds_count{type="put_store"} 1
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.005"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.01"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.025"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.05"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.1"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.25"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="0.5"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="1"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="2.5"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="5"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="10"} 5
+tikv_pd_request_duration_seconds_bucket{type="store_heartbeat",le="+Inf"} 5
+tikv_pd_request_duration_seconds_sum{type="store_heartbeat"} 0.005419517
+tikv_pd_request_duration_seconds_count{type="store_heartbeat"} 5
+# HELP tikv_pending_delete_ranges_of_stale_peer Total number of tikv pending delete range of stale peer
+# TYPE tikv_pending_delete_ranges_of_stale_peer gauge
+tikv_pending_delete_ranges_of_stale_peer 0
+# HELP tikv_raftstore_append_log_duration_seconds Bucketed histogram of peer appending log duration
+# TYPE tikv_raftstore_append_log_duration_seconds histogram
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.0005"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.001"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.002"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.004"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.008"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.016"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.032"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.064"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.128"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.256"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="0.512"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="1.024"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="2.048"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="4.096"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="8.192"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="16.384"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="32.768"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="65.536"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="131.072"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="262.144"} 0
+tikv_raftstore_append_log_duration_seconds_bucket{le="+Inf"} 0
+tikv_raftstore_append_log_duration_seconds_sum 0
+tikv_raftstore_append_log_duration_seconds_count 0
+# HELP tikv_raftstore_commit_log_duration_seconds Bucketed histogram of peer commits logs duration
+# TYPE tikv_raftstore_commit_log_duration_seconds histogram
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.0005"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.001"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.002"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.004"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.008"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.016"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.032"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.064"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.128"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.256"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="0.512"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="1.024"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="2.048"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="4.096"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="8.192"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="16.384"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="32.768"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="65.536"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="131.072"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="262.144"} 0
+tikv_raftstore_commit_log_duration_seconds_bucket{le="+Inf"} 0
+tikv_raftstore_commit_log_duration_seconds_sum 0
+tikv_raftstore_commit_log_duration_seconds_count 0
+# HELP tikv_raftstore_event_duration Duration of raft store events.
+# TYPE tikv_raftstore_event_duration histogram
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.001"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.00159"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.0025281"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.004019679000000001"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.0063912896100000016"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.010162150479900003"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.016157819263041006"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.0256909326282352"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.04084858287889397"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.06494924677744142"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.10326930237613186"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.16419819077804965"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.2610751233370989"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.4151094461059873"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="0.6600240193085198"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="1.0494381907005466"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="1.668606723213869"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="2.653084689910052"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="4.218404656956983"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="6.707263404561603"} 5
+tikv_raftstore_event_duration_bucket{type="pd_store_heartbeat",le="+Inf"} 5
+tikv_raftstore_event_duration_sum{type="pd_store_heartbeat"} 0
+tikv_raftstore_event_duration_count{type="pd_store_heartbeat"} 5
+# HELP tikv_raftstore_leader_missing Total number of leader missed region
+# TYPE tikv_raftstore_leader_missing gauge
+tikv_raftstore_leader_missing 0
+# HELP tikv_raftstore_raft_process_duration_secs Bucketed histogram of peer processing raft duration
+# TYPE tikv_raftstore_raft_process_duration_secs histogram
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.0005"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.001"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.002"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.004"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.008"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.016"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.032"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.064"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.128"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.256"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="0.512"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="1.024"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="2.048"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="4.096"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="8.192"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="16.384"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="32.768"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="65.536"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="131.072"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="262.144"} 6
+tikv_raftstore_raft_process_duration_secs_bucket{type="ready",le="+Inf"} 6
+tikv_raftstore_raft_process_duration_secs_sum{type="ready"} 0
+tikv_raftstore_raft_process_duration_secs_count{type="ready"} 6
+# HELP tikv_raftstore_region_count Number of regions collected in region_collector
+# TYPE tikv_raftstore_region_count gauge
+tikv_raftstore_region_count{type="leader"} 0
+tikv_raftstore_region_count{type="region"} 0
+# HELP tikv_raftstore_request_wait_time_duration_secs Bucketed histogram of request wait time duration
+# TYPE tikv_raftstore_request_wait_time_duration_secs histogram
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.0005"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.001"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.002"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.004"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.008"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.016"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.032"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.064"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.128"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.256"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="0.512"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="1.024"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="2.048"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="4.096"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="8.192"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="16.384"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="32.768"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="65.536"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="131.072"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="262.144"} 0
+tikv_raftstore_request_wait_time_duration_secs_bucket{le="+Inf"} 0
+tikv_raftstore_request_wait_time_duration_secs_sum 0
+tikv_raftstore_request_wait_time_duration_secs_count 0
+# HELP tikv_raftstore_snapshot_traffic_total Total number of raftstore snapshot traffic.
+# TYPE tikv_raftstore_snapshot_traffic_total gauge
+tikv_raftstore_snapshot_traffic_total{type="applying"} 0
+tikv_raftstore_snapshot_traffic_total{type="receiving"} 0
+tikv_raftstore_snapshot_traffic_total{type="sending"} 0
+# HELP tikv_region_read_bytes Histogram of bytes written for regions
+# TYPE tikv_region_read_bytes histogram
+tikv_region_read_bytes_bucket{le="256"} 0
+tikv_region_read_bytes_bucket{le="512"} 0
+tikv_region_read_bytes_bucket{le="1024"} 0
+tikv_region_read_bytes_bucket{le="2048"} 0
+tikv_region_read_bytes_bucket{le="4096"} 0
+tikv_region_read_bytes_bucket{le="8192"} 0
+tikv_region_read_bytes_bucket{le="16384"} 0
+tikv_region_read_bytes_bucket{le="32768"} 0
+tikv_region_read_bytes_bucket{le="65536"} 0
+tikv_region_read_bytes_bucket{le="131072"} 0
+tikv_region_read_bytes_bucket{le="262144"} 0
+tikv_region_read_bytes_bucket{le="524288"} 0
+tikv_region_read_bytes_bucket{le="1048576"} 0
+tikv_region_read_bytes_bucket{le="2097152"} 0
+tikv_region_read_bytes_bucket{le="4194304"} 0
+tikv_region_read_bytes_bucket{le="8388608"} 0
+tikv_region_read_bytes_bucket{le="16777216"} 0
+tikv_region_read_bytes_bucket{le="33554432"} 0
+tikv_region_read_bytes_bucket{le="67108864"} 0
+tikv_region_read_bytes_bucket{le="134217728"} 0
+tikv_region_read_bytes_bucket{le="+Inf"} 0
+tikv_region_read_bytes_sum 0
+tikv_region_read_bytes_count 0
+# HELP tikv_region_read_keys Histogram of keys written for regions
+# TYPE tikv_region_read_keys histogram
+tikv_region_read_keys_bucket{le="1"} 0
+tikv_region_read_keys_bucket{le="2"} 0
+tikv_region_read_keys_bucket{le="4"} 0
+tikv_region_read_keys_bucket{le="8"} 0
+tikv_region_read_keys_bucket{le="16"} 0
+tikv_region_read_keys_bucket{le="32"} 0
+tikv_region_read_keys_bucket{le="64"} 0
+tikv_region_read_keys_bucket{le="128"} 0
+tikv_region_read_keys_bucket{le="256"} 0
+tikv_region_read_keys_bucket{le="512"} 0
+tikv_region_read_keys_bucket{le="1024"} 0
+tikv_region_read_keys_bucket{le="2048"} 0
+tikv_region_read_keys_bucket{le="4096"} 0
+tikv_region_read_keys_bucket{le="8192"} 0
+tikv_region_read_keys_bucket{le="16384"} 0
+tikv_region_read_keys_bucket{le="32768"} 0
+tikv_region_read_keys_bucket{le="65536"} 0
+tikv_region_read_keys_bucket{le="131072"} 0
+tikv_region_read_keys_bucket{le="262144"} 0
+tikv_region_read_keys_bucket{le="524288"} 0
+tikv_region_read_keys_bucket{le="+Inf"} 0
+tikv_region_read_keys_sum 0
+tikv_region_read_keys_count 0
+# HELP tikv_region_written_bytes Histogram of bytes written for regions
+# TYPE tikv_region_written_bytes histogram
+tikv_region_written_bytes_bucket{le="256"} 0
+tikv_region_written_bytes_bucket{le="512"} 0
+tikv_region_written_bytes_bucket{le="1024"} 0
+tikv_region_written_bytes_bucket{le="2048"} 0
+tikv_region_written_bytes_bucket{le="4096"} 0
+tikv_region_written_bytes_bucket{le="8192"} 0
+tikv_region_written_bytes_bucket{le="16384"} 0
+tikv_region_written_bytes_bucket{le="32768"} 0
+tikv_region_written_bytes_bucket{le="65536"} 0
+tikv_region_written_bytes_bucket{le="131072"} 0
+tikv_region_written_bytes_bucket{le="262144"} 0
+tikv_region_written_bytes_bucket{le="524288"} 0
+tikv_region_written_bytes_bucket{le="1048576"} 0
+tikv_region_written_bytes_bucket{le="2097152"} 0
+tikv_region_written_bytes_bucket{le="4194304"} 0
+tikv_region_written_bytes_bucket{le="8388608"} 0
+tikv_region_written_bytes_bucket{le="16777216"} 0
+tikv_region_written_bytes_bucket{le="33554432"} 0
+tikv_region_written_bytes_bucket{le="67108864"} 0
+tikv_region_written_bytes_bucket{le="134217728"} 0
+tikv_region_written_bytes_bucket{le="+Inf"} 0
+tikv_region_written_bytes_sum 0
+tikv_region_written_bytes_count 0
+# HELP tikv_region_written_keys Histogram of keys written for regions
+# TYPE tikv_region_written_keys histogram
+tikv_region_written_keys_bucket{le="1"} 0
+tikv_region_written_keys_bucket{le="2"} 0
+tikv_region_written_keys_bucket{le="4"} 0
+tikv_region_written_keys_bucket{le="8"} 0
+tikv_region_written_keys_bucket{le="16"} 0
+tikv_region_written_keys_bucket{le="32"} 0
+tikv_region_written_keys_bucket{le="64"} 0
+tikv_region_written_keys_bucket{le="128"} 0
+tikv_region_written_keys_bucket{le="256"} 0
+tikv_region_written_keys_bucket{le="512"} 0
+tikv_region_written_keys_bucket{le="1024"} 0
+tikv_region_written_keys_bucket{le="2048"} 0
+tikv_region_written_keys_bucket{le="4096"} 0
+tikv_region_written_keys_bucket{le="8192"} 0
+tikv_region_written_keys_bucket{le="16384"} 0
+tikv_region_written_keys_bucket{le="32768"} 0
+tikv_region_written_keys_bucket{le="65536"} 0
+tikv_region_written_keys_bucket{le="131072"} 0
+tikv_region_written_keys_bucket{le="262144"} 0
+tikv_region_written_keys_bucket{le="524288"} 0
+tikv_region_written_keys_bucket{le="+Inf"} 0
+tikv_region_written_keys_sum 0
+tikv_region_written_keys_count 0
+# HELP tikv_store_size_bytes Size of storage.
+# TYPE tikv_store_size_bytes gauge
+tikv_store_size_bytes{type="available"} 186345172992
+tikv_store_size_bytes{type="capacity"} 958613114880
+# HELP tikv_thread_cpu_seconds_total Total user and system CPU time spent in seconds by threads.
+# TYPE tikv_thread_cpu_seconds_total counter
+tikv_thread_cpu_seconds_total{name="addr_resolver",tid="244193"} 0
+tikv_thread_cpu_seconds_total{name="apply_0",tid="244304"} 0
+tikv_thread_cpu_seconds_total{name="apply_1",tid="244305"} 0
+tikv_thread_cpu_seconds_total{name="backup_endpoint",tid="244330"} 0
+tikv_thread_cpu_seconds_total{name="cleanup_worker",tid="244312"} 0
+tikv_thread_cpu_seconds_total{name="consistency_che",tid="244315"} 0
+tikv_thread_cpu_seconds_total{name="deadlock_0",tid="244328"} 0
+tikv_thread_cpu_seconds_total{name="deadlock_detect",tid="244329"} 0
+tikv_thread_cpu_seconds_total{name="deadlock_detect",tid="244338"} 0
+tikv_thread_cpu_seconds_total{name="debugger0",tid="244326"} 0
+tikv_thread_cpu_seconds_total{name="default_executo",tid="244155"} 0
+tikv_thread_cpu_seconds_total{name="future_poller0",tid="244306"} 0
+tikv_thread_cpu_seconds_total{name="gc_manager",tid="244317"} 0
+tikv_thread_cpu_seconds_total{name="gc_worker",tid="244286"} 0
+tikv_thread_cpu_seconds_total{name="gc_worker",tid="244295"} 0
+tikv_thread_cpu_seconds_total{name="grpc_global_tim",tid="244157"} 0
+tikv_thread_cpu_seconds_total{name="grpc_global_tim",tid="244180"} 0
+tikv_thread_cpu_seconds_total{name="grpc_server_0",tid="244297"} 0
+tikv_thread_cpu_seconds_total{name="grpc_server_1",tid="244298"} 0
+tikv_thread_cpu_seconds_total{name="grpc_server_2",tid="244299"} 0
+tikv_thread_cpu_seconds_total{name="grpc_server_3",tid="244300"} 0
+tikv_thread_cpu_seconds_total{name="lock_collector",tid="244287"} 0
+tikv_thread_cpu_seconds_total{name="pd_0",tid="244158"} 0
+tikv_thread_cpu_seconds_total{name="pd_worker",tid="244314"} 0
+tikv_thread_cpu_seconds_total{name="pd_worker",tid="244316"} 0
+tikv_thread_cpu_seconds_total{name="raft_gc_worker",tid="244311"} 0
+tikv_thread_cpu_seconds_total{name="raftstore_5_0",tid="244302"} 0
+tikv_thread_cpu_seconds_total{name="raftstore_5_1",tid="244303"} 0
+tikv_thread_cpu_seconds_total{name="region_collecto",tid="244194"} 0
+tikv_thread_cpu_seconds_total{name="resolver_execut",tid="244156"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:dump_st",tid="244216"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:dump_st",tid="244284"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:high0",tid="244199"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:high1",tid="244221"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low0",tid="244196"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low1",tid="244197"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low2",tid="244198"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low3",tid="244218"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low4",tid="244219"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:low5",tid="244220"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:pst_st",tid="244217"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb:pst_st",tid="244285"} 0
+tikv_thread_cpu_seconds_total{name="rocksdb_metrics",tid="244331"} 0.02
+tikv_thread_cpu_seconds_total{name="slogger",tid="244154"} 0
+tikv_thread_cpu_seconds_total{name="snap_generator",tid="244308"} 0
+tikv_thread_cpu_seconds_total{name="snap_generator",tid="244309"} 0
+tikv_thread_cpu_seconds_total{name="snap_handler",tid="244337"} 0
+tikv_thread_cpu_seconds_total{name="snap_sender0",tid="244332"} 0
+tikv_thread_cpu_seconds_total{name="snap_sender1",tid="244333"} 0
+tikv_thread_cpu_seconds_total{name="snap_sender2",tid="244334"} 0
+tikv_thread_cpu_seconds_total{name="snap_sender3",tid="244336"} 0
+tikv_thread_cpu_seconds_total{name="snapshot_worker",tid="244310"} 0
+tikv_thread_cpu_seconds_total{name="split_check",tid="244307"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer0",tid="244318"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer1",tid="244319"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer2",tid="244320"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer3",tid="244321"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer4",tid="244322"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer5",tid="244323"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer6",tid="244324"} 0
+tikv_thread_cpu_seconds_total{name="sst_importer7",tid="244325"} 0
+tikv_thread_cpu_seconds_total{name="stats_monitor",tid="244313"} 0.04
+tikv_thread_cpu_seconds_total{name="status_server_0",tid="244340"} 0.02
+tikv_thread_cpu_seconds_total{name="status_server_0",tid="244341"} 0
+tikv_thread_cpu_seconds_total{name="steady_timer",tid="244301"} 0
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244141"} 0.15
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244142"} 0.17
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244143"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244144"} 0.18
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244145"} 0.13
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244146"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244147"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244148"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244149"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244150"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244151"} 0.14
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244152"} 0.13
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244153"} 0.16
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244200"} 0
+tikv_thread_cpu_seconds_total{name="tikv_server",tid="244222"} 0
+tikv_thread_cpu_seconds_total{name="time_monitor",tid="244195"} 0
+tikv_thread_cpu_seconds_total{name="timer",tid="244159"} 0.06
+tikv_thread_cpu_seconds_total{name="transport_stats",tid="244339"} 2.85
+tikv_thread_cpu_seconds_total{name="waiter_manager",tid="244327"} 0
+tikv_thread_cpu_seconds_total{name="waiter_manager",tid="244335"} 0
+# HELP tikv_threads_io_bytes_total Total number of bytes which threads cause to be fetched from or sent to the storage layer.
+# TYPE tikv_threads_io_bytes_total counter
+tikv_threads_io_bytes_total{io="read",name="addr_resolver",tid="244193"} 0
+tikv_threads_io_bytes_total{io="read",name="apply_0",tid="244304"} 0
+tikv_threads_io_bytes_total{io="read",name="apply_1",tid="244305"} 0
+tikv_threads_io_bytes_total{io="read",name="backup_endpoint",tid="244330"} 0
+tikv_threads_io_bytes_total{io="read",name="cleanup_worker",tid="244312"} 0
+tikv_threads_io_bytes_total{io="read",name="consistency_che",tid="244315"} 0
+tikv_threads_io_bytes_total{io="read",name="deadlock_0",tid="244328"} 0
+tikv_threads_io_bytes_total{io="read",name="deadlock_detect",tid="244329"} 0
+tikv_threads_io_bytes_total{io="read",name="deadlock_detect",tid="244338"} 0
+tikv_threads_io_bytes_total{io="read",name="debugger0",tid="244326"} 0
+tikv_threads_io_bytes_total{io="read",name="default_executo",tid="244155"} 0
+tikv_threads_io_bytes_total{io="read",name="future_poller0",tid="244306"} 0
+tikv_threads_io_bytes_total{io="read",name="gc_manager",tid="244317"} 0
+tikv_threads_io_bytes_total{io="read",name="gc_worker",tid="244286"} 0
+tikv_threads_io_bytes_total{io="read",name="gc_worker",tid="244295"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_global_tim",tid="244157"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_global_tim",tid="244180"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_server_0",tid="244297"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_server_1",tid="244298"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_server_2",tid="244299"} 0
+tikv_threads_io_bytes_total{io="read",name="grpc_server_3",tid="244300"} 0
+tikv_threads_io_bytes_total{io="read",name="lock_collector",tid="244287"} 0
+tikv_threads_io_bytes_total{io="read",name="pd_0",tid="244158"} 0
+tikv_threads_io_bytes_total{io="read",name="pd_worker",tid="244314"} 0
+tikv_threads_io_bytes_total{io="read",name="pd_worker",tid="244316"} 0
+tikv_threads_io_bytes_total{io="read",name="raft_gc_worker",tid="244311"} 0
+tikv_threads_io_bytes_total{io="read",name="raftstore_5_0",tid="244302"} 0
+tikv_threads_io_bytes_total{io="read",name="raftstore_5_1",tid="244303"} 0
+tikv_threads_io_bytes_total{io="read",name="region_collecto",tid="244194"} 0
+tikv_threads_io_bytes_total{io="read",name="resolver_execut",tid="244156"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:dump_st",tid="244216"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:dump_st",tid="244284"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:high0",tid="244199"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:high1",tid="244221"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low0",tid="244196"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low1",tid="244197"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low2",tid="244198"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low3",tid="244218"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low4",tid="244219"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:low5",tid="244220"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:pst_st",tid="244217"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb:pst_st",tid="244285"} 0
+tikv_threads_io_bytes_total{io="read",name="rocksdb_metrics",tid="244331"} 0
+tikv_threads_io_bytes_total{io="read",name="slogger",tid="244154"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_generator",tid="244308"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_generator",tid="244309"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_handler",tid="244337"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_sender0",tid="244332"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_sender1",tid="244333"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_sender2",tid="244334"} 0
+tikv_threads_io_bytes_total{io="read",name="snap_sender3",tid="244336"} 0
+tikv_threads_io_bytes_total{io="read",name="snapshot_worker",tid="244310"} 0
+tikv_threads_io_bytes_total{io="read",name="split_check",tid="244307"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer0",tid="244318"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer1",tid="244319"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer2",tid="244320"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer3",tid="244321"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer4",tid="244322"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer5",tid="244323"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer6",tid="244324"} 0
+tikv_threads_io_bytes_total{io="read",name="sst_importer7",tid="244325"} 0
+tikv_threads_io_bytes_total{io="read",name="stats_monitor",tid="244313"} 0
+tikv_threads_io_bytes_total{io="read",name="status_server_0",tid="244340"} 573440
+tikv_threads_io_bytes_total{io="read",name="status_server_0",tid="244341"} 0
+tikv_threads_io_bytes_total{io="read",name="steady_timer",tid="244301"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244141"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244142"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244143"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244144"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244145"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244146"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244147"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244148"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244149"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244150"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244151"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244152"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244153"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244200"} 0
+tikv_threads_io_bytes_total{io="read",name="tikv_server",tid="244222"} 0
+tikv_threads_io_bytes_total{io="read",name="time_monitor",tid="244195"} 0
+tikv_threads_io_bytes_total{io="read",name="timer",tid="244159"} 0
+tikv_threads_io_bytes_total{io="read",name="transport_stats",tid="244339"} 0
+tikv_threads_io_bytes_total{io="read",name="waiter_manager",tid="244327"} 0
+tikv_threads_io_bytes_total{io="read",name="waiter_manager",tid="244335"} 0
+tikv_threads_io_bytes_total{io="write",name="addr_resolver",tid="244193"} 0
+tikv_threads_io_bytes_total{io="write",name="apply_0",tid="244304"} 0
+tikv_threads_io_bytes_total{io="write",name="apply_1",tid="244305"} 0
+tikv_threads_io_bytes_total{io="write",name="backup_endpoint",tid="244330"} 0
+tikv_threads_io_bytes_total{io="write",name="cleanup_worker",tid="244312"} 0
+tikv_threads_io_bytes_total{io="write",name="consistency_che",tid="244315"} 0
+tikv_threads_io_bytes_total{io="write",name="deadlock_0",tid="244328"} 0
+tikv_threads_io_bytes_total{io="write",name="deadlock_detect",tid="244329"} 0
+tikv_threads_io_bytes_total{io="write",name="deadlock_detect",tid="244338"} 0
+tikv_threads_io_bytes_total{io="write",name="debugger0",tid="244326"} 0
+tikv_threads_io_bytes_total{io="write",name="default_executo",tid="244155"} 0
+tikv_threads_io_bytes_total{io="write",name="future_poller0",tid="244306"} 0
+tikv_threads_io_bytes_total{io="write",name="gc_manager",tid="244317"} 0
+tikv_threads_io_bytes_total{io="write",name="gc_worker",tid="244286"} 0
+tikv_threads_io_bytes_total{io="write",name="gc_worker",tid="244295"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_global_tim",tid="244157"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_global_tim",tid="244180"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_server_0",tid="244297"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_server_1",tid="244298"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_server_2",tid="244299"} 0
+tikv_threads_io_bytes_total{io="write",name="grpc_server_3",tid="244300"} 0
+tikv_threads_io_bytes_total{io="write",name="lock_collector",tid="244287"} 0
+tikv_threads_io_bytes_total{io="write",name="pd_0",tid="244158"} 0
+tikv_threads_io_bytes_total{io="write",name="pd_worker",tid="244314"} 0
+tikv_threads_io_bytes_total{io="write",name="pd_worker",tid="244316"} 0
+tikv_threads_io_bytes_total{io="write",name="raft_gc_worker",tid="244311"} 0
+tikv_threads_io_bytes_total{io="write",name="raftstore_5_0",tid="244302"} 0
+tikv_threads_io_bytes_total{io="write",name="raftstore_5_1",tid="244303"} 0
+tikv_threads_io_bytes_total{io="write",name="region_collecto",tid="244194"} 0
+tikv_threads_io_bytes_total{io="write",name="resolver_execut",tid="244156"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:dump_st",tid="244216"} 12288
+tikv_threads_io_bytes_total{io="write",name="rocksdb:dump_st",tid="244284"} 24576
+tikv_threads_io_bytes_total{io="write",name="rocksdb:high0",tid="244199"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:high1",tid="244221"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low0",tid="244196"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low1",tid="244197"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low2",tid="244198"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low3",tid="244218"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low4",tid="244219"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:low5",tid="244220"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:pst_st",tid="244217"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb:pst_st",tid="244285"} 0
+tikv_threads_io_bytes_total{io="write",name="rocksdb_metrics",tid="244331"} 0
+tikv_threads_io_bytes_total{io="write",name="slogger",tid="244154"} 20480
+tikv_threads_io_bytes_total{io="write",name="snap_generator",tid="244308"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_generator",tid="244309"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_handler",tid="244337"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_sender0",tid="244332"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_sender1",tid="244333"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_sender2",tid="244334"} 0
+tikv_threads_io_bytes_total{io="write",name="snap_sender3",tid="244336"} 0
+tikv_threads_io_bytes_total{io="write",name="snapshot_worker",tid="244310"} 0
+tikv_threads_io_bytes_total{io="write",name="split_check",tid="244307"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer0",tid="244318"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer1",tid="244319"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer2",tid="244320"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer3",tid="244321"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer4",tid="244322"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer5",tid="244323"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer6",tid="244324"} 0
+tikv_threads_io_bytes_total{io="write",name="sst_importer7",tid="244325"} 0
+tikv_threads_io_bytes_total{io="write",name="stats_monitor",tid="244313"} 0
+tikv_threads_io_bytes_total{io="write",name="status_server_0",tid="244340"} 0
+tikv_threads_io_bytes_total{io="write",name="status_server_0",tid="244341"} 0
+tikv_threads_io_bytes_total{io="write",name="steady_timer",tid="244301"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244141"} 135168
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244142"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244143"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244144"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244145"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244146"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244147"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244148"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244149"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244150"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244151"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244152"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244153"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244200"} 0
+tikv_threads_io_bytes_total{io="write",name="tikv_server",tid="244222"} 0
+tikv_threads_io_bytes_total{io="write",name="time_monitor",tid="244195"} 0
+tikv_threads_io_bytes_total{io="write",name="timer",tid="244159"} 0
+tikv_threads_io_bytes_total{io="write",name="transport_stats",tid="244339"} 0
+tikv_threads_io_bytes_total{io="write",name="waiter_manager",tid="244327"} 0
+tikv_threads_io_bytes_total{io="write",name="waiter_manager",tid="244335"} 0
+# HELP tikv_threads_state Number of threads in each state.
+# TYPE tikv_threads_state gauge
+tikv_threads_state{state="R"} 1
+tikv_threads_state{state="S"} 84
+# HELP tikv_worker_handled_task_total Total number of worker handled tasks.
+# TYPE tikv_worker_handled_task_total counter
+tikv_worker_handled_task_total{name="addr-resolver"} 0
+tikv_worker_handled_task_total{name="backup-endpoint"} 0
+tikv_worker_handled_task_total{name="cleanup-worker"} 0
+tikv_worker_handled_task_total{name="consistency-check"} 0
+tikv_worker_handled_task_total{name="deadlock-detector"} 0
+tikv_worker_handled_task_total{name="gc-worker"} 0
+tikv_worker_handled_task_total{name="lock-collector"} 0
+tikv_worker_handled_task_total{name="pd-worker"} 16
+tikv_worker_handled_task_total{name="raft-gc-worker"} 0
+tikv_worker_handled_task_total{name="region-collector-worker"} 0
+tikv_worker_handled_task_total{name="snap-handler"} 0
+tikv_worker_handled_task_total{name="snapshot-worker"} 0
+tikv_worker_handled_task_total{name="split-check"} 0
+tikv_worker_handled_task_total{name="waiter-manager"} 0
+# HELP tikv_worker_pending_task_total Current worker pending + running tasks.
+# TYPE tikv_worker_pending_task_total gauge
+tikv_worker_pending_task_total{name="addr-resolver"} 0
+tikv_worker_pending_task_total{name="backup-endpoint"} 0
+tikv_worker_pending_task_total{name="cleanup-worker"} 0
+tikv_worker_pending_task_total{name="consistenc	y-check"} 0
+tikv_worker_pending_task_total{name="deadlock-detector"} 0
+tikv_worker_pending_task_total{name="gc-worker"} 0
+tikv_worker_pending_task_total{name="lock-collector"} 0
+tikv_worker_pending_task_total{name="pd-worker"} 0
+tikv_worker_pending_task_total{name="raft-gc-worker"} 0
+tikv_worker_pending_task_total{name="region-collector-worker"} 0
+tikv_worker_pending_task_total{name="snap-handler"} 0
+tikv_worker_pending_task_total{name="snapshot-worker"} 0
+tikv_worker_pending_task_total{name="split-check"} 0
+tikv_worker_pending_task_total{name="waiter-manager"} 0

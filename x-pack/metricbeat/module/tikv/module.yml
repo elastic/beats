@@ -1,0 +1,4 @@
+name: tikv
+metricsets:
+- pd
+- server

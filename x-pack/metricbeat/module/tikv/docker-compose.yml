@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  tikv:
+    image: docker.elastic.co/integrations-ci/beats-tikv:${tikv_VERSION:-19.1.1}-1
+    build:
+      context: ./_meta
+      args:
+        tikv_VERSION: ${tikv_VERSION:-19.1.1}
+    ports:
+      - 8080

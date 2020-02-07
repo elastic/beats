@@ -217,6 +217,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-tikv,tikv>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-tikv-pd,pd>> beta[]  
+|<<metricbeat-metricset-tikv-server,server>> beta[]  
 |<<metricbeat-module-tomcat,Tomcat>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .4+| .4+|  |<<metricbeat-metricset-tomcat-cache,cache>> beta[]  
 |<<metricbeat-metricset-tomcat-memory,memory>> beta[]  
@@ -289,6 +292,7 @@ include::modules/sql.asciidoc[]
 include::modules/stan.asciidoc[]
 include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/tikv.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/uwsgi.asciidoc[]
