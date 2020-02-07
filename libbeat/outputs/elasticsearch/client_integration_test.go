@@ -129,7 +129,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	client.Delete(index, "", "", nil)
 
 	// Check version
-	if client.Connection.version.Major < 5 {
+	if client.Connection.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
@@ -210,7 +210,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	})
 	client.Delete(index, "", "", nil)
 
-	if client.Connection.version.Major < 5 {
+	if client.Connection.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
