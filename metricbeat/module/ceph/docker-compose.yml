@@ -10,7 +10,7 @@ services:
         CEPH_VERSION: ${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}
     ports:
       - 5000
-  ceph-nautilus:
+  ceph-mgr:
     image: docker.elastic.co/integrations-ci/beats-ceph:${CEPH_VERSION:-master-97985eb-nautilus-centos-7-x86_64}-1
     build:
       context: ./_meta
