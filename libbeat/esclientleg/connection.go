@@ -155,6 +155,25 @@ func (conn *Connection) execRequest(
 	return conn.execHTTPRequest(req)
 }
 
+// GetVersion returns the elasticsearch version the client is connected to.
+// The version is read and updated on 'Connect'.
+func (conn *Connection) GetVersion() common.Version {
+	return conn.version
+}
+
+// LoadJSON creates a PUT request based on a JSON document.
+func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
+	status, body, err := conn.Request("PUT", path, "", nil, json)
+	if err != nil {
+		return body, fmt.Errorf("couldn't load json. Error: %s", err)
+	}
+	if status > 300 {
+		return body, fmt.Errorf("couldn't load json. Status: %v", status)
+	}
+
+	return body, nil
+}
+
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 
@@ -196,12 +215,6 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	}
 
 	return status, obj, err
-}
-
-// GetVersion returns the elasticsearch version the client is connected to.
-// The version is read and updated on 'Connect'.
-func (conn *Connection) GetVersion() common.Version {
-	return conn.version
 }
 
 func closing(c io.Closer) {

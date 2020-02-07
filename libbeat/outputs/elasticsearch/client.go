@@ -485,19 +485,6 @@ func bulkCollectPublishFails(
 	return failed, stats
 }
 
-// LoadJSON creates a PUT request based on a JSON document.
-func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
-	status, body, err := client.Request("PUT", path, "", nil, json)
-	if err != nil {
-		return body, fmt.Errorf("couldn't load json. Error: %s", err)
-	}
-	if status > 300 {
-		return body, fmt.Errorf("couldn't load json. Status: %v", status)
-	}
-
-	return body, nil
-}
-
 func (client *Client) Test(d testing.Driver) {
 	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
 		u, err := url.Parse(client.URL)
