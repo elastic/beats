@@ -41,6 +41,8 @@ type publishClient struct {
 	es     *esout.Client
 	params map[string]string
 	format report.Format
+
+	log *logp.Logger
 }
 
 func newPublishClient(
@@ -53,6 +55,8 @@ func newPublishClient(
 		es:     es,
 		params: params,
 		format: format,
+
+		log: logp.NewLogger(logSelector),
 	}
 	return p, nil
 }
@@ -93,7 +97,11 @@ func (c *publishClient) Connect() error {
 		return errNoMonitoring
 	}
 
+<<<<<<< HEAD
 	c.log.Debug("XPack monitoring is enabled")
+=======
+	c.log.Debug(("XPack monitoring is enabled"))
+>>>>>>> Reducing global logging usage
 
 	return nil
 }
@@ -111,7 +119,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
+<<<<<<< HEAD
 			c.log.Errorf("Type not available in monitoring reported. Please report this error: %+v", err)
+=======
+			c.log.Errorf("Type not available in monitoring reported. Please report this error: %s", err)
+>>>>>>> Reducing global logging usage
 			continue
 		}
 

@@ -57,6 +57,8 @@ type Client struct {
 	proxyURL         *url.URL
 
 	observer outputs.Observer
+
+	log *logp.Logger
 }
 
 // ClientSettings contains the settings for a client.
@@ -154,35 +156,39 @@ func NewClient(
 		}
 	}
 
-	client := &Client{
-		Connection: esclientleg.Connection{
-			URL:      s.URL,
-			Username: s.Username,
-			Password: s.Password,
-			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
-			Headers:  s.Headers,
-			HTTP: &http.Client{
-				Transport: &http.Transport{
-					Dial:            dialer.Dial,
-					DialTLS:         tlsDialer.Dial,
-					TLSClientConfig: s.TLS.ToConfig(),
-					Proxy:           proxy,
-				},
-				Timeout: s.Timeout,
+	conn := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+		URL:      s.URL,
+		Username: s.Username,
+		Password: s.Password,
+		APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
+		Headers:  s.Headers,
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial:            dialer.Dial,
+				DialTLS:         tlsDialer.Dial,
+				TLSClientConfig: s.TLS.ToConfig(),
+				Proxy:           proxy,
 			},
-			Encoder: encoder,
+			Timeout: s.Timeout,
 		},
-		tlsConfig: s.TLS,
-		index:     s.Index,
-		pipeline:  pipeline,
-		params:    params,
-		timeout:   s.Timeout,
+		Encoder: encoder,
+	})
+
+	client := &Client{
+		Connection: *conn,
+		tlsConfig:  s.TLS,
+		index:      s.Index,
+		pipeline:   pipeline,
+		params:     params,
+		timeout:    s.Timeout,
 
 		bulkRequ: bulkRequ,
 
 		compressionLevel: compression,
 		proxyURL:         s.Proxy,
 		observer:         s.Observer,
+
+		log: logp.NewLogger("elasticsearch"),
 	}
 
 	client.Connection.OnConnectCallback = func() error {
@@ -377,7 +383,7 @@ func (client *Client) publishEvents(
 	}
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data)
+	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data, client.log)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -390,11 +396,11 @@ func (client *Client) publishEvents(
 	requ.Reset(body)
 	status, result, sendErr := client.SendBulkRequest(requ)
 	if sendErr != nil {
-		client.Connection.log.Error("Failed to perform any bulk index operations: %+v", sendErr)
+		client.log.Errorf("Failed to perform any bulk index operations: %s", sendErr)
 		return data, sendErr
 	}
 
-	client.Connection.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
+	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		len(data),
 		time.Now().Sub(begin))
 
@@ -405,7 +411,7 @@ func (client *Client) publishEvents(
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		failedEvents, stats = bulkCollectPublishFails(result, data)
+		failedEvents, stats = bulkCollectPublishFails(result, data, client.log)
 	}
 
 	failed := len(failedEvents)
@@ -440,6 +446,7 @@ func bulkEncodePublishRequest(
 	pipeline *outil.Selector,
 	eventType string,
 	data []publisher.Event,
+	logger *logp.Logger,
 ) []publisher.Event {
 	okEvents := data[:0]
 	for i := range data {
@@ -466,6 +473,7 @@ func createEventBulkMeta(
 	pipelineSel *outil.Selector,
 	eventType string,
 	event *beat.Event,
+	logger *logp.Logger,
 ) (interface{}, error) {
 	pipeline, err := getPipeline(event, pipelineSel)
 	if err != nil {

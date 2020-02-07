@@ -29,12 +29,16 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var (
-	debugf = logp.MakeDebug("esclientleg")
-)
-
 // Connection manages the connection for a given client.
 type Connection struct {
+	ConnectionSettings
+
+	version common.Version
+	log     *logp.Logger
+}
+
+// ConnectionSettings are the settings needed for a Connection
+type ConnectionSettings struct {
 	URL      string
 	Username string
 	Password string
@@ -45,7 +49,13 @@ type Connection struct {
 	OnConnectCallback func() error
 
 	Encoder BodyEncoder
-	version common.Version
+}
+
+func NewConnection(settings ConnectionSettings) *Connection {
+	return &Connection{
+		ConnectionSettings: settings,
+		log:                logp.NewLogger("esclientleg"),
+	}
 }
 
 // Connect connects the client. It runs a GET request against the root URL of
@@ -58,7 +68,7 @@ func (conn *Connection) Connect() error {
 	}
 
 	if version, err := common.NewVersion(versionString); err != nil {
-		logp.Err("Invalid version from Elasticsearch: %v", versionString)
+		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
 		conn.version = common.Version{}
 	} else {
 		conn.version = *version
@@ -76,11 +86,11 @@ func (conn *Connection) Connect() error {
 
 // Ping sends a GET request to the Elasticsearch.
 func (conn *Connection) Ping() (string, error) {
-	debugf("ES Ping(url=%v)", conn.URL)
+	conn.log.Debugf("ES Ping(url=%v)", conn.URL)
 
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
-		debugf("Ping request failed with: %v", err)
+		conn.log.Debugf("Ping request failed with: %v", err)
 		return "", err
 	}
 
@@ -99,8 +109,8 @@ func (conn *Connection) Ping() (string, error) {
 		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
 	}
 
-	debugf("Ping status code: %v", status)
-	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
+	conn.log.Debugf("Ping status code: %v", status)
+	conn.log.Infof("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 
@@ -118,7 +128,7 @@ func (conn *Connection) Request(
 ) (int, []byte, error) {
 
 	url := addToURL(conn.URL, path, pipeline, params)
-	debugf("%s %s %s %v", method, url, pipeline, body)
+	conn.log.Debugf("%s %s %s %v", method, url, pipeline, body)
 
 	return conn.RequestURL(method, url, body)
 }
@@ -134,7 +144,7 @@ func (conn *Connection) RequestURL(
 	}
 
 	if err := conn.Encoder.Marshal(body); err != nil {
-		logp.Warn("Failed to json encode body (%v): %#v", err, body)
+		conn.log.Warnf("Failed to json encode body (%v): %#v", err, body)
 		return 0, nil, ErrJSONEncodeFailed
 	}
 	return conn.execRequest(method, url, conn.Encoder.Reader())
@@ -146,7 +156,7 @@ func (conn *Connection) execRequest(
 ) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		logp.Warn("Failed to create request %+v", err)
+		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
 	}
 	if body != nil {
@@ -201,7 +211,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	if err != nil {
 		return 0, nil, err
 	}
-	defer closing(resp.Body)
+	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
 	obj, err := ioutil.ReadAll(resp.Body)
@@ -217,9 +227,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, err
 }
 
-func closing(c io.Closer) {
+func closing(c io.Closer, logger *logp.Logger) {
 	err := c.Close()
 	if err != nil {
-		logp.Warn("Close failed with: %v", err)
+		logger.Warn("Close failed with: %v", err)
 	}
 }

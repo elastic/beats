@@ -59,7 +59,7 @@ type reporter struct {
 	out []outputs.NetworkClient
 }
 
-const selector = "monitoring"
+const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
@@ -112,7 +112,7 @@ func defaultConfig(settings report.Settings) config {
 }
 
 func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) (report.Reporter, error) {
-	log := logp.NewLogger(selector)
+	log := logp.NewLogger(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
