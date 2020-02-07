@@ -31,8 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const eventDebugSelector = "event"
-
 var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
 
 type Float float64
@@ -51,7 +49,7 @@ type GenericEventConverter struct {
 // NewGenericEventConverter creates an EventConverter with the given configuration options
 func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 	return &GenericEventConverter{
-		log:      logp.NewLogger(eventDebugSelector),
+		log:      logp.NewLogger("event"),
 		keepNull: keepNull,
 	}
 }
