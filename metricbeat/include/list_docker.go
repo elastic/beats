@@ -29,6 +29,7 @@ package include
 
 import (
 	_ "github.com/elastic/beats/metricbeat/module/docker"
+	_ "github.com/elastic/beats/metricbeat/module/docker/__pycache__"
 	_ "github.com/elastic/beats/metricbeat/module/docker/container"
 	_ "github.com/elastic/beats/metricbeat/module/docker/cpu"
 	_ "github.com/elastic/beats/metricbeat/module/docker/diskio"
@@ -39,6 +40,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/docker/memory"
 	_ "github.com/elastic/beats/metricbeat/module/docker/network"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/__pycache__"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/container"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/controllermanager"
