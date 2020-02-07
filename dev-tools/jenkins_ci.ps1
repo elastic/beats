@@ -65,5 +65,7 @@ exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test 
 
 if (Test-Path "tests\system") {
     echo "Running python tests"
+    choco install -y python3
+    python --version
     exec { mage pythonUnitTest } "System test FAILURE"
 }
