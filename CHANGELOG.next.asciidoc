@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Fix a connection error in httpjson input. {pull}16123[16123]
 
 *Heartbeat*
 
