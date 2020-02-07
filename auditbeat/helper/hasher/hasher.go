@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	xxhash "github.com/cespare/xxhash/v2"
+	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"

@@ -7,7 +7,7 @@ package cache
 import (
 	"testing"
 
-	xxhash "github.com/cespare/xxhash/v2"
+	"github.com/cespare/xxhash/v2"
 	"github.com/stretchr/testify/assert"
 )
 
