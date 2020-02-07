@@ -2,10 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package elb
+package ec2
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -13,58 +12,18 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/logp"
 	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
+	"github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/test"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type testEventAccumulator struct {
-	events []bus.Event
-	lock   sync.Mutex
-}
-
-func (tea *testEventAccumulator) add(e bus.Event) {
-	tea.lock.Lock()
-	defer tea.lock.Unlock()
-
-	tea.events = append(tea.events, e)
-}
-
-func (tea *testEventAccumulator) len() int {
-	tea.lock.Lock()
-	defer tea.lock.Unlock()
-
-	return len(tea.events)
-}
-
-func (tea *testEventAccumulator) get() []bus.Event {
-	tea.lock.Lock()
-	defer tea.lock.Unlock()
-
-	res := make([]bus.Event, len(tea.events))
-	copy(res, tea.events)
-	return res
-}
-
-func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
-	start := time.Now()
-
-	for time.Now().Sub(start) < timeout {
-		if tea.len() >= targetLen {
-			return
-		}
-		time.Sleep(time.Millisecond)
-	}
-
-	t.Fatalf("Timed out waiting for num events to be %d", targetLen)
-}
-
 func Test_internalBuilder(t *testing.T) {
-	log := logp.NewLogger("elb")
-	lbl := fakeLbl()
-	lbls := []*lbListener{lbl}
-	fetcher := newMockFetcher(lbls, nil)
+	instance := fakeEC2Instance()
+	instances := []*ec2Instance{instance}
+	fetcher := newMockFetcher(instances, nil)
+	log := logp.NewLogger("ec2")
 	pBus := bus.New(log, "test")
 
 	cfg := &awsauto.Config{
@@ -81,14 +40,14 @@ func Test_internalBuilder(t *testing.T) {
 	listenerDone := make(chan struct{})
 	defer close(listenerDone)
 
-	var events testEventAccumulator
+	var events test.TestEventAccumulator
 	go func() {
 		for {
 			select {
 			case e := <-startListener.Events():
-				events.add(e)
+				events.Add(e)
 			case e := <-stopListener.Events():
-				events.add(e)
+				events.Add(e)
 			case <-listenerDone:
 				return
 			}
@@ -99,48 +58,52 @@ func Test_internalBuilder(t *testing.T) {
 	// Since we're turning a list of assets into a list of changes the second once() call should be a noop
 	provider.watcher.once()
 	provider.watcher.once()
-	events.waitForNumEvents(t, 1, time.Second)
+	events.WaitForNumEvents(t, 1, time.Second)
 
-	assert.Equal(t, 1, events.len())
+	assert.Equal(t, 1, events.Len())
 
 	expectedStartEvent := bus.Event{
-		"id":       lbl.arn(),
+		"id":       instance.instanceID(),
 		"provider": uuid,
 		"start":    true,
-		"host":     *lbl.lb.DNSName,
-		"port":     *lbl.listener.Port,
+		"aws": common.MapStr{
+			"ec2": instance.toMap(),
+		},
+		"cloud": instance.toCloudMap(),
 		"meta": common.MapStr{
-			"elb_listener": lbl.toMap(),
-			"cloud":        lbl.toCloudMap(),
+			"aws": common.MapStr{
+				"ec2": instance.toMap(),
+			},
+			"cloud": instance.toCloudMap(),
 		},
 	}
 
-	require.Equal(t, expectedStartEvent, events.get()[0])
+	require.Equal(t, expectedStartEvent, events.Get()[0])
 
-	fetcher.setLbls([]*lbListener{})
+	fetcher.setEC2s([]*ec2Instance{})
 
 	// Let run twice to ensure that duplicates don't cause an issue
 	provider.watcher.once()
 	provider.watcher.once()
-	events.waitForNumEvents(t, 2, time.Second)
+	events.WaitForNumEvents(t, 2, time.Second)
 
-	require.Equal(t, 2, events.len())
+	require.Equal(t, 2, events.Len())
 
 	expectedStopEvent := bus.Event{
 		"stop":     true,
-		"id":       lbl.arn(),
+		"id":       awsauto.SafeString(instance.ec2Instance.InstanceId),
 		"provider": uuid,
 	}
 
-	require.Equal(t, expectedStopEvent, events.get()[1])
+	require.Equal(t, expectedStopEvent, events.Get()[1])
 
 	// Test that in an error situation nothing changes.
-	preErrorEventCount := events.len()
+	preErrorEventCount := events.Len()
 	fetcher.setError(errors.New("oops"))
 
 	// Let run twice to ensure that duplicates don't cause an issue
 	provider.watcher.once()
 	provider.watcher.once()
 
-	assert.Equal(t, preErrorEventCount, events.len())
+	assert.Equal(t, preErrorEventCount, events.Len())
 }
