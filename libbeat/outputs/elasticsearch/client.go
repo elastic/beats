@@ -77,9 +77,6 @@ type ClientSettings struct {
 	Observer           outputs.Observer
 }
 
-// ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
-type ConnectCallback func(client *Client) error
-
 type bulkResultStats struct {
 	acked        int // number of events ACKed by Elasticsearch
 	duplicates   int // number of events failed with `create` due to ID already being indexed
