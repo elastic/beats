@@ -40,6 +40,8 @@ type FilesetConfig struct {
 	Enabled *bool                  `config:"enabled"`
 	Var     map[string]interface{} `config:"var"`
 	Input   map[string]interface{} `config:"input"`
+
+	Version   string `config:"version"`
 }
 
 // NewFilesetConfig creates a new FilesetConfig from a common.Config.
@@ -53,6 +55,7 @@ func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking configuration")
 	}
+
 
 	return &fcfg, nil
 }
