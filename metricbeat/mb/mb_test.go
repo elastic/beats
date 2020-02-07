@@ -83,7 +83,7 @@ func TestModuleConfig(t *testing.T) {
 		{
 			name: "missing required field",
 			in:   map[string]interface{}{},
-			err:  "missing required field accessing 'module'",
+			err:  "string value is not set accessing 'module'",
 		},
 		{
 			name: "valid config",
@@ -97,7 +97,7 @@ func TestModuleConfig(t *testing.T) {
 				Enabled:    true,
 				Period:     time.Second * 10,
 				Timeout:    0,
-				Query:      QueryParams{},
+				Query:      nil,
 			},
 		},
 		{

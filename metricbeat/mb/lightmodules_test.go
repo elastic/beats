@@ -194,22 +194,22 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
 			expectedOption: "test",
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"light module default metricset": {
 			config:         common.MapStr{"module": "service"},
 			expectedOption: "test",
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"light module override option": {
 			config:         common.MapStr{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"light module with query": {
 			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
@@ -220,7 +220,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config:         common.MapStr{"module": "service", "period": "42s"},
 			expectedOption: "test",
 			expectedPeriod: 42 * time.Second,
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
@@ -237,7 +237,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"mixed module with standard and light metricsets": {
 			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
 			expectedOption: "default",
-			expectedQuery:  QueryParams{},
+			expectedQuery:  nil,
 		},
 		"mixed module with unregistered and light metricsets": {
 			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
