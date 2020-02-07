@@ -33,9 +33,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var (
-	logger = logp.NewLogger("test")
-)
+var logger = logp.NewLogger("test")
 
 func TestNewInput_MissingConfigField(t *testing.T) {
 	config := common.MustNewConfigFrom(common.MapStr{
@@ -106,7 +104,7 @@ func TestNewInput_Run(t *testing.T) {
 	}
 
 	var client *mockedClient
-	newMqttClient = func(o *libmqtt.ClientOptions) libmqtt.Client {
+	newMqttClient := func(o *libmqtt.ClientOptions) libmqtt.Client {
 		client = &mockedClient{
 			onConnectHandler: o.OnConnect,
 			messages:         []mockedMessage{firstMessage, secondMessage},
@@ -117,7 +115,7 @@ func TestNewInput_Run(t *testing.T) {
 		return client
 	}
 
-	input, err := NewInput(config, connector, inputContext)
+	input, err := newInput(config, connector, inputContext, newMqttClient, backoff.NewEqualJitterBackoff)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -179,7 +177,7 @@ func TestNewInput_Run_Wait(t *testing.T) {
 	}
 
 	var client *mockedClient
-	newMqttClient = func(o *libmqtt.ClientOptions) libmqtt.Client {
+	newMqttClient := func(o *libmqtt.ClientOptions) libmqtt.Client {
 		client = &mockedClient{
 			onConnectHandler: o.OnConnect,
 			messages:         messages,
@@ -190,7 +188,7 @@ func TestNewInput_Run_Wait(t *testing.T) {
 		return client
 	}
 
-	input, err := NewInput(config, connector, inputContext)
+	input, err := newInput(config, connector, inputContext, newMqttClient, backoff.NewEqualJitterBackoff)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -259,11 +257,10 @@ func TestOnCreateHandler_SubscribeMultiple_Succeeded(t *testing.T) {
 	inputContext := new(finput.Context)
 	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
 	var clientSubscriptions map[string]byte
-	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
-
-	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
 	}
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{
 		tokens: []libmqtt.Token{&mockedToken{
@@ -279,11 +276,10 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSucceeded(t *testing.T) {
 	inputContext := new(finput.Context)
 	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
 	var clientSubscriptions map[string]byte
-	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
-
-	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
 	}
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{
 		tokens: []libmqtt.Token{&mockedToken{
@@ -301,14 +297,13 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSignalDone(t *testing.T) {
 	inputContext := new(finput.Context)
 	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
 	var clientSubscriptions map[string]byte
-	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions)
-
 	mockedBackoff := &mockedBackoff{
 		waits: []bool{true, false},
 	}
-	newBackoff = func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return mockedBackoff
 	}
+	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{
 		tokens: []libmqtt.Token{&mockedToken{

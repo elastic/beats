@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -83,9 +82,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 
 func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
-
-	newMqttClient = libmqtt.NewClient
-	newBackoff = backoff.NewEqualJitterBackoff
 
 	// Setup the input config.
 	config := common.MustNewConfigFrom(common.MapStr{

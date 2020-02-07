@@ -40,11 +40,6 @@ const (
 	subscribeRetryInterval = 1 * time.Second
 )
 
-var (
-	newMqttClient = libmqtt.NewClient
-	newBackoff    = backoff.NewEqualJitterBackoff
-)
-
 // Input contains the input and its config
 type mqttInput struct {
 	once sync.Once
@@ -68,6 +63,16 @@ func NewInput(
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
+	return newInput(cfg, connector, inputContext, libmqtt.NewClient, backoff.NewEqualJitterBackoff)
+}
+
+func newInput(
+	cfg *common.Config,
+	connector channel.Connector,
+	inputContext input.Context,
+	newMqttClient func(options *libmqtt.ClientOptions) libmqtt.Client,
+	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff,
+) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading mqtt input config")
@@ -88,7 +93,7 @@ func NewInput(
 	inflightMessages := new(sync.WaitGroup)
 	clientSubscriptions := createClientSubscriptions(config)
 	onMessageHandler := createOnMessageHandler(logger, out, inflightMessages)
-	onConnectHandler := createOnConnectHandler(logger, &inputContext, onMessageHandler, clientSubscriptions)
+	onConnectHandler := createOnConnectHandler(logger, &inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 	clientOptions, err := createClientOptions(config, onConnectHandler)
 	if err != nil {
 		return nil, err
@@ -127,7 +132,11 @@ func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflig
 	}
 }
 
-func createOnConnectHandler(logger *logp.Logger, inputContext *input.Context, onMessageHandler func(client libmqtt.Client, message libmqtt.Message), clientSubscriptions map[string]byte) func(client libmqtt.Client) {
+func createOnConnectHandler(logger *logp.Logger,
+	inputContext *input.Context,
+	onMessageHandler func(client libmqtt.Client, message libmqtt.Message),
+	clientSubscriptions map[string]byte,
+	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff) func(client libmqtt.Client) {
 	// The function subscribes the client to the specific topics (with retry backoff in case of failure).
 	return func(client libmqtt.Client) {
 		backoff := newBackoff(
