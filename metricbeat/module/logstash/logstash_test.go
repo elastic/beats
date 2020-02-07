@@ -15,32 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package logstash
 
 import (
-	"flag"
-	"fmt"
-	"os"
+	"testing"
 
-	"github.com/elastic/beats/filebeat/generator/module"
+	"github.com/stretchr/testify/assert"
 )
 
-func main() {
-	moduleName := flag.String("module", "", "Name of the module")
-	modulePath := flag.String("path", ".", "Path to the generated fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	flag.Parse()
-
-	if *moduleName == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
+func TestGetVertexClusterUUID(t *testing.T) {
+	tests := map[string]struct {
+		vertex              map[string]interface{}
+		overrideClusterUUID string
+		expectedClusterUUID string
+	}{
+		"vertex_and_override": {
+			map[string]interface{}{
+				"cluster_uuid": "v",
+			},
+			"o",
+			"v",
+		},
+		"vertex_only": {
+			vertex: map[string]interface{}{
+				"cluster_uuid": "v",
+			},
+			expectedClusterUUID: "v",
+		},
+		"override_only": {
+			overrideClusterUUID: "o",
+			expectedClusterUUID: "o",
+		},
+		"none": {
+			expectedClusterUUID: "",
+		},
 	}
 
-	err := module.Generate(*moduleName, *modulePath, *beatsPath)
-	if err != nil {
-		fmt.Printf("Cannot generate module: %v\n", err)
-		os.Exit(2)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.expectedClusterUUID, GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
+		})
 	}
-
-	fmt.Println("New module was generated, now you can start creating filesets by create-fileset command.")
 }

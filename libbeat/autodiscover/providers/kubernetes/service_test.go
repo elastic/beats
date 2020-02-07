@@ -281,7 +281,7 @@ func TestEmitEvent_Service(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}

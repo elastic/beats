@@ -2121,7 +2121,7 @@ type: long
 
 --
 
-*`aws.rds.read.iops`*::
+*`aws.rds.read_io.ops_per_sec`*::
 +
 --
 The average number of disk read I/O operations per second.
@@ -2165,7 +2165,7 @@ type: long
 
 --
 
-*`aws.rds.write.iops`*::
+*`aws.rds.write_io.ops_per_sec`*::
 +
 --
 The average number of disk write I/O operations per second.
@@ -20992,7 +20992,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
 
 
 type: scaled_float
