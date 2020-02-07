@@ -20,15 +20,13 @@ package esclientleg
 
 import (
 	"encoding/json"
+	"net/http"
 	"testing"
-	"time"
-
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 func GetValidQueryResult() QueryResult {
@@ -174,17 +172,17 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestClient(url string) *elasticsearch.Client {
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-		URL:              url,
-		Index:            outil.MakeSelector(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	if err != nil {
-		panic(err)
+func newTestConnection(url string) Connection {
+	return Connection{
+		URL: url,
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(0).Dial,
+			},
+			Timeout: 0,
+		},
+		Encoder: NewJSONEncoder(nil, false),
 	}
-	return client
 }
 
 func (r QueryResult) String() string {

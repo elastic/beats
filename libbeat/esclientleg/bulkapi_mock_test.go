@@ -55,7 +55,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	client := newTestClient(server.URL)
+	client := newTestConnection(server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -91,7 +91,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	client := newTestClient(server.URL)
+	client := newTestConnection(server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -131,7 +131,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	client := newTestClient(server.URL)
+	client := newTestConnection(server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
