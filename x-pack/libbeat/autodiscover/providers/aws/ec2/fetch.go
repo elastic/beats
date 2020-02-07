@@ -13,11 +13,11 @@ import (
 	"go.uber.org/multierr"
 
 <<<<<<< HEAD
+	"github.com/elastic/beats/v7/v7/libbeat/logp"
+	awsauto "github.com/elastic/beats/v7/v7/x-pack/libbeat/autodiscover/providers/aws"
+=======
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
-=======
-	"github.com/elastic/beats/libbeat/logp"
-	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 >>>>>>> Add autodiscover for aws_ec2 (#14823)
 )
 
