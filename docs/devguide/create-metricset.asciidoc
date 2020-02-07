@@ -92,7 +92,7 @@ func init() {
 [float]
 ===== Definition
 
-The MetricSet type defines all fields of the metricset. As a minimum it must inherit the `mb.BaseMetricSet` fields,
+The MetricSet type defines all fields of the metricset. As a minimum it must be composed of the `mb.BaseMetricSet` fields,
 but can be extended with additional entries. These variables can be used to persist data or configuration between
 multiple fetch calls.
 
