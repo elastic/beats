@@ -1,0 +1,11 @@
+- key: ec2_listener
+  title: "EC2 Listener"
+  description: >
+    AWS EC2 Listeners
+  short_config: false
+  release: experimental
+  fields:
+    - name: ec2_listener
+      type: group
+      description: >
+        Represents an AWS EC2 Listener, e.g. state of an EC2.
