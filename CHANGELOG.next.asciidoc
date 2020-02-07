@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
+- move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 
 *Heartbeat*
 
