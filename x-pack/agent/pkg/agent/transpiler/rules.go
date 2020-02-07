@@ -188,7 +188,7 @@ func (r *RemoveKeyRule) Apply(ast *AST) error {
 }
 
 // RemoveKey creates a RemoveKeyRule
-func RemoveKey(item Selector, key string) *RemoveKeyRule {
+func RemoveKey(key string) *RemoveKeyRule {
 	return &RemoveKeyRule{
 		Key: key,
 	}

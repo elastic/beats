@@ -24,62 +24,62 @@ func TestRules(t *testing.T) {
 	}{
 		"inject index": {
 			givenYAML: `
-streams:
-- name: All default
-  input:
-    type:	file
-    path:	/var/log/mysql/error.log
-- name: Specified namespace
-  namespace: nsns
-  input:
-    type:	file
-    path: /var/log/mysql/access.log
-- name: Specified dataset
-  dataset:
-    type: dsds
-  input:
-    type: mysql
-    host: localhost
-    port: 3306
-- name: All specified
-  namespace: nsns
-  dataset:
-    type: dsds
-  input:
-    type: mysql
-    host: localhost
-    port: 3306
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+  - name: Specified dataset
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
 `,
 			expectedYAML: `
-streams:
-- name: All default
-  input:
-    type:	file
-    path:	/var/log/mysql/error.log
-    index: mytype-default-generic
-- name: Specified namespace
-  namespace: nsns
-  input:
-    type:	file
-    path: /var/log/mysql/access.log
-    index: mytype-nsns-generic
-- name: Specified dataset
-  dataset:
-    type: dsds
-  input:
-    type: mysql
-    host: localhost
-    port: 3306
-    index: mytype-default-dsds
-- name: All specified
-  namespace: nsns
-  dataset:
-    type: dsds
-  input:
-    type: mysql
-    host: localhost
-    port: 3306
-    index: mytype-nsns-dsds
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+          index: mytype-default-generic
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          index: mytype-nsns-generic
+  - name: Specified dataset
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+          index: mytype-default-dsds
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+          index: mytype-nsns-dsds
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -445,6 +445,61 @@ inputs:
 			rule: &RuleList{
 				Rules: []Rule{
 					Map("inputs", TranslateWithRegexp("type", regexp.MustCompile("^metric/(.*)"), "$1")),
+				},
+			},
+		},
+
+		"remove key": {
+			givenYAML: `
+key1: val1
+key2: val2
+`,
+			expectedYAML: `
+key1: val1
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					RemoveKey("key2"),
+				},
+			},
+		},
+
+		"copy item to list": {
+			givenYAML: `
+namespace: testing
+inputs:
+  - type: metric/log
+  - type: metric/tcp
+`,
+			expectedYAML: `
+namespace: testing
+inputs:
+  - type: metric/log
+    namespace: testing
+  - type: metric/tcp
+    namespace: testing
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					CopyToList("namespace", "inputs"),
+				},
+			},
+		},
+
+		"Make array": {
+			givenYAML: `
+sample:
+  log: "log value"
+`,
+			expectedYAML: `
+sample:
+  log: "log value"
+logs:
+  - "log value"
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					MakeArray("sample.log", "logs"),
 				},
 			},
 		},
