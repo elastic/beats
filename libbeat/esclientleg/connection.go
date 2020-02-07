@@ -64,10 +64,13 @@ func (conn *Connection) Connect() error {
 		conn.version = *version
 	}
 
-	err = conn.OnConnectCallback()
-	if err != nil {
-		return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
+	if conn.OnConnectCallback != nil {
+		err = conn.OnConnectCallback()
+		if err != nil {
+			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
+		}
 	}
+
 	return nil
 }
 
