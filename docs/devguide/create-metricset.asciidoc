@@ -10,14 +10,14 @@ implementation of existing metricsets for inspiration.
 
 To create a new metricset:
 
-. Run the following command inside your beat directory:
+. Run the following command inside the metricbeat beat directory:
 +
 [source,bash]
 ----
 make create-metricset
 ----
 +
-You'll be prompted to enter a module and metricset name. Only use characters `[a-z]`
+You need Python to run this command, then, you'll be prompted to enter a module and metricset name. Remember that a module represents the service you want to retrieve metrics from (like Redis) and a metricset is a specific set of grouped metrics (like `info` on Redis). Only use characters `[a-z]`
 and, if required, underscores (`_`). No other characters are allowed.
 +
 When you run `make create-metricset`, it creates all the basic files for your metricset, along with the required module
@@ -37,12 +37,12 @@ make
 ----
 +
 The first command, `make collect`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
-`make`, compiles your source code and provides you with a binary called `{beat}` in the beat folder. You can run the
+`make`, compiles your source code and provides you with a binary called metricbeat in the same folder. You can run the
 binary in debug mode with the following command:
 +
 [source,bash]
 ----
-./{beat} -e -d "*"
+./metricbeat -e -d "*"
 ----
 
 After running the make commands, you'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
