@@ -74,7 +74,6 @@ func makePath(index string, docType string, id string) (string, error) {
 	return path, nil
 }
 
-// TODO: make this reusable. Same definition in elasticsearch monitoring module
 func ParseProxyURL(raw string) (*url.URL, error) {
 	if raw == "" {
 		return nil, nil

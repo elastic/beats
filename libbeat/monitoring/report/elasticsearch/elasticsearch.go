@@ -24,12 +24,12 @@ import (
 	"math/rand"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -131,7 +131,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		windowSize = 1
 	}
 
-	proxyURL, err := parseProxyURL(config.ProxyURL)
+	proxyURL, err := esclientleg.ParseProxyURL(config.ProxyURL)
 	if err != nil {
 		return nil, err
 	}
@@ -366,22 +366,6 @@ func closing(log *logp.Logger, c io.Closer) {
 	if err := c.Close(); err != nil {
 		log.Warnf("Closed failed with: %v", err)
 	}
-}
-
-// TODO: make this reusable. Same definition in elasticsearch monitoring module
-func parseProxyURL(raw string) (*url.URL, error) {
-	if raw == "" {
-		return nil, nil
-	}
-
-	url, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(url.Scheme, "http") {
-		return url, err
-	}
-
-	// Proxy was bogus. Try prepending "http://" to it and
-	// see if that parses correctly.
-	return url.Parse("http://" + raw)
 }
 
 func makeMeta(beat beat.Info) common.MapStr {
