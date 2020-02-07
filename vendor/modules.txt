@@ -73,10 +73,10 @@ github.com/Azure/go-autorest/logger
 github.com/Azure/go-autorest/tracing
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
-# github.com/Microsoft/go-winio v0.4.14
+# github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/Microsoft/hcsshim v0.8.7-0.20190904141738-84b0c364e1e3
+# github.com/Microsoft/hcsshim v0.8.7
 github.com/Microsoft/hcsshim/osversion
 # github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 => github.com/elastic/sarama v0.0.0-20191122160421-355d120d0970
 github.com/Shopify/sarama
@@ -268,7 +268,7 @@ github.com/cavaliercoder/go-rpm
 github.com/cavaliercoder/go-rpm/version
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
-# github.com/containerd/containerd v1.3.0
+# github.com/containerd/containerd v1.3.3
 github.com/containerd/containerd/errdefs
 # github.com/containerd/continuity v0.0.0-20200107194136-26c1120b8d41
 github.com/containerd/continuity/fs
@@ -279,9 +279,8 @@ github.com/containerd/continuity/sysx
 github.com/containerd/fifo
 # github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
 github.com/coreos/bbolt
-# github.com/coreos/go-systemd v0.0.0-00010101000000-000000000000 => github.com/coreos/go-systemd/v22 v22.0.0
-github.com/coreos/go-systemd/activation
 # github.com/coreos/go-systemd/v22 v22.0.0
+github.com/coreos/go-systemd/v22/activation
 github.com/coreos/go-systemd/v22/dbus
 github.com/coreos/go-systemd/v22/internal/dlopen
 github.com/coreos/go-systemd/v22/sdjournal
@@ -350,15 +349,15 @@ github.com/docker/docker/pkg/stringid
 github.com/docker/docker/pkg/system
 github.com/docker/docker/pkg/term
 github.com/docker/docker/pkg/term/windows
-# github.com/docker/go-connections v0.3.0
+# github.com/docker/go-connections v0.4.0
 github.com/docker/go-connections/nat
 github.com/docker/go-connections/sockets
 github.com/docker/go-connections/tlsconfig
 # github.com/docker/go-metrics v0.0.1
 github.com/docker/go-metrics
-# github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
+# github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8 => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 github.com/docker/go-plugins-helpers/sdk
-# github.com/docker/go-units v0.3.2
+# github.com/docker/go-units v0.4.0
 github.com/docker/go-units
 # github.com/dop251/goja v0.0.0-00010101000000-000000000000 => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 github.com/dop251/goja
@@ -480,7 +479,7 @@ github.com/godror/godror
 github.com/gofrs/flock
 # github.com/gofrs/uuid v3.2.0+incompatible
 github.com/gofrs/uuid
-# github.com/gogo/protobuf v1.2.2-0.20190818160850-4c00d2f19fb9
+# github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
 # github.com/golang/protobuf v1.3.2
@@ -726,7 +725,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest/observer
-# golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413
+# golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/cast5
 golang.org/x/crypto/ed25519
@@ -749,7 +748,7 @@ golang.org/x/exp/cmd/apidiff
 # golang.org/x/lint v0.0.0-20190930215403-16217165b5de
 golang.org/x/lint
 golang.org/x/lint/golint
-# golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
+# golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 golang.org/x/net/bpf
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -883,8 +882,9 @@ google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/googleapis/type/calendarperiod
 google.golang.org/genproto/googleapis/type/expr
 google.golang.org/genproto/protobuf/field_mask
-# google.golang.org/grpc v1.25.1
+# google.golang.org/grpc v1.27.1
 google.golang.org/grpc
+google.golang.org/grpc/attributes
 google.golang.org/grpc/backoff
 google.golang.org/grpc/balancer
 google.golang.org/grpc/balancer/base
