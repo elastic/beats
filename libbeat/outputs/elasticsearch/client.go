@@ -505,9 +505,9 @@ func createEventBulkMeta(
 	}
 
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		return esclientleg.BulkCreateAction{meta}, nil
+		return esclientleg.BulkCreateAction{Create: meta}, nil
 	}
-	return esclientleg.BulkIndexAction{meta}, nil
+	return esclientleg.BulkIndexAction{Index: meta}, nil
 }
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
