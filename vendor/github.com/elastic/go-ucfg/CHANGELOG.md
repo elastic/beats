@@ -13,6 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 ### Fixed
+- Fixed nonzero validator to not fail on nil array or slice. #147
+- Fixed nonzero validator to validate maps.
+- Fixed required validator to validate maps.
 
 ## [0.8.1]
 
