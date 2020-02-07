@@ -19,7 +19,11 @@
 
 package esclientleg
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestUrlEncode(t *testing.T) {
 	params := map[string]string{
@@ -73,5 +77,51 @@ func TestMakePath(t *testing.T) {
 	}
 	if path != "/twitter" {
 		t.Errorf("Wrong path created: %s", path)
+	}
+}
+
+func TestAddToURL(t *testing.T) {
+	type Test struct {
+		url      string
+		path     string
+		pipeline string
+		params   map[string]string
+		expected string
+	}
+	tests := []Test{
+		{
+			url:      "localhost:9200",
+			path:     "/path",
+			pipeline: "",
+			params:   make(map[string]string),
+			expected: "localhost:9200/path",
+		},
+		{
+			url:      "localhost:9200/",
+			path:     "/path",
+			pipeline: "",
+			params:   make(map[string]string),
+			expected: "localhost:9200/path",
+		},
+		{
+			url:      "localhost:9200",
+			path:     "/path",
+			pipeline: "pipeline_1",
+			params:   make(map[string]string),
+			expected: "localhost:9200/path?pipeline=pipeline_1",
+		},
+		{
+			url:      "localhost:9200/",
+			path:     "/path",
+			pipeline: "",
+			params: map[string]string{
+				"param": "value",
+			},
+			expected: "localhost:9200/path?param=value",
+		},
+	}
+	for _, test := range tests {
+		url := addToURL(test.url, test.path, test.pipeline, test.params)
+		assert.Equal(t, url, test.expected)
 	}
 }

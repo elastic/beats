@@ -299,52 +299,6 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.Equal(t, 2, requestCount)
 }
 
-func TestAddToURL(t *testing.T) {
-	type Test struct {
-		url      string
-		path     string
-		pipeline string
-		params   map[string]string
-		expected string
-	}
-	tests := []Test{
-		{
-			url:      "localhost:9200",
-			path:     "/path",
-			pipeline: "",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path",
-		},
-		{
-			url:      "localhost:9200/",
-			path:     "/path",
-			pipeline: "",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path",
-		},
-		{
-			url:      "localhost:9200",
-			path:     "/path",
-			pipeline: "pipeline_1",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path?pipeline=pipeline_1",
-		},
-		{
-			url:      "localhost:9200/",
-			path:     "/path",
-			pipeline: "",
-			params: map[string]string{
-				"param": "value",
-			},
-			expected: "localhost:9200/path?param=value",
-		},
-	}
-	for _, test := range tests {
-		url := esclientleg.addToURL(test.url, test.path, test.pipeline, test.params)
-		assert.Equal(t, url, test.expected)
-	}
-}
-
 type testBulkRecorder struct {
 	data     []interface{}
 	inAction bool
