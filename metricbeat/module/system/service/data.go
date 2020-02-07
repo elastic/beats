@@ -22,7 +22,7 @@ package service
 import (
 	"time"
 
-	"github.com/coreos/go-systemd/dbus"
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
