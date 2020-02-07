@@ -180,7 +180,23 @@ pipeline {
                 mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
                 //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
               }
+<<<<<<< HEAD
+=======
             }
+          }
+        }
+        stage('Auditbeat x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false"
+>>>>>>> ci: run test on Windows (#15570)
+            }
+          }
+          steps {
+            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
           }
         }
         stage('Auditbeat x-pack'){
@@ -526,16 +542,13 @@ pipeline {
   }
 }
 
-def makeTarget(context, target, clean = true){
+def makeTarget(context, target){
   withGithubNotify(context: "${context}") {
     withBeatsEnv(){
       sh(label: "Make ${target}", script: """
         eval "\$(gvm use ${GO_VERSION} --format=bash)"
         make ${target}
       """)
-      if(clean) {
-        sh(script: 'script/fix_permissions.sh ${HOME}')
-      }
     }
   }
 }
