@@ -101,8 +101,8 @@ type nodeInfo struct {
 type inNodeInfo struct {
 	nodeInfo
 	Monitoring struct {
-		ClusterID string `json:"cluster_uuid,omitempty"`
-	} `json:"monitoring,omitempty"`
+		ClusterID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
 }
 
 type reloads struct {
