@@ -64,11 +64,14 @@ $packages = ($packages|group|Select -ExpandProperty Name) -join ","
 exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
 
 if (Test-Path "tests\system") {
-    # Installation of python 3 to be removed once it is installed in the base image
     echo "Installing python 3"
-    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.7.6/python-3.7.6-embed-amd64.zip" | Expand-Archive -DestinationPath "build/python" -Force
     $currentDir = (Get-Item -Path ".\").FullName
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe" -OutFile "build\python-installer.exe"
+    .\build\python-installer.exe /quiet InstallAllUsers=0 SimpleInstall=1 Shortcuts=0 Include_launcher=0 AssociateFiles=0 Include_test=0 Include_doc=0 TargetDir="$currentDir\build\python"
     $env:PATH = "$currentDir\build\python;$env:PATH"
+    python --version
+    python -m venv --help
 
     echo "Running python tests"
     exec { mage pythonUnitTest } "System test FAILURE"
