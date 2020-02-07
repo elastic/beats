@@ -38,7 +38,7 @@ class TestCAPinning(BaseTest):
                 "username": "admin",
                 "password": "changeme",
                 "ssl.certificate_authorities": [ca],
-                "ssl.ca_sha256": "s1fmFCvb3eN6Zfk14+zD23JtJalUhCWl3MtwPGrQNIE=",
+                "ssl.ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
             },
         )
 

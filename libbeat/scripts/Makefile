@@ -40,8 +40,8 @@ ES_HOST?=elasticsearch
 ES_PORT?=9200
 ES_USER?=beats
 ES_PASS?=testing
-ES_HOST_SSL?=elasticsearch_ssl
-ES_PORT_SSL?=9205
+ES_HOST_SSL?=elasticsearchssl
+ES_PORT_SSL?=9200
 KIBANA_HOST?=kibana
 KIBANA_PORT?=5601
 # Kibana's Elaticsearch user
