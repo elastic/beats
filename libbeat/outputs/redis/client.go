@@ -21,6 +21,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -77,7 +78,7 @@ func newClient(
 		observer: observer,
 		timeout:  timeout,
 		password: pass,
-		index:    index,
+		index:    strings.ToLower(index),
 		db:       db,
 		dataType: dt,
 		key:      key,

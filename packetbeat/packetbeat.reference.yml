@@ -40,6 +40,13 @@ packetbeat.interfaces.device: any
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
+# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# This option does not work with `any` interface device.
+# The default option is false and requires manual set-up of promiscuous mode.
+# Warning: under some circumstances (e.g beat crash) promiscuous mode
+# can stay enabled even after beat is shut down.
+#packetbeat.interfaces.auto_promisc_mode: true
+
 #================================== Flows =====================================
 
 packetbeat.flows:
@@ -1480,7 +1487,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
