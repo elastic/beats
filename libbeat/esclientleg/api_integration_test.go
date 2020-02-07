@@ -189,7 +189,7 @@ type Connectable interface {
 
 // getTestingElasticsearch creates a test client.
 func getTestingElasticsearch(t TestLogger) *Connection {
-	connection := Connection{
+	connection := NewConnection(ConnectionSettings{
 		URL: getURL(),
 		HTTP: &http.Client{
 			Transport: &http.Transport{
@@ -198,7 +198,8 @@ func getTestingElasticsearch(t TestLogger) *Connection {
 			Timeout: 0,
 		},
 		Encoder: NewJSONEncoder(nil, false),
-	}
+	})
+
 	err := connection.Connect()
 	if err != nil {
 		t.Fatal(err)
