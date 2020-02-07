@@ -33,7 +33,7 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.http?.response?.status_code !=null && ctx.http.response.status_code > 399"
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code > 399"
 - lowercase:
     field: http.request.method
     ignore_missing: true
