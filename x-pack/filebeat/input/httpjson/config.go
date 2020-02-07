@@ -38,9 +38,6 @@ type Pagination struct {
 }
 
 func (c *config) Validate() error {
-	if c.Interval < 3600*time.Second && c.Interval != 0 {
-		return errors.New("httpjson input: interval must not be less than 3600 seconds - ")
-	}
 	switch strings.ToUpper(c.HTTPMethod) {
 	case "GET":
 		break
