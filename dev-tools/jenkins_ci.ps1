@@ -65,7 +65,9 @@ exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test 
 
 if (Test-Path "tests\system") {
     echo "Running python tests"
-    choco install -y python3
+    choco install python -y -r --version 3.8.1.20200110
+    refreshenv
+    $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
     python --version
     exec { mage pythonUnitTest } "System test FAILURE"
 }
