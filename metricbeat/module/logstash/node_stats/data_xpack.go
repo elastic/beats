@@ -96,9 +96,13 @@ type nodeInfo struct {
 	Status      string   `json:"status"`
 	HTTPAddress string   `json:"http_address"`
 	Pipeline    pipeline `json:"pipeline"`
-	Monitoring  struct {
-		ClusterID string `json:"cluster_uuid"`
-	} `json:"monitoring"`
+}
+
+type inNodeInfo struct {
+	nodeInfo
+	Monitoring struct {
+		ClusterID string `json:"cluster_uuid,omitempty"`
+	} `json:"monitoring,omitempty"`
 }
 
 type reloads struct {
@@ -108,7 +112,7 @@ type reloads struct {
 
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
-	nodeInfo
+	inNodeInfo
 	commonStats
 	Process   process                  `json:"process"`
 	OS        os                       `json:"os"`
