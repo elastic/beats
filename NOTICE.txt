@@ -693,10 +693,10 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: github.com/cespare/xxhash
-Version: v1.1.0
+Dependency: github.com/cespare/xxhash/v2
+Version: v2.1.1
 License type (autodetected): MIT
-./vendor/github.com/cespare/xxhash/LICENSE.txt:
+./vendor/github.com/cespare/xxhash/v2/LICENSE.txt:
 --------------------------------------------------------------------
 Copyright (c) 2016 Caleb Spare
 
@@ -795,9 +795,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Revision: e64a0ec8b42a
+Overwrite: github.com/coreos/go-systemd/v22
+Overwrite-Version: v22.0.0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+CoreOS Project
+Copyright 2018 CoreOS, Inc
+
+This product includes software developed at CoreOS, Inc.
+(http://www.coreos.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/coreos/go-systemd/v22
+Version: v22.0.0
+License type (autodetected): Apache-2.0
+./vendor/github.com/coreos/go-systemd/v22/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -2033,10 +2049,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
-Dependency: github.com/godbus/dbus
-Version: v4.1.0
+Dependency: github.com/godbus/dbus/v5
+Version: v5.0.3
 License type (autodetected): BSD-2-Clause
-./vendor/github.com/godbus/dbus/LICENSE:
+./vendor/github.com/godbus/dbus/v5/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
 All rights reserved.

@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 )
