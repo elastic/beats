@@ -4,7 +4,7 @@
 :log-driver: Elastic Log Driver
 :log-driver-long: Elastic Log Driver for Docker
 :log-driver-alias: elastic-logging-plugin
-:docker-version: ???
+:docker-version: Engine API 1.25
 
 include::{libbeat-dir}/version.asciidoc[]
 
@@ -19,3 +19,7 @@ include::install.asciidoc[]
 include::configuration.asciidoc[]
 
 include::usage.asciidoc[]
+
+include::troubleshooting.asciidoc[]
+
+include::limitations.asciidoc[]

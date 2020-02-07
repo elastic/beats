@@ -1,0 +1,11 @@
+[[log-driver-limitations]]
+[role="xpack"]
+== Known problems and limitations
+
+experimental[]
+
+This release of the {log-driver} has the following problems and limitations:
+
+coming[a future update. This documentation is a work in progress]
+
+//* Add limitations here... 

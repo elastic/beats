@@ -1,8 +1,5 @@
-// I thought it might be useful to put the descriptions we want to use in into variables.
-
-:shortdesc: {log-driver} is a Docker logging plugin for shipping container logs to the {stack}.
-
 [[log-driver-overview]]
+[role="xpack"]
 == {log-driver} overview
 
 ++++
@@ -11,6 +8,12 @@
 
 experimental[]
 
-{shortdesc}
+The {log-driver} is a Docker plugin that sends container logs to the
+https://www.elastic.co/elastic-stack[{stack}], where you can search, analyze,
+and visualize the data in real time.
 
-TODO: Add more detail here.
+The {log-driver} is built on top of the https://www.elastic.co/beats[{beats}]
+platform and supports many of the features and outputs supported by the
+{beats} shippers.
+
+Beat users: see <<log-driver-limitations>>.
