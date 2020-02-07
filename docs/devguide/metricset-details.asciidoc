@@ -87,24 +87,37 @@ functionality of the metricset and `Fetch` method from the data mapping.
 [float]
 ==== fields.yml
 
-The `fields.yml` file is used for different purposes:
+You can find up to 3 `fields.yml` files in the beats repository for each metricbeat module:
+
+[float]
+===== metricbeat/fields.yml
+
+This file is located at `metricbeat/fields.yml` and it is used for different purposes:
 
 * Creates the Elasticsearch template
 * Creates the Kibana index pattern configuration
 * Creates the Exported Fields documentation for the metricset
 
 To make sure the Elasticsearch template is correct, it's important to keep this file up-to-date
-with all the changes. There is a `fields.yml` file under `module/{module}/_meta/fields.yml` that contains
+with all the changes. 
+
+[float]
+===== metricbeat/[module]/_meta/fields.yml
+
+The second `fields.yml` file is under `metricbeat/module/{module}/_meta/fields.yml` and it contains
 the general top level structure for all metricsets. Normally you only need to modify the description in this file.
 
-Here an example for the `fields.yml` file from the MySQL module.
+Here is an example for the `fields.yml` file from the MySQL module.
 
 [source,yaml]
 ----
 include::../../metricbeat/module/mysql/_meta/fields.yml[]
 ----
 
-There is another `fields.yml` file under `module/{module}/{metricset}/_meta/fields.yml` that contains all fields retrieved
+[float]
+===== metricbeat/[module]/[metricset]/_meta/fields.yml
+
+The last `fields.yml` file is under `metricbeat/module/{module}/{metricset}/_meta/fields.yml` and it contains all fields retrieved
 by the metricset. As field types, each field must have a core data type
 https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes[supported by elasticsearch]. Here's a very basic example that shows one group from the MySQL `status` metricset:
 
@@ -148,7 +161,7 @@ We recommend that you use all three when you create a metricset. Unit tests are
 written in Go and have no dependencies. Integration tests are also written
 in Go but require the service from which the module collects metrics to also be running.
 System tests for Metricbeat also require the service to be running in most cases and are
-written in Python based on our small Python test framework.
+written in Python {python_major_version} based on our small Python test framework.
 We use `virtualenv` to deal with Python dependencies.
 You can simply run the command `make python-env`  and then `. build/python-env/bin/activate` .
 
