@@ -3,21 +3,36 @@ cmd: filebeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
-- filter_values:
-    selector: streams
-    key: type
-    values:
-    - logs
-
 - inject_index:
     type: filebeat
 
+- extract_list_items:
+    path: datasources
+    item: inputs
+    to: inputsstreams
+
 - map:
-    path: streams
+    path: inputsstreams
+    rules:
+    - copy_to_list:
+        item: type
+        to: streams
+    - copy_to_list:
+        item: processors
+        to: streams
+
+- extract_list_items:
+    path: inputsstreams
+    item: streams
+    to: inputs
+
+- map:
+    path: inputs
     rules:
     - translate:
-        path: input.type
+        path: type
         mapper:
+          logs: log
           event/file: log
           event/stdin: stdin
           event/tcp: tcp
@@ -26,10 +41,6 @@ rules:
           log/redis_slowlog: redis
           log/syslog: syslog
 
-- extract_list_items:
-    path: streams
-    item: input
-    to: inputs
 
 - filter_values:
     selector: inputs
@@ -42,6 +53,12 @@ rules:
     - docker
     - redis
     - syslog
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
 
 - copy:
     from: inputs

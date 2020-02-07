@@ -3,15 +3,15 @@ fleet:
     kibana_url:		https://kibana.mydomain.com:5601
     ca_hash:		7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
     checkin_interval:	5m
-streams:
-  - type: logs
-    name: generic logs
-    input:
-      type: event/file
-      enabled: true
-      paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
+datasources:
+  - use_output: default
+    inputs:
+      - type: event/file
+        streams:
+          - enabled: true
+            paths:
+              - /var/log/hello1.log
+              - /var/log/hello2.log
 management:
   host: "localhost"
 config:

@@ -3,30 +3,60 @@ cmd: metricbeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
 configurable: grpc
 rules:
-- filter_values:
-    selector: streams
-    key: type
-    values:
-    - metrics
-
 - inject_index:
     type: metricbeat
 
 - extract_list_items:
-    path: streams
-    item: input
+    path: datasources
+    item: inputs
+    to: inputsstreams
+
+- map:
+    path: inputsstreams
+    rules:
+    - copy_to_list:
+        item: type
+        to: streams
+    - copy_to_list:
+        item: processors
+        to: streams
+
+- extract_list_items:
+    path: inputsstreams
+    item: streams
     to: inputs
+
+
+- filter_values_with_regexp:
+    key: type
+    re: ^metrics/.+
+    selector: inputs
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
 
 - map:
     path: inputs
     rules:
     - translate_with_regexp:
         path: type
-        re: ^metric/(?P<type>.+)
+        re: ^metrics/(?P<type>.+)
         with: $type
     - rename:
         from: type
         to: module
+    - make_array:
+        item: metricset
+        to: metricsets
+    - remove_key:
+        key: metricset
+    - remove_key:
+        key: enabled
+    - remove_key:
+        key: dataset
 
 - copy:
     from: inputs

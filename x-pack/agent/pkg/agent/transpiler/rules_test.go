@@ -506,6 +506,7 @@ func TestSerialization(t *testing.T) {
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
 		InjectIndex("index-type"),
+		CopyToList("t1", "t2"),
 	)
 
 	y := `- rename:
@@ -552,6 +553,9 @@ func TestSerialization(t *testing.T) {
     to: target
 - inject_index:
     type: index-type
+- copy_to_list:
+    item: t1
+    to: t2
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

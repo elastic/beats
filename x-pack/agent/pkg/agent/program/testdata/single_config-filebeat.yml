@@ -14,4 +14,4 @@ output:
     username: elastic
     password: changeme
     api_key:	TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
-    ca_hash:	7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+    ca_sha256:	7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=

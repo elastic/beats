@@ -51,33 +51,32 @@ Something went wrong
 		func(t *testing.T) *http.ServeMux {
 			raw := `
 {
-    "actions": [
-        {
-            "type": "POLICY_CHANGE",
-            "id": "id1",
-            "data": {
-                "policy": {
-                    "id": "policy-id",
-                    "outputs": {
-                        "default": {
-                            "hosts": "https://localhost:9200"
-                        }
-                    },
-                    "streams": [
-                        {
-                            "id": "string",
-                            "type": "logs",
-                            "path": "/var/log/hello.log",
-                            "output": {
-                                "use_output": "default"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    ],
-    "success": true
+	"actions": [{
+		"type": "POLICY_CHANGE",
+		"id": "id1",
+		"data": {
+			"policy": {
+				"id": "policy-id",
+				"outputs": {
+					"default": {
+						"hosts": "https://localhost:9200"
+					}
+				},
+				"datasources": [{
+					"id": "string",
+					"enabled": true,
+					"use_output": "default",
+					"inputs": [{
+						"type": "logs",
+						"streams": [{
+							"paths": ["/var/log/hello.log"]
+						}]
+					}]
+				}]
+			}
+		}
+	}],
+	"success": true
 }
 `
 			mux := http.NewServeMux()
@@ -121,16 +120,17 @@ Something went wrong
                             "hosts": "https://localhost:9200"
                         }
                     },
-                    "streams": [
-                        {
-                            "id": "string",
-                            "type": "logs",
-                            "path": "/var/log/hello.log",
-                            "output": {
-                                "use_output": "default"
-                            }
-                        }
-                    ]
+					"datasources": [{
+						"id": "string",
+						"enabled": true,
+						"use_output": "default",
+						"inputs": [{
+							"type": "logs",
+							"streams": [{
+								"paths": ["/var/log/hello.log"]
+							}]
+						}]
+					}]
                 }
             }
         },
