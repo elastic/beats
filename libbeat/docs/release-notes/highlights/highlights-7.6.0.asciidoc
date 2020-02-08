@@ -7,8 +7,8 @@
 Each release of {beats} brings new features and product improvements. 
 Following are the most notable features and enhancements in 7.6.
 
-For a complete list of highlights, see the 
-https://www.elastic.co/blog/beats-7-6-0-released[{beats} 7.6 release blog].
+//For a complete list of highlights, see the 
+//https://www.elastic.co/blog/observability-7-6-0-released[Observability 7.6 release blog].
 
 For a list of bug fixes and other changes, see the {beats}
 <<breaking-changes-7.6, Breaking Changes>> and <<release-notes, Release Notes>>.
@@ -18,8 +18,58 @@ For a list of bug fixes and other changes, see the {beats}
 
 // tag::notable-highlights[]
 
-//[float]
-//==== Highlight
+[float]
+==== Support added for TLS 1.3
+
+In 7.6, we've added support for TLS 1.3, enabling you to take advantage
+of the security and performance improvements available in TLS 1.3 when {beats}
+connects to an {es} cluster that supports it.
+
+//REVIEWERS: Any more details to add here. GitHub issues/PRs were spare.
+
+[float]
+==== Azure cloud monitoring improvements
+
+The new {metricbeat-ref}/metricbeat-metricset-azure-storage.html[`storage`]
+metricset in the {metricbeat} {metricbeat-ref}/metricbeat-module-azure.html[Azure]
+module adds the ability to collect metrics from storage accounts.
+
+We've also made it easier for you to do a cost analysis on metrics
+collection by adding a cost warning message to each metrics API call. The
+message indicates the cost applied while retrieving metric values from Azure
+resources.
+
+[float]
+==== Google cloud improvements
+
+Starting in 7.6, you can use {functionbeat} to get events from 
+https://cloud.google.com/pubsub/[Google Pub/Sub] and
+https://cloud.google.com/storage/[Google Cloud Storage].
+
+You define functions that respond to Google triggers then export them as YAML
+files that you deploy by using the Google Cloud Deployment Manager. 
+
+// REVIEWERS: I can't say much about this yet because I just started working on
+// the docs. Please let me know what details we should include here and how we
+// want to position this.
+
+[float]
+==== Better support for document deduplication
+
+To help prevent duplicate events, we've introduced `document_id` settings
+in {beats} that you can use to set the document ID _before_ sending events to
+an output. The ID is stored in the {beats} `@metadata._id` field and used to
+set the document ID during indexing. Both the `decode_json_fields` processor and
+`json` options in the {filebeat} have been enhanced to include a
+`document_id` setting to use when decoding JSON data. 
+
+We've also added new processors for generating IDs when your data has no natural
+key field. The {filebeat-ref}/add-id.html[`add_id`] processor generates a unique
+ID for an event. The {filebeat-ref}/fingerpring.html[`fingerprint`] processor
+generates a fingerprint of an event based on a specified subset of its fields.
+
+To learn more, see {filebeat-ref}/filebeat-deduplication.html[Data
+deduplication].
 
 //Description
 
