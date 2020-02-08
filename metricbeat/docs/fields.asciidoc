@@ -3933,6 +3933,11 @@ type: long
 --
 
 [float]
+=== ceph
+
+Status metrics of Ceph cluster
+
+[float]
 === monitor_health
 
 monitor_health stats data

@@ -1,0 +1,3 @@
+name: ceph
+metricsets:
+  - mgr_cluster_health
