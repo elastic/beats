@@ -6752,18 +6752,6 @@
 			"revisionTime": "2016-08-18T02:01:20Z"
 		},
 		{
-			"checksumSHA1": "9zWLKf1I9P/EOJFQwdlf0oWBWdU=",
-			"path": "gopkg.in/vmihailenco/msgpack.v2",
-			"revision": "f4f8982de4ef0de18be76456617cc3f5d8d8141e",
-			"revisionTime": "2017-05-02T10:41:14Z"
-		},
-		{
-			"checksumSHA1": "KqVHe5SB85yaDcseNq2CogozjRk=",
-			"path": "gopkg.in/vmihailenco/msgpack.v2/codes",
-			"revision": "f4f8982de4ef0de18be76456617cc3f5d8d8141e",
-			"revisionTime": "2017-05-02T10:41:14Z"
-		},
-		{
 			"checksumSHA1": "ZSWoOPUNRr5+3dhkLK3C4cZAQPk=",
 			"path": "gopkg.in/yaml.v2",
 			"revision": "5420a8b6744d3b0345ab293f6fcba19c978f1183",
