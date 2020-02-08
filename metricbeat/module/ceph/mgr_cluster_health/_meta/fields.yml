@@ -1,0 +1,10 @@
+- name: mgr_cluster_health
+  type: group
+  release: beta
+  description: >
+    mgr_cluster_health
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
