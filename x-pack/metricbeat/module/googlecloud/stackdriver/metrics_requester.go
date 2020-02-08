@@ -55,7 +55,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   fmt.Sprintf(`metric.type="%s" AND resource.labels.zone = "%s"`, m, r.config.Zone),
+		Filter:   constructFilter(m, r.config.Region, r.config.Zone),
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
@@ -74,6 +74,18 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 	}
 
 	return
+}
+
+func constructFilter(m string, region string, zone string) string {
+	filter := fmt.Sprintf(`metric.type="%s" AND resource.labels.zone = `, m)
+	// If region is specified, use region as filter resource label.
+	// If region is empty but zone is given, use zone instead.
+	if region != "" {
+		filter += fmt.Sprintf(`starts_with("%s")`, region)
+	} else if zone != "" {
+		filter += fmt.Sprintf(`"%s"`, zone)
+	}
+	return filter
 }
 
 func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) ([]*monitoringpb.TimeSeries, error) {
