@@ -18,6 +18,9 @@
 package mb
 
 import (
+	"fmt"
+	"net/url"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -83,7 +86,18 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		// At this point host parser was already run, we need to run this again
 		// with the overriden defaults
 		if registration.HostParser != nil {
-			base.hostData, err = registration.HostParser(base.module, base.host)
+			u, err := url.Parse(base.hostData.URI)
+			if err != nil {
+				return nil, errors.Wrapf(err, "host data URI parsing failed on light metricset factory for '%s/%s'", m.Module, m.Name)
+			}
+
+			var host string
+			if u.Scheme != "" {
+				host = fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+			} else {
+				host = base.host
+			}
+			base.hostData, err = registration.HostParser(base.module, host)
 			if err != nil {
 				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
 			}
