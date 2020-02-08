@@ -1,10 +1,5 @@
-- name: mgr_cluster_health
+- name: ceph
   type: group
+  description: Status metrics of Ceph cluster
   release: beta
-  description: >
-    mgr_cluster_health
   fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field

@@ -1,0 +1,25 @@
+default: true
+input:
+  module: http
+  metricset: json
+  defaults:
+    method: POST
+    namespace: "json_namespace"
+    basepath: "/request"
+    headers:
+      Content-Type: application/json
+    query:
+      wait: "1"
+    body: '{"prefix": "status", "format": "json"}'
+
+processors:
+  - extract_array:
+      field: http.json_namespace.finished
+      mappings:
+        ceph.request: 0
+  - decode_json_fields:
+      fields: ["ceph.request.outb"]
+      process_array: true
+      target: "ceph.mgr_cluster_status.output"
+  - drop_fields:
+      fields: ["http", "ceph.request"]
