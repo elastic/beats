@@ -55,6 +55,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-s3>>
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-azure-eventhub>>
 
 
 include::inputs/input-log.asciidoc[]
@@ -82,3 +83,5 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]

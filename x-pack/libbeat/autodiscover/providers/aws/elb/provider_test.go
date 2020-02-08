@@ -9,13 +9,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
 )
 
 type testEventAccumulator struct {
@@ -60,12 +61,13 @@ func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, t
 }
 
 func Test_internalBuilder(t *testing.T) {
+	log := logp.NewLogger("elb")
 	lbl := fakeLbl()
 	lbls := []*lbListener{lbl}
 	fetcher := newMockFetcher(lbls, nil)
-	pBus := bus.New("test")
+	pBus := bus.New(log, "test")
 
-	cfg := &Config{
+	cfg := &awsauto.Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
 		Period:  time.Nanosecond,
 	}

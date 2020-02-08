@@ -15,7 +15,9 @@ import (
 	_ "github.com/elastic/beats/libbeat/outputs/console"
 	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/libbeat/outputs/fileout"
+	_ "github.com/elastic/beats/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
+	_ "github.com/elastic/beats/libbeat/outputs/redis"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 	"github.com/elastic/beats/libbeat/service"
@@ -24,8 +26,12 @@ import (
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger
 func genNewMonitoringConfig() (*common.Config, error) {
+	lvl, isSet := os.LookupEnv("LOG_DRIVER_LEVEL")
+	if !isSet {
+		lvl = "info"
+	}
 	cfgObject := make(map[string]string)
-	cfgObject["level"] = "debug"
+	cfgObject["level"] = lvl
 	cfgObject["to_stderr"] = "true"
 
 	cfg, err := common.NewConfigFrom(cfgObject)

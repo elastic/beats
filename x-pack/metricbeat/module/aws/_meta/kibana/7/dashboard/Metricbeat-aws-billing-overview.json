@@ -32,7 +32,7 @@
             "panelIndex": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
             "panelRefName": "panel_0",
             "title": "AWS Account Filter",
-            "version": "7.3.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "26670498-b079-4447-bbc8-e4ca8215898c",
             "panelRefName": "panel_1",
             "title": "Estimated Billing Chart",
-            "version": "7.3.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
@@ -64,11 +64,11 @@
             "panelIndex": "221aab02-2747-4d84-9dde-028ccd51bdce",
             "panelRefName": "panel_2",
             "title": "Total Estimated Charges",
-            "version": "7.3.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {
-              "title": "Top 5 Estimated Billing Per Service Name"
+              "title": "Top 10 Estimated Billing Per Service Name"
             },
             "gridData": {
               "h": 15,
@@ -79,8 +79,8 @@
             },
             "panelIndex": "21e91e6b-0ff0-42ba-9132-6f30c5c6bbb7",
             "panelRefName": "panel_3",
-            "title": "Top 5 Estimated Billing Per Service Name",
-            "version": "7.3.0"
+            "title": "Top 10 Estimated Billing Per Service Name",
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -114,8 +114,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-01-17T15:11:20.337Z",
-      "version": "WzY2MiwxXQ=="
+      "updated_at": "2020-02-04T15:57:47.353Z",
+      "version": "WzY3NjQsMV0="
     },
     {
       "attributes": {
@@ -172,8 +172,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-17T14:43:10.917Z",
-      "version": "WzE1NywxXQ=="
+      "updated_at": "2020-01-27T21:33:20.219Z",
+      "version": "WzQ2OTAsMV0="
     },
     {
       "attributes": {
@@ -295,8 +295,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-17T14:43:00.631Z",
-      "version": "WzU0LDFd"
+      "updated_at": "2020-01-27T21:33:08.924Z",
+      "version": "WzQ1ODAsMV0="
     },
     {
       "attributes": {
@@ -331,7 +331,7 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 1,
+            "drop_last_bucket": 0,
             "gauge_color_rules": [
               {
                 "id": "e8a045e0-1531-11ea-961e-c1db9cc6166e"
@@ -365,14 +365,14 @@
                     "type": "sum"
                   }
                 ],
-                "override_index_pattern": 1,
+                "override_index_pattern": 0,
                 "point_size": 1,
                 "separate_axis": 0,
                 "series_drop_last_bucket": 0,
                 "series_interval": "12h",
                 "split_mode": "filter",
                 "stacked": "none",
-                "time_range_mode": "entire_time_range",
+                "time_range_mode": "last_value",
                 "value_template": "${{value}}"
               }
             ],
@@ -391,8 +391,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-17T15:10:12.013Z",
-      "version": "WzY1OSwxXQ=="
+      "updated_at": "2020-02-03T23:52:07.805Z",
+      "version": "WzY3NDUsMV0="
     },
     {
       "attributes": {
@@ -406,7 +406,7 @@
             }
           }
         },
-        "title": "Top 5 Billing per Service Name [Metricbeat AWS]",
+        "title": "Top 10 Billing per Service Name [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -416,7 +416,7 @@
             "axis_min": 0,
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": {
@@ -445,11 +445,13 @@
                   {
                     "field": "aws.billing.metrics.EstimatedCharges.max",
                     "id": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
-                    "type": "avg"
+                    "type": "sum"
                   }
                 ],
+                "override_index_pattern": 0,
                 "point_size": "4",
                 "separate_axis": 0,
+                "series_drop_last_bucket": 0,
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
@@ -457,7 +459,8 @@
                 "terms_field": "aws.dimensions.ServiceName",
                 "terms_include": "",
                 "terms_order_by": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
-                "terms_size": "5",
+                "terms_size": "10",
+                "type": "timeseries",
                 "value_template": "${{value}}"
               }
             ],
@@ -466,7 +469,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Top 5 Billing per Service Name [Metricbeat AWS]",
+          "title": "Top 10 Billing per Service Name [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -476,9 +479,9 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-01-17T14:43:00.631Z",
-      "version": "WzU2LDFd"
+      "updated_at": "2020-02-04T13:56:47.812Z",
+      "version": "WzY3NjMsMV0="
     }
   ],
-  "version": "7.3.0"
+  "version": "7.4.0"
 }

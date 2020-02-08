@@ -40,6 +40,7 @@ type decodeJSONFields struct {
 	overwriteKeys bool
 	addErrorKey   bool
 	processArray  bool
+	documentID    string
 	target        *string
 }
 
@@ -50,6 +51,7 @@ type config struct {
 	AddErrorKey   bool     `config:"add_error_key"`
 	ProcessArray  bool     `config:"process_array"`
 	Target        *string  `config:"target"`
+	DocumentID    string   `config:"document_id"`
 }
 
 var (
@@ -66,7 +68,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		checks.ConfigChecked(NewDecodeJSONFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when")))
+			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when", "document_id")))
 
 	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
 }
@@ -81,7 +83,15 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, addErrorKey: config.AddErrorKey, processArray: config.ProcessArray, target: config.Target}
+	f := &decodeJSONFields{
+		fields:        config.Fields,
+		maxDepth:      config.MaxDepth,
+		overwriteKeys: config.OverwriteKeys,
+		addErrorKey:   config.AddErrorKey,
+		processArray:  config.ProcessArray,
+		documentID:    config.DocumentID,
+		target:        config.Target,
+	}
 	return f, nil
 }
 
@@ -115,6 +125,18 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			target = *f.target
 		}
 
+		var id string
+		if key := f.documentID; key != "" {
+			if dict, ok := output.(map[string]interface{}); ok {
+				if tmp, err := common.MapStr(dict).GetValue(key); err == nil {
+					if v, ok := tmp.(string); ok {
+						id = v
+						common.MapStr(dict).Delete(key)
+					}
+				}
+			}
+		}
+
 		if target != "" {
 			_, err = event.PutValue(target, output)
 		} else {
@@ -130,6 +152,13 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			debug("Error trying to Put value %v for field : %s", output, field)
 			errs = append(errs, err.Error())
 			continue
+		}
+
+		if id != "" {
+			if event.Meta == nil {
+				event.Meta = common.MapStr{}
+			}
+			event.Meta["_id"] = id
 		}
 	}
 
