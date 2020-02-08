@@ -26,7 +26,7 @@ import (
 type mqttInputConfig struct {
 	Hosts  []string `config:"hosts" validate:"required,min=1"`
 	Topics []string `config:"topics" validate:"required,min=1"`
-	QoS    int      `config:"qos" validate:"nonzero,min=0,max=2"`
+	QoS    int      `config:"qos" validate:"min=0,max=2"`
 
 	ClientID string `config:"client_id" validate:"nonzero"`
 	Username string `config:"username"`
