@@ -20,6 +20,7 @@
 package mb
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -285,6 +286,41 @@ func TestNewModuleFromConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
+	const hostEndpoint = "ceph-restful:8003"
+	const sampleHttpsEndpoint = "https://" + hostEndpoint
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption,
+		WithHostParser(func(module Module, host string) (HostData, error) {
+			u, err := url.Parse(host)
+			if err != nil {
+				return HostData{}, err
+			}
+			return HostData{
+				Host:         u.Host,
+				URI:          host,
+				SanitizedURI: host,
+			}, nil
+		}))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{sampleHttpsEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, hostEndpoint, metricSets[0].Host())
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].HostData().URI)
 }
 
 func TestNewModulesCallModuleFactory(t *testing.T) {
