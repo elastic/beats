@@ -19,6 +19,9 @@ package redis
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -129,8 +132,23 @@ func makeRedis(
 			return outputs.Fail(err)
 		}
 
+		pass := config.Password
+		if parts := strings.SplitN(host, "://", 2); len(parts) != 2 {
+			// Add scheme.
+			host = fmt.Sprintf("redis://%s", host)
+		}
+		url, err := url.Parse(host)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+
+		hostPass, passSet := url.User.Password()
+		if passSet {
+			pass = hostPass
+		}
+
 		client := newClient(conn, observer, config.Timeout,
-			config.Password, config.Db, key, dataType, config.Index, enc)
+			pass, config.Db, key, dataType, config.Index, enc)
 		clients[i] = newBackoffClient(client, config.Backoff.Init, config.Backoff.Max)
 	}
 
