@@ -114,7 +114,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
 - move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
-- Work on e2e ACK's for the azure-eventhub input {issue}15671[15671]
+- Work on e2e ACK's for the azure-eventhub input {issue}15671[15671] {pull}16215[16215]
 
 *Heartbeat*
 
