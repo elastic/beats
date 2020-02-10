@@ -67,8 +67,13 @@ func (Update) VendorBeats() error {
 		}
 
 		for _, d := range deps {
-			in := strings.ReplaceAll(d, "github.com/elastic/beats/", "")
-			in = filepath.Join("..", "..", in)
+			var in string
+			if strings.HasPrefix(d, "github.com/elastic/beats") {
+				in = strings.ReplaceAll(d, "github.com/elastic/beats/", "")
+				in = filepath.Join("..", "..", in)
+			} else {
+				in = filepath.Join("..", "..", "vendor", d)
+			}
 
 			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
 

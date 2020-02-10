@@ -147,7 +147,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 	}
 
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", "run", dir)()
+		rawMap, err := sh.OutCmd("go", "run", "-mod", "vendor", dir)()
 		if err != nil {
 			return nil, errors.Wrap(err, "Error running subcommand to get metricsets")
 		}

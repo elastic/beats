@@ -156,7 +156,7 @@ endif
 
 .PHONY: fmt
 fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@go get $(GOIMPORTS_REPO)
+	@go install -mod=vendor $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name '*.py' -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
@@ -184,9 +184,9 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go get ${COVERAGE_TOOL_REPO}
+	go install -mod=vendor ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
-	go get ${TESTIFY_TOOL_REPO}
+	go install -mod=vendor ${TESTIFY_TOOL_REPO}
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
@@ -441,7 +441,7 @@ help_variables: ## @help Show Makefile customizable variables.
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
-	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@go install -mod=vendor github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
 	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \

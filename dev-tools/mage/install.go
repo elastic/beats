@@ -18,10 +18,6 @@
 package mage
 
 import (
-	"path/filepath"
-
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
@@ -32,15 +28,10 @@ var (
 
 // InstallVendored uses go get to install a command from its vendored source
 func InstallVendored(importPath string) error {
-	beatDir, err := ElasticBeatsDir()
-	if err != nil {
-		return errors.Wrap(err, "failed to obtain beats repository path")
-	}
-
 	install := gotool.Install
 	return install(
 		install.Vendored(),
-		install.Package(filepath.Join(beatDir, "vendor", importPath)),
+		install.Package(importPath),
 	)
 }
 
