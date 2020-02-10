@@ -122,6 +122,305 @@ datasources:
          - metricset: foo
            dataset: system.foo
 
+
+  #################################################################################################
+  # Elasticsearch package example
+  - id?: my-endpoint
+    title: Collect Elasticsearch information
+    package:
+      name: epm/elsticsearch
+      version: 1.7.0
+    inputs:
+        - type: log
+          streams:
+          - id?: {id}
+            enabled?: true # default to true
+            dataset: elasticsearch.audit
+            paths: [/var/log/elasticsearch/*_access.log, /var/log/elasticsearch/*_audit.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.deprecation
+            paths: [/var/log/elasticsearch/*_deprecation.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.gc
+            paths: [/var/log/elasticsearch/*_gc.log, /var/log/elasticsearch/*_gc.log.[0-9]*]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.server
+            paths: [/var/log/elasticsearch/*.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.slowlog
+            paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
+        - type: metrics/elasticsearch
+          hosts: ["http://localhost:9200"]
+          # api_key: "xxxx"
+          xpack.enabled: true
+          streams:
+          - id?: {id}
+            metricset: ccr
+            dataset: elasticseach.ccr
+          - id?: {id}
+            metricset: cluster_stats
+            dataset: elasticseach.cluster_stats
+          - id?: {id}
+            metricset: enrich
+            dataset: elasticseach.enrich
+          - id?: {id}
+            metricset: index
+            dataset: elasticseach.index
+          - id?: {id}
+            metricset: index_recovery
+            dataset: elasticseach.index_recovery
+          - id?: {id}
+            metricset: index_recovery
+            dataset: elasticseach.index_recovery
+          - id?: {id}
+            metricset: ml_jobs
+            dataset: elasticseach.ml_jobs
+          - id?: {id}
+            metricset: node_stats
+            dataset: elasticseach.node_stats
+          - id?: {id}
+            metricset: shard
+            dataset: elasticseach.shard
+
+  #################################################################################################
+  # AWS module
+  - id?: my-aws
+    title: Collect AWS
+    package:
+      name: epm/aws
+      version: 1.7.0
+    inputs:
+        # Looking at the AWS modules, I believe each fileset need to be in their own
+        # buckets?
+        - type: s3
+          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+          credential_profile_name: fb-aws
+          streams:
+          - id?: {id}
+            metricset: s3
+            dataset: aws/s3
+        - type: s3
+          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+          credential_profile_name: fb-aws
+          streams:
+          - id?: {id}
+            metricset: s3access
+            dataset: aws/s3access
+        - type: s3
+          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+          credential_profile_name: fb-aws
+          streams:
+          - id?: {id}
+            metricset: s3access
+            dataset: aws.vpcflow
+       - type: metrics/aws
+         streams:
+          - id?: {id}
+            metricset: usage
+            dataset: aws.usage
+            period: 5m
+          - id?: {id}
+            metricset: cloudwatch
+            dataset: aws.cloudwatch
+            period: 5m
+            name: ["CPUUtilization", "DiskWriteOps"]
+            tags.resource_type_filter: ec2:instance
+            #dimensions:
+            #  - name: InstanceId
+            #    value: i-0686946e22cf9494a
+            statistic: ["Average", "Maximum"]
+          - id?: {id}
+            metricset: ebs
+            dataset: aws.ebs
+            period: 5m
+          - id?: {id}
+            metricset: ec2
+            dataset: aws.ec2
+            period: 5m
+          - id?: {id}
+            metricset: elb
+            dataset: aws.elb
+            period: 5m
+          - id?: {id}
+            metricset: sns
+            dataset: aws.sns
+            period: 5m
+          - id?: {id}
+            metricset: sqs
+            dataset: aws.sqs
+            period: 5m
+          - id?: {id}
+            metricset: rds
+            dataset: aws.rds
+            period: 5m
+          - id?: {id}
+            metricset: billing
+            dataset: aws.billing
+            period: 12
+          - id?: {id}
+            metricset: billing
+            dataset: aws.billing
+            period: 12
+          - id?: {id}
+            metricset: s3_daily_storage
+            dataset: aws.s3_daily_storage
+            period: 24
+          - id?: {id}
+            metricset: s3_request
+            dataset: aws.s3_request
+            period: 24
+
+
+  #################################################################################################
+  # - Kubernetes
+  - id?: my-kubernetes
+    title: Collect Kubernetes
+    package:
+      name: epm/kubernetes
+      version: 1.7.0
+    inputs:
+      - type: metrics/kubernetes
+        hosts: ["localhost:10250"]
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        ssl.certificate_authorities:
+          - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        # username: "user"
+        # password: "secret"
+        # If kube_config is not set, KUBECONFIG environment variable will be checked
+        # and if not present it will fall back to InCluster
+        # kube_config: ~/.kube/config
+        streams:
+          - id?: {id}
+            metricset: node
+            dataset: kubernetes.node
+            period: 10s
+          - id?: {id}
+            metricset: system
+            dataset: kubernetes.system
+            period: 10s
+          - id?: {id}
+            metricset: pod
+            dataset: kubernetes.pod
+            period: 10s
+          - id?: {id}
+            metricset: container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: event
+            dataset: kubernetes.event
+            period: 10s
+      - type: metrics/kubernetes
+        hosts: ["kube-state-metrics:8080"]
+        streams:
+          - id?: {id}
+            metricset: state_node
+            dataset: kubernetes.state_node
+            period: 10s
+          - id?: {id}
+            metricset: state_deployment
+            dataset: kubernetes.state_deployment
+            period: 10s
+          - id?: {id}
+            metricset: state_replicaset
+            dataset: kubernetes.state_replicaset
+            period: 10s
+          - id?: {id}
+            metricset: state_statefulset
+            dataset: kubernetes.state_statefulset
+            period: 10s
+          - id?: {id}
+            metricset: state_pod
+            dataset: kubernetes.state_pod
+            period: 10s
+          - id?: {id}
+            metricset: state_container
+            dataset: kubernetes.state_container
+            period: 10s
+          - id?: {id}
+            metricset: state_container
+            dataset: kubernetes.state_container
+            period: 10s
+          - id?: {id}
+            metricset: state_cronjob
+            dataset: kubernetes.state_cronjob
+            period: 10s
+          - id?: {id}
+            metricset: state_resourcequota
+            dataset: kubernetes.state_resourcequota
+            period: 10s
+          - id?: {id}
+            metricset: state_service
+            dataset: kubernetes.state_serice
+            period: 10s
+          - id?: {id}
+            metricset: state_persistentvolume
+            dataset: kubernetes.state_persistentvolume
+            period: 10s
+          - id?: {id}
+            metricset: state_persistentvolumeclaim
+            dataset: kubernetes.state_persistentvolumeclaim
+            period: 10s
+
+  #################################################################################################
+  # - Kubernetes
+  - id?: my-docker
+    title: Collect docker
+    package:
+      name: epm/docker
+      version: 1.7.0
+    inputs:
+      - type: metrics/docker
+        hosts: ["localhost:10250"]
+        #labels.dedot: false
+
+        # To connect to Docker over TLS you must specify a client and CA certificate.
+        #ssl:
+          #certificate_authority: "/etc/pki/root/ca.pem"
+          #certificate:           "/etc/pki/client/cert.pem"
+          #key:                   "/etc/pki/client/cert.key"
+        streams:
+          - id?: {id}
+            metricset: container
+            dataset: docker.container
+            period: 10s
+          - id?: {id}
+            metricset: cpu
+            dataset: docker.cpu
+            period: 10s
+          - id?: {id}
+            metricset: diskio
+            dataset: docker.diskio
+            period: 10s
+          - id?: {id}
+            metricset: event
+            dataset: docker.event
+            period: 10s
+          - id?: {id}
+            metricset: healthcheck
+            dataset: docker.healthcheck
+            period: 10s
+          - id?: {id}
+            metricset: info
+            dataset: docker.info
+            period: 10s
+          - id?: {id}
+            metricset: memory
+            dataset: docker.memory
+            period: 10s
+          - id?: {id}
+            metricset: network
+            dataset: docker.network
+            period: 10s
+
 #################################################################################################
 ### suggestion 1
  - id?: myendpoint-x1
