@@ -64,6 +64,10 @@ type TLSConfig struct {
 	// ClientAuth controls how we want to verify certificate from a client, `none`, `optional` and
 	// `required`, default to required. Do not affect TCP client.
 	ClientAuth tls.ClientAuthType
+
+	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
+	// the server certificate.
+	CASha256 pins
 }
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
@@ -79,17 +83,25 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		logp.Warn("SSL/TLS verifications disabled.")
 	}
 
+	// When we are usign the CAsha256 pin to validate the CA used to validate the chain
+	// we add a custom callback.
+	var verifyPeerCertFn verifyPeerCertFunc
+	if len(c.CASha256) > 0 {
+		verifyPeerCertFn = MakeCAPinCallback(c.CASha256)
+	}
+
 	return &tls.Config{
-		MinVersion:         minVersion,
-		MaxVersion:         maxVersion,
-		Certificates:       c.Certificates,
-		RootCAs:            c.RootCAs,
-		ClientCAs:          c.ClientCAs,
-		InsecureSkipVerify: insecure,
-		CipherSuites:       c.CipherSuites,
-		CurvePreferences:   c.CurvePreferences,
-		Renegotiation:      c.Renegotiation,
-		ClientAuth:         c.ClientAuth,
+		MinVersion:            minVersion,
+		MaxVersion:            maxVersion,
+		Certificates:          c.Certificates,
+		RootCAs:               c.RootCAs,
+		ClientCAs:             c.ClientCAs,
+		InsecureSkipVerify:    insecure,
+		CipherSuites:          c.CipherSuites,
+		CurvePreferences:      c.CurvePreferences,
+		Renegotiation:         c.Renegotiation,
+		ClientAuth:            c.ClientAuth,
+		VerifyPeerCertificate: verifyPeerCertFn,
 	}
 }
 

@@ -24,6 +24,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+
 
 *Metricbeat*
 
@@ -53,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
+- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 
 *Auditbeat*
 
