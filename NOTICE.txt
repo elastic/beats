@@ -2396,7 +2396,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gogo/protobuf
-Revision: 4c00d2f19fb91be5fecd8681fa83450a2a979e69
+Version: v1.3.1
+Revision: 5628607bb4c51c3157aacc3a50f0ab707582b805
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/gogo/protobuf/LICENSE:
 --------------------------------------------------------------------

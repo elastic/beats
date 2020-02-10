@@ -24,10 +24,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+
 
 *Metricbeat*
 
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
+- Add Tomcat overview dashboard {pull}14026[14026]
 
 *Packetbeat*
 
@@ -51,7 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
-- Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
+- Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
+- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 
 *Auditbeat*
 
@@ -66,6 +70,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Fix a connection error in httpjson input. {pull}16123[16123]
 
 *Heartbeat*
 
@@ -98,7 +103,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
-
+- Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 
 *Auditbeat*
 
@@ -109,6 +114,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
 - Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
+- move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
+- Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
 
 *Heartbeat*
 
@@ -141,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
+- Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
 
 *Packetbeat*
 
