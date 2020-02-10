@@ -19,7 +19,7 @@ const (
 	monitoringOutputFormatKey = "outputs.%s"
 	outputKey                 = "output"
 
-	enabledKey       = "monitoring.enabled"
+	enabledKey       = "settings.monitoring.enabled"
 	outputsKey       = "outputs"
 	elasticsearchKey = "elasticsearch"
 	typeKey          = "type"

@@ -16,6 +16,7 @@ import (
 
 const (
 	monitoringName          = "FLEET_MONITORING"
+	settingsKey             = "settings"
 	monitoringKey           = "monitoring"
 	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
@@ -97,15 +98,27 @@ func monitoringTags() map[app.Tag]string {
 }
 
 func isMonitoringEnabled(logger *logger.Logger, cfg map[string]interface{}) bool {
-	monitoringVal, found := cfg[monitoringKey]
+	settingsVal, found := cfg[settingsKey]
 	if !found {
-		logger.Error("operator.isMonitoringEnabled: monitoring not found in config")
+		logger.Error("operator.isMonitoringEnabled: settings not found in config")
+		return false
+	}
+
+	settingsMap, ok := settingsVal.(map[string]interface{})
+	if !ok {
+		logger.Error("operator.isMonitoringEnabled: settings not a map")
+		return false
+	}
+
+	monitoringVal, found := settingsMap[monitoringKey]
+	if !found {
+		logger.Error("operator.isMonitoringEnabled: settings.monitoring not found in config")
 		return false
 	}
 
 	monitoringMap, ok := monitoringVal.(map[string]interface{})
 	if !ok {
-		logger.Error("operator.isMonitoringEnabled: monitoring not a map")
+		logger.Error("operator.isMonitoringEnabled: settings.monitoring not a map")
 		return false
 	}
 
