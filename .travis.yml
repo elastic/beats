@@ -14,7 +14,6 @@ env:
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.21.0
     - TRAVIS_GO_VERSION=$(cat .go-version)
-    - GOFLAGS="-mod=vendor"
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
