@@ -19,6 +19,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import generate
+	_ "github.com/elastic/beats/filebeat/scripts/mage/generate"
 )
 
 func init() {

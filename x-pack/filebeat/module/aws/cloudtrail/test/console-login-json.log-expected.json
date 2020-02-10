@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2014-07-16T15:49:27.000Z",
+        "aws.cloudtrail.additional_eventdata": "{LoginTo=https://console.aws.amazon.com/s3/, MobileVersion=No, MFAUsed=No}",
         "aws.cloudtrail.event_version": "1.05",
         "aws.cloudtrail.response_elements": "{ConsoleLogin=Success}",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::111122223333:user/JohnDoe",
@@ -34,6 +35,7 @@
     },
     {
         "@timestamp": "2014-07-08T17:35:27.000Z",
+        "aws.cloudtrail.additional_eventdata": "{LoginTo=https://console.aws.amazon.com/sns, MobileVersion=No, MFAUsed=No}",
         "aws.cloudtrail.error_message": "Failed authentication",
         "aws.cloudtrail.event_version": "1.05",
         "aws.cloudtrail.response_elements": "{ConsoleLogin=Failure}",

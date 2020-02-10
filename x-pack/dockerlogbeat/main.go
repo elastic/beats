@@ -26,8 +26,12 @@ import (
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger
 func genNewMonitoringConfig() (*common.Config, error) {
+	lvl, isSet := os.LookupEnv("LOG_DRIVER_LEVEL")
+	if !isSet {
+		lvl = "info"
+	}
 	cfgObject := make(map[string]string)
-	cfgObject["level"] = "debug"
+	cfgObject["level"] = lvl
 	cfgObject["to_stderr"] = "true"
 
 	cfg, err := common.NewConfigFrom(cfgObject)
