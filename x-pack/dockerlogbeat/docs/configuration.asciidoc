@@ -52,7 +52,7 @@ format is `"username:password"`.
 [[es-output-options]]
 === {es} output options
 
-// TODO: Add the following settings. Syntax is a little differnt so we might
+// TODO: Add the following settings. Syntax is a little different so we might
 // need to add deameon examples that show how to specify these settings:
 // `output.elasticsearch.indices
 // `output.elasticsearch.pipelines`
