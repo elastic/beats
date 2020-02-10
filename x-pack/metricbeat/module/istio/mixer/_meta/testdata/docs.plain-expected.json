@@ -1,0 +1,164 @@
+[
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "handler": {
+                    "daemons": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "dispatcher_destinations_per_variety_total": 1,
+                "variety": "TEMPLATE_VARIETY_ATTRIBUTE_GENERATOR"
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "config": {
+                    "adapter": {
+                        "info": {
+                            "configs": 0,
+                            "errors": {
+                                "config": 0
+                            }
+                        }
+                    },
+                    "attributes": 113,
+                    "handler": {
+                        "configs": 3,
+                        "errors": {
+                            "validation": 0
+                        }
+                    },
+                    "instance": {
+                        "configs": 11,
+                        "errors": {
+                            "config": 0
+                        }
+                    },
+                    "rule": {
+                        "configs": 8,
+                        "errors": {
+                            "config": 0,
+                            "match": 0
+                        }
+                    },
+                    "template": {
+                        "configs": 0,
+                        "errors": {
+                            "config": 0
+                        }
+                    },
+                    "unsatisfied": {
+                        "action_handler": 0
+                    }
+                },
+                "handler": {
+                    "failures": {
+                        "build": 0,
+                        "close": 0
+                    },
+                    "handlers": {
+                        "closed": 0,
+                        "new": 3,
+                        "reused": 0
+                    }
+                },
+                "istio": {
+                    "mcp": {
+                        "request": {
+                            "acks": 1
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "handler": {
+                    "daemons": 4
+                }
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "dispatcher_destinations_per_variety_total": 2,
+                "variety": "TEMPLATE_VARIETY_REPORT"
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    }
+]

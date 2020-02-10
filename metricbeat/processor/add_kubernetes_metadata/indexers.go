@@ -30,7 +30,7 @@ func init() {
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
 	config := map[string]interface{}{
-		"lookup_fields": []string{"metricset.host"},
+		"lookup_fields": []string{"service.address"},
 	}
 	fieldCfg, err := common.NewConfigFrom(config)
 	if err == nil {

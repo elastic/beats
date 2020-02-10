@@ -1,12 +1,13 @@
 [
     {
-        "@timestamp": "2018-10-31T09:34:25.109Z",
+        "@timestamp": "2018-10-31T11:34:25.109Z",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.action": "authentication_failed",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -19,13 +20,14 @@
         "user.name": "elastic"
     },
     {
-        "@timestamp": "2018-10-31T09:34:25.207Z",
+        "@timestamp": "2018-10-31T11:34:25.207Z",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.action": "authentication_failed",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 274,
@@ -38,7 +40,7 @@
         "user.name": "elastic"
     },
     {
-        "@timestamp": "2018-10-31T09:35:11.428Z",
+        "@timestamp": "2018-10-31T11:35:11.428Z",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -51,6 +53,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 558,
@@ -62,7 +65,7 @@
         "user.name": "_xpack_security"
     },
     {
-        "@timestamp": "2018-10-31T09:35:11.430Z",
+        "@timestamp": "2018-10-31T11:35:11.430Z",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear[n]",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -75,6 +78,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 941,
@@ -86,7 +90,7 @@
         "user.name": "_xpack_security"
     },
     {
-        "@timestamp": "2018-10-31T09:35:12.303Z",
+        "@timestamp": "2018-10-31T11:35:12.303Z",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/user/change_password",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "rest",
@@ -99,6 +103,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1309,
@@ -110,7 +115,7 @@
         "user.name": "elastic"
     },
     {
-        "@timestamp": "2018-10-31T09:35:12.314Z",
+        "@timestamp": "2018-10-31T11:35:12.314Z",
         "elasticsearch.audit.action": "indices:admin/create",
         "elasticsearch.audit.indices": [
             ".security-6"
@@ -126,6 +131,7 @@
         "event.action": "access_granted",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1676,
@@ -137,7 +143,7 @@
         "user.name": "_xpack_security"
     },
     {
-        "@timestamp": "2019-01-27T20:15:10.380Z",
+        "@timestamp": "2019-01-27T22:15:10.380Z",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.audit.realm": "default_file",
@@ -147,6 +153,7 @@
         "event.action": "authentication_success",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "http.request.body.content": "\n{\n    \"query\" : {\n        \"term\" : { \"user\" : \"kimchy\" }\n    }\n}\n",
         "http.request.method": "GET",

@@ -20,6 +20,8 @@ package ucfg
 import (
 	"reflect"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 type tagOptions struct {
@@ -171,4 +173,48 @@ func isFloat(k reflect.Kind) bool {
 	default:
 		return false
 	}
+}
+
+type fieldInfo struct {
+	name          string
+	ftype         reflect.Type
+	value         reflect.Value
+	options       *options
+	tagOptions    tagOptions
+	validatorTags []validatorTag
+}
+
+func accessField(structVal reflect.Value, fieldIdx int, opts *options) (fieldInfo, bool, Error) {
+	stField := structVal.Type().Field(fieldIdx)
+
+	// ignore non exported fields
+	if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+		return fieldInfo{}, true, nil
+	}
+	name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+	if tagOpts.ignore {
+		return fieldInfo{}, true, nil
+	}
+
+	// create new context, overwriting configValueHandling for all sub-operations
+	if tagOpts.cfgHandling != opts.configValueHandling {
+		tmp := &options{}
+		*tmp = *opts
+		tmp.configValueHandling = tagOpts.cfgHandling
+		opts = tmp
+	}
+
+	validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
+	if err != nil {
+		return fieldInfo{}, false, raiseCritical(err, "")
+	}
+
+	return fieldInfo{
+		name:          fieldName(name, stField.Name),
+		ftype:         stField.Type,
+		value:         structVal.Field(fieldIdx),
+		options:       opts,
+		tagOptions:    tagOpts,
+		validatorTags: validators,
+	}, false, nil
 }

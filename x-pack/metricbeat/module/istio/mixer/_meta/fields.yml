@@ -1,0 +1,98 @@
+- name: mixer
+  type: group
+  description: >
+    Contains statistics related to the Istio mixer service
+  release: beta
+  fields:
+    - name: istio.mcp.request.acks
+      type: long
+      description: >
+        The number of request acks received by the source.
+    - name: config.adapter.info.errors.config
+      type: long
+      description: >
+        The number of errors encountered during processing of the adapter info configuration.
+    - name: config.adapter.info.configs
+      type: long
+      description: >
+        The number of known adapters in the current config.
+    - name: config.attributes
+      type: long
+      description: >
+        The number of known attributes in the current config.
+    - name: config.handler.configs
+      type: long
+      description: >
+        The number of known handlers in the current config.
+    - name: config.handler.errors.validation
+      type: long
+      description: >
+        The number of errors encountered because handler validation returned error.
+    - name: config.instance.errors.config
+      type: long
+      description: >
+        The number of errors encountered during processing of the instance configuration.
+    - name: config.instance.configs
+      type: long
+      description: >
+        The number of known instances in the current config.
+    - name: config.rule.errors.config
+      type: long
+      description: >
+        The number of errors encountered during processing of the rule configuration.
+    - name: config.rule.errors.match
+      type: long
+      description: >
+        The number of rule conditions that was not parseable.
+    - name: config.rule.configs
+      type: long
+      description: >
+        The number of known rules in the current config.
+    - name: config.template.errors.config
+      type: long
+      description: >
+        The number of errors encountered during processing of the template configuration.
+    - name: config.template.configs
+      type: long
+      description: >
+        The number of known templates in the current config.
+    - name: config.unsatisfied.action_handler
+      type: long
+      description: >
+        The number of actions that failed due to handlers being unavailable.
+    - name: dispatcher_destinations_per_variety_total
+      type: long
+      description: >
+        The number of Mixer adapter destinations by template variety type.
+    - name: handler.handlers.closed
+      type: long
+      description: >
+        The number of handlers that were closed during config transition.
+    - name: handler.daemons
+      type: long
+      description: >
+        The current number of active daemon routines in a given adapter environment.
+    - name: handler.failures.build
+      type: long
+      description: >
+        The number of handlers that failed creation during config transition.
+    - name: handler.failures.close
+      type: long
+      description: >
+        The number of errors encountered while closing handlers during config transition.
+    - name: handler.handlers.new
+      type: long
+      description: >
+        The number of handlers that were newly created during config transition.
+    - name: handler.handlers.reused
+      type: long
+      description: >
+        The number of handlers that were re-used during config transition.
+    - name: handler
+      type: long
+      description: >
+        The name of the daemon  handler
+    - name: variety
+      type: long
+      description: >
+        The name of the variety

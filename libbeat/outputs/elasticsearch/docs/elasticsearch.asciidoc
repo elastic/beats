@@ -20,6 +20,12 @@ output.elasticsearch:
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
+Notes about the previous example and client based PKI authentication:
+
+- The `ssl.certificate` and `ssl.key` settings are ONLY needed if {es} is configured to require client based PKI authentication (with `xpack.security.http.ssl.client_authentication: required` or `xpack.security.http.ssl.client_authentication: optional`).
+- The `ssl.certificate_authorities` setting needs to include the CA used to sign the remote server certificate, not the client cert.
+- If client PKI is used, the remote server ({es}) should include the CA used for signing the client cert in the `xpack.security.http.ssl.certificate_authorities: []` list.
+
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 ["source","yaml",subs="attributes,callouts"]
@@ -29,6 +35,15 @@ output.elasticsearch:
   hosts: ["https://localhost:9200"]
   username: "{beatname_lc}_internal"
   password: "{pwd}"
+------------------------------------------------------------------------------
+
+To use an API key to connect to {es}, use `api_key`.
+
+["source","yaml",subs="attributes,callouts"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["https://localhost:9200"]
+  api_key: "KnR6yE41RrSowb0kQ0HWoA"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -117,6 +132,12 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
 The default value is 1.
+
+===== `api_key`
+
+Instead of using usernames and passwords,
+you can use API keys to secure communication with {es}.
+For more information, see <<beats-api-keys>>.
 
 ===== `username`
 
