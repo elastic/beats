@@ -15,13 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
+package generate
 
-// GetConfig for Logstash
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{host},
+import (
+	"fmt"
+	"os"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	genfields "github.com/elastic/beats/filebeat/generator/fields"
+)
+
+// Fields creates a new fields.yml for an existing Filebeat fileset.
+// Use MODULE=module to specify the name of the existing module
+// Use FILESET=fileset to specify the name of the existing fileset
+func Fields() error {
+	targetModule := os.Getenv("MODULE")
+	targetFileset := os.Getenv("FILESET")
+
+	if targetModule == "" || targetFileset == "" {
+		return fmt.Errorf("you must specify the module and fileset: MODULE=module FILESET=fileset mage generate:fields")
 	}
+
+	curDir := devtools.CWD()
+
+	return genfields.Generate(curDir, targetModule, targetFileset, false)
 }

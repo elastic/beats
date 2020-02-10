@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package elb
+package aws
 
 import (
 	"time"
@@ -10,31 +10,23 @@ import (
 	"github.com/elastic/beats/x-pack/libbeat/common/aws"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
 )
 
-// Config for the aws_elb autodiscover provider.
+// Config for all aws autodiscover providers.
 type Config struct {
-	Type string `config:"type"`
-
-	// Standard autodiscover fields.
-
-	// Hints are currently not supported, but may be implemented in a later release
-	HintsEnabled bool                    `config:"hints.enabled"`
-	Builders     []*common.Config        `config:"builders"`
-	Appenders    []*common.Config        `config:"appenders"`
-	Templates    template.MapperSettings `config:"templates"`
+	Type      string                  `config:"type"`
+	Templates template.MapperSettings `config:"templates"`
 
 	// Period defines how often to poll the AWS API.
 	Period time.Duration `config:"period" validate:"nonzero,required"`
 
 	// AWS Specific autodiscover fields
-
-	Regions   []string      `config:"regions" validate:"required"`
+	Regions   []string      `config:"regions"`
 	AWSConfig aws.ConfigAWS `config:",inline"`
 }
 
-func defaultConfig() *Config {
+// DefaultConfig for all aws autodiscover providers.
+func DefaultConfig() *Config {
 	return &Config{
 		Period: time.Minute,
 	}
