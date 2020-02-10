@@ -1,0 +1,116 @@
+[[log-driver-installation]]
+[role="xpack"]
+== Install and configure the {log-driver}
+
+++++
+<titleabbrev>Install and configure</titleabbrev>
+++++
+
+experimental[]
+
+[float]
+=== Before you begin
+
+Make sure your system meets the following prerequisites:
+
+* Docker: {docker-version} or later
+* {stack}: Version 7.6.0 or later
+
+[float]
+=== Step 1: Install the {log-driver} plugin
+
+// TODO: Test the following commands when the driver is available on docker hub.
+
+1. Install the plugin. You can install it from the Docker store (recommended),
+or build and install the plugin from source in the
+https://github.com/elastic/beats[beats] GitHub repo.
++
+*To install from the Docker store:*
++
+["source","sh",subs="attributes"]
+----
+docker plugin install store/elastic/{log-driver-alias}:{version} --alias {log-driver-alias}
+----
++
+*To build and install from source:*
++
+{beats-devguide}/beats-contributing.html#setting-up-dev-environment[Set up your
+development environment] as described in the _Beats Developer Guide_ then run:
++
+[source,shell]
+----
+cd x-pack/dockerlogbeat
+mage BuildAndInstall
+----
+
+2. If necessary, enable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin enable elastic/{log-driver-alias}:{version}
+----
+
+3. Verify that the plugin is installed and enabled:
++
+[source,shell]
+----
+docker plugin ls
+----
++
+The output should say something like:
++
+["source","sh",subs="attributes"]
+----
+ID                  NAME                                   DESCRIPTION              ENABLED
+c2ff9d2cf090        elastic/{log-driver-alias}:{version}   A beat for docker logs   true
+----
+
+[float]
+=== Step 2: Configure the {log-driver}
+
+You can set configuration options for a single container, or for all containers
+running on the host. See <<log-driver-configuration>> for a list of
+supported configuration options.
+
+*To configure a single container:*
+
+Pass configuration options at run time when you start the container. For
+example:
+
+// tag::log-driver-run[] 
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt output.elasticsearch.hosts="https://myhost:9200" \
+           --log-opt output.elasticsearch.username="myusername" \
+           --log-opt output.elasticsearch.password="mypassword" \
+           --log-opt output.elasticsearch.index="elastic-log-driver-%{+yyyy.MM.dd}" \
+           -it debian:jessie /bin/bash
+----
+// end::log-driver-run[]
+
+*To configure all containers running on the host:*
+
+Set configuration options in the Docker `daemon.json` configuration file. For
+example:
+
+// tag::log-driver-daemon[] 
+[source,json,subs="attributes"]
+----
+{
+  "log-driver" : "elastic/{log-driver-alias}:{version}",
+  "log-opts" : {
+    "output.elasticsearch.hosts" : "https://myhost:9200",
+    "output.elasticsearch.username" : "myusername",
+    "output.elasticsearch.password" : "mypassword",
+    "output.elasticsearch.index" : "elastic-log-driver-%{+yyyy.MM.dd}"
+  }
+}
+----
+// end::log-driver-daemon[]
+
+NOTE: The default location of the `daemon.json` file varies by platform. On
+Linux, the default location is `/etc/docker/daemon.json`. For more information,
+see the
+https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file[Docker
+docs].
