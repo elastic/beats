@@ -8,15 +8,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/logp"
 	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/test"
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_internalBuilder(t *testing.T) {
