@@ -5,30 +5,19 @@
 package ec2
 
 import (
+	"errors"
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-=======
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/test"
->>>>>>> Add autodiscover for aws_ec2 (#14823)
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
-
-	"github.com/elastic/beats/v7/v7/libbeat/common"
-	"github.com/elastic/beats/v7/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/v7/libbeat/logp"
-	awsauto "github.com/elastic/beats/v7/v7/x-pack/libbeat/autodiscover/providers/aws"
-	"github.com/elastic/beats/v7/v7/x-pack/libbeat/autodiscover/providers/aws/test"
-=======
->>>>>>> Add autodiscover for aws_ec2 (#14823)
 )
 
 func Test_internalBuilder(t *testing.T) {
