@@ -24,6 +24,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+
 
 *Metricbeat*
 
