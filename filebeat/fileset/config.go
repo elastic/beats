@@ -56,7 +56,6 @@ func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
 		return nil, fmt.Errorf("error unpacking configuration")
 	}
 
-
 	return &fcfg, nil
 }
 

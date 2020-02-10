@@ -116,7 +116,7 @@ type manifest struct {
 	} `config:"requires"`
 }
 
-func newManifest(cfg *common.Config, pipelineName string) (*manifest, error) {
+func newManifest(cfg *common.Config, pipelineVersion string) (*manifest, error) {
 	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
 		return nil, err
 	}
@@ -127,8 +127,8 @@ func newManifest(cfg *common.Config, pipelineName string) (*manifest, error) {
 		return nil, err
 	}
 
-	if pipelineName != "" {
-		pipelineFile := fmt.Sprintf("ingest/%s.json", pipelineName)
+	if pipelineVersion != "" {
+		pipelineFile := fmt.Sprintf("ingest/%s.json", pipelineVersion)
 		newPipeline := []string{pipelineFile}
 		manifest.IngestPipeline = newPipeline
 	}
