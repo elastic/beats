@@ -20,11 +20,15 @@
 package website
 
 import (
+	"encoding/xml"
 	"github.com/StackExchange/wmi"
 	"github.com/elastic/beats/metricbeat/module/iis"
-	"strings"
-
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 	"github.com/pkg/errors"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -78,8 +82,8 @@ func NewReader() (*Reader, error) {
 }
 
 func (re *Reader) InitCounters() error {
-	websites, err:= GetWebsites()
-	if err!= nil {
+	websites, err := GetWebsites1()
+	if err != nil {
 		return err
 	}
 	re.Websites = websites
@@ -150,7 +154,7 @@ func (re *Reader) Fetch() ([]mb.Event, error) {
 	for _, host := range re.Websites {
 		events[host.Name] = mb.Event{
 			MetricSetFields: common.MapStr{
-				"name": host.Name,
+				"name":             host.Name,
 				"application_pool": host.ApplicationName,
 			},
 		}
@@ -231,4 +235,70 @@ func GetWebsites() ([]Website, error) {
 		sites = append(sites, site)
 	}
 	return sites, nil
+}
+
+func GetWebsites1() ([]Website, error) {
+	path := os.Getenv("windir")
+	body, err := ioutil.ReadFile(path + "/system32/inetsrv/config/applicationHost.config")
+	if err != nil {
+		return nil, err
+	}
+	var config Configuration
+	err = xml.Unmarshal(body, &config)
+	if err != nil {
+		return nil, err
+	}
+	var websites []Website
+	for _, site := range config.SystemApplicationHost.Sites.Site {
+		if site.Name != "Default Web Site" {
+			websites = append(websites, Website{Name: site.Name, ApplicationName: site.Application.ApplicationPool})
+		}
+	}
+	processes, err := sysinfo.Processes()
+	if err != nil {
+		return nil, err
+	}
+	var filt []types.Process
+	for _, pro := range processes {
+		info, err := pro.Info()
+		if err != nil {
+			return nil, err
+		}
+		if info.Name == "w3wp.exe" {
+			for i, si := range websites {
+				if getapp(info.Args) == si.ApplicationName {
+					websites[i].WorkerProcessIds = append(websites[i].WorkerProcessIds, info.PID)
+				}
+			}
+			filt = append(filt, pro)
+		}
+	}
+	return websites, nil
+}
+
+func getapp(as []string) string {
+	for i, sd := range as {
+		if sd == "-ap" {
+			return as[i+1]
+		}
+	}
+	return ""
+
+}
+
+type Configuration struct {
+	SystemApplicationHost struct {
+		Sites struct {
+			Site []struct {
+				Text        string `xml:",chardata"`
+				Name        string `xml:"name,attr"`
+				ID          string `xml:"id,attr"`
+				Application struct {
+					Text            string `xml:",chardata"`
+					Path            string `xml:"path,attr"`
+					ApplicationPool string `xml:"applicationPool,attr"`
+				} `xml:"application"`
+			} `xml:"site"`
+		} `xml:"sites"`
+	} `xml:"system.applicationHost"`
 }
