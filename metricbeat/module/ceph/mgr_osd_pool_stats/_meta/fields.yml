@@ -1,0 +1,5 @@
+- name: ceph
+  type: group
+  description: OSD disk metrics of Ceph cluster
+  release: beta
+  fields:
