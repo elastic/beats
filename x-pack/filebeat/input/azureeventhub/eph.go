@@ -7,7 +7,8 @@ package azureeventhub
 import (
 	"context"
 	"fmt"
-	"github.com/Azure/azure-event-hubs-go/v3"
+
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 	"github.com/Azure/azure-event-hubs-go/v3/storage"
 	"github.com/Azure/azure-storage-blob-go/azblob"
