@@ -9,6 +9,42 @@
         An array of remote IP addresses. It is a list because it is common to include, besides the client
         IP address, IP addresses from headers like `X-Forwarded-For`.
         Real source IP is restored to `source.ip`.
+    # ingress-controller specific fields
+    - name: upstream.response.length
+      type: long
+      description: >
+        The response length
+    - name: http.request.length
+      type: long
+      description: >
+    - name: http.request.time
+      type: double
+      description: >
+    - name: proxy.upstream.name
+      type: text
+      description: >
+    - name: proxy.upstream.alternative_name
+      type: text
+      description: >
+    - name: upstream.response.length
+      type: long
+      description: >
+    - name: upstream.response.time
+      type: long
+      description: >
+    - name: upstream.response.status_code
+      type: long
+      description: >
+    - name: http.request.id
+      type: text
+      description: >
+    - name: upstream.ip
+      type: text
+      description: >
+    - name: upstream.port
+      type: long
+      description: >
+
 
     - name: body_sent.bytes
       type: alias

@@ -5,13 +5,13 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{NGINX_HOST} )?\"?(?:%{NGINX_ADDRESS_LIST:nginx.access.remote_ip_list}|%{NOTSPACE:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\" %{NUMBER:http.request.length:long} %{NUMBER:http.request.time:double} \\[%{DATA:proxy.upstream.name}\\] \\[%{DATA:proxy.upstream.alternative_name}\\] (%{IP:upstream.ip}:%{NUMBER:upstream.port}|-) (%{NUMBER:upstream.response.length:long}|-) (%{NUMBER:upstream.response.time:double}|-) (%{NUMBER:upstream.response.status_code:long}|-) %{GREEDYDATA:http.request.id}"
+                    "(%{NGINX_HOST} )?\"?(?:%{NGINX_ADDRESS_LIST:nginx.access.remote_ip_list}|%{NOTSPACE:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\" %{NUMBER:nginx.access.http.request.length:long} %{NUMBER:nginx.access.http.request.time:double} \\[%{DATA:nginx.access.proxy.upstream.name}\\] \\[%{DATA:nginx.access.proxy.upstream.alternative_name}\\] (%{UPSTREAM_ADDRESS}|-) (%{NUMBER:nginx.access.upstream.response.length:long}|-) (%{NUMBER:nginx.access.upstream.response.time:double}|-) (%{NUMBER:nginx.access.upstream.response.status_code:long}|-) %{GREEDYDATA:nginx.access.http.request.id}"
                 ],
                 "pattern_definitions": {
                     "NGINX_HOST": "(?:%{IP:destination.ip}|%{NGINX_NOTSEPARATOR:destination.domain})(:%{NUMBER:destination.port})?",
                     "NGINX_NOTSEPARATOR": "[^\t ,:]+",
                     "NGINX_ADDRESS_LIST": "(?:%{IP}|%{WORD})(\"?,?\\s*(?:%{IP}|%{WORD}))*",
-                    "UPSTREAM_ADDRESS": "%{IP:upstream.ip}(:%{NUMBER:upstream.port})?"
+                    "UPSTREAM_ADDRESS": "%{IP:nginx.access.upstream.ip}(:%{NUMBER:nginx.access.upstream.port})?"
                 },
                 "ignore_missing": true
             }

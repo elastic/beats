@@ -19914,6 +19914,106 @@ type: array
 
 --
 
+*`nginx.access.upstream.response.length`*::
++
+--
+The response length
+
+
+type: long
+
+--
+
+*`nginx.access.http.request.length`*::
++
+--
+
+
+type: long
+
+--
+
+*`nginx.access.http.request.time`*::
++
+--
+
+
+type: double
+
+--
+
+*`nginx.access.proxy.upstream.name`*::
++
+--
+
+
+type: text
+
+--
+
+*`nginx.access.proxy.upstream.alternative_name`*::
++
+--
+
+
+type: text
+
+--
+
+*`nginx.access.upstream.response.length`*::
++
+--
+
+
+type: long
+
+--
+
+*`nginx.access.upstream.response.time`*::
++
+--
+
+
+type: long
+
+--
+
+*`nginx.access.upstream.response.status_code`*::
++
+--
+
+
+type: long
+
+--
+
+*`nginx.access.http.request.id`*::
++
+--
+
+
+type: text
+
+--
+
+*`nginx.access.upstream.ip`*::
++
+--
+
+
+type: text
+
+--
+
+*`nginx.access.upstream.port`*::
++
+--
+
+
+type: long
+
+--
+
 *`nginx.access.body_sent.bytes`*::
 +
 --
