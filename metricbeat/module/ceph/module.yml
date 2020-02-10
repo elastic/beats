@@ -1,3 +1,4 @@
 name: ceph
 metricsets:
   - mgr_cluster_health
+  - mgr_cluster_disk
