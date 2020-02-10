@@ -12,4 +12,18 @@
 
 //tag::notable-breaking-changes[]
 
+[float]
+==== Version removed from default ILM policy name
+
+To prevent custom ILM policies from breaking during upgrades, the default 
+ILM policy name no longer includes the {beats} version.
+
+If you want to include the version, use the `setup.ilm.policy_name`
+configuration setting. For example:
+
+[source,yaml]
+----
+setup.ilm.policy_name: "%{[agent.name]}-%{[agent.version]}"
+----
+
 // end::notable-breaking-changes[]
