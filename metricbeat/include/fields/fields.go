@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "/Users/marcin.tojek/go/src/github.com/elastic/beats/libbeat/fields.yml", asset.LibbeatFieldsPri, AssetUsersMarcinTojekGoSrcGithubComElasticBeatsLibbeatFieldsYml); err != nil {
+	if err := asset.SetFields("metricbeat", "../libbeat/fields.yml", asset.LibbeatFieldsPri, AssetLibbeatFieldsYml); err != nil {
 		panic(err)
 	}
 }
