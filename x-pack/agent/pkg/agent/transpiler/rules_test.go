@@ -57,21 +57,21 @@ datasources:
     - type: file
       streams:
         - paths: /var/log/mysql/error.log
-          index: mytype-default-generic
+          index: mytype-generic-default
   - name: Specified namespace
     namespace: nsns
     inputs:
     - type: file
       streams:
         - paths: /var/log/mysql/access.log
-          index: mytype-nsns-generic
+          index: mytype-generic-nsns
   - name: Specified dataset
     inputs:
     - type: file
       streams:
         - paths: /var/log/mysql/access.log
           dataset: dsds
-          index: mytype-default-dsds
+          index: mytype-dsds-default
   - name: All specified
     namespace: nsns
     inputs:
@@ -79,7 +79,7 @@ datasources:
       streams:
         - paths: /var/log/mysql/access.log
           dataset: dsds
-          index: mytype-nsns-dsds
+          index: mytype-dsds-nsns
 `,
 			rule: &RuleList{
 				Rules: []Rule{

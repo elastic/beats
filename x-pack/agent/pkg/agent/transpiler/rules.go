@@ -349,7 +349,7 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 
 				streamMap.value = append(streamMap.value, &Key{
 					name:  "index",
-					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, namespace, dataset)},
+					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
 				})
 			}
 
