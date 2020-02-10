@@ -3935,7 +3935,17 @@ type: long
 [float]
 === ceph
 
+Disk metrics of Ceph cluster
+
+[float]
+=== ceph
+
 Status metrics of Ceph cluster
+
+[float]
+=== ceph
+
+OSD disk metrics of Ceph cluster
 
 [float]
 === monitor_health
