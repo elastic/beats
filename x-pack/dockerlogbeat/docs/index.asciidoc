@@ -1,10 +1,10 @@
-= Elastic Log Driver for Docker
-
 :libbeat-dir: {docdir}/../../../libbeat/docs
-:log-driver: Elastic Log Driver
-:log-driver-long: Elastic Log Driver for Docker
+:log-driver: Elastic Logging Plugin
+:log-driver-long: Elastic Logging Plugin for Docker
 :log-driver-alias: elastic-logging-plugin
 :docker-version: Engine API 1.25
+
+= {log-driver} for Docker
 
 include::{libbeat-dir}/version.asciidoc[]
 
