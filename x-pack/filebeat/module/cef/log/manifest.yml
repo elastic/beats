@@ -13,7 +13,10 @@ var:
   - name: input
     default: syslog
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/fp-pipeline.yml
+
 input: config/input.yml
 
 requires.processors:

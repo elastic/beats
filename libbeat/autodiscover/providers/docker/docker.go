@@ -60,6 +60,8 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+	logger := logp.NewLogger("docker")
+
 	cfgwarn.Beta("The docker autodiscover is beta")
 
 	errWrap := func(err error) error {
@@ -72,7 +74,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	watcher, err := docker.NewWatcher(config.Host, config.TLS, false)
+	watcher, err := docker.NewWatcher(logger, config.Host, config.TLS, false)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -115,7 +117,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		stopListener:  stop,
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
-		logger:        logp.NewLogger("docker"),
+		logger:        logger,
 	}, nil
 }
 

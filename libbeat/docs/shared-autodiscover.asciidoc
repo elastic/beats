@@ -362,6 +362,51 @@ ifdef::autodiscoverHints[]
 include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
 endif::autodiscoverHints[]
 
+ifdef::autodiscoverAWSEC2[]
+[float]
+===== Amazon EC2s
+
+*Note: This provider is experimental*
+
+The Amazon EC2 autodiscover provider discovers https://aws.amazon.com/ec2/[EC2 instances].
+This is useful for users to launch Metricbeat modules to monitor services running on AWS EC2 instances.
+For example, to gather MySQL metrics from mysql servers running on EC2 instances with specific tag `service: mysql`.
+
+This provider will load AWS credentials using the standard AWS environment variables and shared credentials files
+see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys]
+for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and
+`secret_access_key` variables.
+
+These are the available fields during within config templating.
+The `aws.ec2.*` fields and `cloud.*` fields will be available on each emitted event.
+
+* cloud.availability_zone
+* cloud.instance.id
+* cloud.machine.type
+* cloud.provider
+* cloud.region
+
+* aws.ec2.architecture
+* aws.ec2.image.id
+* aws.ec2.kernel.id
+* aws.ec2.monitoring.state
+* aws.ec2.private.dns_name
+* aws.ec2.private.ip
+* aws.ec2.public.dns_name
+* aws.ec2.public.ip
+* aws.ec2.root_device_name
+* aws.ec2.state.code
+* aws.ec2.state.name
+* aws.ec2.subnet.id
+* aws.ec2.tags
+* aws.ec2.vpc.id
+
+include::../../{beatname_lc}/docs/autodiscover-aws-ec2-config.asciidoc[]
+
+This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
+
+endif::autodiscoverAWSEC2[]
+
 [[configuration-autodiscover-advanced]]
 === Advanced usage
 

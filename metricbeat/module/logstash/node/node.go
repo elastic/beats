@@ -74,13 +74,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return eventMapping(r, content)
 	}
 
-	pipelinesContent, err := logstash.GetPipelines(m.MetricSet)
+	pipelinesContent, overrideClusterUUID, err := logstash.GetPipelines(m.MetricSet)
 	if err != nil {
 		m.Logger().Error(err)
 		return nil
 	}
 
-	err = eventMappingXPack(r, m, pipelinesContent)
+	err = eventMappingXPack(r, m, pipelinesContent, overrideClusterUUID)
 	if err != nil {
 		m.Logger().Error(err)
 	}

@@ -11,7 +11,31 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:55911",
+                "instance": "127.0.0.1:60794",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.qmgr",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "qmgr",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60794",
                 "job": "ibmmq",
                 "qmgr": "QM1"
             },

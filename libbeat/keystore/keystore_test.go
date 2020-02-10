@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 )
 
 func TestResolverWhenTheKeyDoesntExist(t *testing.T) {
@@ -33,7 +34,7 @@ func TestResolverWhenTheKeyDoesntExist(t *testing.T) {
 	keystore := CreateAnExistingKeystore(path)
 
 	resolver := ResolverWrap(keystore)
-	_, err := resolver("donotexist")
+	_, _, err := resolver("donotexist")
 	assert.Equal(t, err, ucfg.ErrMissing)
 }
 
@@ -44,7 +45,8 @@ func TestResolverWhenTheKeyExist(t *testing.T) {
 	keystore := CreateAnExistingKeystore(path)
 
 	resolver := ResolverWrap(keystore)
-	v, err := resolver("output.elasticsearch.password")
+	v, pCfg, err := resolver("output.elasticsearch.password")
 	assert.NoError(t, err)
+	assert.Equal(t, pCfg, parse.DefaultConfig)
 	assert.Equal(t, v, "secret")
 }
