@@ -1,4 +1,3 @@
-from past.utils import old_div
 import time
 import sys
 
@@ -19,5 +18,5 @@ line_length = len(str(total_lines)) + 1
 # Setup python log handler
 handler = logging.handlers.RotatingFileHandler(
     log_file, maxBytes=line_length * lines_per_file + 1,
-    backupCount=old_div(total_lines, lines_per_file) + 1)
+    backupCount=int(total_lines/lines_per_file) + 1)
 logger.addHandler(handler)
