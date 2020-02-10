@@ -118,7 +118,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.20+| .20+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.21+| .21+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>> beta[]  
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -136,6 +136,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_service,state_service>> experimental[]  
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
+|<<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>> experimental[]  
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,kvm>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  

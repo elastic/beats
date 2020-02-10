@@ -51,6 +51,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_resourcequota"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_service"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_statefulset"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_storageclass"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/system"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/volume"
 )
