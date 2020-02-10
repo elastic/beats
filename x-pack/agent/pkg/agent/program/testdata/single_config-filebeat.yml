@@ -4,10 +4,9 @@ filebeat:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
-    index: filebeat-default-generic
+    index: filebeat-generic-default
 output:
   elasticsearch:
-    # index: logs-default-generic
     hosts:
       - 127.0.0.1:9200
       - 127.0.0.1:9300
