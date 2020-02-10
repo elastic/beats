@@ -18,8 +18,6 @@
 package mage
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage/gotool"
@@ -40,7 +38,7 @@ func InstallVendored(importPath string) error {
 	install := gotool.Install
 	return install(
 		install.Vendored(),
-		install.Package(filepath.Join(beatDir, "vendor", importPath)),
+		install.Package(importPath),
 	)
 }
 
