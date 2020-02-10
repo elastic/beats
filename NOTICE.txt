@@ -291,7 +291,7 @@ License type (autodetected): MIT
 
 --------------------------------------------------------------------
 Dependency: github.com/Azure/azure-event-hubs-go/v3
-Version: v3.0.0
+Version: v3.1.2
 Revision: 7a1b2e2089e284bcec716b3bdc64ee2e5e626871
 License type (autodetected): MIT
 ./vendor/github.com/Azure/azure-event-hubs-go/v3/LICENSE:

@@ -206,7 +206,7 @@
 			"path": "github.com/Azure/azure-event-hubs-go/v3",
 			"revision": "7a1b2e2089e284bcec716b3bdc64ee2e5e626871",
 			"revisionTime": "2019-12-17T22:59:24Z",
-			"version": "v3.0.0",
+			"version": "v3.1.2",
 			"versionExact": "v3.0.0"
 		},
 		{
@@ -215,7 +215,7 @@
 			"path": "github.com/Azure/azure-event-hubs-go/v3/atom",
 			"revision": "7a1b2e2089e284bcec716b3bdc64ee2e5e626871",
 			"revisionTime": "2019-12-17T22:59:24Z",
-			"version": "v3.0.0",
+			"version": "v3.1.2",
 			"versionExact": "v3.0.0"
 		},
 		{
@@ -224,7 +224,7 @@
 			"path": "github.com/Azure/azure-event-hubs-go/v3/eph",
 			"revision": "7a1b2e2089e284bcec716b3bdc64ee2e5e626871",
 			"revisionTime": "2019-12-17T22:59:24Z",
-			"version": "v3.0.0",
+			"version": "v3.1.2",
 			"versionExact": "v3.0.0"
 		},
 		{
@@ -233,7 +233,7 @@
 			"path": "github.com/Azure/azure-event-hubs-go/v3/persist",
 			"revision": "7a1b2e2089e284bcec716b3bdc64ee2e5e626871",
 			"revisionTime": "2019-12-17T22:59:24Z",
-			"version": "v3.0.0",
+			"version": "v3.1.2",
 			"versionExact": "v3.0.0"
 		},
 		{
@@ -242,7 +242,7 @@
 			"path": "github.com/Azure/azure-event-hubs-go/v3/storage",
 			"revision": "7a1b2e2089e284bcec716b3bdc64ee2e5e626871",
 			"revisionTime": "2019-12-17T22:59:24Z",
-			"version": "v3.0.0",
+			"version": "v3.1.2",
 			"versionExact": "v3.0.0"
 		},
 		{

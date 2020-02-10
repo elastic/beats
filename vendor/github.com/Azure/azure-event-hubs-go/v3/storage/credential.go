@@ -153,7 +153,7 @@ func (cred *AADSASCredential) getToken(ctx context.Context) (SASToken, error) {
 	defer span.End()
 
 	if cred.token != nil {
-		if cred.token.expiry.Before(time.Now().Add(-5 * time.Minute)) {
+		if !cred.token.expiry.Before(time.Now().Add(5 * time.Minute)) {
 			return *cred.token, nil
 		}
 	}

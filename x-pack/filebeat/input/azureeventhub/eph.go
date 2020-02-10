@@ -7,8 +7,7 @@ package azureeventhub
 import (
 	"context"
 	"fmt"
-
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 	"github.com/Azure/azure-event-hubs-go/v3/storage"
 	"github.com/Azure/azure-storage-blob-go/azblob"
@@ -49,7 +48,11 @@ func (a *azureInput) runWithEPH() error {
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
 			// partitionID is not yet mapped in the azure-eventhub sdk
-			return a.processEvents(e, "")
+			err := a.processEvents(e, "")
+			if err != nil {
+				a.log.Errorf("Error received from processing events: %v", err)
+			}
+			return err
 		})
 	if err != nil {
 		return err
