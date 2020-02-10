@@ -1,5 +1,6 @@
-- name: ceph
+- name: mgr_osd_perf
   type: group
-  description: OSD disk metrics of Ceph cluster
+  description: >
+    OSD performance metrics of Ceph cluster
   release: beta
   fields:

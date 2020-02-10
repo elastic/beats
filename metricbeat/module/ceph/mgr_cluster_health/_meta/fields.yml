@@ -1,5 +1,6 @@
-- name: ceph
+- name: mgr_cluster_health
   type: group
-  description: Status metrics of Ceph cluster
+  description: >
+    Status metrics of Ceph cluster
   release: beta
   fields:
