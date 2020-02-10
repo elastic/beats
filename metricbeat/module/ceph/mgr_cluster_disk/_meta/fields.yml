@@ -1,5 +1,6 @@
-- name: ceph
+- name: mgr_cluster_disk
   type: group
-  description: Disk metrics of Ceph cluster
+  description: >
+    Disk metrics of Ceph cluster
   release: beta
   fields:

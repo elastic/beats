@@ -1,5 +1,6 @@
-- name: ceph
+- name: mgr_osd_pool_stats
   type: group
-  description: OSD disk metrics of Ceph cluster
+  description: >
+    OSD pool stats of Ceph cluster
   release: beta
   fields:

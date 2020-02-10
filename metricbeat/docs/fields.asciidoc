@@ -3933,19 +3933,40 @@ type: long
 --
 
 [float]
-=== ceph
+=== mgr_cluster_disk
 
 Disk metrics of Ceph cluster
 
+
 [float]
-=== ceph
+=== mgr_cluster_health
 
 Status metrics of Ceph cluster
 
+
 [float]
-=== ceph
+=== mgr_osd_disk
 
 OSD disk metrics of Ceph cluster
+
+
+[float]
+=== mgr_osd_perf
+
+OSD performance metrics of Ceph cluster
+
+
+[float]
+=== mgr_osd_pool_stats
+
+OSD pool stats of Ceph cluster
+
+
+[float]
+=== mgr_osd_tree
+
+OSD tree stats of Ceph cluster
+
 
 [float]
 === monitor_health
