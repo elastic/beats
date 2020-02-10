@@ -11,7 +11,9 @@ the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The de
 [float]
 === Compatibility
 
-The Ceph module is tested with Ceph Jewel (10.2.10).
+The Ceph module is tested with Ceph Jewel (10.2.10) and Ceph Nautilus (14.2.7).
+
+Metricsets with the `mgr_` prefix are compatible with Ceph releases using the Ceph Manager Daemon.
 
 [float]
 === Dashboard
@@ -52,6 +54,18 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-ceph-cluster_status,cluster_status>>
 
+* <<metricbeat-metricset-ceph-mgr_cluster_disk,mgr_cluster_disk>>
+
+* <<metricbeat-metricset-ceph-mgr_cluster_health,mgr_cluster_health>>
+
+* <<metricbeat-metricset-ceph-mgr_osd_disk,mgr_osd_disk>>
+
+* <<metricbeat-metricset-ceph-mgr_osd_perf,mgr_osd_perf>>
+
+* <<metricbeat-metricset-ceph-mgr_osd_pool_stats,mgr_osd_pool_stats>>
+
+* <<metricbeat-metricset-ceph-mgr_osd_tree,mgr_osd_tree>>
+
 * <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
 
 * <<metricbeat-metricset-ceph-osd_df,osd_df>>
@@ -65,6 +79,18 @@ include::ceph/cluster_disk.asciidoc[]
 include::ceph/cluster_health.asciidoc[]
 
 include::ceph/cluster_status.asciidoc[]
+
+include::ceph/mgr_cluster_disk.asciidoc[]
+
+include::ceph/mgr_cluster_health.asciidoc[]
+
+include::ceph/mgr_osd_disk.asciidoc[]
+
+include::ceph/mgr_osd_perf.asciidoc[]
+
+include::ceph/mgr_osd_pool_stats.asciidoc[]
+
+include::ceph/mgr_osd_tree.asciidoc[]
 
 include::ceph/monitor_health.asciidoc[]
 
