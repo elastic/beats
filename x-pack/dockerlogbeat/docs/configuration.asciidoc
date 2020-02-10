@@ -52,8 +52,8 @@ format is `"username:password"`.
 [[es-output-options]]
 === {es} output options
 
-// TODO: Add the following settings. Not sure how to represent them as commands
-// or in the daemon file:
+// TODO: Add the following settings. Syntax is a little differnt so we might
+// need to add deameon examples that show how to specify these settings:
 // `output.elasticsearch.indices
 // `output.elasticsearch.pipelines`
 
@@ -283,6 +283,11 @@ host).
 
 coming[a future update. This documentation is a work in progress]
 
+Need the docs now? See the
+{filebeat-ref}/kafka-output.html[Kafka output docs] for {filebeat}.
+The {log-driver} supports most of the same options, just make sure you use
+the fully qualified setting names.
+
 [float]
 [[redis-output-options]]
 === Redis output options
@@ -290,3 +295,8 @@ coming[a future update. This documentation is a work in progress]
 // TODO: Add Redis output options here. 
 
 coming[a future update. This documentation is a work in progress]
+
+Need the docs now? See the
+{filebeat-ref}/redis-output.html[Redis output docs] for {filebeat}.
+The {log-driver} supports most of the same options, just make sure you use
+the fully qualified setting names.

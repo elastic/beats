@@ -4,9 +4,6 @@
 
 experimental[]
 
-// TODO: Add details about locating the log files written by the Elastic Log
-// driver.
-
 You can set the debug level to capture debugging output about the {log-driver}.
 To set the debug level:
 
@@ -33,3 +30,13 @@ Where valid settings for `LOG_DRIVER_LEVEL` are `debug`, `info`, `warning`, or
 ----
 docker plugin enable elastic/{log-driver-alias}:{version}
 ----
+
+To view the logs:
+
+On Linux, the {log-driver} logs are written to the same location as other
+docker logs, typically the system journal. 
+
+On MacOS, locating the logs is more complicated. For more information, see
+the
+https://github.com/elastic/beats/tree/{branch}/x-pack/dockerlogbeat#debugging-on-macos[Debugging
+on MacOS] section in the readme file.

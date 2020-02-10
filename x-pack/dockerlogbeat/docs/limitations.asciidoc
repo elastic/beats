@@ -4,8 +4,10 @@
 
 experimental[]
 
-This release of the {log-driver} has the following problems and limitations:
+This release of the {log-driver} has the following known problems and
+limitations:
 
-coming[a future update. This documentation is a work in progress]
-
-//* Add limitations here... 
+* Spool to disk (beta) is not supported.
+* Complex config options can't be easily represented via `--log-opts`.
+* Mapping templates and other assets that are normally installed by the
+{beats} setup are not available.
