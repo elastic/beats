@@ -61,7 +61,7 @@ type EnrollCmdOption struct {
 	EnrollAPIKey         string
 }
 
-func (e *EnrollCmdOption) KibanaConfig() (*kibana.Config, error) {
+func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	cfg, err := kibana.NewConfigFromURL(e.URL)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func NewEnrollCmdWithStore(
 	store store,
 ) (*EnrollCmd, error) {
 
-	cfg, err := options.KibanaConfig()
+	cfg, err := options.kibanaConfig()
 	if err != nil {
 		return nil, errors.New(err,
 			"invalid Kibana configuration",
