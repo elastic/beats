@@ -36,7 +36,8 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		},
 	}
 
-	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
+	cmd.Flags().StringP("certificate_authorities", "a", "", "Comma separated list of root certificate for server verifications")
+	cmd.Flags().StringP("ca_sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 
 	return cmd
@@ -71,20 +72,29 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	url := args[0]
 	enrollmentToken := args[1]
 
-	caStr, _ := cmd.Flags().GetString("certificate-authorities")
+	caStr, _ := cmd.Flags().GetString("certificate_authorities")
 	CAs := cli.StringToSlice(caStr)
+
+	caSHA256str, _ := cmd.Flags().GetString("ca_sha256")
+	caSHA256 := cli.StringToSlice(caSHA256str)
 
 	delay(defaultDelay)
 
+	options := application.EnrollCmdOption{
+		ID:                   "", // TODO(ph), This should not be an empty string, will clarify in a new PR.
+		EnrollAPIKey:         enrollmentToken,
+		URL:                  url,
+		CAs:                  CAs,
+		CASha256:             caSHA256,
+		UserProvidedMetadata: make(map[string]interface{}),
+	}
+
 	c, err := application.NewEnrollCmd(
 		logger,
-		url,
-		CAs,
-		enrollmentToken,
-		"",
-		nil,
+		&options,
 		flags.PathConfigFile,
 	)
+
 	if err != nil {
 		return err
 	}
