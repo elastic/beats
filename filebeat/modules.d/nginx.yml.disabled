@@ -10,6 +10,8 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Set specific pipeline to use. If left blank default will be used.
+    # version: ingress-controller
   # Error logs
   error:
     enabled: true
