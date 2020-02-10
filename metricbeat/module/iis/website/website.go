@@ -43,7 +43,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	log    *logp.Logger
-	reader *iis.Reader
+	reader *Reader
 }
 
 // Config for the iis website metricset.
@@ -61,17 +61,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// init reader object
-	reader, err := iis.NewReader()
+	reader, err := NewReader()
 	if err != nil {
 		return nil, err
 	}
-	// get instances will retrieve the websites running in iis and also filter on the sites configured by users
-	instances, err := getInstances(reader, config.Sites)
-	if err != nil {
-		return nil, err
-	}
-	reader.Instances = instances
-	if err := reader.InitCounters(iis.WebsiteCounters, nil); err != nil {
+
+	if err := reader.InitCounters(); err != nil {
 		return nil, err
 	}
 	return &MetricSet{
@@ -89,12 +84,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err := m.Module().UnpackConfig(&config); err != nil {
 		return nil
 	}
-	instances, err := getInstances(m.reader, config.Sites)
-	if err != nil {
-		return err
-	}
-	m.reader.Instances = instances
-	events, err := m.reader.Fetch(iis.WebsiteCounters, nil)
+	events, err := m.reader.Fetch()
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}

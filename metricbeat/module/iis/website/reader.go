@@ -17,9 +17,11 @@
 
 // +build windows
 
-package iis
+package website
 
 import (
+	"github.com/StackExchange/wmi"
+	"github.com/elastic/beats/metricbeat/module/iis"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -32,17 +34,33 @@ import (
 
 // Reader will contain the config options
 type Reader struct {
-	Query     pdh.Query    // PDH Query
-	Instances []Instance   // Mapping of counter path to key used for the label (e.g. processor.name)
-	log       *logp.Logger // logger
-	hasRun    bool         // will check if the reader has run a first time
+	Query           pdh.Query    // PDH Query
+	Websites        []Website    // Mapping of counter path to key used for the label (e.g. processor.name)
+	log             *logp.Logger // logger
+	hasRun          bool         // will check if the reader has run a first time
+	WorkerProcesses map[string]string
 }
 
-type Instance struct {
-	Name        string
+type Website struct {
+	Name             string
+	WorkerProcessIds []int
+	ApplicationName  string
+	counters         map[string]string
+}
+
+type WorkerProcess struct {
+	ProcessId    int
+	InstanceName string
+	counters     map[string]string
+}
+
+type Application struct {
+	ApplicationPool string
+	SiteName        string
+}
+type Worker struct {
+	AppPoolName string
 	ProcessId   int
-	ProcessName string
-	counters    map[string]string
 }
 
 // NewReader creates a new instance of Reader.
@@ -59,20 +77,39 @@ func NewReader() (*Reader, error) {
 	return reader, nil
 }
 
-func (re *Reader) InitCounters(counters map[string]string) error {
+func (re *Reader) InitCounters() error {
+	websites, err:= GetWebsites()
+	if err!= nil {
+		return err
+	}
+	re.Websites = websites
+	re.WorkerProcesses = make(map[string]string)
 	var newQueries []string
-	for i, instance := range re.Instances {
-		re.Instances[i].counters = make(map[string]string)
-		for key, value := range counters {
+	for i, instance := range re.Websites {
+		re.Websites[i].counters = make(map[string]string)
+		for key, value := range iis.WebsiteCounters {
 			value = strings.Replace(value, "*", instance.Name, 1)
 			if err := re.Query.AddCounter(value, "", "float", true); err != nil {
 				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 			}
 			newQueries = append(newQueries, value)
-			re.Instances[i].counters[value] = key
+			re.Websites[i].counters[value] = key
 		}
 	}
-	err := re.Query.RemoveUnusedCounters(newQueries)
+	for key, value := range iis.AppPoolCounters {
+		counters, err := re.Query.ExpandWildCardPath(value)
+		if err != nil {
+			return errors.Wrapf(err, `failed to expand counter path (query="%v")`, value)
+		}
+		for _, count := range counters {
+			if err = re.Query.AddCounter(count, "", "float", true); err != nil {
+				return errors.Wrapf(err, `failed to add counter (query="%v")`, count)
+			}
+			newQueries = append(newQueries, count)
+			re.WorkerProcesses[count] = key
+		}
+	}
+	err = re.Query.RemoveUnusedCounters(newQueries)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
@@ -80,7 +117,7 @@ func (re *Reader) InitCounters(counters map[string]string) error {
 }
 
 // Read executes a query and returns those values in an event.
-func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
+func (re *Reader) Fetch() ([]mb.Event, error) {
 	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
 	if len(re.Query.Counters) == 0 {
 		return nil, errors.New("no counters to read")
@@ -91,7 +128,7 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
 	if re.hasRun {
-		err := re.InitCounters(counters)
+		err := re.InitCounters()
 		if err != nil {
 			return nil, errors.Wrap(err, "failed retrieving counters")
 		}
@@ -108,18 +145,17 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
+	workers := getProcessIds(values)
 	events := make(map[string]mb.Event)
-	for _, host := range re.Instances {
+	for _, host := range re.Websites {
 		events[host.Name] = mb.Event{
 			MetricSetFields: common.MapStr{
 				"name": host.Name,
+				"application_pool": host.ApplicationName,
 			},
 		}
-		if host.ProcessId != 0 {
-			events[host.Name].MetricSetFields.Put("worker_process_id", host.ProcessId)
-		}
-		for counterPath, values := range values {
-			for _, val := range values {
+		for counterPath, value := range values {
+			for _, val := range value {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 				if val.Err != nil && !re.hasRun {
@@ -127,10 +163,13 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 						"error", val.Err, logp.Namespace("website"), "query", counterPath)
 					continue
 				}
-				if val.Instance == host.Name || val.Instance == string(host.ProcessName) {
+				if val.Instance == host.Name {
 					events[host.Name].MetricSetFields.Put(host.counters[counterPath], val.Measurement)
+				} else if hasWorkerProcess(val.Instance, workers, host.WorkerProcessIds) {
+					events[host.Name].MetricSetFields.Put(re.WorkerProcesses[counterPath], val.Measurement)
 				}
 			}
+
 		}
 	}
 
@@ -147,37 +186,49 @@ func (re *Reader) Close() error {
 	return re.Query.Close()
 }
 
-func (re *Reader) GetInstances(instances []Instance) ([]Instance, error) {
-	var newQueries []string
-	counter := "\\Process(w3wp*)\\ID Process"
-	counters, err := re.Query.ExpandWildCardPath(counter)
-	for _, count := range counters {
-		if err := re.Query.AddCounter(count, "", "float", true); err != nil {
-			return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, count)
+func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess {
+	var workers []WorkerProcess
+	for key, values := range counterValues {
+		if strings.Contains(key, "\\ID Process") {
+			workers = append(workers, WorkerProcess{InstanceName: values[0].Instance, ProcessId: int(values[0].Measurement.(float64))})
 		}
-		newQueries = append(newQueries, counter)
 	}
-	err = re.Query.RemoveUnusedCounters(newQueries)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed removing unused counter values")
-	}
-	if err := re.Query.CollectData(); err != nil {
-		return nil, errors.Wrap(err, "failed collecting counter values")
-	}
-	// Get the values.
-	counterValues, err := re.Query.GetFormattedCounterValues()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed retrieving counter formatted values")
-	}
-	for i, instance := range instances {
-		for _, value := range counterValues {
-			for _, counterValue := range value {
-				if instance.ProcessId == int(counterValue.Measurement.(float64)) {
-					instances[i].ProcessName = counterValue.Instance
+	return workers
+}
+
+func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool {
+	for _, worker := range workers {
+		if worker.InstanceName == instance {
+			for _, pid := range pids {
+				if pid == worker.ProcessId {
+					return true
 				}
 			}
-
 		}
 	}
-	return instances, nil
+	return false
+}
+
+func GetWebsites() ([]Website, error) {
+	var applications []Application
+	err := wmi.QueryNamespace("Select ApplicationPool, SiteName from Application", &applications, "root\\webadministration")
+	if err != nil {
+		// Don't return from this error since the name space might exist.
+	}
+	var workerProcesses []Worker
+	err = wmi.QueryNamespace("Select AppPoolName, ProcessId from WorkerProcess", &workerProcesses, "root\\webadministration")
+	if err != nil {
+		// Don't return from this error since the name space might exist.
+	}
+	var sites []Website
+	for _, application := range applications {
+		site := Website{Name: application.SiteName, ApplicationName: application.ApplicationPool}
+		for _, wp := range workerProcesses {
+			if wp.AppPoolName == application.ApplicationPool {
+				site.WorkerProcessIds = append(site.WorkerProcessIds, wp.ProcessId)
+			}
+		}
+		sites = append(sites, site)
+	}
+	return sites, nil
 }

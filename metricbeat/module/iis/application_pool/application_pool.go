@@ -20,13 +20,12 @@
 package application_pool
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/iis"
 	"github.com/elastic/go-sysinfo"
+	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -43,8 +42,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log    *logp.Logger
-	reader *iis.Reader
+	log            *logp.Logger
+	reader         *iis.Reader
+	instanceReader *iis.Reader
 }
 
 // Config for the iis website metricset.
@@ -60,23 +60,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
+	// instantiate reader object
 	reader, err := iis.NewReader()
 	if err != nil {
 		return nil, err
 	}
-	instances, err := getInstances(config.Names)
+	// instantiate reader object that should retrieve the process ids and process names for the worker processes
+	instanceReader, err := iis.NewReader()
+	if err != nil {
+		return nil, err
+	}
+
+	instances, err := getInstances(config.Names, instanceReader)
 	if err != nil {
 		return nil, err
 	}
 	reader.Instances = instances
-	if err := reader.InitCounters(nil, iis.AppPoolCounters); err != nil {
+	if err := reader.InitCounters(iis.AppPoolCounters); err != nil {
 		return nil, err
 	}
 	return &MetricSet{
-		BaseMetricSet: base,
-		log:           logp.NewLogger("application pool"),
-		reader:        reader,
+		BaseMetricSet:  base,
+		log:            logp.NewLogger("application pool"),
+		reader:         reader,
+		instanceReader: instanceReader,
 	}, nil
 }
 
@@ -88,12 +95,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err := m.Module().UnpackConfig(&config); err != nil {
 		return nil
 	}
-	instances, err := getInstances(config.Names)
+	instances, err := getInstances(config.Names, m.instanceReader)
 	if err != nil {
 		return err
 	}
 	m.reader.Instances = instances
-	events, err := m.reader.Fetch(nil, iis.AppPoolCounters)
+	events, err := m.reader.Fetch(iis.AppPoolCounters)
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
@@ -109,7 +116,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 // getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
-func getInstances(names []string) ([]iis.Instance, error) {
+func getInstances(names []string, instanceReader *iis.Reader) ([]iis.Instance, error) {
 	processes, err := sysinfo.Processes()
 	if err != nil {
 		return nil, err
@@ -134,7 +141,7 @@ func getInstances(names []string) ([]iis.Instance, error) {
 		}
 	}
 	if len(names) == 0 {
-		return w3processes, nil
+		return instanceReader.GetInstances(w3processes)
 	}
 	var filtered []iis.Instance
 	for _, n := range names {
@@ -144,5 +151,8 @@ func getInstances(names []string) ([]iis.Instance, error) {
 			}
 		}
 	}
-	return filtered, nil
+	return instanceReader.GetInstances(filtered)
 }
+
+
+
