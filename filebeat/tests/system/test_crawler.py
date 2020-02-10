@@ -528,7 +528,7 @@ class Test(BaseTest):
                 lambda: self.output_has(lines=1), max_timeout=10)
 
         # Append utf-8 chars to check if it keeps reading
-        with codecs.open(testfile, "a") as f:
+        with codecs.open(testfile, "a", "utf-8") as f:
             # write additional lines
             f.write("Hello\n")
             f.write("薩科Ruflin" + "\n")
