@@ -212,6 +212,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
 	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  -e GOFLAGS=-mod=vendor
 	  beat make integration-tests
 
 # Runs the system tests
