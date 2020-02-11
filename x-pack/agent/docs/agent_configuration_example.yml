@@ -53,7 +53,7 @@ datasources:
             enabled?: true # default to true
             dataset: nginx.error
             paths: /var/log/nginx/error.log
-      - type: metrics/nginx
+      - type: nginx/metrics
         streams:
           - id?: {id}
             enabled?: true # default to true
@@ -84,7 +84,7 @@ datasources:
       name: epm/system
       version: 1.7.0
     inputs:
-      - type: metrics/system
+      - type: system/metrics
         streams:
          - id?: {id}
            enabled?: false # default true
@@ -128,7 +128,7 @@ datasources:
   - id?: my-endpoint
     title: Collect Elasticsearch information
     package:
-      name: epm/elsticsearch
+      name: epm/elasticsearch
       version: 1.7.0
     inputs:
         - type: log
@@ -153,7 +153,7 @@ datasources:
             enabled?: true
             dataset: elasticsearch.slowlog
             paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
-        - type: metrics/elasticsearch
+        - type: elasticsearch/metrics
           hosts: ["http://localhost:9200"]
           hosts: ["http://localhost:9200"]
           # api_key: xxxx
@@ -161,6 +161,8 @@ datasources:
           # password: changeme
           # ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
           # ssl.ca_sha256: BxZ...
+          # ssl.certificate: ...
+          # ssl.key: ...
           xpack.enabled: true
           streams:
           - id?: {id}
@@ -228,7 +230,7 @@ datasources:
           - id?: {id}
             metricset: s3access
             dataset: aws.vpcflow
-       - type: metrics/aws
+       - type: aws/metrics
          streams:
           - id?: {id}
             metricset: usage
@@ -294,7 +296,7 @@ datasources:
       name: epm/kubernetes
       version: 1.7.0
     inputs:
-      - type: metrics/kubernetes
+      - type: kubernetes-node/metrics
         hosts: ["localhost:10250"]
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         ssl.certificate_authorities:
@@ -329,7 +331,7 @@ datasources:
             metricset: event
             dataset: kubernetes.event
             period: 10s
-      - type: metrics/kubernetes
+      - type: kubernetes-state/metrics
         hosts: ["kube-state-metrics:8080"]
         streams:
           - id?: {id}
@@ -389,7 +391,7 @@ datasources:
       name: epm/docker
       version: 1.7.0
     inputs:
-      - type: metrics/docker
+      - type: docker/metrics
         hosts: ["localhost:10250"]
         #labels.dedot: false
 
