@@ -3194,10 +3194,10 @@ type: object
 
 --
 
-*`azure.compute_vm.*.*`*::
+*`azure.database_account.*.*`*::
 +
 --
-compute_vm
+database account
 
 
 type: object

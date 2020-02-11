@@ -1,7 +1,7 @@
-- name: compute_vm.*.*
+- name: database_account.*.*
   release: beta
   type: object
   object_type: float
   object_type_mapping_type: "*"
   description: >
-    compute_vm
+    database account
