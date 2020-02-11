@@ -143,7 +143,8 @@ class Test(BaseTest):
             print(test_file)
             cmd.append("-M")
             pipeline = test_file.split("pipeline-version-")[1].split(".log")[0]
-            cmd.append("{module}.{fileset}.version={pipeline}".format(module=module, fileset=fileset, pipeline=pipeline))
+            cmd.append("{module}.{fileset}.version={pipeline}".format(
+                module=module, fileset=fileset, pipeline=pipeline))
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")

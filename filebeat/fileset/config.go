@@ -41,7 +41,7 @@ type FilesetConfig struct {
 	Var     map[string]interface{} `config:"var"`
 	Input   map[string]interface{} `config:"input"`
 
-	Version   string `config:"version"`
+	Version string `config:"version"`
 }
 
 // NewFilesetConfig creates a new FilesetConfig from a common.Config.
