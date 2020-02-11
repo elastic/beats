@@ -4655,8 +4655,26 @@ type: keyword
 [[exported-fields-cef-module]]
 == CEF fields
 
-Module for receiving CEF logs over Syslog. The module does not add fields beyond what the decode_cef processor provides.
+Module for receiving CEF logs over Syslog. The module adds vendor specific fields in addition to the fields the decode_cef processor provides.
 
+
+
+[float]
+=== forcepoint
+
+Fields for Forcepoint Custom String mappings
+
+
+
+*`forcepoint.virus_id`*::
++
+--
+Virus ID
+
+
+type: keyword
+
+--
 
 [[exported-fields-cisco]]
 == Cisco fields
@@ -17090,7 +17108,7 @@ type: long
 *`netflow.class_id`*::
 +
 --
-type: short
+type: long
 
 --
 

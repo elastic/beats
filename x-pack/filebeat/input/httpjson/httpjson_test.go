@@ -192,6 +192,28 @@ func TestPOST(t *testing.T) {
 	})
 }
 
+func TestRepeatedPOST(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":       "POST",
+		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
+		"interval":          10 ^ 9,
+	}
+	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(3)
+		if !ok {
+			t.Fatalf("Expected 3 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
 func TestRunStop(t *testing.T) {
 	m := map[string]interface{}{
 		"http_method": "GET",

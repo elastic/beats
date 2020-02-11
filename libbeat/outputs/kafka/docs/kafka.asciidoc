@@ -5,7 +5,11 @@
 <titleabbrev>Kafka</titleabbrev>
 ++++
 
-The Kafka output sends the events to Apache Kafka.
+The Kafka output sends events to Apache Kafka.
+
+To use this output, edit the {beatname_uc} configuration file to disable the {es}
+output by commenting it out, and enable the Kafka output by uncommenting the
+Kafka section.
 
 Example configuration:
 
@@ -42,7 +46,12 @@ You can specify the following options in the `kafka` section of the +{beatname_l
 The `enabled` config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
-The default value is true.
+ifndef::apm-server[]
+The default value is `true`.
+endif::[]
+ifdef::apm-server[]
+The default value is `false`.
+endif::[]
 
 ===== `hosts`
 
@@ -123,12 +132,12 @@ the specified string:
 ------------------------------------------------------------------------------
 output.kafka:
   hosts: ["localhost:9092"]
-  topic: "logs-%{[beat.version]}"
+  topic: "logs-%{[agent.version]}"
   topics:
-    - topic: "critical-%{[beat.version]}"
+    - topic: "critical-%{[agent.version]}"
       when.contains:
         message: "CRITICAL"
-    - topic: "error-%{[beat.version]}"
+    - topic: "error-%{[agent.version]}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
