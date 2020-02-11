@@ -1,4 +1,3 @@
-from past.utils import old_div
 from filebeat import BaseTest
 import os
 import logging
@@ -41,7 +40,7 @@ class Test(BaseTest):
         # Setup python log handler
         handler = logging.handlers.RotatingFileHandler(
             log_file, maxBytes=line_length * lines_per_file + 1,
-            backupCount=old_div(total_lines, lines_per_file) + 1)
+            backupCount=int(total_lines / lines_per_file) + 1)
         logger.addHandler(handler)
 
         self.render_config_template(

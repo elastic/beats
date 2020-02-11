@@ -10,7 +10,6 @@ dockerpty==0.4.1
 docopt==0.6.2
 elasticsearch==7.1.0
 enum34==1.1.6
-future==0.18.2
 idna==2.6
 ipaddress==1.0.19
 Jinja2==2.10.1
