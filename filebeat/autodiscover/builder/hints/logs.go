@@ -141,9 +141,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConf := map[string]interface{}{
 			"module": module,
 		}
+
 		filesets := l.getFilesets(hints, module)
 		for fileset, conf := range filesets {
-
 			filesetConf, _ := common.NewConfigFrom(config)
 
 			if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
