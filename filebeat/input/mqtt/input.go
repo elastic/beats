@@ -46,8 +46,9 @@ type mqttInput struct {
 
 	logger *logp.Logger
 
-	client           libmqtt.Client
-	inflightMessages *sync.WaitGroup
+	client             libmqtt.Client
+	clientDisconnected *sync.WaitGroup
+	inflightMessages   *sync.WaitGroup
 }
 
 func init() {
@@ -90,6 +91,7 @@ func newInput(
 	logger := logp.NewLogger("mqtt input").With("hosts", config.Hosts)
 	setupLibraryLogging()
 
+	clientDisconnected := new(sync.WaitGroup)
 	inflightMessages := new(sync.WaitGroup)
 	clientSubscriptions := createClientSubscriptions(config)
 	onMessageHandler := createOnMessageHandler(logger, out, inflightMessages)
@@ -100,9 +102,10 @@ func newInput(
 	}
 
 	return &mqttInput{
-		client:           newMqttClient(clientOptions),
-		inflightMessages: inflightMessages,
-		logger:           logp.NewLogger("mqtt input").With("hosts", config.Hosts),
+		client:             newMqttClient(clientOptions),
+		clientDisconnected: clientDisconnected,
+		inflightMessages:   inflightMessages,
+		logger:             logp.NewLogger("mqtt input").With("hosts", config.Hosts),
 	}, nil
 }
 
@@ -183,12 +186,19 @@ func (mi *mqttInput) Run() {
 // Stop method stops the input.
 func (mi *mqttInput) Stop() {
 	mi.logger.Debug("Stop the input.")
-	mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
+
+	mi.clientDisconnected.Add(1)
+	go func() {
+		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
+		mi.clientDisconnected.Done()
+	}()
 }
 
 // Wait method stops the input and waits until event processing is finished.
 func (mi *mqttInput) Wait() {
-	mi.Stop()
 	mi.logger.Debug("Wait for the input to finish processing.")
+
+	mi.Stop()
+	mi.clientDisconnected.Wait()
 	mi.inflightMessages.Wait()
 }

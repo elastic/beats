@@ -230,12 +230,14 @@ func TestRun_Twice(t *testing.T) {
 }
 
 func TestWait(t *testing.T) {
+	clientDisconnected := new(sync.WaitGroup)
 	inflightMessages := new(sync.WaitGroup)
 	client := new(mockedClient)
 	input := &mqttInput{
-		client:           client,
-		logger:           logger,
-		inflightMessages: inflightMessages,
+		client:             client,
+		clientDisconnected: clientDisconnected,
+		logger:             logger,
+		inflightMessages:   inflightMessages,
 	}
 
 	input.Wait()
@@ -245,9 +247,11 @@ func TestWait(t *testing.T) {
 
 func TestStop(t *testing.T) {
 	client := new(mockedClient)
+	clientDisconnected := new(sync.WaitGroup)
 	input := &mqttInput{
-		client: client,
-		logger: logger,
+		client:             client,
+		clientDisconnected: clientDisconnected,
+		logger:             logger,
 	}
 
 	input.Stop()
