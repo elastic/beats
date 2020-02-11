@@ -150,8 +150,12 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
+func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *requestInfo) error {
 	for {
+		req, err := in.createHTTPRequest(ctx, ri)
+		if err != nil {
+			return err
+		}
 		msg, err := client.Do(req)
 		if err != nil {
 			return errors.New("failed to do http request. Stopping input worker - ")
@@ -224,10 +228,6 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				if in.config.Pagination.ExtraBodyContent != nil {
 					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
 				}
-				req, err = in.createHTTPRequest(ctx, ri)
-				if err != nil {
-					return err
-				}
 				continue
 			}
 			return nil
@@ -274,11 +274,7 @@ func (in *httpjsonInput) run() error {
 	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
 		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))
 	}
-	req, err := in.createHTTPRequest(ctx, ri)
-	if err != nil {
-		return err
-	}
-	err = in.processHTTPRequest(ctx, client, req, ri)
+	err = in.processHTTPRequest(ctx, client, ri)
 	if err == nil && in.Interval > 0 {
 		ticker := time.NewTicker(in.Interval)
 		defer ticker.Stop()
@@ -288,7 +284,8 @@ func (in *httpjsonInput) run() error {
 				in.log.Info("Context done.")
 				return nil
 			case <-ticker.C:
-				err = in.processHTTPRequest(ctx, client, req, ri)
+				in.log.Info("Process another repeated request.")
+				err = in.processHTTPRequest(ctx, client, ri)
 				if err != nil {
 					return err
 				}
