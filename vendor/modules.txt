@@ -654,7 +654,7 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
-# github.com/tsg/go-daemon v0.0.0-20200123164349-4b60efc26d5f
+# github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 github.com/tsg/go-daemon
 # github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 github.com/tsg/gopacket

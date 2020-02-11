@@ -149,3 +149,8 @@ func CheckLicenseHeaders() error {
 func DumpVariables() error {
 	return devtools.DumpVariables()
 }
+
+// Vendor moves dependencies to the repo using go modules.
+func Vendor() error {
+	return devtools.Vendor()
+}

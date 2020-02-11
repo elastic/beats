@@ -101,7 +101,7 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 		return err
 	}
 
-	globalFieldsCmd := sh.RunCmd("go", "run",
+	globalFieldsCmd := sh.RunCmd("go", "run", "-mod", "vendor",
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
@@ -125,7 +125,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
-	assetCmd := sh.RunCmd("go", "run",
+	assetCmd := sh.RunCmd("go", "run", "-mod", "vendor",
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
@@ -152,7 +152,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		moduleDir = CWD(moduleDir)
 	}
 
-	moduleFieldsCmd := sh.RunCmd("go", "run",
+	moduleFieldsCmd := sh.RunCmd("go", "run", "-mod", "vendor",
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
@@ -179,7 +179,7 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		return err
 	}
 
-	includeListCmd := sh.RunCmd("go", "run",
+	includeListCmd := sh.RunCmd("go", "run", "-mod", "vendor",
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		"-out", options.Outfile, "-buildTags", options.BuildTags,
