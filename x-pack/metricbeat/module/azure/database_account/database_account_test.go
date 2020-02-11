@@ -5,21 +5,14 @@
 package database_account
 
 import (
-	"fmt"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
 	missingResourcesConfig = common.MapStr{
 		"module":          "azure",
 		"period":          "60s",
-		"metricsets":      []string{"compute_vm"},
+		"metricsets":      []string{"database_account"},
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
@@ -29,7 +22,7 @@ var (
 	resourceConfig = common.MapStr{
 		"module":          "azure",
 		"period":          "60s",
-		"metricsets":      []string{"compute_vm"},
+		"metricsets":      []string{"database_account"},
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
@@ -44,31 +37,3 @@ var (
 			}},
 	}
 )
-
-func TestFetch(t *testing.T) {
-	c, err := common.NewConfigFrom(missingResourcesConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry)
-	assert.NotNil(t, module)
-	assert.NotNil(t, metricsets)
-	assert.Nil(t, err)
-	ms, ok := metricsets[0].(*MetricSet)
-	assert.Equal(t, len(ms.Client.Config.Resources), 1)
-	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultVMNamespace))
-
-	c, err = common.NewConfigFrom(resourceConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.NotNil(t, module)
-	assert.NotNil(t, metricsets)
-	ms, ok = metricsets[0].(*MetricSet)
-	require.True(t, ok, "metricset must be MetricSet")
-	assert.NotNil(t, ms)
-}

@@ -130,8 +130,10 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 			"subscription_id": metric.Resource.Subscription,
 			"namespace":       metric.Namespace,
 		},
-		MetricSetFields: common.MapStr{},
-		Timestamp:       timestamp,
+		MetricSetFields: common.MapStr{
+			"timegrain": metric.TimeGrain,
+		},
+		Timestamp: timestamp,
 	}
 	if len(metric.Resource.Tags) > 0 {
 		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)

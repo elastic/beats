@@ -3,10 +3,50 @@ input:
   module: azure
   metricset: monitor
   defaults:
+    default_resource_type: "Microsoft.DocumentDb/databaseAccounts"
+    resource_params:
+    - field: group
+      option: resource_group
+    - field: id
+      option: resource_id
     resources:
-    - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+    - resource_group: {.group}
+      resource_type: "Microsoft.DocumentDb/databaseAccounts"
       metrics:
-      - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+      - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
+      "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
-
+      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
+      "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
+                "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
+      - name: ["CassandraRequestCharges", "CassandraRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT1M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
+    - resource_id: {.id}
+      metrics:
+      - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
+                "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
+                "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
+                "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
+      - name: ["CassandraRequestCharges", "CassandraRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT1M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
 
