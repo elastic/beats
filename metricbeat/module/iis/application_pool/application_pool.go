@@ -44,12 +44,11 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	log            *logp.Logger
 	reader         *iis.Reader
-	instanceReader *iis.Reader
 }
 
 // Config for the iis website metricset.
 type Config struct {
-	Names []string `config:"name"`
+	Names []string `config:"app_pool_name"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -83,7 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:  base,
 		log:            logp.NewLogger("application pool"),
 		reader:         reader,
-		instanceReader: instanceReader,
 	}, nil
 }
 
@@ -115,44 +113,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-// getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
-func getInstances(names []string, instanceReader *iis.Reader) ([]iis.Instance, error) {
-	processes, err := sysinfo.Processes()
-	if err != nil {
-		return nil, err
-	}
-	var w3processes []iis.Instance
-	for _, p := range processes {
-		info, err := p.Info()
-		if err != nil {
-			continue
-		}
-		if info.Name == "w3wp.exe" {
-			var app string
-			if len(info.Args) > 0 {
-				for i, ar := range info.Args {
-					if ar == "-ap" {
-						app = info.Args[i+1]
-						continue
-					}
-				}
-			}
-			w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
-		}
-	}
-	if len(names) == 0 {
-		return instanceReader.GetInstances(w3processes)
-	}
-	var filtered []iis.Instance
-	for _, n := range names {
-		for _, w3 := range w3processes {
-			if n == w3.Name {
-				filtered = append(filtered, w3)
-			}
-		}
-	}
-	return instanceReader.GetInstances(filtered)
-}
 
 
 

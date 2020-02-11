@@ -20,6 +20,8 @@
 package iis
 
 import (
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -33,15 +35,14 @@ import (
 // Reader will contain the config options
 type Reader struct {
 	Query     pdh.Query    // PDH Query
-	Instances []Instance   // Mapping of counter path to key used for the label (e.g. processor.name)
+	Instances []ApplicationPool   // Mapping of counter path to key used for the label (e.g. processor.name)
 	log       *logp.Logger // logger
 	hasRun    bool         // will check if the reader has run a first time
 }
 
-type Instance struct {
+type ApplicationPool struct {
 	Name        string
-	ProcessId   int
-	ProcessName string
+	WorkerProcessIds  []int
 	counters    map[string]string
 }
 
@@ -181,3 +182,75 @@ func (re *Reader) GetInstances(instances []Instance) ([]Instance, error) {
 	}
 	return instances, nil
 }
+
+// getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
+func getApplicationPools(names []string) ([]ApplicationPool, error) {
+	processes, err := sysinfo.Processes()
+	if err != nil {
+		return nil, err
+	}
+	var w3processes []ApplicationPool
+	for _, p := range processes {
+		info, err := p.Info()
+		if err != nil {
+			continue
+		}
+		if info.Name == "w3wp.exe" {
+			var app string
+			if len(info.Args) > 0 {
+				for i, ar := range info.Args {
+					if ar == "-ap" && len(info.Args) > i+1 {
+						app = info.Args[i+1]
+						continue
+					}
+				}
+			}
+
+			w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
+		}
+	}
+	if len(names) == 0 {
+		return instanceReader.GetInstances(w3processes)
+	}
+	var filtered []iis.Instance
+	for _, n := range names {
+		for _, w3 := range w3processes {
+			if n == w3.Name {
+				filtered = append(filtered, w3)
+			}
+		}
+	}
+	return instanceReader.GetInstances(filtered)
+}
+
+func addAppPool(info types.ProcessInfo, appPools *[]ApplicationPool){
+	if info.Name == "w3wp.exe" {
+		var app string
+		if len(info.Args) > 0 {
+			for i, ar := range info.Args {
+				if ar == "-ap" && len(info.Args) > i+1 {
+					app = info.Args[i+1]
+					continue
+				}
+			}
+		}
+for i, app:= range appPools {
+	appPools[i].Name == app {
+
+	}
+}
+		w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
+	}
+}
+
+func hasApp(appName string, appPools []ApplicationPool) bool {
+	for _, app:= range appPools {
+		if app.Name == appName{
+return true
+
+		}
+		return false
+	}
+
+}
+
