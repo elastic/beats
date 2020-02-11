@@ -15,38 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+// +build !integration
+
+package state_storageclass
 
 import (
-	"flag"
-	"fmt"
-	"os"
+	"testing"
 
-	"github.com/elastic/beats/filebeat/generator/fields"
+	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
 )
 
-func main() {
-	module := flag.String("module", "", "Name of the module")
-	fileset := flag.String("fileset", "", "Name of the fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	noDoc := flag.Bool("nodoc", false, "Generate documentation for fields")
-	flag.Parse()
-
-	if *module == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
-	}
-
-	if *fileset == "" {
-		fmt.Println("Missing parameter: fileset")
-		os.Exit(1)
-	}
-
-	err := fields.Generate(*beatsPath, *module, *fileset, *noDoc)
-	if err != nil {
-		fmt.Printf("Error while generating fields.yml: %v\n", err)
-		os.Exit(2)
-	}
-
-	fmt.Printf("Fields.yml generated for %s/%s\n", *module, *fileset)
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", "state_storageclass",
+		ptest.TestCases{
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
+			},
+			{
+				MetricsFile:  "./_meta/test/ksm.unit.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.unit.v1.8.0.expected",
+			},
+		},
+	)
 }
