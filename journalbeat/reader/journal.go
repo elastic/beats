@@ -288,8 +288,16 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 	if fc.isInteger {
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
-			return value
+			// On some versions of systemd the 'syslog.pid' can contain the username
+			// appended to the end of the pid. In most cases this does not occur
+			// but in the cases that it does, this tries to strip ',\w*' from the
+			// value and then perform the conversion.
+			s := strings.Split(value, ",")
+			v, err = strconv.ParseInt(s[0], 10, 64)
+			if err != nil {
+				r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+				return value
+			}
 		}
 		return v
 	}

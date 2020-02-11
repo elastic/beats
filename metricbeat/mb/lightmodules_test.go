@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	_ "github.com/elastic/beats/libbeat/processors/add_id"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -391,6 +392,31 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
+}
+
+func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "nonexisting", "fake")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "nonexisting")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
+	require.NoError(t, err)
+	require.NotNil(t, procs)
+	require.Len(t, procs.List, 1)
 }
 
 type metricSetWithOption struct {

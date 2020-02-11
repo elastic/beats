@@ -2,48 +2,62 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "rds": {
+            "aurora_bin_log_replica_lag": 0,
+            "aurora_replica.lag.ms": 19.683,
+            "aurora_replica.lag_max.ms": 19.651500701904297,
+            "aurora_replica.lag_min.ms": 19.651500701904297,
+            "cache_hit_ratio.buffer": 100,
+            "cache_hit_ratio.result_set": 0,
             "cpu": {
                 "total": {
-                    "pct": 0.999999999997575
+                    "pct": 0.035
                 }
             },
             "database_connections": 0,
-            "db_instance": {
-                "arn": "arn:aws:rds:ap-southeast-1:627959692251:db:database-1",
-                "class": "db.t2.micro",
-                "identifier": "database-1",
-                "status": "available"
-            },
-            "disk_queue_depth": 0.00006666888896296543,
+            "db_instance.class": "db.r5.large",
+            "deadlocks": 0,
             "disk_usage": {
-                "bin_log.bytes": 2752
+                "bin_log.bytes": 0
             },
-            "free_storage.bytes": 20402475008,
-            "freeable_memory.bytes": 441335808,
+            "engine_uptime.sec": 278598.25,
+            "free_local_storage.bytes": 33112842240,
+            "freeable_memory.bytes": 4879514624,
             "latency": {
-                "read": 0,
-                "write": 0.0002909090909090909
+                "commit": 2.9322999999999997,
+                "ddl": 0,
+                "delete": 0,
+                "dml": 0.08325833333333334,
+                "insert": 0.08325833333333334,
+                "select": 0.20890321021571023,
+                "update": 0
             },
-            "read_io.ops_per_sec": 0,
-            "swap_usage.bytes": 1167360,
+            "login_failures": 0,
+            "queries": 7.807070323085375,
             "throughput": {
-                "network_receive": 570.7618714269047,
-                "network_transmit": 3228.0614030701536,
-                "read": 0,
-                "write": 3754.7918263942133
+                "commit": 0.2500020925349523,
+                "ddl": 0,
+                "delete": 0,
+                "dml": 0.2500020925349523,
+                "insert": 0.2500020925349523,
+                "network": 1.7498192019524124,
+                "network_receive": 0.8749096009762062,
+                "network_transmit": 0.8749096009762062,
+                "select": 2.8751975752392616,
+                "update": 0
             },
-            "transactions": {},
-            "write_io.ops_per_sec": 0.40002000100005003
+            "transactions": {
+                "active": 0,
+                "blocked": 0
+            }
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
-        "availability_zone": "ap-southeast-1a",
         "provider": "aws",
-        "region": "ap-southeast-1"
+        "region": "eu-west-1"
     },
     "event": {
         "dataset": "aws.rds",

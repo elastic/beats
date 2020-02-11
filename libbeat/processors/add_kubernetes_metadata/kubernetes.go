@@ -41,12 +41,15 @@ const (
 )
 
 type kubernetesAnnotator struct {
+	log                 *logp.Logger
 	watcher             kubernetes.Watcher
 	indexers            *Indexers
 	matchers            *Matchers
 	cache               *cache
 	kubernetesAvailable bool
 }
+
+const selector = "kubernetes"
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
@@ -74,6 +77,7 @@ func isKubernetesAvailable(client k8sclient.Interface) bool {
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultKubernetesAnnotatorConfig()
+	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
 
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -99,6 +103,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	processor := &kubernetesAnnotator{
+		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
 		kubernetesAvailable: false,
 	}
@@ -106,11 +111,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		if kubernetes.IsInCluster(config.KubeConfig) {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config: %v", "add_kubernetes_metadata", err)
+			log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
 		} else if config.KubeConfig == "" {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"), err)
+			log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
 		} else {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", config.KubeConfig, err)
+			log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
 		}
 		return processor, nil
 	}
@@ -122,15 +127,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	matchers := NewMatchers(config.Matchers)
 
 	if matchers.Empty() {
-		logp.Debug("kubernetes", "%v: could not initialize kubernetes plugin with zero matcher plugins", "add_kubernetes_metadata")
+		log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
 		return processor, nil
 	}
 
 	processor.matchers = matchers
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+	config.Host = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %s", config.Host)
+	log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
@@ -138,7 +143,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Namespace:   config.Namespace,
 	}, nil)
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
+		log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 
@@ -150,17 +155,17 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
-			logp.Debug("kubernetes", "%v: adding pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
 			processor.addPod(pod)
 		},
 		UpdateFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
-			logp.Debug("kubernetes", "%v: updating pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
 			processor.updatePod(pod)
 		},
 		DeleteFunc: func(obj interface{}) {
 			pod := obj.(*kubernetes.Pod)
-			logp.Debug("kubernetes", "%v: removing pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
 			processor.removePod(pod)
 		},
 	})
@@ -205,7 +210,7 @@ func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
 
 	// Add it again only if it is not being deleted
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		logp.Debug("kubernetes", "%v: removing pod being terminated: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+		k.log.Debugf("Removing kubernetes pod being terminated: %s/%s", pod.GetNamespace(), pod.GetName())
 		return
 	}
 
