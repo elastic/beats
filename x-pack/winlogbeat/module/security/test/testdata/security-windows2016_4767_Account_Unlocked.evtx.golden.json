@@ -14,12 +14,16 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": [
+        "Administrator",
+        "elastictest1"
+      ]
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
-      "name": "elastictest1"
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",

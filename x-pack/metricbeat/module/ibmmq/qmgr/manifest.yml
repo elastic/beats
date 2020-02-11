@@ -4,3 +4,27 @@ input:
   metricset: collector
   defaults:
     metrics_path: /metrics
+
+# The custom processor is responsible for filtering Prometheus metrics
+# not stricly related to the IBM MQ domain, e.g. system load, process,
+# metrics HTTP server.
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var metrics = event.Get("prometheus.metrics");
+          if (metrics == null) {
+            event.Cancel();
+            return;
+          }
+          Object.keys(metrics).forEach(function(key) {
+            if (!(key.match(/^ibmmq_.*$/))) {
+              event.Delete("prometheus.metrics." + key);
+            }
+          });
+          metrics = event.Get("prometheus.metrics");
+          if (Object.keys(metrics).length == 0) {
+            event.Cancel();
+          }
+        }

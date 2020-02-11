@@ -29,7 +29,7 @@
         "service.type": "system"
     },
     {
-        "@timestamp": "2019-06-14T08:40:20.912-02:00",
+        "@timestamp": "2019-06-14T10:40:20.912-02:00",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "-02:00",

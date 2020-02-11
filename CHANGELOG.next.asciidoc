@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
-
+- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
 
 *Auditbeat*
 
@@ -24,9 +24,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+
 
 *Metricbeat*
 
+- Make use of secure port when accessing Kubelet API {pull}16063[16063]
+- Add Tomcat overview dashboard {pull}14026[14026]
 
 *Packetbeat*
 
@@ -49,6 +53,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
+- Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
+- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 
 *Auditbeat*
 
@@ -59,7 +66,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
+- Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Fix a connection error in httpjson input. {pull}16123[16123]
 
 *Heartbeat*
 
@@ -75,9 +86,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
 - Change lookup_fields from metricset.host to service.address {pull}15883[15883]
 - Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
+- Fix skipping protocol scheme by light modules. {pull}16205[pull]
 
 *Packetbeat*
 
+- Enable setting promiscuous mode automatically. {pull}11366[11366]
 
 *Winlogbeat*
 
@@ -90,7 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
-
+- Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 
 *Auditbeat*
 
@@ -98,7 +112,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
-
+- Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
+- Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
+- Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
+- move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
+- Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
 
 *Heartbeat*
 
@@ -125,6 +143,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
 - Add STAN dashboard {pull}15654[15654]
 - Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
+- Add `up` metric to prometheus metrics collected from host {pull}15948[15948]
+- Add citadel metricset for Istio Metricbeat module {pull}15990[15990]
+- Add support for processors in light modules. {issue}14740[14740] {pull}15923[15923]
+- Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
+- Reuse connections in SQL module. {pull}16001[16001]
+- Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
+- Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
 
 *Packetbeat*
 

@@ -23,7 +23,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -40,10 +40,10 @@ func TestMapper(t *testing.T) {
 
 func TestEmpty(t *testing.T) {
 	input, err := ioutil.ReadFile("./_meta/test/empty.700.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	eventsMapping(reporter, info, input)
-	assert.Equal(t, 0, len(reporter.GetErrors()))
-	assert.Equal(t, 0, len(reporter.GetEvents()))
+	require.Equal(t, 0, len(reporter.GetErrors()))
+	require.Equal(t, 0, len(reporter.GetEvents()))
 }
