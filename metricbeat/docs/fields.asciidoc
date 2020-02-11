@@ -3194,6 +3194,16 @@ type: object
 
 --
 
+*`azure.compute_vm.*.*`*::
++
+--
+compute_vm
+
+
+type: object
+
+--
+
 [float]
 === monitor
 

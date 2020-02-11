@@ -1,0 +1,12 @@
+default: true
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    resources:
+    - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+      metrics:
+      - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+
