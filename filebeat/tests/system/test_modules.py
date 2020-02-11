@@ -135,17 +135,6 @@ class Test(BaseTest):
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
 
-        # Based on the convention that if a name contains pipeline-version- then a special pipiline should be used in "version" setting
-        # Example:
-        #   file: pipeline-version-ingress-controller.log
-        #   version: ingress-controller
-        if "pipeline-version-" in test_file:
-            print(test_file)
-            cmd.append("-M")
-            pipeline = test_file.split("pipeline-version-")[1].split(".log")[0]
-            cmd.append("{module}.{fileset}.version={pipeline}".format(
-                module=module, fileset=fileset, pipeline=pipeline))
-
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")

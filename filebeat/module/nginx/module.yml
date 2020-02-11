@@ -10,3 +10,5 @@ dashboards:
 
 - id: ML-Nginx-Remote-IP-URL-Explorer
   file: ml-nginx-remote-ip-url-explorer.json
+- id: Filebeat-nginx-ingress-controller-Dashboard
+  file: Filebeat-nginx-ingress-controller.json

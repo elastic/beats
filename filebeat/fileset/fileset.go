@@ -116,7 +116,7 @@ type manifest struct {
 	} `config:"requires"`
 }
 
-func newManifest(cfg *common.Config, pipelineVersion string) (*manifest, error) {
+func newManifest(cfg *common.Config) (*manifest, error) {
 	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
 		return nil, err
 	}
@@ -127,11 +127,6 @@ func newManifest(cfg *common.Config, pipelineVersion string) (*manifest, error) 
 		return nil, err
 	}
 
-	if pipelineVersion != "" {
-		pipelineFile := fmt.Sprintf("ingest/%s.json", pipelineVersion)
-		newPipeline := []string{pipelineFile}
-		manifest.IngestPipeline = newPipeline
-	}
 	return &manifest, nil
 }
 
@@ -148,7 +143,7 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error reading manifest file: %v", err)
 	}
-	manifest, err := newManifest(cfg, fs.fcfg.Version)
+	manifest, err := newManifest(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
 	}

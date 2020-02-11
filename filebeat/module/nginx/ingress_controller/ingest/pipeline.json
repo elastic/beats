@@ -5,20 +5,20 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{NGINX_HOST} )?\"?(?:%{NGINX_ADDRESS_LIST:nginx.access.remote_ip_list}|%{NOTSPACE:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\" %{NUMBER:nginx.access.http.request.length:long} %{NUMBER:nginx.access.http.request.time:double} \\[%{DATA:nginx.access.upstream.name}\\] \\[%{DATA:nginx.access.upstream.alternative_name}\\] (%{UPSTREAM_ADDRESS}|-) (%{NUMBER:nginx.access.upstream.response.length:long}|-) (%{NUMBER:nginx.access.upstream.response.time:double}|-) (%{NUMBER:nginx.access.upstream.response.status_code:long}|-) %{GREEDYDATA:nginx.access.http.request.id}"
+                    "(%{NGINX_HOST} )?\"?(?:%{NGINX_ADDRESS_LIST:nginx.ingress_controller.remote_ip_list}|%{NOTSPACE:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.ingress_controller.time}\\] \"%{DATA:nginx.ingress_controller.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\" %{NUMBER:nginx.ingress_controller.http.request.length:long} %{NUMBER:nginx.ingress_controller.http.request.time:double} \\[%{DATA:nginx.ingress_controller.upstream.name}\\] \\[%{DATA:nginx.ingress_controller.upstream.alternative_name}\\] (%{UPSTREAM_ADDRESS}|-) (%{NUMBER:nginx.ingress_controller.upstream.response.length:long}|-) (%{NUMBER:nginx.ingress_controller.upstream.response.time:double}|-) (%{NUMBER:nginx.ingress_controller.upstream.response.status_code:long}|-) %{GREEDYDATA:nginx.ingress_controller.http.request.id}"
                 ],
                 "pattern_definitions": {
                     "NGINX_HOST": "(?:%{IP:destination.ip}|%{NGINX_NOTSEPARATOR:destination.domain})(:%{NUMBER:destination.port})?",
                     "NGINX_NOTSEPARATOR": "[^\t ,:]+",
                     "NGINX_ADDRESS_LIST": "(?:%{IP}|%{WORD})(\"?,?\\s*(?:%{IP}|%{WORD}))*",
-                    "UPSTREAM_ADDRESS": "%{IP:nginx.access.upstream.ip}(:%{NUMBER:nginx.access.upstream.port})?"
+                    "UPSTREAM_ADDRESS": "%{IP:nginx.ingress_controller.upstream.ip}(:%{NUMBER:nginx.ingress_controller.upstream.port})?"
                 },
                 "ignore_missing": true
             }
         },
         {
             "grok": {
-                "field": "nginx.access.info",
+                "field": "nginx.ingress_controller.info",
                 "patterns": [
                     "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}",
                     ""
@@ -28,19 +28,19 @@
         },
         {
             "remove": {
-                "field": "nginx.access.info"
+                "field": "nginx.ingress_controller.info"
             }
         },
         {
             "split": {
-                "field": "nginx.access.remote_ip_list",
+                "field": "nginx.ingress_controller.remote_ip_list",
                 "separator": "\"?,?\\s+",
                 "ignore_missing": true
             }
         },
         {
             "split": {
-                "field": "nginx.access.origin",
+                "field": "nginx.ingress_controller.origin",
                 "separator": "\"?,?\\s+",
                 "ignore_missing": true
             }
@@ -54,9 +54,9 @@
         },
         {
             "script": {
-                "if": "ctx.nginx?.access?.remote_ip_list != null && ctx.nginx.access.remote_ip_list.length > 0",
+                "if": "ctx.nginx?.access?.remote_ip_list != null && ctx.nginx.ingress_controller.remote_ip_list.length > 0",
                 "lang": "painless",
-                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.address = null;    if (ctx.nginx.access.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.access.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.address = item;            found = true;            break;        }    }    if (!found) {     ctx.source.address = ctx.nginx.access.remote_ip_list[0];   }} catch (Exception e) { ctx.source.address = null; }",
+                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.address = null;    if (ctx.nginx.ingress_controller.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.ingress_controller.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.address = item;            found = true;            break;        }    }    if (!found) {     ctx.source.address = ctx.nginx.ingress_controller.remote_ip_list[0];   }} catch (Exception e) { ctx.source.address = null; }",
                 "params": {
                     "dot": "."
                 }
@@ -88,7 +88,7 @@
         },
         {
             "date": {
-                "field": "nginx.access.time",
+                "field": "nginx.ingress_controller.time",
                 "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
@@ -98,7 +98,7 @@
         },
         {
             "remove": {
-                "field": "nginx.access.time"
+                "field": "nginx.ingress_controller.time"
             }
         },
         {

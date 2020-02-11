@@ -184,21 +184,6 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
-		// Scenarios being tested:
-		// have co.elastic.logs/module set to nginx.
-		// co.elastic.logs/fileset set to access:ingress-controller
-		{
-			annotations: map[string]string{
-				"co.elastic.logs/module":  "nginx",
-				"co.elastic.logs/fileset": "access:ingress-controller",
-			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"fileset": "access:ingress-controller",
-					"module":  "nginx",
-				},
-			},
-		},
 	}
 
 	for _, test := range tests {

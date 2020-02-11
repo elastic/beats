@@ -126,51 +126,6 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint to define pipeline version works",
-			config: defaultDisabled,
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
-				},
-				"container": common.MapStr{
-					"name": "foobar",
-					"id":   "abc",
-				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"enabled": "true",
-						"module":  "nginx",
-						"fileset": "access:ingress-controller",
-					},
-				},
-			},
-			len: 1,
-			result: common.MapStr{
-				"module": "nginx",
-				"access": map[string]interface{}{
-					"enabled": true,
-					"version": "ingress-controller",
-					"input": map[string]interface{}{
-						"type":   "container",
-						"paths":  []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-						"stream": "all",
-					},
-				},
-				"error": map[string]interface{}{
-					"enabled": false,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"paths":  []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-						"stream": "all",
-					},
-				},
-			},
-		},
-		{
 			msg:    "Hints without host should return nothing",
 			config: customCfg,
 			event: bus.Event{
