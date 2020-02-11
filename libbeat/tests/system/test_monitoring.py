@@ -92,6 +92,7 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    @unittest.skip("flaky: https://github.com/elastic/beats/issues/16247")
     def test_compare(self):
         """
         Test that monitoring docs are the same, regardless of how they are shipped.
