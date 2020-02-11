@@ -517,7 +517,7 @@ class Test(BaseTest):
             max_timeout=15)
 
         # Add utf-8 Chars for the first time
-        with codecs.open(testfile, "w", "utf-8") as f:
+        with codecs.open(testfile, "w", "utf_8") as f:
             # Write lines before registrar started
 
             # Special encoding needed?!?
@@ -528,7 +528,7 @@ class Test(BaseTest):
                 lambda: self.output_has(lines=1), max_timeout=10)
 
         # Append utf-8 chars to check if it keeps reading
-        with codecs.open(testfile, "a", "utf-8") as f:
+        with codecs.open(testfile, "a", "utf_8") as f:
             # write additional lines
             f.write("Hello\n")
             f.write("薩科Ruflin" + "\n")
