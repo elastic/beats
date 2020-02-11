@@ -1,0 +1,133 @@
+- name: log
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: timestamp
+    description: Please add description
+    example: Please add example
+  - name: user
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: database
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: process_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: thread_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: host
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: port
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: session_start
+    description: Please add description
+    example: Please add example
+  - name: transaction_id
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: session_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: command_count
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: gp_segment
+    description: Please add description
+    example: Please add example
+    type: group
+    fields:
+    - name: type
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: id
+      description: Please add description
+      example: Please add example
+      type: keyword
+  - name: slice_id
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: distributed_transaction_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: local_transaction_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: subtransaction_id
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: level
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: state_code
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: message
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: detail
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: hint
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: query
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: query_position
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: context
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: debug
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: cursor_position
+    description: Please add description
+    example: Please add example
+    type: long
+  - name: file
+    description: Please add description
+    example: Please add example
+    type: group
+    fields:
+    - name: name
+      description: Please add description
+      example: Please add example
+      type: text
+    - name: line
+      description: Please add description
+      example: Please add example
+      type: long
+  - name: stack
+    description: Please add description
+    example: Please add example
+    type: text

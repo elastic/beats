@@ -1,0 +1,60 @@
+2020-01-29 00:00:01.606881 UTC,,,p713507,th-2019006592,,,2020-01-29 00:00:01 UTC,0,,,seg-1,,,,,"LOG","00000","connection received: host=[local]",,,,,,,0,,"postmaster.c",6841,
+2020-01-29 00:00:01.607028 UTC,"gpadmin","postgres",p713507,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,0,,,seg-1,,,,,"LOG","00000","connection authorized: user=gpadmin database=postgres",,,,,,,0,,"postmaster.c",6900,
+2020-01-29 00:00:01.613414 UTC,"gpadmin","postgres",p713507,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682061,con408754,,seg-1,,,x190682061,sx1,"LOG","00000","connection authorized: user=gpadmin database=postgres",,,,,,,0,,"postinit.c",265,
+2020-01-29 00:00:01.616552 UTC,"gpadmin","postgres",p713507,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682062,con408754,cmd1,seg-1,,dx889919,x190682062,sx1,"LOG","00000","statement: select datname from pg_database where datname not in ('postgres', 'template0', 'template1');",,,,,,"select datname from pg_database where datname not in ('postgres', 'template0', 'template1');",0,,"postgres.c",1632,
+2020-01-29 00:00:01.640393 UTC,"gpadmin","dq_data_model",p713944,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682065,con408755,cmd1,seg-1,,dx889920,x190682065,sx1,"LOG","00000","statement: select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",,,,,,"select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",0,,"postgres.c",1632,
+2020-01-29 00:00:01.640757 UTC,"gpadmin","vds_prd",p713961,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682066,con408756,cmd1,seg-1,,dx889921,x190682066,sx1,"LOG","00000","statement: select version()",,,,,,"select version()",0,,"postgres.c",1632,
+2020-01-29 00:00:01.650141 UTC,"gpadmin","vds_prd",p714144,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682070,con408757,cmd1,seg-1,,dx889922,x190682070,sx1,"LOG","00000","statement: select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",,,,,,"select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",0,,"postgres.c",1632,
+2020-01-29 00:00:01.653023 UTC,"gpadmin","vds_prd",p714201,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682072,con408759,cmd1,seg-1,,dx889924,x190682072,sx1,"LOG","00000","statement: 
+SELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,
+    string_agg(l_procpid,',') as l_pids,
+    string_agg(l_usename,',') as l_users,
+    string_agg('con' || l_sess_id,',') as l_conns,
+    string_agg(l_table) as tables
+from
+    (
+    select w.procpid, w.usename,w.sess_id,
+        l.procpid as l_procpid,
+        l.usename as l_usename,
+        l.sess_id as l_sess_id,
+        t.schemaname || '.' || t.relname as l_table
+    from pg_stat_activity w
+    join pg_locks l1 on w.procpid = l1.pid and not l1.granted
+    join pg_locks l2 on l1.relation = l2.relation and l2.granted
+    join pg_stat_activity l on l2.pid = l.procpid
+    join pg_stat_user_tables t on l1.relation = t.relid
+    where w.waiting
+    and w.usename in ('yotta_prd','gpadmin')
+    and w.procpid <> l.procpid
+    group by
+        1,2,3,4,5,6,7
+    )xxx
+group by 1,2,3
+order by 1,2,3",,,,,,"
+SELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,
+    string_agg(l_procpid,',') as l_pids,
+    string_agg(l_usename,',') as l_users,
+    string_agg('con' || l_sess_id,',') as l_conns,
+    string_agg(l_table) as tables
+from
+    (
+    select w.procpid, w.usename,w.sess_id,
+        l.procpid as l_procpid,
+        l.usename as l_usename,
+        l.sess_id as l_sess_id,
+        t.schemaname || '.' || t.relname as l_table
+    from pg_stat_activity w
+    join pg_locks l1 on w.procpid = l1.pid and not l1.granted
+    join pg_locks l2 on l1.relation = l2.relation and l2.granted
+    join pg_stat_activity l on l2.pid = l.procpid
+    join pg_stat_user_tables t on l1.relation = t.relid
+    where w.waiting
+    and w.usename in ('yotta_prd','gpadmin')
+    and w.procpid <> l.procpid
+    group by
+        1,2,3,4,5,6,7
+    )xxx
+group by 1,2,3
+order by 1,2,3
+",0,,"postgres.c",1632,
+

@@ -29,6 +29,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-googlecloud>>
 * <<exported-fields-greenplum>>
+* <<exported-fields-greenplum>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-ibmmq>>
@@ -12473,6 +12474,363 @@ Latency as measured (for TCP flows only) during the time interval. This is the t
 
 
 type: long
+
+--
+
+[[exported-fields-greenplum]]
+== greenplum fields
+
+greenplum Module
+
+
+
+[float]
+=== greenplum
+
+
+
+
+[float]
+=== log
+
+Please add description
+
+
+*`greenplum.log.timestamp`*::
++
+--
+Please add description
+
+example: Please add example
+
+--
+
+*`greenplum.log.user`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.database`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.process_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.thread_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.host`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.port`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.session_start`*::
++
+--
+Please add description
+
+example: Please add example
+
+--
+
+*`greenplum.log.transaction_id`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.session_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.command_count`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+[float]
+=== gp_segment
+
+Please add description
+
+
+*`greenplum.log.gp_segment.type`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.gp_segment.id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.slice_id`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.distributed_transaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.local_transaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.subtransaction_id`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.level`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`greenplum.log.state_code`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.message`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.detail`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.hint`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.query`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.query_position`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.context`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.debug`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.cursor_position`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+[float]
+=== file
+
+Please add description
+
+
+*`greenplum.log.file.name`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`greenplum.log.file.line`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
+*`greenplum.log.stack`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
 
 --
 
