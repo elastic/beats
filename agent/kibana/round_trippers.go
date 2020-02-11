@@ -151,7 +151,7 @@ func (r *EnforceKibanaVersionRoundTripper) RoundTrip(req *http.Request) (*http.R
 }
 
 // NewEnforceKibanaVersionRoundTripper enforce the remove endpoint to be a a certain version, if the
-// remove kibana is not equal or superiod on the requested version the call will fail.
+// remove kibana is not equal or superior on the requested version the call will fail.
 func NewEnforceKibanaVersionRoundTripper(wrapped http.RoundTripper, version string) http.RoundTripper {
 	return &EnforceKibanaVersionRoundTripper{rt: wrapped, version: version}
 }
