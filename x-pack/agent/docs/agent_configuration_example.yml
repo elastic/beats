@@ -232,14 +232,13 @@ datasources:
           queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           streams:
           - id?: {id}
-            metricset: s3
             dataset: aws.s3
           - id?: {id}
-            metricset: s3access
             dataset: aws.s3access
           - id?: {id}
-            metricset: vpcflow
             dataset: aws.vpcflow
+          - id?: {id}
+            dataset: aws.cloudtrail
        - type: aws/metrics
          access_key_id: '${AWS_ACCESS_KEY_ID:""}'
          secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
