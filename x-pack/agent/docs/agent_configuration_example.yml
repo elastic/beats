@@ -289,7 +289,7 @@ datasources:
 
 
   #################################################################################################
-  # - Kubernetes
+  # Kubernetes
   - id?: my-kubernetes
     title: Collect Kubernetes
     package:
@@ -384,7 +384,7 @@ datasources:
             period: 10s
 
   #################################################################################################
-  # - Kubernetes
+  # Docker
   - id?: my-docker
     title: Collect docker
     package:
