@@ -1,0 +1,196 @@
+[id="configuration-{beatname_lc}-gcp-options"]
+[role="xpack"]
+== Configure Google Functions
+
+++++
+<titleabbrev>Configure Google functions</titleabbrev>
+++++
+
+beta[]
+
+{beatname_uc} runs as a Google Function on Google Cloud Platform (GCP).
+
+Before deploying {beatname_uc} to Google Cloud Platform, you need to
+configure one or more functions and specify details about the services that will
+trigger the functions.
+
+You configure the functions in the the +{beatname_lc}.yml+ configuration file.
+When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
+to your serverless environment.
+
+The following example configures two functions: `pubsub` and `storage`. The
+`pubsub` function collects log events from https://cloud.google.com/pubsub/[Google
+Pub/Sub]. The `storage` function collects log events from
+https://cloud.google.com/storage/[Google Cloud Storage]. Both functions in the
+example forward the events to {es}.
+
+["source","sh",subs="attributes"]
+----
+functionbeat.provider.gcp.location_id: "europe-west2"
+functionbeat.provider.gcp.project_id: "my-project-123456"
+functionbeat.provider.gcp.storage_name: "functionbeat-deploy"
+functionbeat.provider.gcp.functions:
+  - name: pubsub
+    enabled: true
+    type: pubsub
+    description: "Google Cloud Function for Pub/Sub"
+    trigger:
+      resource: "projects/_/pubsub/myPubSub"
+      #service: "pubsub.googleapis.com"
+  - name: storage
+    enabled: true
+    type: storage
+    description: "Google Cloud Function for Cloud Storage"
+    trigger:
+      resource: "projects/my-project/buckets/my-storage"
+      event_type: "google.storage.object.finalize"
+
+cloud.id: "MyESDeployment:SomeLongString"
+cloud.auth: "myusername:mypassword"
+----
+
+[id="{beatname_lc}-gcp-options"]
+[float]
+=== Configuration options
+Specify the following options to configure the functions
+that you want to deploy to Google Cloud Platform (GCP).
+
+TIP: If you change the configuration after deploying the function, use
+the <<update-command,`update` command>> to update your deployment.
+
+[float]
+[id="{beatname_lc}-gcp-location_id"]
+==== `provider.gcp.location_id`
+
+The region where your GCP project is located.
+
+[float]
+[id="{beatname_lc}-gcp-project_id"]
+==== `provider.gcp.project_id`
+
+The ID of the GCP project to which you're deploying the function artifacts.
+
+[float]
+[id="{beatname_lc}-gcp-storage_name"]
+==== `provider.gcp.storage_name`
+
+The name of the GCP storage bucket to which you're deploying the function
+artifacts.
+
+[float]
+[id="{beatname_lc}-gcp-functions"]
+==== `functionbeat.provider.gcp.functions`
+A list of functions that are available for deployment. Each function must have
+a unique name.
+
+[float]
+[id="{beatname_lc}-gcp-name"]
+===== `name`
+
+A unique name for the Google function.
+
+[float]
+[id="{beatname_lc}-gcp--type"]
+===== `type`
+
+The type of GCP service to monitor. For this release, the supported types
+are:
+
+[horizontal]
+`pubsub`:: Collects log events from Google Cloud Platform.
+`storage`:: Collects log events for Google Cloud storage. 
+
+[float]
+[id="{beatname_lc}-gcp-description"]
+===== `description`
+
+A description of the function. This description is useful when you are running
+multiple functions and need more context about how each function is used.
+
+[float]
+[id="{beatname_lc}-gcp-memory-size"]
+==== `memory_size`
+
+The maximum amount of memory to allocate for this function. 
+The default is `256MB`.
+
+[float]
+[id="{beatname_lc}-gcp-timeout"]
+==== `timeout`
+
+The execution timeout in seconds. If the function does not finish in time,
+it is considered failed and terminated. The default is `60s`.
+
+[float]
+[id="{beatname_lc}-gcp-service_account_email"]
+==== `service_account_email`
+The email of service account for the function. The default is
+{projectid}@appspot.gserviceaccount.com.email of the 
+
+[float]
+[id="{beatname_lc}-gcp-labels"]
+==== `labels`
+One or more labels to apply to the function.
+
+[float]
+[id="{beatname_lc}-gcp-vpc_connector"]
+==== `vpc_connector`
+The VPC connector to which the function can connect.
+
+//REVIEWERS: Wondering if this should actually be called a VCP Access connector?
+
+The format can be `projects/*/locations/*/connectors/*` or a fully qualified
+URI.
+
+[float]
+[id="{beatname_lc}-gcp-maximum_instances"]
+==== `maximum_instances`
+
+The maximum instances that can be running at the same time. The default is
+unlimited.
+
+//REVIEWERS: Does 0 set this to unlimited?
+
+[float]
+[id="{beatname_lc}-gcp-triggers"]
+===== `trigger`
+
+The trigger that will cause the function to execute. Specify `resource` and
+optionally the `service` API, where:
+
+[horizontal]
+resource:: The name of the Cloud Storage bucket that the function watches
+for events.
+service:: The service API. The default is `pubsub.googleapis.com`.
+
+// TODO: Test this. Not sure what we mean by service here. There is no
+// description in the YAML files. 
+
+[float]
+[id="{beatname_lc}-gcp-keep_null"]
+==== `keep_null`
+
+If `true`, fields with null values will be published in the output document. By
+default, `keep_null` is `false`.
+
+[float]
+[id="{beatname_lc}-gcp-fields"]
+==== `fields`
+
+Optional fields that you can specify to add additional information to the
+output. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these.
+
+[float]
+[id="{beatname_lc}-gcp-processors"]
+==== `processors`
+
+Define custom processors for this function. For example, you can specify a
+dissect processor to tokenize a string:
+
+[source,yaml]
+----
+processors:
+  - dissect:
+      tokenizer: "%{key1} %{key2}"
+----
