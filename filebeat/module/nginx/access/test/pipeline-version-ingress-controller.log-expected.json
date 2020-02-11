@@ -15,12 +15,12 @@
         "nginx.access.http.request.id": "529a007902362a5f51385a5fa7049884",
         "nginx.access.http.request.length": 89,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -51,12 +51,12 @@
         "nginx.access.http.request.id": "68fa971ce4dfce685fdc01c877bfa645",
         "nginx.access.http.request.length": 91,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -87,12 +87,12 @@
         "nginx.access.http.request.id": "0be411044cb1cb67580e115413b2da60",
         "nginx.access.http.request.length": 94,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -123,12 +123,12 @@
         "nginx.access.http.request.id": "f479ab1d9cc8afcbac9e9f958ff8babc",
         "nginx.access.http.request.length": 93,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -159,11 +159,11 @@
         "nginx.access.http.request.id": "4c7d2079340e68353c7d0dfff00b904b",
         "nginx.access.http.request.length": 0,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
+        "nginx.access.upstream.name": "",
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -189,11 +189,11 @@
         "nginx.access.http.request.id": "efb0c5aa8be6cdeb4a7e7bd090e3d893",
         "nginx.access.http.request.length": 0,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
+        "nginx.access.upstream.name": "",
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -219,12 +219,12 @@
         "nginx.access.http.request.id": "457b71c3e1ee1887bb809effd301a0ec",
         "nginx.access.http.request.length": 157,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -255,12 +255,12 @@
         "nginx.access.http.request.id": "da29abf31e4d6324cebe5e7bca370709",
         "nginx.access.http.request.length": 450,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -294,12 +294,12 @@
         "nginx.access.http.request.id": "e983c8cf3d713548baa50c9e2fffeb34",
         "nginx.access.http.request.length": 381,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -333,12 +333,12 @@
         "nginx.access.http.request.id": "3d7ff18ff4181a7db5013a76f975d900",
         "nginx.access.http.request.length": 441,
         "nginx.access.http.request.time": 0.002,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web2-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.6",
+        "nginx.access.upstream.name": "default-web2-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 61,
         "nginx.access.upstream.response.status_code": 200,
@@ -372,12 +372,12 @@
         "nginx.access.http.request.id": "d131fe4bcd359cf947f75efca4bfa553",
         "nginx.access.http.request.length": 372,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -411,12 +411,12 @@
         "nginx.access.http.request.id": "ef6629fcaaa1ea0d1a843cf2bf40571d",
         "nginx.access.http.request.length": 369,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -450,12 +450,12 @@
         "nginx.access.http.request.id": "2593a1126588922449c183c8d9ddbbeb",
         "nginx.access.http.request.length": 325,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -489,12 +489,12 @@
         "nginx.access.http.request.id": "0f76ea730f282d5759018eb756b23b14",
         "nginx.access.http.request.length": 369,
         "nginx.access.http.request.time": 0.002,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -528,12 +528,12 @@
         "nginx.access.http.request.id": "21efd18e3a7952fc78c0f2dcc1f05e69",
         "nginx.access.http.request.length": 358,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -567,12 +567,12 @@
         "nginx.access.http.request.id": "e096809c2cb46f004c3b538b23916e5b",
         "nginx.access.http.request.length": 314,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -606,12 +606,12 @@
         "nginx.access.http.request.id": "0a2a92d080e664dd4e95c85d097c9d3d",
         "nginx.access.http.request.length": 360,
         "nginx.access.http.request.time": 0.002,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web2-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.6",
+        "nginx.access.upstream.name": "default-web2-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 61,
         "nginx.access.upstream.response.status_code": 200,
@@ -645,12 +645,12 @@
         "nginx.access.http.request.id": "4c024ebfc20acfb2d59e542e3ed60789",
         "nginx.access.http.request.length": 316,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -684,12 +684,12 @@
         "nginx.access.http.request.id": "9a7babf34ca4ee59d90ac48d452a9214",
         "nginx.access.http.request.length": 197,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -720,12 +720,12 @@
         "nginx.access.http.request.id": "ba91c30454893c121879396b0a78be79",
         "nginx.access.http.request.length": 343,
         "nginx.access.http.request.time": 0.0,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web2-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.6",
+        "nginx.access.upstream.name": "default-web2-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 61,
         "nginx.access.upstream.response.status_code": 200,
@@ -759,12 +759,12 @@
         "nginx.access.http.request.id": "98c81aa2d50c67f6fb1fa16d5ce62f8f",
         "nginx.access.http.request.length": 262,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.5",
+        "nginx.access.upstream.name": "default-web-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 59,
         "nginx.access.upstream.response.status_code": 200,
@@ -798,12 +798,12 @@
         "nginx.access.http.request.id": "835136ae24486dbb4156dcbe21f5d402",
         "nginx.access.http.request.length": 348,
         "nginx.access.http.request.time": 0.001,
-        "nginx.access.proxy.upstream.alternative_name": "",
-        "nginx.access.proxy.upstream.name": "default-web2-8080",
         "nginx.access.remote_ip_list": [
             "192.168.64.1"
         ],
+        "nginx.access.upstream.alternative_name": "",
         "nginx.access.upstream.ip": "172.17.0.6",
+        "nginx.access.upstream.name": "default-web2-8080",
         "nginx.access.upstream.port": "8080",
         "nginx.access.upstream.response.length": 61,
         "nginx.access.upstream.response.status_code": 200,
