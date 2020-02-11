@@ -18,7 +18,6 @@ services:
       args:
         CEPH_VERSION: ${CEPH_VERSION:-master-97985eb-nautilus-centos-7-x86_64}
     ports:
-      - 5000:5000
-      - 8003:8003
-      - 8080:8080
-      - 9283:9283
+      - 5000
+      - 8003
+      - 8080
