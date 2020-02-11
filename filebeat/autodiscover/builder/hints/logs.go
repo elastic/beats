@@ -20,6 +20,7 @@ package hints
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/elastic/beats/filebeat/fileset"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -66,6 +67,20 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 	}
 
 	return &logHints{&config, moduleRegistry}, nil
+}
+
+// getFilesetAndVersion return fileset name and version based on the `:` separator
+// Examples:
+//   1. input: access:ingress, output: access, ingress
+//   2. input: access        , output: access, " "
+func getFilesetAndVersion(fileset string) (string, string) {
+	// "access:nginx", ":"
+	arr := strings.Split(fileset, ":")
+	if len(arr) == 2 {
+		return arr[0], arr[1]
+	} else {
+		return arr[0], ""
+	}
 }
 
 // Create config based on input hints in the bus event
@@ -141,7 +156,6 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		moduleConf := map[string]interface{}{
 			"module": module,
 		}
-
 		filesets := l.getFilesets(hints, module)
 		for fileset, conf := range filesets {
 			filesetConf, _ := common.NewConfigFrom(config)
@@ -153,6 +167,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 			}
 
 			moduleConf[fileset+".enabled"] = conf.Enabled
+			if conf.Version != "" {
+				moduleConf[fileset+".version"] = conf.Version
+			}
 			moduleConf[fileset+".input"] = filesetConf
 
 			logp.Debug("hints.builder", "generated config %+v", moduleConf)
@@ -198,11 +215,13 @@ func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
 type filesetConfig struct {
 	Enabled bool
 	Stream  string
+	Version string
 }
 
 // Return a map containing filesets -> enabled & stream (stdout, stderr, all)
 func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*filesetConfig {
 	var configured bool
+	var version string
 	filesets := make(map[string]*filesetConfig)
 
 	moduleFilesets, err := l.registry.ModuleFilesets(module)
@@ -218,20 +237,24 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	// If a single fileset is given, pass all streams to it
 	fileset := builder.GetHintString(hints, l.config.Key, "fileset")
 	if fileset != "" {
+		fileset, version = getFilesetAndVersion(fileset)
 		if conf, ok := filesets[fileset]; ok {
 			conf.Enabled = true
 			configured = true
+			conf.Version = version
 		}
 	}
 
 	// If fileset is defined per stream, return all of them
 	for _, stream := range []string{"all", "stdout", "stderr"} {
 		fileset := builder.GetHintString(hints, l.config.Key, "fileset."+stream)
+		fileset, version = getFilesetAndVersion(fileset)
 		if fileset != "" {
 			if conf, ok := filesets[fileset]; ok {
 				conf.Enabled = true
 				conf.Stream = stream
 				configured = true
+				conf.Version = version
 			}
 		}
 	}
