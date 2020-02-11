@@ -81,7 +81,7 @@ func TestModuleConfig(t *testing.T) {
 		err  string
 	}{
 		{
-			name: "missing required field",
+			name: "string value is not set on required field",
 			in:   map[string]interface{}{},
 			err:  "string value is not set accessing 'module'",
 		},
