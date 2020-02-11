@@ -98,6 +98,9 @@ type nodeInfo struct {
 	Pipeline    pipeline `json:"pipeline"`
 }
 
+// inNodeInfo represents the Logstash node info to be parsed from the Logstash API
+// response. It contains nodeInfo (which is also used as-is elsewhere) + monitoring
+// information.
 type inNodeInfo struct {
 	nodeInfo
 	Monitoring struct {
