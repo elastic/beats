@@ -142,8 +142,8 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"enabled":       "true",
-						"module": "nginx",
+						"enabled": "true",
+						"module":  "nginx",
 						"fileset": "access:ingress-controller",
 					},
 				},
@@ -155,16 +155,16 @@ func TestGenerateHints(t *testing.T) {
 					"enabled": true,
 					"version": "ingress-controller",
 					"input": map[string]interface{}{
-						"type": "container",
-						"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+						"type":   "container",
+						"paths":  []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
 						"stream": "all",
 					},
 				},
 				"error": map[string]interface{}{
 					"enabled": false,
 					"input": map[string]interface{}{
-						"type": "container",
-						"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+						"type":   "container",
+						"paths":  []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
 						"stream": "all",
 					},
 				},

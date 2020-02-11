@@ -189,13 +189,13 @@ func TestGenerateHints(t *testing.T) {
 		// co.elastic.logs/fileset set to access:ingress-controller
 		{
 			annotations: map[string]string{
-				"co.elastic.logs/module":           "nginx",
+				"co.elastic.logs/module":  "nginx",
 				"co.elastic.logs/fileset": "access:ingress-controller",
 			},
 			result: common.MapStr{
 				"logs": common.MapStr{
 					"fileset": "access:ingress-controller",
-					"module": "nginx",
+					"module":  "nginx",
 				},
 			},
 		},
