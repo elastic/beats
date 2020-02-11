@@ -100,6 +100,8 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	return registration, nil
 }
 
+// useHostURISchemeIfPossible method parses given URI to extract protocol scheme and prepend it to the host.
+// It prevents from skipping protocol scheme (e.g. https) while executing HostParser.
 func (m *LightMetricSet) useHostURISchemeIfPossible(host, uri string) string {
 	u, err := url.ParseRequestURI(uri)
 	if err == nil {
