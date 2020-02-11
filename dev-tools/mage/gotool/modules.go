@@ -39,16 +39,16 @@ func (cmd modCommand) run(opts ...ArgOpt) error {
 }
 
 type goMod struct {
-	Tidy   ModTidy
-	Verify ModVerify
-	Vendor ModVendor
+	Tidy   modTidy
+	Verify modVerify
+	Vendor modVendor
 }
 
-// Tidy cleans the go.mod file
-type ModTidy func(opts ...ArgOpt) error
+// modTidy cleans the go.mod file
+type modTidy func(opts ...ArgOpt) error
 
-// Vendor downloads and copies dependencies under the folder vendor.
-type ModVerify func(opts ...ArgOpt) error
+// modVerify check that deps have the expected content.
+type modVerify func(opts ...ArgOpt) error
 
-// Verify check that deps have the expected content.
-type ModVendor func(opts ...ArgOpt) error
+// modVendor downloads and copies dependencies under the folder vendor.
+type modVendor func(opts ...ArgOpt) error

@@ -25,24 +25,24 @@ import (
 	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
-// CopyModules contains a module name and the list of files or directories
+// copyModule contains a module name and the list of files or directories
 // to copy recursively.
-type CopyModules struct {
-	Name        string
-	FilesToCopy []string
+type copyModule struct {
+	name        string
+	filesToCopy []string
 }
 
 var (
-	copyAll = []CopyModules{
-		CopyModules{
-			Name: "github.com/godror/godror",
-			FilesToCopy: []string{
+	copyAll = []copyModule{
+		copyModule{
+			name: "github.com/godror/godror",
+			filesToCopy: []string{
 				"odpi",
 			},
 		},
-		CopyModules{
-			Name: "github.com/tsg/go-daemon",
-			FilesToCopy: []string{
+		copyModule{
+			name: "github.com/tsg/go-daemon",
+			filesToCopy: []string{
 				"src",
 			},
 		},
@@ -76,17 +76,18 @@ func Vendor() error {
 
 	// copy packages which require the whole tree
 	for _, p := range copyAll {
-		path, err := gotool.ListModulePath(p.Name)
+		path, err := gotool.ListModulePath(p.name)
 		if err != nil {
 			return err
 		}
 		if len(path) != 1 {
 			return fmt.Errorf("unexpected number of paths")
 		}
+		fmt.Println(path)
 
-		for _, f := range p.FilesToCopy {
+		for _, f := range p.filesToCopy {
 			from := filepath.Join(path[0], f)
-			to := filepath.Join(vendorFolder, p.Name, f)
+			to := filepath.Join(vendorFolder, p.name, f)
 			copyTask := &CopyTask{Source: from, Dest: to, DirMode: os.ModeDir | 0750}
 			err = copyTask.Execute()
 			if err != nil {
@@ -95,10 +96,4 @@ func Vendor() error {
 		}
 	}
 	return nil
-}
-
-// AddModuleFilesToCopy adds modules which contain files
-// which has to be copied to the folder vendor (e.g. C source).
-func AddModuleFilesToCopy(files []CopyModules) {
-	copyAll = append(copyAll, files...)
 }
