@@ -210,27 +210,24 @@ datasources:
         # Looking at the AWS modules, I believe each fileset need to be in their own
         # buckets?
         - type: s3
-          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
           credential_profile_name: fb-aws
           streams:
           - id?: {id}
             metricset: s3
             dataset: aws/s3
-        - type: s3
-          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-          credential_profile_name: fb-aws
-          streams:
+            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
           - id?: {id}
             metricset: s3access
             dataset: aws/s3access
-        - type: s3
-          queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-          credential_profile_name: fb-aws
-          streams:
           - id?: {id}
             metricset: s3access
             dataset: aws.vpcflow
+            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
        - type: aws/metrics
+         # access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+         # secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+         # session_token: '${AWS_SESSION_TOKEN:""}'
+         credential_profile_name: test-mb
          streams:
           - id?: {id}
             metricset: usage
