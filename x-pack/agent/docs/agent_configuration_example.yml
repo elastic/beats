@@ -155,36 +155,47 @@ datasources:
             paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
         - type: metrics/elasticsearch
           hosts: ["http://localhost:9200"]
-          # api_key: "xxxx"
+          hosts: ["http://localhost:9200"]
+          # api_key: xxxx
+          # username: elastic
+          # password: changeme
+          # ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+          # ssl.ca_sha256: BxZ...
           xpack.enabled: true
           streams:
           - id?: {id}
             metricset: ccr
             dataset: elasticseach.ccr
+            period: 10s
           - id?: {id}
             metricset: cluster_stats
             dataset: elasticseach.cluster_stats
+            period: 10s
           - id?: {id}
             metricset: enrich
             dataset: elasticseach.enrich
+            period: 10s
           - id?: {id}
             metricset: index
             dataset: elasticseach.index
+            period: 10s
           - id?: {id}
             metricset: index_recovery
             dataset: elasticseach.index_recovery
-          - id?: {id}
-            metricset: index_recovery
-            dataset: elasticseach.index_recovery
+            active_only: true
+            period: 10s
           - id?: {id}
             metricset: ml_jobs
             dataset: elasticseach.ml_jobs
+            period: 10s
           - id?: {id}
             metricset: node_stats
             dataset: elasticseach.node_stats
+            period: 10s
           - id?: {id}
             metricset: shard
             dataset: elasticseach.shard
+            period: 10s
 
   #################################################################################################
   # AWS module
@@ -323,51 +334,51 @@ datasources:
         streams:
           - id?: {id}
             metricset: state_node
-            dataset: kubernetes.state_node
+            dataset: kubernetes.node
             period: 10s
           - id?: {id}
             metricset: state_deployment
-            dataset: kubernetes.state_deployment
+            dataset: kubernetes.deployment
             period: 10s
           - id?: {id}
             metricset: state_replicaset
-            dataset: kubernetes.state_replicaset
+            dataset: kubernetes.replicaset
             period: 10s
           - id?: {id}
             metricset: state_statefulset
-            dataset: kubernetes.state_statefulset
+            dataset: kubernetes.statefulset
             period: 10s
           - id?: {id}
             metricset: state_pod
-            dataset: kubernetes.state_pod
+            dataset: kubernetes.pod
             period: 10s
           - id?: {id}
             metricset: state_container
-            dataset: kubernetes.state_container
+            dataset: kubernetes.container
             period: 10s
           - id?: {id}
             metricset: state_container
-            dataset: kubernetes.state_container
+            dataset: kubernetes.container
             period: 10s
           - id?: {id}
             metricset: state_cronjob
-            dataset: kubernetes.state_cronjob
+            dataset: kubernetes.cronjob
             period: 10s
           - id?: {id}
             metricset: state_resourcequota
-            dataset: kubernetes.state_resourcequota
+            dataset: kubernetes.resourcequota
             period: 10s
           - id?: {id}
             metricset: state_service
-            dataset: kubernetes.state_serice
+            dataset: kubernetes.service
             period: 10s
           - id?: {id}
             metricset: state_persistentvolume
-            dataset: kubernetes.state_persistentvolume
+            dataset: kubernetes.persistentvolume
             period: 10s
           - id?: {id}
             metricset: state_persistentvolumeclaim
-            dataset: kubernetes.state_persistentvolumeclaim
+            dataset: kubernetes.persistentvolumeclaim
             period: 10s
 
   #################################################################################################
