@@ -1,5 +1,5 @@
 {
-    "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
+    "description": "Pipeline for parsing Nginx ingress controller access logs. Requires the geoip and user_agent plugins.",
     "processors": [
         {
             "grok": {
