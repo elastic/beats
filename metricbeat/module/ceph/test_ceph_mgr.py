@@ -1,4 +1,5 @@
 import os
+import requests
 import sys
 import time
 import unittest
@@ -12,14 +13,14 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['ceph-mgr']
     FIELDS = ["ceph"]
 
-    def get_ceph_module_config(self, metricset, password):
+    def get_ceph_module_config(self, metricset):
         return {
             'name': 'ceph',
             'metricsets': [metricset],
             'period': '1h',
             'hosts': self.get_hosts(),
             'username': 'demo',
-            'password': password,
+            'password': self.get_password(),
             'extras': {
                 'ssl.verification_mode': 'none'
             }
@@ -27,6 +28,11 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return ['https://' + self.compose_host(port='8003/tcp')]
+
+    def get_password(self):
+        r = requests.get('http://' + self.compose_host(port='5000/tcp') + '/restful-list-keys.json')
+        keys = r.json()
+        return keys['demo']
 
     @parameterized.expand([
         "mgr_cluster_disk",
@@ -42,11 +48,12 @@ class Test(metricbeat.BaseTest):
         ceph-mgr metricsets tests
         """
 
-        self.render_config_template(modules=[self.get_ceph_module_config(metricset, 'password')])
+        self.render_config_template(modules=[self.get_ceph_module_config(metricset)])
         proc = self.start_beat(home=self.beat_path)
-
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(replace=['SSL/TLS verifications disabled.'])
 
-        #output = self.read_output_json()
+        output = self.read_output_json()
+        for evt in output:
+            assert 'ceph' in evt
