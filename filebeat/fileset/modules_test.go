@@ -56,7 +56,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error"},
+		"nginx":  {"access", "error", "ingress_controller"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
