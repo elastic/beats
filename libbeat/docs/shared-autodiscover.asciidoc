@@ -95,7 +95,9 @@ autodiscover.providers:
 -------------------------------------------------------------------------------------
 
 That would read all the files under the given path several times (one per nginx container). What you really
-want is to scope your template to the container that matched the autodiscover condition. Good settings:
+want is to scope your template to the container that matched the autodiscover condition.
+
+**Good settings**:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
