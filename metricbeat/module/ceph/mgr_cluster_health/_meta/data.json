@@ -18,14 +18,6 @@
         "mgr_cluster_status": {
             "progress_events": {},
             "health": {
-                "checks": {
-                    "POOL_APP_NOT_ENABLED": {
-                        "severity": "HEALTH_WARN",
-                        "summary": {
-                            "message": "application not enabled on 1 pool(s)"
-                        }
-                    }
-                },
                 "status": "HEALTH_WARN"
             },
             "election_epoch": 3,
