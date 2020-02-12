@@ -47,6 +47,10 @@ require (
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/elastic/ecs v1.4.0
+	github.com/elastic/go-elasticsearch v0.0.0
+	github.com/elastic/go-elasticsearch/v6 v6.8.5
+	github.com/elastic/go-elasticsearch/v7 v7.5.0
+	github.com/elastic/go-elasticsearch/v8 v8.0.0-20200210103600-aff00e5adfde
 	github.com/elastic/go-libaudit v0.4.0
 	github.com/elastic/go-licenser v0.2.1
 	github.com/elastic/go-lookslike v0.3.0
@@ -90,6 +94,7 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
 	github.com/magefile/mage v1.9.0
+	github.com/mailru/easyjson v0.0.0-20160728113105-d5b7844b561a
 	github.com/mattn/go-colorable v0.0.8
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/mattn/go-isatty v0.0.2 // indirect
