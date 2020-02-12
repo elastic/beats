@@ -5,24 +5,10 @@
         "type": "_doc",
         "version": "8.0.0"
     },
-    "host": {
-        "name": "MacBook-Elastic.local",
-        "os": {
-            "build": "18G95",
-            "platform": "darwin",
-            "version": "10.14.6",
-            "family": "darwin",
-            "name": "Mac OS X",
-            "kernel": "18.7.0"
-        },
-        "id": "24F065F8-4274-521D-8DD5-5D27557E15B4",
-        "hostname": "MacBook-Elastic.local",
-        "architecture": "x86_64"
-    },
     "agent": {
         "type": "metricbeat",
         "ephemeral_id": "ee373afc-c2ca-4308-91a2-651e4081d823",
-        "hostname": "MacBook-Elastic.local",
+        "hostname": "host",
         "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
         "version": "8.0.0"
     },

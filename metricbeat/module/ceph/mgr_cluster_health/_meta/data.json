@@ -6,11 +6,11 @@
         "version": "8.0.0"
     },
     "agent": {
-        "id": "host",
+        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
         "version": "8.0.0",
         "type": "metricbeat",
         "ephemeral_id": "59b80233-4d5c-48c9-a3db-a40d6e172aae",
-        "hostname": "MacBook-Elastic.local"
+        "hostname": "host"
     },
     "event": {
         "duration": 29973749,
