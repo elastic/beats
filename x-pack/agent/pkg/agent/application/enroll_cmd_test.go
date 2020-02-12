@@ -81,11 +81,13 @@ func TestEnroll(t *testing.T) {
 			store := &mockStore{Err: errors.New("fail to save")}
 			cmd, err := NewEnrollCmdWithStore(
 				log,
-				url,
-				[]string{caFile},
-				"my-enrollment-token",
-				"my-id",
-				map[string]interface{}{"custom": "customize"},
+				&EnrollCmdOption{
+					ID:                   "my-id",
+					URL:                  url,
+					CAs:                  []string{caFile},
+					EnrollAPIKey:         "my-enrollment-token",
+					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
+				},
 				"",
 				store,
 			)
@@ -133,11 +135,13 @@ func TestEnroll(t *testing.T) {
 			store := &mockStore{}
 			cmd, err := NewEnrollCmdWithStore(
 				log,
-				url,
-				[]string{caFile},
-				"my-enrollment-api-key",
-				"my-id",
-				map[string]interface{}{"custom": "customize"},
+				&EnrollCmdOption{
+					ID:                   "my-id",
+					URL:                  url,
+					CAs:                  []string{caFile},
+					EnrollAPIKey:         "my-enrollment-api-key",
+					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
+				},
 				"",
 				store,
 			)
@@ -189,11 +193,13 @@ func TestEnroll(t *testing.T) {
 			store := &mockStore{}
 			cmd, err := NewEnrollCmdWithStore(
 				log,
-				url,
-				make([]string, 0),
-				"my-enrollment-api-key",
-				"my-id",
-				map[string]interface{}{"custom": "customize"},
+				&EnrollCmdOption{
+					ID:                   "my-id",
+					URL:                  url,
+					CAs:                  []string{},
+					EnrollAPIKey:         "my-enrollment-api-key",
+					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
+				},
 				"",
 				store,
 			)
@@ -231,11 +237,13 @@ func TestEnroll(t *testing.T) {
 			store := &mockStore{}
 			cmd, err := NewEnrollCmdWithStore(
 				log,
-				url,
-				make([]string, 0),
-				"my-enrollment-token",
-				"my-id",
-				map[string]interface{}{"custom": "customize"},
+				&EnrollCmdOption{
+					ID:                   "my-id",
+					URL:                  url,
+					CAs:                  []string{},
+					EnrollAPIKey:         "my-enrollment-token",
+					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
+				},
 				"",
 				store,
 			)
@@ -319,7 +327,7 @@ func readConfig(raw []byte) (*FleetAgentConfig, error) {
 		return nil, err
 	}
 
-	cfg := &FleetAgentConfig{}
+	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}
