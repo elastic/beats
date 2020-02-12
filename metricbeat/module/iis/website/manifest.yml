@@ -1,0 +1,54 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  processors:
+  - drop_event.when.regexp:
+      iis.website.name: '^/(_Total|cgroup)($|/)'
+  defaults:
+    perfmon.group_measurements_by_instance: true
+    perfmon.ignore_non_existent_counters: true
+    perfmon.counters:
+    #network
+    - instance_label: 'name'
+      measurement_label: network.total_bytes_received
+      query: '\Web Service(*)\Total Bytes Received'
+    - instance_label: 'name'
+      measurement_label: network.total_bytes_sent
+      query: '\Web Service(*)\Total Bytes Sent'
+    - instance_label: 'name'
+      measurement_label: network.bytes_sent_per_sec
+      query: '\Web Service(*)\Bytes Sent/sec'
+    - instance_label: 'name'
+      measurement_label: network.bytes_received_per_sec
+      query: '\Web Service(*)\Bytes Received/sec'
+    - instance_label: 'name'
+      measurement_label: network.current_connections
+      query: 'Web Service(*)\Current Connections'
+    - instance_label: 'name'
+      measurement_label: network.maximum_connections
+      query: '\Web Service(*)\Maximum Connections'
+    - instance_label: 'name'
+      measurement_label: network.total_connection_attempts
+      query: '\Web Service(*)\Total Connection Attempts (all instances)'
+    - instance_label: 'name'
+      measurement_label: network.total_get_requests
+      query: '\Web Service(*)\Total Get Requests'
+    - instance_label: 'name'
+      measurement_label: network.get_requests_per_sec
+      query: '\Web Service(*)\Get Requests/sec'
+    - instance_label: 'name'
+      measurement_label: network.total_post_requests
+      query: '\Web Service(*)\Total Post Requests'
+    - instance_label: 'name'
+      measurement_label: network.post_requests_per_sec
+      query: '\Web Service(*)\Post Requests/sec'
+    - instance_label: 'name'
+      measurement_label: network.total_delete_requests
+      query: '\Web Service(*)\Total Delete Requests'
+    - instance_label: 'name'
+      measurement_label: network.delete_requests_per_sec
+      query: '\Web Service(*)\Delete Requests/sec'
+    - instance_label: 'name'
+      measurement_label: network.service_uptime
+      query: '\Web Service(*)\Service Uptime'

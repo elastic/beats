@@ -78,7 +78,6 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/http/server"
 	_ "github.com/elastic/beats/metricbeat/module/iis"
 	_ "github.com/elastic/beats/metricbeat/module/iis/application_pool"
-	_ "github.com/elastic/beats/metricbeat/module/iis/website"
 	_ "github.com/elastic/beats/metricbeat/module/jolokia"
 	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
 	_ "github.com/elastic/beats/metricbeat/module/kafka"
