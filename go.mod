@@ -56,7 +56,7 @@ require (
 	github.com/elastic/go-structform v0.0.6
 	github.com/elastic/go-sysinfo v1.3.0
 	github.com/elastic/go-txfile v0.0.7
-	github.com/elastic/go-ucfg v0.8.1
+	github.com/elastic/go-ucfg v0.8.2
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.10.5
 	github.com/fatih/color v1.5.0
