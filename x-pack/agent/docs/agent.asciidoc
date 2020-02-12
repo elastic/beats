@@ -4,5 +4,5 @@ Agent's notes
 [[requirements]]
 Requirements
 
-The remote Kibana version of the Agent must be equal or higher than the Agent version, if this is not meet
-Kibana will refuses the connection.
+The remote Kibana version of the Agent must be equal or higher than the Agent version, if this is not met
+Kibana will refuse the connection.
