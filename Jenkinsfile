@@ -471,28 +471,28 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
-                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test-package")
+                makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
+                makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                makeTarget("Generators Beat Linux", "-C generator/beat test")
-                makeTarget("Generators Beat Linux", "-C generator/beat test-package")
+                makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
+                makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
               }
             }
             stage('Generators Metricbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                makeTarget("Generators Metricbeat Mac OS X", "-C generator/metricbeat test")
+                makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
               }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
               steps {
-                makeTarget("Generators Beat Mac OS X", "-C generator/beat test")
+                makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
               }
             }
           }
