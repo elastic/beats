@@ -238,6 +238,7 @@ addons:
 
 before_install:
   - python --version
+  # - sudo pip install -U pip
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
@@ -245,7 +246,7 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
 
 
 # Skips installations step
