@@ -100,7 +100,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
-
 ==== Added
 
 *Affecting all Beats*
