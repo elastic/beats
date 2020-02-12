@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/x-pack/filebeat/input/o365audit/auth"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -20,6 +21,8 @@ type Config struct {
 
 	// ApplicationID (aka. client ID) of the Azure application.
 	ApplicationID string `config:"application_id" validate:"required"`
+
+	ClientSecret string `config:"client_secret"`
 
 	// TenantID (aka. Directory ID) is a list of tenants for which to fetch
 	// the audit logs. This can be a string or a list of strings.
@@ -158,4 +161,24 @@ func asStringList(value interface{}) (list []string, err error) {
 		return nil, fmt.Errorf("array of strings required. Found %v (type %T)", value, value)
 	}
 	return list, nil
+}
+
+// NewTokenProvider returns an auth.TokenProvider for the given tenantID.
+func (c *Config) NewTokenProvider(tenantID string) (auth.TokenProvider, error) {
+	if c.ClientSecret != "" {
+		return auth.NewProviderFromClientSecret(
+			c.API.AuthenticationEndpoint,
+			c.API.Resource,
+			c.ApplicationID,
+			tenantID,
+			c.ClientSecret,
+		)
+	}
+	return auth.NewProviderFromCertificate(
+		c.API.AuthenticationEndpoint,
+		c.API.Resource,
+		c.ApplicationID,
+		tenantID,
+		c.CertificateConfig,
+	)
 }

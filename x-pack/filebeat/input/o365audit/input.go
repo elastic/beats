@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/useragent"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/filebeat/input/o365audit/auth"
 	"github.com/elastic/beats/x-pack/filebeat/input/o365audit/poll"
 )
 
@@ -104,17 +103,13 @@ func NewInput(
 	for _, tenantID := range config.tenants {
 		// MaxRequestsPerMinute limitation is per tenant.
 		delay := time.Duration(len(config.contentTypes)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
-		auth, err := auth.NewProviderFromCertificate(
-			config.API.AuthenticationEndpoint,
-			config.API.Resource,
-			config.ApplicationID,
-			tenantID,
-			config.CertificateConfig,
-		)
+		auth, err := config.NewTokenProvider(tenantID)
 		if err != nil {
 			return nil, err
 		}
-
+		if _, err = auth.Token(); err != nil {
+			return nil, errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
+		}
 		for _, contentType := range config.contentTypes {
 			key := stream{
 				tenantID:    tenantID,
@@ -158,7 +153,7 @@ func (inp *o365input) Run() {
 func (inp *o365input) run() {
 	for stream, poller := range inp.pollers {
 		start := inp.loadLastLocation(stream)
-		inp.log.Debugw("Start fetching events",
+		inp.log.Infow("Start fetching events",
 			"cursor", start,
 			"tenantID", stream.tenantID,
 			"contentType", stream.contentType)
