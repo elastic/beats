@@ -82,7 +82,6 @@ that contains:
 +
 * a binary, called `functionbeat-aws`, that contains the function code
 * the `functionbeat.yml` config file
-* `/tmp/functionbeat.keystore`, if a keystore is used
 
 . If certificates are required, add the cert files to the zip package under the
 same path as the configured +{beatname_lc}.yml+ file. 

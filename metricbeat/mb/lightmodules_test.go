@@ -20,6 +20,7 @@
 package mb
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -28,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	_ "github.com/elastic/beats/libbeat/processors/add_id"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -280,6 +282,96 @@ func TestNewModuleFromConfig(t *testing.T) {
 	}
 }
 
+func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
+	const hostEndpoint = "ceph-restful:8003"
+	const sampleHttpsEndpoint = "https://" + hostEndpoint
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption,
+		WithHostParser(func(module Module, host string) (HostData, error) {
+			u, err := url.Parse(host)
+			if err != nil {
+				return HostData{}, err
+			}
+			return HostData{
+				Host: u.Host,
+				URI:  host,
+			}, nil
+		}))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{sampleHttpsEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, hostEndpoint, metricSets[0].Host())
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].HostData().URI)
+}
+
+func TestLightMetricSet_WithoutHostParser(t *testing.T) {
+	const sampleHttpsEndpoint = "https://ceph-restful:8003"
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{sampleHttpsEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].Host())
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].HostData().URI)
+}
+
+func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
+	const (
+		postgresHost     = "host1:5432"
+		postgresEndpoint = "postgres://user1:pass@host1:5432?connect_timeout=2"
+		postgresParsed   = "connect_timeout=3 host=host1 password=pass port=5432 user=user1"
+	)
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption,
+		WithHostParser(func(module Module, host string) (HostData, error) {
+			return HostData{
+				Host: postgresHost,
+				URI:  postgresParsed,
+			}, nil
+		}))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{postgresEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, postgresHost, metricSets[0].Host())
+	assert.Equal(t, postgresParsed, metricSets[0].HostData().URI)
+}
+
 func TestNewModulesCallModuleFactory(t *testing.T) {
 	logp.TestingSetup()
 
@@ -300,6 +392,31 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
+}
+
+func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "nonexisting", "fake")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "nonexisting")
+	require.Error(t, err)
+	require.Nil(t, procs)
+}
+
+func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
+	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
+	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
+	require.NoError(t, err)
+	require.NotNil(t, procs)
+	require.Len(t, procs.List, 1)
 }
 
 type metricSetWithOption struct {

@@ -67,10 +67,10 @@ type Autodiscover struct {
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
 func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, config *Config) (*Autodiscover, error) {
-	// Init Event bus
-	bus := bus.New(name)
-
 	logger := logp.NewLogger("autodiscover")
+
+	// Init Event bus
+	bus := bus.New(logger, name)
 
 	// Init providers
 	var providers []Provider
