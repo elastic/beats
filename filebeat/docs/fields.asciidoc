@@ -438,13 +438,13 @@ type: keyword
 --
 
 [float]
-=== access
+=== ssl_request
 
-Contains fields for the Apache2 HTTPD ssl access logs.
+Contains fields for the Apache HTTPD ssl access logs.
 
 
 
-*`apache.access.ssl_protocol`*::
+*`apache.ssl_request.ssl_protocol`*::
 +
 --
 The SSL protocol used during the connection.
@@ -454,7 +454,7 @@ type: keyword
 
 --
 
-*`apache.access.ssl_cipher`*::
+*`apache.ssl_request.ssl_cipher`*::
 +
 --
 The SSL cipher used during the connection.

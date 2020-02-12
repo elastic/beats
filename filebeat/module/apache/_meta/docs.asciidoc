@@ -40,6 +40,9 @@ file to override the default paths for Apache HTTP Server access and error logs:
   error:
     enabled: true
     var.paths: ["/path/to/log/apache/error.log*"]
+  ssl:
+    enabled: true
+    var.paths: ["/path/to/log/apache/ssl_requests.log*"]
 -----
 
 
@@ -67,6 +70,11 @@ include::../include/var-paths.asciidoc[]
 include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
+
+[float]
+==== `ssl` log fileset settings
+
+include::../include/var-paths.asciidoc[]
 
 [float]
 === Virtual Host

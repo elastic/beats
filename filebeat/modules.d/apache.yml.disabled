@@ -17,3 +17,11 @@
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+  # SSL Request Logs
+  ssl_request:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
