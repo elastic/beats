@@ -23,8 +23,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/iis"
-	"github.com/elastic/go-sysinfo"
 	"github.com/pkg/errors"
 )
 
@@ -43,7 +41,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	log            *logp.Logger
-	reader         *iis.Reader
+	reader         *Reader
 }
 
 // Config for the iis website metricset.
@@ -60,22 +58,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := iis.NewReader()
-	if err != nil {
-		return nil, err
-	}
-	// instantiate reader object that should retrieve the process ids and process names for the worker processes
-	instanceReader, err := iis.NewReader()
+	reader, err := NewReader()
 	if err != nil {
 		return nil, err
 	}
 
-	instances, err := getInstances(config.Names, instanceReader)
-	if err != nil {
-		return nil, err
-	}
-	reader.Instances = instances
-	if err := reader.InitCounters(iis.AppPoolCounters); err != nil {
+	if err := reader.InitCounters(config.Names); err != nil {
 		return nil, err
 	}
 	return &MetricSet{
@@ -93,12 +81,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err := m.Module().UnpackConfig(&config); err != nil {
 		return nil
 	}
-	instances, err := getInstances(config.Names, m.instanceReader)
-	if err != nil {
-		return err
-	}
-	m.reader.Instances = instances
-	events, err := m.reader.Fetch(iis.AppPoolCounters)
+
+	events, err := m.reader.Fetch(config.Names)
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}

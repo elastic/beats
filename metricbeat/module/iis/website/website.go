@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/iis"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -99,41 +98,3 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-// getInstances will retrieve the websites running in iis and also filter on the sites configured by users
-func getInstances(reader *iis.Reader, sites []string) ([]iis.Instance, error) {
-	_, instances, err := reader.Query.GetCountersAndInstances("Web Service")
-	if err != nil {
-		reader.Query.Close()
-		return nil, err
-	}
-	return filterOnInstances(sites, instances), nil
-}
-
-// filterOnInstances will filter on the sites configured by users
-func filterOnInstances(hosts []string, instances []string) []iis.Instance {
-	filtered := make([]iis.Instance, 0)
-	// remove _Total and empty instances
-	for _, instance := range instances {
-		if instance == "_Total" || instance == "" {
-			continue
-		}
-		if containsHost(instance, hosts) {
-			filtered = append(filtered, iis.Instance{Name: instance})
-		}
-	}
-	return filtered
-}
-
-// containsHost checks if array contains site/hostname
-func containsHost(item string, array []string) bool {
-	// if no hosts specified all instances are selected
-	if len(array) == 0 {
-		return true
-	}
-	for _, i := range array {
-		if i == item {
-			return true
-		}
-	}
-	return false
-}

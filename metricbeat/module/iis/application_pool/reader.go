@@ -17,11 +17,11 @@
 
 // +build windows
 
-package iis
+package application_pool
 
 import (
+	"github.com/elastic/beats/metricbeat/module/iis"
 	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -34,16 +34,23 @@ import (
 
 // Reader will contain the config options
 type Reader struct {
-	Query     pdh.Query    // PDH Query
-	Instances []ApplicationPool   // Mapping of counter path to key used for the label (e.g. processor.name)
-	log       *logp.Logger // logger
-	hasRun    bool         // will check if the reader has run a first time
+	Query            pdh.Query         // PDH Query
+	ApplicationPools []ApplicationPool // Mapping of counter path to key used for the label (e.g. processor.name)
+	log              *logp.Logger      // logger
+	hasRun           bool              // will check if the reader has run a first time
+	WorkerProcesses  map[string]string
 }
 
 type ApplicationPool struct {
-	Name        string
-	WorkerProcessIds  []int
-	counters    map[string]string
+	Name             string
+	WorkerProcessIds []int
+	counters         map[string]string
+}
+
+type WorkerProcess struct {
+	ProcessId    int
+	InstanceName string
+	counters     map[string]string
 }
 
 // NewReader creates a new instance of Reader.
@@ -60,20 +67,25 @@ func NewReader() (*Reader, error) {
 	return reader, nil
 }
 
-func (re *Reader) InitCounters(counters map[string]string) error {
+func (re *Reader) InitCounters(filtered []string) error {
+	apps, err := getApplicationPools(filtered)
+	re.ApplicationPools = apps
+	re.WorkerProcesses = make(map[string]string)
 	var newQueries []string
-	for i, instance := range re.Instances {
-		re.Instances[i].counters = make(map[string]string)
-		for key, value := range counters {
-			value = strings.Replace(value, "*", instance.Name, 1)
-			if err := re.Query.AddCounter(value, "", "float", true); err != nil {
-				return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
+	for key, value := range iis.AppPoolCounters {
+		counters, err := re.Query.ExpandWildCardPath(value)
+		if err != nil {
+			return errors.Wrapf(err, `failed to expand counter path (query="%v")`, value)
+		}
+		for _, count := range counters {
+			if err = re.Query.AddCounter(count, "", "float", true); err != nil {
+				return errors.Wrapf(err, `failed to add counter (query="%v")`, count)
 			}
-			newQueries = append(newQueries, value)
-			re.Instances[i].counters[value] = key
+			newQueries = append(newQueries, count)
+			re.WorkerProcesses[count] = key
 		}
 	}
-	err := re.Query.RemoveUnusedCounters(newQueries)
+	err = re.Query.RemoveUnusedCounters(newQueries)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
@@ -81,7 +93,7 @@ func (re *Reader) InitCounters(counters map[string]string) error {
 }
 
 // Read executes a query and returns those values in an event.
-func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
+func (re *Reader) Fetch(names []string) ([]mb.Event, error) {
 	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
 	if len(re.Query.Counters) == 0 {
 		return nil, errors.New("no counters to read")
@@ -92,7 +104,7 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
 	if re.hasRun {
-		err := re.InitCounters(counters)
+		err := re.InitCounters(names)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed retrieving counters")
 		}
@@ -109,18 +121,16 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
+	workers := getProcessIds(values)
 	events := make(map[string]mb.Event)
-	for _, host := range re.Instances {
-		events[host.Name] = mb.Event{
+	for _, appPool := range re.ApplicationPools {
+		events[appPool.Name] = mb.Event{
 			MetricSetFields: common.MapStr{
-				"name": host.Name,
+				"name": appPool.Name,
 			},
 		}
-		if host.ProcessId != 0 {
-			events[host.Name].MetricSetFields.Put("worker_process_id", host.ProcessId)
-		}
-		for counterPath, values := range values {
-			for _, val := range values {
+		for counterPath, value := range values {
+			for _, val := range value {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 				if val.Err != nil && !re.hasRun {
@@ -128,10 +138,13 @@ func (re *Reader) Fetch(counters map[string]string) ([]mb.Event, error) {
 						"error", val.Err, logp.Namespace("website"), "query", counterPath)
 					continue
 				}
-				if val.Instance == host.Name || val.Instance == string(host.ProcessName) {
-					events[host.Name].MetricSetFields.Put(host.counters[counterPath], val.Measurement)
+				if val.Instance == appPool.Name {
+					events[appPool.Name].MetricSetFields.Put(appPool.counters[counterPath], val.Measurement)
+				} else if hasWorkerProcess(val.Instance, workers, appPool.WorkerProcessIds) {
+					events[appPool.Name].MetricSetFields.Put(re.WorkerProcesses[counterPath], val.Measurement)
 				}
 			}
+
 		}
 	}
 
@@ -148,109 +161,82 @@ func (re *Reader) Close() error {
 	return re.Query.Close()
 }
 
-func (re *Reader) GetInstances(instances []Instance) ([]Instance, error) {
-	var newQueries []string
-	counter := "\\Process(w3wp*)\\ID Process"
-	counters, err := re.Query.ExpandWildCardPath(counter)
-	for _, count := range counters {
-		if err := re.Query.AddCounter(count, "", "float", true); err != nil {
-			return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, count)
-		}
-		newQueries = append(newQueries, counter)
-	}
-	err = re.Query.RemoveUnusedCounters(newQueries)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed removing unused counter values")
-	}
-	if err := re.Query.CollectData(); err != nil {
-		return nil, errors.Wrap(err, "failed collecting counter values")
-	}
-	// Get the values.
-	counterValues, err := re.Query.GetFormattedCounterValues()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed retrieving counter formatted values")
-	}
-	for i, instance := range instances {
-		for _, value := range counterValues {
-			for _, counterValue := range value {
-				if instance.ProcessId == int(counterValue.Measurement.(float64)) {
-					instances[i].ProcessName = counterValue.Instance
-				}
-			}
-
-		}
-	}
-	return instances, nil
-}
-
 // getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
 func getApplicationPools(names []string) ([]ApplicationPool, error) {
+	processes, err := getw3wpProceses()
+	if err != nil {
+		return nil, err
+	}
+	var appPools = make(map[string][]int)
+	for key, value := range processes {
+		appPools[value] = append(appPools[value], key)
+		//if _, ok:= applicationPools[value]; ok {
+		//	applicationPools[value] = append(applicationPools[value], key)
+		//}
+	}
+	var applicationPools []ApplicationPool
+	for key, value := range appPools {
+		applicationPools = append(applicationPools, ApplicationPool{Name: key, WorkerProcessIds: value})
+	}
+
+	if len(names) == 0 {
+		return applicationPools, nil
+	}
+	var filtered []ApplicationPool
+	for _, n := range names {
+		for _, w3 := range applicationPools {
+			if n == w3.Name {
+				filtered = append(filtered, w3)
+			}
+		}
+	}
+	return filtered, nil
+}
+
+func getw3wpProceses() (map[int]string, error) {
 	processes, err := sysinfo.Processes()
 	if err != nil {
 		return nil, err
 	}
-	var w3processes []ApplicationPool
+	wps := make(map[int]string)
 	for _, p := range processes {
 		info, err := p.Info()
 		if err != nil {
 			continue
 		}
 		if info.Name == "w3wp.exe" {
-			var app string
 			if len(info.Args) > 0 {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
-						app = info.Args[i+1]
+						wps[info.PID] = info.Args[i+1]
 						continue
 					}
 				}
 			}
-
-			w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
 		}
 	}
-	if len(names) == 0 {
-		return instanceReader.GetInstances(w3processes)
-	}
-	var filtered []iis.Instance
-	for _, n := range names {
-		for _, w3 := range w3processes {
-			if n == w3.Name {
-				filtered = append(filtered, w3)
-			}
-		}
-	}
-	return instanceReader.GetInstances(filtered)
+	return wps, nil
 }
 
-func addAppPool(info types.ProcessInfo, appPools *[]ApplicationPool){
-	if info.Name == "w3wp.exe" {
-		var app string
-		if len(info.Args) > 0 {
-			for i, ar := range info.Args {
-				if ar == "-ap" && len(info.Args) > i+1 {
-					app = info.Args[i+1]
-					continue
+func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess {
+	var workers []WorkerProcess
+	for key, values := range counterValues {
+		if strings.Contains(key, "\\ID Process") {
+			workers = append(workers, WorkerProcess{InstanceName: values[0].Instance, ProcessId: int(values[0].Measurement.(float64))})
+		}
+	}
+	return workers
+}
+
+func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool {
+	for _, worker := range workers {
+		if worker.InstanceName == instance {
+			for _, pid := range pids {
+				if pid == worker.ProcessId {
+					return true
 				}
 			}
 		}
-for i, app:= range appPools {
-	appPools[i].Name == app {
-
 	}
+	return false
 }
-		w3processes = append(w3processes, iis.Instance{ProcessId: info.PID, Name: app})
-	}
-}
-
-func hasApp(appName string, appPools []ApplicationPool) bool {
-	for _, app:= range appPools {
-		if app.Name == appName{
-return true
-
-		}
-		return false
-	}
-
-}
-
