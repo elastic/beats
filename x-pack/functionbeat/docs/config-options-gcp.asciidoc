@@ -10,9 +10,8 @@ beta[]
 
 {beatname_uc} runs as a Google Function on Google Cloud Platform (GCP).
 
-Before deploying {beatname_uc} to Google Cloud Platform, you need to
-configure one or more functions and specify details about the services that will
-trigger the functions.
+Before deploying {beatname_uc}, you need to configure one or more functions and
+specify details about the services that will trigger the functions.
 
 You configure the functions in the the +{beatname_lc}.yml+ configuration file.
 When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
@@ -45,8 +44,8 @@ functionbeat.provider.gcp.functions:
       resource: "projects/my-project/buckets/my-storage"
       event_type: "google.storage.object.finalize"
 
-cloud.id: "MyESDeployment:SomeLongString"
-cloud.auth: "myusername:mypassword"
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:mypassword"
 ----
 
 [id="{beatname_lc}-gcp-options"]
@@ -68,20 +67,22 @@ The region where your GCP project is located.
 [id="{beatname_lc}-gcp-project_id"]
 ==== `provider.gcp.project_id`
 
-The ID of the GCP project to which you're deploying the function artifacts.
+The ID of the GCP project where the function artifacts will be deployed. See the
+https://cloud.google.com/about/locations/[Google Cloud Function documentation]
+to verify that Cloud Functions are supported in the region you specify.
 
 [float]
 [id="{beatname_lc}-gcp-storage_name"]
 ==== `provider.gcp.storage_name`
 
-The name of the GCP storage bucket to which you're deploying the function
-artifacts.
+The name of the Google Cloud storage bucket where the function artifacts will be
+deployed. If the bucket doesn't exist, it will be created, if you have the
+correct project permissions (`storage.objects.create`).
 
 [float]
 [id="{beatname_lc}-gcp-functions"]
 ==== `functionbeat.provider.gcp.functions`
-A list of functions that are available for deployment. Each function must have
-a unique name.
+A list of functions that are available for deployment.
 
 [float]
 [id="{beatname_lc}-gcp-name"]
@@ -97,8 +98,8 @@ The type of GCP service to monitor. For this release, the supported types
 are:
 
 [horizontal]
-`pubsub`:: Collects log events from Google Cloud Platform.
-`storage`:: Collects log events for Google Cloud storage. 
+`pubsub`:: Collect log events from Google Pub/Sub.
+`storage`:: Collect log events from Google Cloud storage buckets. 
 
 [float]
 [id="{beatname_lc}-gcp-description"]
@@ -119,27 +120,34 @@ The default is `256MB`.
 ==== `timeout`
 
 The execution timeout in seconds. If the function does not finish in time,
-it is considered failed and terminated. The default is `60s`.
+it is considered failed and terminated. The default is `60s`. Increase this
+value if you see timeout messages is the Google Stackdriver logs.
+
+// REVIEWERS: I had to change the timeout manually for pubsub and storage.
+// I wonder why we don't set a longer timeout by default.
 
 [float]
 [id="{beatname_lc}-gcp-service_account_email"]
 ==== `service_account_email`
-The email of service account for the function. The default is
-{projectid}@appspot.gserviceaccount.com.email of the 
+
+The email of the service account that the function will assume as its identity.
+The default is {projectid}@appspot.gserviceaccount.com.email.
 
 [float]
 [id="{beatname_lc}-gcp-labels"]
 ==== `labels`
-One or more labels to apply to the function.
+
+One or more labels to apply to the function. A label is a key-value pair that
+helps you organize your Google Cloud resources.
 
 [float]
 [id="{beatname_lc}-gcp-vpc_connector"]
 ==== `vpc_connector`
-The VPC connector to which the function can connect.
 
-//REVIEWERS: Wondering if this should actually be called a VCP Access connector?
+A VPC connector that the function can connect to when sending requests to
+resources in your VPC network.
 
-The format can be `projects/*/locations/*/connectors/*` or a fully qualified
+Use the format `projects/*/locations/*/connectors/*` or a fully qualified
 URI.
 
 [float]
@@ -149,22 +157,29 @@ URI.
 The maximum instances that can be running at the same time. The default is
 unlimited.
 
-//REVIEWERS: Does 0 set this to unlimited?
+//REVIEWERS: Does 0 mean unlimited?
 
 [float]
 [id="{beatname_lc}-gcp-triggers"]
 ===== `trigger`
 
-The trigger that will cause the function to execute. Specify `resource` and
-optionally the `service` API, where:
+The trigger that will cause the function to execute.
 
-[horizontal]
-resource:: The name of the Cloud Storage bucket that the function watches
-for events.
-service:: The service API. The default is `pubsub.googleapis.com`.
+* If `type` is `pubsub`, specify the name of the Pub/Sub topic to watch for
+messages.
 
-// TODO: Test this. Not sure what we mean by service here. There is no
-// description in the YAML files. 
+// REVIEWERS: When would you change `trigger.service`? Sorry I'm not very
+// familiar with pub/sub.
+
+* If `type` is `storage`, specify the Cloud Storage bucket to watch for object
+events. For `event_type`, specify the type of object event that will trigger the
+function. See the https://cloud.google.com/functions/docs/calling/storage[Google Cloud
+docs] for a list of available event types.
+
+// REVIEWERS: Do we want to link to the google docs as I have here, or provide a
+// list of supported event types? Currently the google docs list:
+// google.storage.object.finalize, google.storage.object.delete, 
+// google.storage.object.archive, and google.storage.object.metadataUpdate
 
 [float]
 [id="{beatname_lc}-gcp-keep_null"]

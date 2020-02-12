@@ -34,6 +34,20 @@ If you don't want to use the {beatname_uc} manager, use your own deployment
 infrastructure. To do this, create a package, then deploy it to your cloud
 provider:
 
+//Questions:
+//
+// -  Have the following steps changed for deploying AWS Lambda functions, or
+//    can users still enable and export specific functions?
+//
+// -  PR #13598 says, "Make sure all three zip files are generated and
+//    the --output flag is applied correctly." Please clarify with an example.
+//
+//    I can run the package command a few different ways and get unexpected
+//    results. I wanted to also try deploying with Google Cloud Deployment
+//    manager and didn't have much success.
+
+
+
 . Set the following environment variables:
 +
 `BEAT_STRICT_PERMS=false`:: This setting makes the function skip the ownership
