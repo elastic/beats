@@ -22,7 +22,7 @@ SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
-MAGE_IMPORT_PATH?=github.com/elastic/beats/vendor/github.com/magefile/mage
+MAGE_IMPORT_PATH?=github.com/magefile/mage
 export MAGE_IMPORT_PATH
 
 space:=$() #
@@ -59,8 +59,8 @@ PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
 PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
 COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
-COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
-TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
+COVERAGE_TOOL_REPO?=github.com/pierrre/gotestcover
+TESTIFY_TOOL_REPO?=github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
@@ -154,7 +154,7 @@ endif
 
 .PHONY: fmt
 fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@go get $(GOIMPORTS_REPO)
+	@go install -mod=vendor $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name '*.py' -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
@@ -182,9 +182,9 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go get ${COVERAGE_TOOL_REPO}
+	go install -mod=vendor ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
-	go get ${TESTIFY_TOOL_REPO}
+	go install -mod=vendor ${TESTIFY_TOOL_REPO}
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
@@ -214,6 +214,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
 	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  -e GOFLAGS=-mod=vendor \
 	  beat make integration-tests
 
 # Runs the system tests
@@ -227,7 +228,12 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env
 .PHONY: system-tests-environment
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	${DOCKER_COMPOSE} run \
+		-e INTEGRATION_TESTS=1 \
+		-e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} \
+		-e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
+		-e GOFLAGS=-mod=vendor \
+		beat make system-tests
 
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
@@ -439,7 +445,7 @@ help_variables: ## @help Show Makefile customizable variables.
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
-	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@go install -mod=vendor github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
 	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
@@ -469,3 +475,7 @@ ifdef NO_COLLECT
 .PHONY: collect
 collect:
 endif
+
+.PHONY: vendor
+vendor:
+	@mage vendor

@@ -32,7 +32,7 @@ import (
 
 var (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
@@ -64,7 +64,10 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if err := sh.Run("go", "get", GoImportsImportPath); err != nil {
+	if err := gotool.Install(
+		gotool.Install.Vendored(),
+		gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+	); err != nil {
 		return err
 	}
 
