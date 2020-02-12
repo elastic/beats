@@ -78,3 +78,129 @@
         - name: created
           type: date
           description: Creation time and date
+    - name: pgmap
+      type: group
+      description: >
+        `pgmap` contains information about placement groups.
+      fields:
+        - name: num_pgs
+          type: long
+          description: Number of PGs
+        - name: bytes_avail
+          type: long
+          description: Available bytes
+        - name: read_bytes_sec
+          type: long
+          description: Average number of bytes read per second
+        - name: write_bytes_sec
+          type: long
+          description: Average number of bytes written per second
+        - name: bytes_used
+          type: long
+          description: Used bytes
+        - name: bytes_total
+          type: long
+          description: Total bytes
+        - name: read_op_per_sec
+          type: long
+          description: Read operations per second
+        - name: write_op_per_sec
+          type: long
+          description: Write operations per second
+        - name: pgs_by_state
+          type: group
+          description: >
+            `pgs_by_state` contains information about PGs' states.
+          fields:
+            - name: state_name
+              type: keyword
+              description: State name
+            - name: count
+              type: long
+              description: Count
+        - name: num_pools
+          type: long
+          description: Number of pools
+        - name: num_objects
+          type: long
+          description: Number of objects
+        - name: data_bytes
+          type: long
+          description: Data bytes
+    - name: health
+      type: group
+      description: >
+        `health` contains general information about cluster status.
+      fields:
+        - name: status
+          type: keyword
+          description: Health status
+    - name: election_epoch
+      type: long
+      description: Election epoch
+    - name: quorum
+      type: long
+      description: Quorum ID
+    - name: quorum_names
+      type: keyword
+      description: Quorum names
+    - name: osdmap
+      type: group
+      description: >
+        `osdmap` contains information about OSDs.
+      fields:
+        - name: epoch
+          type: long
+          description: Epoch version
+        - name: num_osds
+          type: long
+          description: Number of OSDs
+        - name: num_up_osds
+          type: long
+          description: Number of up OSDs
+        - name: num_in_osds
+          type: long
+          description: Number of in OSDs
+        - name: num_remapped_pgs
+          type: long
+          description: Number of remapped OSDs
+    - name: fsmap
+      type: group
+      description: >
+        `fsmap` contains information about file systems.
+      fields:
+        - name: in
+          type: long
+          description: File system in
+        - name: max
+          type: long
+          description: File system max
+        - name: up:standby
+          type: long
+          description: File system up:standby
+        - name: epoch
+          type: long
+          description: Epoch version
+        - name: up
+          type: long
+          description: File system up
+        - name: by_rank
+          type: group
+          description: >
+            `by_rank` contains information about file systems sorted by rank.
+          fields:
+            - name: filesystem_id
+              type: long
+              description: File system ID
+            - name: rank
+              type: long
+              description: File system rank
+            - name: name
+              type: keyword
+              description: File system name
+            - name: status
+              type: keyword
+              description: File system status
+            - name: gid
+              type: long
+              description: File system GID

@@ -4289,6 +4289,336 @@ type: date
 --
 
 [float]
+=== pgmap
+
+`pgmap` contains information about placement groups.
+
+
+
+*`ceph.mgr_cluster_health.pgmap.num_pgs`*::
++
+--
+Number of PGs
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.bytes_avail`*::
++
+--
+Available bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.read_bytes_sec`*::
++
+--
+Average number of bytes read per second
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.write_bytes_sec`*::
++
+--
+Average number of bytes written per second
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.bytes_used`*::
++
+--
+Used bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.bytes_total`*::
++
+--
+Total bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.read_op_per_sec`*::
++
+--
+Read operations per second
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.write_op_per_sec`*::
++
+--
+Write operations per second
+
+type: long
+
+--
+
+[float]
+=== pgs_by_state
+
+`pgs_by_state` contains information about PGs' states.
+
+
+
+*`ceph.mgr_cluster_health.pgmap.pgs_by_state.state_name`*::
++
+--
+State name
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.pgs_by_state.count`*::
++
+--
+Count
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.num_pools`*::
++
+--
+Number of pools
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.num_objects`*::
++
+--
+Number of objects
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.pgmap.data_bytes`*::
++
+--
+Data bytes
+
+type: long
+
+--
+
+[float]
+=== health
+
+`health` contains general information about cluster status.
+
+
+
+*`ceph.mgr_cluster_health.health.status`*::
++
+--
+Health status
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.election_epoch`*::
++
+--
+Election epoch
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.quorum`*::
++
+--
+Quorum ID
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.quorum_names`*::
++
+--
+Quorum names
+
+type: keyword
+
+--
+
+[float]
+=== osdmap
+
+`osdmap` contains information about OSDs.
+
+
+
+*`ceph.mgr_cluster_health.osdmap.epoch`*::
++
+--
+Epoch version
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.osdmap.num_osds`*::
++
+--
+Number of OSDs
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.osdmap.num_up_osds`*::
++
+--
+Number of up OSDs
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.osdmap.num_in_osds`*::
++
+--
+Number of in OSDs
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.osdmap.num_remapped_pgs`*::
++
+--
+Number of remapped OSDs
+
+type: long
+
+--
+
+[float]
+=== fsmap
+
+`fsmap` contains information about file systems.
+
+
+
+*`ceph.mgr_cluster_health.fsmap.in`*::
++
+--
+File system in
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.max`*::
++
+--
+File system max
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.up:standby`*::
++
+--
+File system up:standby
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.epoch`*::
++
+--
+Epoch version
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.up`*::
++
+--
+File system up
+
+type: long
+
+--
+
+[float]
+=== by_rank
+
+`by_rank` contains information about file systems sorted by rank.
+
+
+
+*`ceph.mgr_cluster_health.fsmap.by_rank.filesystem_id`*::
++
+--
+File system ID
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.by_rank.rank`*::
++
+--
+File system rank
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.by_rank.name`*::
++
+--
+File system name
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.by_rank.status`*::
++
+--
+File system status
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.fsmap.by_rank.gid`*::
++
+--
+File system GID
+
+type: long
+
+--
+
+[float]
 === mgr_osd_disk
 
 OSD disk metrics of Ceph cluster
