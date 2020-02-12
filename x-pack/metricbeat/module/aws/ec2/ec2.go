@@ -11,13 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -91,6 +91,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
+
+		// check if endpoint is given from configuration
+		if m.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + m.Endpoint)
+		}
+
 		svcEC2 := ec2.New(awsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
@@ -98,6 +104,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.Logger().Errorf(err.Error())
 			report.Error(err)
 			continue
+		}
+
+		// check if endpoint is given from configuration
+		if m.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + m.Endpoint)
 		}
 
 		svcCloudwatch := cloudwatch.New(awsConfig)

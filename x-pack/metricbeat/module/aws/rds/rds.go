@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -82,6 +82,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
+
+		// check if endpoint is given from configuration
+		if m.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://rds." + m.Endpoint)
+		}
+
 		svc := rds.New(awsConfig)
 		// Get DBInstance IDs per region
 		dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
@@ -94,6 +100,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		if len(dbInstanceIDs) == 0 {
 			continue
+		}
+
+		// check if endpoint is given from configuration
+		if m.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + m.Endpoint)
 		}
 
 		svcCloudwatch := cloudwatch.New(awsConfig)

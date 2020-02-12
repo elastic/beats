@@ -18,6 +18,7 @@ type ConfigAWS struct {
 	ProfileName          string `config:"credential_profile_name"`
 	SharedCredentialFile string `config:"shared_credential_file"`
 	Endpoint             string `config:"endpoint"`
+	EndpointRegion       string `config:"endpoint_region"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.

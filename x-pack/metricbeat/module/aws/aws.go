@@ -32,6 +32,7 @@ type Config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	RegionsList []string
+	Endpoint    string
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
 	AccountName string
@@ -86,6 +87,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account name
+	// check if endpoint is given from configuration
+	if config.AWSConfig.Endpoint != "" {
+		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://iam." + config.AWSConfig.Endpoint)
+	}
+
+	awsConfig.Region = "us-east-1"
 	svcIam := iam.New(awsConfig)
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
@@ -100,6 +107,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account id
+	// check if endpoint is given from configuration
+	if config.AWSConfig.Endpoint != "" {
+		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://sts." + config.AWSConfig.Endpoint)
+	}
 	svcSts := sts.New(awsConfig)
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
@@ -107,6 +118,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	} else {
 		metricSet.AccountID = *outputIdentity.Account
+	}
+
+	// Construct MetricSet when endpoint is given
+	// When endpoint is given, use endpoint_region as RegionsList.
+	if config.AWSConfig.Endpoint != "" {
+		// When use an endpoint with no Region, AWS routes the request to US East
+		// (N. Virginia) (us-east-1), which is the default Region for API calls.
+		metricSet.RegionsList = []string{"us-east-1"}
+		if config.AWSConfig.EndpointRegion != "" {
+			metricSet.RegionsList = []string{config.AWSConfig.EndpointRegion}
+		}
+
+		return &metricSet, nil
 	}
 
 	// Construct MetricSet with a full regions list
