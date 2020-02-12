@@ -75,8 +75,11 @@ func (r *Poller) Run(item Transaction) error {
 	}
 	return nil
 }
-
 func (r *Poller) fetch(item Transaction) error {
+	return r.fetchWithDelay(item, r.interval)
+}
+
+func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error {
 	r.log.Debugf("* Fetch %s", item)
 	// The order here is important. item's decorators must come first as those
 	// set the URL, which is required by other decorators (WithQueryParameters).
@@ -94,17 +97,15 @@ func (r *Poller) fetch(item Transaction) error {
 	if err != nil {
 		return errors.Wrap(err, "failed preparing request")
 	}
-	delay := item.Delay()
-	if delay < r.interval {
-		delay = r.interval
-	}
+	delay := max(item.Delay(), minDelay)
 	r.log.Debugf(" -- wait %s for %s", delay, request.URL.String())
 
 	response, err := autorest.Send(request,
 		autorest.DoCloseIfError(),
 		autorest.AfterDelay(delay))
 	if err != nil {
-		return errors.Wrap(err, "failed sending request")
+		r.log.Warnf("-- error sending request: %v", err)
+		return r.fetchWithDelay(item, max(time.Minute, r.interval))
 	}
 
 	acts := item.OnResponse(response)
@@ -256,4 +257,11 @@ func RenewToken() Action {
 	return func(q Enqueuer) error {
 		return q.RenewToken()
 	}
+}
+
+func max(a, b time.Duration) time.Duration {
+	if a < b {
+		return b
+	}
+	return a
 }

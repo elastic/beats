@@ -188,7 +188,7 @@ func (inp *o365input) runPoller(poller *poll.Poller, start cursor) {
 			action = action.WithStartTime(start.startTime)
 		}
 		if err := poller.Run(action); err != nil {
-			inp.log.Errorf("API request failed with error: %v", err.Error())
+			ctx.Logger.Errorf("API polling terminated with error: %v", err.Error())
 			msg := common.MapStr{}
 			msg.Put("error.message", err.Error())
 			event := beat.Event{
