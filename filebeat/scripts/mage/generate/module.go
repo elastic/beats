@@ -15,32 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package generate
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/filebeat/generator/module"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	genmod "github.com/elastic/beats/filebeat/generator/module"
 )
 
-func main() {
-	moduleName := flag.String("module", "", "Name of the module")
-	modulePath := flag.String("path", ".", "Path to the generated fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	flag.Parse()
-
-	if *moduleName == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
+// Module creates a new Filebeat module.
+// Use MODULE=module to specify the name of the new module
+func Module() error {
+	targetModule := os.Getenv("MODULE")
+	if targetModule == "" {
+		return fmt.Errorf("you must specify the module: MODULE=name mage generate:module")
 	}
 
-	err := module.Generate(*moduleName, *modulePath, *beatsPath)
-	if err != nil {
-		fmt.Printf("Cannot generate module: %v\n", err)
-		os.Exit(2)
-	}
+	ossDir := devtools.OSSBeatDir()
+	xPackDir := devtools.XPackBeatDir()
 
-	fmt.Println("New module was generated, now you can start creating filesets by create-fileset command.")
+	switch devtools.CWD() {
+	case ossDir:
+		return genmod.Generate(targetModule, ossDir, ossDir)
+	case xPackDir:
+		return genmod.Generate(targetModule, xPackDir, ossDir)
+	default:
+		return fmt.Errorf("you must be in a filebeat directory")
+	}
 }
