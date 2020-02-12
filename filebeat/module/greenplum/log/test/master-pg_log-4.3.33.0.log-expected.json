@@ -1,308 +1,287 @@
 [
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "transaction_id": "0",
-      "process_id": "p713507",
-      "cursor_position": "0",
-      "stack": "",
-      "debug": "",
-      "level": "LOG",
-      "query": "",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "connection received: host=[local]",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "thread_id": "2019006592",
-      "file": {
-        "name": "postmaster.c",
-        "line": "6841"
-      },
-      "hint": "",
-      "context": "",
-      "detail": "",
-      "state_code": "00000",
-      "timestamp": "2020-01-29 00:00:01.606881 UTC"
+    {
+        "@timestamp": "2020-01-29T00:00:01.606Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.debug": "",
+        "greenplum.log.detail": "",
+        "greenplum.log.file.line": "6841",
+        "greenplum.log.file.name": "postmaster.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.message": "connection received: host=[local]",
+        "greenplum.log.process_id": "p713507",
+        "greenplum.log.query": "",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.606881 UTC",
+        "greenplum.log.transaction_id": "0",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.607Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "postgres",
+        "greenplum.log.debug": "",
+        "greenplum.log.detail": "",
+        "greenplum.log.file.line": "6900",
+        "greenplum.log.file.name": "postmaster.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.message": "connection authorized: user=gpadmin database=postgres",
+        "greenplum.log.process_id": "p713507",
+        "greenplum.log.query": "",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.607028 UTC",
+        "greenplum.log.transaction_id": "0",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 175,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.613Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "postgres",
+        "greenplum.log.debug": "",
+        "greenplum.log.detail": "",
+        "greenplum.log.file.line": "265",
+        "greenplum.log.file.name": "postinit.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682061",
+        "greenplum.log.message": "connection authorized: user=gpadmin database=postgres",
+        "greenplum.log.process_id": "p713507",
+        "greenplum.log.query": "",
+        "greenplum.log.session_id": "con408754",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.613414 UTC",
+        "greenplum.log.transaction_id": "190682061",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 398,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.616Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "1",
+        "greenplum.log.context": "\"select datname from pg_database where datname not in ('postgres', 'template0'",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "postgres",
+        "greenplum.log.debug": " 'template1');\"",
+        "greenplum.log.detail": ",",
+        "greenplum.log.distributed_transaction_id": "dx889919",
+        "greenplum.log.file.line": "1632",
+        "greenplum.log.file.name": "postgres.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682062",
+        "greenplum.log.message": "statement: select datname from pg_database where datname not in ('postgres', 'template0', 'template1');",
+        "greenplum.log.process_id": "p713507",
+        "greenplum.log.query": "",
+        "greenplum.log.session_id": "con408754",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.616552 UTC",
+        "greenplum.log.transaction_id": "190682062",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 648,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.640Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "1",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "dq_data_model",
+        "greenplum.log.debug": "\"select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';\"",
+        "greenplum.log.detail": "",
+        "greenplum.log.distributed_transaction_id": "dx889920",
+        "greenplum.log.file.line": "1632",
+        "greenplum.log.file.name": "postgres.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682065",
+        "greenplum.log.message": "statement: select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",
+        "greenplum.log.process_id": "p713944",
+        "greenplum.log.query": "",
+        "greenplum.log.session_id": "con408755",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.640393 UTC",
+        "greenplum.log.transaction_id": "190682065",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 1055,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.640Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "1",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "vds_prd",
+        "greenplum.log.debug": "\"select version()\"",
+        "greenplum.log.detail": "",
+        "greenplum.log.distributed_transaction_id": "dx889921",
+        "greenplum.log.file.line": "1632",
+        "greenplum.log.file.name": "postgres.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682066",
+        "greenplum.log.message": "statement: select version()",
+        "greenplum.log.process_id": "p713961",
+        "greenplum.log.query": "",
+        "greenplum.log.session_id": "con408756",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.640757 UTC",
+        "greenplum.log.transaction_id": "190682066",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 1449,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.650Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "1",
+        "greenplum.log.context": "",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "vds_prd",
+        "greenplum.log.debug": "\"select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;\"",
+        "greenplum.log.detail": "",
+        "greenplum.log.distributed_transaction_id": "dx889922",
+        "greenplum.log.file.line": "1632",
+        "greenplum.log.file.name": "postgres.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682070",
+        "greenplum.log.message": "statement: select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",
+        "greenplum.log.process_id": "p714144",
+        "greenplum.log.query": "",
+        "greenplum.log.session_id": "con408757",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.650141 UTC",
+        "greenplum.log.transaction_id": "190682070",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.offset": 1703,
+        "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-29T00:00:01.653Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "1",
+        "greenplum.log.context": "3\norder by 1,2",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "vds_prd",
+        "greenplum.log.debug": "3\n\"",
+        "greenplum.log.detail": ",,,,,\"\nSELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,\n    string_agg(l_procpid,',') as l_pids,\n    string_agg(l_usename,',') as l_users,\n    string_agg('con' || l_sess_id,',') as l_conns,\n    string_agg(l_table) as tables\nfrom\n    (\n    select w.procpid, w.usename,w.sess_id,\n        l.procpid as l_procpid,\n        l.usename as l_usename,\n        l.sess_id as l_sess_id,\n        t.schemaname || '.' || t.relname as l_table\n    from pg_stat_activity w\n    join pg_locks l1 on w.procpid = l1.pid and not l1.granted\n    join pg_locks l2 on l1.relation = l2.relation and l2.granted\n    join pg_stat_activity l on l2.pid = l.procpid\n    join pg_stat_user_tables t on l1.relation = t.relid\n    where w.waiting\n    and w.usename in ('yotta_prd','gpadmin')\n    and w.procpid <> l.procpid\n    group by\n        1,2,3,4,5",
+        "greenplum.log.distributed_transaction_id": "dx889924",
+        "greenplum.log.file.line": "1632",
+        "greenplum.log.file.name": "postgres.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.hint": "6",
+        "greenplum.log.host": "[local]",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.local_transaction_id": "x190682072",
+        "greenplum.log.message": "statement: \nSELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,\n    string_agg(l_procpid,',') as l_pids,\n    string_agg(l_usename,',') as l_users,\n    string_agg('con' || l_sess_id,',') as l_conns,\n    string_agg(l_table) as tables\nfrom\n    (\n    select w.procpid, w.usename,w.sess_id,\n        l.procpid as l_procpid,\n        l.usename as l_usename,\n        l.sess_id as l_sess_id,\n        t.schemaname || '.' || t.relname as l_table\n    from pg_stat_activity w\n    join pg_locks l1 on w.procpid = l1.pid and not l1.granted\n    join pg_locks l2 on l1.relation = l2.relation and l2.granted\n    join pg_stat_activity l on l2.pid = l.procpid\n    join pg_stat_user_tables t on l1.relation = t.relid\n    where w.waiting\n    and w.usename in ('yotta_prd','gpadmin')\n    and w.procpid <> l.procpid\n    group by\n        1,2,3,4,5,6,7\n    )xxx\ngroup by 1,2,3\norder by 1,2,3",
+        "greenplum.log.process_id": "p714201",
+        "greenplum.log.query": "7\n    )xxx\ngroup by 1",
+        "greenplum.log.query_position": "2",
+        "greenplum.log.session_id": "con408759",
+        "greenplum.log.session_start": "2020-01-29 00:00:01 UTC",
+        "greenplum.log.stack": "\n",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "2019006592",
+        "greenplum.log.timestamp": "2020-01-29 00:00:01.653023 UTC",
+        "greenplum.log.transaction_id": "190682072",
+        "greenplum.log.user": "gpadmin",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2215,
+        "service.type": "greenplum"
     }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "transaction_id": "0",
-      "process_id": "p713507",
-      "cursor_position": "0",
-      "stack": "",
-      "debug": "",
-      "level": "LOG",
-      "query": "",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "connection authorized: user=gpadmin database=postgres",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "thread_id": "2019006592",
-      "database": "postgres",
-      "file": {
-        "name": "postmaster.c",
-        "line": "6900"
-      },
-      "hint": "",
-      "host": "[local]",
-      "context": "",
-      "detail": "",
-      "state_code": "00000",
-      "user": "gpadmin",
-      "timestamp": "2020-01-29 00:00:01.607028 UTC"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "transaction_id": "190682061",
-      "process_id": "p713507",
-      "cursor_position": "0",
-      "stack": "",
-      "debug": "",
-      "level": "LOG",
-      "query": "",
-      "subtransaction_id": "sx1",
-      "session_id": "con408754",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "connection authorized: user=gpadmin database=postgres",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682061",
-      "thread_id": "2019006592",
-      "database": "postgres",
-      "file": {
-        "name": "postinit.c",
-        "line": "265"
-      },
-      "hint": "",
-      "host": "[local]",
-      "context": "",
-      "detail": "",
-      "state_code": "00000",
-      "user": "gpadmin",
-      "timestamp": "2020-01-29 00:00:01.613414 UTC"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "process_id": "p713507",
-      "cursor_position": "0",
-      "stack": "",
-      "distributed_transaction_id": "dx889919",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682062",
-      "thread_id": "2019006592",
-      "database": "postgres",
-      "file": {
-        "name": "postgres.c",
-        "line": "1632"
-      },
-      "host": "[local]",
-      "context": "\"select datname from pg_database where datname not in ('postgres', 'template0'",
-      "timestamp": "2020-01-29 00:00:01.616552 UTC",
-      "transaction_id": "190682062",
-      "command_count": "1",
-      "debug": " 'template1');\"",
-      "level": "LOG",
-      "query": "",
-      "subtransaction_id": "sx1",
-      "session_id": "con408754",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "statement: select datname from pg_database where datname not in ('postgres', 'template0', 'template1');",
-      "hint": "",
-      "detail": ",",
-      "state_code": "00000",
-      "user": "gpadmin"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "process_id": "p713944",
-      "cursor_position": "0",
-      "stack": "\n",
-      "distributed_transaction_id": "dx889920",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682065",
-      "thread_id": "2019006592",
-      "database": "dq_data_model",
-      "file": {
-        "name": "postgres.c",
-        "line": "1632"
-      },
-      "host": "[local]",
-      "context": "",
-      "timestamp": "2020-01-29 00:00:01.640393 UTC",
-      "transaction_id": "190682065",
-      "command_count": "1",
-      "debug": "\"select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';\"",
-      "level": "LOG",
-      "query": "",
-      "subtransaction_id": "sx1",
-      "session_id": "con408755",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "statement: select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",
-      "hint": "",
-      "detail": "",
-      "state_code": "00000",
-      "user": "gpadmin"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "process_id": "p713961",
-      "cursor_position": "0",
-      "stack": "\n",
-      "distributed_transaction_id": "dx889921",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682066",
-      "thread_id": "2019006592",
-      "database": "vds_prd",
-      "file": {
-        "name": "postgres.c",
-        "line": "1632"
-      },
-      "host": "[local]",
-      "context": "",
-      "timestamp": "2020-01-29 00:00:01.640757 UTC",
-      "transaction_id": "190682066",
-      "command_count": "1",
-      "debug": "\"select version()\"",
-      "level": "LOG",
-      "query": "",
-      "subtransaction_id": "sx1",
-      "session_id": "con408756",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "statement: select version()",
-      "hint": "",
-      "detail": "",
-      "state_code": "00000",
-      "user": "gpadmin"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "process_id": "p714144",
-      "cursor_position": "0",
-      "stack": "\n",
-      "distributed_transaction_id": "dx889922",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682070",
-      "thread_id": "2019006592",
-      "database": "vds_prd",
-      "file": {
-        "name": "postgres.c",
-        "line": "1632"
-      },
-      "host": "[local]",
-      "context": "",
-      "timestamp": "2020-01-29 00:00:01.650141 UTC",
-      "transaction_id": "190682070",
-      "command_count": "1",
-      "debug": "\"select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;\"",
-      "level": "LOG",
-      "query": "",
-      "subtransaction_id": "sx1",
-      "session_id": "con408757",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "statement: select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",
-      "hint": "",
-      "detail": "",
-      "state_code": "00000",
-      "user": "gpadmin"
-    }
-  }
-},
-{
-  "event": {
-    "timezone": "UTC"
-  },
-  "greenplum": {
-    "log": {
-      "process_id": "p714201",
-      "cursor_position": "0",
-      "stack": "",
-      "distributed_transaction_id": "dx889924",
-      "session_start": "2020-01-29 00:00:01 UTC",
-      "local_transaction_id": "x190682072",
-      "thread_id": "2019006592",
-      "database": "vds_prd",
-      "file": {
-        "name": "postgres.c",
-        "line": "1632"
-      },
-      "host": "[local]",
-      "context": "3\norder by 1,2",
-      "timestamp": "2020-01-29 00:00:01.653023 UTC",
-      "transaction_id": "190682072",
-      "command_count": "1",
-      "debug": "3\n\"",
-      "query_position": "2",
-      "level": "LOG",
-      "query": "7\n    )xxx\ngroup by 1",
-      "subtransaction_id": "sx1",
-      "session_id": "con408759",
-      "gp_segment": {
-        "type": "seg",
-        "id": "1"
-      },
-      "message": "statement: \nSELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,\n    string_agg(l_procpid,',') as l_pids,\n    string_agg(l_usename,',') as l_users,\n    string_agg('con' || l_sess_id,',') as l_conns,\n    string_agg(l_table) as tables\nfrom\n    (\n    select w.procpid, w.usename,w.sess_id,\n        l.procpid as l_procpid,\n        l.usename as l_usename,\n        l.sess_id as l_sess_id,\n        t.schemaname || '.' || t.relname as l_table\n    from pg_stat_activity w\n    join pg_locks l1 on w.procpid = l1.pid and not l1.granted\n    join pg_locks l2 on l1.relation = l2.relation and l2.granted\n    join pg_stat_activity l on l2.pid = l.procpid\n    join pg_stat_user_tables t on l1.relation = t.relid\n    where w.waiting\n    and w.usename in ('yotta_prd','gpadmin')\n    and w.procpid <> l.procpid\n    group by\n        1,2,3,4,5,6,7\n    )xxx\ngroup by 1,2,3\norder by 1,2,3",
-      "hint": "6",
-      "detail": ",,,,,\"\nSELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,\n    string_agg(l_procpid,',') as l_pids,\n    string_agg(l_usename,',') as l_users,\n    string_agg('con' || l_sess_id,',') as l_conns,\n    string_agg(l_table) as tables\nfrom\n    (\n    select w.procpid, w.usename,w.sess_id,\n        l.procpid as l_procpid,\n        l.usename as l_usename,\n        l.sess_id as l_sess_id,\n        t.schemaname || '.' || t.relname as l_table\n    from pg_stat_activity w\n    join pg_locks l1 on w.procpid = l1.pid and not l1.granted\n    join pg_locks l2 on l1.relation = l2.relation and l2.granted\n    join pg_stat_activity l on l2.pid = l.procpid\n    join pg_stat_user_tables t on l1.relation = t.relid\n    where w.waiting\n    and w.usename in ('yotta_prd','gpadmin')\n    and w.procpid <> l.procpid\n    group by\n        1,2,3,4,5",
-      "state_code": "00000",
-      "user": "gpadmin"
-    }
-  }
-}
 ]
