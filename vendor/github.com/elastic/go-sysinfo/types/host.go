@@ -26,6 +26,34 @@ type Host interface {
 	Memory() (*HostMemoryInfo, error)
 }
 
+// NetworkCounters represents network stats from /proc/net
+type NetworkCounters interface {
+	NetworkCounters() (*NetworkCountersInfo, error)
+}
+
+// SNMP represents the data from /proc/net/snmp
+// Note that according to RFC 2012,TCP.MaxConn, if present, is a signed value and should be cast to int64
+type SNMP struct {
+	IP      map[string]uint64 `json:"ip" netstat:"Ip"`
+	ICMP    map[string]uint64 `json:"icmp" netstat:"Icmp"`
+	ICMPMsg map[string]uint64 `json:"icmp_msg" netstat:"IcmpMsg"`
+	TCP     map[string]uint64 `json:"tcp" netstat:"Tcp"`
+	UDP     map[string]uint64 `json:"udp" netstat:"Udp"`
+	UDPLite map[string]uint64 `json:"udp_lite" netstat:"UdpLite"`
+}
+
+// Netstat represents the data from /proc/net/netstat
+type Netstat struct {
+	TCPExt map[string]uint64 `json:"tcp_ext" netstat:"TcpExt"`
+	IPExt  map[string]uint64 `json:"ip_ext" netstat:"IpExt"`
+}
+
+// NetworkCountersInfo represents available network counters from /proc/net
+type NetworkCountersInfo struct {
+	SNMP    SNMP    `json:"snmp"`
+	Netstat Netstat `json:"netstat"`
+}
+
 // VMStat is the interface wrapper for platforms that support /proc/vmstat.
 type VMStat interface {
 	VMStat() (*VMStatInfo, error)

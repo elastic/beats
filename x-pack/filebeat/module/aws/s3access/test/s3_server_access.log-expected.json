@@ -24,7 +24,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 0,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-08-01T00:24:42.000Z",
@@ -51,7 +54,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 715,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-08-01T00:24:43.000Z",
@@ -79,7 +85,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 1429,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-08-01T00:24:43.000Z",
@@ -106,7 +115,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 2161,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-09-10T15:11:07.000Z",
@@ -130,7 +142,10 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 2875,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2019-09-19T17:06:39.000Z",
@@ -154,6 +169,9 @@
         "fileset.name": "s3access",
         "input.type": "log",
         "log.offset": 3280,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     }
 ]

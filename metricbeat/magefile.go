@@ -79,7 +79,13 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithModulesD())
+	return devtools.TestPackages(
+		devtools.WithModulesD(),
+		devtools.WithModules(),
+
+		// To be increased or removed when more light modules are added
+		devtools.MinModules(1),
+	)
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
@@ -115,7 +121,7 @@ func MockedTests(ctx context.Context) error {
 	}
 
 	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")); generate {
-		params.ExtraFlags = append(params.ExtraFlags, "-generate")
+		params.ExtraFlags = append(params.ExtraFlags, "-data")
 	}
 
 	params.Packages = nil

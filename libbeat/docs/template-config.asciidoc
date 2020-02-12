@@ -69,11 +69,6 @@ setup.template.settings:
   index.number_of_replicas: 1
 ----------------------------------------------------------------------
 
-NOTE: If you want to use {ref}/xpack-ccr.html[{ccr}] to replicate {beatname_uc}
-indices to another cluster, you will need to add additional template settings to
-{ref}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
-underlying indices.
-
 *`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
 please see the Elasticsearch {ref}/mapping-source-field.html[reference].
 +
@@ -88,7 +83,6 @@ setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
 
-ifeval::["{beatname_lc}"!="apm-server"]
 *`setup.template.append_fields`* experimental[]:: A list of fields to be added
 to the template and {kib} index pattern. This setting adds new fields. It does
 not overwrite or change existing fields. 
@@ -134,5 +128,3 @@ setup.template.json.name: "template-name
 
 NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
 generation.
-
-endif::[]

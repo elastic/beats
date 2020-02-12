@@ -18,8 +18,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "WIN-41OB2LO92CR$"
     },
     "user": {
       "domain": "WORKGROUP",

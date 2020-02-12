@@ -59,6 +59,7 @@ type client struct {
 	done     chan struct{}
 }
 
+// Config performs grpc Config request.
 func (c *client) Config(ctx context.Context, config string) error {
 	request := ConfigRequest{
 		Config: string(config),
@@ -70,6 +71,18 @@ func (c *client) Config(ctx context.Context, config string) error {
 	return err
 }
 
+// Status performs grpc Status request.
+func (c *client) Status(ctx context.Context) (string, error) {
+	request := StatusRequest{}
+	res, err := c.client.Status(ctx, &request)
+	if err != nil {
+		return "", err
+	}
+
+	return res.Status, nil
+}
+
+// Close cleans up resources.
 func (c *client) Close() error {
 	close(c.done)
 	return c.grpcConn.Close()

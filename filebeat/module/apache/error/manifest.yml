@@ -11,5 +11,5 @@ var:
       - "C:/tools/Apache/httpd-2.*/Apache24/logs/error.log*"
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/error.log*"
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/error.yml

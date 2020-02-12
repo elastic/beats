@@ -20,6 +20,9 @@
         "service.type": "aws",
         "source.bytes": 57,
         "source.ip": "192.168.131.39",
-        "source.port": "2817"
+        "source.port": "2817",
+        "tls.cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     }
 ]

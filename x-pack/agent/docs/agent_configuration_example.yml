@@ -1,0 +1,528 @@
+outputs:
+  default:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+    # Not supported at first
+    queue:
+      type: disk
+
+  long_term_storage:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+    queue:
+      type: disk
+
+  monitoring:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+
+settings.monitoring:
+  use_output: monitoring
+
+datasources:
+  # use the nginx package
+  - id?: nginx-x1
+    enabled?: true # default to true
+    title?: "This is a nice title for human"
+    # Package this config group is coming from. On importing, we know where it belongs
+    # The package tells the UI which application to link to
+    package?:
+      name: epm/nginx
+      version: 1.7.0
+    namespace?: prod
+    constraints?:
+      # Contraints look are not final
+      - os.platform: { in: "windows" }
+      - agent.version: { ">=": "8.0.0" }
+    use_output: long_term_storage
+    inputs:
+      - type: logs
+        processors?:
+        streams:
+          - id?: {id}
+            enabled?: true # default to true
+            dataset: nginx.acccess
+            paths: /var/log/nginx/access.log
+          - id?: {id}
+            enabled?: true # default to true
+            dataset: nginx.error
+            paths: /var/log/nginx/error.log
+      - type: nginx/metrics
+        streams:
+          - id?: {id}
+            enabled?: true # default to true
+            dataset: nginx.stub_status
+            metricset: stub_status
+
+  #################################################################################################
+  # Custom Kafka datasource
+  - id: kafka-x1
+    title: "Consume data from kafka"
+    namespace?: prod
+    use_output: long_term_storage
+    inputs:
+      - type: kafka
+        host: localhost:6566
+        streams:
+          - dataset: foo.dataset
+            topic: foo
+            processors:
+             - extract_bro_specifics
+
+
+  #################################################################################################
+  # System EPM package
+  - id?: system
+    title: Collect system information and metrics
+    package:
+      name: epm/system
+      version: 1.7.0
+    inputs:
+      - type: system/metrics
+        streams:
+         - id?: {id}
+           enabled?: false # default true
+           metricset: cpu
+           period: 10s
+           dataset: system.cpu
+           metrics: ["percentages", "normalized_percentages"]
+         - metricset: memory
+           dataset: system.memory
+         - metricset: diskio
+           dataset: system.diskio
+         - metricset: load
+           dataset: system.load
+         - metricset: memory
+           dataset: system.memory
+         - metricset: process
+           dataset: system.process
+           processes: ["firefox*"]
+         - metricset: process_summary
+           dataset: system.process_summary
+         - metricset: uptime
+           dataset: system.uptime
+         - metricset: socket_summary
+           dataset: system.socket_summary
+         - metricset: filesystem
+           dataset: system.filesystem
+         - metricset: raid
+           dataset: system.raid
+         - metricset: socket
+           dataset: system.socket
+         - metricset: service
+           dataset: system.service
+         - metricset: fsstat
+           dataset: system.fsstat
+         - metricset: foo
+           dataset: system.foo
+
+
+  #################################################################################################
+  # Elasticsearch package example
+  - id?: my-endpoint
+    title: Collect Elasticsearch information
+    package:
+      name: epm/elasticsearch
+      version: 1.7.0
+    inputs:
+        - type: log
+          streams:
+          - id?: {id}
+            enabled?: true # default to true
+            dataset: elasticsearch.audit
+            paths: [/var/log/elasticsearch/*_access.log, /var/log/elasticsearch/*_audit.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.deprecation
+            paths: [/var/log/elasticsearch/*_deprecation.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.gc
+            paths: [/var/log/elasticsearch/*_gc.log, /var/log/elasticsearch/*_gc.log.[0-9]*]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.server
+            paths: [/var/log/elasticsearch/*.log]
+          - id?: {id}
+            enabled?: true
+            dataset: elasticsearch.slowlog
+            paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
+        - type: elasticsearch/metrics
+          hosts: ["http://localhost:9200"]
+          hosts: ["http://localhost:9200"]
+          # api_key: xxxx
+          # username: elastic
+          # password: changeme
+          # ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+          # ssl.ca_sha256: BxZ...
+          # ssl.certificate: ...
+          # ssl.key: ...
+          xpack.enabled: true
+          streams:
+          - id?: {id}
+            metricset: ccr
+            dataset: elasticseach.ccr
+            period: 10s
+          - id?: {id}
+            metricset: cluster_stats
+            dataset: elasticseach.cluster_stats
+            period: 10s
+          - id?: {id}
+            metricset: enrich
+            dataset: elasticseach.enrich
+            period: 10s
+          - id?: {id}
+            metricset: index
+            dataset: elasticseach.index
+            period: 10s
+          - id?: {id}
+            metricset: index_recovery
+            dataset: elasticseach.index_recovery
+            active_only: true
+            period: 10s
+          - id?: {id}
+            metricset: ml_jobs
+            dataset: elasticseach.ml_jobs
+            period: 10s
+          - id?: {id}
+            metricset: node_stats
+            dataset: elasticseach.node_stats
+            period: 10s
+          - id?: {id}
+            metricset: shard
+            dataset: elasticseach.shard
+            period: 10s
+
+  #################################################################################################
+  # AWS module
+  - id?: my-aws
+    title: Collect AWS
+    package:
+      name: epm/aws
+      version: 1.7.0
+    inputs:
+        # Looking at the AWS modules, I believe each fileset need to be in their own
+        # buckets?
+        - type: s3
+          credential_profile_name: fb-aws
+          streams:
+          - id?: {id}
+            metricset: s3
+            dataset: aws/s3
+            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+          - id?: {id}
+            metricset: s3access
+            dataset: aws/s3access
+          - id?: {id}
+            metricset: s3access
+            dataset: aws.vpcflow
+            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+       - type: aws/metrics
+         # access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+         # secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+         # session_token: '${AWS_SESSION_TOKEN:""}'
+         credential_profile_name: test-mb
+         streams:
+          - id?: {id}
+            metricset: usage
+            dataset: aws.usage
+            period: 5m
+          - id?: {id}
+            metricset: cloudwatch
+            dataset: aws.cloudwatch
+            period: 5m
+            name: ["CPUUtilization", "DiskWriteOps"]
+            tags.resource_type_filter: ec2:instance
+            #dimensions:
+            #  - name: InstanceId
+            #    value: i-0686946e22cf9494a
+            statistic: ["Average", "Maximum"]
+          - id?: {id}
+            metricset: ebs
+            dataset: aws.ebs
+            period: 5m
+          - id?: {id}
+            metricset: ec2
+            dataset: aws.ec2
+            period: 5m
+          - id?: {id}
+            metricset: elb
+            dataset: aws.elb
+            period: 5m
+          - id?: {id}
+            metricset: sns
+            dataset: aws.sns
+            period: 5m
+          - id?: {id}
+            metricset: sqs
+            dataset: aws.sqs
+            period: 5m
+          - id?: {id}
+            metricset: rds
+            dataset: aws.rds
+            period: 5m
+          - id?: {id}
+            metricset: billing
+            dataset: aws.billing
+            period: 12
+          - id?: {id}
+            metricset: billing
+            dataset: aws.billing
+            period: 12
+          - id?: {id}
+            metricset: s3_daily_storage
+            dataset: aws.s3_daily_storage
+            period: 24
+          - id?: {id}
+            metricset: s3_request
+            dataset: aws.s3_request
+            period: 24
+
+
+  #################################################################################################
+  # Kubernetes
+  - id?: my-kubernetes
+    title: Collect Kubernetes
+    package:
+      name: epm/kubernetes
+      version: 1.7.0
+    inputs:
+      - type: kubernetes-node/metrics
+        hosts: ["localhost:10250"]
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        ssl.certificate_authorities:
+          - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        # username: "user"
+        # password: "secret"
+        # If kube_config is not set, KUBECONFIG environment variable will be checked
+        # and if not present it will fall back to InCluster
+        # kube_config: ~/.kube/config
+        streams:
+          - id?: {id}
+            metricset: node
+            dataset: kubernetes.node
+            period: 10s
+          - id?: {id}
+            metricset: system
+            dataset: kubernetes.system
+            period: 10s
+          - id?: {id}
+            metricset: pod
+            dataset: kubernetes.pod
+            period: 10s
+          - id?: {id}
+            metricset: container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: event
+            dataset: kubernetes.event
+            period: 10s
+      - type: kubernetes-state/metrics
+        hosts: ["kube-state-metrics:8080"]
+        streams:
+          - id?: {id}
+            metricset: state_node
+            dataset: kubernetes.node
+            period: 10s
+          - id?: {id}
+            metricset: state_deployment
+            dataset: kubernetes.deployment
+            period: 10s
+          - id?: {id}
+            metricset: state_replicaset
+            dataset: kubernetes.replicaset
+            period: 10s
+          - id?: {id}
+            metricset: state_statefulset
+            dataset: kubernetes.statefulset
+            period: 10s
+          - id?: {id}
+            metricset: state_pod
+            dataset: kubernetes.pod
+            period: 10s
+          - id?: {id}
+            metricset: state_container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: state_container
+            dataset: kubernetes.container
+            period: 10s
+          - id?: {id}
+            metricset: state_cronjob
+            dataset: kubernetes.cronjob
+            period: 10s
+          - id?: {id}
+            metricset: state_resourcequota
+            dataset: kubernetes.resourcequota
+            period: 10s
+          - id?: {id}
+            metricset: state_service
+            dataset: kubernetes.service
+            period: 10s
+          - id?: {id}
+            metricset: state_persistentvolume
+            dataset: kubernetes.persistentvolume
+            period: 10s
+          - id?: {id}
+            metricset: state_persistentvolumeclaim
+            dataset: kubernetes.persistentvolumeclaim
+            period: 10s
+
+  #################################################################################################
+  # Docker
+  - id?: my-docker
+    title: Collect docker
+    package:
+      name: epm/docker
+      version: 1.7.0
+    inputs:
+      - type: docker/metrics
+        hosts: ["localhost:10250"]
+        #labels.dedot: false
+
+        # To connect to Docker over TLS you must specify a client and CA certificate.
+        #ssl:
+          #certificate_authority: "/etc/pki/root/ca.pem"
+          #certificate:           "/etc/pki/client/cert.pem"
+          #key:                   "/etc/pki/client/cert.key"
+        streams:
+          - id?: {id}
+            metricset: container
+            dataset: docker.container
+            period: 10s
+          - id?: {id}
+            metricset: cpu
+            dataset: docker.cpu
+            period: 10s
+          - id?: {id}
+            metricset: diskio
+            dataset: docker.diskio
+            period: 10s
+          - id?: {id}
+            metricset: event
+            dataset: docker.event
+            period: 10s
+          - id?: {id}
+            metricset: healthcheck
+            dataset: docker.healthcheck
+            period: 10s
+          - id?: {id}
+            metricset: info
+            dataset: docker.info
+            period: 10s
+          - id?: {id}
+            metricset: memory
+            dataset: docker.memory
+            period: 10s
+          - id?: {id}
+            metricset: network
+            dataset: docker.network
+            period: 10s
+
+#################################################################################################
+### suggestion 1
+ - id?: myendpoint-x1
+   title: Endpoint configuration
+   namespace?: "canada"
+   package:
+     name: endpoint
+     version: xxx
+   inputs:
+     - type: endpoint # Reserved key word
+       streams:
+         - type: malware
+           detect: true
+           prevent: false
+           notify_user: false
+           threshold: recommended
+           platform: windows
+
+        - type: eventing
+          api: true
+          clr: false
+          dll_and_driver_load: false
+          dns: true
+          file: false
+          platform: windows
+
+       - type: malware
+         detect: true
+         prevent: false
+         notify_user: false
+         threshold: recommended
+         platform: mac
+
+      - type: eventing
+        api: true
+        clr: false
+        dll_and_driver_load: false
+        dns: true
+        file: false
+        platform: mac
+
+       - type: malware
+         detect: true
+         prevent: false
+         notify_user: false
+         threshold: recommended
+         platform: linux
+
+      - type: eventing
+        api: true
+        clr: false
+        dll_and_driver_load: false
+        dns: true
+        file: false
+        platform: linux
+
+#################################################################################################
+### suggestion 2
+ - id?: myendpoint-1
+   title: Endpoint configuration
+   namespace?: "canada"
+   package:
+     name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
+     version: xxx
+   inputs:
+     - type: endpoint # Reserved key word
+       windows:
+            eventing:
+                api: true
+                clr: false
+                dll_and_driver_load: false
+                dns: true
+                 ...
+                file: false
+            malware:
+                detect: true
+                prevent: false
+                notify_user: false
+                threshold: recommended
+        mac:
+            eventing:
+                file: true
+                network: false
+                process: false
+                ...
+            malware:
+               detect: true
+               prevent: false
+               notify_user: false
+               threshold: recommended
+         linux:
+            eventing:
+                file: true
+                network: false
+                process: false

@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -114,6 +116,11 @@ func TestEmitEvent_Node(t *testing.T) {
 	nodeIP := "192.168.0.1"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	UUID, err := uuid.NewV4()
+
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Node",
+		APIVersion: "v1",
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,6 +141,7 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
 					Addresses: []v1.NodeAddress{
 						{
@@ -180,7 +188,8 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: v1.NodeStatus{},
+				TypeMeta: typeMeta,
+				Status:   v1.NodeStatus{},
 			},
 			Expected: nil,
 		},
@@ -194,6 +203,7 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
 					Addresses: []v1.NodeAddress{},
 					Conditions: []v1.NodeCondition{
@@ -236,14 +246,10 @@ func TestEmitEvent_Node(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}

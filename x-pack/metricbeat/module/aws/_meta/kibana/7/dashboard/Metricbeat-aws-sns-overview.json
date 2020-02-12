@@ -55,7 +55,7 @@
             },
             "panelIndex": "3b9b0cee-b175-4268-8c5b-4ce869a09caf",
             "panelRefName": "panel_0",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -71,7 +71,7 @@
             "panelIndex": "5f0d72c5-0f28-449f-9c93-3b4074f068f7",
             "panelRefName": "panel_1",
             "title": "SNS Messages and Notifications",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -84,7 +84,7 @@
             },
             "panelIndex": "5a9d5f2f-b075-4892-8188-c6e808a1163d",
             "panelRefName": "panel_2",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -100,7 +100,7 @@
             "panelIndex": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
             "panelRefName": "panel_3",
             "title": "SNS Publish Size",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -116,7 +116,7 @@
             "panelIndex": "0684c25d-34e8-425e-9069-dd8364e6325b",
             "panelRefName": "panel_4",
             "title": "SNS Notifications Filtered Out",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -132,7 +132,7 @@
             "panelIndex": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
             "panelRefName": "panel_5",
             "title": "SNS Notifications Filtered Out Invalid Attributes",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -148,7 +148,7 @@
             "panelIndex": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
             "panelRefName": "panel_6",
             "title": "SNS Notifications Filtered Out No Message Attributes",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -164,7 +164,7 @@
             "panelIndex": "f176153f-4588-42f9-a7bb-3015909d5610",
             "panelRefName": "panel_7",
             "title": "SNS Notifications Failed to Redrive to DLQ",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -180,7 +180,7 @@
             "panelIndex": "f3c5915b-6848-4950-afca-53653d13d6af",
             "panelRefName": "panel_8",
             "title": "SNS SMS Success Rate",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -196,7 +196,7 @@
             "panelIndex": "3b3cc747-b57c-44e0-a18c-77155072bee4",
             "panelRefName": "panel_9",
             "title": "SNS Notifications Redriven To DLQ",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -212,7 +212,7 @@
             "panelIndex": "ee130150-c1de-465b-8a8e-013f466528bf",
             "panelRefName": "panel_10",
             "title": "SNS SMS Month To Date Spent USD",
-            "version": "7.4.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -388,7 +388,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfMessagesPublished.sum",
+                    "field": "aws.sns.metrics.NumberOfMessagesPublished.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -413,7 +413,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsDelivered.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsDelivered.sum",
                     "id": "204ff2b1-1b77-11ea-9357-231d0e09a8a9",
                     "type": "avg"
                   }
@@ -438,7 +438,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFailed.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFailed.sum",
                     "id": "32e925e1-1b77-11ea-9357-231d0e09a8a9",
                     "type": "avg"
                   }
@@ -491,7 +491,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "aws.cloudwatch.dimensions.TopicName",
+                "fieldName": "aws.dimensions.TopicName",
                 "id": "1565034367477",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "topic name",
@@ -570,7 +570,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.PublishSize.avg",
+                    "field": "aws.sns.metrics.PublishSize.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -644,7 +644,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -718,7 +718,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -792,7 +792,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -866,7 +866,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -940,7 +940,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.SMSSuccessRate.avg",
+                    "field": "aws.sns.metrics.SMSSuccessRate.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -1014,7 +1014,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.NumberOfNotificationsRedrivenToDlq.sum",
+                    "field": "aws.sns.metrics.NumberOfNotificationsRedrivenToDlq.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -1088,7 +1088,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.SMSMonthToDateSpentUSD.sum",
+                    "field": "aws.sns.metrics.SMSMonthToDateSpentUSD.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -1122,5 +1122,5 @@
       "version": "WzU1MywxXQ=="
     }
   ],
-  "version": "7.4.0"
+  "version": "7.3.0"
 }

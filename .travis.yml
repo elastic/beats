@@ -16,6 +16,7 @@ env:
     - TRAVIS_GO_VERSION=$(cat .go-version)
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
+    - MACOSX_DEPLOYMENT_TARGET=10.15
 
 jobs:
   include:
@@ -158,11 +159,11 @@ jobs:
 
     # Generators
     - os: linux
-      env: TARGETS="-C generator/metricbeat test"
+      env: TARGETS="-C generator/metricbeat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C generator/beat test"
+      env: TARGETS="-C generator/beat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
 
@@ -237,6 +238,7 @@ addons:
 
 before_install:
   - python --version
+  # - sudo pip install -U pip
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
@@ -244,14 +246,19 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
 
 
 # Skips installations step
 install: true
 
 script:
+  # Replacement for travis_wait which doesn't print output in real time.
+  # Default Travis timeout is 10min, so this workaround prints timestamps every 9min to reset the counter.
+  # Using seconds (540s = 9min) instead of minutes for shell compatibility reasons.
+  - while sleep 540; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
   - make $TARGETS
+  - kill %1
 
 notifications:
   slack:

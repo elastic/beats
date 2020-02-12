@@ -1,3 +1,9 @@
+; WARNING: This is an edited version of the original IANA document!
+;
+; Changes
+; =======
+; 2020-01-14 - @adriansr: Change field 51 (classId) from unsigned8 to unsigned32
+;
 ;ElementID,Name,Abstract Data Type,Data Type Semantics,Status,Description,Units,Range,References,Requester,Revision,Date
 0,Reserved,,,,,,,,[RFC5102],,2013-02-18
 1,octetDeltaCount,unsigned64,deltaCounter,current,"The number of octets since the previous report (if any)
@@ -335,7 +341,7 @@ Sampling.  Use with samplerRandomInterval.",,,,[RFC7270],0,2014-04-04
 50,samplerRandomInterval,unsigned32,quantity,deprecated,"Deprecated in favor of 305 samplingPacketInterval.  Packet
 interval at which to sample -- in case of random sampling.  Used in
 connection with the samplerMode 0x02 (random sampling) value.",,,,[RFC7270],0,2014-04-04
-51,classId,unsigned8,identifier,deprecated,"Deprecated in favor of 302 selectorId.  Characterizes the traffic
+51,classId,unsigned32,identifier,deprecated,"Deprecated in favor of 302 selectorId.  Characterizes the traffic
 class, i.e., QoS treatment.",,,,[RFC7270],0,2014-04-04
 52,minimumTTL,unsigned8,,current,Minimum TTL value observed for any packet in this Flow.,hops,,"See [RFC791] for the definition of the IPv4
 Time to Live field.

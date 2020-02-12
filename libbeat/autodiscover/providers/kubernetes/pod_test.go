@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -175,6 +177,11 @@ func TestEmitEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Pod",
+		APIVersion: "v1",
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -192,6 +199,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -264,6 +272,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
@@ -295,6 +304,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -326,6 +336,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
@@ -393,6 +404,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -459,14 +471,10 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}

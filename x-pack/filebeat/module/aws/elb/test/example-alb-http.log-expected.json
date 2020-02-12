@@ -72,6 +72,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -110,6 +113,9 @@
         "service.type": "aws",
         "source.ip": "10.0.1.252",
         "source.port": "48160",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -174,6 +180,9 @@
         "service.type": "aws",
         "source.ip": "10.0.0.140",
         "source.port": "44244",
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
         "user_agent.original": "-"
     },
     {
