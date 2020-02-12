@@ -269,7 +269,6 @@ func readJSONBody(response *http.Response, dest interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "reading body failed")
 	}
-	logp.L().Infof(" --> content: %s", string(body))
 	if err = json.Unmarshal(body, dest); err != nil {
 		return errors.Wrap(err, "decoding json failed")
 	}
