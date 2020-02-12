@@ -64,6 +64,8 @@ type enricher struct {
 	isPod              bool
 }
 
+const selector = "kubernetes"
+
 // GetWatcher initializes a kubernetes watcher with the given
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
@@ -89,12 +91,14 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		SyncTimeout: config.SyncPeriod,
 	}
 
+	log := logp.NewLogger(selector)
+
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		options.Node = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
-	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %v", config.Host)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
 
 	return kubernetes.NewWatcher(client, resource, options, nil)
 }

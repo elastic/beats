@@ -143,36 +143,6 @@ metricbeat.modules:
   path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
   username: admin # default username
   password: admin # default password
-  processors:
-    - script:
-        lang: javascript
-        source: >
-          function process(event) {
-            var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
-            if (broker_memory_broker_pct != null) {
-              event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
-            }
-
-            var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
-            if (broker_memory_temp_pct != null) {
-              event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
-            }
-
-            var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
-            if (broker_memory_store_pct != null) {
-              event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
-            }
-
-            var queue_memory_broker_pct = event.Get("activemq.queue.memory.broker.pct")
-            if (queue_memory_broker_pct != null) {
-              event.Put("activemq.queue.memory.broker.pct", queue_memory_broker_pct / 100.0)
-            }
-
-            var topic_memory_broker_pct = event.Get("activemq.topic.memory.broker.pct")
-            if (topic_memory_broker_pct != null) {
-              event.Put("activemq.topic.memory.broker.pct", topic_memory_broker_pct / 100.0)
-            }
-          }
 
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
@@ -517,26 +487,6 @@ metricbeat.modules:
   # the options for this metricset are also available here.
   metrics_path: /metrics
 
-  # The custom processor is responsible for filtering Prometheus metrics
-  # not stricly related to the IBM MQ domain, e.g. system load, process,
-  # metrics HTTP server.
-  processors:
-    - script:
-        lang: javascript
-        source: >
-          function process(event) {
-            var metrics = event.Get("prometheus.metrics");
-            Object.keys(metrics).forEach(function(key) {
-              if (!(key.match(/^ibmmq_.*$/))) {
-                event.Delete("prometheus.metrics." + key);
-              }
-            });
-            metrics = event.Get("prometheus.metrics");
-            if (Object.keys(metrics).length == 0) {
-              event.Cancel();
-            }
-          }
-
 #-------------------------------- Istio Module --------------------------------
 # Istio mesh. To collect all Mixer-generated metrics
 - module: istio
@@ -562,6 +512,13 @@ metricbeat.modules:
 # Istio pilot. To collect all Pilot-generated metrics.
 - module: istio
   metricsets: ["pilot"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio citadel. To collect all Citadel-generated metrics.
+- module: istio
+  metricsets: ["citadel"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
@@ -670,9 +627,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -701,6 +659,7 @@ metricbeat.modules:
     - state_service
     - state_persistentvolume
     - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -943,7 +902,7 @@ metricbeat.modules:
   #password: "secret"
 
   # This can be used for service account based authorization:
-  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
@@ -1474,6 +1433,12 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
+
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1566,6 +1531,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2023,7 +1994,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html

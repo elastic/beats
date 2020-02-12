@@ -2,11 +2,12 @@
 Status](https://travis-ci.org/elastic/go-ucfg.svg?branch=master)](https://travis-ci.org/elastic/go-ucfg)
 [![Go Report
 Card](https://goreportcard.com/badge/github.com/elastic/go-ucfg)](https://goreportcard.com/report/github.com/elastic/go-ucfg)
+[![codecov](https://codecov.io/gh/elastic/go-ucfg/branch/master/graph/badge.svg)](https://codecov.io/gh/elastic/go-ucfg)
 
 
 # ucfg - Universal Configuration
 
-`ucfg` is a Golang library to handle yaml and json configuration files in your Golang project. It was developed for the [libbeat framework](https://github.com/elastic/beats/tree/master/libbeat) and used by all [beats](https://github.com/elastic/beats).
+`ucfg` is a Golang library to handle hjson, json, and yaml configuration files in your Golang project. It was developed for the [libbeat framework](https://github.com/elastic/beats/tree/master/libbeat) and used by all [beats](https://github.com/elastic/beats).
 
 
 ## API Documentation
@@ -57,7 +58,7 @@ ucfg allows to automatically validate fields and set defaults for fields in case
 ```golang
 // Defines struct to read config from
 type ExampleConfig struct {
-    Counter  string 	`config:"counter" validate:"min=0, max=9"`
+    Counter  int 	`config:"counter" validate:"min=0, max=9"`
 }
 
 // Defines default config option
@@ -71,12 +72,12 @@ func main() {
     appConfig := defaultConfig // copy default config so it's not overwritten
     config, err := yaml.NewConfigWithFile(path, ucfg.PathSep("."))
     if err != nil {
-        fmt.Fprintln(err)
+        fmt.Println(err)
         os.Exit(1)
     }
     err = config.Unpack(&appConfig)
     if err != nil {
-        fmt.Fprintln(err)
+        fmt.Println(err)
         os.Exit(1)
     }
 }
