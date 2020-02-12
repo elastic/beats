@@ -1,6 +1,65 @@
 - name: mgr_cluster_disk
   type: group
-  description: >
-    Disk metrics of Ceph cluster
+  description: Disk metrics of Ceph cluster
   release: beta
   fields:
+    - name: stats
+      type: group
+      description: >
+        `stats` contains disk availability statistics.
+      fields:
+        - name: total_bytes
+          type: long
+          description: Total bytes of the cluster
+        - name: total_avail_bytes
+          type: long
+          description: Available bytes of the cluster
+        - name: total_used_bytes
+          type: long
+          description: Used bytes of the cluster
+        - name: total_used_raw_bytes
+          type: long
+          description: Used raw bytes of the cluster
+        - name: total_used_raw_ratio
+          type: scaled_float
+          description: Used raw bytes ratio
+        - name: num_osds
+          type: long
+          description: Number of OSDs in the cluster
+        - name: num_per_pool_osds
+          type: long
+          description: Number of OSDs per pool in the cluster
+    - name: pools
+      type: group
+      description: >
+        `pools` contains disk pool statistics.
+      fields:
+        - name: name
+          type: keyword
+          description: Pool name
+        - name: id
+          type: long
+          description: Pool ID
+        - name: stats
+          type: group
+          description: Pool statistics
+          fields:
+            - name: kb_used
+              type: long
+              description: Used space in kilobytes
+            - name: bytes_used
+              type: long
+              description: Used space in bytes
+            - name: percent_used
+              type: scaled_float
+              description: Used space in pct
+              format: percent
+            - name: max_avail
+              type: long
+              description: Maximum available space in bytes
+            - name: stored
+              type: long
+              description: Stored bytes
+            - name: objects
+              type: long
+              description: Number of stored objects

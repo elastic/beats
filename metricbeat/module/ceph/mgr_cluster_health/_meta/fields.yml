@@ -1,6 +1,8 @@
 - name: mgr_cluster_health
   type: group
-  description: >
-    Status metrics of Ceph cluster
+  description: Status metrics of Ceph cluster
   release: beta
   fields:
+    - name: fsid
+      type: keyword
+      description: File System ID, a unique identifier for the cluster

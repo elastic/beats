@@ -3939,10 +3939,176 @@ Disk metrics of Ceph cluster
 
 
 [float]
+=== stats
+
+`stats` contains disk availability statistics.
+
+
+
+*`ceph.mgr_cluster_disk.stats.total_bytes`*::
++
+--
+Total bytes of the cluster
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.stats.total_avail_bytes`*::
++
+--
+Available bytes of the cluster
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.stats.total_used_bytes`*::
++
+--
+Used bytes of the cluster
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.stats.total_used_raw_bytes`*::
++
+--
+Used raw bytes of the cluster
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.stats.total_used_raw_ratio`*::
++
+--
+Used raw bytes ratio
+
+type: scaled_float
+
+--
+
+*`ceph.mgr_cluster_disk.stats.num_osds`*::
++
+--
+Number of OSDs in the cluster
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.stats.num_per_pool_osds`*::
++
+--
+Number of OSDs per pool in the cluster
+
+type: long
+
+--
+
+[float]
+=== pools
+
+`pools` contains disk pool statistics.
+
+
+
+*`ceph.mgr_cluster_disk.pools.name`*::
++
+--
+Pool name
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_disk.pools.id`*::
++
+--
+Pool ID
+
+type: long
+
+--
+
+[float]
+=== stats
+
+Pool statistics
+
+
+*`ceph.mgr_cluster_disk.pools.stats.kb_used`*::
++
+--
+Used space in kilobytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.pools.stats.bytes_used`*::
++
+--
+Used space in bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.pools.stats.percent_used`*::
++
+--
+Used space in pct
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`ceph.mgr_cluster_disk.pools.stats.max_avail`*::
++
+--
+Maximum available space in bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.pools.stats.stored`*::
++
+--
+Stored bytes
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_disk.pools.stats.objects`*::
++
+--
+Number of stored objects
+
+type: long
+
+--
+
+[float]
 === mgr_cluster_health
 
 Status metrics of Ceph cluster
 
+
+*`ceph.mgr_cluster_health.fsid`*::
++
+--
+File System ID, a unique identifier for the cluster
+
+type: keyword
+
+--
 
 [float]
 === mgr_osd_disk
