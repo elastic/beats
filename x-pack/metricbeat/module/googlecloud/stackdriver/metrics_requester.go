@@ -51,6 +51,10 @@ type stackdriverMetricsRequester struct {
 func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
+	if r.config.Region != "" && r.config.Zone != "" {
+		r.logger.Warnf("when region %s and zone %s config parameter both are provided, only use region", r.config.Region, r.config.Zone)
+	}
+
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
