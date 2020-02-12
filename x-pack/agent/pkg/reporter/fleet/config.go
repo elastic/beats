@@ -6,8 +6,8 @@ package fleet
 
 // ManagementConfig is a configuration describing fleet connected parts
 type ManagementConfig struct {
-	Threshold               int `config:"threshold" validate:"min=1"`
-	ReportingCheckFrequency int `config:"check_frequency_sec" validate:"min=1"`
+	Threshold               int `yaml:"threshold" config:"threshold" validate:"min=1"`
+	ReportingCheckFrequency int `yaml:"check_frequency_sec" config:"check_frequency_sec" validate:"min=1"`
 }
 
 // DefaultFleetManagementConfig initiates FleetManagementConfig with default values
