@@ -1,0 +1,19 @@
+[
+    {
+        "@timestamp": "2019-09-10T16:19:28.465Z",
+        "event.dataset": "zeek.capture_loss",
+        "event.module": "zeek",
+        "fileset.name": "capture_loss",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.capture_loss"
+        ],
+        "zeek.capture_loss.acks": 206,
+        "zeek.capture_loss.gaps": 0,
+        "zeek.capture_loss.peer": "bro",
+        "zeek.capture_loss.percent_lost": 0,
+        "zeek.capture_loss.ts_delta": 32.282249
+    }
+]

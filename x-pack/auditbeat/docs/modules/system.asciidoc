@@ -1,0 +1,191 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:modulename: system
+
+[id="{beatname_lc}-module-system"]
+[role="xpack"]
+== System Module
+
+beta[]
+
+The `system` module collects various security related information about
+a system. All datasets send both periodic state information (e.g. all currently
+running processes) and real-time changes (e.g. when a new process starts
+or stops).
+
+The module is fully implemented for Linux. Some datasets are also available
+for macOS (Darwin) and Windows.
+
+[float]
+=== How it works
+
+Each dataset sends two kinds of information: state and events.
+
+State information is sent periodically and (for some datasets) on startup.
+A state update will consist of one event per object that is currently
+active on the system (e.g. a process). All events belonging to the same state
+update will share the same UUID in `event.id`.
+
+The frequency of state updates can be controlled for all datasets using the
+`state.period` configuration option. Overrides are available per dataset.
+The default is `12h`.
+
+Event information is sent as the events occur (e.g. a process starts or stops).
+All datasets are currently using a poll model to retrieve their data.
+The frequency of these polls is controlled by the `period` configuration
+parameter.
+
+[float]
+==== Example dashboard
+
+The module comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
+
+[float]
+=== Configuration options
+
+This module has some configuration options for controlling its behavior. The
+following example shows all configuration options with their default values for
+Linux.
+
+NOTE: It is recommended to configure some datasets separately. See below for a
+sample suggested configuration.
+
+[source,yaml]
+----
+- module: system
+  datasets:
+    - host
+    - login
+    - package
+    - process
+    - socket
+    - user
+  period: 10s
+  state.period: 12h
+
+  socket.include_localhost: false
+
+  user.detect_password_changes: true
+----
+
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
+
+*`state.period`*:: The frequency at which the datasets send full state information.
+This option can be overridden per dataset using `{dataset}.state.period`.
+
+*`user.detect_password_changes`*:: If the `user` dataset is configured and
+this option is set to `true`, Auditbeat will read password information in `/etc/passwd`
+and `/etc/shadow` to detect password changes. A hash will be kept locally in
+the `beat.db` file to detect changes between Auditbeat restarts. The `beat.db` file
+should be readable only by the root user and be treated similar to the shadow file
+itself.
+
+include::{docdir}/auditbeat-options.asciidoc[]
+
+[float]
+=== Suggested configuration
+
+Processes and sockets can be short-lived, so the chance of missing an update
+increases if the polling interval is too large.
+
+On the other hand, host and user information is unlikely to change frequently,
+so a longer polling interval can be used.
+
+[source,yaml]
+----
+- module: system
+  datasets:
+    - host
+    - login
+    - package
+    - user
+  period: 1m
+
+  user.detect_password_changes: true
+
+- module: system
+  datasets:
+    - process
+    - socket
+  period: 1s
+----
+
+
+[float]
+=== Example configuration
+
+The System module supports the common configuration options that are
+described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
+is an example configuration:
+
+[source,yaml]
+----
+auditbeat.modules:
+- module: system
+  datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 2m # The frequency at which the datasets check for changes
+
+- module: system
+  datasets:
+    - host    # General host information, e.g. uptime, IPs
+    - login   # User logins, logouts, and system boots.
+    - process # Started and stopped processes
+    - socket  # Opened and closed sockets
+    - user    # User information
+
+  # How often datasets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
+  state.period: 12h
+
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+
+  # File patterns of the login record files.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
+----
+
+
+:modulename!:
+
+[float]
+=== Datasets
+
+The following datasets are available:
+
+* <<{beatname_lc}-dataset-system-host,host>>
+
+* <<{beatname_lc}-dataset-system-login,login>>
+
+* <<{beatname_lc}-dataset-system-package,package>>
+
+* <<{beatname_lc}-dataset-system-process,process>>
+
+* <<{beatname_lc}-dataset-system-socket,socket>>
+
+* <<{beatname_lc}-dataset-system-user,user>>
+
+include::system/host.asciidoc[]
+
+include::system/login.asciidoc[]
+
+include::system/package.asciidoc[]
+
+include::system/process.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/user.asciidoc[]
+

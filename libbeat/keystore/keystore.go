@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package keystore
 
 import (
@@ -5,8 +22,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 )
 
 var (
@@ -47,6 +64,12 @@ type Keystore interface {
 	Save() error
 }
 
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
+type Packager interface {
+	Package() ([]byte, error)
+	ConfiguredPath() string
+}
+
 // Factory Create the right keystore with the configured options.
 func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 	config := defaultConfig
@@ -64,13 +87,12 @@ func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 		config.Path = defaultPath
 	}
 
-	logp.Debug("keystore", "Loading file keystore from %s", config.Path)
 	keystore, err := NewFileKeystore(config.Path)
 	return keystore, err
 }
 
 // ResolverFromConfig create a resolver from a configuration.
-func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, error), error) {
+func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
 	keystore, err := Factory(cfg, dataPath)
 
 	if err != nil {
@@ -81,36 +103,24 @@ func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (stri
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.
-func ResolverWrap(keystore Keystore) func(string) (string, error) {
-	return func(keyName string) (string, error) {
+func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) {
+	return func(keyName string) (string, parse.Config, error) {
 		key, err := keystore.Retrieve(keyName)
 
 		if err != nil {
 			// If we cannot find the key, its a non fatal error
 			// and we pass to other resolver.
 			if err == ErrKeyDoesntExists {
-				return "", ucfg.ErrMissing
+				return "", parse.DefaultConfig, ucfg.ErrMissing
 			}
-			return "", err
+			return "", parse.DefaultConfig, err
 		}
 
 		v, err := key.Get()
 		if err != nil {
-			return "", err
+			return "", parse.DefaultConfig, err
 		}
 
-		logp.Debug("keystore", "accessing key '%s' from the keystore", keyName)
-		return string(v), nil
-	}
-}
-
-// ConfigOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
-func ConfigOpts(keystore Keystore) []ucfg.Option {
-	return []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.Resolve(ResolverWrap(keystore)),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
+		return string(v), parse.DefaultConfig, nil
 	}
 }

@@ -1,2 +1,0 @@
-The Prometheus `stats` metricset collects statistics about the Prometheus
-server.

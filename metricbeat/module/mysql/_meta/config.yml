@@ -1,8 +1,12 @@
 - module: mysql
-  metricsets: ["status"]
+  #metricsets:
+  #  - status
+  #  - galera_status
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
   # The username and password can either be set in the DSN or using the username
   # and password config options. Those specified in the DSN take precedence.
   hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
@@ -12,6 +16,3 @@
 
   # Password of hosts. Empty by default.
   #password: secret
-
-  # By setting raw to true, all raw fields from the status metricset will be added to the event.
-  #raw: false

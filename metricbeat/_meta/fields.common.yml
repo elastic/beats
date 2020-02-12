@@ -7,30 +7,37 @@
     - name: metricset.module
       description: >
         The name of the module that generated the event.
+      type: alias
+      path: event.module
+      migration: true
 
     - name: metricset.name
       description: >
         The name of the metricset that generated the event.
 
-    - name: metricset.host
+    - name: metricset.period
+      type: integer
       description: >
-        Hostname of the machine from which the metricset was collected. This
+        Current data collection period for this event in milliseconds.
+
+    - name: service.address
+      description: >
+        Address of the machine where the service is running. This
         field may not be present when the data was collected locally.
 
-    - name: metricset.rtt
-      type: long
-      required: true
+    - name: service.hostname
       description: >
-        Event round trip time in microseconds.
-
-    - name: metricset.namespace
-      type: keyword
-      description: >
-        Namespace of dynamic metricsets.
+        Host name of the machine where the service is running.
 
     - name: type
       required: true
       example: metricsets
       description: >
-        The document type. Always set to "metricsets".
+        The document type. Always set to "doc".
 
+    - name: systemd.fragment_path
+      type: keyword
+      description: the location of the systemd unit path
+    - name: systemd.unit
+      type: keyword
+      description: the unit name of the systemd service

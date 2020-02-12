@@ -1,0 +1,12 @@
+# Module: mssql
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mssql.html
+
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10s
+

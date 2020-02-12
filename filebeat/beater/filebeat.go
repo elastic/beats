@@ -1,10 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package beater
 
 import (
 	"flag"
 	"fmt"
+	"strings"
 
-	"github.com/joeshaw/multierror"
+	"github.com/elastic/beats/libbeat/common/reload"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -13,9 +32,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
+	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
@@ -24,6 +45,7 @@ import (
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -49,17 +71,15 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	err := cfgwarn.CheckRemoved5xSettings(rawConfig, "spool_size", "publish_async", "idle_timeout")
-	if err != nil {
+	if err := cfgwarn.CheckRemoved6xSettings(
+		rawConfig,
+		"prospectors",
+		"config.prospectors",
+		"registry_file",
+		"registry_file_permissions",
+		"registry_flush",
+	); err != nil {
 		return nil, err
-	}
-
-	if len(config.Prospectors) > 0 {
-		cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
-		if len(config.Inputs) > 0 {
-			return nil, fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
-		}
-		config.Inputs = config.Prospectors
 	}
 
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
@@ -82,15 +102,13 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// Add inputs created by the modules
 	config.Inputs = append(config.Inputs, moduleInputs...)
 
-	haveEnabledInputs := false
-	for _, input := range config.Inputs {
-		if input.Enabled() {
-			haveEnabledInputs = true
-			break
-		}
+	enabledInputs := config.ListEnabledInputs()
+	var haveEnabledInputs bool
+	if len(enabledInputs) > 0 {
+		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.ConfigManager.Enabled() {
 		if !b.InSetupCmd {
 			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -103,17 +121,50 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, errors.New("input configs and -once cannot be used together")
 	}
 
+	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
+		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
+	}
+
 	fb := &Filebeat{
 		done:           make(chan struct{}),
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 	}
 
-	// register `setup` callback for ML jobs
-	b.SetupMLCallback = func(b *beat.Beat) error {
-		return fb.loadModulesML(b)
+	err = fb.setupPipelineLoaderCallback(b)
+	if err != nil {
+		return nil, err
 	}
+
 	return fb, nil
+}
+
+// setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
+func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
+	if b.Config.Output.Name() != "elasticsearch" {
+		logp.Warn(pipelinesWarning)
+		return nil
+	}
+
+	overwritePipelines := true
+	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return err
+		}
+
+		// When running the subcommand setup, configuration from modules.d directories
+		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
+		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
+		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
+		if fb.config.ConfigModules.Enabled() {
+			modulesLoader := cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
+			modulesLoader.Load(modulesFactory)
+		}
+
+		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
+	}
+	return nil
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -124,64 +175,19 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 		return nil
 	}
 
+	overwritePipelines := fb.config.OverwritePipelines
+	if b.InSetupCmd {
+		overwritePipelines = true
+	}
+
 	// register pipeline loading to happen every time a new ES connection is
 	// established
 	callback := func(esClient *elasticsearch.Client) error {
-		return fb.moduleRegistry.LoadPipelines(esClient)
+		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
-	elasticsearch.RegisterConnectCallback(callback)
+	_, err := elasticsearch.RegisterConnectCallback(callback)
 
-	return nil
-}
-
-func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
-	logp.Debug("machine-learning", "Setting up ML jobs for modules")
-	var errs multierror.Errors
-
-	if b.Config.Output.Name() != "elasticsearch" {
-		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
-			" modules because the Elasticsearch output is not configured/enabled.")
-		return nil
-	}
-
-	esConfig := b.Config.Output.Config()
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
-	if err != nil {
-		return errors.Errorf("Error creating Elasticsearch client: %v", err)
-	}
-	if err := fb.moduleRegistry.LoadML(esClient); err != nil {
-		errs = append(errs, err)
-	}
-
-	// Add dynamic modules.d
-	if fb.config.ConfigModules.Enabled() {
-		config := cfgfile.DefaultDynamicConfig
-		fb.config.ConfigModules.Unpack(&config)
-
-		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
-		if err != nil {
-			return errors.Wrap(err, "initialization error")
-		}
-
-		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
-			if err != nil {
-				errs = append(errs, errors.Wrap(err, "error loading config file"))
-				continue
-			}
-			set, err := fileset.NewModuleRegistry(confs, "", false)
-			if err != nil {
-				errs = append(errs, err)
-				continue
-			}
-
-			if err := set.LoadML(esClient); err != nil {
-				errs = append(errs, err)
-			}
-		}
-	}
-
-	return errs.Err()
+	return err
 }
 
 // Run allows the beater to be run as a beat.
@@ -208,7 +214,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, config.RegistryFlush, finishedLogger)
+	registrar, err := registrar.New(config.Registry, finishedLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
@@ -218,7 +224,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrarChannel := newRegistrarLogger(registrar)
 
 	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: newEventACKer(registrarChannel).ackEvents,
+		ACKEvents: newEventACKer(finishedLogger, registrarChannel).ackEvents,
 	})
 	if err != nil {
 		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)
@@ -227,7 +233,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
-		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
+		channel.NewOutletFactory(outDone, wgEvents, b.Info).Create,
 		config.Inputs,
 		b.Info.Version,
 		fb.done,
@@ -269,7 +275,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory)
+	if config.OverwritePipelines {
+		logp.Debug("modules", "Existing Ingest pipelines will be updated")
+	}
+
+	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -285,10 +295,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitFinished.Add(runOnce)
 	}
 
+	// Register reloadable list of inputs and modules
+	inputs := cfgfile.NewRunnerList(management.DebugK, crawler.InputsFactory, b.Publisher)
+	reload.Register.MustRegisterList("filebeat.inputs", inputs)
+
+	modules := cfgfile.NewRunnerList(management.DebugK, crawler.ModulesFactory, b.Publisher)
+	reload.Register.MustRegisterList("filebeat.modules", modules)
+
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
-		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
+		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
+		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return err
 		}
@@ -299,10 +316,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop autodiscover -> Stop crawler -> stop inputs -> stop harvesters
+	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
 	//       or publisher might panic due to concurrent updates.
+	inputs.Stop()
+	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
 

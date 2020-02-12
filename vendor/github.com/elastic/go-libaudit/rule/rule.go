@@ -1,6 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package rule
 
 import (
+	"fmt"
+	"math"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -28,10 +47,10 @@ func Build(rule Rule) (WireFormat, error) {
 
 	switch v := rule.(type) {
 	case *SyscallRule:
-		if err = addList(data, v.List); err != nil {
+		if err = data.setList(v.List); err != nil {
 			return nil, err
 		}
-		if err = addAction(data, v.Action); err != nil {
+		if err = data.setAction(v.Action); err != nil {
 			return nil, err
 		}
 
@@ -72,6 +91,228 @@ func Build(rule Rule) (WireFormat, error) {
 	}
 
 	return ard.toWireFormat(), nil
+}
+
+// ToCommandLine decodes a WireFormat into a command-line rule.
+// When resolveIds is set, it tries to resolve the argument to UIDs, GIDs,
+// file_type fields.
+// `auditctl -l` always prints the numeric (non-resolved) representation of
+// this fields, so when the flag is set to false, the output is the same as
+// auditctl.
+// There is an exception to this rule when parsing the `arch` field:
+// auditctl always prints "b64" or "b32" even for architectures other than
+// the current machine. This is misleading, so this code will print the actual
+// architecture.
+func ToCommandLine(wf WireFormat, resolveIds bool) (rule string, err error) {
+	ar, err := fromWireFormat(wf)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to parse wire format")
+	}
+
+	r := ruleData{}
+	if err = r.fromAuditRuleData(ar); err != nil {
+		return "", errors.Wrap(err, "failed to parse audit rule")
+	}
+
+	list, err := r.getList()
+	if err != nil {
+		return "", err
+	}
+
+	act, err := r.getAction()
+	if err != nil {
+		return "", err
+	}
+
+	existingFields := make(map[field]int)
+	for idx, fieldId := range r.fields {
+		existingFields[fieldId] = idx
+	}
+
+	// Detect if rule is a watch.
+	// Must have all syscalls and perm field. Only other valid fields are
+	// dir, path and key, according to auditctl source
+	if permIdx, ok := existingFields[permField]; r.allSyscalls && ok {
+		extraFields, pos := false, 0
+		var path, key string
+		for _, fieldId := range r.fields {
+			switch fieldId {
+			case keyField, pathField, dirField:
+				if pos >= len(r.strings) {
+					return "", fmt.Errorf("no buffer data for path field %d", fieldId)
+				}
+				if fieldId == keyField {
+					key = r.strings[pos]
+				} else {
+					path = r.strings[pos]
+				}
+				pos++
+			case permField:
+			default:
+				extraFields = true
+				break
+			}
+		}
+		if !extraFields {
+			arguments := []string{"-w", path, "-p", permission(r.values[permIdx]).String()}
+			if len(key) > 0 {
+				arguments = append(arguments, "-k", key)
+			}
+			return strings.Join(arguments, " "), nil
+		}
+	}
+
+	// Parse rule as syscall type
+
+	arguments := []string{
+		"-a",
+		fmt.Sprintf("%s,%s", act, list),
+	}
+
+	// Parse arch field first, if present
+	// Here there is a significant difference to what auditctl does.
+	// Auditctl will allow to install a rule for a different platform
+	// (i.e. "aarch64" when the actual platform is "x86_64"). A rule like this
+	// will never trigger any events in the kernel.
+	// When such a rule is printed with `auditctl -l`, it will show as
+	// "-F arch=b64", which is wrong.
+	// This code will print the real value, "aarch64".
+	if fieldIdx, found := existingFields[archField]; found {
+		r.arch, err = getDisplayArch(r.values[fieldIdx])
+		if err != nil {
+			return "", err
+		}
+		arguments = append(arguments, "-F", fmt.Sprintf("arch=%s", r.arch))
+	}
+
+	// Parse syscalls
+	if r.allSyscalls {
+		if r.flags == exitFilter || r.flags == entryFilter {
+			arguments = append(arguments, "-S", "all")
+		}
+	} else if len(r.syscalls) > 0 {
+		arch, err := getRuntimeArch()
+		if err != nil {
+			return "", err
+		}
+		if r.arch == "b32" {
+			switch arch {
+			case "i386", "arm", "ppc":
+			case "aarch64":
+				arch = "arm"
+			case "x86_64":
+				arch = "i386"
+			case "ppc64", "ppc64le":
+				arch = "ppc"
+			default:
+				return "", fmt.Errorf("invalid arch for b32: '%s'", arch)
+			}
+		} else if len(r.arch) > 0 && r.arch != "b64" {
+			arch = r.arch
+		}
+		syscallTable, ok := auparse.AuditSyscalls[arch]
+		if !ok {
+			return "", fmt.Errorf("no syscall table for arch %s", arch)
+		}
+		list := make([]string, len(r.syscalls))
+		for idx, syscallId := range r.syscalls {
+			list[idx], ok = syscallTable[int(syscallId)]
+			if !ok {
+				return "", fmt.Errorf("syscall %d not found for arch %s", syscallId, arch)
+			}
+		}
+
+		arguments = append(arguments, "-S", strings.Join(list, ","))
+	}
+
+	// Parse fields
+	stringIndex := 0
+	for idx, fieldId := range r.fields {
+		op, found := reverseOperatorsTable[r.fieldFlags[idx]]
+		if !found {
+			return "", fmt.Errorf("field operator %x not found", r.fieldFlags[idx])
+		}
+		switch fieldId {
+		case archField:
+			// arch already handled
+		case fieldCompare:
+			fieldIds, found := reverseComparisonsTable[comparison(r.values[idx])]
+			if !found {
+				return "", errors.New("comparision code not valid")
+			}
+			if fieldIds[1] < fieldIds[0] {
+				fieldIds[0], fieldIds[1] = fieldIds[1], fieldIds[0]
+			}
+			var fields [2]string
+			for idx, id := range fieldIds {
+				if fields[idx], found = reverseFieldsTable[id]; !found {
+					return "", fmt.Errorf("unknown field %d", id)
+				}
+			}
+			arguments = append(arguments, fmt.Sprintf("-C %s%s%s",
+				fields[0], op, fields[1]))
+
+		default:
+			lhs, found := reverseFieldsTable[fieldId]
+			if !found {
+				return "", fmt.Errorf("field %x not found", fieldId)
+			}
+			value := r.values[idx]
+			var rhs string
+			switch fieldId {
+			// Fields that take a string
+			case objectUserField, objectRoleField, objectTypeField, objectLevelLowField,
+				objectLevelHighField, pathField, dirField, subjectUserField,
+				subjectRoleField, subjectTypeField, subjectSensitivityField,
+				subjectClearanceField, keyField, exeField:
+				if stringIndex >= len(r.strings) {
+					return "", errors.New("string buffer overflow")
+				}
+				rhs = r.strings[stringIndex]
+				stringIndex++
+			case exitField:
+				exitCode := int(int32(value))
+				if errnoValue, ok := auparse.AuditErrnoToName[-exitCode]; ok {
+					rhs = fmt.Sprintf("-%s", errnoValue)
+				} else {
+					rhs = strconv.Itoa(exitCode)
+				}
+			case uidField, euidField, suidField, fsuidField, auidField, objectUIDField:
+				rhs = strconv.Itoa(int(int32(value)))
+				if resolveIds {
+					if user, err := user.LookupId(rhs); err == nil {
+						rhs = user.Username
+					}
+				}
+			case gidField, egidField, sgidField, fsgidField, objectGIDField:
+				rhs = strconv.Itoa(int(int32(value)))
+				if resolveIds {
+					if group, err := user.LookupGroupId(rhs); err == nil {
+						rhs = group.Name
+					}
+				}
+			case msgTypeField:
+				if value <= math.MaxUint16 {
+					rhs = auparse.AuditMessageType(value).String()
+				} else {
+					rhs = fmt.Sprintf("UNKNOWN[%d]", value)
+				}
+			case permField:
+				rhs = permission(value).String()
+			case filetypeField:
+				if resolveIds {
+					rhs = filetype(value).String()
+				} else {
+					rhs = strconv.Itoa(int(value))
+				}
+			default:
+				rhs = strconv.Itoa(int(value))
+			}
+			arguments = append(arguments, fmt.Sprintf("-F %s%s%s", lhs, op, rhs))
+		}
+	}
+
+	return strings.Join(arguments, " "), nil
 }
 
 func addFileWatch(data *ruleData, rule *FileWatchRule) error {
@@ -186,7 +427,50 @@ func (d ruleData) toAuditRuleData() (*auditRuleData, error) {
 	return rule, nil
 }
 
-func addList(rule *ruleData, list string) error {
+func (rule *ruleData) fromAuditRuleData(in *auditRuleData) error {
+	rule.flags = in.Flags
+	rule.action = in.Action
+	rule.fields = make([]field, in.FieldCount)
+	rule.allSyscalls = true
+	for i := 0; rule.allSyscalls && i < len(in.Mask)-1; i++ {
+		rule.allSyscalls = in.Mask[i] == 0xFFFFFFFF
+	}
+	if rule.allSyscalls == false {
+		for word, bits := range in.Mask {
+			for bit := uint32(0); bit < 32; bit++ {
+				if bits&(1<<bit) != 0 {
+					rule.syscalls = append(rule.syscalls, uint32(word)*32+bit)
+				}
+			}
+		}
+	}
+	rule.fields = make([]field, in.FieldCount)
+	rule.fieldFlags = make([]operator, in.FieldCount)
+	rule.values = make([]uint32, in.FieldCount)
+
+	offset := uint32(0)
+	for i := uint32(0); i < in.FieldCount; i++ {
+		rule.fields[i] = in.Fields[i]
+		rule.fieldFlags[i] = in.FieldFlags[i]
+		rule.values[i] = in.Values[i]
+		switch rule.fields[i] {
+		case objectUserField, objectRoleField, objectTypeField, objectLevelLowField,
+			objectLevelHighField, pathField, dirField, subjectUserField,
+			subjectRoleField, subjectTypeField, subjectSensitivityField,
+			subjectClearanceField, keyField, exeField:
+			end := in.Values[i] + offset
+			if end > in.BufLen {
+				return fmt.Errorf("field %d overflows buffer", i)
+			}
+			rule.strings = append(rule.strings, string(in.Buf[offset:end]))
+			offset = end
+		}
+	}
+
+	return nil
+}
+
+func (rule *ruleData) setList(list string) error {
 	switch list {
 	case "exit":
 		rule.flags = exitFilter
@@ -203,7 +487,22 @@ func addList(rule *ruleData, list string) error {
 	return nil
 }
 
-func addAction(rule *ruleData, action string) error {
+func (rule *ruleData) getList() (string, error) {
+	switch rule.flags {
+	case exitFilter:
+		return "exit", nil
+	case taskFilter:
+		return "task", nil
+	case userFilter:
+		return "user", nil
+	case excludeFilter:
+		return "exclude", nil
+	default:
+		return "", errors.Errorf("invalid list flag '%v'", rule.flags)
+	}
+}
+
+func (rule *ruleData) setAction(action string) error {
 	switch action {
 	case "always":
 		rule.action = alwaysAction
@@ -214,6 +513,17 @@ func addAction(rule *ruleData, action string) error {
 	}
 
 	return nil
+}
+
+func (rule *ruleData) getAction() (string, error) {
+	switch rule.action {
+	case alwaysAction:
+		return "always", nil
+	case neverAction:
+		return "never", nil
+	default:
+		return "", errors.Errorf("invalid action '%v'", rule.action)
+	}
 }
 
 // Convert name to number.
@@ -530,7 +840,7 @@ func getArch(arch string) (string, uint32, error) {
 		}
 
 		switch runtimeArch {
-		case "aarch64", "x86_64", "ppc":
+		case "aarch64", "x86_64", "ppc64":
 			realArch = runtimeArch
 		default:
 			return "", 0, errors.Errorf("cannot use b64 on %v", runtimeArch)
@@ -548,6 +858,8 @@ func getArch(arch string) (string, uint32, error) {
 			realArch = "arm"
 		case "x86_64":
 			realArch = "i386"
+		case "ppc64":
+			realArch = "ppc"
 		default:
 			return "", 0, errors.Errorf("cannot use b32 on %v", runtimeArch)
 		}
@@ -560,7 +872,41 @@ func getArch(arch string) (string, uint32, error) {
 	return realArch, archValue, nil
 }
 
-// getRuntimeArch returns the programs arch (not the machines arch).
+// from a rule arch returned by kernel, decide what arch name to display
+func getDisplayArch(archId uint32) (string, error) {
+	runtimeArchStr, err := getRuntimeArch()
+	if err != nil {
+		return "", err
+	}
+	runtimeArchU32, ok := reverseArch[runtimeArchStr]
+	if !ok {
+		return "", errors.New("current architecture not supported")
+	}
+	runtimeArch := auparse.AuditArch(runtimeArchU32)
+	requestedArch := auparse.AuditArch(archId)
+	if requestedArch == runtimeArch {
+		switch requestedArch {
+		case auparse.AUDIT_ARCH_AARCH64, auparse.AUDIT_ARCH_X86_64, auparse.AUDIT_ARCH_PPC64:
+			return "b64", nil
+		case auparse.AUDIT_ARCH_ARM, auparse.AUDIT_ARCH_I386, auparse.AUDIT_ARCH_PPC:
+			return "b32", nil
+		}
+	} else {
+		switch {
+		case runtimeArch == auparse.AUDIT_ARCH_AARCH64 && requestedArch == auparse.AUDIT_ARCH_ARM,
+			runtimeArch == auparse.AUDIT_ARCH_X86_64 && requestedArch == auparse.AUDIT_ARCH_I386,
+			runtimeArch == auparse.AUDIT_ARCH_PPC64 && requestedArch == auparse.AUDIT_ARCH_PPC:
+			return "b32", nil
+		}
+	}
+	name, ok := auparse.AuditArchNames[requestedArch]
+	if !ok {
+		return "", fmt.Errorf("unsupported arch=%x in rule", requestedArch)
+	}
+	return name, nil
+}
+
+// getRuntimeArch returns the program's arch (not the machine's arch).
 func getRuntimeArch() (string, error) {
 	var arch string
 	switch runtime.GOARCH {
@@ -572,8 +918,12 @@ func getRuntimeArch() (string, error) {
 		arch = "i386"
 	case "amd64":
 		arch = "x86_64"
-	case "ppc64", "ppc64le":
-		arch = "ppc"
+	case "ppc64", "ppc64le", "ppc":
+		arch = runtime.GOARCH
+	case "s390":
+		arch = "s390"
+	case "s390x":
+		arch = "s390x"
 	case "mips", "mipsle", "mips64", "mips64le":
 		fallthrough
 	default:
@@ -620,6 +970,24 @@ func getPerm(perm string) (uint32, error) {
 	return uint32(permBits), nil
 }
 
+// String returns the string representation of the permission bits.
+func (bits permission) String() string {
+	perms := make([]byte, 0, 4)
+	if bits&readPerm != 0 {
+		perms = append(perms, 'r')
+	}
+	if bits&writePerm != 0 {
+		perms = append(perms, 'w')
+	}
+	if bits&execPerm != 0 {
+		perms = append(perms, 'x')
+	}
+	if bits&attrPerm != 0 {
+		perms = append(perms, 'a')
+	}
+	return string(perms)
+}
+
 func getFiletype(filetype string) (filetype, error) {
 	switch strings.ToLower(filetype) {
 	case "file":
@@ -638,6 +1006,28 @@ func getFiletype(filetype string) (filetype, error) {
 		return fifoFiletype, nil
 	default:
 		return 0, errors.Errorf("invalid filetype '%v'", filetype)
+	}
+}
+
+// String returns the string representation of a filetype
+func (ft filetype) String() string {
+	switch ft {
+	case fileFiletype:
+		return "file"
+	case dirFiletype:
+		return "dir"
+	case socketFiletype:
+		return "socket"
+	case linkFiletype:
+		return "symlink"
+	case characterFiletype:
+		return "char"
+	case blockFiletype:
+		return "block"
+	case fifoFiletype:
+		return "fifo"
+	default:
+		return fmt.Sprintf("UNKNOWN:%x", uint32(ft))
 	}
 }
 

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package outputs
 
 import "github.com/elastic/beats/libbeat/monitoring"
@@ -16,6 +33,7 @@ type Stats struct {
 	active     *monitoring.Uint // events sent and waiting for ACK/fail from output
 	duplicates *monitoring.Uint // events sent and waiting for ACK/fail from output
 	dropped    *monitoring.Uint // total number of invalid events dropped by the output
+	tooMany    *monitoring.Uint // total number of too many requests replies from output
 
 	//
 	// Output network connection stats
@@ -39,6 +57,7 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		dropped:    monitoring.NewUint(reg, "events.dropped"),
 		duplicates: monitoring.NewUint(reg, "events.duplicates"),
 		active:     monitoring.NewUint(reg, "events.active"),
+		tooMany:    monitoring.NewUint(reg, "events.toomany"),
 
 		writeBytes:  monitoring.NewUint(reg, "write.bytes"),
 		writeErrors: monitoring.NewUint(reg, "write.errors"),
@@ -73,7 +92,7 @@ func (s *Stats) Failed(n int) {
 	}
 }
 
-// Duplicate updats the active and duplicate event metrics.
+// Duplicate updates the active and duplicate event metrics.
 func (s *Stats) Duplicate(n int) {
 	if s != nil {
 		s.duplicates.Add(uint64(n))
@@ -83,7 +102,7 @@ func (s *Stats) Duplicate(n int) {
 
 // Dropped updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
-// event not being publishabel. For example encoding errors or total event size
+// event not being publishable. For example encoding errors or total event size
 // being bigger then maximum supported event size.
 func (s *Stats) Dropped(n int) {
 	// number of dropped events (e.g. encoding failures)
@@ -97,6 +116,13 @@ func (s *Stats) Dropped(n int) {
 func (s *Stats) Cancelled(n int) {
 	if s != nil {
 		s.active.Sub(uint64(n))
+	}
+}
+
+// ErrTooMany updates the number of Too Many Requests responses reported by the output.
+func (s *Stats) ErrTooMany(n int) {
+	if s != nil {
+		s.tooMany.Add(uint64(n))
 	}
 }
 

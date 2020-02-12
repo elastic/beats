@@ -1,0 +1,81 @@
+- module: zeek
+  capture_loss:
+    enabled: true
+  connection:
+    enabled: true
+  dce_rpc:
+    enabled: true
+  dhcp:
+    enabled: true
+  dnp3:
+    enabled: true
+  dns:
+    enabled: true
+  dpd:
+    enabled: true
+  files:
+    enabled: true
+  ftp:
+    enabled: true
+  http:
+    enabled: true
+  intel:
+    enabled: true    
+  irc:
+    enabled: true
+  kerberos:
+    enabled: true
+  modbus:
+    enabled: true
+  mysql:
+    enabled: true
+  notice:
+    enabled: true
+  ntlm:
+    enabled: true
+  ocsp:
+    enabled: true
+  pe:
+    enabled: true
+  radius:
+    enabled: true
+  rdp:
+    enabled: true
+  rfb:
+    enabled: true
+  signatures:
+    enabled: true
+  sip:
+    enabled: true
+  smb_cmd:
+    enabled: true
+  smb_files:
+    enabled: true
+  smb_mapping:
+    enabled: true
+  smtp:
+    enabled: true
+  snmp:
+    enabled: true
+  socks:
+    enabled: true
+  ssh:
+    enabled: true
+  ssl:
+    enabled: true
+  stats:
+    enabled: true
+  syslog:
+    enabled: true
+  traceroute:
+    enabled: true
+  tunnel:
+    enabled: true
+  weird:
+    enabled: true
+  x509:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:

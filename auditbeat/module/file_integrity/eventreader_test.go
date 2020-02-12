@@ -1,10 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package file_integrity
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -12,6 +31,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	underTest = true
+}
 
 // ErrorSharingViolation is a Windows ERROR_SHARING_VIOLATION. It means "The
 // process cannot access the file because it is being used by another process."
@@ -214,6 +237,74 @@ func TestEventReader(t *testing.T) {
 
 		assertNoEvent(t, events)
 	})
+}
+
+func TestRaces(t *testing.T) {
+	const (
+		fileMode os.FileMode = 0640
+		N                    = 100
+	)
+
+	var dirs []string
+
+	for i := 0; i < N; i++ {
+		dir, err := ioutil.TempDir("", "audit")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if dir, err = filepath.EvalSymlinks(dir); err != nil {
+			t.Fatal(err)
+		}
+		dirs = append(dirs, dir)
+	}
+
+	defer func() {
+		for _, dir := range dirs {
+			os.RemoveAll(dir)
+		}
+	}()
+
+	// Create a new EventProducer.
+	config := defaultConfig
+	config.Paths = dirs
+	config.Recursive = true
+	r, err := NewEventReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done := make(chan struct{})
+	defer close(done)
+
+	// Generate a lot of events in parallel to Start() so there is a chance of
+	// events arriving before all watched dirs are Add()-ed
+	go func() {
+		for i := 0; i < 10; i++ {
+			for _, dir := range dirs {
+				fname := filepath.Join(dir, fmt.Sprintf("%d.dat", i))
+				ioutil.WriteFile(fname, []byte("hello"), fileMode)
+			}
+		}
+	}()
+	eventC, err := r.Start(done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const marker = "test_file"
+	for _, dir := range dirs {
+		fname := filepath.Join(dir, marker)
+		ioutil.WriteFile(fname, []byte("hello"), fileMode)
+	}
+
+	got := 0
+	for i := 0; got < N; i++ {
+		ev := readTimeout(t, eventC)
+		if strings.Contains(ev.Path, marker) {
+			got++
+		}
+	}
+	assert.Equal(t, N, got)
 }
 
 // readTimeout reads one event from the channel and returns it. If it does

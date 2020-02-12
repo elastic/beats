@@ -1,0 +1,47 @@
+{
+  "@timestamp": "2020-02-07T17:10:12.124Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "service": {
+    "address": "192.168.39.32:32042",
+    "type": "kubernetes"
+  },
+  "kubernetes": {
+    "storageclass": {
+      "volume_binding_mode": "Immediate",
+      "name": "beats-test-sc2",
+      "created": "2020-02-07T10:14:28.000Z",
+      "provisioner": "kubernetes.io/non-existing2",
+      "reclaim_policy": "Delete"
+    },
+    "labels": {
+      "testl3": "value3",
+      "testl4": "value4"
+    }
+  },
+  "event": {
+    "duration": 13684387,
+    "dataset": "kubernetes.storageclass",
+    "module": "kubernetes"
+  },
+  "ecs": {
+    "version": "1.4.0"
+  },
+  "host": {
+    "name": "pl51"
+  },
+  "agent": {
+    "version": "8.0.0",
+    "type": "metricbeat",
+    "ephemeral_id": "f4458304-dc2e-4831-be7a-45cd34126fd2",
+    "hostname": "tamag8",
+    "id": "e9952df4-592e-4102-84a6-ad0b333b3b98"
+  },
+  "metricset": {
+    "name": "state_storageclass",
+    "period": 10000
+  }
+}

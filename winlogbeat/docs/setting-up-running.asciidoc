@@ -4,7 +4,7 @@
 // that is unique to each beat.
 /////
 
-[[seting-up-and-running]]
+[[setting-up-and-running]]
 == Setting up and running {beatname_uc}
 
 Before reading this section, see the
@@ -18,10 +18,12 @@ This section includes additional information on how to set up and run
 
 * <<command-line-options>>
 
-//MAINTAINERS: If you add a new file to this section, make sure you update the bulletedl ist ^^ too.
+//MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::{libbeat-dir}/shared-directory-layout.asciidoc[]
 
-include::../../libbeat/docs/keystore.asciidoc[]
+include::{libbeat-dir}/keystore.asciidoc[]
 
-include::../../libbeat/docs/command-reference.asciidoc[]
+include::{libbeat-dir}/command-reference.asciidoc[]
+
+include::{libbeat-dir}/shared-shutdown.asciidoc[]

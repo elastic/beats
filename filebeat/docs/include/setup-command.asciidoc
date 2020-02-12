@@ -1,0 +1,47 @@
+--
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup -e
+----
+
+The <<setup-command,`setup`>> command loads the recommended index template for
+writing to {es} and deploys the sample dashboards (if available) for visualizing
+the data in {kib}. This is a one-time setup step. 
+
+The `-e` flag is optional and sends output to standard error instead of syslog.
+
+The ingest pipelines used to parse log lines are set up automatically the first
+time you run the module, assuming the {es} output is enabled. If you're sending
+events to {ls}, or plan to use <<configuration-central-management,{beats} central
+management>>, also see <<load-ingest-pipelines>>.
+--

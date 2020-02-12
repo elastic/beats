@@ -8,3 +8,5 @@ multiline:
   pattern: '^\['
   negate: true
   match: after
+processors:
+- add_locale: ~

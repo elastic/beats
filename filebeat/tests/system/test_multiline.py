@@ -24,7 +24,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -55,7 +54,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/multiline-c-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -132,7 +130,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -215,7 +212,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -231,7 +227,7 @@ connection <0.23893.109>, channel 3 - soft error:
         # Check that first 60 chars are sent
         assert True == self.log_contains("cluster.metadata", "output/filebeat")
 
-        # Checks that chars aferwards are not sent
+        # Checks that chars afterwards are not sent
         assert False == self.log_contains("Zach", "output/filebeat")
 
         # Check that output file has the same number of lines as the log file

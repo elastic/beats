@@ -10,8 +10,13 @@
 //// This content is structured to be included as a whole file.
 //////////////////////////////////////////////////////////////////////////
 
-To secure the communication between {beatname_uc} and Elasticsearch, you can use HTTPS
-and basic authentication. Here is a sample configuration:
+To secure the communication between {beatname_uc} and Elasticsearch, you can use
+HTTPS and basic authentication. Basic authentication for Elasticsearch is
+available when you enable {security} (see
+{ref}/secure-cluster.html[Secure a cluster] and <<securing-beats>>).
+If you aren't using {security}, you can use a web proxy instead.
+
+Here is a sample configuration:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -26,13 +31,13 @@ output.elasticsearch:
 <3> This setting enables the HTTPS protocol.
 <4> The IP and port of the Elasticsearch nodes.
 
-TIP: To obfuscate passwords and other sensitive settings, use the
-<<keystore,secrets keystore>>.
-
-Elasticsearch doesn't have built-in basic authentication, but you can achieve it
-either by using a web proxy or by using X-Pack to secure Elasticsearch. For more
-information, see the X-Pack documentation about
-{securitydoc}/xpack-security.html[securing Elasticsearch] and <<securing-beats>>. 
+TIP: To obfuscate passwords and other sensitive settings,
+ifndef::serverless[]
+use the <<keystore,secrets keystore>>.
+endif::[]
+ifdef::serverless[]
+use environment variables.
+endif::[]
 
 {beatname_uc} verifies the validity of the server certificates and only accepts trusted
 certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
@@ -41,7 +46,7 @@ this document.
 By default {beatname_uc} uses the list of trusted certificate authorities from the
 operating system where {beatname_uc} is running. You can configure {beatname_uc} to use a specific list of
 CA certificates instead of the list from the OS. You can also configure it to use client authentication
-by specifying the certificate and key to use when the server requires the Beat to authenticate. Here is an example
+by specifying the certificate and key to use when the server requires the {beatname_uc} to authenticate. Here is an example
 configuration:
 
 ["source","yaml",subs="attributes,callouts"]

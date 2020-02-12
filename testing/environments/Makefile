@@ -3,7 +3,7 @@ BASE_COMMAND=docker-compose -f ${ENV} -f local.yml
 
 start:
 	# This is run every time to make sure the environment is up-to-date
-	${BASE_COMMAND} build
+	${BASE_COMMAND} build --pull --force-rm
 	${BASE_COMMAND} run beat bash
 
 stop:
@@ -13,6 +13,10 @@ stop:
 up:
 	${BASE_COMMAND} build
 	${BASE_COMMAND} up
+
+up-%:
+	${BASE_COMMAND} build $*
+	${BASE_COMMAND} up $*
 
 # Be careful using this command, as it will remove all containers and volumes of your docker-machine
 clean:

@@ -1,9 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package redis
 
 import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -60,7 +78,7 @@ func newClient(
 		observer: observer,
 		timeout:  timeout,
 		password: pass,
-		index:    index,
+		index:    strings.ToLower(index),
 		db:       db,
 		dataType: dt,
 		key:      key,
@@ -133,6 +151,10 @@ func (c *client) Publish(batch publisher.Batch) error {
 
 	batch.ACK()
 	return err
+}
+
+func (c *client) String() string {
+	return "redis(" + c.Client.String() + ")"
 }
 
 func (c *client) makePublish(
@@ -211,7 +233,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		// RPUSH returns total length of list -> fail and retry all on error
 		_, err := conn.Do(command, args...)
 		if err != nil {
-			logp.Err("Failed to %v to redis list with %v", command, err)
+			logp.Err("Failed to %v to redis list with: %v", command, err)
 			return okEvents, err
 
 		}
@@ -291,6 +313,7 @@ func serializeEvents(
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			logp.Err("Encoding event failed with error: %v", err)
+			logp.Debug("redis", "Failed event: %v", d.Content)
 			goto failLoop
 		}
 
@@ -308,6 +331,7 @@ failLoop:
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			logp.Err("Encoding event failed with error: %v", err)
+			logp.Debug("redis", "Failed event: %v", d.Content)
 			i++
 			continue
 		}

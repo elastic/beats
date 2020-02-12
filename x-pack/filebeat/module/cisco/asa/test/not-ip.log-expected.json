@@ -1,0 +1,35 @@
+[
+    {
+        "@timestamp": "2019-10-04T15:27:55.000-02:00",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "106100",
+        "cisco.asa.rule_name": "AL-DMZ-LB-IN",
+        "cisco.asa.source_interface": "LB-DMZ",
+        "destination.address": "203.0.113.42",
+        "destination.ip": "203.0.113.42",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.code": 106100,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-106100: access-list AL-DMZ-LB-IN denied tcp LB-DMZ/WHAT-IS-THIS-A-HOSTNAME-192.0.2.244(27218) -> OUTSIDE/203.0.113.42(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
+        "event.outcome": "deny",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "not-ip.log",
+        "log.level": "notification",
+        "log.offset": 0,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "service.type": "cisco",
+        "source.address": "WHAT-IS-THIS-A-HOSTNAME-192.0.2.244",
+        "source.domain": "WHAT-IS-THIS-A-HOSTNAME-192.0.2.244",
+        "source.port": 27218,
+        "syslog.facility": 165,
+        "tags": [
+            "cisco-asa"
+        ]
+    }
+]

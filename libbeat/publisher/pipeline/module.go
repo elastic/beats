@@ -1,7 +1,23 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pipeline
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 
@@ -10,7 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -21,101 +37,136 @@ var publishDisabled = false
 
 const defaultQueueType = "mem"
 
+// Monitors configures visibility for observing state and progress of the
+// pipeline.
+type Monitors struct {
+	Metrics   *monitoring.Registry
+	Telemetry *monitoring.Registry
+	Logger    *logp.Logger
+}
+
+// OutputFactory is used by the publisher pipeline to create an output instance.
+// If the group returned can be empty. The pipeline will accept events, but
+// eventually block.
+type OutputFactory func(outputs.Observer) (string, outputs.Group, error)
+
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
 }
 
 // Load uses a Config object to create a new complete Pipeline instance with
-// configured queue and outputs.
+// configured queue and outputs. This is a non-blocking operation, and outputs should connect lazily.
 func Load(
 	beatInfo beat.Info,
-	reg *monitoring.Registry,
+	monitors Monitors,
 	config Config,
-	outcfg common.ConfigNamespace,
+	processors processing.Supporter,
+	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 ) (*Pipeline, error) {
-	if publishDisabled {
-		logp.Info("Dry run mode. All output types except the file based one are disabled.")
-	}
 
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing processors: %v", err)
-	}
-
-	name := beatInfo.Name
 	settings := Settings{
 		WaitClose:     0,
 		WaitCloseMode: NoWaitOnClose,
-		Disabled:      publishDisabled,
 		Processors:    processors,
-		Annotations: Annotations{
-			Event: config.EventMetadata,
-			Beat: common.MapStr{
-				"name":     name,
-				"hostname": beatInfo.Hostname,
-				"version":  beatInfo.Version,
-			},
-		},
 	}
 
-	queueBuilder, err := createQueueBuilder(config.Queue)
+	return LoadWithSettings(beatInfo, monitors, config, makeOutput, settings)
+}
+
+// LoadWithSettings is the same as Load, but it exposes a Settings object that includes processors and WaitClose behavior
+func LoadWithSettings(
+	beatInfo beat.Info,
+	monitors Monitors,
+	config Config,
+	makeOutput func(outputs.Observer) (string, outputs.Group, error),
+	settings Settings,
+) (*Pipeline, error) {
+	log := monitors.Logger
+	if log == nil {
+		log = logp.L()
+	}
+
+	if publishDisabled {
+		log.Info("Dry run mode. All output types except the file based one are disabled.")
+	}
+
+	name := beatInfo.Name
+
+	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
 	if err != nil {
 		return nil, err
 	}
 
-	out, err := loadOutput(beatInfo, reg, outcfg)
+	out, err := loadOutput(monitors, makeOutput)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := New(beatInfo, reg, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Info("Beat name: %s", name)
+	log.Infof("Beat name: %s", name)
 	return p, err
 }
 
 func loadOutput(
-	beatInfo beat.Info,
-	reg *monitoring.Registry,
-	outcfg common.ConfigNamespace,
+	monitors Monitors,
+	makeOutput OutputFactory,
 ) (outputs.Group, error) {
+	log := monitors.Logger
+	if log == nil {
+		log = logp.L()
+	}
+
 	if publishDisabled {
 		return outputs.Group{}, nil
 	}
 
-	if !outcfg.IsSet() {
-		msg := "No outputs are defined. Please define one under the output section."
-		logp.Info(msg)
-		return outputs.Fail(errors.New(msg))
+	if makeOutput == nil {
+		return outputs.Group{}, nil
 	}
-
-	// TODO: add support to unload/reassign outStats on output reloading
 
 	var (
-		outReg   *monitoring.Registry
+		metrics  *monitoring.Registry
 		outStats outputs.Observer
 	)
-	if reg != nil {
-		outReg = reg.NewRegistry("output")
-		outStats = outputs.NewStats(outReg)
+	if monitors.Metrics != nil {
+		metrics = monitors.Metrics.GetRegistry("output")
+		if metrics != nil {
+			metrics.Clear()
+		} else {
+			metrics = monitors.Metrics.NewRegistry("output")
+		}
+		outStats = outputs.NewStats(metrics)
 	}
 
-	out, err := outputs.Load(beatInfo, outStats, outcfg.Name(), outcfg.Config())
+	outName, out, err := makeOutput(outStats)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	if outReg != nil {
-		monitoring.NewString(outReg, "type").Set(outcfg.Name())
+	if metrics != nil {
+		monitoring.NewString(metrics, "type").Set(outName)
+	}
+	if monitors.Telemetry != nil {
+		telemetry := monitors.Telemetry.GetRegistry("output")
+		if telemetry != nil {
+			telemetry.Clear()
+		} else {
+			telemetry = monitors.Telemetry.NewRegistry("output")
+		}
+		monitoring.NewString(telemetry, "name").Set(outName)
 	}
 
 	return out, nil
 }
 
-func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (queue.Queue, error), error) {
+func createQueueBuilder(
+	config common.ConfigNamespace,
+	monitors Monitors,
+) (func(queue.Eventer) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
 		queueType = b
@@ -131,7 +182,12 @@ func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (que
 		queueConfig = common.NewConfig()
 	}
 
+	if monitors.Telemetry != nil {
+		queueReg := monitors.Telemetry.NewRegistry("queue")
+		monitoring.NewString(queueReg, "name").Set(queueType)
+	}
+
 	return func(eventer queue.Eventer) (queue.Queue, error) {
-		return queueFactory(eventer, queueConfig)
+		return queueFactory(eventer, monitors.Logger, queueConfig)
 	}, nil
 }

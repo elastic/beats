@@ -1,0 +1,232 @@
+{
+  "@metadata": {
+    "beat": "packetbeat",
+    "type": "_doc",
+    "version": "7.0.0"
+  },
+  "@timestamp": "2015-02-07T12:00:36.846Z",
+  "agent": {
+    "ephemeral_id": "6fa23feb-c9b7-40b4-ab92-1f70de06479e",
+    "hostname": "host.example.com",
+    "id": "d7c50ec8-fb6d-48b0-84ca-d28e6c1d2968",
+    "type": "packetbeat",
+    "version": "7.0.0"
+  },
+  "client": {
+    "ip": "127.0.0.1",
+    "port": 60883
+  },
+  "destination": {
+    "domain": "localhost",
+    "ip": "127.0.0.1",
+    "port": 443
+  },
+  "ecs": {
+    "version": "1.0.0-beta2"
+  },
+  "event": {
+    "dataset": "tls",
+    "duration": 2575000,
+    "end": "2015-02-07T12:00:36.849Z",
+    "start": "2015-02-07T12:00:36.846Z"
+  },
+  "host": {
+    "name": "host.example.com"
+  },
+  "network": {
+    "community_id": "1:wDuS+WyVK9RbbXpvXaQzGSJ4d6g=",
+    "protocol": "tls",
+    "transport": "tcp",
+    "type": "ipv4"
+  },
+  "server": {
+    "domain": "localhost",
+    "ip": "127.0.0.1",
+    "port": 443
+  },
+  "source": {
+    "ip": "127.0.0.1",
+    "port": 60883
+  },
+  "status": "OK",
+  "tls": {
+    "client_certificate_requested": false,
+    "client_hello": {
+      "extensions": {
+        "_unparsed_": [
+          "15",
+          "13172",
+          "21"
+        ],
+        "application_layer_protocol_negotiation": [
+          "h2-16",
+          "h2-14"
+        ],
+        "ec_points_formats": [
+          "uncompressed",
+          "ansiX962_compressed_prime",
+          "ansiX962_compressed_char2"
+        ],
+        "server_name_indication": [
+          "localhost"
+        ],
+        "session_ticket": "",
+        "signature_algorithms": [
+          "rsa_pkcs1_sha512",
+          "(unknown:0x0602)",
+          "ecdsa_secp521r1_sha512",
+          "rsa_pkcs1_sha384",
+          "(unknown:0x0502)",
+          "ecdsa_secp384r1_sha384",
+          "rsa_pkcs1_sha256",
+          "(unknown:0x0402)",
+          "ecdsa_secp256r1_sha256",
+          "(unknown:0x0301)",
+          "(unknown:0x0302)",
+          "(unknown:0x0303)",
+          "rsa_pkcs1_sha1",
+          "(unknown:0x0202)",
+          "ecdsa_sha1"
+        ],
+        "supported_groups": [
+          "sect571r1",
+          "sect571k1",
+          "secp521r1",
+          "brainpoolP512r1",
+          "sect409k1",
+          "sect409r1",
+          "brainpoolP384r1",
+          "secp384r1",
+          "sect283k1",
+          "sect283r1",
+          "brainpoolP256r1",
+          "secp256k1",
+          "secp256r1",
+          "sect239k1",
+          "sect233k1",
+          "sect233r1",
+          "secp224k1",
+          "secp224r1",
+          "sect193r1",
+          "sect193r2",
+          "secp192k1",
+          "secp192r1",
+          "sect163k1",
+          "sect163r1",
+          "sect163r2",
+          "secp160k1",
+          "secp160r1",
+          "secp160r2"
+        ]
+      },
+      "supported_ciphers": [
+        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_DHE_DSS_WITH_AES_128_GCM_SHA256",
+        "TLS_DHE_DSS_WITH_AES_256_GCM_SHA384",
+        "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+        "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
+        "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+        "TLS_DHE_DSS_WITH_AES_256_CBC_SHA",
+        "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+        "TLS_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_RSA_WITH_AES_256_CBC_SHA256",
+        "TLS_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_RSA_WITH_AES_256_CBC_SHA",
+        "TLS_DH_DSS_WITH_AES_256_GCM_SHA384",
+        "TLS_DH_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256",
+        "TLS_DH_RSA_WITH_AES_256_CBC_SHA256",
+        "TLS_DH_DSS_WITH_AES_256_CBC_SHA256",
+        "TLS_DH_RSA_WITH_AES_256_CBC_SHA",
+        "TLS_DH_DSS_WITH_AES_256_CBC_SHA",
+        "TLS_DH_DSS_WITH_AES_128_GCM_SHA256",
+        "TLS_DH_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_DH_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_DH_DSS_WITH_AES_128_CBC_SHA256",
+        "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+        "TLS_DH_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_DH_DSS_WITH_AES_128_CBC_SHA",
+        "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA",
+        "TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA",
+        "TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA",
+        "TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA",
+        "TLS_RSA_WITH_CAMELLIA_256_CBC_SHA",
+        "TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA",
+        "TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA",
+        "TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA",
+        "TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA",
+        "TLS_RSA_WITH_CAMELLIA_128_CBC_SHA",
+        "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+        "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
+      ],
+      "supported_compression_methods": [
+        "NULL"
+      ],
+      "version": "3.3"
+    },
+    "fingerprints": {
+      "ja3": {
+        "hash": "ba7a226ea102737ecfa8959f26b28b95",
+        "str": "771,49199-49195-49200-49196-158-162-163-159-49191-49187-49171-49161-49192-49188-49172-49162-103-51-64-107-56-57-156-157-60-61-47-53-165-161-106-105-104-55-54-164-160-63-62-50-49-48-136-135-134-133-132-69-68-67-66-65-10-255,0-11-10-35-13-15-13172-16-21,14-13-25-28-11-12-27-24-9-10-26-22-23-8-6-7-20-21-4-5-18-19-1-2-3-15-16-17,0-1-2"
+      }
+    },
+    "handshake_completed": true,
+    "resumed": false,
+    "server_certificate": {
+      "fingerprint": {
+        "sha1": "43273588ab2683d2d61ded6e040b3ada31b7db21"
+      },
+      "issuer": {
+        "common_name": "localhost"
+      },
+      "not_after": "2015-03-09T11:30:11.000Z",
+      "not_before": "2015-02-07T11:30:11.000Z",
+      "public_key_algorithm": "RSA",
+      "public_key_size": 1024,
+      "serial_number": "17658991175679227337",
+      "signature_algorithm": "SHA256-RSA",
+      "subject": {
+        "common_name": "localhost"
+      },
+      "version": 3
+    },
+    "server_hello": {
+      "extensions": {
+        "_unparsed_": [
+          "renegotiation_info",
+          "15"
+        ],
+        "application_layer_protocol_negotiation": [
+          "h2-16"
+        ],
+        "ec_points_formats": [
+          "uncompressed",
+          "ansiX962_compressed_prime",
+          "ansiX962_compressed_char2"
+        ]
+      },
+      "selected_cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "selected_compression_method": "NULL",
+      "session_id": "e4c37fcf360eb71fddb0788550cde2243da8e7f052e816a16989cffd9cf1bd86",
+      "version": "3.3"
+    },
+    "version": "TLS 1.2"
+  },
+  "type": "tls"
+}

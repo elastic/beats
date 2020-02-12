@@ -1,0 +1,65 @@
+[
+    {
+        "@timestamp": "2016-10-25T14:49:34.000-02:00",
+        "event.dataset": "nginx.error",
+        "event.module": "nginx",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 0,
+        "message": "open() \"/usr/local/Cellar/nginx/1.10.2_1/html/favicon.ico\" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: \"GET /favicon.ico HTTP/1.1\", host: \"localhost:8080\", referrer: \"http://localhost:8080/\"",
+        "nginx.error.connection_id": 1,
+        "process.pid": 54053,
+        "process.thread.id": 0,
+        "service.type": "nginx"
+    },
+    {
+        "@timestamp": "2016-10-25T14:50:44.000-02:00",
+        "event.dataset": "nginx.error",
+        "event.module": "nginx",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 273,
+        "message": "open() \"/usr/local/Cellar/nginx/1.10.2_1/html/adsasd\" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: \"GET /adsasd HTTP/1.1\", host: \"localhost:8080\"",
+        "nginx.error.connection_id": 3,
+        "process.pid": 54053,
+        "process.thread.id": 0,
+        "service.type": "nginx"
+    },
+    {
+        "@timestamp": "2019-10-30T23:26:34.000-02:00",
+        "event.dataset": "nginx.error",
+        "event.module": "nginx",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "error",
+        "log.offset": 500,
+        "message": "FastCGI sent in stderr: \"PHP message: PHP Warning:  Declaration of FEE_Field_Terms::wrap($content, $taxonomy, $before, $sep, $after) should be compatible with FEE_Field_Post::wrap($content, $post_id = 0) in /var/www/xxx/web/wp-content/plugins/front-end-editor/php/fields/post.php on line 0\nPHP message: PHP Warning:  Declaration of FEE_Field_Tags::wrap($content, $before, $sep, $after) should be compatible with FEE_Field_Terms::wrap($content, $taxonomy, $before, $sep, $after) in /var/www/xxx/web/wp-content/plugins/front-end-editor/php/fields/post.php on line 0\nPHP message: PHP Warning:  Declaration of FEE_Field_Category::wrap($content, $sep, $parents) should be compatible with FEE_Field_Terms::wrap($content, $taxonomy, $before, $sep, $after) in /var/www/xxx/web/wp-content/plugins/front-end-editor/php/fields/post.php on line 0",
+        "nginx.error.connection_id": 180289,
+        "process.pid": 205860,
+        "process.thread.id": 205860,
+        "service.type": "nginx"
+    },
+    {
+        "@timestamp": "2019-11-05T14:50:44.000-02:00",
+        "event.dataset": "nginx.error",
+        "event.module": "nginx",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 1386,
+        "message": "open() \"/usr/local/Cellar/nginx/1.10.2_1/html/adsasd\" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: \"GET /pysio HTTP/1.1\", host: \"localhost:8080\"",
+        "nginx.error.connection_id": 3,
+        "process.pid": 54053,
+        "process.thread.id": 0,
+        "service.type": "nginx"
+    }
+]

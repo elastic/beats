@@ -10,9 +10,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[setup-kibana-endpoint]]
-== Set up the Kibana endpoint
+== Configure the Kibana endpoint
 
-Starting with Beats 6.0.0, the Kibana dashboards are loaded into Kibana
+Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
 via the Kibana API. This requires a Kibana endpoint configuration.
 
 You configure the endpoint in the `setup.kibana` section of the
@@ -22,7 +22,7 @@ Here is an example configuration:
 
 [source,yaml]
 ----
-setup.kibana.host: "localhost:5601"
+setup.kibana.host: "http://localhost:5601"
 ----
 
 [float]
@@ -58,7 +58,7 @@ Example config:
 [source,yaml]
 ----
 setup.kibana.host: "192.0.2.255:5601"
-setup.kibana.protocol: "https"
+setup.kibana.protocol: "http"
 setup.kibana.path: /kibana
 ----
 
@@ -89,15 +89,14 @@ under a custom prefix.
 ==== `setup.kibana.ssl.enabled`
 
 Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
-If you configure the Beat to connect over HTTPS, this setting defaults to
+If you configure {beatname_uc} to connect over HTTPS, this setting defaults to
 `true` and {beatname_uc} uses the default SSL settings.
 
 Example configuration:
 
 [source,yaml]
 ----
-setup.kibana.host: "192.0.2.255:5601"
-setup.kibana.protocol: "https"
+setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
 setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"

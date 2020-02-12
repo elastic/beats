@@ -1,0 +1,65 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-nats]]
+== Nats module
+
+This is the Nats module. The Nats module uses https://nats.io/documentation/managing_the_server/monitoring/[Nats monitoring server APIs] to collect metrics.
+
+The default metricsets are `stats`, `connections`, `routes` and `subscriptions`.
+
+[float]
+=== Compatibility
+
+The Nats module is tested with Nats 1.3.0 and 2.0.4
+
+
+[float]
+=== Dashboard
+
+The Nats module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_nats_dashboard.png[]
+
+
+[float]
+=== Example configuration
+
+The Nats module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: nats
+  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-nats-connections,connections>>
+
+* <<metricbeat-metricset-nats-routes,routes>>
+
+* <<metricbeat-metricset-nats-stats,stats>>
+
+* <<metricbeat-metricset-nats-subscriptions,subscriptions>>
+
+include::nats/connections.asciidoc[]
+
+include::nats/routes.asciidoc[]
+
+include::nats/stats.asciidoc[]
+
+include::nats/subscriptions.asciidoc[]
+

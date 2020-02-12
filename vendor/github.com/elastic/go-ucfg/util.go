@@ -1,14 +1,46 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
 	"reflect"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 type tagOptions struct {
-	squash bool
-	ignore bool
+	squash      bool
+	ignore      bool
+	cfgHandling configHandling
 }
+
+// configHandling configures the operation to execute if we merge into a struct
+// field that holds an unpacked config object.
+type configHandling uint8
+
+const (
+	cfgDefaultHandling configHandling = iota
+	cfgMergeValues
+	cfgReplaceValue
+	cfgArrAppend
+	cfgArrPrepend
+)
 
 var noTagOpts = tagOptions{}
 
@@ -21,6 +53,14 @@ func parseTags(tag string) (string, tagOptions) {
 			opts.squash = true
 		case "ignore":
 			opts.ignore = true
+		case "merge":
+			opts.cfgHandling = cfgMergeValues
+		case "replace":
+			opts.cfgHandling = cfgReplaceValue
+		case "append":
+			opts.cfgHandling = cfgArrAppend
+		case "prepend":
+			opts.cfgHandling = cfgArrPrepend
 		}
 	}
 	return s[0], opts
@@ -133,4 +173,48 @@ func isFloat(k reflect.Kind) bool {
 	default:
 		return false
 	}
+}
+
+type fieldInfo struct {
+	name          string
+	ftype         reflect.Type
+	value         reflect.Value
+	options       *options
+	tagOptions    tagOptions
+	validatorTags []validatorTag
+}
+
+func accessField(structVal reflect.Value, fieldIdx int, opts *options) (fieldInfo, bool, Error) {
+	stField := structVal.Type().Field(fieldIdx)
+
+	// ignore non exported fields
+	if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+		return fieldInfo{}, true, nil
+	}
+	name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+	if tagOpts.ignore {
+		return fieldInfo{}, true, nil
+	}
+
+	// create new context, overwriting configValueHandling for all sub-operations
+	if tagOpts.cfgHandling != opts.configValueHandling {
+		tmp := &options{}
+		*tmp = *opts
+		tmp.configValueHandling = tagOpts.cfgHandling
+		opts = tmp
+	}
+
+	validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
+	if err != nil {
+		return fieldInfo{}, false, raiseCritical(err, "")
+	}
+
+	return fieldInfo{
+		name:          fieldName(name, stField.Name),
+		ftype:         stField.Type,
+		value:         structVal.Field(fieldIdx),
+		options:       opts,
+		tagOptions:    tagOpts,
+		validatorTags: validators,
+	}, false, nil
 }

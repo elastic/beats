@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package actions
 
 import (
@@ -14,6 +31,7 @@ func TestCommonPaths(t *testing.T) {
 	var tests = []struct {
 		Value, Field, Separator, Target, Result string
 		Index                                   int
+		Error                                   bool
 	}{
 		// Common docker case
 		{
@@ -48,6 +66,15 @@ func TestCommonPaths(t *testing.T) {
 			Index:     0,
 			Result:    "var",
 		},
+		{
+			Value:     "/var/lib/foo/bar",
+			Field:     "source",
+			Separator: "*",
+			Target:    "destination",
+			Index:     10, // out of range
+			Result:    "var",
+			Error:     true,
+		},
 	}
 
 	for _, test := range tests {
@@ -63,17 +90,25 @@ func TestCommonPaths(t *testing.T) {
 			test.Field: test.Value,
 		}
 
-		actual := runExtractField(t, testConfig, input)
+		event, err := runExtractField(t, testConfig, input)
+		if test.Error {
+			assert.NotNil(t, err)
+		} else {
 
-		result, err := actual.GetValue(test.Target)
-		if err != nil {
-			t.Fatalf("could not get target field: %s", err)
+			assert.Nil(t, err)
+			result, err := event.Fields.GetValue(test.Target)
+			if err != nil {
+				t.Fatalf("could not get target field: %s", err)
+			}
+			assert.Equal(t, result.(string), test.Result)
 		}
-		assert.Equal(t, result.(string), test.Result)
+
+		// Event must be present, even on error
+		assert.NotNil(t, event)
 	}
 }
 
-func runExtractField(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
+func runExtractField(t *testing.T, config *common.Config, input common.MapStr) (*beat.Event, error) {
 	logp.TestingSetup()
 
 	p, err := NewExtractField(config)
@@ -81,10 +116,5 @@ func runExtractField(t *testing.T, config *common.Config, input common.MapStr) c
 		t.Fatalf("error initializing extract_field: %s", err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: input})
-	if err != nil {
-		t.Fatalf("error running extract_field: %s", err)
-	}
-
-	return actual.Fields
+	return p.Run(&beat.Event{Fields: input})
 }

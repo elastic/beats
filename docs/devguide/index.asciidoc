@@ -1,16 +1,25 @@
 [[beats-reference]]
 = Beats Developer Guide
 
-include::../../libbeat/docs/version.asciidoc[]
+:libbeat-dir: {docdir}/../../libbeat/docs
 
+include::{libbeat-dir}/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
+:dev-guide: true
 :beatname_lc: beatname
 :beatname_uc: a Beat
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
+
+include::./pull-request-guidelines.asciidoc[]
 
 include::./contributing.asciidoc[]
 
-include::../../libbeat/docs/communitybeats.asciidoc[]
+include::{libbeat-dir}/communitybeats.asciidoc[]
 
 include::./newbeat.asciidoc[]
 

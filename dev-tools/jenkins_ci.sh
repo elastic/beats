@@ -8,7 +8,7 @@ set -euox pipefail
 if [ ! -d "$beat" ]; then
   echo "$beat does not exist"
   mkdir -p build
-  touch build/TEST-empty.xml
+  touch build/TEST-empty.out
   exit
 fi
 
@@ -27,10 +27,11 @@ cleanup() {
     ids=$(docker ps -q)
     if [ -n "$ids" ]; then
       docker kill $ids
-    fi  
+    fi
     echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
     docker system prune -f || true
   fi
+
   echo "Cleanup complete."
 }
 trap cleanup EXIT

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -93,6 +110,10 @@ func tryValidate(val reflect.Value) error {
 	t := val.Type()
 	var validator Validator
 
+	if (t.Kind() == reflect.Ptr || t.Kind() == reflect.Interface) && val.IsNil() {
+		return nil
+	}
+
 	if t.Implements(tValidator) {
 		validator = val.Interface().(Validator)
 	} else if reflect.PtrTo(t).Implements(tValidator) {
@@ -107,8 +128,81 @@ func tryValidate(val reflect.Value) error {
 }
 
 func runValidators(val interface{}, validators []validatorTag) error {
+	if validators == nil {
+		return nil
+	}
 	for _, tag := range validators {
 		if err := tag.cb(val, tag.param); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func tryRecursiveValidate(val reflect.Value, opts *options, validators []validatorTag) error {
+	var curr interface{}
+	if val.IsValid() {
+		curr = val.Interface()
+	}
+	if err := runValidators(curr, validators); err != nil {
+		return err
+	}
+	if !val.IsValid() {
+		return nil
+	}
+
+	t := val.Type()
+	if (t.Kind() == reflect.Ptr || t.Kind() == reflect.Interface) && val.IsNil() {
+		return nil
+	}
+
+	var err error
+	switch chaseValue(val).Kind() {
+	case reflect.Struct:
+		err = validateStruct(val, opts)
+	case reflect.Map:
+		err = validateMap(val, opts)
+	case reflect.Array, reflect.Slice:
+		err = validateArray(val, opts)
+	}
+
+	if err != nil {
+		return err
+	}
+	return tryValidate(val)
+}
+
+func validateStruct(val reflect.Value, opts *options) error {
+	val = chaseValue(val)
+	numField := val.NumField()
+	for i := 0; i < numField; i++ {
+		fInfo, skip, err := accessField(val, i, opts)
+		if err != nil {
+			return err
+		}
+		if skip {
+			continue
+		}
+
+		if err := tryRecursiveValidate(fInfo.value, fInfo.options, fInfo.validatorTags); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateMap(val reflect.Value, opts *options) error {
+	for _, key := range val.MapKeys() {
+		if err := tryRecursiveValidate(val.MapIndex(key), opts, nil); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateArray(val reflect.Value, opts *options) error {
+	for i := 0; i < val.Len(); i++ {
+		if err := tryRecursiveValidate(val.Index(i), opts, nil); err != nil {
 			return err
 		}
 	}
@@ -131,7 +225,7 @@ func validateNonZero(v interface{}, name string) error {
 		return nil
 	}
 
-	val := reflect.ValueOf(v)
+	val := chaseValue(reflect.ValueOf(v))
 	switch val.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if val.Int() != 0 {
@@ -288,28 +382,63 @@ func validateRequired(v interface{}, name string) error {
 	if v == nil {
 		return ErrRequired
 	}
-	return validateNonEmpty(v, name)
+	val := reflect.ValueOf(v)
+	if val.Kind() == reflect.Ptr && val.IsNil() {
+		return ErrRequired
+	}
+	if isInt(val.Kind()) || isUint(val.Kind()) || isFloat(val.Kind()) {
+		if err := validateNonZero(v, name); err != nil {
+			return ErrRequired
+		}
+		return nil
+	}
+	if err := validateNonEmptyWithAllowNil(v, name, false); err != nil {
+		return err
+	}
+	return nil
 }
 
-func validateNonEmpty(v interface{}, _ string) error {
+func validateNonEmpty(v interface{}, name string) error {
+	return validateNonEmptyWithAllowNil(v, name, true)
+}
+
+func validateNonEmptyWithAllowNil(v interface{}, _ string, allowNil bool) error {
 	if s, ok := v.(string); ok {
 		if s == "" {
-			return ErrEmpty
+			return ErrStringEmpty
 		}
 		return nil
 	}
 
 	if r, ok := v.(regexp.Regexp); ok {
 		if r.String() == "" {
-			return ErrEmpty
+			return ErrRegexEmpty
 		}
 		return nil
 	}
 
 	val := reflect.ValueOf(v)
 	if val.Kind() == reflect.Array || val.Kind() == reflect.Slice {
+		if val.IsNil() {
+			if allowNil {
+				return nil
+			}
+			return ErrRequired
+		}
 		if val.Len() == 0 {
-			return ErrEmpty
+			return ErrArrayEmpty
+		}
+		return nil
+	}
+	if val.Kind() == reflect.Map {
+		if val.IsNil() {
+			if allowNil {
+				return nil
+			}
+			return ErrRequired
+		}
+		if val.Len() == 0 {
+			return ErrMapEmpty
 		}
 		return nil
 	}

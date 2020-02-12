@@ -1,0 +1,41 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/Usage"
+        },
+        "dimensions": {
+            "Class": "None",
+            "Resource": "AccountProvisionedWriteCapacityUnits",
+            "Service": "DynamoDB",
+            "Type": "Resource"
+        },
+        "usage": {
+            "metrics": {
+                "ResourceCount": {
+                    "sum": 45
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "eu-central-1"
+    },
+    "event": {
+        "dataset": "aws.usage",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "usage",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

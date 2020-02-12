@@ -4,3 +4,14 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+
+{{ if eq .format "plain" }}
+multiline:
+  pattern: ^\[[0-9]{4}-[0-9]{2}-[0-9]{2}
+  negate: true
+  match: after
+{{ end }}
+
+processors:
+# Locale for timezone is only needed in non-json logs
+- add_locale.when.not.regexp.message: "^{"

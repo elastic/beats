@@ -1,7 +1,23 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kafka
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -10,15 +26,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kafka"
 )
+
+// Version returns a kafka version from its string representation
+func Version(version string) kafka.Version {
+	return kafka.Version(version)
+}
 
 // Broker provides functionality for communicating with a single kafka broker
 type Broker struct {
 	broker *sarama.Broker
 	cfg    *sarama.Config
+	client sarama.Client
 
 	advertisedAddr string
 	id             int32
@@ -34,7 +59,7 @@ type BrokerSettings struct {
 	Backoff                  time.Duration
 	TLS                      *tls.Config
 	Username, Password       string
-	Version                  Version
+	Version                  kafka.Version
 }
 
 type GroupDescription struct {
@@ -67,11 +92,12 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
 	}
-	cfg.Version = settings.Version.get()
+	cfg.Version, _ = settings.Version.Get()
 
 	return &Broker{
 		broker:  sarama.NewBroker(host),
 		cfg:     cfg,
+		client:  nil,
 		id:      noID,
 		matchID: settings.MatchID,
 	}
@@ -80,14 +106,22 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 // Close the broker connection
 func (b *Broker) Close() error {
 	closeBroker(b.broker)
+	b.client.Close()
 	return nil
 }
 
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
-		return err
+		return errors.Wrap(err, "broker.Open failed")
 	}
+
+	c, err := getClusterWideClient(b.Addr(), b.cfg)
+	if err != nil {
+		closeBroker(b.broker)
+		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
+	}
+	b.client = c
 
 	if b.id != noID || !b.matchID {
 		return nil
@@ -97,10 +131,11 @@ func (b *Broker) Connect() error {
 	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
 		closeBroker(b.broker)
-		return err
+		return errors.Wrap(err, "failed to query metadata")
 	}
 
-	other := findMatchingBroker(brokerAddress(b.broker), meta.Brokers)
+	finder := brokerFinder{Net: &defaultNet{}}
+	other := finder.findBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
 		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
@@ -109,6 +144,7 @@ func (b *Broker) Connect() error {
 	debugf("found matching broker %v with id %v", other.Addr(), other.ID())
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
+
 	return nil
 }
 
@@ -151,12 +187,12 @@ func (b *Broker) PartitionOffset(
 	req.AddBlock(topic, partition, time, 1)
 	resp, err := b.broker.GetAvailableOffsets(req)
 	if err != nil {
-		return -1, err
+		return -1, errors.Wrap(err, "get available offsets failed")
 	}
 
 	block := resp.GetBlock(topic, partition)
 	if len(block.Offsets) == 0 {
-		return -1, nil
+		return -1, errors.Wrap(block.Err, "block offsets is empty")
 	}
 
 	return block.Offsets[0], nil
@@ -245,7 +281,16 @@ func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) 
 	return b.broker.FetchOffset(requ)
 }
 
-// ID returns the broker or -1 if the broker id is unknown.
+// FetchPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
+func (b *Broker) FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+	offset, err := b.client.GetOffset(topic, partitionID, sarama.OffsetNewest)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
+}
+
+// ID returns the broker ID or -1 if the broker id is unknown.
 func (b *Broker) ID() int32 {
 	if b.id == noID {
 		return b.broker.ID()
@@ -330,36 +375,65 @@ func checkRetryQuery(err error) (retry, reconnect bool) {
 	return false, false
 }
 
-func findMatchingBroker(
-	addr string,
-	brokers []*sarama.Broker,
-) *sarama.Broker {
+// NetInfo can be used to obtain network information
+type NetInfo interface {
+	LookupIP(string) ([]net.IP, error)
+	LookupAddr(string) ([]string, error)
+	LocalIPAddrs() ([]net.IP, error)
+	Hostname() (string, error)
+}
+
+type defaultNet struct{}
+
+// LookupIP looks up a host using the local resolver
+func (m *defaultNet) LookupIP(addr string) ([]net.IP, error) {
+	return net.LookupIP(addr)
+}
+
+// LookupAddr returns the list of hosts resolving to an specific address
+func (m *defaultNet) LookupAddr(address string) ([]string, error) {
+	return net.LookupAddr(address)
+}
+
+// LocalIPAddrs return the list of IP addresses configured in local network interfaces
+func (m *defaultNet) LocalIPAddrs() ([]net.IP, error) {
+	return common.LocalIPAddrs()
+}
+
+// Hostname returns the hostname reported by the OS
+func (m *defaultNet) Hostname() (string, error) {
+	return os.Hostname()
+}
+
+type brokerFinder struct {
+	Net NetInfo
+}
+
+func (m *brokerFinder) findBroker(addr string, brokers []*sarama.Broker) *sarama.Broker {
 	lst := brokerAddresses(brokers)
-	if idx, found := findMatchingAddress(addr, lst); found {
+	if idx, found := m.findAddress(addr, lst); found {
 		return brokers[idx]
 	}
 	return nil
 }
 
-func findMatchingAddress(
-	addr string,
-	brokers []string,
-) (int, bool) {
+func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	debugf("Try to match broker to: %v", addr)
 
-	// compare connection address to list of broker addresses
-	if i, found := indexOf(addr, brokers); found {
-		return i, true
-	}
-
 	// get connection 'port'
-	_, port, err := net.SplitHostPort(addr)
+	host, port, err := net.SplitHostPort(addr)
 	if err != nil || port == "" {
+		host = addr
 		port = "9092"
 	}
 
+	// compare connection address to list of broker addresses
+	if i, found := indexOf(net.JoinHostPort(host, port), brokers); found {
+		return i, true
+	}
+
 	// lookup local machines ips for comparing with broker addresses
-	localIPs, err := common.LocalIPAddrs()
+	localIPs, err := m.Net.LocalIPAddrs()
 	if err != nil || len(localIPs) == 0 {
 		return -1, false
 	}
@@ -367,7 +441,7 @@ func findMatchingAddress(
 
 	// try to find broker by comparing the fqdn for each known ip to list of
 	// brokers
-	localHosts := lookupHosts(localIPs)
+	localHosts := m.lookupHosts(localIPs)
 	debugf("local machine addresses: %v", localHosts)
 	for _, host := range localHosts {
 		debugf("try to match with fqdn: %v (%v)", host, port)
@@ -376,9 +450,22 @@ func findMatchingAddress(
 		}
 	}
 
+	// try matching ip of configured host with broker list, this would
+	// match if hosts of advertised addresses are IPs, but configured host
+	// is a hostname
+	ips, err := m.Net.LookupIP(host)
+	if err == nil {
+		for _, ip := range ips {
+			addr := net.JoinHostPort(ip.String(), port)
+			if i, found := indexOf(addr, brokers); found {
+				return i, true
+			}
+		}
+	}
+
 	// try to find broker id by comparing the machines local hostname to
 	// broker hostnames in metadata
-	if host, err := os.Hostname(); err == nil {
+	if host, err := m.Net.Hostname(); err == nil {
 		debugf("try to match with hostname only: %v (%v)", host, port)
 
 		tmp := net.JoinHostPort(strings.ToLower(host), port)
@@ -402,7 +489,7 @@ func findMatchingAddress(
 		}
 
 		// lookup all ips for brokers host:
-		ips, err := net.LookupIP(bh)
+		ips, err := m.Net.LookupIP(bh)
 		debugf("broker %v ips: %v, %v", bh, ips, err)
 		if err != nil {
 			continue
@@ -419,7 +506,7 @@ func findMatchingAddress(
 	return -1, false
 }
 
-func lookupHosts(ips []net.IP) []string {
+func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 	set := map[string]struct{}{}
 	for _, ip := range ips {
 		txt, err := ip.MarshalText()
@@ -427,7 +514,7 @@ func lookupHosts(ips []net.IP) []string {
 			continue
 		}
 
-		hosts, err := net.LookupAddr(string(txt))
+		hosts, err := m.Net.LookupAddr(string(txt))
 		debugf("lookup %v => %v, %v", string(txt), hosts, err)
 		if err != nil {
 			continue
@@ -449,12 +536,20 @@ func lookupHosts(ips []net.IP) []string {
 func anyIPsMatch(as, bs []net.IP) bool {
 	for _, a := range as {
 		for _, b := range bs {
-			if bytes.Equal(a, b) {
+			if a.Equal(b) {
 				return true
 			}
 		}
 	}
 	return false
+}
+
+func getClusterWideClient(addr string, cfg *sarama.Config) (sarama.Client, error) {
+	client, err := sarama.NewClient([]string{addr}, cfg)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 func brokerAddresses(brokers []*sarama.Broker) []string {

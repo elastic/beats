@@ -1,14 +1,13 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-couchbase-bucket]]
 === Couchbase bucket metricset
 
-beta[]
-
 include::../../../module/couchbase/bucket/_meta/docs.asciidoc[]
 
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
 ==== Fields
 

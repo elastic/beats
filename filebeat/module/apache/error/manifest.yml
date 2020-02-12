@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/apache2/error.log*
+      - /var/log/httpd/error_log*
+    os.darwin:
+      - /usr/local/var/log/apache2/error_log*
+    os.windows:
+      - "C:/tools/Apache/httpd-2.*/Apache24/logs/error.log*"
+      - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/error.log*"
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/error.yml

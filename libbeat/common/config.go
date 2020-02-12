@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -10,12 +27,11 @@ import (
 	"runtime"
 	"strings"
 
-	ucfg "github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/yaml"
-
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
+	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -50,18 +66,6 @@ const (
 	selectorConfigWithPassword = "config-with-passwords"
 )
 
-var debugBlacklist = MakeStringSet(
-	"password",
-	"passphrase",
-	"key_passphrase",
-	"pass",
-	"proxy_url",
-	"url",
-	"urls",
-	"host",
-	"hosts",
-)
-
 // make hasSelector and configDebugf available for unit testing
 var hasSelector = logp.HasSelector
 var configDebugf = logp.Debug
@@ -70,9 +74,36 @@ func NewConfig() *Config {
 	return fromConfig(ucfg.New())
 }
 
+// NewConfigFrom creates a new Config object from the given input.
+// From can be any kind of structured data (struct, map, array, slice).
+//
+// If from is a string, the contents is treated like raw YAML input. The string
+// will be parsed and a structure config object is build from the parsed
+// result.
 func NewConfigFrom(from interface{}) (*Config, error) {
+	if str, ok := from.(string); ok {
+		c, err := yaml.NewConfig([]byte(str), configOpts...)
+		return fromConfig(c), err
+	}
+
 	c, err := ucfg.NewFrom(from, configOpts...)
 	return fromConfig(c), err
+}
+
+// MustNewConfigFrom creates a new Config object from the given input.
+// From can be any kind of structured data (struct, map, array, slice).
+//
+// If from is a string, the contents is treated like raw YAML input. The string
+// will be parsed and a structure config object is build from the parsed
+// result.
+//
+// MustNewConfigFrom panics if an error occurs.
+func MustNewConfigFrom(from interface{}) *Config {
+	cfg, err := NewConfigFrom(from)
+	if err != nil {
+		panic(err)
+	}
+	return cfg
 }
 
 func MergeConfigs(cfgs ...*Config) (*Config, error) {
@@ -103,7 +134,7 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 
 func LoadFile(path string) (*Config, error) {
 	if IsStrictPerms() {
-		if err := ownerHasExclusiveWritePerms(path); err != nil {
+		if err := OwnerHasExclusiveWritePerms(path); err != nil {
 			return nil, err
 		}
 	}
@@ -143,6 +174,14 @@ func (c *Config) Path() string {
 
 func (c *Config) PathOf(field string) string {
 	return c.access().PathOf(field, ".")
+}
+
+func (c *Config) Remove(name string, idx int) (bool, error) {
+	return c.access().Remove(name, idx, configOpts...)
+}
+
+func (c *Config) Has(name string, idx int) (bool, error) {
+	return c.access().Has(name, idx, configOpts...)
 }
 
 func (c *Config) HasField(name string) bool {
@@ -214,12 +253,13 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 		}
 	}
 
-	debugStr := configDebugString(c, filtered)
+	debugStr := DebugString(c, filtered)
 	if debugStr != "" {
 		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
 }
 
+// Enabled return the configured enabled value or true by default.
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
 		Enabled bool `config:"enabled"`
@@ -306,7 +346,9 @@ func (ns *ConfigNamespace) IsSet() bool {
 	return ns.config != nil
 }
 
-func configDebugString(c *Config, filterPrivate bool) string {
+// DebugString prints a human readable representation of the underlying config using
+// JSON formatting.
+func DebugString(c *Config, filterPrivate bool) string {
 	var bufs []string
 
 	if c.IsDict() {
@@ -315,7 +357,7 @@ func configDebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -326,7 +368,7 @@ func configDebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -338,34 +380,10 @@ func configDebugString(c *Config, filterPrivate bool) string {
 	return strings.Join(bufs, "\n")
 }
 
-func filterDebugObject(c interface{}) {
-	switch cfg := c.(type) {
-	case map[string]interface{}:
-		for k, v := range cfg {
-			if debugBlacklist.Has(k) {
-				if arr, ok := v.([]interface{}); ok {
-					for i := range arr {
-						arr[i] = "xxxxx"
-					}
-				} else {
-					cfg[k] = "xxxxx"
-				}
-			} else {
-				filterDebugObject(v)
-			}
-		}
-
-	case []interface{}:
-		for _, elem := range cfg {
-			filterDebugObject(elem)
-		}
-	}
-}
-
-// ownerHasExclusiveWritePerms asserts that the current user or root is the
+// OwnerHasExclusiveWritePerms asserts that the current user or root is the
 // owner of the config file and that the config file is (at most) writable by
 // the owner or root (e.g. group and other cannot have write access).
-func ownerHasExclusiveWritePerms(name string) error {
+func OwnerHasExclusiveWritePerms(name string) error {
 	if runtime.GOOS == "windows" {
 		return nil
 	}
@@ -380,7 +398,7 @@ func ownerHasExclusiveWritePerms(name string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, name, euid)
 	}
 

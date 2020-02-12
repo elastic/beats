@@ -12,7 +12,7 @@ To configure {beatname_uc}, you edit the configuration file. You’ll find the c
 +/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated options.
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax. See the
-{libbeat}/config-file-format.html[Config File Format] section of the
+{beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Winlogbeat:
@@ -21,9 +21,11 @@ The following topics describe how to configure Winlogbeat:
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
@@ -31,6 +33,7 @@ The following topics describe how to configure Winlogbeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -39,30 +42,36 @@ include::./winlogbeat-options.asciidoc[]
 
 include::./winlogbeat-general-options.asciidoc[]
 
-:win:
-include::../../libbeat/docs/queueconfig.asciidoc[]
+include::{libbeat-dir}/queueconfig.asciidoc[]
 
-include::../../libbeat/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[]
 
-include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/shared-ilm.asciidoc[]
+
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::./winlogbeat-filtering.asciidoc[]
 
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
-include::../../libbeat/docs/shared-path-config.asciidoc[]
+include::{libbeat-dir}/shared-geoip.asciidoc[]
 
-include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/shared-path-config.asciidoc[]
 
-include::../../libbeat/docs/setup-config.asciidoc[]
+include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
-include::../../libbeat/docs/loggingconfig.asciidoc[]
+include::{libbeat-dir}/setup-config.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 :standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
 
 :standalone:
-:win:
-include::../../libbeat/docs/yaml.asciidoc[]
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
 
-include::../../libbeat/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/reference-yml.asciidoc[]

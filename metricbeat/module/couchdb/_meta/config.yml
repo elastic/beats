@@ -1,0 +1,4 @@
+- module: couchdb
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:5984"]

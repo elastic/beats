@@ -1,10 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !windows
 
 package file
 
 import (
-	"fmt"
 	"os"
+	"strconv"
 	"syscall"
 )
 
@@ -32,7 +49,11 @@ func (fs StateOS) IsSame(state StateOS) bool {
 }
 
 func (fs StateOS) String() string {
-	return fmt.Sprintf("%d-%d", fs.Inode, fs.Device)
+	var buf [64]byte
+	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.Device, 10)
+	return string(current)
 }
 
 // ReadOpen opens a file for reading only
@@ -40,4 +61,10 @@ func ReadOpen(path string) (*os.File, error) {
 	flag := os.O_RDONLY
 	perm := os.FileMode(0)
 	return os.OpenFile(path, flag, perm)
+}
+
+// IsRemoved checks wheter the file held by f is removed.
+func IsRemoved(f *os.File) bool {
+	_, err := os.Stat(f.Name())
+	return err != nil
 }

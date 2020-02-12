@@ -1,0 +1,63 @@
+{
+  "test_name": "IPFIX Nokia BRAS",
+  "events": [
+    {
+      "Timestamp": "2017-12-14T07:23:45Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.34",
+          "locality": "private",
+          "port": 80
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-12-14T07:23:45Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "aVnWxMM8qxI",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.0.0.34",
+          "destination_transport_port": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 2228226,
+            "timestamp": "2017-12-14T07:23:45Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_id": 3389049088,
+          "flow_start_milliseconds": "2017-12-14T07:23:45.148Z",
+          "nat_inside_svcid": 100,
+          "nat_outside_svcid": 0,
+          "nat_sub_string": "USER1@10.10.0.123",
+          "padding_octets": "AA==",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.0.1.228",
+          "source_transport_port": 5878,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:WBN/ZleczX2flsJWsHfNA7w+NGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "10.0.1.228",
+          "locality": "private",
+          "port": 5878
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

@@ -20,17 +20,17 @@ class Test(BaseTest):
 
         o = objs[0]
         assert o["type"] == "http"
-        assert o["client_port"] == 46249
-        assert o["port"] == 8888
+        assert o["client.port"] == 46249
+        assert o["server.port"] == 8888
         assert o["status"] == "OK"
-        assert o["method"] == "GET"
-        assert o["path"] == "/"
-        assert o["http.response.code"] == 200
-        assert o["http.response.phrase"] == "OK"
+        assert o["http.request.method"] == "get"
+        assert o["url.path"] == "/"
+        assert o["http.response.status_code"] == 200
+        assert o["http.response.status_phrase"] == "ok"
         assert "request" not in objs[0]
         assert "response" not in objs[0]
 
-    def test_drum_interraction(self):
+    def test_drum_interaction(self):
         self.render_config_template(
             http_ports=[8888]
         )
@@ -41,14 +41,14 @@ class Test(BaseTest):
         assert len(objs) == 16
 
         assert all([o["type"] == "http" for o in objs])
-        assert all([o["port"] == 8888 for o in objs])
+        assert all([o["server.port"] == 8888 for o in objs])
 
         assert all([o["status"] == "OK" for i, o in enumerate(objs)
                     if i != 13])
 
         assert objs[13]["status"] == "Error"
-        assert objs[13]["path"] == "/comment/"
-        assert objs[13]["http.response.code"] == 500
+        assert objs[13]["url.path"] == "/comment/"
+        assert objs[13]["http.response.status_code"] == 500
 
     def test_send_options(self):
         """

@@ -1,0 +1,188 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auditbeat-config
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+data:
+  auditbeat.yml: |-
+    auditbeat.config.modules:
+      # Mounted `auditbeat-daemonset-modules` configmap:
+      path: ${path.config}/modules.d/*.yml
+      # Reload module configs as they change:
+      reload.enabled: false
+
+    processors:
+      - add_cloud_metadata:
+
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auditbeat-daemonset-modules
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+data:
+  system.yml: |-
+    - module: file_integrity
+      paths:
+      - /hostfs/bin
+      - /hostfs/usr/bin
+      - /hostfs/sbin
+      - /hostfs/usr/sbin
+      - /hostfs/etc
+      exclude_files:
+      - '(?i)\.sw[nop]$'
+      - '~$'
+      - '/\.git($|/)'
+      scan_at_start: true
+      scan_rate_per_sec: 50 MiB
+      max_file_size: 100 MiB
+      hash_types: [sha1]
+      recursive: true
+---
+# Deploy a auditbeat instance per node for node metrics retrieval
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: auditbeat
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+spec:
+  selector:
+    matchLabels:
+      k8s-app: auditbeat
+  template:
+    metadata:
+      labels:
+        k8s-app: auditbeat
+    spec:
+      serviceAccountName: auditbeat
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: auditbeat
+        image: docker.elastic.co/beats/auditbeat:8.0.0
+        args: [
+          "-c", "/etc/auditbeat.yml"
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/auditbeat.yml
+          readOnly: true
+          subPath: auditbeat.yml
+        - name: modules
+          mountPath: /usr/share/auditbeat/modules.d
+          readOnly: true
+        - name: bin
+          mountPath: /hostfs/bin
+          readOnly: true
+        - name: sbin
+          mountPath: /hostfs/sbin
+          readOnly: true
+        - name: usrbin
+          mountPath: /hostfs/usr/bin
+          readOnly: true
+        - name: usrsbin
+          mountPath: /hostfs/usr/sbin
+          readOnly: true
+        - name: etc
+          mountPath: /hostfs/etc
+          readOnly: true
+      volumes:
+      - name: bin
+        hostPath:
+          path: /bin
+      - name: usrbin
+        hostPath:
+          path: /usr/bin
+      - name: sbin
+        hostPath:
+          path: /sbin
+      - name: usrsbin
+        hostPath:
+          path: /usr/sbin
+      - name: etc
+        hostPath:
+          path: /etc
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: auditbeat-config
+      - name: modules
+        configMap:
+          defaultMode: 0600
+          name: auditbeat-daemonset-modules
+      - name: data
+        hostPath:
+          path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auditbeat
+subjects:
+- kind: ServiceAccount
+  name: auditbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: auditbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: auditbeat
+  labels:
+    k8s-app: auditbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auditbeat
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+---

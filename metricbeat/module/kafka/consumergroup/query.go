@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package consumergroup
 
 import (
@@ -12,6 +29,7 @@ type client interface {
 	ListGroups() ([]string, error)
 	DescribeGroups(group []string) (map[string]kafka.GroupDescription, error)
 	FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error)
+	FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error)
 }
 
 func fetchGroupInfo(
@@ -96,12 +114,19 @@ func fetchGroupInfo(
 
 		for topic, partitions := range ret.off.Blocks {
 			for partition, info := range partitions {
+				partitionOffset, err := getPartitionOffsetFromTheLeader(b, topic, partition)
+				if err != nil {
+					logp.Err("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
+					continue
+				}
+				consumerLag := partitionOffset - info.Offset
 				event := common.MapStr{
-					"id":        ret.group,
-					"topic":     topic,
-					"partition": partition,
-					"offset":    info.Offset,
-					"meta":      info.Metadata,
+					"id":           ret.group,
+					"topic":        topic,
+					"partition":    partition,
+					"offset":       info.Offset,
+					"meta":         info.Metadata,
+					"consumer_lag": consumerLag,
 					"error": common.MapStr{
 						"code": info.Err,
 					},
@@ -116,7 +141,6 @@ func fetchGroupInfo(
 						}
 					}
 				}
-
 				emit(event)
 			}
 		}
@@ -126,6 +150,14 @@ func fetchGroupInfo(
 	close(results)
 
 	return err
+}
+
+func getPartitionOffsetFromTheLeader(b client, topic string, partitionID int32) (int64, error) {
+	offset, err := b.FetchPartitionOffsetFromTheLeader(topic, partitionID)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
 }
 
 func listGroups(b client, filter func(string) bool) ([]string, error) {

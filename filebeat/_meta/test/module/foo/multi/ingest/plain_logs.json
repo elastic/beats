@@ -1,0 +1,12 @@
+{
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "^%{DATA:some_data}"
+                ]
+            }
+        }
+    ]
+}

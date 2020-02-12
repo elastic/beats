@@ -1,0 +1,34 @@
+version: '2.3'
+
+services:
+  beat:
+    build: ../../metricbeat
+    environment:
+      - BEAT_STRICT_PERMS=false
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
+    command: make
+
+  # Used by base tests
+  elasticsearch:
+    extends:
+      file: ../../metricbeat/docker-compose.yml
+      service: elasticsearch
+
+  # Used by base tests
+  kibana:
+    # Copied configuration from OSS metricbeat because services with depends_on
+    # cannot be extended with extends
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.5.2}-1
+    build:
+      context: ../../metricbeat/module/kibana/_meta
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.5.2}
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601

@@ -1,0 +1,114 @@
+- name: server
+  type: group
+  description: >
+    Server metrics from the Etcd V3 /metrics endpoint
+  release: beta
+  fields:
+    - name: has_leader
+      type: byte
+      description: >
+        Whether a leader exists in the cluster
+
+    - name: leader_changes.count
+      type: long
+      description: >
+        Number of leader changes seen at the cluster
+
+    - name: proposals_committed.count
+      type: long
+      description: >
+        Number of consensus proposals commited
+
+    - name: proposals_pending.count
+      type: long
+      description: >
+        Number of consensus proposals pending
+
+    - name: proposals_failed.count
+      type: long
+      description: >
+        Number of consensus proposals failed
+
+    - name: grpc_started.count
+      type: long
+      description: >
+        Number of sent gRPC requests
+
+    - name: grpc_handled.count
+      type: long
+      description: >
+        Number of received gRPC requests
+
+- name: disk
+  type: group
+  description: >
+    Disk metrics from the Etcd V3 /metrics endpoint
+  release: beta
+  fields:
+    - name: mvcc_db_total_size.bytes
+      type: long
+      format: bytes
+      description: >
+        Size of stored data at MVCC
+
+    - name: wal_fsync_duration.ns.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Latency for writing ahead logs to disk
+
+    - name: wal_fsync_duration.ns.count
+      type: long
+      description: >
+        Write ahead logs count
+    
+    - name: wal_fsync_duration.ns.sum
+      type: long
+      description: >
+        Write ahead logs latency sum
+
+    - name: backend_commit_duration.ns.bucket.*
+      type: object
+      object_type: long
+      description: >
+        Latency for writing backend changes to disk
+
+    - name: backend_commit_duration.ns.count
+      type: long
+      description: >
+        Backend commits count
+    
+    - name: backend_commit_duration.ns.sum
+      type: long
+      description: >
+        Backend commits latency sum
+
+- name: memory
+  type: group
+  description: >
+    Memory metrics from the Etcd V3 /metrics endpoint
+  release: beta
+  fields:
+    - name: go_memstats_alloc.bytes
+      type: long
+      format: bytes
+      description: >
+        Memory allocated bytes as of MemStats Go
+
+- name: network
+  type: group
+  description: >
+    Network metrics from the Etcd V3 /metrics endpoint
+  release: beta
+  fields:
+    - name: client_grpc_sent.bytes
+      type: long
+      format: bytes
+      description: >
+        gRPC sent bytes total
+
+    - name: client_grpc_received.bytes
+      type: long
+      format: bytes
+      description: >
+        gRPC received bytes total

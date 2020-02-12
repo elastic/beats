@@ -1,25 +1,26 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "prometheus.collector",
+        "duration": 115000,
+        "module": "prometheus"
     },
     "metricset": {
-        "host": "prometheus:9090",
-        "module": "prometheus",
         "name": "collector",
-        "namespace": "collector",
-        "rtt": 115
+        "period": 10000
     },
     "prometheus": {
-        "collector": {
-            "label": {
-                "event": "add",
-                "role": "node"
-            },
-            "prometheus_sd_kubernetes_events_total": {
-                "value": 0
-            }
+        "labels": {
+            "job": "prometheus",
+            "listener_name": "http"
+        },
+        "metrics": {
+            "net_conntrack_listener_conn_accepted_total": 3,
+            "net_conntrack_listener_conn_closed_total": 0
         }
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "prometheus"
     }
 }

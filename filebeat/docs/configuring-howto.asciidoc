@@ -14,7 +14,7 @@ There's also a full example configuration file at
 options. For mac and win, look in the archive that you extracted.
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {libbeat}/config-file-format.html[Config File Format] section of the
+See the {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Filebeat:
@@ -26,10 +26,13 @@ The following topics describe how to configure Filebeat:
 * <<filebeat-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<load-balancing>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
+* <<{beatname_lc}-deduplication>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
@@ -39,6 +42,7 @@ The following topics describe how to configure Filebeat:
 * <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -47,44 +51,52 @@ include::./filebeat-modules-options.asciidoc[]
 
 include::./filebeat-options.asciidoc[]
 
-include::./multiple-prospectors.asciidoc[]
-
 include::./multiline.asciidoc[]
 
 include::./filebeat-general-options.asciidoc[]
 
 include::./reload-configuration.asciidoc[]
 
-:allplatforms:
-include::../../libbeat/docs/queueconfig.asciidoc[]
+include::{libbeat-dir}/queueconfig.asciidoc[]
 
-include::../../libbeat/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ilm.asciidoc[]
 
 include::./load-balancing.asciidoc[]
 
-include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
 
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
-include::../../libbeat/docs/shared-path-config.asciidoc[]
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
-include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/shared-geoip.asciidoc[]
 
-include::../../libbeat/docs/setup-config.asciidoc[]
+include::{libbeat-dir}/shared-path-config.asciidoc[]
 
-include::../../libbeat/docs/loggingconfig.asciidoc[]
+include::{libbeat-dir}/shared-kibana-config.asciidoc[]
+
+include::{libbeat-dir}/setup-config.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 :standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
 
-include::../../libbeat/docs/shared-autodiscover.asciidoc[]
+:autodiscoverJolokia:
+:autodiscoverHints:
+include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 
 :standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
 
-include::../../libbeat/docs/regexp.asciidoc[]
+include::{libbeat-dir}/regexp.asciidoc[]
 
-include::../../libbeat/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/reference-yml.asciidoc[]

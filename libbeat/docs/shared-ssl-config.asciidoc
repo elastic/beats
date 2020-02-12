@@ -1,33 +1,85 @@
 [[configuration-ssl]]
+ifndef::apm-server[]
 == Specify SSL settings
+endif::apm-server[]
+ifdef::apm-server[]
+== SSL output settings
 
-You can specify SSL options for any <<configuring-output,output>> that supports
-SSL. You can also specify SSL options when you
-<<setup-kibana-endpoint,set up the Kibana endpoint>>.
+You can specify SSL options with any output that supports SSL, like {es}, {ls}, or Kafka.
+endif::[]
+
+ifndef::apm-server[]
+You can specify SSL options when you configure:
+
+* <<configuring-output,outputs>> that support SSL
+* the <<setup-kibana-endpoint,Kibana endpoint>>
+ifeval::["{beatname_lc}"=="heartbeat"]
+* <<configuration-heartbeat-options,{beatname_uc} monitors>> that support SSL
+endif::[]
+ifeval::["{beatname_lc}"=="metricbeat"]
+* <<metricbeat-modules,modules>> that define the host as an HTTP URL
+endif::[]
+endif::[]
 
 Example output config with SSL enabled:
 
 [source,yaml]
 ----
-output.elasticsearch.hosts: ["192.168.1.42:9200"]
+output.elasticsearch.hosts: ["https://192.168.1.42:9200"]
 output.elasticsearch.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
+ifndef::no-output-logstash[]
 Also see <<configuring-ssl-logstash>>.
+endif::[]
 
+ifndef::no_kibana[]
 Example Kibana endpoint config with SSL enabled:
 
 [source,yaml]
 ----
-setup.kibana.host: "192.0.2.255:5601"
-setup.kibana.protocol: "https"
+setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
 setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-setup.kibana.ssl.key: "/etc/pki/client/cert.key
+setup.kibana.ssl.key: "/etc/pki/client/cert.key"
 ----
+endif::no_kibana[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+Example monitor with SSL enabled:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+heartbeat.monitors:
+- type: tcp
+  schedule: '@every 5s'
+  hosts: ["myhost"]
+  ports: [80, 9200, 5044]
+  ssl:
+    certificate_authorities: ['/etc/ca.crt']
+    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+-------------------------------------------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+Example module with SSL enabled:
+
+[source,yaml]
+----
+- module: http
+  namespace: "myservice"
+  enabled: true
+  period: 10s
+  hosts: ["https://localhost"]
+  path: "/stats"
+  headers:
+    Authorization: "Bearer test123"
+  ssl.verification_mode: "none"
+----
+endif::[]
 
 [float]
 === Configuration options
@@ -58,10 +110,10 @@ might fail if the server requests client authentication. If the SSL server does 
 require client authentication, the certificate will be loaded, but not requested or used
 by the server.
 
-When this option is configured, the <<certificate_key,`certificate_key`>> option is also required.
+When this option is configured, the <<key,`key`>> option is also required.
 
 [float]
-[[certificate_key]]
+[[key]]
 ==== `key: "/etc/pki/client/cert.key"`
 
 The client certificate key used for client authentication. This option is required if <<certificate,`certificate`>> is specified.
@@ -77,9 +129,10 @@ The passphrase used to decrypt an encrypted key stored in the configured `key` f
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
+`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
+`TLSv1.3`.
 
-The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
+The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 
 [float]
 ==== `verification_mode`
@@ -97,25 +150,33 @@ The default is `full`.
 
 The list of cipher suites to use. The first entry has the highest priority.
 If this option is omitted, the Go crypto library's default
-suites are used (recommended).
+suites are used (recommended). Note that TLS 1.3 cipher suites are not
+individually configurable in Go, so they are not included in this list.
 
 The following cipher suites are available:
 
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
 * ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-CHACHA20-POLY1305 (TLS 1.2 only)
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * ECDHE-RSA-3DES-CBC3-SHA
 * ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
 * ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-CBC-SHA
 * ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-RSA-CHACHA20-POLY1205 (TLS 1.2 only)
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
+* RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* RSA-AES-256-CBC-SHA
+* RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 
 Here is a list of acronyms used in defining the cipher suites:
 
@@ -156,6 +217,7 @@ The following elliptic curve types are available:
 * P-256
 * P-384
 * P-521
+* X25519
 
 [float]
 ==== `renegotiation`
@@ -166,3 +228,32 @@ are `never`, `once`, and `freely`. The default value is never.
 * `never` - Disables renegotiation.
 * `once` - Allows a remote server to request renegotiation once per connection.
 * `freely` - Allows a remote server to repeatedly request renegotiation.
+
+
+[float]
+==== `ca_sha256`
+
+This configure a certificate pin can that ca be used to ensure that a specific certificate is used
+to as part of the verified chain.
+
+The pin is a base64 encoded string of the SHA-256 of the certificate.
+
+NOTE: This check is not a replacement for the normal SSL validation but it add additional validation.
+If this option is used with  `verification_mode` set to `none`, the check will always fail because
+it will not receive any verified chains.
+
+
+ifeval::["{beatname_lc}" == "filebeat"]
+[float]
+==== `client_authentication`
+
+This configures what types of client authentication are supported. The valid options
+are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+default to `required` otherwise it will be set to `none`.
+
+NOTE: This option is only valid with the TCP or the Syslog input.
+
+* `none` - Disables client authentication.
+* `optional` - When a client certificate is given, the server will verify it.
+* `required` - Will require clients to provide a valid certificate.
+endif::[]

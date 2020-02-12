@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-jolokia-jmx]]
 === Jolokia jmx metricset
-
-beta[]
 
 include::../../../module/jolokia/jmx/_meta/docs.asciidoc[]
 

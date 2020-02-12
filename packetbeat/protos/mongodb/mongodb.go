@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package mongodb
 
 import (
@@ -5,10 +22,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -200,7 +218,7 @@ func (mongodb *mongodbPlugin) handleMongodb(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isResponse {
 		debugf("MongoDB response message")
@@ -269,22 +287,14 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 
 		trans.cmdline = requ.cmdlineTuple
 		trans.ts = requ.ts
-		trans.src = common.Endpoint{
-			IP:   requ.tcpTuple.SrcIP.String(),
-			Port: requ.tcpTuple.SrcPort,
-			Proc: string(requ.cmdlineTuple.Src),
-		}
-		trans.dst = common.Endpoint{
-			IP:   requ.tcpTuple.DstIP.String(),
-			Port: requ.tcpTuple.DstPort,
-			Proc: string(requ.cmdlineTuple.Dst),
-		}
+		trans.src, trans.dst = common.MakeEndpointPair(requ.tcpTuple.BaseTuple, requ.cmdlineTuple)
 		if requ.direction == tcp.TCPDirectionReverse {
 			trans.src, trans.dst = trans.dst, trans.src
 		}
 		trans.params = requ.params
 		trans.resource = requ.resource
 		trans.bytesIn = requ.messageLength
+		trans.documents = requ.documents
 	}
 
 	// fill response
@@ -296,7 +306,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.error = resp.error
 		trans.documents = resp.documents
 
-		trans.responseTime = int32(resp.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+		trans.endTime = resp.ts
 		trans.bytesOut = resp.messageLength
 
 	}
@@ -367,9 +377,19 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 		return
 	}
 
-	timestamp := t.ts
-	fields := common.MapStr{}
-	fields["type"] = "mongodb"
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Dataset = "mongodb"
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
 	if t.error == "" {
 		fields["status"] = common.OK_STATUS
 	} else {
@@ -380,11 +400,6 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 	fields["method"] = t.method
 	fields["resource"] = t.resource
 	fields["query"] = reconstructQuery(t, false)
-	fields["responsetime"] = t.responseTime
-	fields["bytes_in"] = uint64(t.bytesIn)
-	fields["bytes_out"] = uint64(t.bytesOut)
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
 
 	if mongodb.sendRequest {
 		fields["request"] = reconstructQuery(t, true)
@@ -412,8 +427,5 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 		}
 	}
 
-	mongodb.results(beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
-	})
+	mongodb.results(evt)
 }

@@ -7,6 +7,8 @@ import argparse
 import json
 import csv
 import re
+import pdb
+import copy
 
 
 def read_file(filename):
@@ -44,38 +46,120 @@ def read_versions(vendor):
     return libs
 
 
-def gather_dependencies(vendor_dirs):
+def gather_dependencies(vendor_dirs, overrides=None):
     dependencies = {}   # lib_path -> [array of lib]
     for vendor in vendor_dirs:
         libs = read_versions(vendor)
 
         # walk looking for LICENSE files
         for root, dirs, filenames in os.walk(vendor):
-            for filename in sorted(filenames):
-                if filename.startswith("LICENSE"):
-                    lib_path = get_library_path(root)
-                    lib_search = [l for l in libs if l["path"].startswith(lib_path)]
-                    if len(lib_search) == 0:
-                        print("WARNING: No version information found for: {}".format(lib_path))
-                        lib = {"path": lib_path}
-                    else:
-                        lib = lib_search[0]
-                    lib["license_file"] = os.path.join(root, filename)
+            licenses = get_licenses(root)
+            for filename in licenses:
+                lib_path = get_library_path(root)
+                lib_search = [l for l in libs if l["path"].startswith(lib_path)]
+                if len(lib_search) == 0:
+                    print("WARNING: No version information found for: {}".format(lib_path))
+                    lib = {"path": lib_path}
+                else:
+                    lib = copy.deepcopy(lib_search[0])
 
-                    lib["license_contents"] = read_file(lib["license_file"])
-                    lib["license_summary"] = detect_license_summary(lib["license_contents"])
-                    if lib["license_summary"] == "UNKNOWN":
-                        print("WARNING: Unknown license for: {}".format(lib_path))
+                lib["license_file"] = os.path.join(root, filename)
 
-                    if lib_path not in dependencies:
-                        dependencies[lib_path] = [lib]
-                    else:
-                        dependencies[lib_path].append(lib)
+                lib["license_contents"] = read_file(lib["license_file"])
+                lib["license_summary"] = detect_license_summary(lib["license_contents"])
+                if lib["license_summary"] == "UNKNOWN":
+                    print("WARNING: Unknown license for: {}".format(lib_path))
+
+                revision = overrides.get(lib_path, {}).get("revision")
+                if revision:
+                    lib["revision"] = revision
+
+                if lib_path not in dependencies:
+                    dependencies[lib_path] = [lib]
+                else:
+                    dependencies[lib_path].append(lib)
 
             # don't walk down into another vendor dir
             if "vendor" in dirs:
                 dirs.remove("vendor")
+
     return dependencies
+
+
+# Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
+SKIP_FILES = [
+    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
+    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
+]
+
+
+def get_licenses(folder):
+    """
+    Get a list of license files from a given directory.
+    """
+    licenses = []
+    for filename in sorted(os.listdir(folder)):
+        if filename.startswith("LICENSE") and "docs" not in filename and os.path.join(folder, filename) not in SKIP_FILES:
+            licenses.append(filename)
+        elif filename.startswith("APLv2"):  # gorhill/cronexpr
+            licenses.append(filename)
+        elif filename in ("COPYING",):  # BurntSushi/toml
+            licenses.append(filename)
+    return licenses
+
+
+def has_license(folder):
+    """
+    Checks if a particular repo has a license files.
+
+    There are two cases accepted:
+        * The folder contains a LICENSE
+        * The parent folder contains a LICENSE
+        * The folder only contains subdirectories AND all these
+          subdirectories contain a LICENSE
+        * The folder only contains subdirectories AND all these
+          subdirectories contain  subdirectories which contain a LICENSE (ex Azure folder)
+    """
+
+    if len(get_licenses(folder)) > 0:
+        return True, ""
+    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0:  # For go.opencensus.io.
+        return True, ""
+
+    for subdir in os.listdir(folder):
+        if not os.path.isdir(os.path.join(folder, subdir)):
+            return False, folder
+        if len(get_licenses(os.path.join(folder, subdir))) > 0:
+            continue
+        for dir in os.listdir(os.path.join(folder, subdir)):
+            if not os.path.isdir(os.path.join(folder, subdir, dir)):
+                return False, subdir
+            if len(get_licenses(os.path.join(folder, subdir, dir))) == 0:
+                return False, os.path.join(folder, subdir, dir)
+
+    return True, ""
+
+
+def check_all_have_license_files(vendor_dirs):
+    """
+    Checks that everything in the vendor folders has a license one way
+    or the other. This doesn't collect the licenses, because the code that
+    collects the licenses needs to walk the full tree. This one makes sure
+    that every folder in the `vendor` directories has at least one license.
+    """
+    issues = []
+    for vendor in vendor_dirs:
+        for root, dirs, filenames in os.walk(vendor):
+            if root.count(os.sep) - vendor.count(os.sep) == 2:  # two levels deep
+                # Two level deep means folders like `github.com/elastic`.
+                # look for the license in root but also one level up
+                ok, issue = has_license(root)
+                if not ok:
+                    print("No license in: {}".format(issue))
+                    issues.append(issue)
+    if len(issues) > 0:
+        raise Exception("I have found licensing issues in the following folders: {}"
+                        .format(issues))
 
 
 def write_notice_file(f, beat, copyright, dependencies):
@@ -137,20 +221,29 @@ def get_url(repo):
     return "https://github.com/{}/{}".format(words[1], words[2])
 
 
-def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
-    dependencies = gather_dependencies(vendor_dirs)
+def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=None):
+    dependencies = gather_dependencies(vendor_dirs, overrides=overrides)
     if not csvfile:
         with open(filename, "w+") as f:
             write_notice_file(f, beat, copyright, dependencies)
+            print("Available at {}".format(filename))
     else:
         with open(csvfile, "wb") as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
+            print("Available at {}".format(csvfile))
+    return dependencies
 
 
 APACHE2_LICENSE_TITLES = [
+    "Apache License 2.0",
     "Apache License Version 2.0",
-    "Apache License, Version 2.0"
+    "Apache License, Version 2.0",
+    "licensed under the Apache 2.0 license",  # github.com/zmap/zcrypto
+    re.sub(r"\s+", " ", """Apache License
+    ==============
+
+    _Version 2.0, January 2004_"""),
 ]
 
 MIT_LICENSES = [
@@ -166,7 +259,28 @@ copies or substantial portions of the Software.
     """),
     re.sub(r"\s+", " ", """Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.""")
+copyright notice and this permission notice appear in all copies."""),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+    """),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    """),
 ]
 
 BSD_LICENSE_CONTENTS = [
@@ -204,11 +318,17 @@ MPL_LICENSE_TITLES = [
     "Mozilla Public License, version 2.0"
 ]
 
+UNIVERSAL_PERMISSIVE_LICENSE_TITLES = [
+    "The Universal Permissive License (UPL), Version 1.0"
+]
+
 
 # return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
+    # replace smart quotes with less intelligent ones
+    content = content.replace(b'\xe2\x80\x9c', '"').replace(b'\xe2\x80\x9d', '"')
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
@@ -226,10 +346,21 @@ def detect_license_summary(content):
         return "CC-BY-SA-4.0"
     if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
         return "LGPL-3.0"
+    if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
+        return "UPL-1.0"
 
     return "UNKNOWN"
 
 
+ACCEPTED_LICENSES = [
+    "Apache-2.0",
+    "MIT",
+    "BSD-4-Clause",
+    "BSD-3-Clause",
+    "BSD-2-Clause",
+    "MPL-2.0",
+    "UPL-1.0",
+]
 SKIP_NOTICE = []
 
 if __name__ == "__main__":
@@ -246,6 +377,9 @@ if __name__ == "__main__":
                         help="Output to a csv file")
     parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
                         help="List of top directories to exclude")
+    # no need to be generic for now, no other transitive dependency information available
+    parser.add_argument("--beats-origin", type=argparse.FileType('r'),
+                        help="path to beats vendor.json")
     parser.add_argument("-s", "--skip-notice", default=[],
                         help="List of NOTICE files to skip")
     args = parser.parse_args()
@@ -273,7 +407,18 @@ if __name__ == "__main__":
             if exclude in dirs:
                 dirs.remove(exclude)
 
-    print("Get the licenses available from {}".format(vendor_dirs))
-    create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
+    overrides = {}  # revision overrides only for now
+    if args.beats_origin:
+        govendor = json.load(args.beats_origin)
+        overrides = {package['path']: package for package in govendor["package"]}
 
-    print("Available at {}".format(notice))
+    print("Get the licenses available from {}".format(vendor_dirs))
+    check_all_have_license_files(vendor_dirs)
+    dependencies = create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile, overrides=overrides)
+
+    # check that all licenses are accepted
+    for _, deps in dependencies.items():
+        for dep in deps:
+            if dep["license_summary"] not in ACCEPTED_LICENSES:
+                raise Exception("Dependency {} has invalid license {}"
+                                .format(dep["path"], dep["license_summary"]))

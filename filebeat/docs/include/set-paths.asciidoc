@@ -1,0 +1,59 @@
+Each module and fileset has variables that you can set to change the default
+behavior of the module, including the paths where the module looks for log
+files. You can set the path in configuration or from the command line. For
+example:
+
+[source,yaml]
+----
+- module: nginx
+  access:
+    var.paths: ["/var/log/nginx/access.log*"] <1> 
+----
+<1> Sets the path for `nginx` access log files.
+
+To set the path at the command line, use the `-M` flag. The variable name
+must include the module and fileset name. For example:
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe -e -M "nginx.access.var.paths=[c:/programdata/nginx/logs/*access.log*]"
+----
+
+You can specify multiple overrides. Each override must start with `-M`. 
+
+If you are running {beatname_uc} as a service, you cannot set paths from the
+command line. You must set the `var.paths` option in the module configuration
+file.
+
+For information about specific variables that you can set for each fileset,
+see the <<{beatname_lc}-modules,documentation for the modules>>.

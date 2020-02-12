@@ -1,49 +1,82 @@
 import re
 import sys
+import os
+import shutil
 import unittest
-from auditbeat import BaseTest
+from auditbeat import *
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 
 
 class Test(BaseTest):
-    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_start_stop(self):
         """
         Auditbeat starts and stops without error.
         """
-        self.render_config_template(modules=[{
-            "name": "audit",
-            "metricsets": ["kernel"],
-        }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("start running"))
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        dirs = [self.temp_dir("auditbeat_test")]
+        with PathCleanup(dirs):
+            self.render_config_template(
+                modules=[{
+                    "name": "file_integrity",
+                    "extras": {
+                        "paths": dirs,
+                    }
+                }],
+            )
+            proc = self.start_beat()
+            self.wait_until(lambda: self.log_contains("start running"))
+            proc.check_kill_and_wait()
+            self.assert_no_logged_warnings()
 
-        # Ensure all Beater stages are used.
-        assert self.log_contains("Setup Beat: auditbeat")
-        assert self.log_contains("auditbeat start running")
-        assert self.log_contains("auditbeat stopped")
+            # Ensure all Beater stages are used.
+            assert self.log_contains("Setup Beat: auditbeat")
+            assert self.log_contains("auditbeat start running")
+            assert self.log_contains("auditbeat stopped")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_template(self):
         """
         Test that the template can be loaded with `setup --template`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()])
+        dirs = [self.temp_dir("auditbeat_test")]
+        with PathCleanup(dirs):
+            es = Elasticsearch([self.get_elasticsearch_url()])
 
-        self.render_config_template(
-            modules=[{
-                "name": "audit",
-                "metricsets": ["file"],
-                "extras": {
-                    "file.paths": ["file.example"],
-                },
-            }],
-            elasticsearch={"host": self.get_elasticsearch_url()})
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+            self.render_config_template(
+                modules=[{
+                    "name": "file_integrity",
+                    "extras": {
+                        "paths": dirs,
+                    }
+                }],
+                elasticsearch={"host": self.get_elasticsearch_url()})
+            self.run_beat(extra_args=["setup", "--template"], exit_code=0)
 
-        assert exit_code == 0
-        assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='auditbeat-*', h='name')) > 0
+            assert self.log_contains('Loaded index template')
+            assert len(es.cat.templates(name='auditbeat-*', h='name')) > 0
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_dashboards(self):
+        """
+        Test that the dashboards can be loaded with `setup --dashboards`
+        """
+
+        dirs = [self.temp_dir("auditbeat_test")]
+        with PathCleanup(dirs):
+            kibana_dir = os.path.join(self.beat_path, "build", "kibana")
+            shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
+
+            es = Elasticsearch([self.get_elasticsearch_url()])
+            self.render_config_template(
+                modules=[{
+                    "name": "file_integrity",
+                    "extras": {
+                        "paths": dirs,
+                    }
+                }],
+                elasticsearch={"host": self.get_elasticsearch_url()},
+                kibana={"host": self.get_kibana_url()},
+            )
+            self.run_beat(extra_args=["setup", "--dashboards"], exit_code=0)
+
+            assert self.log_contains("Kibana dashboards successfully loaded.")

@@ -1,5 +1,3 @@
-=== Elasticsearch node_stats metricset
-
 The `node_stats` metricset interrogates the
 https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-nodes-stats.html[Cluster API endpoint] of
 Elasticsearch to get the cluster nodes statistics. The data received is only for the local node so this Metricbeat has

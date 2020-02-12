@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package amqp
 
 import (
@@ -179,7 +196,7 @@ type amqpFrame struct {
 type amqpMessage struct {
 	ts             time.Time
 	tcpTuple       common.TCPTuple
-	cmdlineTuple   *common.CmdlineTuple
+	cmdlineTuple   *common.ProcessTuple
 	method         string
 	isRequest      bool
 	request        string
@@ -209,15 +226,15 @@ type amqpTransaction struct {
 	dst   common.Endpoint
 	ts    time.Time
 
-	method       string
-	request      string
-	response     string
-	responseTime int32
-	body         []byte
-	bytesOut     uint64
-	bytesIn      uint64
-	toString     bool
-	notes        []string
+	method   string
+	request  string
+	response string
+	endTime  time.Time
+	body     []byte
+	bytesOut uint64
+	bytesIn  uint64
+	toString bool
+	notes    []string
 
 	amqp common.MapStr
 

@@ -162,6 +162,12 @@ func (w *Watcher) Remove(name string) error {
 	return nil
 }
 
+// SetRecursive enables watches to also monitor subdirectories. Currently
+// only supported under Windows.
+func (w *Watcher) SetRecursive() error {
+	return errors.New("recursion not supported")
+}
+
 type watch struct {
 	wd    uint32 // Watch descriptor (as returned by the inotify_add_watch() syscall)
 	flags uint32 // inotify flags of this watch (see inotify(7) for the list of valid flags)

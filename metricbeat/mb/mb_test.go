@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package mb
@@ -58,15 +75,18 @@ func (m *testPushMetricSet) Run(r PushReporter) {}
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
-		in  interface{}
-		out ModuleConfig
-		err string
+		name string
+		in   interface{}
+		out  ModuleConfig
+		err  string
 	}{
 		{
-			in:  map[string]interface{}{},
-			err: "missing required field accessing 'module'",
+			name: "string value is not set on required field",
+			in:   map[string]interface{}{},
+			err:  "string value is not set accessing 'module'",
 		},
 		{
+			name: "valid config",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -77,9 +97,11 @@ func TestModuleConfig(t *testing.T) {
 				Enabled:    true,
 				Period:     time.Second * 10,
 				Timeout:    0,
+				Query:      nil,
 			},
 		},
 		{
+			name: "missing period",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -88,6 +110,7 @@ func TestModuleConfig(t *testing.T) {
 			err: "negative value accessing 'period'",
 		},
 		{
+			name: "negative timeout",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -98,27 +121,29 @@ func TestModuleConfig(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		c, err := common.NewConfigFrom(test.in)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		unpackedConfig := DefaultModuleConfig()
-		err = c.Unpack(&unpackedConfig)
-		if err != nil && test.err == "" {
-			t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
-			continue
-		}
-		if test.err != "" {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.in)
 			if err != nil {
-				assert.Contains(t, err.Error(), test.err, "testcase %d", i)
-			} else {
-				t.Errorf("expected error '%v' in testcase %d", test.err, i)
+				t.Fatal(err)
 			}
-			continue
-		}
 
-		assert.Equal(t, test.out, unpackedConfig)
+			unpackedConfig := DefaultModuleConfig()
+			err = c.Unpack(&unpackedConfig)
+			if err != nil && test.err == "" {
+				t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
+				return
+			}
+			if test.err != "" {
+				if err != nil {
+					assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+				} else {
+					t.Errorf("expected error '%v' in testcase %d", test.err, i)
+				}
+				return
+			}
+
+			assert.Equal(t, test.out, unpackedConfig)
+		})
 	}
 }
 
@@ -189,7 +214,7 @@ func TestNewModulesHostParser(t *testing.T) {
 	r := newTestRegistry(t)
 
 	factory := func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSet{base}, nil
+		return &testMetricSet{BaseMetricSet: base}, nil
 	}
 
 	hostParser := func(m Module, rawHost string) (HostData, error) {
@@ -357,4 +382,27 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 		t.Fatal(err)
 	}
 	return config
+}
+
+func TestModuleConfigQueryParams(t *testing.T) {
+	qp := QueryParams{
+		"stringKey": "value",
+		"intKey":    10,
+		"floatKey":  11.5,
+		"boolKey":   true,
+		"nullKey":   nil,
+		"arKey":     []interface{}{1, 2},
+	}
+
+	res := qp.String()
+
+	expectedValues := []string{"stringKey=value", "intKey=10", "floatKey=11.5", "boolKey=true", "nullKey=", "arKey=1", "arKey=2"}
+	for _, expected := range expectedValues {
+		assert.Contains(t, res, expected)
+	}
+
+	assert.NotContains(t, res, "?")
+	assert.NotContains(t, res, "%")
+	assert.NotEqual(t, "&", res[0])
+	assert.NotEqual(t, "&", res[len(res)-1])
 }

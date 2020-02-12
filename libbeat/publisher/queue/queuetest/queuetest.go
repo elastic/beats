@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package queuetest
 
 import (
@@ -8,7 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-type QueueFactory func() queue.Queue
+// QueueFactory is used to create a per test queue instance.
+type QueueFactory func(t *testing.T) queue.Queue
 
 type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
 
@@ -45,11 +63,16 @@ func TestSingleProducerConsumer(
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, withLogOutput(func(t *testing.T) {
+		verbose := testing.Verbose()
+		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
+			if !verbose {
+				t.Parallel()
+			}
+
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory()
+			queue := factory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
@@ -188,11 +211,16 @@ func TestMultiProducerConsumer(
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, withLogOutput(func(t *testing.T) {
+		verbose := testing.Verbose()
+		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
+			if !verbose {
+				t.Parallel()
+			}
+
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory()
+			queue := factory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
@@ -263,6 +291,7 @@ func makeProducer(
 				ACK: ackCB,
 			})
 			for i := 0; i < maxEvents; i++ {
+				log.Debug("publish event", i)
 				producer.Publish(makeEvent(makeFields(i)))
 			}
 
@@ -288,6 +317,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 				consumers[i] = b.Consumer()
 			}
 
+			log.Debugf("consumer: wait for %v events\n", maxEvents)
 			events.Add(maxEvents)
 
 			for _, c := range consumers {
@@ -303,7 +333,10 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 							return
 						}
 
-						for range batch.Events() {
+						collected := batch.Events()
+						log.Debug("consumer: process batch", len(collected))
+
+						for range collected {
 							events.Done()
 						}
 						batch.ACK()

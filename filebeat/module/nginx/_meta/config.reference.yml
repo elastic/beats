@@ -7,9 +7,9 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Error logs
   #error:
@@ -19,6 +19,14 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
+
+  # Ingress-nginx controller logs. This is disabled by default. It could be used in Kubernetes environments to parse ingress-nginx logs
+  #ingress_controller:
+  #  enabled: false
+  #
+  #  # Set custom paths for the log files. If left empty,
+  #  # Filebeat will choose the paths depending on your OS.
+  #  #var.paths:

@@ -1,7 +1,0 @@
-*.swp
-*.swo
-/build/
-/env/
-
-# copied over from xgo-image/
-docker/xgo-image-deb6/base/build.sh

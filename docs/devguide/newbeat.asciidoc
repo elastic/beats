@@ -23,7 +23,6 @@ The following topics describe how to build a new Beat:
 * <<setting-up-beat>>
 * <<compiling-and-running>>
 * <<beater-interface>>
-* <<ls-beat>>
 * <<newbeat-sharing>>
 * <<event-conventions>>
 
@@ -32,35 +31,19 @@ The following topics describe how to build a new Beat:
 
 All Beats are written in http://golang.org/[Go], so having Go installed and knowing
 the basics are prerequisites for understanding this guide.
-But don't worry if you aren't a Go expert. Go is a relatively new
-language, and very few people are experts in it. In fact, several
-people learned Go by contributing to Packetbeat and libbeat, including the
-original Packetbeat authors.
 
-For general information about contributing to Beats, see <<beats-contributing>>.
+*Before you begin:* Set up your Go environment as described under
+<<setting-up-dev-environment>> in <<beats-contributing>>. The minimum required
+Go version is {go-version}.
 
-After you have https://golang.org/doc/install[installed Go] and set up the
-https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, a simple way of getting the source code for
-Beats, including libbeat and the Beat generator, is to do:
-
-[source,shell]
-----------------------------------------------------------------------
-go get github.com/elastic/beats
-----------------------------------------------------------------------
-
-When you run the command, all source files are downloaded to the
-`$GOPATH/src/github.com/elastic/beats` path. You can ignore the "no buildable Go source files" message because
-you will build the source later. By default `go get`  fetches the master branch. To build your beat
-on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+To build your Beat on a specific version of libbeat, check out the specific
+branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
 cd ${GOPATH}/src/github.com/elastic/beats
-git checkout {doc-branch}
+git checkout {branch}
 ----
-
-NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
 [[newbeat-overview]]
 === Overview
@@ -76,9 +59,9 @@ specific to your Beat (the code that creates the event and sends it to the publi
 Libbeat also offers common services like configuration management, logging,
 daemonzing, and Windows service handling, and data processing modules.
 
-image:./images/beat_overview.png[Beat overview architecture]
+image::./images/beat_overview.png[Beat overview architecture]
 
-The event that you create is a JSON-like object (Golang type `map[string]interface{}`) that
+The event that you create is a JSON-like object (Go type `map[string]interface{}`) that
 contains the collected data to send to the publisher. At a minimum, the event object
 must contain a `@timestamp` field and a `type` field. Beyond
 that, events can contain any additional fields, and they can be created as often
@@ -123,9 +106,9 @@ Now that you have the big picture, let's dig into the code.
 === Generating Your Beat
 
 To generate your own Beat, you use the Beat generator available in the beats repo on GitHub. If you haven't
-downloaded the Beats source code yet, follow the instructions in <<newbeat-getting-ready>>.
+downloaded the Beats source code yet, follow the instructions in <<setting-up-dev-environment>>.
 
-Before running beat generator, you must decide on a name for your beat. The name should be one word with
+Before running the Beat generator, you must decide on a name for your Beat. The name should be one word with
 the first letter capitalized. In our example, we use `Countbeat`.
 
 Now create a directory under $GOPATH for your repository and change to the new directory:
@@ -136,25 +119,26 @@ mkdir ${GOPATH}/src/github.com/{user}
 cd ${GOPATH}/src/github.com/{user}
 --------------------
 
-Run python and specify the path to the Beat generator:
+Run the mage script to generate the custom beat:
+
 
 [source,shell]
 --------------------
-python $GOPATH/src/github.com/elastic/beats/script/generate.py
+mage GenerateCustomBeat
 --------------------
 
-Python will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
+The mage script will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
 For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
 [source,shell]
 ---------
-project_name [Examplebeat]: Countbeat
-github_name [your-github-name]: {username}
-beat_path [github.com/{github id}]:
-full_name [Firstname Lastname]: {Full Name}
+Enter a project name [examplebeat]:  Countbeat
+Enter a github name [your-github-name]: {username}
+Enter a beat path [github.com/{username}/countbeat]: 
+Enter a full name [Firstname Lastname]: {Full Name}
 ---------
 
-The Beat generator creates a directory called `countbeat` inside of your project folder.
+The Beat generator creates a directory called `countbeat` inside of your project folder (e.g. {project folder}/github.com/{github id}/countbeat).
 
 You now have a raw template of the Beat, but you still need to <<setting-up-beat,fetch dependencies and set up the Beat>>.
 
@@ -184,7 +168,7 @@ To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/githu
 
 [source,shell]
 ---------
-make
+mage build
 ---------
 
 NOTE: we don't support the `-j` option for make at the moment.
@@ -474,14 +458,15 @@ package main
 
 import (
 	"os"
-	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 
 	"github.com/kimjmin/countbeat/beater"
 )
 
-var RootCmd = cmd.GenRootCmd("countbeat", "", beater.New)
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: "countbeat"})
 
 func main() {
 	if err := RootCmd.Execute(); err != nil {
@@ -490,18 +475,8 @@ func main() {
 }
 ----------------------------------------------------------------------
 
-
-[[ls-beat]]
-=== Example: Building Lsbeat from Scratch
-
-https://github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command-line tool, but instead of printing the files and subdirectories to the screen,
-Lsbeat periodically ships them to Elasticsearch for storage.
-
-To help you learn how to build a Beat, we've created this http://elastic.co//blog/build-your-own-beat[blog post]
-that describes how to build Lsbeat from scratch. You can refer to the Lsbeat implementation as a working example.
-
 [[newbeat-sharing]]
 === Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open
-a pull request to add your link to the {libbeat}/community-beats.html[Community Beats] list.
+a pull request to add your link to the {beats-ref}/community-beats.html[Community Beats] list.

@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
@@ -40,6 +40,13 @@ packetbeat.interfaces.device: any
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
+# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# This option does not work with `any` interface device.
+# The default option is false and requires manual set-up of promiscuous mode.
+# Warning: under some circumstances (e.g beat crash) promiscuous mode
+# can stay enabled even after beat is shut down.
+#packetbeat.interfaces.auto_promisc_mode: true
+
 #================================== Flows =====================================
 
 packetbeat.flows:
@@ -53,12 +60,18 @@ packetbeat.flows:
   # Configure reporting period. If set to -1, only killed flows will be reported
   period: 10s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 #========================== Transaction protocols =============================
 
 packetbeat.protocols:
 - type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   #enabled: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: amqp
   # Enable AMQP monitoring. Default: true
@@ -93,6 +106,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -117,12 +133,22 @@ packetbeat.protocols:
   # is included in published events. The default is true. enable `send_response` first before enable this option.
   #send_response_header: true
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Configures the default compression algorithm being used to uncompress compressed frames by name. Currently only `snappy` is can be configured.
   # By default no compressor is configured.
   #compressor: "snappy"
 
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
+
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: dns
   # Enable DNS monitoring. Default: true
@@ -149,6 +175,9 @@ packetbeat.protocols:
   # Default: false
   # send_request:  true
   # send_response: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -178,9 +207,27 @@ packetbeat.protocols:
   # all headers by setting this option to true. The default is false.
   #send_all_headers: false
 
+  # A list of headers to redact if present in the HTTP request. This will keep
+  # the header field present, but will redact it's value to show the headers
+  # presence.
+  #redact_headers: []
+
   # The list of content types for which Packetbeat includes the full HTTP
-  # payload in the response field.
+  # payload. If the request's or response's Content-Type matches any on this
+  # list, the full body will be included under the request or response field.
   #include_body_for: []
+
+  # The list of content types for which Packetbeat includes the full HTTP
+  # request payload.
+  #include_request_body_for: []
+
+  # The list of content types for which Packetbeat includes the full HTTP
+  # response payload.
+  #include_response_body_for: []
+
+  # Whether the body of a request must be decoded when a content-encoding
+  # or transfer-encoding has been applied.
+  #decode_body: true
 
   # If the Cookie or Set-Cookie headers are sent, this option controls whether
   # they are split into individual values.
@@ -198,6 +245,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -252,6 +302,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -262,7 +315,7 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.
@@ -271,6 +324,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -292,6 +348,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -312,9 +371,21 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -367,6 +438,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -397,6 +471,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -417,6 +494,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -427,7 +507,18 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
+
+  # List of hash algorithms to use to calculate certificates' fingerprints.
+  # Valid values are `sha1`, `sha256` and `md5`.
+  #fingerprints: [sha1]
 
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.
@@ -437,32 +528,19 @@ packetbeat.protocols:
   # in PEM format under the `raw` key. The default is false.
   #include_raw_certificates: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false

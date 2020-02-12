@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package beater provides the implementation of the libbeat Beater interface for
 Winlogbeat. The main event loop is implemented in this package.
@@ -5,7 +22,7 @@ Winlogbeat. The main event loop is implemented in this package.
 package beater
 
 import (
-	"expvar"
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -19,10 +36,6 @@ import (
 	"github.com/elastic/beats/winlogbeat/config"
 	"github.com/elastic/beats/winlogbeat/eventlog"
 )
-
-func init() {
-	expvar.Publish("uptime", expvar.Func(uptime))
-}
 
 // Debug logging functions for this package.
 var (
@@ -82,7 +95,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		}
 		debugf("Initialized EventLog[%s]", eventLog.Name())
 
-		logger, err := newEventLogger(eventLog, config)
+		logger, err := newEventLogger(b.Info, eventLog, config)
 		if err != nil {
 			return fmt.Errorf("Failed to create new event log. %v", err)
 		}
@@ -114,6 +127,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	acker := newEventACKer(eb.checkpoint)
 	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
@@ -121,13 +135,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// setup global event ACK handler
 	err := eb.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKLastEvents: func(data []interface{}) {
-			for _, datum := range data {
-				if st, ok := datum.(checkpoint.EventLogState); ok {
-					eb.checkpoint.PersistState(st)
-				}
-			}
-		},
+		ACKEvents: acker.ACKEvents,
 	})
 	if err != nil {
 		return err
@@ -139,11 +147,20 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 		// Start a goroutine for each event log.
 		wg.Add(1)
-		go eb.processEventLog(&wg, log, state)
+		go eb.processEventLog(&wg, log, state, acker)
 	}
 
 	wg.Wait()
-	eb.checkpoint.Shutdown()
+	defer eb.checkpoint.Shutdown()
+
+	if eb.config.ShutdownTimeout > 0 {
+		logp.Info("Shutdown will wait max %v for the remaining %v events to publish.",
+			eb.config.ShutdownTimeout, acker.Active())
+		ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
+		defer cancel()
+		acker.Wait(ctx)
+	}
+
 	return nil
 }
 
@@ -159,20 +176,8 @@ func (eb *Winlogbeat) processEventLog(
 	wg *sync.WaitGroup,
 	logger *eventLogger,
 	state checkpoint.EventLogState,
+	acker *eventACKer,
 ) {
 	defer wg.Done()
-	logger.run(eb.done, eb.pipeline, state)
-}
-
-// uptime returns a map of uptime related metrics.
-func uptime() interface{} {
-	now := time.Now().UTC()
-	uptimeDur := now.Sub(startTime)
-
-	return map[string]interface{}{
-		"start_time":  startTime,
-		"uptime":      uptimeDur.String(),
-		"uptime_ms":   fmt.Sprintf("%d", uptimeDur.Nanoseconds()/int64(time.Microsecond)),
-		"server_time": now,
-	}
+	logger.run(eb.done, eb.pipeline, state, acker)
 }

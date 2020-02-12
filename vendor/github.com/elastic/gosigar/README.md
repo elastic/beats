@@ -26,6 +26,7 @@ The features vary by operating system.
 | FDUsage         |   X   |        |         |         |    X    |
 | FileSystemList  |   X   |    X   |    X    |    X    |    X    |
 | FileSystemUsage |   X   |    X   |    X    |    X    |    X    |
+| HugeTLBPages    |   X   |        |         |         |         |
 | LoadAverage     |   X   |    X   |         |    X    |    X    |
 | Mem             |   X   |    X   |    X    |    X    |    X    |
 | ProcArgs        |   X   |    X   |    X    |         |    X    |
@@ -36,6 +37,7 @@ The features vary by operating system.
 | ProcMem         |   X   |    X   |    X    |         |    X    |
 | ProcState       |   X   |    X   |    X    |         |    X    |
 | ProcTime        |   X   |    X   |    X    |         |    X    |
+| Rusage          |   X   |        |    X    |         |         |
 | Swap            |   X   |    X   |         |    X    |    X    |
 | Uptime          |   X   |    X   |         |    X    |    X    |
 

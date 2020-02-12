@@ -7,116 +7,90 @@
       type: array
       description: >
         An array of remote IP addresses. It is a list because it is common to include, besides the client
-        IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
-    - name: remote_ip
-      type: keyword
-      description: >
-        Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP
-        addresses are present, this field contains the first private IP address from the `remote_ip_list`
-        array.
-    - name: user_name
-      type: keyword
-      description: >
-        The user name used when basic authentication is used.
-    - name: method
-      type: keyword
-      example: GET
-      description: >
-        The request HTTP method.
-    - name: url
-      type: keyword
-      description: >
-        The request HTTP URL.
-    - name: http_version
-      type: keyword
-      description: >
-        The HTTP version.
-    - name: response_code
-      type: long
-      description: >
-        The HTTP response code.
+        IP address, IP addresses from headers like `X-Forwarded-For`.
+        Real source IP is restored to `source.ip`.
+
     - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
+      type: alias
+      path: http.response.body.bytes
+      migration: true
+    - name: user_name
+      type: alias
+      path: user.name
+      migration: true
+    - name: method
+      type: alias
+      path: http.request.method
+      migration: true
+    - name: url
+      type: alias
+      path: url.original
+      migration: true
+    - name: http_version
+      type: alias
+      path: http.version
+      migration: true
+    - name: response_code
+      type: alias
+      path: http.response.status_code
+      migration: true
     - name: referrer
-      type: keyword
-      description: >
-        The HTTP referrer.
+      type: alias
+      path: http.request.referrer
+      migration: true
     - name: agent
-      type: text
-      description: >
-        Contains the un-parsed user agent string. Only present if the user
-        agent Elasticsearch plugin is not available or not used.
+      type: alias
+      path: user_agent.original
+      migration: true
+
     - name: user_agent
       type: group
-      description: >
-        Contains the parsed User agent field. Only present if the user
-        agent Elasticsearch plugin is available and used.
       fields:
         - name: device
-          type: keyword
-          description: >
-            The name of the physical device.
-        - name: major
-          type: long
-          description: >
-            The major version of the user agent.
-        - name: minor
-          type: long
-          description: >
-            The minor version of the user agent.
-        - name: patch
-          type: keyword
-          description: >
-            The patch version of the user agent.
+          type: alias
+          path: user_agent.device.name
+          migration: true
         - name: name
-          type: keyword
-          example: Chrome
-          description: >
-            The name of the user agent.
+          type: alias
+          path: user_agent.name
+          migration: true
         - name: os
-          type: keyword
-          description: >
-            The name of the operating system.
-        - name: os_major
-          type: long
-          description: >
-            The major version of the operating system.
-        - name: os_minor
-          type: long
-          description: >
-            The minor version of the operating system.
+          type: alias
+          path: user_agent.os.full_name
+          migration: true
         - name: os_name
-          type: keyword
-          description: >
-            The name of the operating system.
+          type: alias
+          path: user_agent.os.name
+          migration: true
+        - name: original
+          type: alias
+          path: user_agent.original
+          migration: true
+
     - name: geoip
       type: group
-      description: >
-        Contains GeoIP information gathered based on the remote_ip field.
-        Only present if the GeoIP Elasticsearch plugin is available and
-        used.
       fields:
         - name: continent_name
-          type: keyword
-          description: >
-            The name of the continent.
+          type: alias
+          path: source.geo.continent_name
+          migration: true
         - name: country_iso_code
-          type: keyword
-          description: >
-            Country ISO code.
+          type: alias
+          path: source.geo.country_iso_code
+          migration: true
         - name: location
-          type: geo_point
-          description: >
-            The longitude and latitude.
+          type: alias
+          path: source.geo.location
+          migration: true
         - name: region_name
-          type: keyword
-          description: >
-            The region name.
+          type: alias
+          path: source.geo.region_name
+          migration: true
         - name: city_name
-          type: keyword
-          description: >
-            The city name.
-
+          type: alias
+          path: source.geo.city_name
+          migration: true
+        - name: region_iso_code
+          type: alias
+          path: source.geo.region_iso_code
+          migration: true

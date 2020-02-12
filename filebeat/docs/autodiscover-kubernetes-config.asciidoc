@@ -1,4 +1,4 @@
-Filebeat supports templates for both prospectors and modules.
+Filebeat supports templates for inputs and modules.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -10,16 +10,16 @@ filebeat.autodiscover:
             equals:
               kubernetes.namespace: kube-system
           config:
-            - type: docker
-              containers.ids:
-                - "${data.docker.container.id}"
+            - type: container
+              paths:
+                - /var/log/containers/*-${data.kubernetes.container.id}.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
-This configuration launches a `docker` logs prospector for all containers of pods running in the Kubernetes namespace
+This configuration launches a `docker` logs input for all containers of pods running in the Kubernetes namespace
 `kube-system`.
 
-If you are using modules, you can override the default prospector and use the docker prospector instead.
+If you are using modules, you can override the default input and use the docker input instead.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -33,8 +33,8 @@ filebeat.autodiscover:
           config:
             - module: redis
               log:
-                prospector:
-                  type: docker
-                  containers.ids:
-                    - "${data.docker.container.id}"
+                input:
+                  type: container
+                  paths:
+                    - /var/log/containers/*-${data.kubernetes.container.id}.log
 -------------------------------------------------------------------------------------

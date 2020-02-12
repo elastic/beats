@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package tls
@@ -12,7 +29,7 @@ import (
 )
 
 var ja3test = []struct {
-	Packet, Fingerprint, Str string
+	Packet, Fingerprint string
 }{
 	// Chrome on OSX
 	{
@@ -24,7 +41,6 @@ var ja3test = []struct {
 			"02683208687474702f312e3175500000000b00020100000a000a00086a6a001d" +
 			"00170018aaaa000100",
 		Fingerprint: "94c485bca29d5392be53f2b8cf7f4304",
-		Str:         "771,49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0",
 	},
 	// Safari
 	{
@@ -37,7 +53,6 @@ var ja3test = []struct {
 			"3106737064792f3308687474702f312e31000500050100000000001200000017" +
 			"0000",
 		Fingerprint: "c07cb55f88702033a8f52c046d23e0b2",
-		Str:         "771,255-49196-49195-49188-49187-49162-49161-49200-49199-49192-49191-49172-49171-157-156-61-60-53-47,0-10-11-13-13172-16-5-18-23,23-24-25,0",
 	},
 	// Handmade
 	{
@@ -45,7 +60,6 @@ var ja3test = []struct {
 			"ffffffffffffffffffffffffff0000080035002f000a00ff0100000800230000" +
 			"000f0000",
 		Fingerprint: "7a75198d3e18354a6763860d331ff46a",
-		Str:         "769,53-47-10-255,35-15,,",
 	},
 }
 
@@ -63,10 +77,7 @@ func TestJa3(t *testing.T) {
 		tls.ReceivedFin(tcpTuple, 0, private)
 		assert.Len(t, results.events, 1)
 		event := results.events[0]
-		actual, err := event.Fields.GetValue("tls.fingerprints.ja3.str")
-		assert.NoError(t, err)
-		assert.Equal(t, test.Str, actual)
-		actual, err = event.Fields.GetValue("tls.fingerprints.ja3.hash")
+		actual, err := event.Fields.GetValue("tls.client.ja3")
 		assert.NoError(t, err)
 		assert.Equal(t, test.Fingerprint, actual)
 	}

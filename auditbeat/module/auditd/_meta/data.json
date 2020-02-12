@@ -1,11 +1,16 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "auditd": {
         "data": {
             "acct": "(invalid user)",
             "op": "login",
             "terminal": "sshd"
         },
+        "message_type": "user_login",
         "result": "fail",
         "sequence": 19955,
         "session": "unset",
@@ -22,25 +27,32 @@
             }
         }
     },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "action": "logged-in",
         "category": "user-login",
         "module": "auditd",
-        "type": "user_login"
+        "original": [
+            "type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe=\"/usr/sbin/sshd\" hostname=? addr=179.38.151.221 terminal=sshd res=failed'"
+        ]
+    },
+    "network": {
+        "direction": "incoming"
     },
     "process": {
-        "exe": "/usr/sbin/sshd",
-        "pid": "12635"
+        "executable": "/usr/sbin/sshd",
+        "pid": 12635
+    },
+    "service": {
+        "type": "auditd"
+    },
+    "source": {
+        "ip": "179.38.151.221"
     },
     "user": {
-        "auid": "unset",
-        "name_map": {
-            "uid": "root"
+        "audit": {
+            "id": "unset"
         },
-        "uid": "0"
+        "id": "0",
+        "name": "root"
     }
 }

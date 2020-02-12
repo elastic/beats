@@ -24,13 +24,13 @@ class Test(BaseTest):
 
     def assert_common(self, objs):
         # check client ip are not mixed up
-        assert all(o['client_ip'] == '192.168.188.37' for o in objs)
-        assert all(o['ip'] == '192.168.188.38' for o in objs)
-        assert all(o['port'] == 11211 for o in objs)
+        assert all(o['client.ip'] == '192.168.188.37' for o in objs)
+        assert all(o['server.ip'] == '192.168.188.38' for o in objs)
+        assert all(o['server.port'] == 11211 for o in objs)
 
         # check transport layer always udp
         assert all(o['type'] == 'memcache' for o in objs)
-        assert all(o['transport'] == 'udp' for o in objs)
+        assert all(o['network.transport'] == 'udp' for o in objs)
         assert all(o['memcache.protocol_type'] == 'binary' for o in objs)
 
     def test_store(self):

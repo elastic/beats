@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-haproxy]]
@@ -11,7 +11,7 @@ collection from using TCP sockets or HTTP with or without basic authentication.
 To configure HAProxy to collect stats, you must enable the stats module, it can
 be done by enabling a TCP socket, or by adding an HTTP stats frontend.
 
-Metricbeat can collect two metric sets from HAproxy, `info` and `stats`. `info`
+Metricbeat can collect two metric sets from HAProxy, `info` and `stats`. `info`
 is not available when using HTTP stats frontend.
 
 For example, to enable stats reporting via any local IP on port 14567, place
@@ -32,16 +32,18 @@ required authentication add this to the haproxy config:
 [source,haproxy]
 ----
  listen stats
-   bind 0.0.0.0:14569
+   bind 0.0.0.0:14567
    stats enable
    stats uri /stats
    stats auth admin:admin
 ----
 
+The default metricsets are `info`and `stat`.
+
 [float]
 === Compatibility
 
-The HAProxy metricsets were tested with HAProxy 1.6 and are expected to work with all 1.6 versions.
+The HAProxy metricsets are tested with HAProxy versions from 1.6, 1.7 to 1.8.
 
 
 [float]
@@ -57,6 +59,7 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  enabled: true
 ----
 
 [float]

@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/intel.log
+    os.linux:
+      - /var/log/bro/current/intel.log
+    os.darwin:
+      - /usr/local/var/logs/current/intel.log
+  - name: tags
+    default: [zeek.intel]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/intel.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

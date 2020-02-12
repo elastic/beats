@@ -79,11 +79,10 @@ make update
 
 ### Cleanup
 
-To clean  {Beat} source code, run the following commands:
+To clean  {Beat} source code, run the following command:
 
 ```
 make fmt
-make simplify
 ```
 
 To clean up the build directory and generated artifacts, run:
@@ -111,7 +110,7 @@ For further development, check out the [beat developer guide](https://www.elasti
 The beat frameworks provides tools to crosscompile and package your beat for different platforms. This requires [docker](https://www.docker.com/) and vendoring as described above. To build packages of your beat, run the following command:
 
 ```
-make package
+make release
 ```
 
-This will fetch and create all images required for the build process. The hole process to finish can take several minutes.
+This will fetch and create all images required for the build process. The whole process to finish can take several minutes.

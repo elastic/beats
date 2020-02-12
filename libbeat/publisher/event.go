@@ -1,7 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package publisher
 
 import (
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening
@@ -24,10 +42,37 @@ type Batch interface {
 type Event struct {
 	Content beat.Event
 	Flags   EventFlags
+	Cache   EventCache
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
 type EventFlags uint8
+
+// EventCache provides a space for outputs to define per-event metadata
+// that's intended to be used only within the scope of an output
+type EventCache struct {
+	m common.MapStr
+}
+
+// Put lets outputs put key-value pairs into the event cache
+func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
+	if ec.m == nil {
+		// uninitialized map
+		ec.m = common.MapStr{}
+	}
+
+	return ec.m.Put(key, value)
+}
+
+// GetValue lets outputs retrieve values from the event cache by key
+func (ec *EventCache) GetValue(key string) (interface{}, error) {
+	if ec.m == nil {
+		// uninitialized map
+		return nil, common.ErrKeyNotFound
+	}
+
+	return ec.m.GetValue(key)
+}
 
 const (
 	// GuaranteedSend requires an output to not drop the event on failure, but

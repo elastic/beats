@@ -1,13 +1,28 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package tls
 
 import (
 	"encoding/hex"
-	"encoding/pem"
 	"fmt"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -222,7 +237,7 @@ func TestParserHello(t *testing.T) {
 
 	helloMap := parser.hello.toMap()
 	assert.Equal(t, "3.3", mapGet(t, helloMap, "version").(string))
-	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
+	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", parser.hello.selected.cipherSuite.String())
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)
 	hasExts := parser.hello.extensions.Parsed != nil
@@ -242,7 +257,7 @@ func TestParserHello(t *testing.T) {
 
 	helloMap = parser.hello.toMap()
 	assert.Equal(t, "3.3", mapGet(t, helloMap, "version").(string))
-	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
+	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", parser.hello.selected.cipherSuite.String())
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)
 	hasExts = parser.hello.extensions.Parsed != nil
@@ -274,7 +289,6 @@ func TestParserHello(t *testing.T) {
 }
 
 func TestCertificates(t *testing.T) {
-
 	parser := &parser{}
 
 	// A certificates message with two certificates
@@ -307,7 +321,8 @@ func TestCertificates(t *testing.T) {
 		"subject.organizational_unit": "Technology",
 		"subject.province":            "California",
 	}
-	certMap := certToMap(c[0], false)
+
+	certMap := certToMap(c[0])
 
 	for key, expectedValue := range expected {
 		value, err := certMap.GetValue(key)
@@ -317,7 +332,7 @@ func TestCertificates(t *testing.T) {
 		} else if n, ok := value.(int); ok {
 			value = strconv.Itoa(n)
 		}
-		assert.Equal(t, expectedValue, value)
+		assert.Equal(t, expectedValue, value, key)
 	}
 	san, err := certMap.GetValue("alternative_names")
 	assert.NoError(t, err)
@@ -332,19 +347,27 @@ func TestCertificates(t *testing.T) {
 		"www.example.net",
 	}, san)
 
-	// test raw certificates in PEM format
-	for idx, cc := range c {
-		logStr := fmt.Sprintf("certificate %d", idx)
-		certMap = certToMap(cc, true)
-		obj, err := certMap.GetValue("raw")
-		assert.NoError(t, err, logStr)
-		cert := obj.(string)
-		assert.True(t, strings.HasPrefix(cert, "-----BEGIN CERTIFICATE-----\n"), logStr)
-		assert.True(t, strings.HasSuffix(cert, "-----END CERTIFICATE-----\n"), logStr)
-		block, rest := pem.Decode([]byte(cert))
-		assert.Equal(t, block.Type, "CERTIFICATE", logStr)
-		assert.Equal(t, block.Bytes, cc.Raw, logStr)
-		assert.Empty(t, rest, logStr)
+	type fpTest struct {
+		expected, actual string
+	}
+	fingerPrints := map[string]*fpTest{
+		"md5":    {expected: "68423D55EA27D0B4FDA1878FCAB7A1EB"},
+		"sha1":   {expected: "2509FB22F7671AEA2D0A28AE80516F390DE0CA21"},
+		"sha256": {expected: "642DE54D84C30494157F53F657BF9F89B4EA6C8B16351FD7EC258D556F821040"},
+	}
+	req := make(map[string]*string)
+	var algos []*FingerprintAlgorithm
+	for algo, testCase := range fingerPrints {
+		ptr, err := GetFingerprintAlgorithm(algo)
+		if err != nil {
+			t.Fatal(err)
+		}
+		algos = append(algos, ptr)
+		req[algo] = &testCase.actual
+	}
+	hashCert(c[0], algos, req)
+	for k, v := range fingerPrints {
+		assert.Equal(t, v.expected, v.actual, k)
 	}
 }
 

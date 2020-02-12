@@ -1,75 +1,95 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package api
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 )
 
-// Start starts the metrics api endpoint on the configured host and port
-func Start(cfg *common.Config, info beat.Info) {
-	cfgwarn.Experimental("Metrics endpoint is enabled.")
-	config := DefaultConfig
-	cfg.Unpack(&config)
-
-	logp.Info("Starting stats endpoint")
-	go func() {
-		mux := http.NewServeMux()
-
-		// register handlers
-		mux.HandleFunc("/", rootHandler(info))
-		mux.HandleFunc("/stats", statsHandler)
-
-		url := config.Host + ":" + strconv.Itoa(config.Port)
-		logp.Info("Metrics endpoint listening on: %s", url)
-		endpoint := http.ListenAndServe(url, mux)
-		logp.Info("finished starting stats endpoint: %v", endpoint)
-	}()
+// Server takes cares of correctly starting the HTTP component of the API
+// and will answers all the routes defined in the received ServeMux.
+type Server struct {
+	log    *logp.Logger
+	mux    *http.ServeMux
+	l      net.Listener
+	config Config
 }
 
-func rootHandler(info beat.Info) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Return error page
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-		data := common.MapStr{
-			"version":  info.Version,
-			"beat":     info.Beat,
-			"name":     info.Name,
-			"uuid":     info.UUID,
-			"hostname": info.Hostname,
-		}
-
-		print(w, data, r.URL)
+// New creates a new API Server.
+func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, error) {
+	if log == nil {
+		log = logp.NewLogger("")
 	}
+
+	cfg := DefaultConfig
+	err := config.Unpack(&cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	l, err := makeListener(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Server{mux: mux, l: l, config: cfg, log: log.Named("api")}, nil
 }
 
-// statsHandler report expvar and all libbeat/monitoring metrics
-func statsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	data := monitoring.CollectStructSnapshot(nil, monitoring.Full, false)
-
-	print(w, data, r.URL)
+// Start starts the HTTP server and accepting new connection.
+func (s *Server) Start() {
+	s.log.Info("Starting stats endpoint")
+	go func(l net.Listener) {
+		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
+		http.Serve(l, s.mux)
+		s.log.Infof("Finished starting stats endpoint: %s", l.Addr().String())
+	}(s.l)
 }
 
-func print(w http.ResponseWriter, data common.MapStr, u *url.URL) {
-	query := u.Query()
-	if _, ok := query["pretty"]; ok {
-		fmt.Fprintf(w, data.StringToPrint())
-	} else {
-		fmt.Fprintf(w, data.String())
+// Stop stops the API server and free any resource associated with the process like unix sockets.
+func (s *Server) Stop() error {
+	return s.l.Close()
+}
+
+func parse(host string, port int) (string, string, error) {
+	url, err := url.Parse(host)
+	if err != nil {
+		return "", "", err
+	}
+
+	// When you don't explicitely define the Scheme we fallback on tcp + host.
+	if len(url.Host) == 0 && len(url.Scheme) == 0 {
+		addr := host + ":" + strconv.Itoa(port)
+		return "tcp", addr, nil
+	}
+
+	switch url.Scheme {
+	case "http":
+		return "tcp", url.Host, nil
+	case "unix":
+		return url.Scheme, url.Path, nil
+	default:
+		return "", "", fmt.Errorf("unknown scheme %s for host string %s", url.Scheme, host)
 	}
 }

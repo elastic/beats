@@ -1,7 +1,23 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package flows
 
 import (
-	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"net"
@@ -9,6 +25,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/flowhash"
+	"github.com/elastic/beats/packetbeat/procs"
+	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
 
 type flowsProcessor struct {
@@ -19,7 +38,7 @@ type flowsProcessor struct {
 }
 
 var (
-	ErrInvalidTimeout = errors.New("timeout must not >= 1s")
+	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
 	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
 )
 
@@ -187,16 +206,31 @@ func createEvent(
 	intNames, uintNames, floatNames []string,
 ) beat.Event {
 	timestamp := ts
-	fields := common.MapStr{
-		"start_time": common.Time(f.createTS),
-		"last_time":  common.Time(f.ts),
-		"type":       "flow",
-		"flow_id":    common.NetString(f.id.Serialize()),
-		"final":      isOver,
-	}
 
+	event := common.MapStr{
+		"start":    common.Time(f.createTS),
+		"end":      common.Time(f.ts),
+		"duration": f.ts.Sub(f.createTS),
+		"dataset":  "flow",
+		"kind":     "event",
+		"category": "network_traffic",
+		"action":   "network_flow",
+	}
+	flow := common.MapStr{
+		"id":    common.NetString(f.id.Serialize()),
+		"final": isOver,
+	}
+	fields := common.MapStr{
+		"event": event,
+		"flow":  flow,
+		"type":  "flow",
+	}
+	network := common.MapStr{}
 	source := common.MapStr{}
 	dest := common.MapStr{}
+	tuple := common.IPPortTuple{}
+	var communityID flowhash.Flow
+	var proto applayer.Transport
 
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
@@ -206,66 +240,190 @@ func createEvent(
 
 	// add vlan
 	if vlan := f.id.OutterVLan(); vlan != nil {
-		fields["outer_vlan"] = binary.LittleEndian.Uint16(vlan)
+		vlanID := uint64(binary.LittleEndian.Uint16(vlan))
+		putOrAppendUint64(flow, "vlan", vlanID)
 	}
 	if vlan := f.id.VLan(); vlan != nil {
-		fields["vlan"] = binary.LittleEndian.Uint16(vlan)
-	}
-
-	// add icmp
-	if icmp := f.id.ICMPv4(); icmp != nil {
-		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
-	} else if icmp := f.id.ICMPv6(); icmp != nil {
-		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
+		vlanID := uint64(binary.LittleEndian.Uint16(vlan))
+		putOrAppendUint64(flow, "vlan", vlanID)
 	}
 
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
-		source["outer_ip"] = net.IP(src).String()
-		dest["outer_ip"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		source["ip"] = srcIP.String()
+		dest["ip"] = dstIP.String()
+		tuple.SrcIP = srcIP
+		tuple.DstIP = dstIP
+		tuple.IPLength = 4
+		network["type"] = "ipv4"
+		communityID.SourceIP = srcIP
+		communityID.DestinationIP = dstIP
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
-		source["ip"] = net.IP(src).String()
-		dest["ip"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
+		// Save IPs for process matching if an outer layer was not present
+		if tuple.IPLength == 0 {
+			tuple.SrcIP = srcIP
+			tuple.DstIP = dstIP
+			tuple.IPLength = 4
+			communityID.SourceIP = srcIP
+			communityID.DestinationIP = dstIP
+			network["type"] = "ipv4"
+		}
 	}
 
 	// ipv6 layer meta data
 	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
-		source["outer_ipv6"] = net.IP(src).String()
-		dest["outer_ipv6"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
+		tuple.SrcIP = srcIP
+		tuple.DstIP = dstIP
+		tuple.IPLength = 6
+		network["type"] = "ipv6"
+		communityID.SourceIP = srcIP
+		communityID.DestinationIP = dstIP
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
-		source["ipv6"] = net.IP(src).String()
-		dest["ipv6"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
+		// Save IPs for process matching if an outer layer was not present
+		if tuple.IPLength == 0 {
+			tuple.SrcIP = srcIP
+			tuple.DstIP = dstIP
+			tuple.IPLength = 6
+			communityID.SourceIP = srcIP
+			communityID.DestinationIP = dstIP
+			network["type"] = "ipv6"
+		}
 	}
 
 	// udp layer meta data
 	if src, dst, ok := f.id.UDPAddr(); ok {
-		source["port"] = binary.LittleEndian.Uint16(src)
-		dest["port"] = binary.LittleEndian.Uint16(dst)
-		fields["transport"] = "udp"
+		tuple.SrcPort = binary.LittleEndian.Uint16(src)
+		tuple.DstPort = binary.LittleEndian.Uint16(dst)
+		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
+		network["transport"] = "udp"
+		proto = applayer.TransportUDP
+		communityID.SourcePort = tuple.SrcPort
+		communityID.DestinationPort = tuple.DstPort
+		communityID.Protocol = 17
 	}
 
 	// tcp layer meta data
 	if src, dst, ok := f.id.TCPAddr(); ok {
-		source["port"] = binary.LittleEndian.Uint16(src)
-		dest["port"] = binary.LittleEndian.Uint16(dst)
-		fields["transport"] = "tcp"
+		tuple.SrcPort = binary.LittleEndian.Uint16(src)
+		tuple.DstPort = binary.LittleEndian.Uint16(dst)
+		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
+		network["transport"] = "tcp"
+		proto = applayer.TransportTCP
+		communityID.SourcePort = tuple.SrcPort
+		communityID.DestinationPort = tuple.DstPort
+		communityID.Protocol = 6
 	}
 
-	if id := f.id.ConnectionID(); id != nil {
-		fields["connection_id"] = base64.StdEncoding.EncodeToString(id)
-	}
-
+	var totalBytes, totalPackets uint64
 	if f.stats[0] != nil {
-		source["stats"] = encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		// Source stats.
+		stats := encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		for k, v := range stats {
+			switch k {
+			case "icmpV4TypeCode":
+				if typeCode, ok := v.(uint64); ok && typeCode > 0 {
+					network["transport"] = "icmp"
+					communityID.Protocol = 1
+					communityID.ICMP.Type = uint8(typeCode >> 8)
+					communityID.ICMP.Code = uint8(typeCode)
+				}
+			case "icmpV6TypeCode":
+				if typeCode, ok := v.(uint64); ok && typeCode > 0 {
+					network["transport"] = "ipv6-icmp"
+					communityID.Protocol = 58
+					communityID.ICMP.Type = uint8(typeCode >> 8)
+					communityID.ICMP.Code = uint8(typeCode)
+				}
+			default:
+				source[k] = v
+			}
+		}
+
+		if v, found := stats["bytes"]; found {
+			totalBytes += v.(uint64)
+		}
+		if v, found := stats["packets"]; found {
+			totalPackets += v.(uint64)
+		}
 	}
 	if f.stats[1] != nil {
-		dest["stats"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
+		// Destination stats.
+		stats := encodeStats(f.stats[1], intNames, uintNames, floatNames)
+		for k, v := range stats {
+			switch k {
+			case "icmpV4TypeCode", "icmpV6TypeCode":
+			default:
+				dest[k] = v
+			}
+		}
+
+		if v, found := stats["bytes"]; found {
+			totalBytes += v.(uint64)
+		}
+		if v, found := stats["packets"]; found {
+			totalPackets += v.(uint64)
+		}
+	}
+	if communityID.Protocol > 0 && len(communityID.SourceIP) > 0 && len(communityID.DestinationIP) > 0 {
+		hash := flowhash.CommunityID.Hash(communityID)
+		network["community_id"] = hash
+	}
+	network["bytes"] = totalBytes
+	network["packets"] = totalPackets
+	fields["network"] = network
+
+	// Set process information if it's available
+	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
+		if proc := procs.ProcWatcher.FindProcessesTuple(&tuple, proto); proc != nil {
+			if proc.Src.PID > 0 {
+				p := common.MapStr{
+					"pid":               proc.Src.PID,
+					"name":              proc.Src.Name,
+					"args":              proc.Src.Args,
+					"ppid":              proc.Src.PPID,
+					"executable":        proc.Src.Exe,
+					"start":             proc.Src.StartTime,
+					"working_directory": proc.Src.CWD,
+				}
+				if proc.Src.CWD != "" {
+					p["working_directory"] = proc.Src.CWD
+				}
+				source["process"] = p
+				fields["process"] = p
+			}
+			if proc.Dst.PID > 0 {
+				p := common.MapStr{
+					"pid":               proc.Dst.PID,
+					"name":              proc.Dst.Name,
+					"args":              proc.Dst.Args,
+					"ppid":              proc.Dst.PPID,
+					"executable":        proc.Dst.Exe,
+					"start":             proc.Dst.StartTime,
+					"working_directory": proc.Src.CWD,
+				}
+				if proc.Dst.CWD != "" {
+					p["working_directory"] = proc.Dst.CWD
+				}
+				dest["process"] = p
+				fields["process"] = p
+			}
+		}
 	}
 
 	fields["source"] = source
-	fields["dest"] = dest
+	fields["destination"] = dest
 
 	return beat.Event{
 		Timestamp: timestamp,
@@ -310,4 +468,44 @@ func encodeStats(
 	}
 
 	return report
+}
+
+func putOrAppendString(m common.MapStr, key, value string) {
+	old, found := m[key]
+	if !found {
+		m[key] = value
+		return
+	}
+
+	if old != nil {
+		switch v := old.(type) {
+		case string:
+			m[key] = []string{v, value}
+		case []string:
+			m[key] = append(v, value)
+		}
+	}
+}
+
+func putOrAppendUint64(m common.MapStr, key string, value uint64) {
+	old, found := m[key]
+	if !found {
+		m[key] = value
+		return
+	}
+
+	if old != nil {
+		switch v := old.(type) {
+		case uint8:
+			m[key] = []uint64{uint64(v), value}
+		case uint16:
+			m[key] = []uint64{uint64(v), value}
+		case uint32:
+			m[key] = []uint64{uint64(v), value}
+		case uint64:
+			m[key] = []uint64{uint64(v), value}
+		case []uint64:
+			m[key] = append(v, value)
+		}
+	}
 }

@@ -1,7 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package parse
 
 import (
 	"testing"
+
+	"github.com/elastic/beats/metricbeat/helper/dialer"
+	"github.com/elastic/beats/metricbeat/mb"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
@@ -36,6 +56,66 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.URI)
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.SanitizedURI)
 			assert.Equal(t, "/var/lib/docker.sock", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+unix at root", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix", hostData.URI)
+			assert.Equal(t, "http://unix", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+unix with path", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix/apath", hostData.URI)
+			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe at root", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe", hostData.URI)
+			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe with path", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
 			assert.Equal(t, "", hostData.User)
 			assert.Equal(t, "", hostData.Password)
 		}
@@ -97,6 +177,12 @@ func TestURLHostParserBuilder(t *testing.T) {
 		{map[string]interface{}{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/default"},
 		{map[string]interface{}{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com"},
 		{map[string]interface{}{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com"},
+		{map[string]interface{}{"password": "secret"}, URLHostParserBuilder{}, "http://:secret@example.com"},
+		{map[string]interface{}{"basepath": "/foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "/foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/queryParams", QueryParams: mb.QueryParams{"key": "value"}.String()}, "http://example.com/foo/queryParams?key=value"},
 	}
 
 	for _, test := range cases {

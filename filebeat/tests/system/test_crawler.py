@@ -5,6 +5,7 @@ from filebeat import BaseTest
 import codecs
 import os
 import time
+import unittest
 from nose.plugins.skip import Skip, SkipTest
 import shutil
 
@@ -390,7 +391,7 @@ class Test(BaseTest):
 
             self.wait_until(
                 lambda: self.output_has(1),
-                max_timeout=15)
+                max_timeout=60, poll_interval=1)
 
         lines_written = 0
 
@@ -405,7 +406,7 @@ class Test(BaseTest):
 
                 self.wait_until(
                     lambda: self.output_has(lines_written + 1),
-                    max_timeout=15)
+                    max_timeout=60, poll_interval=1)
 
         filebeat.check_kill_and_wait()
 
@@ -573,15 +574,15 @@ class Test(BaseTest):
                 f.write(text + "\n")
 
         # create the config file
-        prospectors = []
+        inputs = []
         for enc_go, enc_py, _ in encodings:
-            prospectors.append({
+            inputs.append({
                 "path": self.working_dir + "/log/test-{}".format(enc_py),
                 "encoding": enc_go
             })
         self.render_config_template(
-            template_name="filebeat_prospectors",
-            prospectors=prospectors
+            template_name="filebeat_inputs",
+            inputs=inputs
         )
 
         # run filebeat

@@ -1,0 +1,85 @@
+{
+  "test_name": "Netflow 9 H3C Netstream with varstring",
+  "events": [
+    {
+      "Timestamp": "2018-07-18T01:35:35Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "20.20.255.255",
+          "locality": "public",
+          "port": 137
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-18T01:35:35Z",
+          "duration": 29695000000,
+          "end": "2018-07-18T01:35:02.969Z",
+          "kind": "event",
+          "start": "2018-07-18T01:34:33.274Z"
+        },
+        "flow": {
+          "id": "dK1E5m-O-ns",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgp_destination_as_number": 0,
+          "bgp_source_as_number": 0,
+          "destination_ipv4_address": "20.20.255.255",
+          "destination_ipv4_prefix_length": 32,
+          "destination_transport_port": 137,
+          "dst_traffic_index": 4294967295,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2018-07-18T01:35:35Z",
+            "uptime_millis": 1871244,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "flow_end_sys_up_time": 1839213,
+          "flow_start_sys_up_time": 1809518,
+          "forwarding_status": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "ip_version": 4,
+          "octet_delta_count": 702,
+          "packet_delta_count": 9,
+          "protocol_identifier": 17,
+          "sampling_algorithm": 0,
+          "sampling_interval": 0,
+          "source_ipv4_address": "20.20.20.20",
+          "source_ipv4_prefix_length": 32,
+          "source_transport_port": 137,
+          "src_traffic_index": 0,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow",
+          "vrf_name": ""
+        },
+        "network": {
+          "bytes": 702,
+          "community_id": "1:H4Lg41gxc8Sb+0ZP09wcnLj0a/Y=",
+          "direction": "inbound",
+          "iana_number": 17,
+          "packets": 9,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 702,
+          "ip": "20.20.20.20",
+          "locality": "public",
+          "packets": 9,
+          "port": 137
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

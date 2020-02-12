@@ -1,7 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package logp
 
 import (
+	"fmt"
+
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // LogOption configures a Logger.
@@ -9,24 +29,39 @@ type LogOption = zap.Option
 
 // Logger logs messages to the configured output.
 type Logger struct {
-	sugar *zap.SugaredLogger
+	logger *zap.Logger
+	sugar  *zap.SugaredLogger
 }
 
-// NewLogger returns a new Logger labeled with the name of the selector. This
-// should never be used from any global contexts (instead create "per instance"
-// loggers).
-func NewLogger(selector string, options ...LogOption) *Logger {
-	log := loadLogger().rootLogger.
+func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
+	log := rootLogger.
 		WithOptions(zap.AddCallerSkip(1)).
 		WithOptions(options...).
 		Named(selector)
-	return &Logger{log.Sugar()}
+	return &Logger{log, log.Sugar()}
+}
+
+// NewLogger returns a new Logger labeled with the name of the selector. This
+// should never be used from any global contexts, otherwise you will receive a
+// no-op Logger. This is because the logp package needs to be initialized first.
+// Instead create new Logger instance that your object reuses. Or if you need to
+// log from a static context then you may use logp.L().Infow(), for example.
+func NewLogger(selector string, options ...LogOption) *Logger {
+	return newLogger(loadLogger().rootLogger, selector, options...)
 }
 
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
-	return &Logger{l.sugar.With(args...)}
+	sugar := l.sugar.With(args...)
+	return &Logger{sugar.Desugar(), sugar}
+}
+
+// Named adds a new path segment to the logger's name. Segments are joined by
+// periods.
+func (l *Logger) Named(name string) *Logger {
+	logger := l.logger.Named(name)
+	return &Logger{logger, logger.Sugar()}
 }
 
 // Sprint
@@ -65,6 +100,11 @@ func (l *Logger) Panic(args ...interface{}) {
 // logger then panics.
 func (l *Logger) DPanic(args ...interface{}) {
 	l.sugar.DPanic(args...)
+}
+
+// IsDebug checks to see if the given logger is Debug enabled.
+func (l *Logger) IsDebug() bool {
+	return l.logger.Check(zapcore.DebugLevel, "") != nil
 }
 
 // Sprintf
@@ -163,4 +203,17 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // Field such as logp.Stringer.
 func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 	l.sugar.DPanicw(msg, keysAndValues...)
+}
+
+// Recover stops a panicking goroutine and logs an Error.
+func (l *Logger) Recover(msg string) {
+	if r := recover(); r != nil {
+		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
+		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
+	}
+}
+
+// L returns an unnamed global logger.
+func L() *Logger {
+	return loadLogger().logger
 }

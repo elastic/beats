@@ -1,0 +1,99 @@
+# Deploy a auditbeat instance per node for node metrics retrieval
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: auditbeat
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+spec:
+  selector:
+    matchLabels:
+      k8s-app: auditbeat
+  template:
+    metadata:
+      labels:
+        k8s-app: auditbeat
+    spec:
+      serviceAccountName: auditbeat
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: auditbeat
+        image: docker.elastic.co/beats/auditbeat:%VERSION%
+        args: [
+          "-c", "/etc/auditbeat.yml"
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/auditbeat.yml
+          readOnly: true
+          subPath: auditbeat.yml
+        - name: modules
+          mountPath: /usr/share/auditbeat/modules.d
+          readOnly: true
+        - name: bin
+          mountPath: /hostfs/bin
+          readOnly: true
+        - name: sbin
+          mountPath: /hostfs/sbin
+          readOnly: true
+        - name: usrbin
+          mountPath: /hostfs/usr/bin
+          readOnly: true
+        - name: usrsbin
+          mountPath: /hostfs/usr/sbin
+          readOnly: true
+        - name: etc
+          mountPath: /hostfs/etc
+          readOnly: true
+      volumes:
+      - name: bin
+        hostPath:
+          path: /bin
+      - name: usrbin
+        hostPath:
+          path: /usr/bin
+      - name: sbin
+        hostPath:
+          path: /sbin
+      - name: usrsbin
+        hostPath:
+          path: /usr/sbin
+      - name: etc
+        hostPath:
+          path: /etc
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: auditbeat-config
+      - name: modules
+        configMap:
+          defaultMode: 0600
+          name: auditbeat-daemonset-modules
+      - name: data
+        hostPath:
+          path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate

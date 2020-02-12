@@ -1,19 +1,23 @@
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: metricbeat
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 spec:
+  selector:
+    matchLabels:
+      k8s-app: metricbeat
   template:
     metadata:
       labels:
         k8s-app: metricbeat
-        kubernetes.io/cluster-service: "true"
     spec:
+      serviceAccountName: metricbeat
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
         image: docker.elastic.co/beats/metricbeat:%VERSION%
@@ -34,10 +38,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
-        - name: POD_NAMESPACE
+        - name: NODE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: metadata.namespace
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -58,7 +62,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-deployment-config
       - name: modules
         configMap:
           defaultMode: 0600

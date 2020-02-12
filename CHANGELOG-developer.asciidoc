@@ -1,0 +1,204 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+This changelog is intended for community Beat developers. It covers the major
+breaking changes to the internal APIs in the official Beats and changes related
+to developing a Beat like code generators or `fields.yml`. Only the major
+changes will be covered in this changelog that are expected to affect community
+developers. Each breaking change added here should have an explanation on how
+other Beats should be migrated.
+
+Note: This changelog was only started after the 6.3 release.
+
+=== Beats version 7.5.1
+https://github.com/elastic/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
+
+=== Beats version 7.5.0
+https://github.com/elastic/beats/compare/v7.4.1..v7.5.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
+- Need to register new processors to be used in the JS processor in their `init` functions. {pull}13509[13509]
+
+==== Added
+
+- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
+
+=== Beats version 7.4.1
+https://github.com/elastic/beats/compare/v7.4.0..v7.4.1[Check the HEAD diff]
+
+=== Beats version 7.4.0
+https://github.com/elastic/beats/compare/v7.3.1..v7.4.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
+
+==== Added
+
+- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
+- Introduce beat.OutputChooses publisher mode. {pull}12996[12996]
+- Ensure that beat.Processor, beat.ProcessorList, and processors.ProcessorList are compatible and can be composed more easily. {pull}12996[12996]
+- Add support to close beat.Client via beat.CloseRef (a subset of context.Context). {pull}13031[13031]
+- Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
+- Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
+
+=== Beats version 7.3.2
+https://github.com/elastic/beats/compare/v7.3.1..v7.3.2[Check the HEAD diff]
+
+=== Beats version 7.3.1
+https://github.com/elastic/beats/compare/v7.3.0..v7.3.1[Check the HEAD diff]
+
+=== Beats version 7.3.0
+https://github.com/elastic/beats/compare/v7.2.1..v7.3.0[Check the HEAD diff]
+
+==== Added
+
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+
+=== Beats version 7.2.1
+https://github.com/elastic/beats/compare/v7.2.0..v7.2.1[Check the HEAD diff]
+
+=== Beats version 7.2.0
+https://github.com/elastic/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
+
+==== Breaking changes
+
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
+
+==== Added
+
+- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
+- Support for Logger in the Metricset base instance. {pull}11106[11106]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
+- Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
+- Update Jinja2 version to 2.10.1. {pull}11817[11817]
+- Reduce idxmgmt.Supporter interface and rework export commands to reuse logic. {pull}11777[11777],{pull}12065[12065],{pull}12067[12067],{pull}12160[12160]
+- Update urllib3 version to 1.24.2 {pull}11930[11930]
+- Add libbeat/common/cleanup package. {pull}12134[12134]
+- Only Load minimal template if no fields are provided. {pull}12103[12103]
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+- Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
+
+=== Beats version 7.1.1
+https://github.com/elastic/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
+
+=== Beats version 7.1.0
+https://github.com/elastic/beats/compare/v7.0.0..v7.1.0[Check the HEAD diff]
+
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0..v7.0.1[Check the HEAD diff]
+
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2..v7.0.0[Check the HEAD diff]
+
+The list below covers the major changes between 7.0.0-rc2 and 7.0 only.
+
+==== Added
+
+- Added support for using PYTHON_EXE to control what Python interpreter is used
+  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
+
+=== Beats version 7.0.0-rc2
+https://github.com/elastic/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
+
+=== Beats version 7.0.0-rc1
+https://github.com/elastic/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD diff]
+
+==== Breaking changes
+
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
+
+==== Bugfixes
+
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
+- Fix duplication check for `append_fields` option. {pull}10959[10959]
+
+==== Added
+
+- Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
+
+=== Beats version 7.0.0-beta1
+https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
+
+==== Breaking changes
+- Outputs receive Index Manager as additional parameter. The index manager can
+  be used to create an index selector. {pull}10347[10347]
+- Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
+
+==== Added
+
+- Allow multiple object type configurations per field. {pull}9772[9772]
+- Move agent metadata addition to a processor. {pull}9952[9952]
+- Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
+- Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
+- Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
+
+=== Beats version 7.0.0-alpha2
+https://github.com/elastic/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
+
+The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
+
+==== Breaking changes
+
+- The beat.Pipeline is now passed to cfgfile.RunnerFactory. Beats using libbeat for module reloading or autodiscovery need to be adapted. {pull}7018[7017]
+- Moving of TLS helper functions and structs from `output/tls` to `tlscommon`. {pull}7054[7054]
+- Port fields.yml collector to Golang {pull}6911[6911]
+- Dashboards under _meta/kibana are expected to be decoded. See https://github.com/elastic/beats/pull/7224 for a conversion script. {pull}7265[7265]
+- Constructor `(github.com/elastic/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
+- Packaging has been refactored and updates are required. See the PR for migration details. {pull}7388[7388]
+- `make fields` has been modified to use Mage (https://magefile.org/) in an effort to make
+  the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat
+  has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
+  used because the value is specified in magefile.go. {pull}7670[7670]
+- Outputs must implement String. {pull}6404[6404]
+- Renamed `-beat-name` CLI option used in `kibana_index_pattern.go` to `-beat` for consistency with other scripts in `dev-tools/cmd`. {pull}8615[8615]
+- Systemd unit file template used on Linux packaging now includes environment variables to ease flag overriding. One of them includes the `-e` flag, making beats log to stderr by default on systemd uses. {pull}8942[8942]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
+- Move generator packages of Filebeat from `scripts/generator` to `generator`. {pull}9147[9147]
+
+==== Bugfixes
+
+- Fix permissions of generated Filebeat filesets. {pull}7140[7140]
+- Collect fields from _meta/fields.yml too. {pull}8397[8397]
+- Fix issue on asset generation that could lead to different results in Windows. {pull}8464[8464]
+- Remove default version qualifier, you can use `VERSION_QUALIFIER` environment variable to set it. {pull}9148[9148]
+
+==== Added
+
+- Libbeat provides a global registry for beats developer that allow to register and retrieve plugin. {pull}7392[7392]
+- Added more options to control required and optional fields in schema.Apply(), error returned is a plain nil if no error happened {pull}7335[7335]
+- Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]
+- Added mage targets `goTestUnit` and `goTestIntegration` for executing
+  'go test'. This captures the log to a file, summarizes the result, produces a
+  coverage profile (.cov), and produces an HTML coverage report. See
+  `mage -h goTestUnit`. {pull}7766[7766]
+- Beats packaging now build non-oss binaries from code located in the x-pack folder. {issue}7783[7783]
+- New function `AddTagsWithKey` is added, so `common.MapStr` can be enriched with tags with an arbitrary key. {pull}7991[7991]
+- Move filebeat/reader to libbeat/reader {pull}8206[8206]
+- Libbeat provides a new function `cmd.GenRootCmdWithSettings` that should be preferred over deprecated functions
+  `cmd.GenRootCmd`, `cmd.GenRootCmdWithRunFlags`, and `cmd.GenRootCmdWithIndexPrefixWithRunFlags`. {pull}7850[7850]
+- Set current year in generator templates. {pull}8396[8396]
+- You can now override default settings of libbeat by using instance.Settings. {pull}8449[8449]
+- Add `-space-id` option to `export_dashboards.go` script to support Kibana Spaces {pull}7942[7942]
+- Add `-name` option to `asset.go` script to explicitly name the asset rather than using its filename. {pull}8693[8693]
+- Add `-out` option to `kibana_index_pattern.go` to control the output dir to make it possible to write the generated output to `build/kibana` instead of `_meta/kibana.generated` (but the output dir remains unchanged at this point). {pull}8615[8615]
+- Add `module_fields.go` for generated `fields.go` files for modules. {pull}8615[8615]
+- Add `mage.GenerateModuleReferenceConfig` for generating reference config files that include configuration sections from the module directory. {pull}8615[8615]
+- Add `mage.GenerateFieldsGo` for generating fields.go files. {pull}8615[8615]
+- Add `mage.KibanaDashboards` for collecting Kibana dashboards and generating index patterns. {pull}8615[8615]
+- Allow to disable config resolver using the `Settings.DisableConfigResolver` field when initializing libbeat. {pull}8769[8769]
+- Add `mage.AddPlatforms` to allow to specify dependent platforms when building a beat. {pull}8889[8889]
+- Add `cfgwarn.CheckRemoved6xSetting(s)` to display a warning for options removed in 7.0. {pull}8909[8909]
+- Add docker image building to `mage.Package`. {pull}8898[8898]
+- Simplified exporting of dashboards. {pull}7730[7730]
+- Update Beats to use go 1.11.2 {pull}8746[8746]
+- Allow/Merge fields.yml overrides {pull}9188[9188]
+- Filesets can now define multiple ingest pipelines, with the first one considered as the entry point pipeline. {pull}8914[8914]
+- Add `group_measurements_by_instance` option to windows perfmon metricset. {pull}8688[8688]

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package haproxy
 
 import (
@@ -86,6 +103,7 @@ type Stat struct {
 	Ttime         string `csv:"ttime"`
 }
 
+// Info represents the show info response from HAProxy
 type Info struct {
 	Name                       string `mapstructure:"Name"`
 	Version                    string `mapstructure:"Version"`
@@ -143,6 +161,7 @@ type clientProto interface {
 	Info() (*bytes.Buffer, error)
 }
 
+// Client is struct that wraps the clientProto interface
 type Client struct {
 	proto clientProto
 }
@@ -234,18 +253,21 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 
 	conn, err := net.Dial(p.Network, p.Address)
 	if err != nil {
-		return response, err
+		return response, errors.Wrapf(err, "error connecting to %s", p.Address)
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(cmd + "\n"))
 	if err != nil {
-		return response, err
+		return response, errors.Wrap(err, "error writing to connection")
 	}
 
-	_, err = io.Copy(response, conn)
+	recv, err := io.Copy(response, conn)
 	if err != nil {
-		return response, err
+		return response, errors.Wrap(err, "error reading response")
+	}
+	if recv == 0 {
+		return response, errors.New("got empty response from HAProxy")
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
@@ -297,6 +319,9 @@ func (p *httpProto) Stat() (*bytes.Buffer, error) {
 	d, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.Errorf("couldn't read response body: %v", err)
+	}
+	if len(d) == 0 {
+		return nil, errors.New("got empty response from HAProxy")
 	}
 	return bytes.NewBuffer(d), nil
 }

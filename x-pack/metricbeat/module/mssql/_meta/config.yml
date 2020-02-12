@@ -1,0 +1,9 @@
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10s
+

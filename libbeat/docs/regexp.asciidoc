@@ -17,11 +17,9 @@
 ifeval::["{beatname_lc}"=="filebeat"]
 
 {beatname_uc} has several configuration options that accept regular expressions.
-For example, <<multiline,`multiline.pattern`>>,
-<<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and
-<<exclude-files,`exclude_files`>> all accept regular expressions. Some options,
-however, such as the prospector <<prospector-paths,`paths`>> option, accept only
-glob-based paths.
+For example, `multiline.pattern`, `include_lines`, `exclude_lines`, and
+`exclude_files` all accept regular expressions. Some options, however, such as
+the input `paths` option, accept only glob-based paths.
 
 endif::[]
 
@@ -30,7 +28,7 @@ to verify that the option you are setting accepts a regular expression.
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
-For more examples of supported regexp patterns, see {filebeat}/multiline-examples.html[Managing Multiline Messages].
+For more examples of supported regexp patterns, see {filebeat-ref}/multiline-examples.html[Managing Multiline Messages].
 Although the examples pertain to Filebeat, the regexp patterns are applicable to other use cases.
 
 The following patterns are supported:
@@ -112,7 +110,7 @@ The following patterns are supported:
 |`[[:blank:]]`    |blank (same as `[\t ]`)
 |`[[:cntrl:]]`    |control (same as `[\x00-\x1F\x7F]`)
 |`[[:digit:]]`    |digits (same as `[0-9]`)
-|`[[:graph:]]`    |graphical (same as `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\\]^_`` `{\|}~]`)
+|`[[:graph:]]`    |graphical (same as `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_`` `{\|}~]`)
 |`[[:lower:]]`    |lower case (same as `[a-z]`)
 |`[[:print:]]`    |printable (same as `[ -~] == [ [:graph:]]`)
 |`[[:punct:]]`    |punctuation (same as ++[!-/:-@[-`{-~]++)

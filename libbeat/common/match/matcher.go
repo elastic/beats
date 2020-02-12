@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package match
 
 import "regexp/syntax"
@@ -102,19 +119,23 @@ func (m *Matcher) Unpack(s string) error {
 	return nil
 }
 
-func (m *Matcher) MatchAnyString(strs []string) bool {
+// MatchAnyString succeeds if any string in the given array contains a match.
+func (m *Matcher) MatchAnyString(strs interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *Matcher) MatchAllStrings(strs []string) bool {
+// MatchAllStrings succeeds if all strings in the given array contain a match.
+func (m *Matcher) MatchAllStrings(strs interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAnyString(strs []string) bool {
+// MatchAnyString succeeds if any string in the given array is an exact match.
+func (m *ExactMatcher) MatchAnyString(strs interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAllStrings(strs []string) bool {
+// MatchAllStrings succeeds if all strings in the given array are an exact match.
+func (m *ExactMatcher) MatchAllStrings(strs interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
@@ -128,19 +149,37 @@ func (m *ExactMatcher) Unpack(s string) error {
 	return nil
 }
 
-func matchAnyStrings(m stringMatcher, strs []string) bool {
-	for _, s := range strs {
-		if m.MatchString(s) {
-			return true
+func matchAnyStrings(m stringMatcher, strs interface{}) bool {
+	switch v := strs.(type) {
+	case []interface{}:
+		for _, s := range v {
+			if str, ok := s.(string); ok && m.MatchString(str) {
+				return true
+			}
+		}
+	case []string:
+		for _, s := range v {
+			if m.MatchString(s) {
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func matchAllStrings(m stringMatcher, strs []string) bool {
-	for _, s := range strs {
-		if !m.MatchString(s) {
-			return false
+func matchAllStrings(m stringMatcher, strs interface{}) bool {
+	switch v := strs.(type) {
+	case []interface{}:
+		for _, s := range v {
+			if str, ok := s.(string); ok && !m.MatchString(str) {
+				return false
+			}
+		}
+	case []string:
+		for _, s := range v {
+			if !m.MatchString(s) {
+				return false
+			}
 		}
 	}
 	return true

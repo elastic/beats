@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package virtualmachine
 
 import (
@@ -20,17 +37,19 @@ func TestFetchEventContents(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig(ts))
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch error", err)
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
-	event := events[0]
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	assert.EqualValues(t, "ha-host", event["host"])
+	assert.EqualValues(t, "ha-host", event["host.id"])
+	assert.EqualValues(t, "localhost.localdomain", event["host.hostname"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
 
 	cpu := event["cpu"].(common.MapStr)
@@ -64,9 +83,9 @@ func TestData(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig(ts))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEvents(f, t); err != nil {
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

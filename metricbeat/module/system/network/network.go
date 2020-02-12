@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build darwin freebsd linux windows
 
 package network
@@ -17,9 +34,10 @@ import (
 var debugf = logp.MakeDebug("system-network")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "network", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "network", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching system network IO metrics.
@@ -55,30 +73,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches network IO metrics from the OS.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := net.IOCounters(true)
 	if err != nil {
-		return nil, errors.Wrap(err, "network io counters")
+		return errors.Wrap(err, "network io counters")
 	}
 
-	var events []common.MapStr
-	if m.interfaces == nil {
-		// Include all stats.
-		for _, counters := range stats {
-			events = append(events, ioCountersToMapStr(counters))
-		}
-	} else {
-		// Select stats by interface name.
-		for _, counters := range stats {
+	for _, counters := range stats {
+		if m.interfaces != nil {
+			// Select stats by interface name.
 			name := strings.ToLower(counters.Name)
-			if _, include := m.interfaces[name]; include {
-				events = append(events, ioCountersToMapStr(counters))
+			if _, include := m.interfaces[name]; !include {
 				continue
 			}
 		}
+
+		isOpen := r.Event(mb.Event{
+			MetricSetFields: ioCountersToMapStr(counters),
+		})
+		if !isOpen {
+			return nil
+		}
 	}
 
-	return events, nil
+	return nil
 }
 
 func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {

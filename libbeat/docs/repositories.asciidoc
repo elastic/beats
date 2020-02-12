@@ -27,13 +27,13 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of Beats has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-To add the Beats repository for APT:
+To add the {repo} repository for APT:
 
 . Download and install the Public Signing Key:
 +
@@ -50,21 +50,49 @@ sudo apt-get install apt-transport-https
 --------------------------------------------------
 
 ifeval::["{release-state}"=="prerelease"]
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x-prerelease.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}-prerelease.list+:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/6.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x-prerelease.list
+echo "deb https://artifacts.elastic.co/packages/{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
 --------------------------------------------------
++
 endif::[]
 ifeval::["{release-state}"=="released"]
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}.list+:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+echo "deb https://artifacts.elastic.co/packages/{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
 --------------------------------------------------
++
 endif::[]
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following sources list:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
+--------------------------------------------------
+
+endif::[]
+
+==================================================
 +
 [WARNING]
 ==================================================
@@ -88,7 +116,14 @@ install {beatname_uc} by running:
 sudo apt-get update && sudo apt-get install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the Beat to start automatically during boot, run:
+. To configure {beatname_uc} to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
@@ -102,13 +137,13 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of Beats has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-To add the Beats repository for YUM:
+To add the {repo} repository for YUM:
 
 . Download and install the public signing key:
 +
@@ -123,9 +158,9 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 ifeval::["{release-state}"=="prerelease"]
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-[elastic-6.x-prerelease]
-name=Elastic repository for 6.x prerelease packages
-baseurl=https://artifacts.elastic.co/packages/6.x-prerelease/yum
+[elastic-{major-version}-prerelease]
+name=Elastic repository for {major-version} prerelease packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}-prerelease/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -136,9 +171,9 @@ endif::[]
 ifeval::["{release-state}"=="released"]
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-[elastic-6.x]
-name=Elastic repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
+[elastic-{major-version}]
+name=Elastic repository for {major-version} packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -146,6 +181,34 @@ autorefresh=1
 type=rpm-md
 --------------------------------------------------
 endif::[]
++
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following `baseurl` in your
+`.repo` file:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/yum
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}/yum
+--------------------------------------------------
+
+endif::[]
+
+==================================================
 +
 Your repository is ready to use. For example, you can install {beatname_uc} by
 running:
@@ -155,7 +218,14 @@ running:
 sudo yum install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the Beat to start automatically during boot, run:
+. To configure {beatname_uc} to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------

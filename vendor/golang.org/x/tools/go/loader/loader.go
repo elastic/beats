@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"golang.org/x/tools/go/ast/astutil"
+	"golang.org/x/tools/go/internal/cgo"
 )
 
 var ignoreVendor build.ImportMode
@@ -105,7 +106,7 @@ type Config struct {
 	// conventions, for example.
 	//
 	// It must be safe to call concurrently from multiple goroutines.
-	FindPackage func(ctxt *build.Context, fromDir, importPath string, mode build.ImportMode) (*build.Package, error)
+	FindPackage func(ctxt *build.Context, importPath, fromDir string, mode build.ImportMode) (*build.Package, error)
 
 	// AfterTypeCheck is called immediately after a list of files
 	// has been type-checked and appended to info.Files.
@@ -754,7 +755,7 @@ func (conf *Config) parsePackageFiles(bp *build.Package, which rune) ([]*ast.Fil
 
 	// Preprocess CgoFiles and parse the outputs (sequentially).
 	if which == 'g' && bp.CgoFiles != nil {
-		cgofiles, err := processCgoFiles(bp, conf.fset(), conf.DisplayPath, conf.ParserMode)
+		cgofiles, err := cgo.ProcessFiles(bp, conf.fset(), conf.DisplayPath, conf.ParserMode)
 		if err != nil {
 			errs = append(errs, err)
 		} else {
@@ -779,7 +780,7 @@ func (imp *importer) doImport(from *PackageInfo, to string) (*types.Package, err
 	if to == "C" {
 		// This should be unreachable, but ad hoc packages are
 		// not currently subject to cgo preprocessing.
-		// See https://github.com/golang/go/issues/11627.
+		// See https://golang.org/issue/11627.
 		return nil, fmt.Errorf(`the loader doesn't cgo-process ad hoc packages like %q; see Go issue 11627`,
 			from.Pkg.Path())
 	}
@@ -810,7 +811,15 @@ func (imp *importer) doImport(from *PackageInfo, to string) (*types.Package, err
 	// Import of incomplete package: this indicates a cycle.
 	fromPath := from.Pkg.Path()
 	if cycle := imp.findPath(path, fromPath); cycle != nil {
-		cycle = append([]string{fromPath}, cycle...)
+		// Normalize cycle: start from alphabetically largest node.
+		pos, start := -1, ""
+		for i, s := range cycle {
+			if pos < 0 || s > start {
+				pos, start = i, s
+			}
+		}
+		cycle = append(cycle, cycle[:pos]...)[pos:] // rotate cycle to start from largest
+		cycle = append(cycle, cycle[0])             // add start node to end to show cycliness
 		return nil, fmt.Errorf("import cycle: %s", strings.Join(cycle, " -> "))
 	}
 

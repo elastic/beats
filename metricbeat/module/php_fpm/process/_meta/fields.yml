@@ -1,0 +1,68 @@
+- name: process
+  type: group
+  description: >
+    process contains the metrics that were obtained from the PHP-FPM process.
+  release: ga
+  fields:
+  - name: pid
+    type: alias
+    path: process.pid
+    migration: true
+    description: >
+      The PID of the process
+  - name: state
+    type: keyword
+    description: >
+      The state of the process (Idle, Running, etc)
+  - name: start_time
+    type: date
+    description: >
+      The date and time the process has started
+  - name: start_since
+    type: integer
+    description: >
+      The number of seconds since the process has started
+  - name: requests
+    type: integer
+    description: >
+      The number of requests the process has served
+  - name: request_duration
+    type: integer
+    description: >
+      The duration in microseconds (1 million in a second) of the current request (my own definition)
+  - name: request_method
+    type: alias
+    path: http.request.method
+    migration: true
+    description: >
+      The request method (GET, POST, etc) (of the current request)
+  - name: request_uri
+    type: alias
+    path: url.original
+    migration: true
+    description: >
+      The request URI with the query string (of the current request)
+  - name: content_length
+    type: alias
+    path: http.response.body.bytes
+    migration: true
+    description: >
+      The content length of the request (only with POST) (of the current request)
+  - name: user
+    type: alias
+    path: user.name
+    migration: true
+    description: >
+      The user (PHP_AUTH_USER) (or - if not set) (for the current request)
+  - name: script
+    type: keyword
+    description: >
+      The main script called (or - if not set) (for the current request)
+  - name: last_request_cpu
+    type: long
+    description: >
+      The max amount of memory the last request consumed (it is always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
+  - name: last_request_memory
+    type: integer
+    description: >
+      The content length of the request (only with POST) (of the current request)

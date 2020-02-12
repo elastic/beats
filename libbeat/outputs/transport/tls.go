@@ -1,76 +1,39 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package transport
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
 	"net"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/testing"
 )
 
-type TLSConfig struct {
+// TLSConfig is the interface used to configure a tcp client or server from a `Config`
+type TLSConfig = tlscommon.TLSConfig
 
-	// List of allowed SSL/TLS protocol versions. Connections might be dropped
-	// after handshake succeeded, if TLS version in use is not listed.
-	Versions []TLSVersion
-
-	// Configure SSL/TLS verification mode used during handshake. By default
-	// VerifyFull will be used.
-	Verification TLSVerificationMode
-
-	// List of certificate chains to present to the other side of the
-	// connection.
-	Certificates []tls.Certificate
-
-	// Set of root certificate authorities use to verify server certificates.
-	// If RootCAs is nil, TLS might use the system its root CA set (not supported
-	// on MS Windows).
-	RootCAs *x509.CertPool
-
-	// List of supported cipher suites. If nil, a default list provided by the
-	// implementation will be used.
-	CipherSuites []uint16
-
-	// Types of elliptic curves that will be used in an ECDHE handshake. If empty,
-	// the implementation will choose a default.
-	CurvePreferences []tls.CurveID
-
-	// Renegotiation controls what types of renegotiation are supported.
-	// The default, never, is correct for the vast majority of applications.
-	Renegotiation tls.RenegotiationSupport
-}
-
-type TLSVersion uint16
-
-const (
-	TLSVersionSSL30 TLSVersion = tls.VersionSSL30
-	TLSVersion10    TLSVersion = tls.VersionTLS10
-	TLSVersion11    TLSVersion = tls.VersionTLS11
-	TLSVersion12    TLSVersion = tls.VersionTLS12
-)
-
-type TLSVerificationMode uint8
-
-const (
-	VerifyFull TLSVerificationMode = iota
-	VerifyNone
-
-	// TODO: add VerifyCertificate support. Due to checks being run
-	//       during handshake being limited, verify certificates in
-	//       postVerifyTLSConnection
-	// VerifyCertificate
-)
-
-var tlsDefaultVersions = []TLSVersion{
-	TLSVersion10,
-	TLSVersion11,
-	TLSVersion12,
-}
+// TLSVersion type for TLS version.
+type TLSVersion = tlscommon.TLSVersion
 
 func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) (Dialer, error) {
 	return TestTLSDialer(testing.NullDriver, forward, config, timeout)
@@ -184,7 +147,7 @@ func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *TLSConfig
 
 	versions := config.Versions
 	if versions == nil {
-		versions = tlsDefaultVersions
+		versions = tlscommon.TLSDefaultVersions
 	}
 	versionOK := false
 	for _, version := range versions {
@@ -196,117 +159,5 @@ func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *TLSConfig
 		return err
 	}
 
-	return nil
-}
-
-func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
-	if c == nil {
-		// use default TLS settings, if config is empty.
-		return &tls.Config{ServerName: host}
-	}
-
-	versions := c.Versions
-	if len(versions) == 0 {
-		versions = tlsDefaultVersions
-	}
-
-	minVersion := uint16(0xffff)
-	maxVersion := uint16(0)
-	for _, version := range versions {
-		v := uint16(version)
-		if v < minVersion {
-			minVersion = v
-		}
-		if v > maxVersion {
-			maxVersion = v
-		}
-	}
-
-	insecure := c.Verification != VerifyFull
-	if insecure {
-		logp.Warn("SSL/TLS verifications disabled.")
-	}
-
-	return &tls.Config{
-		ServerName:         host,
-		MinVersion:         minVersion,
-		MaxVersion:         maxVersion,
-		Certificates:       c.Certificates,
-		RootCAs:            c.RootCAs,
-		InsecureSkipVerify: insecure,
-		CipherSuites:       c.CipherSuites,
-		CurvePreferences:   c.CurvePreferences,
-	}
-}
-
-var tlsProtocolVersions = map[string]TLSVersion{
-	"SSLv3":   TLSVersionSSL30,
-	"SSLv3.0": TLSVersionSSL30,
-	"TLSv1":   TLSVersion10,
-	"TLSv1.0": TLSVersion10,
-	"TLSv1.1": TLSVersion11,
-	"TLSv1.2": TLSVersion12,
-}
-
-func (v TLSVersion) String() string {
-	versions := map[TLSVersion]string{
-		TLSVersionSSL30: "SSLv3",
-		TLSVersion10:    "TLSv1.0",
-		TLSVersion11:    "TLSv1.1",
-		TLSVersion12:    "TLSv1.2",
-	}
-	if s, ok := versions[v]; ok {
-		return s
-	}
-	return "unknown"
-}
-
-func (v *TLSVersion) Unpack(s string) error {
-	version, found := tlsProtocolVersions[s]
-	if !found {
-		return fmt.Errorf("invalid tls version '%v'", s)
-	}
-
-	*v = version
-	return nil
-}
-
-var tlsVerificationModes = map[string]TLSVerificationMode{
-	"":     VerifyFull,
-	"full": VerifyFull,
-	"none": VerifyNone,
-	// "certificate": verifyCertificate,
-}
-
-func (m TLSVerificationMode) String() string {
-	modes := map[TLSVerificationMode]string{
-		VerifyFull: "full",
-		// VerifyCertificate: "certificate",
-		VerifyNone: "none",
-	}
-
-	if s, ok := modes[m]; ok {
-		return s
-	}
-	return "unknown"
-}
-
-func (m *TLSVerificationMode) Unpack(in interface{}) error {
-	if in == nil {
-		*m = VerifyFull
-		return nil
-	}
-
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("verification mode must be an identifier")
-	}
-
-	mode, found := tlsVerificationModes[s]
-	if !found {
-		return fmt.Errorf("unknown verification mode '%v'", s)
-	}
-
-	*m = mode
 	return nil
 }

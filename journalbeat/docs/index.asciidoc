@@ -1,0 +1,45 @@
+= Journalbeat Reference
+
+:libbeat-dir: {docdir}/../../libbeat/docs
+
+include::{libbeat-dir}/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+:beatname_lc: journalbeat
+:beatname_uc: Journalbeat
+:beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:deb_os:
+:rpm_os:
+:linux_os:
+:docker_platform:
+:no_dashboards:
+:no_decode_cef_processor:
+
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
+
+include::./overview.asciidoc[]
+
+include::./getting-started.asciidoc[]
+
+include::{libbeat-dir}/repositories.asciidoc[]
+
+include::./setting-up-running.asciidoc[]
+
+include::./configuring-howto.asciidoc[]
+
+include::./fields.asciidoc[]
+
+include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
+
+include::{libbeat-dir}/shared-securing-beat.asciidoc[]
+
+include::./troubleshooting.asciidoc[]
+
+include::./faq.asciidoc[]
+

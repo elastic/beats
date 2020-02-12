@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package log
 
 import (
@@ -9,11 +26,13 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (
@@ -24,7 +43,7 @@ var (
 		},
 		CleanInactive: 0,
 
-		// Prospector
+		// Input
 		Enabled:        true,
 		IgnoreOlder:    0,
 		ScanFrequency:  10 * time.Second,
@@ -37,8 +56,9 @@ var (
 		RecursiveGlob:  true,
 
 		// Harvester
-		BufferSize: 16 * humanize.KiByte,
-		MaxBytes:   10 * humanize.MiByte,
+		BufferSize:     16 * humanize.KiByte,
+		MaxBytes:       10 * humanize.MiByte,
+		LineTerminator: readfile.AutoLineTerminator,
 		LogConfig: LogConfig{
 			Backoff:       1 * time.Second,
 			BackoffFactor: 2,
@@ -60,7 +80,7 @@ type config struct {
 	InputType     string        `config:"input_type"`
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
-	// Prospector
+	// Input
 	Enabled        bool            `config:"enabled"`
 	ExcludeFiles   []match.Matcher `config:"exclude_files"`
 	IgnoreOlder    time.Duration   `config:"ignore_older"`
@@ -78,14 +98,20 @@ type config struct {
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`
 
-	ExcludeLines []match.Matcher         `config:"exclude_lines"`
-	IncludeLines []match.Matcher         `config:"include_lines"`
-	MaxBytes     int                     `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline    *reader.MultilineConfig `config:"multiline"`
-	JSON         *reader.JSONConfig      `config:"json"`
+	LineTerminator readfile.LineTerminator `config:"line_terminator"`
+	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
+	IncludeLines   []match.Matcher         `config:"include_lines"`
+	MaxBytes       int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline      *multiline.Config       `config:"multiline"`
+	JSON           *readjson.Config        `config:"json"`
 
-	// Hidden on purpose, used by the docker prospector:
-	DockerJSON string `config:"docker-json"`
+	// Hidden on purpose, used by the docker input:
+	DockerJSON *struct {
+		Stream   string `config:"stream"`
+		Partial  bool   `config:"partial"`
+		Format   string `config:"format"`
+		CRIFlags bool   `config:"cri_flags"`
+	} `config:"docker-json"`
 }
 
 type LogConfig struct {
@@ -122,14 +148,14 @@ var ValidScanSort = map[string]struct{}{
 }
 
 func (c *config) Validate() error {
-	// DEPRECATED 6.0.0: warning is already outputted on propsector level
+	// DEPRECATED 6.0.0: warning is already outputted on input level
 	if c.InputType != "" {
 		c.Type = c.InputType
 	}
 
-	// Prospector
+	// Input
 	if c.Type == harvester.LogType && len(c.Paths) == 0 {
-		return fmt.Errorf("No paths were defined for prospector")
+		return fmt.Errorf("No paths were defined for input")
 	}
 
 	if c.CleanInactive != 0 && c.IgnoreOlder == 0 {
@@ -171,11 +197,11 @@ func (c *config) Validate() error {
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns
 func (c *config) resolveRecursiveGlobs() error {
 	if !c.RecursiveGlob {
-		logp.Debug("prospector", "recursive glob disabled")
+		logp.Debug("input", "recursive glob disabled")
 		return nil
 	}
 
-	logp.Debug("prospector", "recursive glob enabled")
+	logp.Debug("input", "recursive glob enabled")
 	var paths []string
 	for _, path := range c.Paths {
 		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
@@ -183,7 +209,7 @@ func (c *config) resolveRecursiveGlobs() error {
 			return err
 		}
 		if len(patterns) > 1 {
-			logp.Debug("prospector", "%q expanded to %#v", path, patterns)
+			logp.Debug("input", "%q expanded to %#v", path, patterns)
 		}
 		paths = append(paths, patterns...)
 	}

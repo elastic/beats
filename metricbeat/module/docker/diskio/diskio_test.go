@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package diskio
 
 import (
@@ -6,11 +23,12 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-var blkioService BLkioService
+var blkioService BlkioService
 var oldBlkioRaw = make([]BlkioRaw, 3)
 var newBlkioRaw = make([]BlkioRaw, 3)
 
@@ -44,7 +62,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	apiContainer2.Container = &containers[1]
 	apiContainer2.Stats.BlkioStats.IoServicedRecursive = append(apiContainer2.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer1, apiContainer2}
-	stats := blkioService.getBlkioStatsList(dockerStats)
+	stats := blkioService.getBlkioStatsList(dockerStats, true)
 	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
@@ -54,7 +72,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
 	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		totals[1] = stat.totals
 		if stat.totals < totals[0] {
@@ -66,7 +84,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[1] || stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[1])
@@ -98,7 +116,7 @@ func TestDeltaOneContainer(t *testing.T) {
 	apiContainer.Container = &containers
 	apiContainer.Stats.BlkioStats.IoServicedRecursive = append(apiContainer.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer}
-	stats := blkioService.getBlkioStatsList(dockerStats)
+	stats := blkioService.getBlkioStatsList(dockerStats, true)
 	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
@@ -106,7 +124,7 @@ func TestDeltaOneContainer(t *testing.T) {
 
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[0])
@@ -115,7 +133,7 @@ func TestDeltaOneContainer(t *testing.T) {
 
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[1] || stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[1])
@@ -202,4 +220,94 @@ func TestBlkioTotal(t *testing.T) {
 func setTime(index int) {
 	oldBlkioRaw[index].Time = time.Now()
 	newBlkioRaw[index].Time = oldBlkioRaw[index].Time.Add(time.Duration(2000000000))
+}
+
+func TestGetBlkioStatsList(t *testing.T) {
+	start := time.Now()
+	later := start.Add(10 * time.Second)
+
+	blkioService := BlkioService{
+		map[string]BlkioRaw{
+			"cebada": {Time: start, reads: 100, writes: 200, totals: 300},
+		},
+	}
+
+	dockerStats := []docker.Stat{{
+		Container: &types.Container{
+			ID:    "cebada",
+			Names: []string{"test"},
+		},
+		Stats: types.StatsJSON{Stats: types.Stats{
+			Read: later,
+			BlkioStats: types.BlkioStats{
+				IoServicedRecursive: []types.BlkioStatEntry{
+					{Major: 1, Minor: 1, Op: "Read", Value: 100},
+					{Major: 1, Minor: 1, Op: "Write", Value: 200},
+					{Major: 1, Minor: 1, Op: "Total", Value: 300},
+					{Major: 1, Minor: 2, Op: "Read", Value: 50},
+					{Major: 1, Minor: 2, Op: "Write", Value: 100},
+					{Major: 1, Minor: 2, Op: "Total", Value: 150},
+				},
+				IoServiceBytesRecursive: []types.BlkioStatEntry{
+					{Major: 1, Minor: 1, Op: "Read", Value: 1000},
+					{Major: 1, Minor: 1, Op: "Write", Value: 2000},
+					{Major: 1, Minor: 1, Op: "Total", Value: 3000},
+					{Major: 1, Minor: 2, Op: "Read", Value: 500},
+					{Major: 1, Minor: 2, Op: "Write", Value: 1000},
+					{Major: 1, Minor: 2, Op: "Total", Value: 1500},
+				},
+			},
+		}},
+	}}
+
+	statsList := blkioService.getBlkioStatsList(dockerStats, true)
+	stats := statsList[0]
+	assert.Equal(t, float64(5), stats.reads)
+	assert.Equal(t, float64(10), stats.writes)
+	assert.Equal(t, float64(15), stats.totals)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 150, writes: 300, totals: 450},
+		stats.serviced)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 1500, writes: 3000, totals: 4500},
+		stats.servicedBytes)
+}
+
+func TestGetBlkioStatsListWindows(t *testing.T) {
+	start := time.Now()
+	later := start.Add(10 * time.Second)
+
+	blkioService := BlkioService{
+		map[string]BlkioRaw{
+			"cebada": {Time: start, reads: 100, writes: 200, totals: 300},
+		},
+	}
+
+	dockerStats := []docker.Stat{{
+		Container: &types.Container{
+			ID:    "cebada",
+			Names: []string{"test"},
+		},
+		Stats: types.StatsJSON{Stats: types.Stats{
+			Read: later,
+			StorageStats: types.StorageStats{
+				ReadCountNormalized:  150,
+				WriteCountNormalized: 300,
+				ReadSizeBytes:        1500,
+				WriteSizeBytes:       3000,
+			},
+		}},
+	}}
+
+	statsList := blkioService.getBlkioStatsList(dockerStats, true)
+	stats := statsList[0]
+	assert.Equal(t, float64(5), stats.reads)
+	assert.Equal(t, float64(10), stats.writes)
+	assert.Equal(t, float64(15), stats.totals)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 150, writes: 300, totals: 450},
+		stats.serviced)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 1500, writes: 3000, totals: 4500},
+		stats.servicedBytes)
 }

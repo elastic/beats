@@ -2,8 +2,8 @@
   title: "Logstash"
   description: >
     Logstash module
-  release: experimental
-  settings: ["ssl"]
+  release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: logstash
       type: group

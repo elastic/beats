@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2018-05-03T20:58:17.379Z",
+    "metricset": {
+        "rtt": 2487,
+        "namespace": "elasticsearch.cluster.pending_task",
+        "name": "pending_tasks",
+        "module": "elasticsearch",
+        "host": "localhost:9200"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1",
+            "pending_task": {
+                "insert_order": 47,
+                "priority": "HIGH",
+                "source": "put-mapping",
+                "time_in_queue.ms": 34
+            }
+        }
+    },
+    "agent": {
+        "name": "host.example.com",
+        "hostname": "host.example.com"
+    }
+}

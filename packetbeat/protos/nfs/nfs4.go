@@ -1,6 +1,21 @@
-package nfs
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
-import "fmt"
+package nfs
 
 const (
 	opAccess             = 3
@@ -59,6 +74,19 @@ const (
 	opWantDelegation     = 56
 	opDestroyClientid    = 57
 	opReclaimComplete    = 58
+	opAllocate           = 59
+	opCopy               = 60
+	opCopyNotify         = 61
+	opDeallocate         = 62
+	opIoAdvise           = 63
+	opLayoutError        = 64
+	opLayoutStats        = 65
+	opOffloadCancel      = 66
+	opOffloadStatus      = 67
+	opReadPlus           = 68
+	opSeek               = 69
+	opWriteSame          = 70
+	opClone              = 71
 	opIllegal            = 10044
 )
 
@@ -119,6 +147,19 @@ var nfsOpnum4 = map[int]string{
 	56:    "WANT_DELEGATION",
 	57:    "DESTROY_CLIENTID",
 	58:    "RECLAIM_COMPLETE",
+	59:    "ALLOCATE",
+	60:    "COPY",
+	61:    "COPY_NOTIFY",
+	62:    "DEALLOCATE",
+	63:    "IO_ADVISE",
+	64:    "LAYOUTERROR",
+	65:    "LAYOUTSTATS",
+	66:    "OFFLOAD_CANCEL",
+	67:    "OFFLOAD_STATUS",
+	68:    "READ_PLUS",
+	69:    "SEEK",
+	70:    "WRITE_SAME",
+	71:    "CLONE",
 	10044: "ILLEGAL",
 }
 
@@ -191,7 +232,7 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 		opname, ok := nfsOpnum4[op]
 
 		if !ok {
-			return fmt.Sprintf("ILLEGAL (%d)", op)
+			return "ILLEGAL"
 		}
 		currentOpname = opname
 
@@ -199,9 +240,9 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 		// First class ops
 		//
 		// The first class ops usually the main operation in the compound.
-		// NFS spec allowes to build compound opertion where multiple
+		// NFS spec allows to build compound operation where multiple
 		// first class ops are used, like OPEN->LOCK->WRITE->LOCKU->CLOSE,
-		// but such construnction are not used in the practice.
+		// but such construction are not used in the practice.
 		case
 			opAccess,
 			opBackchannelCtl,
@@ -244,7 +285,20 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 			opSetSsv,
 			opTestStateid,
 			opWantDelegation,
-			opWrite:
+			opWrite,
+			opAllocate,
+			opCopy,
+			opCopyNotify,
+			opDeallocate,
+			opIoAdvise,
+			opLayoutError,
+			opLayoutStats,
+			opOffloadCancel,
+			opOffloadStatus,
+			opReadPlus,
+			opSeek,
+			opWriteSame,
+			opClone:
 
 			found = true
 		default:

@@ -1,0 +1,164 @@
+[[add-cloud-metadata]]
+=== Add cloud metadata
+
+The `add_cloud_metadata` processor enriches each event with instance metadata
+from the machine's hosting provider. At startup it will query a list of hosting
+providers and cache the instance metadata.
+
+The following cloud providers are supported:
+
+- Amazon Web Services (AWS)
+- Digital Ocean
+- Google Compute Engine (GCE)
+- https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
+- Alibaba Cloud (ECS)
+- Azure Virtual Machine
+- Openstack Nova
+
+The Alibaba Cloud and Tencent cloud providers are disabled by default, because
+they require to access a remote host. The `providers` setting allows users to
+select a list of default providers to query.
+
+The simple configuration below enables the processor.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_cloud_metadata: ~
+-------------------------------------------------------------------------------
+
+The `add_cloud_metadata` processor has three optional configuration settings.
+The first one is `timeout` which specifies the maximum amount of time to wait
+for a successful response when detecting the hosting provider. The default
+timeout value is `3s`.
+
+If a timeout occurs then no instance metadata will be added to the events. This
+makes it possible to enable this processor for all your deployments (in the
+cloud or on-premise).
+
+The second optional setting is `providers`. The `providers` settings accepts a
+list of cloud provider names to be used. If `providers` is not configured, then
+all providers that do not access a remote endpoint are enabled by default.
+
+List of names the `providers` setting supports:
+
+- "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
+- "azure" for Azure Virtual Machine (enabled by default).
+- "digitalocean" for Digital Ocean (enabled by default).
+- "aws", or "ec2" for Amazon Web Services (enabled by default).
+- "gcp" for Google Copmute Enging (enabled by default).
+- "openstack", or "nova" for Openstack Nova (enabled by default).
+- "tencent", or "qcloud" for Tencent Cloud (disabled by default).
+
+The third optional configuration setting is `overwrite`. When `overwrite` is
+`true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
+default).
+
+The metadata that is added to events varies by hosting provider. Below are
+examples for each of the supported providers.
+
+_AWS_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "account.id": "123456789012",
+    "availability_zone": "us-east-1c",
+    "instance.id": "i-4e123456",
+    "machine.type": "t2.medium",
+    "image.id": "ami-abcd1234",
+    "provider": "aws",
+    "region": "us-east-1"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Digital Ocean_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "instance.id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
+  }
+}
+-------------------------------------------------------------------------------
+
+_GCP_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance.id": "1234556778987654321",
+    "machine.type": "f1-micro",
+    "project.id": "my-dev",
+    "provider": "gcp"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Tencent Cloud_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance.id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Alibaba Cloud_
+
+This metadata is only available when VPC is selected as the network type of the
+ECS instance.
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance.id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Azure Virtual Machine_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "provider": "az",
+    "instance.id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance.name": "test-az-vm",
+    "machine.type": "Standard_D3_v2",
+    "region": "eastus2"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Openstack Nova_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "instance.name": "test-998d932195.mycloud.tld",
+    "instance.id": "i-00011a84",
+    "availability_zone": "xxxx-az-c",
+    "provider": "openstack",
+    "machine.type": "m2.large"
+  }
+}
+-------------------------------------------------------------------------------

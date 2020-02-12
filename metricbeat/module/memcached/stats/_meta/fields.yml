@@ -2,7 +2,7 @@
   type: group
   description: >
     stats
-  release: beta
+  release: ga
   fields:
     - name: pid
       type: long
@@ -83,3 +83,15 @@
       description: >
         Number of objects removed from the cache to free up memory for new items
         because Memcached reached it's maximum memory setting (limit_maxbytes).
+
+    - name: bytes.current
+      type: long
+      formate: bytes
+      description: >
+        Number of bytes currently used for caching items.
+
+    - name: bytes.limit
+      type: long
+      formate: bytes
+      description: >
+        Number of bytes this server is allowed to use for storage.

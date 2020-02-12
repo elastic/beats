@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-vsphere]]
@@ -9,6 +9,15 @@ beta[]
 
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
+By default it enables the metricsets `datastore`, `host` and `virtualmachine`.
+
+[float]
+=== Dashboard
+
+The vsphere module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_vsphere_dashboard.png[]
+image::./images/metricbeat_vsphere_vm_dashboard.png[]
 
 
 [float]
@@ -21,6 +30,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: vsphere
+  enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
   hosts: ["https://localhost/sdk"]
@@ -31,7 +41,6 @@ metricbeat.modules:
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
-  
 ----
 
 [float]

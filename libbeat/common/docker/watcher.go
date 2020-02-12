@@ -1,3 +1,22 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -9,7 +28,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
 	"golang.org/x/net/context"
 
@@ -18,7 +36,13 @@ import (
 )
 
 // Select Docker API version
-const dockerAPIVersion = "1.22"
+const (
+	shortIDLen                         = 12
+	dockerRequestTimeout               = 10 * time.Second
+	dockerWatchRequestTimeout          = 60 * time.Minute
+	dockerEventsWatchPityTimerInterval = 10 * time.Second
+	dockerEventsWatchPityTimerTimeout  = 10 * time.Minute
+)
 
 // Watcher reads docker events and keeps a list of known containers
 type Watcher interface {
@@ -50,15 +74,18 @@ type TLSConfig struct {
 
 type watcher struct {
 	sync.RWMutex
-	client             Client
-	ctx                context.Context
-	stop               context.CancelFunc
-	containers         map[string]*Container
-	deleted            map[string]time.Time // deleted annotations key -> last access time
-	cleanupTimeout     time.Duration
-	lastValidTimestamp int64
-	stopped            sync.WaitGroup
-	bus                bus.Bus
+	log                        *logp.Logger
+	client                     Client
+	ctx                        context.Context
+	stop                       context.CancelFunc
+	containers                 map[string]*Container
+	deleted                    map[string]time.Time // deleted annotations key -> last access time
+	cleanupTimeout             time.Duration
+	lastValidTimestamp         int64
+	lastWatchReceivedEventTime time.Time
+	stopped                    sync.WaitGroup
+	bus                        bus.Bus
+	shortID                    bool // whether to store short ID in "containers" too
 }
 
 // Container info retrieved by the watcher
@@ -74,13 +101,15 @@ type Container struct {
 // Client for docker interface
 type Client interface {
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
 	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
 }
 
-type WatcherConstructor func(host string, tls *TLSConfig) (Watcher, error)
+// WatcherConstructor represent a function that creates a new Watcher from giving parameters
+type WatcherConstructor func(logp *logp.Logger, host string, tls *TLSConfig, storeShortID bool) (Watcher, error)
 
 // NewWatcher returns a watcher running for the given settings
-func NewWatcher(host string, tls *TLSConfig) (Watcher, error) {
+func NewWatcher(log *logp.Logger, host string, tls *TLSConfig, storeShortID bool) (Watcher, error) {
 	var httpClient *http.Client
 	if tls != nil {
 		options := tlsconfig.Options{
@@ -101,24 +130,35 @@ func NewWatcher(host string, tls *TLSConfig) (Watcher, error) {
 		}
 	}
 
-	client, err := client.NewClient(host, dockerAPIVersion, httpClient, nil)
+	client, err := NewClient(host, httpClient, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewWatcherWithClient(client, 60*time.Second)
+	// Extra check to confirm that Docker is available
+	_, err = client.Info(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	return NewWatcherWithClient(log, client, 60*time.Second, storeShortID)
 }
 
-func NewWatcherWithClient(client Client, cleanupTimeout time.Duration) (*watcher, error) {
+// NewWatcherWithClient creates a new Watcher from a given Docker client
+func NewWatcherWithClient(log *logp.Logger, client Client, cleanupTimeout time.Duration, storeShortID bool) (Watcher, error) {
+	log = log.Named("docker")
+
 	ctx, cancel := context.WithCancel(context.Background())
 	return &watcher{
+		log:            log,
 		client:         client,
 		ctx:            ctx,
 		stop:           cancel,
 		containers:     make(map[string]*Container),
 		deleted:        make(map[string]time.Time),
 		cleanupTimeout: cleanupTimeout,
-		bus:            bus.New("docker"),
+		bus:            bus.New(log, "docker"),
+		shortID:        storeShortID,
 	}, nil
 }
 
@@ -126,13 +166,17 @@ func NewWatcherWithClient(client Client, cleanupTimeout time.Duration) (*watcher
 func (w *watcher) Container(ID string) *Container {
 	w.RLock()
 	container := w.containers[ID]
-	_, ok := w.deleted[ID]
+	if container == nil {
+		w.RUnlock()
+		return nil
+	}
+	_, ok := w.deleted[container.ID]
 	w.RUnlock()
 
 	// Update last access time if it's deleted
 	if ok {
 		w.Lock()
-		w.deleted[ID] = time.Now()
+		w.deleted[container.ID] = time.Now()
 		w.Unlock()
 	}
 
@@ -145,7 +189,9 @@ func (w *watcher) Containers() map[string]*Container {
 	defer w.RUnlock()
 	res := make(map[string]*Container)
 	for k, v := range w.containers {
-		res[k] = v
+		if !w.shortID || len(k) != shortIDLen {
+			res[k] = v
+		}
 	}
 	return res
 }
@@ -153,7 +199,7 @@ func (w *watcher) Containers() map[string]*Container {
 // Start watching docker API for new containers
 func (w *watcher) Start() error {
 	// Do initial scan of existing containers
-	logp.Debug("docker", "Start docker containers scanner")
+	w.log.Debug("Start docker containers scanner")
 	w.lastValidTimestamp = time.Now().Unix()
 
 	w.Lock()
@@ -165,6 +211,9 @@ func (w *watcher) Start() error {
 
 	for _, c := range containers {
 		w.containers[c.ID] = c
+		if w.shortID {
+			w.containers[c.ID[:shortIDLen]] = c
+		}
 	}
 
 	// Emit all start events (avoid blocking if the bus get's blocked)
@@ -189,23 +238,35 @@ func (w *watcher) Stop() {
 }
 
 func (w *watcher) watch() {
+	log := w.log
+
 	filter := filters.NewArgs()
 	filter.Add("type", "container")
 
-	options := types.EventsOptions{
-		Since:   fmt.Sprintf("%d", w.lastValidTimestamp),
-		Filters: filter,
-	}
-
 	for {
-		events, errors := w.client.Events(w.ctx, options)
+		options := types.EventsOptions{
+			Since:   fmt.Sprintf("%d", w.lastValidTimestamp),
+			Filters: filter,
+		}
+
+		log.Debugf("Fetching events since %s", options.Since)
+		ctx, cancel := context.WithTimeout(w.ctx, dockerWatchRequestTimeout)
+		defer cancel()
+
+		events, errors := w.client.Events(ctx, options)
+
+		//ticker for timeout to restart watcher when no events are received
+		w.lastWatchReceivedEventTime = time.Now()
+		tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
+		defer tickChan.Stop()
 
 	WATCH:
 		for {
 			select {
 			case event := <-events:
-				logp.Debug("docker", "Got a new docker event: %v", event)
+				log.Debugf("Got a new docker event: %v", event)
 				w.lastValidTimestamp = event.Time
+				w.lastWatchReceivedEventTime = time.Now()
 
 				// Add / update
 				if event.Action == "start" || event.Action == "update" {
@@ -216,13 +277,16 @@ func (w *watcher) watch() {
 						Filters: filter,
 					})
 					if err != nil || len(containers) != 1 {
-						logp.Err("Error getting container info: %v", err)
+						log.Errorf("Error getting container info: %v", err)
 						continue
 					}
 					container := containers[0]
 
 					w.Lock()
 					w.containers[event.Actor.ID] = container
+					if w.shortID {
+						w.containers[event.Actor.ID[:shortIDLen]] = container
+					}
 					// un-delete if it's flagged (in case of update or recreation)
 					delete(w.deleted, event.Actor.ID)
 					w.Unlock()
@@ -250,21 +314,40 @@ func (w *watcher) watch() {
 
 			case err := <-errors:
 				// Restart watch call
-				logp.Err("Error watching for docker events: %v", err)
+				if err == context.DeadlineExceeded {
+					log.Info("Context deadline exceeded for docker request, restarting watch call")
+				} else {
+					log.Errorf("Error watching for docker events: %+v", err)
+				}
+
 				time.Sleep(1 * time.Second)
 				break WATCH
 
+			case <-tickChan.C:
+				if time.Since(w.lastWatchReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
+					log.Infof("No events received within %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
+					time.Sleep(1 * time.Second)
+					break WATCH
+				}
+
 			case <-w.ctx.Done():
-				logp.Debug("docker", "Watcher stopped")
+				log.Debug("Watcher stopped")
 				w.stopped.Done()
 				return
 			}
 		}
+
 	}
 }
 
 func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
-	containers, err := w.client.ContainerList(w.ctx, options)
+	log := w.log
+
+	log.Debug("List containers")
+	ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
+	defer cancel()
+
+	containers, err := w.client.ContainerList(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -272,8 +355,27 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	var result []*Container
 	for _, c := range containers {
 		var ipaddresses []string
-		for _, net := range c.NetworkSettings.Networks {
-			ipaddresses = append(ipaddresses, net.IPAddress)
+		if c.NetworkSettings != nil {
+			// Handle alternate platforms like VMWare's VIC that might not have this data.
+			for _, net := range c.NetworkSettings.Networks {
+				if net.IPAddress != "" {
+					ipaddresses = append(ipaddresses, net.IPAddress)
+				}
+			}
+		}
+
+		// If there are no network interfaces, assume that the container is on host network
+		// Inspect the container directly and use the hostname as the IP address in order
+		if len(ipaddresses) == 0 {
+			log.Debugf("Inspect container %s", c.ID)
+			ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
+			defer cancel()
+			info, err := w.client.ContainerInspect(ctx, c.ID)
+			if err == nil {
+				ipaddresses = append(ipaddresses, info.Config.Hostname)
+			} else {
+				log.Warnf("unable to inspect container %s due to error %+v", c.ID, err)
+			}
 		}
 		result = append(result, &Container{
 			ID:          c.ID,
@@ -290,6 +392,8 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 
 // Clean up deleted containers after they are not used anymore
 func (w *watcher) cleanupWorker() {
+	log := w.log
+
 	for {
 		// Wait a full period
 		time.Sleep(w.cleanupTimeout)
@@ -305,7 +409,7 @@ func (w *watcher) cleanupWorker() {
 			w.RLock()
 			for key, lastSeen := range w.deleted {
 				if lastSeen.Before(timeout) {
-					logp.Debug("docker", "Removing container %s after cool down timeout", key)
+					log.Debugf("Removing container %s after cool down timeout", key)
 					toDelete = append(toDelete, key)
 				}
 			}
@@ -326,6 +430,9 @@ func (w *watcher) cleanupWorker() {
 			for _, key := range toDelete {
 				delete(w.deleted, key)
 				delete(w.containers, key)
+				if w.shortID {
+					delete(w.containers, key[:shortIDLen])
+				}
 			}
 			w.Unlock()
 		}

@@ -1,46 +1,51 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "elasticsearch": {
         "cluster": {
-            "name": "docker-cluster"
+            "id": "wafoCXEDTrGxpYViNueSaA",
+            "name": "es1"
         },
         "node": {
+            "id": "v5gHTHqKSRa4bZ9vbyDy7g",
             "jvm": {
                 "memory": {
                     "heap": {
                         "init": {
-                            "bytes": 94371840
+                            "bytes": 1073741824
                         },
                         "max": {
-                            "bytes": 91226112
+                            "bytes": 1037959168
                         }
                     },
                     "nonheap": {
                         "init": {
-                            "bytes": 2555904
+                            "bytes": 7667712
                         },
                         "max": {
                             "bytes": 0
                         }
                     }
                 },
-                "version": "1.8.0_151"
+                "version": "11.0.1"
             },
-            "name": "ab1_1Gw3Rtax_2l78Gq_CQ",
+            "name": "es1_1",
             "process": {
                 "mlockall": false
             },
-            "version": "6.0.0"
+            "version": "7.0.0"
         }
     },
     "metricset": {
-        "host": "elasticsearch:9200",
+        "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node",
         "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
     }
 }

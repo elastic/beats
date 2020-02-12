@@ -1,43 +1,52 @@
 = Heartbeat Reference
 
-include::../../libbeat/docs/version.asciidoc[]
+:libbeat-dir: {docdir}/../../libbeat/docs
+
+include::{libbeat-dir}/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
 :beatname_pkg: heartbeat-elastic
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:deb_os:
+:rpm_os:
+:mac_os:
+:linux_os:
+:docker_platform:
+:win_os:
+:no_dashboards:
+:no_decode_cef_processor:
+:no_decode_csv_fields_processor:
+:no_script_processor:
+:no_timestamp_processor:
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
-
 include::./getting-started.asciidoc[]
 
-include::../../libbeat/docs/repositories.asciidoc[]
+include::{libbeat-dir}/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
-
-//
-//include::./upgrading.asciidoc[]
-
-//
-//include::./how-heartbeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::./securing-heartbeat.asciidoc[]
+include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
-include::../../libbeat/docs/security/securing-beats.asciidoc[]
+include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-//
-//include::./heartbeat-devguide.asciidoc[]
+include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+

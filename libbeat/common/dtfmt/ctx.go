@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dtfmt
 
 import (
@@ -16,16 +33,19 @@ type ctx struct {
 	hour, min, sec int
 	millis         int
 
+	tzOffset int
+
 	buf []byte
 }
 
 type ctxConfig struct {
-	date    bool
-	clock   bool
-	weekday bool
-	yearday bool
-	millis  bool
-	iso     bool
+	date     bool
+	clock    bool
+	weekday  bool
+	yearday  bool
+	millis   bool
+	iso      bool
+	tzOffset bool
 }
 
 func (c *ctx) initTime(config *ctxConfig, t time.Time) {
@@ -49,6 +69,10 @@ func (c *ctx) initTime(config *ctxConfig, t time.Time) {
 
 	if config.weekday {
 		c.weekday = t.Weekday()
+	}
+
+	if config.tzOffset {
+		_, c.tzOffset = t.Zone()
 	}
 }
 
@@ -74,6 +98,10 @@ func (c *ctxConfig) enableYearday() {
 
 func (c *ctxConfig) enableISO() {
 	c.iso = true
+}
+
+func (c *ctxConfig) enableTimeZoneOffset() {
+	c.tzOffset = true
 }
 
 func isLeap(year int) bool {

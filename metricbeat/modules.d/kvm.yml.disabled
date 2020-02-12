@@ -1,0 +1,8 @@
+# Module: kvm
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kvm.html
+
+- module: kvm
+  #metricsets:
+  #  - dommemstat
+  period: 10s
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]

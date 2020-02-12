@@ -1,11 +1,30 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package parse
 
 import (
 	"fmt"
 	"net"
 	"net/url"
+	p "path"
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -14,10 +33,12 @@ import (
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
 type URLHostParserBuilder struct {
-	PathConfigKey string
-	DefaultPath   string
-	DefaultScheme string
-	QueryParams   string
+	PathConfigKey   string
+	DefaultPath     string
+	DefaultUsername string
+	DefaultPassword string
+	DefaultScheme   string
+	QueryParams     string
 }
 
 // Build returns a new HostParser function whose behavior is influenced by the
@@ -30,13 +51,25 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
+		query, ok := conf["query"]
+		if ok {
+			queryMap, ok := query.(map[string]interface{})
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
+			}
+
+			b.QueryParams = mb.QueryParams(queryMap).String()
+		}
+
+		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
 			if !ok {
 				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
 			}
+		} else {
+			user = b.DefaultUsername
 		}
 		t, ok = conf["password"]
 		if ok {
@@ -44,6 +77,8 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			if !ok {
 				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
 			}
+		} else {
+			pass = b.DefaultPassword
 		}
 		t, ok = conf[b.PathConfigKey]
 		if ok {
@@ -54,8 +89,24 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
+		// Normalize path
+		path = strings.Trim(path, "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		t, ok = conf["basepath"]
+		if ok {
+			basePath, ok = t.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+			}
+		}
+
+		// Normalize basepath
+		basePath = strings.Trim(basePath, "/")
+
+		// Combine paths and normalize
+		fullPath := strings.Trim(p.Join(basePath, path), "/")
+
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
 }
 
@@ -64,6 +115,12 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 // the HostData.Host field is set to the URLs path instead of the URLs host,
 // the same happens for "npipe".
 func NewHostDataFromURL(u *url.URL) mb.HostData {
+	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
+}
+
+// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
+// url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
+func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
 	if u.User != nil {
 		user = u.User.Username()
@@ -76,6 +133,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	}
 
 	return mb.HostData{
+		Transport:    transport,
 		URI:          u.String(),
 		SanitizedURI: redactURLCredentials(u).String(),
 		Host:         host,
@@ -88,12 +146,13 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
 func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
-	u, err := getURL(rawHost, scheme, user, pass, path, query)
+	u, transport, err := getURL(rawHost, scheme, user, pass, path, query)
+
 	if err != nil {
 		return mb.HostData{}, err
 	}
 
-	return NewHostDataFromURL(u), nil
+	return NewHostDataFromURLWithTransport(transport, u), nil
 }
 
 // SetURLUser set the user credentials in the given URL. If the username or
@@ -119,7 +178,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 		pass = defaultPass
 	}
 
-	if userIsSet && passIsSet {
+	if passIsSet {
 		u.User = url.UserPassword(user, pass)
 	} else if userIsSet {
 		u.User = url.User(user)
@@ -128,22 +187,46 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
-func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, error) {
+func getURL(
+	rawURL, scheme, username, password, path, query string,
+) (*url.URL, dialer.Builder, error) {
+
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
 		// Add scheme.
 		rawURL = fmt.Sprintf("%s://%s", scheme, rawURL)
 	}
 
+	var t dialer.Builder
+
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing URL: %v", err)
+		return nil, t, fmt.Errorf("error parsing URL: %v", err)
+	}
+
+	// discover the transport to use to communicate with the host if we have a combined scheme.
+	// possible values are mb.TransportTCP, mb.transportUnix or mb.TransportNpipe.
+	switch u.Scheme {
+	case "http+unix":
+		t = dialer.NewUnixDialerBuilder(u.Path)
+		u.Path = ""
+		u.Scheme = "http"
+		u.Host = "unix"
+	case "http+npipe":
+		p := strings.Replace(u.Path, "/pipe", `\\.\pipe`, 1)
+		p = strings.Replace(p, "/", "\\", -1)
+		t = dialer.NewNpipeDialerBuilder(p)
+		u.Path = ""
+		u.Scheme = "http"
+		u.Host = "npipe"
+	default:
+		t = dialer.NewDefaultDialerBuilder()
 	}
 
 	SetURLUser(u, username, password)
 
 	if !strings.HasSuffix(u.Scheme, "unix") && !strings.HasSuffix(u.Scheme, "npipe") {
 		if u.Host == "" {
-			return nil, fmt.Errorf("error parsing URL: empty host")
+			return nil, t, fmt.Errorf("error parsing URL: empty host")
 		}
 
 		// Validate the host. The port is optional.
@@ -152,11 +235,11 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, fmt.Errorf("error parsing URL: %v", err)
+				return nil, t, fmt.Errorf("error parsing URL: %v", err)
 			}
 		}
 		if host == "" {
-			return nil, fmt.Errorf("error parsing URL: empty host")
+			return nil, t, fmt.Errorf("error parsing URL: empty host")
 		}
 	}
 
@@ -169,18 +252,27 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 		u.Path = path
 	}
 
-	// Add the query params to existing query parameters overwriting any
-	// keys that already exist.
+	//Adds the query params in the url
+	u, err = SetQueryParams(u, query)
+	return u, t, err
+}
+
+// SetQueryParams adds the query params to existing query parameters overwriting any
+// keys that already exist.
+func SetQueryParams(u *url.URL, query string) (*url.URL, error) {
 	q := u.Query()
 	params, err := url.ParseQuery(query)
+	if err != nil {
+		return u, err
+	}
 	for key, values := range params {
 		for _, v := range values {
 			q.Set(key, v)
 		}
 	}
 	u.RawQuery = q.Encode()
-
 	return u, nil
+
 }
 
 // redactURLCredentials returns the URL as a string with the username and

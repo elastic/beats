@@ -20,7 +20,7 @@ To load the dashboards, you can either enable dashboard loading in the
 run the `setup` command. Dashboard loading is disabled by default.
 
 When dashboard loading is enabled, {beatname_uc} uses the Kibana API to load the
-sample dashboards. Dashboard loading is only attempted at Beat startup.
+sample dashboards. Dashboard loading is only attempted when {beatname_uc} starts up.
 If Kibana is not available at startup, {beatname_uc} will stop with an error.
 
 To enable dashboard loading, add the following setting to the config file:
@@ -40,9 +40,14 @@ You can specify the following options in the `setup.dashboards` section of the
 ==== `setup.dashboards.enabled`
 
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
-automatically on startup. If no other options are set, the dashboard are loaded
-from the local `kibana` directory in the home path of the installation.
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
 
+NOTE: When dashboard loading is enabled, {beatname_uc} overwrites any existing
+dashboards that match the names of the dashboards you are loading. This happens
+every time {beatname_uc} starts. 
+
+If no other options are set, the dashboard are loaded
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
 To load dashboards from a different location, you can configure one of the
 following options: <<directory-option,`setup.dashboards.directory`>>,
 <<url-option,`setup.dashboards.url`>>, or
@@ -97,5 +102,22 @@ NOTE: This setting only works for Kibana 6.0 and newer.
 [float]
 ==== `setup.dashboards.always_kibana`
 
-Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+Force loading of dashboards using the Kibana API without querying Elasticsearch for the version.
 The default is `false`.
+
+[float]
+==== `setup.dashboards.retry.enabled`
+
+If this option is set to true, and Kibana is not reachable at the time when dashboards are loaded,
+ {beatname_uc} will retry to reconnect to Kibana instead of exiting with an error. Disabled by default.
+
+[float]
+==== `setup.dashboards.retry.interval`
+
+Duration interval between Kibana connection retries. Defaults to 1 second.
+
+[float]
+==== `setup.dashboards.retry.maximum`
+
+Maximum number of retries before exiting with an error. Set to 0 for unlimited retrying.
+Default is unlimited.

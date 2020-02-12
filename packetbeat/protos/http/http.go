@@ -1,20 +1,41 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/ecs/code/go/ecs"
 )
 
 var debugf = logp.MakeDebug("http")
@@ -24,7 +45,6 @@ type parserState uint8
 
 const (
 	stateStart parserState = iota
-	stateFLine
 	stateHeaders
 	stateBody
 	stateBodyChunkedStart
@@ -34,6 +54,7 @@ const (
 
 var (
 	unmatchedResponses = monitoring.NewInt(nil, "http.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "http.unmatched_requests")
 )
 
 type stream struct {
@@ -67,8 +88,9 @@ type httpPlugin struct {
 	splitCookie         bool
 	hideKeywords        []string
 	redactAuthorization bool
-	includeBodyFor      []string
+	redactHeaders       []string
 	maxMessageSize      int
+	mustDecodeBody      bool
 
 	parserConfig parserConfig
 
@@ -124,7 +146,19 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.splitCookie = config.SplitCookie
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
-	http.includeBodyFor = config.IncludeBodyFor
+	http.mustDecodeBody = config.DecodeBody
+
+	http.redactHeaders = make([]string, len(config.RedactHeaders))
+	for i, header := range config.RedactHeaders {
+		http.redactHeaders[i] = strings.ToLower(header)
+	}
+
+	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeRequestBodyFor} {
+		http.parserConfig.includeRequestBodyFor = append(http.parserConfig.includeRequestBodyFor, list...)
+	}
+	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeResponseBodyFor} {
+		http.parserConfig.includeResponseBodyFor = append(http.parserConfig.includeResponseBodyFor, list...)
+	}
 	http.maxMessageSize = config.MaxMessageSize
 
 	if config.SendAllHeaders {
@@ -162,19 +196,23 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		}
 
 		if m.isRequest {
-			m.notes = append(m.notes, "Packet loss while capturing the request")
+			if !m.packetLossReq {
+				m.packetLossReq = true
+				m.notes = append(m.notes, "Packet loss while capturing the request")
+			}
 		} else {
-			m.notes = append(m.notes, "Packet loss while capturing the response")
+			if !m.packetLossResp {
+				m.packetLossResp = true
+				m.notes = append(m.notes, "Packet loss while capturing the response")
+			}
 		}
 		if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 			(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
-
 			s.bodyReceived += nbytes
 			m.contentLength += nbytes
 			return true, false
-		} else if len(s.data[s.parseOffset:])+nbytes >= m.contentLength-s.bodyReceived {
+		} else if len(s.data)+nbytes >= m.contentLength-s.bodyReceived {
 			// we're done, but the last portion of the data is gone
-			m.end = s.parseOffset
 			return true, true
 		} else {
 			s.bodyReceived += nbytes
@@ -186,7 +224,6 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 }
 
 func (st *stream) PrepareForNewMessage() {
-	st.data = st.data[st.message.end:]
 	st.parseState = stateStart
 	st.parseOffset = 0
 	st.bodyReceived = 0
@@ -201,8 +238,6 @@ func (http *httpPlugin) messageComplete(
 	dir uint8,
 	st *stream,
 ) {
-	st.message.raw = st.data[st.message.start:st.message.end]
-
 	http.handleHTTP(conn, st.message, tcptuple, dir)
 }
 
@@ -274,7 +309,12 @@ func (http *httpPlugin) doParse(
 		conn.streams[dir] = st
 	} else {
 		// concatenate bytes
-		if len(st.data)+len(pkt.Payload) > http.maxMessageSize {
+		totalLength := len(st.data) + len(pkt.Payload)
+		msg := st.message
+		if msg != nil {
+			totalLength += len(msg.body)
+		}
+		if totalLength > http.maxMessageSize {
 			if isDebug {
 				debugf("Stream data too large, ignoring message")
 			}
@@ -284,13 +324,14 @@ func (http *httpPlugin) doParse(
 		}
 	}
 
-	for len(st.data) > 0 {
+	for len(st.data) > 0 || extraMsgSize > 0 {
 		if st.message == nil {
 			st.message = &message{ts: pkt.Ts}
 		}
 
 		parser := newParser(&http.parserConfig)
 		ok, complete := parser.parse(st, extraMsgSize)
+		extraMsgSize = 0
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -338,8 +379,7 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 	// send whatever data we got so far as complete. This
 	// is needed for the HTTP/1.0 without Content-Length situation.
-	if stream.message != nil && len(stream.data[stream.message.start:]) > 0 {
-		stream.message.raw = stream.data[stream.message.start:]
+	if stream.message != nil {
 		http.handleHTTP(conn, stream.message, tcptuple, dir)
 
 		// and reset message. Probably not needed, just to be sure.
@@ -395,7 +435,7 @@ func (http *httpPlugin) handleHTTP(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	http.hideHeaders(m)
 
 	if m.isRequest {
@@ -412,14 +452,31 @@ func (http *httpPlugin) handleHTTP(
 	}
 }
 
+func (http *httpPlugin) flushResponses(conn *httpConnectionData) {
+	for !conn.responses.empty() {
+		unmatchedResponses.Add(1)
+		resp := conn.responses.pop()
+		debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
+		event := http.newTransaction(nil, resp)
+		http.publishTransaction(event)
+	}
+}
+
+func (http *httpPlugin) flushRequests(conn *httpConnectionData) {
+	for !conn.requests.empty() {
+		unmatchedRequests.Add(1)
+		requ := conn.requests.pop()
+		debugf("Request from unknown transaction %s. Reporting error.", requ.tcpTuple)
+		event := http.newTransaction(requ, nil)
+		http.publishTransaction(event)
+	}
+}
+
 func (http *httpPlugin) correlate(conn *httpConnectionData) {
+
 	// drop responses with missing requests
 	if conn.requests.empty() {
-		for !conn.responses.empty() {
-			debugf("Response from unknown transaction. Ignoring.")
-			unmatchedResponses.Add(1)
-			conn.responses.pop()
-		}
+		http.flushResponses(conn)
 		return
 	}
 
@@ -438,80 +495,129 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 
 func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
-	if resp.statusCode >= 400 {
+	if resp == nil {
+		status = common.ERROR_STATUS
+		if requ != nil {
+			requ.notes = append(requ.notes, "Unmatched request")
+		}
+	} else if resp.statusCode >= 400 {
 		status = common.ERROR_STATUS
 	}
-
-	// resp_time in milliseconds
-	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
-
-	path, params, err := http.extractParameters(requ, requ.raw)
-	if err != nil {
-		logp.Warn("Fail to parse HTTP parameters: %v", err)
+	if requ == nil {
+		status = common.ERROR_STATUS
+		if resp != nil {
+			resp.notes = append(resp.notes, "Unmatched response")
+		}
 	}
 
-	src := common.Endpoint{
-		IP:   requ.tcpTuple.SrcIP.String(),
-		Port: requ.tcpTuple.SrcPort,
-		Proc: string(requ.cmdlineTuple.Src),
-	}
-	dst := common.Endpoint{
-		IP:   requ.tcpTuple.DstIP.String(),
-		Port: requ.tcpTuple.DstPort,
-		Proc: string(requ.cmdlineTuple.Dst),
-	}
-	if requ.direction == tcp.TCPDirectionReverse {
-		src, dst = dst, src
+	var ts time.Time
+	var src, dst *common.Endpoint
+	for _, m := range []*message{requ, resp} {
+		if m == nil {
+			continue
+		}
+		ts = m.ts
+		src, dst = m.getEndpoints()
+		break
 	}
 
-	httpDetails := common.MapStr{
-		"request": common.MapStr{
-			"params":  params,
-			"headers": http.collectHeaders(requ),
-		},
-		"response": common.MapStr{
-			"code":    resp.statusCode,
-			"phrase":  resp.statusPhrase,
-			"headers": http.collectHeaders(resp),
-		},
+	evt, pbf := pb.NewBeatEvent(ts)
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = "http"
+
+	fields := evt.Fields
+	fields["type"] = pbf.Network.Protocol
+	fields["status"] = status
+
+	var httpFields ProtocolFields
+	if requ != nil {
+		http.decodeBody(requ)
+		path, params, err := http.extractParameters(requ)
+		if err != nil {
+			logp.Warn("Fail to parse HTTP parameters: %v", err)
+		}
+
+		pbf.Source.Bytes = int64(requ.size)
+		host, port := extractHostHeader(string(requ.host))
+		if net.ParseIP(host) == nil {
+			pbf.Destination.Domain = host
+		}
+		if port == 0 {
+			port = int(pbf.Destination.Port)
+		} else if port != int(pbf.Destination.Port) {
+			requ.notes = append(requ.notes, "Host header port number mismatch")
+		}
+		pbf.Event.Start = requ.ts
+		pbf.Network.ForwardedIP = string(requ.realIP)
+		pbf.Error.Message = requ.notes
+
+		// http
+		httpFields.Version = requ.version.String()
+		httpFields.RequestBytes = int64(requ.size)
+		httpFields.RequestBodyBytes = int64(requ.contentLength)
+		httpFields.RequestMethod = bytes.ToLower(requ.method)
+		httpFields.RequestReferrer = requ.referer
+		if requ.sendBody && len(requ.body) > 0 {
+			httpFields.RequestBodyBytes = int64(len(requ.body))
+			httpFields.RequestBodyContent = common.NetString(requ.body)
+		}
+		httpFields.RequestHeaders = http.collectHeaders(requ)
+
+		// url
+		u := newURL(host, int64(port), path, params)
+		pb.MarshalStruct(evt.Fields, "url", u)
+
+		// user-agent
+		userAgent := ecs.UserAgent{Original: string(requ.userAgent)}
+		pb.MarshalStruct(evt.Fields, "user_agent", userAgent)
+
+		// packetbeat root fields
+		if http.sendRequest {
+			fields["request"] = string(http.makeRawMessage(requ))
+		}
+		fields["method"] = httpFields.RequestMethod
+		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
 	}
 
-	http.setBody(httpDetails["request"].(common.MapStr), requ)
-	http.setBody(httpDetails["response"].(common.MapStr), resp)
+	if resp != nil {
+		http.decodeBody(resp)
 
-	timestamp := requ.ts
-	fields := common.MapStr{
-		"type":         "http",
-		"status":       status,
-		"responsetime": responseTime,
-		"method":       requ.method,
-		"path":         path,
-		"query":        fmt.Sprintf("%s %s", requ.method, path),
-		"http":         httpDetails,
-		"bytes_out":    resp.size,
-		"bytes_in":     requ.size,
-		"src":          &src,
-		"dst":          &dst,
-	}
+		pbf.Destination.Bytes = int64(resp.size)
+		pbf.Event.End = resp.ts
+		pbf.Error.Message = append(pbf.Error.Message, resp.notes...)
 
-	if http.sendRequest {
-		fields["request"] = string(http.cutMessageBody(requ))
-	}
-	if http.sendResponse {
-		fields["response"] = string(http.cutMessageBody(resp))
-	}
+		// http
+		httpFields.ResponseStatusCode = int64(resp.statusCode)
+		httpFields.ResponseStatusPhrase = bytes.ToLower(resp.statusPhrase)
+		httpFields.ResponseBytes = int64(resp.size)
+		httpFields.ResponseBodyBytes = int64(resp.contentLength)
+		if resp.sendBody && len(resp.body) > 0 {
+			httpFields.ResponseBodyBytes = int64(len(resp.body))
+			httpFields.ResponseBodyContent = common.NetString(resp.body)
+		}
+		httpFields.ResponseHeaders = http.collectHeaders(resp)
 
-	if len(requ.notes)+len(resp.notes) > 0 {
-		fields["notes"] = append(requ.notes, resp.notes...)
-	}
-	if len(requ.realIP) > 0 {
-		fields["real_ip"] = requ.realIP
+		// packetbeat root fields
+		if http.sendResponse {
+			fields["response"] = string(http.makeRawMessage(resp))
+		}
 	}
 
-	return beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
+	pb.MarshalStruct(evt.Fields, "http", httpFields)
+	return evt
+}
+
+func (http *httpPlugin) makeRawMessage(m *message) string {
+	if m.sendBody {
+		var b strings.Builder
+		b.Grow(len(m.rawHeaders) + len(m.body))
+		b.Write(m.rawHeaders)
+		b.Write(m.body)
+		return b.String()
 	}
+	return string(m.rawHeaders)
 }
 
 func (http *httpPlugin) publishTransaction(event beat.Event) {
@@ -521,7 +627,7 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 	http.results(event)
 }
 
-func (http *httpPlugin) collectHeaders(m *message) interface{} {
+func (http *httpPlugin) collectHeaders(m *message) common.MapStr {
 	hdrs := map[string]interface{}{}
 
 	hdrs["content-length"] = m.contentLength
@@ -530,19 +636,18 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 	}
 
 	if http.parserConfig.sendHeaders {
-
 		cookie := "cookie"
 		if !m.isRequest {
 			cookie = "set-cookie"
 		}
 
 		for name, value := range m.headers {
-			if strings.ToLower(name) == "content-type" {
+			switch {
+			case bytes.Equal([]byte(name), nameContentLength),
+				bytes.Equal([]byte(name), nameContentType):
 				continue
 			}
-			if strings.ToLower(name) == "content-length" {
-				continue
-			}
+
 			if http.splitCookie && name == cookie {
 				hdrs[name] = splitCookiesHeader(string(value))
 			} else {
@@ -553,11 +658,36 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 	return hdrs
 }
 
-func (http *httpPlugin) setBody(result common.MapStr, m *message) {
-	body := string(http.extractBody(m))
-	if len(body) > 0 {
-		result["body"] = body
+func (http *httpPlugin) decodeBody(m *message) {
+	if m.saveBody && len(m.body) > 0 {
+		if http.mustDecodeBody && len(m.encodings) > 0 {
+			var err error
+			m.body, err = decodeBody(m.body, m.encodings, http.maxMessageSize)
+			if err != nil {
+				// Body can contain partial data
+				m.notes = append(m.notes, err.Error())
+			}
+		}
 	}
+}
+
+func decodeBody(body []byte, encodings []string, maxSize int) (result []byte, err error) {
+	if isDebug {
+		debugf("decoding body with encodings=%v", encodings)
+	}
+	for idx := len(encodings) - 1; idx >= 0; idx-- {
+		format := encodings[idx]
+		body, err = decodeHTTPBody(body, format, maxSize)
+		if err != nil {
+			// Do not output a partial body unless failure occurs on the
+			// last decoder.
+			if idx != 0 {
+				body = nil
+			}
+			return body, errors.Wrapf(err, "unable to decode body using %s encoding", format)
+		}
+	}
+	return body, nil
 }
 
 func splitCookiesHeader(headerVal string) map[string]string {
@@ -583,57 +713,36 @@ func parseCookieValue(raw string) string {
 	return raw
 }
 
-func (http *httpPlugin) extractBody(m *message) []byte {
-	body := []byte{}
-
-	if len(m.contentType) > 0 && http.shouldIncludeInBody(m.contentType) {
-		if len(m.chunkedBody) > 0 {
-			body = append(body, m.chunkedBody...)
-		} else {
-			if isDebug {
-				debugf("Body to include: [%s]", m.raw[m.bodyOffset:])
-			}
-			body = append(body, m.raw[m.bodyOffset:]...)
+func extractHostHeader(header string) (host string, port int) {
+	if len(header) == 0 || net.ParseIP(header) != nil {
+		return header, port
+	}
+	// Split :port trailer
+	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
+		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
+			header, port = header[:pos], num
 		}
 	}
-
-	return body
-}
-
-func (http *httpPlugin) cutMessageBody(m *message) []byte {
-	cutMsg := []byte{}
-
-	// add headers always
-	cutMsg = m.raw[:m.bodyOffset]
-
-	// add body
-	return append(cutMsg, http.extractBody(m)...)
-}
-
-func (http *httpPlugin) shouldIncludeInBody(contenttype []byte) bool {
-	includedBodies := http.includeBodyFor
-	for _, include := range includedBodies {
-		if bytes.Contains(contenttype, []byte(include)) {
-			if isDebug {
-				debugf("Should Include Body = true Content-Type %s include_body %s",
-					contenttype, include)
-			}
-			return true
-		}
-		if isDebug {
-			debugf("Should Include Body = false Content-Type %s include_body %s",
-				contenttype, include)
-		}
+	// Remove square bracket boxing of IPv6 address.
+	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
+		header = header[1:last]
 	}
-	return false
+	return header, port
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {
+	for _, header := range http.redactHeaders {
+		if _, exists := m.headers[header]; exists {
+			m.headers[header] = []byte("REDACTED")
+		}
+	}
+
 	if !m.isRequest || !http.redactAuthorization {
 		return
 	}
 
-	msg := m.raw
+	msg := m.rawHeaders
+	limit := len(msg)
 
 	// byte64 != encryption, so obscure it in headers in case of Basic Authentication
 
@@ -641,24 +750,24 @@ func (http *httpPlugin) hideHeaders(m *message) {
 	authText := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
 
 	authHeaderStartX := m.headerOffset
-	authHeaderEndX := m.bodyOffset
+	authHeaderEndX := limit
 
-	for authHeaderStartX < m.bodyOffset {
+	for authHeaderStartX < limit {
 		if isDebug {
 			debugf("looking for authorization from %d to %d",
 				authHeaderStartX, authHeaderEndX)
 		}
 
-		startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
+		startOfHeader := bytes.Index(msg[authHeaderStartX:], authText)
 		if startOfHeader >= 0 {
 			authHeaderStartX = authHeaderStartX + startOfHeader
 
-			endOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], []byte("\r\n"))
+			endOfHeader := bytes.Index(msg[authHeaderStartX:], constCRLF)
 			if endOfHeader >= 0 {
 				authHeaderEndX = authHeaderStartX + endOfHeader
 
-				if authHeaderEndX > m.bodyOffset {
-					authHeaderEndX = m.bodyOffset
+				if authHeaderEndX > limit {
+					authHeaderEndX = limit
 				}
 
 				if isDebug {
@@ -670,8 +779,8 @@ func (http *httpPlugin) hideHeaders(m *message) {
 				}
 			}
 		}
-		authHeaderStartX = authHeaderEndX + len("\r\n")
-		authHeaderEndX = m.bodyOffset
+		authHeaderStartX = authHeaderEndX + len(constCRLF)
+		authHeaderEndX = len(m.rawHeaders)
 	}
 
 	for _, header := range redactHeaders {
@@ -679,8 +788,6 @@ func (http *httpPlugin) hideHeaders(m *message) {
 			m.headers[header] = []byte("*")
 		}
 	}
-
-	m.raw = msg
 }
 
 func (http *httpPlugin) hideSecrets(values url.Values) url.Values {
@@ -700,7 +807,7 @@ func (http *httpPlugin) hideSecrets(values url.Values) url.Values {
 // extractParameters parses the URL and the form parameters and replaces the secrets
 // with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
 // Returns the Request URI path and the (adjusted) parameters.
-func (http *httpPlugin) extractParameters(m *message, msg []byte) (path string, params string, err error) {
+func (http *httpPlugin) extractParameters(m *message) (path string, params string, err error) {
 	var values url.Values
 
 	u, err := url.Parse(string(m.requestURI))
@@ -712,9 +819,9 @@ func (http *httpPlugin) extractParameters(m *message, msg []byte) (path string, 
 
 	paramsMap := http.hideSecrets(values)
 
-	if m.contentLength > 0 && bytes.Contains(m.contentType, []byte("urlencoded")) {
+	if m.contentLength > 0 && m.saveBody && bytes.Contains(m.contentType, []byte("urlencoded")) {
 
-		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
+		values, err = url.ParseQuery(string(m.body))
 		if err != nil {
 			return
 		}
@@ -738,6 +845,33 @@ func (http *httpPlugin) isSecretParameter(key string) bool {
 		}
 	}
 	return false
+}
+
+func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
+	conn := getHTTPConnection(private)
+	if conn == nil {
+		return
+	}
+	if isDebug {
+		debugf("expired connection %s", tuple)
+	}
+	// terminate streams
+	for dir, s := range conn.streams {
+		// Do not send incomplete or empty messages
+		if s != nil && s.message != nil && s.message.headersReceived() {
+			if isDebug {
+				debugf("got message %+v", s.message)
+			}
+			http.handleHTTP(conn, s.message, tuple, uint8(dir))
+			s.PrepareForNewMessage()
+		}
+	}
+	// correlate transactions
+	http.correlate(conn)
+
+	// flush uncorrelated requests and responses
+	http.flushRequests(conn)
+	http.flushResponses(conn)
 }
 
 func (ml *messageList) append(msg *message) {

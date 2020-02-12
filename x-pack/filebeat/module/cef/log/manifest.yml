@@ -1,0 +1,24 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/cef.log
+  - name: tags
+    default: [cef]
+  - name: syslog_host
+    default: localhost
+  - name: syslog_port
+    default: 9003
+  - name: input
+    default: syslog
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/fp-pipeline.yml
+
+input: config/input.yml
+
+requires.processors:
+  - name: geoip
+    plugin: ingest-geoip

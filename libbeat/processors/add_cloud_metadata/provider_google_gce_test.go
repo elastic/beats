@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_cloud_metadata
 
 import (
@@ -123,7 +140,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,14 +151,18 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "gce",
-				"instance_id":       "3910564293633576924",
-				"instance_name":     "test-gce-dev",
-				"machine_type":      "projects/111111111111/machineTypes/f1-micro",
-				"availability_zone": "projects/111111111111/zones/us-east1-b",
-				"project_id":        "test-dev",
+		"cloud": common.MapStr{
+			"provider": "gcp",
+			"instance": common.MapStr{
+				"id":   "3910564293633576924",
+				"name": "test-gce-dev",
+			},
+			"machine": common.MapStr{
+				"type": "f1-micro",
+			},
+			"availability_zone": "us-east1-b",
+			"project": common.MapStr{
+				"id": "test-dev",
 			},
 		},
 	}

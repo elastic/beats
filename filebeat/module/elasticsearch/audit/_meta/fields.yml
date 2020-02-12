@@ -1,0 +1,65 @@
+- name: audit
+  type: group
+  description: >
+  fields:
+    - name: layer
+      description: "The layer from which this event originated: rest, transport or ip_filter"
+      example: "rest"
+      type: keyword
+    - name: event_type
+      description: "The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied"
+      example: "access_granted"
+      type: keyword
+    - name: origin.type
+      description: "Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)"
+      example: "local_node"
+      type: keyword
+    - name: realm
+      description: "The authentication realm the authentication was validated against"
+      example": "default_file"
+      type: keyword
+    - name: user.realm
+      description: "The user's authentication realm, if authenticated"
+      example": "active_directory"
+      type: keyword
+    - name: user.roles
+      description: "Roles to which the principal belongs"
+      example: [ "kibana_user", "beats_admin" ]
+      type: keyword
+    - name: action
+      description: "The name of the action that was executed"
+      example: "cluster:monitor/main"
+      type: keyword
+    - name: url.params
+      description: "REST URI parameters"
+      example: "{username=jacknich2}"
+    - name: indices
+      description: "Indices accessed by action"
+      example: [ "foo-2019.01.04", "foo-2019.01.03", "foo-2019.01.06" ]
+      type: keyword
+    - name: request.id
+      description: "Unique ID of request"
+      example: "WzL_kb6VSvOhAq0twPvHOQ"
+      type: keyword
+    - name: request.name
+      description: "The type of request that was executed"
+      example: "ClearScrollRequest"
+      type: keyword
+    - name: request_body
+      type: alias
+      path: http.request.body.content
+      migration: true
+    - name: origin_address
+      type: alias
+      path: source.ip
+      migration: true
+    - name: uri
+      type: alias
+      path: url.original
+      migration: true
+    - name: principal
+      type: alias
+      path: user.name
+      migration: true
+    - name: message
+      type: text

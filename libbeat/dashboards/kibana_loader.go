@@ -1,14 +1,33 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dashboards
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/setup/kibana"
 )
 
 var importAPI = "/api/kibana/dashboards/import"
@@ -16,18 +35,19 @@ var importAPI = "/api/kibana/dashboards/import"
 type KibanaLoader struct {
 	client       *kibana.Client
 	config       *Config
-	version      string
+	version      common.Version
 	hostname     string
 	msgOutputter MessageOutputter
 }
 
-func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
+// NewKibanaLoader creates a new loader to load Kibana files
+func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
 	}
 
-	client, err := kibana.NewKibanaClient(cfg)
+	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
 	}
@@ -40,15 +60,30 @@ func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, hostname stri
 		msgOutputter: msgOutputter,
 	}
 
-	loader.statusMsg("Initialize the Kibana %s loader", client.GetVersion())
+	version := client.GetVersion()
+	loader.statusMsg("Initialize the Kibana %s loader", version.String())
 
 	return &loader, nil
 }
 
-func (loader KibanaLoader) ImportIndex(file string) error {
-	params := url.Values{}
-	params.Set("force", "true") //overwrite the existing dashboards
+func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, retryAttempt uint) (*kibana.Client, error) {
+	client, err := kibana.NewKibanaClient(cfg)
+	if err != nil {
+		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
+			select {
+			case <-ctx.Done():
+				return nil, err
+			case <-time.After(retryCfg.Interval):
+				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1)
+			}
+		}
+		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+	}
+	return client, nil
+}
 
+// ImportIndexFile imports an index pattern from a file
+func (loader KibanaLoader) ImportIndexFile(file string) error {
 	// read json file
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -61,11 +96,19 @@ func (loader KibanaLoader) ImportIndex(file string) error {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
 	}
 
-	indexContent = ReplaceIndexInIndexPattern(loader.config.Index, indexContent)
+	return loader.ImportIndex(indexContent)
+}
 
+// ImportIndex imports the passed index pattern to Kibana
+func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
+	params := url.Values{}
+	params.Set("force", "true") //overwrite the existing dashboards
+
+	indexContent := ReplaceIndexInIndexPattern(loader.config.Index, pattern)
 	return loader.client.ImportJSON(importAPI, params, indexContent)
 }
 
+// ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	params := url.Values{}
 	params.Set("force", "true")            //overwrite the existing dashboards

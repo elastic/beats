@@ -1,0 +1,8 @@
+#Software: Microsoft HTTP API 2.0
+#Version: 1.0
+#Date: 2018-01-01 08:09:10
+#Fields: date time c-ip c-port s-ip s-port cs-version cs-method cs-uri sc-status s-siteid s-reason s-queuename
+2018-01-01 08:09:10 172.31.77.6 2094 172.31.77.6 80 HTTP/1.1 GET /qos/1kbfile.txt 503 - ConnLimit -
+2018-01-01 09:10:11 85.181.35.98 2780 127.0.0.1 80 HTTP/1.1 GET /ThisIsMyUrl.htm 400 - Hostname -
+2018-01-01 10:11:12 85.181.35.98 2894 127.0.0.1 80 HTTP/2.0 GET / 505 - Version_N/S -
+2018-01-01 11:12:13 85.181.35.98 64388 127.0.0.1 80 - - - - - Timer_MinBytesPerSecond -

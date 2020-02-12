@@ -11,7 +11,7 @@ are available. As a developer, you can use Heartbeat in two different ways:
 * Create your own Beat and use Heartbeat as a library
 
 We recommend that you start by creating your own Beat to keep the development of
-your own monintors independent of Heartbeat. At a later stage, if you decide to
+your own monitors independent of Heartbeat. At a later stage, if you decide to
 add a monitor to Heartbeat, you can reuse the code without making additional changes.
 
 The following topics describe how to contribute to Heartbeat by adding new monitors

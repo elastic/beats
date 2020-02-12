@@ -20,6 +20,7 @@ class Test(BaseTest):
 
         objs = self.read_output()
         assert all([o["type"] == "redis" for o in objs])
+        assert all([o["event.dataset"] == "redis" for o in objs])
 
         assert objs[0]["method"] == "SET"
         assert objs[0]["resource"] == "key3"
@@ -45,8 +46,8 @@ class Test(BaseTest):
         assert all([isinstance(o["resource"], six.string_types) for o in objs[3:]])
         assert all([isinstance(o["query"], six.string_types) for o in objs[3:]])
 
-        assert all(["bytes_in" in o for o in objs])
-        assert all(["bytes_out" in o for o in objs])
+        assert all(["source.bytes" in o for o in objs])
+        assert all(["destination.bytes" in o for o in objs])
 
     def test_byteout_bytein(self):
         """
@@ -60,7 +61,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert all([o["type"] == "redis" for o in objs])
 
-        assert all([isinstance(o["bytes_out"], int) for o in objs])
-        assert all([isinstance(o["bytes_in"], int) for o in objs])
-        assert all([o["bytes_out"] > 0 for o in objs])
-        assert all([o["bytes_in"] > 0 for o in objs])
+        assert all([isinstance(o["source.bytes"], int) for o in objs])
+        assert all([isinstance(o["destination.bytes"], int) for o in objs])
+        assert all([o["source.bytes"] > 0 for o in objs])
+        assert all([o["destination.bytes"] > 0 for o in objs])

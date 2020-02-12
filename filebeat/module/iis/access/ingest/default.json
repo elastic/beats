@@ -1,0 +1,134 @@
+{
+    "description": "Pipeline for parsing IIS access logs. Requires the geoip and user_agent plugins.",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:destination.address} %{WORD:http.request.method} %{NOTSPACE:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} %{NOTSPACE:user_agent.original} %{NOTSPACE:http.request.referrer} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:temp.duration:long}",
+                    "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{WORD:http.request.method} %{NOTSPACE:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} %{NOTSPACE:user_agent.original} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:http.response.body.bytes:long} %{NUMBER:http.request.body.bytes:long} %{NUMBER:temp.duration:long}",
+                    "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{NOTSPACE:iis.access.server_name} %{IPORHOST:destination.address} %{WORD:http.request.method} %{NOTSPACE:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} HTTP/%{NUMBER:http.version} %{NOTSPACE:user_agent.original} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:http.response.body.bytes:long} %{NUMBER:http.request.body.bytes:long} %{NUMBER:temp.duration:long}",
+                    "%{TIMESTAMP_ISO8601:iis.access.time} \\[%{IPORHOST:destination.address}\\]\\(http://%{IPORHOST:destination.address}\\) %{WORD:http.request.method} %{NOTSPACE:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} \\[%{IPORHOST:source.address}\\]\\(http://%{IPORHOST:source.address}\\) %{NOTSPACE:user_agent.original} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:temp.duration:long}",
+                    "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:destination.address} %{WORD:http.request.method} %{NOTSPACE:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} %{NOTSPACE:user_agent.original} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:temp.duration:long}"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "date": {
+                "field": "iis.access.time",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd HH:mm:ss"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": "iis.access.time"
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+                "params": {
+                    "scale": 1000000
+                },
+                "if": "ctx.temp?.duration != null"
+            }
+        },
+        {
+            "remove": {
+                "field": "temp.duration",
+                "ignore_missing": true
+            }
+        },
+        {
+            "urldecode": {
+                "field": "user_agent.original"
+            }
+        },
+        {
+            "user_agent": {
+                "field": "user_agent.original"
+            }
+        },
+        {
+            "grok": {
+                "field": "destination.address",
+                "ignore_failure": true,
+                "patterns": [
+                    "%{NOZONEIP:destination.ip}"
+                ],
+                "pattern_definitions": {
+                    "NOZONEIP": "[^%]*"
+                }
+            }
+        },
+        {
+            "grok": {
+                "field": "source.address",
+                "ignore_failure": true,
+                "patterns": [
+                    "%{NOZONEIP:source.ip}"
+                ],
+                "pattern_definitions": {
+                    "NOZONEIP": "[^%]*"
+                }
+            }
+        },
+        {
+            "geoip": {
+                "field": "source.ip",
+                "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

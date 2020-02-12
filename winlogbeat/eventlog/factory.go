@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package eventlog
 
 import (
@@ -11,14 +28,14 @@ import (
 )
 
 var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
-	"tags", "processors"}
+	"tags", "processors", "index"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration
 // options.
 type ConfigCommon struct {
 	API  string `config:"api"`  // Name of the API to use. Optional.
-	Name string `config:"name"` // Name of the event log or channel.
+	Name string `config:"name"` // Name of the event log or channel or file.
 }
 
 type validator interface {
@@ -28,23 +45,19 @@ type validator interface {
 func readConfig(
 	c *common.Config,
 	config interface{},
-	validKeys []string,
+	validKeys common.StringSet,
 ) error {
 	if err := c.Unpack(config); err != nil {
-		return fmt.Errorf("Failed unpacking config. %v", err)
+		return fmt.Errorf("failed unpacking config. %v", err)
 	}
 
 	var errs multierror.Errors
 	if len(validKeys) > 0 {
-		sort.Strings(validKeys)
-
 		// Check for invalid keys.
 		for _, k := range c.GetFields() {
-			k = strings.ToLower(k)
-			i := sort.SearchStrings(validKeys, k)
-			if i >= len(validKeys) || validKeys[i] != k {
-				errs = append(errs, fmt.Errorf("Invalid event log key '%s' "+
-					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+			if !validKeys.Has(k) {
+				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
+					"found. Valid keys are %s", k, strings.Join(validKeys.ToSlice(), ", ")))
 			}
 		}
 	}

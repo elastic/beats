@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_cloud_metadata
 
 import (
@@ -50,7 +67,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,14 +78,16 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":      "az",
-				"instance_id":   "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-				"instance_name": "test-az-vm",
-				"machine_type":  "Standard_D3_v2",
-				"region":        "eastus2",
+		"cloud": common.MapStr{
+			"provider": "az",
+			"instance": common.MapStr{
+				"id":   "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+				"name": "test-az-vm",
 			},
+			"machine": common.MapStr{
+				"type": "Standard_D3_v2",
+			},
+			"region": "eastus2",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

@@ -1,0 +1,47 @@
+- name: server
+  type: group
+  description: 'server contains the metrics reported by the four-letter `srvr` command.'
+  release: ga
+  fields:
+    - name: connections
+      type: long
+      description: Number of clients currently connected to the server
+    - name: latency
+      type: group
+      fields:
+        - name: avg
+          type: long
+          description: Average amount of time taken for the server to respond to a client request
+        - name: max
+          type: long
+          description: Maximum amount of time taken for the server to respond to a client request
+        - name: min
+          type: long
+          description: Minimum amount of time taken for the server to respond to a client request
+    - name: mode
+      type: keyword
+      description: Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone
+    - name: node_count
+      type: long
+      description: Total number of nodes
+    - name: outstanding
+      type: long
+      description: Number of requests queued at the server. This exceeds zero when the server receives more requests than it is able to process
+    - name: received
+      type: long
+      description: Number of requests received by the server
+    - name: sent
+      type: long
+      description: Number of requests sent by the server
+    - name: version_date
+      type: date
+      description: Date of the Zookeeper release currently in use
+    - name: zxid
+      type: keyword
+      description: Unique value of the Zookeeper transaction ID. The zxid consists of an epoch and a counter. It is established by the leader and is used to determine the temporal ordering of changes
+    - name: count
+      type: long
+      description: Total transactions of the leader in epoch
+    - name: epoch
+      type: long
+      description: Epoch value of the Zookeeper transaction ID. An epoch signifies the period in which a server is a leader

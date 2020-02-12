@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package wineventlog
 
 import (
@@ -19,7 +36,7 @@ import (
 var (
 	// ErrorEvtVarTypeNull is an error that means the content of the EVT_VARIANT
 	// data is null.
-	ErrorEvtVarTypeNull = errors.New("Null EVT_VARIANT data")
+	ErrorEvtVarTypeNull = errors.New("null EVT_VARIANT data")
 )
 
 // bookmarkTemplate is a parameterized string that requires two parameters,
@@ -86,6 +103,44 @@ loop:
 	return channels, nil
 }
 
+// EvtOpenLog gets a handle to a channel or log file that you can then use to
+// get information about the channel or log file.
+func EvtOpenLog(session EvtHandle, path string, flags EvtOpenLogFlag) (EvtHandle, error) {
+	var err error
+	var pathPtr *uint16
+	if path != "" {
+		pathPtr, err = syscall.UTF16PtrFromString(path)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return _EvtOpenLog(session, pathPtr, uint32(flags))
+}
+
+// EvtQuery runs a query to retrieve events from a channel or log file that
+// match the specified query criteria.
+func EvtQuery(session EvtHandle, path string, query string, flags EvtQueryFlag) (EvtHandle, error) {
+	var err error
+	var pathPtr *uint16
+	if path != "" {
+		pathPtr, err = syscall.UTF16PtrFromString(path)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	var queryPtr *uint16
+	if query != "" {
+		queryPtr, err = syscall.UTF16PtrFromString(query)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return _EvtQuery(session, pathPtr, queryPtr, uint32(flags))
+}
+
 // Subscribe creates a new subscription to an event log channel.
 func Subscribe(
 	session EvtHandle,
@@ -119,6 +174,12 @@ func Subscribe(
 	}
 
 	return eventHandle, nil
+}
+
+// EvtSeek seeks to a specific event in a query result set.
+func EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, flags EvtSeekFlag) error {
+	_, err := _EvtSeek(resultSet, position, bookmark, 0, uint32(flags))
+	return err
 }
 
 // EventHandles reads the event handles from a subscription. It attempt to read

@@ -1,10 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package status
 
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 type uwsgiCore struct {
@@ -58,15 +77,13 @@ type uwsgiStat struct {
 	// Sockets []UwsgiSocket `json:"sockets"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 	var stats uwsgiStat
 	err := json.Unmarshal(content, &stats)
 	if err != nil {
-		logp.Err("uwsgi statistics parsing failed with error: ", err)
-		return nil, err
+		return errors.Wrap(err, "uwsgi statistics parsing failed")
 	}
 
-	events := []common.MapStr{}
 	totalRequests := 0
 	totalExceptions := 0
 	totalWriteErrors := 0
@@ -116,11 +133,11 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 					"read_errors":  core.ReadErrors,
 				},
 			}
-			events = append(events, coreEvent)
+			reporter.Event(mb.Event{MetricSetFields: coreEvent})
 			coreID++
 		}
 
-		events = append(events, workerEvent)
+		reporter.Event(mb.Event{MetricSetFields: workerEvent})
 	}
 
 	// overall
@@ -134,6 +151,6 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		},
 	}
 
-	events = append(events, baseEvent)
-	return events, nil
+	reporter.Event(mb.Event{MetricSetFields: baseEvent})
+	return nil
 }

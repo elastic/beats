@@ -1,7 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package logstash
 
 import (
+	"errors"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -10,7 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/go-lumber/client/v2"
+	v2 "github.com/elastic/go-lumber/client/v2"
 )
 
 type asyncClient struct {
@@ -20,6 +39,8 @@ type asyncClient struct {
 	win      *window
 
 	connect func() error
+
+	mutex sync.Mutex
 }
 
 type msgRef struct {
@@ -51,7 +72,7 @@ func newAsyncClient(
 		logp.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(beat, config.Index)
+	enc := makeLogstashEventEncoder(beat, config.EscapeHTML, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
@@ -96,7 +117,11 @@ func (c *asyncClient) Connect() error {
 }
 
 func (c *asyncClient) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	logp.Debug("logstash", "close connection")
+
 	if c.client != nil {
 		err := c.client.Close()
 		c.client = nil
@@ -152,6 +177,10 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 	return nil
 }
 
+func (c *asyncClient) String() string {
+	return "async(" + c.Client.String() + ")"
+}
+
 func (c *asyncClient) publishWindowed(
 	ref *msgRef,
 	events []publisher.Event,
@@ -176,12 +205,23 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
+	client := c.getClient()
+	if client == nil {
+		return errors.New("connection closed")
+	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}
 	ref.count.Inc()
-	return c.client.Send(ref.callback, window)
+	return client.Send(ref.callback, window)
+}
+
+func (c *asyncClient) getClient() *v2.AsyncClient {
+	c.mutex.Lock()
+	client := c.client
+	c.mutex.Unlock()
+	return client
 }
 
 func (r *msgRef) callback(seq uint32, err error) {

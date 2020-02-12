@@ -18,25 +18,116 @@ example, the Nginx module has `access` and `error` filesets. You can contribute
 a new module (with at least one fileset), or a new fileset for an existing
 module.
 
+NOTE: In this guide we use `{module}` and `{fileset}` as placeholders for the
+module and fileset names. You need to replace these with the actual names you
+entered when your created the module and fileset. Only use characters `[a-z]` and, if required, underscores (`_`). No other characters are allowed.
+
+[float]
+=== Creating a new module
+
+Run the following command in the `filebeat` folder:
+
+[source,bash]
+----
+make create-module MODULE={module}
+----
+
+After running the `make create-module` command, you'll find the module,
+along with its generated files, under `module/{module}`. This
+directory contains the following files:
+
+[source,bash]
+----
+module/{module}
+├── module.yml
+└── _meta
+    └── docs.asciidoc
+    └── fields.yml
+    └── kibana
+----
+
+Let's look at these files one by one.
+
+[float]
+==== module.yml
+
+This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards.
+Each dashboard is defined by an id and the name of json file where the dashboard is saved locally.
+At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset.
+Please ensure that this settings are correct.
+
+[float]
+==== _meta/docs.asciidoc
+
+This file contains module-specific documentation. You should include information
+about which versions of the service were tested and the variables that are
+defined in each fileset.
+
+[float]
+==== _meta/fields.yml
+
+The module level `fields.yml` contains descriptions for the module-level fields.
+Please review and update the title and the descriptions in this file. The title
+is used as a title in the docs, so it's best to capitalize it.
+
+[float]
+==== _meta/kibana
+
+This folder contains the sample Kibana dashboards for this module. To create
+them, you can build them visually in Kibana and then export them with `export_dashboards`.
+
+The tool will export all of the dashboard dependencies (visualizations,
+saved searches) automatically.
+
+You can see various ways of using `export_dashboards` at <<export-dashboards>>.
+The recommended way to export them is to list your dashboards in your module's
+`module.yml` file:
+
+[source,yaml]
+----
+dashboards:
+- id: 69f5ae20-eb02-11e7-8f04-beef1daadb05
+  file: mymodule-overview.json
+- id: c0a7ce90-cafe-4242-8647-534bb4c21040
+  file: mymodule-errors.json
+----
+
+Then run `export_dashboards` like this:
+
+[source,shell]
+----
+$ cd dev-tools/cmd/dashboards
+$ make # if export_dashboard is not built yet
+$ ./export_dashboards -yml '../../../filebeat/module/{module}/module.yml'
+----
+
+New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards
+that are compatible with 5.x, run the following command inside the developer virtualenv:
+
+[source,shell]
+----
+$ cd filebeat
+$ make python-env
+$ cd module/{module}/
+$ python ../../../dev-tools/export_5x_dashboards.py --regex {module} --dir _meta/kibana/5.x
+----
+
+Where the `--regex` parameter should match the dashboard you want to export.
+
+Please note that dashboards exported from Kibana 5.x are not compatible with Kibana 6.x.
+
+You can find more details about the process of creating and exporting the Kibana
+dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].
+
 [float]
 === Creating a new fileset
 
-Regardless of whether you are creating a fileset in a new or existing module,
-the procedure is similar. Run the following command in the `filebeat` folder:
+Run the following command in the `filebeat` folder:
 
 [source,bash]
 ----
 make create-fileset MODULE={module} FILESET={fileset}
 ----
-
-Only use characters `[a-z]` and, if required, underscores (`_`).
-No other characters are allowed.
-For the module name, you can us either a new module name or an existing module
-name. If the module doesn't exist, it will be created.
-
-NOTE: In this guide we use `{fileset}` and `{module}` as placeholders for the
-fileset and module names. You need to replace these with the actual names you
-entered when your created the module and fileset.
 
 After running the `make create-fileset` command, you'll find the fileset,
 along with its generated files, under `module/{module}/{fileset}`. This
@@ -104,8 +195,7 @@ There's quite a lot going on in this file, so let's break it down:
   element: `"/example/test.log*"`.
 * Note that variable values don't have to be strings.
   They can be also numbers, objects, or as shown in this example, arrays.
-* We will use the `paths` variable to set the prospector
-  {filebeat}/configuration-filebeat-options.html#prospector-paths[paths]
+* We will use the `paths` variable to set the input `paths`
   setting, so "glob" values can be used here.
 * Besides the `default` value, the file defines values for particular
   operating systems: a default for darwin/OS X/macOS systems and a default for
@@ -114,13 +204,13 @@ There's quite a lot going on in this file, so let's break it down:
   Filebeat is executed on the respective OS.
 
 Besides the variable definition, the `manifest.yml` file also contains
-references to the ingest pipeline and prospector configuration to use (see next
+references to the ingest pipeline and input configuration to use (see next
 sections):
 
 [source,yaml]
 ----
 ingest_pipeline: ingest/pipeline.json
-prospector: config/testfileset.yml
+input: config/testfileset.yml
 ----
 
 These should point to the respective files from the fileset.
@@ -139,11 +229,29 @@ This example selects the ingest pipeline file based on the value of the
 resolve to `ingest/with_plugins.json` (assuming the variable value isn't
 overridden at runtime.)
 
+In 6.6 and later, you can specify multiple ingest pipelines.
+
+[source,yaml]
+----
+ingest_pipeline:
+  - ingest/main.json
+  - ingest/plain_logs.json
+  - ingest/json_logs.json
+----
+
+When multiple ingest pipelines are specified the first one in the list is
+considered to be the entry point pipeline.
+
+One reason for using multiple pipelines might be to send all logs harvested
+by this fileset to the entry point pipeline and have it delegate different parts of
+the processing to other pipelines. You can read details about setting
+this up in <<ingest-json-entry-point-pipeline, the `ingest/*.json` section>>.
+
 [float]
 ==== config/*.yml
 
-The `config/` folder contains template files that generate Filebeat prospector
-configurations. The Filebeat prospectors are primarily responsible for tailing
+The `config/` folder contains template files that generate Filebeat input
+configurations. The Filebeat inputs are primarily responsible for tailing
 files, filtering, and multi-line stitching, so that's what you configure in the
 template files.
 
@@ -161,16 +269,16 @@ exclude_files: [".gz$"]
 
 You'll find this example in the template file that gets generated automatically
 when you run `make create-fileset`. In this example, the `paths` variable is
-used to construct the `paths` list for the {filebeat}/configuration-filebeat-options.html#prospector-paths[paths] option.
+used to construct the `paths` list for the input `paths` option.
 
 Any template files that you add to the `config/` folder need to generate a valid
-Filebeat prospector configuration in YAML format. The options accepted by the
-prospector configuration are documented in the
-{filebeat}/configuration-filebeat-options.html[Filebeat Prospectors] section of
+Filebeat input configuration in YAML format. The options accepted by the
+input configuration are documented in the
+{filebeat-ref}/configuration-filebeat-options.html[Filebeat Inputs] section of
 the Filebeat documentation.
 
 The template files use the templating language defined by the
-https://golang.org/pkg/text/template/[Golang standard library].
+https://golang.org/pkg/text/template/[Go standard library].
 
 Here is another example that also configures multiline stitching:
 
@@ -196,12 +304,12 @@ variables to dynamically switch between configurations.
 ==== ingest/*.json
 
 The `ingest/` folder contains Elasticsearch
-{elasticsearch}/ingest.html[Ingest Node] pipeline configurations. The Ingest
+{ref}/ingest.html[Ingest Node] pipeline configurations. The Ingest
 Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
 
-The files in this folder are JSON documents representing
-{elasticsearch}/pipeline.html[pipeline definitions]. Just like with the `config/`
+The files in this folder are JSON or YAML documents representing
+{ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
 folder, you can define multiple pipelines, but a single one is loaded at runtime
 based on the information from `manifest.yml`.
 
@@ -222,11 +330,23 @@ The generator creates a JSON object similar to this one:
 }
 ----
 
+Alternatively, you can use YAML formatted pipelines, which uses a simpler syntax:
+
+[source,yaml]
+----
+description: "Pipeline for parsing {module} {fileset} logs"
+processors:
+on_failure:
+ - set:
+     field: error.message
+     value: "{{ _ingest.on_failure_message }}"
+----
+
 From here, you would typically add processors to the `processors` array to do
 the actual parsing. For details on how to use ingest node processors, see the
-{elasticsearch}/ingest-processors.html[ingest node documentation]. In
+{ref}/ingest-processors.html[ingest node documentation]. In
 particular, you will likely find the
-{elasticsearch}/grok-processor.html[Grok processor] to be useful for parsing.
+{ref}/grok-processor.html[Grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -246,9 +366,71 @@ Note that you should follow the convention of naming of fields prefixed with the
 module and fileset name: `{module}.{fileset}.field`, e.g.
 `nginx.access.remote_ip`. Also, please review our <<event-conventions>>.
 
+[[ingest-json-entry-point-pipeline]]
+In 6.6 and later, ingest pipelines can use the
+{ref}/conditionals-with-multiple-pipelines.html[`pipeline` processor] to delegate
+parts of the processings to other pipelines.
+
+This can be useful if you want a fileset to ingest the same _logical_ information
+presented in different formats, e.g. csv vs. json versions of the same log files.
+Imagine an entry point ingest pipeline that detects the format of a log entry and then conditionally
+delegates further processing of that log entry, depending on the format, to another
+pipeline.
+
+["source","json",subs="callouts"]
+----
+{
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "^%{CHAR:first_char}"
+        ],
+        "pattern_definitions": {
+          "CHAR": "."
+        }
+      }
+    },
+    {
+      "pipeline": {
+        "if": "ctx.first_char == '{'",
+        "name": "{< IngestPipeline "json-log-processing-pipeline" >}" <1>
+      }
+    },
+    {
+      "pipeline": {
+        "if": "ctx.first_char != '{'",
+        "name": "{< IngestPipeline "plain-log-processing-pipeline" >}"
+      }
+    }
+  ]
+}
+----
+<1>  Use the `IngestPipeline` template function to resolve the name. This function converts the
+specified name into the fully qualified pipeline ID that is stored in Elasticsearch.
+
+In order for the above pipeline to work, Filebeat must load the entry point pipeline
+as well as any sub-pipelines into Elasticsearch. You can tell Filebeat to do
+so by specifying all the necessary pipelines for the fileset in its `manifest.yml`
+file. The first pipeline in the list is considered to be the entry point pipeline.
+
+[source,yaml]
+----
+ingest_pipeline:
+  - ingest/main.json
+  - ingest/plain_logs.yml
+  - ingest/json_logs.json
+----
+
 While developing the pipeline definition, we recommend making use of the
-{elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
+{ref}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
+
+By default Filebeat does not update Ingest pipelines if already loaded. If you
+want to force updating your pipeline during development, use
+`./filebeat setup --pipelines` command. This uploads pipelines even if they
+are already available on the node.
 
 [float]
 ==== _meta/fields.yml
@@ -274,7 +456,15 @@ make create-fields MODULE={module} FILESET={fileset}
 ----
 
 Please, always check the generated file and make sure the fields are correct.
-Documenatation of fields must be added manually.
+Documentation of fields must be added manually.
+
+If the fields are correct, it is time to generate documentation, configuration
+and Kibana index patterns.
+
+[source,bash]
+----
+make update
+----
 
 [float]
 ==== test
@@ -289,61 +479,3 @@ In addition, assuming you have a `test.log` file, you can add a
 documents as they are found via an Elasticsearch search. In this case, the
 integration tests will automatically check that the result is the same on each
 run.
-
-[float]
-=== Module-level files
-
-Besides the files in the fileset folder, there is also data that needs to be
-filled at the module level.
-
-[float]
-==== module.yml
-
-This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards.
-Each dashboard is defined by an id and the name of json file where the dashboard is saved locally.
-At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset.
-Please ensure that this settings are correct.
-
-[float]
-==== _meta/docs.asciidoc
-
-This file contains module-specific documentation. You should include information
-about which versions of the service were tested and the variables that are
-defined in each fileset.
-
-[float]
-==== _meta/fields.yml
-
-The module level `fields.yml` contains descriptions for the module-level fields.
-Please review and update the title and the descriptions in this file. The title
-is used as a title in the docs, so it's best to capitalize it.
-
-[float]
-==== _meta/kibana
-
-This folder contains the sample Kibana dashboards for this module. To create
-them, you can build them visually in Kibana and then run the following command:
-
-[source,shell]
-----
-$ cd dev-tools/cmd/dashboards
-$ make # if export_dashboard is not built
-$ ./export_dashboards -dashboard '{dashboard-id}' -output '../../../filebeat/module/{module}/_meta/kibana/default/dashboard'
-----
-
-New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards that are compatible with 5.x, run the following command inside the developer virtualenv:
-
-[source,shell]
-----
-$ cd filebeat
-$ make python-env
-$ cd module/{module}/
-$ python ../../../dev-tools/export_5x_dashboards.py --regex {module} --dir _meta/kibana/5.x
-----
-
-Where the `--regex` parameter should match the dashboard you want to export.
-
-Please note that dashboards exported from Kibana 5.x are not compatible with Kibana 6.x.
-
-You can find more details about the process of creating and exporting the Kibana
-dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].

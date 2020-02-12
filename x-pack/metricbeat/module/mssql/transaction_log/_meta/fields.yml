@@ -1,0 +1,68 @@
+- name: transaction_log
+  type: group
+  description: transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+  release: beta
+  fields:
+    - name: space_usage
+      type: group
+      description: Space usage information for the transaction log
+      fields:
+        - name: since_last_backup
+          description: The amount of space used since the last log backup
+          type: group
+          fields:
+            - name: bytes
+              description: The amount of space used since the last log backup in bytes
+              type: long
+        - name: total
+          type: group
+          description: The size of the log
+          fields:
+            - name: bytes
+              description: The size of the log in bytes
+              type: long
+        - name: used
+          type: group
+          description: The occupied size of the log
+          fields:
+            - name: bytes
+              description: The occupied size of the log in bytes
+              type: long
+            - name: pct
+              description: A percentage of the occupied size of the log as a percent of the total log size
+              type: float
+    - name: stats
+      type: group
+      description: Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
+      fields:
+        - name: active_size
+          description: Total active transaction log size.
+          type: group
+          fields:
+            - name: bytes
+              description: Total active transaction log size in bytes
+              type: long
+        - name: backup_time
+          type: date
+          description: Last transaction log backup time.
+        - name: recovery_size
+          type: group
+          description: Log size since log recovery log sequence number (LSN).
+          fields:
+            - name: bytes
+              description: Log size in bytes since log recovery log sequence number (LSN).
+              type: long
+        - name: since_last_checkpoint
+          type: group
+          description: Log size since last checkpoint log sequence number (LSN).
+          fields:
+            - name: bytes
+              description: Log size in bytes since last checkpoint log sequence number (LSN).
+              type: long
+        - name: total_size
+          type: group
+          description: Total transaction log size.
+          fields:
+            - name: bytes
+              description: Total transaction log size in bytes.
+              type: long

@@ -1,9 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package eventlog
 
 import (
 	"expvar"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -65,7 +83,7 @@ func TestReadLargeBatchSize(t *testing.T) {
 	// Publish large test messages.
 	totalEvents := 1000
 	for i := 0; i < totalEvents; i++ {
-		err = log.Report(elog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randString(31800)})
+		err = log.Report(elog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(31800)})
 		if err != nil {
 			t.Fatal("ReportEvent error", err)
 		}
@@ -96,6 +114,26 @@ func TestReadLargeBatchSize(t *testing.T) {
 			t.Log(kv)
 		}
 	})
+}
+
+func TestReadEvtxFile(t *testing.T) {
+	path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	configureLogp()
+	eventlog, teardown := setupWinEventLog(t, 0, map[string]interface{}{
+		"name": path,
+	})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Len(t, records, 32)
 }
 
 func setupWinEventLog(t *testing.T, recordID uint64, options map[string]interface{}) (EventLog, func()) {

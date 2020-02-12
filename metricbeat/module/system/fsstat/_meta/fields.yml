@@ -2,7 +2,7 @@
   type: group
   description: >
     `system.fsstat` contains filesystem metrics aggregated from all mounted
-    filesystems, similar with what `df -a` prints out.
+    filesystems.
   release: ga
   fields:
     - name: count

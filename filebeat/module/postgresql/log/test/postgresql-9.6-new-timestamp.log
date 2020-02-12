@@ -1,0 +1,5 @@
+2017-07-31 13:36:43 EST [835-1] LOG:  autovacuum launcher started
+2017-07-31 13:36:44 EST [832-1] LOG:  checkpoints are occurring too frequently (25 seconds apart)
+2017-07-31 13:46:02 EST [832-2] HINT:  Consider increasing the configuration parameter "max_wal_size".
+2017-07-31 13:46:23 EST [768-1] postgres@postgres FATAL:  the database system is starting up
+2017-07-31 13:46:55 EST [771-1] postgres@postgres FATAL:  the database system is starting up

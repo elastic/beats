@@ -88,7 +88,7 @@ run Packetbeat with the following command:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-packetbeat -devices
+packetbeat devices
 ----------------------------------------------------------------------
 
 This command returns a list that looks something like the following:
@@ -135,7 +135,7 @@ packetbeat.interfaces.snaplen: 1514
 [float]
 ==== `type`
 
-Packetbeat supports three sniffer types:
+Packetbeat supports these sniffer types:
 
  * `pcap`, which uses the libpcap library and works on most platforms, but
    it's not the fastest option.
@@ -177,6 +177,26 @@ packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
 [float]
+==== `auto_promisc_mode`
+
+With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+This option does not work with `any` interface device.
+The default option is false and requires manual set-up of promiscuous mode.
+Warning: under some circumstances (e.g beat crash) promiscuous mode
+can stay enabled even after beat is shut down.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
+packetbeat.interfaces.auto_promisc_mode: true
+------------------------------------------------------------------------------
+
+
+[float]
 ==== `with_vlans`
 
 Packetbeat automatically generates a
@@ -204,7 +224,7 @@ You can use the `bpf_filter` setting to overwrite the generated BPF filter. For 
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.interfaces.device: eth0
-packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 or port 3306"
 ------------------------------------------------------------------------------
 
 NOTE: This setting disables automatic generation of the BPF filter. If
@@ -226,7 +246,7 @@ For example, in the following scenario, you see a 3-server architecture
 where a Beat is installed on each server. t1 is the transaction exchanged between
 Server1 and Server2, and t2 is the transaction between Server2 and Server3.
 
-image:./images/option_ignore_outgoing.png[Beats Architecture]
+image::./images/option_ignore_outgoing.png[Beats Architecture]
 
 By default, each transaction is indexed twice because Beat2
 sees both transactions. So you would see the following published transactions
@@ -265,7 +285,7 @@ data.
 
 Here's an example of flow events visualized in the Flows dashboard:
 
-image:./images/flows.png[]
+image::./images/flows.png[]
 
 To configure flows, use the `packetbeat.flows` option in the +{beatname_lc}.yml+
 config file. Flows are enabled by default. If this section is missing
@@ -284,45 +304,52 @@ Here’s an example of a flow information sent by Packetbeat. See
 ["source","json",subs="attributes"]
 --------------------------------------------------------------------------------
 {
-  "@timestamp": "2017-05-03T19:42:40.003Z",
-  "beat": {
+  "@timestamp": "2018-11-15T14:41:24.000Z",
+  "agent": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "{stack-version}"
+    "version": "{version}"
   },
-  "connection_id": "AQAAAAAAAAA=",
-  "dest": {
-    "ip": "192.0.2.0",
-    "mac": "fe:ff:20:00:01:00",
-    "port": 80,
-    "stats": {
-      "net_bytes_total": 19236,
-      "net_packets_total": 16
-    }
+  "destination": {
+    "bytes": 460,
+    "ip": "198.51.100.2",
+    "mac": "06:05:04:03:02:01",
+    "packets": 2,
+    "port": 80
   },
-  "final": false, <1>
-  "flow_id": "EQwA////DP//////FBgBAAEAAAEAAAD+/yAAAQCR/qDtQdDk3ywNUAABAAAAAAAAAA",
-  "last_time": "2017-05-03T19:42:24.151Z",
+  "event": {
+    "dataset": "flow",
+    "duration": 3000000000,
+    "end": "2018-11-15T14:41:24.000Z",
+    "start": "2018-11-15T14:41:21.000Z"
+  },
+  "flow": {
+    "final": true, <1>
+    "id": "FQQA/wz/Dv//////Fv8BAQEBAgMEBQYGBQQDAgGrAMsAcQPGM2QC9ZdQAA",
+    "vlan": 171
+  },
+  "network": {
+    "bytes": 470,
+    "community_id": "1:t9T66/2c66NQyftAEsr4aMZv4Hc=",
+    "packets": 3,
+    "transport": "tcp",
+    "type": "ipv4"
+  },
   "source": {
-    "ip": "203.0.113.0",
-    "mac": "00:00:01:00:00:00",
-    "port": 3372,
-    "stats": {
-      "net_bytes_total": 1243,
-      "net_packets_total": 14
-    }
-  },
-  "start_time": "2017-05-03T19:42:24.151Z",
-  "transport": "tcp",
-  "type": "flow"
+    "bytes": 10,
+    "ip": "203.0.113.3",
+    "mac": "01:02:03:04:05:06",
+    "packets": 1,
+    "port": 38901
+  }
 }
 --------------------------------------------------------------------------------
 
-<1> Packetbeat sets the `final` flag to `false` to indicate that the event
+<1> Packetbeat sets the `flow.final` flag to `false` to indicate that the event
 contains an intermediate report about a flow that it's tracking. When the flow
-completes, Packetbeat sends one last event with `final` set to `true`. If you
-want to aggregate sums of traffic, you need to filter on `final:true`, or use
-some other technique, so that you get only the latest update from each flow.
+completes, Packetbeat sends one last event with `flow.final` set to `true`. If
+you want to aggregate sums of traffic, you need to filter on `final:true`, or
+use some other technique, so that you get only the latest update from each flow.
 You can disable intermediate reports by setting `period: -1s`.
 
 [float]
@@ -388,6 +415,11 @@ A list of processors to apply to the data generated by the protocol.
 See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
+[float]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
 
 [[configuration-protocols]]
 == Specify which transaction protocols to monitor
@@ -410,6 +442,9 @@ packetbeat.protocols:
 - type: icmp
   enabled: true
 
+- type: dhcpv4
+  ports: [67, 68]
+
 - type: dns
   ports: [53]
 
@@ -426,7 +461,7 @@ packetbeat.protocols:
   ports: [11211]
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: redis
   ports: [6379]
@@ -438,7 +473,7 @@ packetbeat.protocols:
   ports: [9090]
 
 - type: tls
-  ports: [443]
+  ports: [443, 993, 995, 5223, 8443, 8883, 9243]
 
 ------------------------------------------------------------------------------
 
@@ -450,7 +485,9 @@ The following options are available for all protocols:
 [float]
 ==== `enabled`
 
-The enabled setting is a boolean setting to enable or disable protocols without having to comment out configuration sections. If set to false, the protocol is disabled.
+The enabled setting is a boolean setting to enable or disable protocols without
+having to comment out configuration sections. If set to false, the protocol is
+disabled.
 
 The default value is true.
 
@@ -535,6 +572,12 @@ A list of processors to apply to the data generated by the protocol.
 See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
+[float]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
 [[packetbeat-icmp-options]]
 === Capture ICMP traffic
 
@@ -570,7 +613,9 @@ If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 <titleabbrev>DNS</titleabbrev>
 ++++
 
-The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
+The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration
+options for the DNS protocol. The DNS protocol supports processing DNS messages
+on TCP and UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -587,13 +632,13 @@ Also see <<common-protocol-options>>.
 
 ===== `include_authorities`
 
-If this option is enabled, dns.authority fields (authority resource records) are added to DNS events.
-The default is false.
+If this option is enabled, dns.authority fields (authority resource records) are
+added to DNS events. The default is false.
 
 ===== `include_additionals`
 
-If this option is enabled, dns.additionals fields (additional resource records) are added to DNS events.
-The default is false.
+If this option is enabled, dns.additionals fields (additional resource records)
+are added to DNS events. The default is false.
 
 [[packetbeat-http-options]]
 === Capture HTTP traffic
@@ -657,17 +702,23 @@ headers are placed under the `headers` dictionary in the resulting JSON.
 Instead of sending a white list of headers to Elasticsearch, you can
 send all headers by setting this option to true. The default is false.
 
+===== `redact_headers`
+
+A list of headers to redact if present in the HTTP request. This will keep
+the header field present, but will redact it's value to show the header's
+presence.
+
 ===== `include_body_for`
 
 The list of content types for which Packetbeat exports the full HTTP payload. The HTTP body is available under
-`http.request.body` and `http.response.body` for these Content-Types.
+`http.request.body.content` and `http.response.body.content` for these Content-Types.
 
 In addition, if <<send-response-option>> option is enabled, then the HTTP body is exported together with the HTTP
 headers under `response` and if
 <<send-request-option>> enabled, then `request` contains the entire HTTP message including the body.
 
 In the following example, the HTML attachments of the HTTP responses are exported under the `response` field and under
-`http.request.body` or `http.response.body`:
+`http.request.body.content` or `http.response.body.content`:
 
 [source,yml]
 ------------------------------------------------------------------------------
@@ -678,7 +729,14 @@ packetbeat.protocols:
   include_body_for: ["text/html"]
 ------------------------------------------------------------------------------
 
+===== `decode_body`
 
+A boolean flag that controls decoding of HTTP payload. It interprets the
+`Content-Encoding` and `Transfer-Encoding` headers and uncompresses the entity
+body. Supported encodings are `gzip` and `deflate`. This option is only
+applicable in the cases where the HTTP payload is exported, that is, when
+one of the `include_*_body_for` options is specified or a POST request
+contains url-encoded parameters.
 
 ===== `split_cookie`
 
@@ -704,7 +762,7 @@ HTTP response might result in the following JSON:
     },
     "vary": "Cookie, Accept-Language"
   },
-  "phrase": "OK"
+  "status_phrase": "OK"
 }
 ------------------------------------------------------------------------------
 
@@ -714,10 +772,10 @@ The default is false.
 
 ===== `real_ip_header`
 
-The header field to extract the real IP from. This setting is useful when
-you want to capture traffic behind a reverse proxy, but you want to get the geo-location
-information. If this header is present and contains a valid IP addresses, the
-information is used for the `real_ip` field.
+The header field to extract the real IP from. This setting is useful when you
+want to capture traffic behind a reverse proxy, but you want to get the
+geo-location information. If this header is present and contains a valid IP
+addresses, the information is used for the `network.forwarded_ip` field.
 
 ===== `max_message_size`
 
@@ -883,22 +941,58 @@ The memcache protocol analyzer will wait for the number of milliseconds specifie
 `udptransactiontimeout` before publishing quiet messages. Non-quiet messages or
 quiet requests with an error response are published immediately.
 
-[[packetbeat-mysql-pgsql-options]]
-=== Capture MySQL and PgSQL traffic
+[[packetbeat-mysql-options]]
+=== Capture MySQL traffic
 
 ++++
-<titleabbrev>MySQL and PgSQL</titleabbrev>
+<titleabbrev>MySQL</titleabbrev>
 ++++
 
-The `mysql` and `pgsql` sections of the +{beatname_lc}.yml+ config file specify configuration options for the MySQL
-and PgSQL protocols.
+The `mysql` section of the +{beatname_lc}.yml+ config file specifies configuration
+options for the MySQL protocols.
 
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.protocols:
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+Also see <<common-protocol-options>>.
+
+===== `max_rows`
+
+The maximum number of rows from the SQL message to publish to Elasticsearch. The
+default is 10 rows.
+
+
+===== `max_row_length`
+
+The maximum length in bytes of a row from the SQL message to publish to
+Elasticsearch. The default is 1024 bytes.
+
+==== `statement_timeout`
+
+The duration for which prepared statements are cached after their last use.
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+The default is `1h`.
+
+[[packetbeat-pgsql-options]]
+=== Capture PgSQL traffic
+
+++++
+<titleabbrev>PgSQL</titleabbrev>
+++++
+
+The `pgsql` sections of the +{beatname_lc}.yml+ config file specifies configuration
+options for the PgSQL protocols.
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
 
 - type: pgsql
   ports: [5432]
@@ -945,12 +1039,12 @@ based on any of these fields. Packetbeat automatically fills in the `status`
 column with either `OK` or `Error`, so it's easy to find the problematic RPC calls.
 A transaction is put into the `Error` state if it returned an exception.
 
-Packetbeat also indexes the `responsetime` field so you can get performance
+Packetbeat also indexes the `event.duration` field so you can get performance
 analytics and find the slow RPC calls.
 
 Here is an example performance dashboard:
 
-image:./images/thrift-dashboard.png[Thrift-RPC dashboard]
+image::./images/thrift-dashboard.png[Thrift-RPC dashboard]
 
 
 Thrift supports multiple http://en.wikipedia.org/wiki/Apache_Thrift[transport
@@ -1103,9 +1197,9 @@ TLS is a cryptographic protocol that provides secure communications on top of
 an existing application protocol, like HTTP or MySQL.
 
 Packetbeat intercepts the initial handshake in a TLS connection and extracts
-useful information which helps an operator to diagnose problems as well as
-strengthen the security of his or her network and systems. It does not
-decrypt any information from the encapsulated protocol nor does it reveal any
+useful information that helps operators diagnose problems and
+strengthen the security of their network and systems. It does not
+decrypt any information from the encapsulated protocol, nor does it reveal any
 sensitive information such as cryptographic keys. TLS versions 1.0 to 1.3 and
 SSL 3.0 are supported.
 
@@ -1119,119 +1213,187 @@ An example of indexed event:
 
 [source,json]
 ------------------------------------------------------------------------------
-  "tls": {
-    "handshake_completed": true,
-    "server_certificate": {
-      "version": 3,
-      "issuer": {
-        "organization": "GlobalSign nv-sa",
-        "common_name": "GlobalSign CloudSSL CA - SHA256 - G3",
-        "country": "BE"
-      },
-      "subject": {
-        "organization": "Fastly, Inc.",
-        "locality": "San Francisco",
-        "province": "California",
-        "common_name": "r2.shared.global.fastly.net",
-        "country": "US"
-      },
-      "not_before": "2017-11-30T16:52:06.000Z",
-      "not_after": "2018-11-09T20:51:05.000Z",
-      "alternative_names": [
-        "elastic.co"
+"tls": {
+    "client": {
+      "supported_ciphers": [
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+        "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
       ],
-      "serial_number": "19260053873395556258503998518",
-      "signature_algorithm": "SHA256-RSA",
-      "public_key_algorithm": "RSA"
+      "ja3": "e6573e91e6eb777c0933c5b8f97f10cd",
+      "server_name": "example.net"
     },
-    "server_certificate_chain": [
-      {
-        "not_after": "2025-08-19T00:00:00.000Z",
-        "version": 3,
-        "serial_number": "1438827024893517455116777811697460",
-        "signature_algorithm": "SHA256-RSA",
-        "public_key_algorithm": "RSA",
-        "not_before": "2015-08-19T00:00:00.000Z",
-        "issuer": {
-          "organizational_unit": "Root CA",
-          "common_name": "GlobalSign Root CA",
-          "country": "BE",
-          "organization": "GlobalSign nv-sa"
-        },
+    "server": {
+      "subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+      "issuer": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+      "not_before": "2018-11-28T00:00:00.000Z",
+      "not_after": "2020-12-02T12:00:00.000Z",
+      "hash": {
+        "sha1": "7BB698386970363D2919CC5772846984FFD4A889"
+      }
+    },
+    "version": "1.2",
+    "version_protocol": "tls",
+    "cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+    "established": true,
+    "next_protocol": "h2",
+    "detailed": {
+      "server_certificate": {
         "subject": {
-          "country": "BE",
-          "organization": "GlobalSign nv-sa",
-          "common_name": "GlobalSign CloudSSL CA - SHA256 - G3"
+          "common_name": "www.example.org",
+          "country": "US",
+          "organization": "Internet Corporation for Assigned Names and Numbers",
+          "organizational_unit": "Technology",
+          "locality": "Los Angeles",
+          "province": "California"
+        },
+        "not_after": "2020-12-02T12:00:00.000Z",
+        "public_key_size": 2048,
+        "alternative_names": [
+          "www.example.org",
+          "example.com",
+          "example.edu",
+          "example.net",
+          "example.org",
+          "www.example.com",
+          "www.example.edu",
+          "www.example.net"
+        ],
+        "signature_algorithm": "SHA256-RSA",
+        "version": 3,
+        "issuer": {
+          "organization": "DigiCert Inc",
+          "common_name": "DigiCert SHA2 Secure Server CA",
+          "country": "US"
+        },
+        "not_before": "2018-11-28T00:00:00.000Z",
+        "public_key_algorithm": "RSA",
+        "serial_number": "21020869104500376438182461249190639870"
+      },
+      "server_certificate_chain": [
+        {
+          "public_key_algorithm": "RSA",
+          "not_before": "2013-03-08T12:00:00.000Z",
+          "not_after": "2023-03-08T12:00:00.000Z",
+          "version": 3,
+          "serial_number": "2646203786665923649276728595390119057",
+          "issuer": {
+            "organizational_unit": "www.digicert.com",
+            "common_name": "DigiCert Global Root CA",
+            "country": "US",
+            "organization": "DigiCert Inc"
+          },
+          "subject": {
+            "country": "US",
+            "organization": "DigiCert Inc",
+            "common_name": "DigiCert SHA2 Secure Server CA"
+          },
+          "public_key_size": 2048,
+          "signature_algorithm": "SHA256-RSA"
+        },
+        {
+          "public_key_algorithm": "RSA",
+          "subject": {
+            "common_name": "DigiCert Global Root CA",
+            "country": "US",
+            "organization": "DigiCert Inc",
+            "organizational_unit": "www.digicert.com"
+          },
+          "issuer": {
+            "country": "US",
+            "organization": "DigiCert Inc",
+            "organizational_unit": "www.digicert.com",
+            "common_name": "DigiCert Global Root CA"
+          },
+          "signature_algorithm": "SHA1-RSA",
+          "serial_number": "10944719598952040374951832963794454346",
+          "not_before": "2006-11-10T00:00:00.000Z",
+          "not_after": "2031-11-10T00:00:00.000Z",
+          "public_key_size": 2048,
+          "version": 3
+        }
+      ],
+      "client_certificate_requested": false,
+      "version": "TLS 1.2",
+      "client_hello": {
+        "version": "3.3",
+        "supported_compression_methods": [
+          "NULL"
+        ],
+        "extensions": {
+          "ec_points_formats": [
+            "uncompressed"
+          ],
+          "supported_groups": [
+            "x25519",
+            "secp256r1",
+            "secp384r1"
+          ],
+          "signature_algorithms": [
+            "rsa_pkcs1_sha512",
+            "ecdsa_secp521r1_sha512",
+            "(unknown:0xefef)",
+            "rsa_pkcs1_sha384",
+            "ecdsa_secp384r1_sha384",
+            "rsa_pkcs1_sha256",
+            "ecdsa_secp256r1_sha256",
+            "(unknown:0xeeee)",
+            "(unknown:0xeded)",
+            "(unknown:0x0301)",
+            "(unknown:0x0303)",
+            "rsa_pkcs1_sha1",
+            "ecdsa_sha1"
+          ],
+          "application_layer_protocol_negotiation": [
+            "h2",
+            "http/1.1"
+          ],
+          "server_name_indication": [
+            "example.net"
+          ]
+        }
+      },
+      "server_hello": {
+        "version": "3.3",
+        "session_id": "23bb2aed5d215e1228220b0a51d7aa220785e9e4b83b4f430229117971e9913f",
+        "selected_compression_method": "NULL",
+        "extensions": {
+          "application_layer_protocol_negotiation": [
+            "h2"
+          ],
+          "_unparsed_": [
+            "renegotiation_info",
+            "server_name_indication"
+          ],
+          "ec_points_formats": [
+            "uncompressed",
+            "ansiX962_compressed_prime",
+            "ansiX962_compressed_char2"
+          ]
         }
       }
-    ],
-    "resumed": false,
-    "client_hello": {
-      "extensions": {
-        "server_name_indication": [
-          "www.elastic.co"
-        ],
-        "supported_groups": [
-          "secp256r1",
-          "secp384r1",
-          "secp521r1"
-        ],
-        "ec_points_formats": [
-          "uncompressed"
-        ],
-        "signature_algorithms": [
-          "rsa_pkcs1_sha256",
-          "rsa_pkcs1_sha1",
-          [...]
-        ],
-        "application_layer_protocol_negotiation": [
-          "h2",
-          "h2-16",
-          [...]
-        ],
-      },
-      "version": "3.3",
-      "supported_ciphers": [
-        "TLS_EMPTY_RENEGOTIATION_INFO_SCSV",
-        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-        [...]
-      ],
-      "supported_compression_methods": [
-        "NULL"
-      ]
-    },
-    "server_hello": {
-      "extensions": {
-        "ec_points_formats": [
-          "uncompressed",
-          "ansiX962_compressed_prime",
-          "ansiX962_compressed_char2"
-        ],
-        "application_layer_protocol_negotiation": [
-          "h2"
-        ],
-      },
-      "version": "3.3",
-      "selected_cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "selected_compression_method": "NULL"
-    },
+    }
   }
 ------------------------------------------------------------------------------
 
-The `client_hello` contains the algorithms and extensions supported by the
-client, as well as the maximum TLS version it supports (3.3).
+The TLS events generated by {beatname_uc} follow the Elastic Common Schema
+(ECS) format. See {ecs-ref}/ecs-tls.html[ECS TLS fields] for a description
+of the populated fields.
 
-The `server_hello` contains the final settings for the TLS session: The
-selected cipher, compression method, TLS version to use and other extensions
-such as application layer protocol negotiation (ALPN).
+Detailed information that is not defined in ECS is added under the
+`tls.detailed` key. The <<include_detailed_fields>> configuration flag is used
+to control whether this information is exported.
 
-The `resumed` key indicates if the session has been resumed (`true`) or
-a full handshake has been performed (`false`). When true, an additional field
-is present: `resumption_method` which is `id` if the session has been
-resumed using session IDs (stateful) or `ticket` if it has resumed using
-session tickets (stateless).
+The fields under `tls.detailed.client_hello` contain the algorithms and
+extensions supported by the client, as well as the maximum TLS version
+it supports.
 
-See the <<exported-fields-tls>> section for more detailed information.
+Fields under `tls.detailed.server_hello` contain the final settings for the TLS
+session: The selected cipher, compression method, TLS version to use and
+other extensions such as application layer protocol negotiation (ALPN).
+
+See the <<exported-fields-tls_detailed>> section for more information.
 
 The following settings are specific to the TLS protocol. Here is a sample
 configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
@@ -1241,34 +1403,81 @@ configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
 packetbeat.protocols:
 - type: tls
   send_certificates: true
-  include_raw_certificates: true
+  include_raw_certificates: false
+  include_detailed_fields: true
+  fingerprints: [ md5, sha1, sha256 ]
 ------------------------------------------------------------------------------
 
 ==== Configuration options
 
-The `send_certificates` and `include_raw_certificates` settings are useful
-for limiting the amount of data Packetbeat indexes, as multiple certificates
-are usually exchanged in a single transaction, and those can take a considerable
+The `send_certificates` and `include_detailed_fields` settings are useful for
+limiting the amount of data Packetbeat indexes, as multiple certificates are
+usually exchanged in a single transaction, and those can take a considerable
 amount of storage.
 
 Also see <<common-protocol-options>>.
 
 ===== `send_certificates`
 
-This setting causes the certificates presented by the client and server to be
-included in the event. The server's certificate is indexed in the
-`server_certificate` field and its certification chain in the
-`server_certificate_chain` field. For the client, the
-`client_certificate` and `client_certificate_chain` fields are used.
-
-The default is true.
+This setting causes information about the certificates presented by the
+client and server to be included in the detailed fields. The server's
+certificate is indexed under `tls.detailed.server_certificate` and its
+certification chain under `tls.detailed.server_certificate_chain`.
+For the client, the `client_certificate` and `client_certificate_chain` fields
+are used. The default is true.
 
 ===== `include_raw_certificates`
 
-When `send_certificates` is true, you can set `include_raw_certificates` to
-include the raw certificate encoded in PEM format as a `raw` field.
+You can set `include_raw_certificates` to include the raw certificate chains
+encoded in PEM format, under the `tls.server.certificate_chain` and
+`tls.client.certificate_chain` fields. The default is false.
 
-If `send_certificates` is false, this setting is ignored. The default is false.
+[[include_detailed_fields]]
+===== `include_detailed_fields`
+
+Controls whether the <<exported-fields-tls_detailed>> are added to exported
+documents. When set to `false`, only {ecs-ref}/ecs-tls.html[ECS TLS fields]
+are included. The default is `true`.
+
+===== `fingerprints`
+
+Defines a list of hash algorithms to calculate the certificate's fingerprints.
+Valid values are `sha1`, `sha256` and `md5`.
+
+The default is to output SHA-1 fingerprints.
+
+[[packetbeat-redis-options]]
+=== Capture Redis traffic
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
+
+The Redis protocol has several specific configuration options. Here is a
+sample configuration for the `redis` section of the +{beatname_lc}.yml+ config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: redis
+  ports: [6379]
+  queue_max_bytes: 1048576
+  queue_max_messages: 20000
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+Also see <<common-protocol-options>>.
+
+===== `queue_max_bytes` and `queue_max_messages`
+
+In order for request/response correlation to work, {beatname_uc} needs to
+store requests in memory until a response is received. These settings impose
+a limit on the number of bytes (`queue_max_bytes`) and number of requests
+(`queue_max_messages`) that can be stored. These limits are per-connection.
+The default is to queue up to 1MB or 20.000 requests per connection, which
+allows to use request pipelining while at the same time limiting the amount
+of memory consumed by replication sessions.
 
 [[configuration-processes]]
 == Specify which processes to monitor
@@ -1276,49 +1485,41 @@ If `send_certificates` is false, this setting is ignored. The default is false.
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the
 traffic is flowing between, but also the processes. Packetbeat can even show you
-the traffic between two processes running on the same host, which is particularly
-useful when you have many services running on the same server. By default,
-process matching is disabled.
+the traffic between two processes running on the same host, which is
+particularly useful when you have many services running on the same server. By
+default, process enrichment is disabled.
 
-When Packetbeat starts, and then periodically afterwards, it scans the process table for
-processes that match the configuration file. For each of these processes, it
-monitors which file descriptors it has opened. When a new packet is captured,
-it reads the list of active TCP connections and matches the corresponding one
-with the list of file descriptors.
+When Packetbeat starts, and then periodically afterwards, it scans the process
+table for processes that match the configuration file. For each of these
+processes, it monitors which file descriptors it has opened. When a new packet
+is captured, it reads the list of active TCP and UDP connections and matches the
+corresponding one with the list of file descriptors.
 
-On a Linux system, all this information is available via the `/proc`
-file system, so Packetbeat doesn't need a kernel module.
-
+All this information is available via system interfaces: The `/proc` file system
+in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so {beatname_uc}
+doesn't need a kernel module.
 
 NOTE: Process monitoring is currently only supported on
-      Linux systems. Packetbeat automatically disables
+      Linux and Windows systems. Packetbeat automatically disables
       process monitoring when it detects other operating systems.
 
 Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.procs:
-  enabled: true
-  monitored:
-    - process: mysqld
-      cmdline_grep: mysqld
-
-    - process: pgsql
-      cmdline_grep: postgres
-
-    - process: nginx
-      cmdline_grep: nginx
-
-    - process: app
-      cmdline_grep: gunicorn
+packetbeat.procs.enabled: true
 ------------------------------------------------------------------------------
+
+When the process monitor is enabled, it will enrich all the events whose source
+or destination is a local process. The `source.process` and/or
+`destination.process` fields will be added to an event, when the server side or
+client side of the connection belong to a local process, respectively.
 
 [float]
 === Configuration options
 
-You can specify the following process monitoring options in the `monitored` section
-of the +{beatname_lc}.yml+ config file:
+You can specify the following process monitoring options in the `monitored`
+section of the +{beatname_lc}.yml+ config file to customize the name of process:
 
 [float]
 ==== `process`
@@ -1350,6 +1551,3 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
-
-
-

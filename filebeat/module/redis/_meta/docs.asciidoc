@@ -1,4 +1,5 @@
 :modulename: redis
+:has-dashboards: true
 
 == Redis module
 
@@ -63,7 +64,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "redis.log.var.paths=[/path/to/log/redis/redis-server.log*]" -M "redis.slowlog.var.hosts=[localhost:6378]" -M "redis.slowlog.var.password=[YOUR_PASSWORD]"
+-M "redis.log.var.paths=[/path/to/log/redis/redis-server.log*]" -M "redis.slowlog.var.hosts=[localhost:6378]" -M "redis.slowlog.var.password=[YOUR_PASSWORD]"
 -----
 
 
@@ -92,3 +93,8 @@ left empty, `localhost:6379` is assumed.
 The password to use to connect to Redis, in case Redis authentication is enabled
 (the `requirepass` option in the Redis configuration).
 
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

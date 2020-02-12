@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 // Common variables, functions and tests for the dns package tests
@@ -17,8 +34,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // Test Constants
@@ -40,6 +57,8 @@ type dnsTestMessage struct {
 	qType       string
 	qName       string
 	qEtld       string
+	qSubdomain  interface{}
+	qTLD        interface{}
 	answers     []string
 	authorities []string
 	additionals []string
@@ -62,6 +81,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -122,11 +142,14 @@ func expectResult(t testing.TB, e *eventStore) common.MapStr {
 
 // Retrieves a map value. The key should be the full dotted path to the element.
 func mapValue(t testing.TB, m common.MapStr, key string) interface{} {
+	t.Helper()
 	return mapValueHelper(t, m, strings.Split(key, "."))
 }
 
 // Retrieves nested MapStr values.
 func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
+	t.Helper()
+
 	key := keys[0]
 	if len(keys) == 1 {
 		return m[key]
@@ -135,7 +158,7 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 	if len(keys) > 1 {
 		value, exists := m[key]
 		if !exists {
-			t.Fatalf("%s is missing from MapStr %v.", key, m)
+			return nil
 		}
 
 		switch typ := value.(type) {
@@ -179,6 +202,8 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 //     dns.additionals_count
 //     dns.additionals
 func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
+	t.Helper()
+
 	assertRequest(t, m, q)
 
 	// Answers
@@ -225,11 +250,14 @@ func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 }
 
 func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
+	t.Helper()
+
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
-	assertAddress(t, forward, mapValue(t, m, "src"))
-	assertAddress(t, reverse, mapValue(t, m, "dst"))
-	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.qClass, q.qType, q.qName),
-		mapValue(t, m, "query"))
+	assert.Equal(t, forward.SrcIP.String(), mapValue(t, m, "source.ip"))
+	assert.EqualValues(t, forward.SrcPort, mapValue(t, m, "source.port"))
+	assert.Equal(t, forward.DstIP.String(), mapValue(t, m, "destination.ip"))
+	assert.EqualValues(t, forward.DstPort, mapValue(t, m, "destination.port"))
+	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.qClass, q.qType, q.qName), mapValue(t, m, "query"))
 	assert.Equal(t, q.qName, mapValue(t, m, "resource"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "method"))
 	assert.Equal(t, q.id, mapValue(t, m, "dns.id"))
@@ -237,7 +265,10 @@ func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assert.Equal(t, q.qClass, mapValue(t, m, "dns.question.class"))
 	assert.Equal(t, q.qType, mapValue(t, m, "dns.question.type"))
 	assert.Equal(t, q.qName, mapValue(t, m, "dns.question.name"))
+	assert.Equal(t, q.qTLD, mapValue(t, m, "dns.question.top_level_domain"))
+	assert.Equal(t, q.qSubdomain, mapValue(t, m, "dns.question.subdomain"))
 	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.etld_plus_one"))
+	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.registered_domain"))
 }
 
 // Assert that the specified flags are set.
@@ -271,38 +302,26 @@ func assertFlags(t testing.TB, m common.MapStr, flags []string) {
 	}
 }
 
-// Assert that the given Endpoint matches the IP and port in the given
-// IpPortTuple.
-func assertAddress(t testing.TB, expected common.IPPortTuple, endpoint interface{}) {
-	e, ok := endpoint.(*common.Endpoint)
-	if !ok {
-		t.Errorf("Expected a common.Endpoint but got %v", endpoint)
-	}
-
-	assert.Equal(t, expected.SrcIP.String(), e.IP)
-	assert.Equal(t, expected.SrcPort, e.Port)
-}
-
 func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
 	o := new(mkdns.OPT)
 	o.Hdr.Name = "." // MUST be the root zone, per definition.
 	o.Hdr.Rrtype = mkdns.TypeOPT
 
 	r := new(mkdns.MX)
-	r.Hdr = mkdns.RR_Header{Name: "miek.nl.", Rrtype: mkdns.TypeMX,
+	r.Hdr = mkdns.RR_Header{Name: "miek.nl", Rrtype: mkdns.TypeMX,
 		Class: mkdns.ClassINET, Ttl: 3600}
 	r.Preference = 10
-	r.Mx = "mx.miek.nl."
+	r.Mx = "mx.miek.nl"
 
 	// The OPT record is a pseudo-record so it doesn't become a real record
 	// in our conversion, and there will be 1 entry instead of 2.
-	mapStrs := rrsToMapStrs([]mkdns.RR{o, r})
+	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false)
 	assert.Len(t, mapStrs, 1)
 
 	mapStr := mapStrs[0]
 	assert.Equal(t, "IN", mapStr["class"])
 	assert.Equal(t, "MX", mapStr["type"])
-	assert.Equal(t, "mx.miek.nl.", mapStr["data"])
-	assert.Equal(t, "miek.nl.", mapStr["name"])
+	assert.Equal(t, "mx.miek.nl", mapStr["data"])
+	assert.Equal(t, "miek.nl", mapStr["name"])
 	assert.EqualValues(t, 10, mapStr["preference"])
 }

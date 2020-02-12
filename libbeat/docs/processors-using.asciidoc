@@ -1,25 +1,24 @@
 [[defining-processors]]
 === Define processors
 
-You define processors in the +{beatname_lc}.yml+ file to filter and enhance the
-data before sending events to the configured output.
-
-To define a processor, you specify the processor name, an optional condition,
-and a set of parameters:
+You can use processors to filter and enhance data before sending it to the
+configured output. To define a processor, you specify the processor name, an
+optional condition, and a set of parameters:
 
 [source,yaml]
 ------
 processors:
- - <processor_name>:
-     <parameters>
-     when:
-       <condition>
- - <processor_name>:
-     <parameters>
-     when:
-       <condition>
-...
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
 
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
+
+...
 ------
 
 Where:
@@ -27,24 +26,175 @@ Where:
 * `<processor_name>` specifies a <<processors,processor>> that performs some kind
 of action, such as selecting the fields that are exported or adding metadata to
 the event.
-* `<when: condition>` specifies an optional <<conditions,condition>>. If the
+* `<condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
+
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
+
+[[where-valid]]
+==== Where are processors valid?
+
+// TODO: ANY NEW BEATS THAT RE-USE THIS TOPIC NEED TO DEFINE processor-scope.
+
+ifeval::["{beatname_lc}"=="filebeat"]
+:processor-scope: input
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+:processor-scope: protocol
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+:processor-scope: monitor
+endif::[]
+
+ifeval::["{beatname_lc}"=="winlogbeat"]
+:processor-scope: event log shipper
+endif::[]
+
+Processors are valid:
+
+* At the top-level in the configuration. The processor is applied to all data
+collected by {beatname_uc}.
+* Under a specific {processor-scope}. The processor is applied to the data
+collected for that {processor-scope}.
+ifeval::["{beatname_lc}"=="filebeat"]
++
+[source,yaml]
+------
+- type: <input_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+...
+------
++
+Similarly, for {beatname_uc} modules, you can define processors under the
+`input` section of the module definition.
+endif::[]
+ifeval::["{beatname_lc}"=="metricbeat"]
++
+[source,yaml]
+----
+- module: <module_name>
+  metricsets: ["<metricset_name>"]
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="auditbeat"]
++
+[source,yaml]
+----
+auditbeat.modules:
+- module: <module_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="packetbeat"]
++
+[source,yaml]
+----
+packetbeat.protocols:
+- type: <protocol_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+
+* Under `packetbeat.flows`. The processor is applied to the data in
+<<configuration-flows,network flows>>:
++
+[source,yaml]
+----
+packetbeat.flows:
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="heartbeat"]
++
+[source,yaml]
+----
+heartbeat.monitors:
+- type: <monitor_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="winlogbeat"]
++
+[source,yaml]
+----
+winlogbeat.event_logs:
+- name: <network_shipper_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+
 
 [[processors]]
 ==== Processors
 
 The supported processors are:
 
- * <<add-cloud-metadata,`add_cloud_metadata`>>
- * <<add-locale,`add_locale`>>
- * <<decode-json-fields,`decode_json_fields`>>
- * <<drop-event,`drop_event`>>
- * <<drop-fields,`drop_fields`>>
- * <<include-fields,`include_fields`>>
- * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
- * <<add-docker-metadata,`add_docker_metadata`>>
+include::processors-list.asciidoc[tag=processors-list]
 
 [[conditions]]
 ==== Conditions
@@ -53,8 +203,8 @@ Each condition receives a field to compare. You can specify multiple fields
 under the same condition by using `AND` between the fields (for example,
 `field1 AND field2`).
 
-For each field, you can specify a simple field name or a nested map, for
-example `dns.question.name`.
+For each field, you can specify a simple field name or a nested map, for example
+`dns.question.name`.
 
 See <<exported-fields>> for a list of all the fields that are exported by
 {beatname_uc}.
@@ -65,6 +215,8 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-network, `network`>>
+* <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
@@ -153,6 +305,75 @@ between 0.5 and 0.8.
 range:
     system.cpu.user.pct.gte: 0.5
     system.cpu.user.pct.lt: 0.8
+------
+
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if all the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
 ------
 
 
@@ -246,408 +467,4 @@ not:
     status: OK
 ------
 
-[[add-cloud-metadata]]
-=== Add cloud metadata
-
-The `add_cloud_metadata` processor enriches each event with instance metadata
-from the machine's hosting provider. At startup it will detect the hosting
-provider and cache the instance metadata.
-
-The following cloud providers are supported:
-
-- Amazon Elastic Compute Cloud (EC2)
-- Digital Ocean
-- Google Compute Engine (GCE)
-- https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
-- Alibaba Cloud (ECS)
-- Azure Virtual Machine
-
-The simple configuration below enables the processor.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_cloud_metadata: ~
--------------------------------------------------------------------------------
-
-The `add_cloud_metadata` processor has one optional configuration setting named
-`timeout` that specifies the maximum amount of time to wait for a successful
-response when detecting the hosting provider. The default timeout value is
-`3s`.
-
-If a timeout occurs then no instance metadata will be added to the events. This
-makes it possible to enable this processor for all your deployments (in the
-cloud or on-premise).
-
-The metadata that is added to events varies by hosting provider. Below are
-examples for each of the supported providers.
-
-_EC2_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-_Digital Ocean_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-_GCE_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-_Tencent Cloud_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-_Alibaba Cloud_
-
-This metadata is only available when VPC is selected as the network type of the
-ECS instance.
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-_Azure Virtual Machine_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
-  }
-}
--------------------------------------------------------------------------------
-
-
-[[add-locale]]
-=== Add the local time zone
-
-The `add_locale` processor enriches each event with the machine's time zone
-offset from UTC or with the name of the time zone. It supports one configuration
-option named `format` that controls whether an offset or time zone abbreviation
-is added to the event. The default format is `offset`. The processor adds the
-a `beat.timezone` value to each event.
-
-The configuration below enables the processor with the default settings.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_locale: ~
--------------------------------------------------------------------------------
-
-This configuration enables the processor and configures it to add the time zone
-abbreviation to events.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_locale:
-    format: abbreviation
--------------------------------------------------------------------------------
-
-NOTE: Please note that `add_locale` differentiates between daylight savings
-time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
-regular time.
-
-
-[[decode-json-fields]]
-=== Decode JSON fields
-
-The `decode_json_fields` processor decodes fields containing JSON strings and
-replaces the strings with valid JSON objects.
-
-[source,yaml]
------------------------------------------------------
-processors:
- - decode_json_fields:
-     fields: ["field1", "field2", ...]
-     process_array: false
-     max_depth: 1
-     target: ""
-     overwrite_keys: false
------------------------------------------------------
-
-The `decode_json_fields` processor has the following configuration settings:
-
-`fields`:: The fields containing JSON strings to decode.
-`process_array`:: (Optional) A boolean that specifies whether to process
-arrays. The default is false.
-`max_depth`:: (Optional) The maximum parsing depth. The default is 1.
-`target`:: (Optional) The field under which the decoded JSON will be written. By
-default the decoded JSON object replaces the string field from which it was
-read. To merge the decoded JSON fields into the root of the event, specify
-`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
-is treated as if the field was not set at all.
-`overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
-exist in the event are overwritten by keys from the decoded JSON object. The
-default value is false.
-
-[[drop-event]]
-=== Drop events
-
-The `drop_event` processor drops the entire event if the associated condition
-is fulfilled. The condition is mandatory, because without one, all the events
-are dropped.
-
-[source,yaml]
-------
-processors:
- - drop_event:
-     when:
-        condition
-------
-
-See <<conditions>> for a list of supported conditions.
-
-[[drop-fields]]
-=== Drop fields from events
-
-The `drop_fields` processor specifies which fields to drop if a certain
-condition is fulfilled. The condition is optional. If it's missing, the
-specified fields are always dropped. The `@timestamp` and `type` fields cannot
-be dropped, even if they show up in the `drop_fields` list.
-
-[source,yaml]
------------------------------------------------------
-processors:
- - drop_fields:
-     when:
-        condition
-     fields: ["field1", "field2", ...]
------------------------------------------------------
-
-See <<conditions>> for a list of supported conditions.
-
-NOTE: If you define an empty list of fields under `drop_fields`, then no fields
-are dropped.
-
-[[include-fields]]
-=== Keep fields from events
-
-The `include_fields` processor specifies which fields to export if a certain
-condition is fulfilled. The condition is optional. If it's missing, the
-specified fields are always exported. The `@timestamp` and `type` fields are
-always exported, even if they are not defined in the `include_fields` list.
-
-[source,yaml]
--------
-processors:
- - include_fields:
-     when:
-        condition
-     fields: ["field1", "field2", ...]
--------
-
-See <<conditions>> for a list of supported conditions.
-
-You can specify multiple `include_fields` processors under the `processors`
-section.
-
-NOTE: If you define an empty list of fields under `include_fields`, then only
-the required fields, `@timestamp` and `type`, are exported.
-
-[[add-kubernetes-metadata]]
-=== Add Kubernetes metadata
-
-beta[]
-
-The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from. Each event is
-annotated with:
-
-* Pod Name
-* Namespace
-* Labels
-
-The `add_kubernetes_metadata` processor has two basic building blocks which are:
-
-* Indexers
-* Matchers
-
-Indexers take in a pod's metadata and builds indices based on the pod metadata.
-For example, the `ip_port` indexer can take a Kubernetes pod and index the pod
-metadata based on all `pod_ip:container_port` combinations.
-
-Matchers are used to contruct lookup keys for querying indices. For example,
-when the `fields` matcher takes `["metricset.host"]` as a lookup field, it would
-construct a lookup key with the value of the field `metricset.host`.
-
-Each Beat can define its own default indexers and matchers which are enabled by
-default. For example, FileBeat enables the `container` indexer, which indexes
-pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `source` field, extracts the container ID, and uses it to retrieve metadata.
-
-The configuration below enables the processor when the Beat is run as a pod in
-Kubernetes.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_kubernetes_metadata:
-    in_cluster: true
--------------------------------------------------------------------------------
-
-The configuration below enables the processor on a Beat running as a process on
-the Kubernetes node.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_kubernetes_metadata:
-    in_cluster: false
-    host: <hostname>
-    kube_config: ${HOME}/.kube/config
--------------------------------------------------------------------------------
-
-The configuration below has the default indexers and matchers disabled and
-enables ones that the user is interested in.
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_kubernetes_metadata:
-    in_cluster: false
-    host: <hostname>
-    kube_config: ~/.kube/config
-    default_indexers.enabled: false
-    default_matchers.enabled: false
-    indexers:
-      - ip_port:
-    matchers:
-      - fields:
-          lookup_fields: ["metricset.host"]
--------------------------------------------------------------------------------
-
-The `add_kubernetes_metadata` processor has the following configuration settings:
-
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-by default.
-`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
-Kubernetes API.
-`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
-client.
-`default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
-case you want to specify your own.
-`default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in
-case you want to specify your own.
-
-[[add-docker-metadata]]
-=== Add Docker metadata
-
-beta[]
-
-The `add_docker_metadata` processor annotates each event with relevant metadata
-from Docker containers:
-
-* Container ID
-* Name
-* Image
-* Labels
-
-[source,yaml]
--------------------------------------------------------------------------------
-processors:
-- add_docker_metadata:
-    host: "unix:///var/run/docker.sock"
-    #match_fields: ["system.process.cgroup.id"]
-    #match_pids: ["process.pid", "process.ppid"]
-    #match_source: true
-    #match_source_index: 4
-    #cleanup_timeout: 60
-    # To connect to Docker over TLS you must specify a client and CA certificate.
-    #ssl:
-    #  certificate_authority: "/etc/pki/root/ca.pem"
-    #  certificate:           "/etc/pki/client/cert.pem"
-    #  key:                   "/etc/pki/client/cert.key"
--------------------------------------------------------------------------------
-
-It has the following settings:
-
-`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-`unix:///var/run/docker.sock` by default.
-
-`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
-socket.
-
-`match_fields`:: (Optional) A list of fields to match a container ID, at least
-one of them should hold a container ID to get the event enriched.
-
-`match_pids`:: (Optional) A list of fields that contain process IDs. If the
-process is running in Docker then the event will be enriched. The default value
-is `["process.pid", "process.ppid"]`.
-
-`match_source`:: (Optional) Match container ID from a log path present in the
-`source` field. Enabled by default.
-
-`match_source_index`:: (Optional) Index in the source path split by `/` to look
-for container ID. It defaults to 4 to match
-`/var/lib/docker/containers/<container_id>/*.log`
-
-`cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
-forget metadata for a container, 60s by default.
+include::processors-list.asciidoc[tag=processors-include]

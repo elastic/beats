@@ -1,5 +1,5 @@
 filebeat:
-  prospectors:
+  inputs:
     - type: log
       paths:
         - /Users/ruflin/Dev/gopath/src/github.com/elastic/filebeat/tests/load/logs/*
@@ -15,7 +15,7 @@ filebeat:
   spool_size: 4096
   idle_timeout: 5s
   registry_file: registry
-
+  registry_file_permissions: 0600
 
 ############################# Output ##########################################
 

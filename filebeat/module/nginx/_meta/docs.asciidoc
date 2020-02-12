@@ -1,4 +1,6 @@
 :modulename: nginx
+:has-dashboards: true
+
 
 == Nginx module
 
@@ -9,10 +11,6 @@ include::../include/what-happens.asciidoc[]
 
 [float]
 === Compatibility
-
-This module requires the
-{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
-{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
 
 The Nginx module was tested with logs from version 1.10.
 
@@ -50,7 +48,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
+-M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
 -----
 
 
@@ -70,3 +68,11 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

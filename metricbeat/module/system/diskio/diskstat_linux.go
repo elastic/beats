@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build linux
 
 package diskio
@@ -10,38 +27,44 @@ import (
 )
 
 func Get_CLK_TCK() uint32 {
-	//return uint32(C.sysconf(C._SC_CLK_TCK))
-	//NOTE: _SC_CLK_TCK should be fetched from sysconf using cgo
+	// return uint32(C.sysconf(C._SC_CLK_TCK))
+	// NOTE: _SC_CLK_TCK should be fetched from sysconf using cgo
 	return uint32(100)
 }
 
-func NewDiskIOStat() *DiskIOStat {
-	d := &DiskIOStat{}
-	d.lastDiskIOCounters = make(map[string]disk.IOCountersStat)
-	return d
+// IOCounters should map functionality to disk package for linux os.
+func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+	return disk.IOCounters(names...)
 }
 
-// create current cpu sampling
-// need call as soon as get IOCounters
+// NewDiskIOStat :init DiskIOStat object.
+func NewDiskIOStat() *DiskIOStat {
+	return &DiskIOStat{
+		lastDiskIOCounters: map[string]disk.IOCountersStat{},
+	}
+}
+
+// OpenSampling creates current cpu sampling
+// need call as soon as get IOCounters.
 func (stat *DiskIOStat) OpenSampling() error {
 	return stat.curCpu.Get()
 }
 
-func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetric, error) {
+// CalIOStatistics calculates IO statistics.
+func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
 	var last disk.IOCountersStat
 	var ok bool
-	var result DiskIOMetric
 
 	// if last counter not found, create one and return all 0
 	if last, ok = stat.lastDiskIOCounters[counter.Name]; !ok {
 		stat.lastDiskIOCounters[counter.Name] = counter
-		return result, nil
+		return nil
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
 	deltams := 1000.0 * float64(stat.curCpu.Total()-stat.lastCpu.Total()) / float64(cpu.NumCores) / float64(Get_CLK_TCK())
 	if deltams <= 0 {
-		return result, errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
+		return errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
 
 	rd_ios := counter.ReadCount - last.ReadCount
@@ -81,6 +104,12 @@ func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetr
 	result.AvgRequestSize = size
 	result.AvgQueueSize = queue
 	result.AvgAwaitTime = wait
+	if rd_ios > 0 {
+		result.AvgReadAwaitTime = float64(rd_ticks) / float64(rd_ios)
+	}
+	if wr_ios > 0 {
+		result.AvgWriteAwaitTime = float64(wr_ticks) / float64(wr_ios)
+	}
 	result.AvgServiceTime = svct
 	result.BusyPct = 100.0 * float64(ticks) / deltams
 	if result.BusyPct > 100.0 {
@@ -88,7 +117,7 @@ func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetr
 	}
 
 	stat.lastDiskIOCounters[counter.Name] = counter
-	return result, nil
+	return nil
 
 }
 

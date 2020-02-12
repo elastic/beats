@@ -11,13 +11,15 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-path]]
-== Set up project paths
+== Configure project paths
 
 The `path` section of the +{beatname_lc}.yml+ config file contains configuration
-options that define where the Beat looks for its files. For example, all Beats
-look for the Elasticsearch template file in the configuration path, Filebeat and
-Winlogbeat look for their registry files in the data path, and all Beats write
-their log files in the logs path.
+options that define where {beatname_uc} looks for its files. For example, {beatname_uc}
+looks for the Elasticsearch template file in the configuration path and writes
+log files in the logs path.
+ifdef::has_registry[]
+{beatname_uc} looks for its registry files in the data path.
+endif::[]
 
 Please see the <<directory-layout>> section for more details.
 
@@ -84,10 +86,13 @@ Example:
 path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
+TIP: When running multiple {beatname_uc} instances on the same host, make sure they
+each have a distinct `path.data` value.
+
 [float]
 ==== `logs`
 
-The logs path for a {beatname_uc} installation. This is the default location for the Beat's
+The logs path for a {beatname_uc} installation. This is the default location for {beatname_uc}'s
 log files. If not set by a CLI flag or in the configuration file, the default
 for the logs path is a `logs` subdirectory inside the home path.
 

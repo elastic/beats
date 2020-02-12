@@ -347,7 +347,7 @@
                 Namespace name
             - name: node.host
               type: keyword
-              desription: >
+              description: >
                 Node host
             - name: node.name
               type: keyword
@@ -1110,7 +1110,7 @@
           fields:
             - name: kernel.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 The system kernel consumed by the Docker server.
             - name: kernel.ticks
@@ -1119,7 +1119,7 @@
                 CPU kernel ticks.
             - name: system.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
             - name: system.ticks
               type: long
@@ -1127,7 +1127,7 @@
                 CPU system ticks.
             - name: user.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
             - name: user.ticks
               type: long
@@ -1135,7 +1135,7 @@
                 CPU user ticks
             - name: total.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 Total CPU usage.
             # TODO: how to document cpu list?
@@ -1309,7 +1309,7 @@
                     Total memory resident set size.
                 - name: pct
                   type: scaled_float
-                  format: percentage
+                  format: percent
                   description: >
                     Memory resident set size percentage.
             - name: usage
@@ -1324,7 +1324,7 @@
                     Max memory usage.
                 - name: pct
                   type: scaled_float
-                  format: percentage
+                  format: percent
                   description: >
                     Memory usage percentage.
                 - name: total
@@ -2061,7 +2061,7 @@
 
             - name: throttle.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 Current throttle percentage for the server when slowstart
                 is active, or no value if slowstart is inactive.
@@ -4885,7 +4885,7 @@
                 Number of consumers.
             - name: consumers.utilisation.pct
               type: long
-              format: percentage
+              format: percent
               description: >
                 Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
             - name: messages.total.count
@@ -5000,8 +5000,8 @@
               fields:
                 - name: used.value
                   type: long
-                  description: >
                   format: bytes
+                  description: >
                     Used memory.
 
                 - name: used.rss
@@ -5216,7 +5216,7 @@
                 - name: commands_processed
                   type: long
                   description:
-                    Total number of commands preocessed.
+                    Total number of commands processed.
 
                 - name: net.input.bytes
                   type: long

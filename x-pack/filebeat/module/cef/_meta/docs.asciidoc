@@ -1,0 +1,56 @@
+[role="xpack"]
+
+:modulename: cef
+:has-dashboards: false
+
+== CEF module
+
+This is a module for receiving Common Event Format (CEF) data over Syslog. When
+messages are received over the syslog protocol the syslog input will parse the
+header and set the timestamp value. Then the
+<<processor-decode-cef, `decode_cef`>> processor is applied to parse the CEF
+encoded data. The decoded data is written into a `cef` object field. Lastly any
+Elastic Common Schema (ECS) fields that can be populated with the CEF data are
+populated.
+
+include::../include/running-modules.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9003`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+[float]
+==== Forcepoint NGFW Security Management Center
+
+This module will process CEF data from Forcepoint NGFW Security
+Management Center (SMC).  In the SMC configure the logs to be
+forwarded to the address set in `var.syslog_host` in format CEF and
+service UDP on `var.syslog_port`.  Instructions can be found in
+https://support.forcepoint.com/KBArticle?id=000015002[KB 15002] for
+configuring the SMC.  Testing was done with CEF logs from SMC version
+6.6.1 and custom string mappings were taken from 'CEF Connector
+Configuration Guide' dated December 5, 2011.
+
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+

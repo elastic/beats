@@ -1,31 +1,30 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "apache": {
         "status": {
-            "bytes_per_request": 78.7692,
-            "bytes_per_sec": 4.94686,
+            "bytes_per_request": 112.913,
+            "bytes_per_sec": 103.832,
             "connections": {
                 "async": {
                     "closing": 0,
-                    "keep_alive": 1,
+                    "keep_alive": 0,
                     "writing": 0
                 },
-                "total": 1
+                "total": 0
             },
             "cpu": {
                 "children_system": 0,
                 "children_user": 0,
-                "load": 3.99758,
-                "system": 16.39,
+                "load": 0.125874,
+                "system": 0.2,
                 "user": 0.16
             },
-            "hostname": "apache",
             "load": {
-                "1": 170.11,
-                "15": 77.62,
-                "5": 167.51
+                "1": 2,
+                "15": 1.91,
+                "5": 1.85
             },
-            "requests_per_sec": 0.0628019,
+            "requests_per_sec": 0.91958,
             "scoreboard": {
                 "closing_connection": 0,
                 "dns_lookup": 0,
@@ -33,33 +32,36 @@
                 "idle_cleanup": 0,
                 "keepalive": 0,
                 "logging": 0,
-                "open_slot": 300,
+                "open_slot": 325,
                 "reading_request": 0,
                 "sending_reply": 1,
                 "starting_up": 0,
                 "total": 400,
-                "waiting_for_connection": 99
+                "waiting_for_connection": 74
             },
-            "total_accesses": 26,
-            "total_kbytes": 2,
+            "total_accesses": 263,
+            "total_kbytes": 29,
             "uptime": {
-                "server_uptime": 414,
-                "uptime": 414
+                "server_uptime": 286,
+                "uptime": 286
             },
             "workers": {
                 "busy": 1,
-                "idle": 99
+                "idle": 74
             }
         }
     },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "apache.status",
+        "duration": 115000,
+        "module": "apache"
     },
     "metricset": {
-        "host": "apache",
-        "module": "apache",
         "name": "status",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "apache"
     }
 }

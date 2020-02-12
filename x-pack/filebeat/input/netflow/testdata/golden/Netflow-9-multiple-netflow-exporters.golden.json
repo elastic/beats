@@ -1,0 +1,583 @@
+{
+  "test_name": "Netflow 9 multiple netflow exporters",
+  "events": [
+    {
+      "Timestamp": "2015-10-08T19:06:29Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:06:29Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 147,
+            "timestamp": "2015-10-08T19:06:29Z",
+            "uptime_millis": 33990,
+            "version": 9
+          },
+          "options": {
+            "exported_flow_record_total_count": 1,
+            "exported_message_total_count": 0
+          },
+          "scope": {
+            "octet_delta_count": 0
+          },
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.248",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 1000000,
+          "end": "2015-10-08T19:03:46.141Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:46.14Z"
+        },
+        "flow": {
+          "id": "1E-M5OJg_go",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.248",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 1217,
+          "flow_start_sys_up_time": 1216,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.100",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:QKTFMKhaT7j1xLTKOURCTVzbKk8=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 1000000,
+          "end": "2015-10-08T19:03:46.141Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:46.14Z"
+        },
+        "flow": {
+          "id": "yMxFd8CW_Ok",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 1217,
+          "flow_start_sys_up_time": 1216,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.248",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:QKTFMKhaT7j1xLTKOURCTVzbKk8=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.248",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 1000000,
+          "end": "2015-10-08T19:03:51.814Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:51.813Z"
+        },
+        "flow": {
+          "id": "NF1W3jyrHAA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 6890,
+          "flow_start_sys_up_time": 6889,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.100",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:8JJSV5jQe+UfRnLVV/iA7sy8Nz0=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 1000000,
+          "end": "2015-10-08T19:03:51.814Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:51.813Z"
+        },
+        "flow": {
+          "id": "Tw1iOKJ-dfE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 6890,
+          "flow_start_sys_up_time": 6889,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.201",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:8JJSV5jQe+UfRnLVV/iA7sy8Nz0=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.202",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 0,
+          "end": "2015-10-08T19:03:55.958Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:55.958Z"
+        },
+        "flow": {
+          "id": "sNF38-obC7k",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.202",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 11034,
+          "flow_start_sys_up_time": 11034,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.100",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:SYyoe1e5BMoo9l35SqJ7wRextZg=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 0,
+          "end": "2015-10-08T19:03:55.958Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:55.958Z"
+        },
+        "flow": {
+          "id": "458D6voFu3E",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_transport_port": 123,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 11034,
+          "flow_start_sys_up_time": 11034,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 4,
+          "octet_delta_count": 76,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.202",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 76,
+          "community_id": "1:SYyoe1e5BMoo9l35SqJ7wRextZg=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 1,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 76,
+          "ip": "172.16.32.202",
+          "locality": "private",
+          "packets": 1,
+          "port": 123
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:04:30Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "port": 34304
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:04:30Z",
+          "duration": 38081000000,
+          "end": "2015-10-08T19:04:25.9Z",
+          "kind": "event",
+          "start": "2015-10-08T19:03:47.819Z"
+        },
+        "flow": {
+          "id": "tYpw8DU5u10",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv6_address": "ff02::1",
+          "destination_transport_port": 34304,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2015-10-08T19:04:30Z",
+            "uptime_millis": 45076,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 40976,
+          "flow_start_sys_up_time": 2895,
+          "ingress_interface": 0,
+          "ip_class_of_service": 0,
+          "ip_version": 6,
+          "octet_delta_count": 672,
+          "packet_delta_count": 7,
+          "protocol_identifier": 58,
+          "source_ipv6_address": "fe80::20c:29ff:fe83:3b6e",
+          "source_transport_port": 0,
+          "tcp_control_bits": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 672,
+          "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
+          "direction": "unknown",
+          "iana_number": 58,
+          "packets": 7,
+          "transport": "ipv6-icmp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 672,
+          "packets": 7,
+          "port": 0
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2015-10-08T19:06:29Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "port": 65058
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-08T19:06:29Z",
+          "duration": 5000000,
+          "end": "2015-10-08T19:05:55.015Z",
+          "kind": "event",
+          "start": "2015-10-08T19:05:55.01Z"
+        },
+        "flow": {
+          "id": "zQfsdfKgh-o",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgp_destination_as_number": 0,
+          "bgp_source_as_number": 0,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_ipv4_prefix_length": 0,
+          "destination_transport_port": 65058,
+          "egress_interface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 147,
+            "timestamp": "2015-10-08T19:06:29Z",
+            "uptime_millis": 33990,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 5,
+          "flow_start_sys_up_time": 0,
+          "ingress_interface": 0,
+          "ip_class_of_service": 16,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "octet_delta_count": 200,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_ipv4_prefix_length": 0,
+          "source_transport_port": 22,
+          "tcp_control_bits": 24,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 200,
+          "community_id": "1:xXTn9GECsRXx7t5CqUym4B1cCNU=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 2,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 200,
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "packets": 2,
+          "port": 22
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package match
 
 import "regexp/syntax"
@@ -23,13 +40,27 @@ var (
 	patDigits = mustParse(`\d`)
 )
 
+func isRegular(r *syntax.Regexp) bool {
+	const irregular = syntax.FoldCase
+	return (r.Flags & irregular) == 0
+}
+
+func isRegularLiteral(r *syntax.Regexp) bool {
+	return r.Op == syntax.OpLiteral && isRegular(r)
+}
+
+func isSubstringLiteral(r *syntax.Regexp) bool {
+	return isRegularLiteral(r)
+}
+
 // isPrefixLiteral checks regular expression being literal checking string
 // starting with literal pattern (like '^PATTERN')
 func isPrefixLiteral(r *syntax.Regexp) bool {
 	return r.Op == syntax.OpConcat &&
 		len(r.Sub) == 2 &&
 		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpLiteral
+		isRegularLiteral(r.Sub[1]) &&
+		isRegular(r)
 }
 
 func isAltLiterals(r *syntax.Regexp) bool {
@@ -38,10 +69,11 @@ func isAltLiterals(r *syntax.Regexp) bool {
 	}
 
 	for _, sub := range r.Sub {
-		if sub.Op != syntax.OpLiteral {
+		if !isRegularLiteral(sub) {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -49,8 +81,9 @@ func isExactLiteral(r *syntax.Regexp) bool {
 	return r.Op == syntax.OpConcat &&
 		len(r.Sub) == 3 &&
 		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpLiteral &&
-		r.Sub[2].Op == syntax.OpEndText
+		isRegularLiteral(r.Sub[1]) &&
+		r.Sub[2].Op == syntax.OpEndText &&
+		isRegular(r)
 }
 
 func isOneOfLiterals(r *syntax.Regexp) bool {
@@ -73,7 +106,7 @@ func isPrefixAltLiterals(r *syntax.Regexp) bool {
 	}
 
 	for _, sub := range r.Sub[1].Sub {
-		if sub.Op != syntax.OpLiteral {
+		if !isRegularLiteral(sub) {
 			return false
 		}
 	}
@@ -86,7 +119,7 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 	}
 
 	i := 1
-	if r.Sub[i].Op == syntax.OpLiteral {
+	if isRegularLiteral(r.Sub[i]) {
 		i++
 	}
 
@@ -98,7 +131,7 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 
 	for i < len(r.Sub) {
 		// check separator
-		if r.Sub[i].Op != syntax.OpLiteral {
+		if !isRegularLiteral(r.Sub[i]) {
 			return false
 		}
 		i++

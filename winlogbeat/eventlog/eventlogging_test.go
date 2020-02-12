@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package eventlog
@@ -250,7 +267,7 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 	assert.Len(t, records, 1)
 	for _, record := range records {
 		t.Log(record)
-		assert.Equal(t, "The data area passed to a system call is too small.", record.RenderErr)
+		assert.Equal(t, []string{"The data area passed to a system call is too small."}, record.RenderErr)
 	}
 }
 
@@ -473,6 +490,49 @@ func TestReadWhileCleared(t *testing.T) {
 	if len(lr) > 0 {
 		assert.Equal(t, uint32(3), lr[0].EventIdentifier.ID)
 	}
+}
+
+// Test event messages that include less parameters than required for message
+// formating (caused a crash in previous versions)
+func TestReadMissingParameters(t *testing.T) {
+	configureLogp()
+	log, err := initLog(providerName, sourceName, servicesMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	var eventID uint32 = 1073748860
+	// Missing parameters will be substituted by "(null)"
+	template := "The %s service entered the (null) state."
+	msgs := []string{"Windows Update"}
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read messages:
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify the message contents:
+	assert.Len(t, records, 1)
+	if len(records) != 1 {
+		t.FailNow()
+	}
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
+	assert.Equal(t, fmt.Sprintf(template, msgs[0]),
+		strings.TrimRight(records[0].Message, "\r\n"))
 }
 
 func newTestEventLogging(t *testing.T, options map[string]interface{}) EventLog {

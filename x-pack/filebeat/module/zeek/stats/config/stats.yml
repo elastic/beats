@@ -1,0 +1,95 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.stats"
+
+        - from: "zeek.stats.mem"
+          to: "zeek.stats.memory"
+
+        - from: "zeek.stats.pkts_proc"
+          to: "zeek.stats.packets.processed"
+
+        - from: "zeek.stats.pkts_dropped"
+          to: "zeek.stats.packets.dropped"
+
+        - from: "zeek.stats.pkts_link"
+          to: "zeek.stats.packets.received"
+
+        - from: "zeek.stats.pkts_link"
+          to: "zeek.stats.packets.received"
+
+        - from: "zeek.stats.bytes_recv"
+          to: "zeek.stats.bytes.received"
+
+        - from: "zeek.stats.tcp_conns"
+          to: "zeek.stats.connections.tcp.count"
+
+        - from: "zeek.stats.active_tcp_conns"
+          to: "zeek.stats.connections.tcp.active"
+
+        - from: "zeek.stats.udp_conns"
+          to: "zeek.stats.connections.udp.count"
+
+        - from: "zeek.stats.active_udp_conns"
+          to: "zeek.stats.connections.udp.active"
+
+        - from: "zeek.stats.icmp_conns"
+          to: "zeek.stats.connections.icmp.count"
+
+        - from: "zeek.stats.active_icmp_conns"
+          to: "zeek.stats.connections.icmp.active"
+
+        - from: "zeek.stats.events_proc"
+          to: "zeek.stats.events.processed"
+
+        - from: "zeek.stats.events_queued"
+          to: "zeek.stats.events.queued"
+
+        - from: "zeek.stats.timers"
+          to: "zeek.stats.timers.count"
+
+        - from: "zeek.stats.active_timers"
+          to: "zeek.stats.timers.active"
+
+        - from: "zeek.stats.files"
+          to: "zeek.stats.files.count"
+
+        - from: "zeek.stats.active_files"
+          to: "zeek.stats.files.active"
+
+        - from: "zeek.stats.dns_requests"
+          to: "zeek.stats.dns_requests.count"
+
+        - from: "zeek.stats.active_dns_requests"
+          to: "zeek.stats.dns_requests.active"
+
+        - from: "zeek.stats.reassem_tcp_size"
+          to: "zeek.stats.reassembly_size.tcp"
+
+        - from: "zeek.stats.reassem_file_size"
+          to: "zeek.stats.reassembly_size.file"
+
+        - from: "zeek.stats.reassem_frag_size"
+          to: "zeek.stats.reassembly_size.frag"
+
+        - from: "zeek.stats.reassem_unknown_size"
+          to: "zeek.stats.reassembly_size.unknown"
+
+        - from: "zeek.stats.pkt_lag"
+          to: "zeek.stats.timestamp_lag"
+
+      ignore_missing: true
+      fail_on_error: false

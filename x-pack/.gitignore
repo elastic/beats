@@ -1,0 +1,14 @@
+# Directories
+*beat/build
+*beat/logs
+*beat/data
+dockerlogbeat/rootfs
+dockerlogbeat/vendor/github.com/elastic/beats
+
+# Files
+*beat/*beat
+*beat/*beat.exe
+*beat/*beat.test
+*beat/*beat.test.exe
+*beat/fields.yml
+*beat/_meta/kibana.generated

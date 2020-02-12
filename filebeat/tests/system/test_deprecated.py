@@ -37,29 +37,19 @@ class Test(BaseTest):
 
         assert self.log_contains("DEPRECATED: input_type input config is deprecated")
 
-    def test_prospectors_deprecated(self):
+    def test_invalid_config_with_removed_settings(self):
         """
-        Checks that harvesting works with deprecated prospectors but a deprecation warning is printed.
+        Checks if filebeat fails to load if removed settings have been used:
         """
+        self.render_config_template()
 
-        self.render_config_template(
-            input_config="prospectors",
-            path=os.path.abspath(self.working_dir) + "/log/test.log",
-            scan_frequency="0.1s"
-        )
-        os.mkdir(self.working_dir + "/log/")
+        exit_code = self.run_beat(extra_args=[
+            "-E", "filebeat.prospectors=anything",
+            "-E", "filebeat.config.prospectors=anything",
+        ])
 
-        logfile = self.working_dir + "/log/test.log"
-
-        with open(logfile, 'w') as f:
-            f.write("Hello world\n")
-
-        filebeat = self.start_beat()
-
-        # Let it read the file
-        self.wait_until(
-            lambda: self.output_has(lines=1), max_timeout=10)
-
-        filebeat.check_kill_and_wait()
-
-        assert self.log_contains("DEPRECATED: prospectors are deprecated, Use `inputs` instead.")
+        assert exit_code == 1
+        assert self.log_contains("setting 'filebeat.prospectors'"
+                                 " has been removed")
+        assert self.log_contains("setting 'filebeat.config.prospectors'"
+                                 " has been removed")

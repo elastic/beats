@@ -4,17 +4,22 @@
     Contains fields from the syslog system logs.
   fields:
     - name: timestamp
-      description: >
-        The timestamp as read from the syslog message.
+      type: alias
+      path: '@timestamp'
+      migration: true
     - name: hostname
-      description: >
-        The hostname as read from the syslog message.
+      type: alias
+      path: host.hostname
+      migration: true
     - name: program
-      description: >
-        The process name as read from the syslog message.
+      type: alias
+      path: process.name
+      migration: true
     - name: pid
-      description: >
-        The PID of the process that sent the syslog message.
+      type: alias
+      path: process.pid
+      migration: true
     - name: message
-      description: >
-        The message in the log line.
+      type: alias
+      path: message
+      migration: true

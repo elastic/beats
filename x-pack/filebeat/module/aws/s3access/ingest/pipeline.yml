@@ -1,0 +1,61 @@
+description: "Pipeline for s3 server access logs"
+
+processors:
+  - grok:
+      field: message
+      patterns:
+        - >-
+          %{BASE16NUM:aws.s3access.bucket_owner} %{HOSTNAME:aws.s3access.bucket} \[%{HTTPDATE:_temp_.s3access_time}\]
+          %{IP:aws.s3access.remote_ip} (?:-|%{S3REQUESTER:aws.s3access.requester}) %{S3REQUESTID:aws.s3access.request_id}
+          %{S3OPERATION:aws.s3access.operation} (?:-|%{S3KEY:aws.s3access.key}) (?:-|\"%{DATA:aws.s3access.request_uri}\")
+          %{NUMBER:aws.s3access.http_status:long} (?:-|%{WORD:aws.s3access.error_code}) (?:-|%{NUMBER:aws.s3access.bytes_sent:long})
+          (?:-|%{NUMBER:aws.s3access.object_size:long}) (?:-|%{NUMBER:aws.s3access.total_time:long}) (?:-|%{NUMBER:aws.s3access.turn_around_time:long})
+          (?:-|\"%{DATA:aws.s3access.referrer}\") (?:-|\"(-|%{DATA:aws.s3access.user_agent})\") (?:-|%{S3KEY:aws.s3access.version_id})
+          (?:-|%{S3ID:aws.s3access.host_id}) (?:-|%{S3VERSION:aws.s3access.signature_version}) (?:-|%{S3KEY:aws.s3access.cipher_suite})
+          (?:-|%{WORD:aws.s3access.authentication_type}) (?:-|%{S3ID:aws.s3access.host_header}) (?:-|%{S3VERSION:aws.s3access.tls_version})
+      pattern_definitions:
+        S3REQUESTER: "[a-zA-Z0-9\\/_\\.\\-%:@]+"
+        S3REQUESTID: "[a-zA-Z0-9]+"
+        S3OPERATION: "%{WORD}.%{WORD}.%{WORD}"
+        S3KEY: "[a-zA-Z0-9\\/_\\.\\-%+]+"
+        S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
+        S3VERSION: "[a-zA-Z0-9.]+"
+
+  #
+  # Parse the date included in s3 access logs
+  #
+  - date:
+      field: "_temp_.s3access_time"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - "dd/MMM/yyyy:H:m:s Z"
+  - set:
+      field: tls.cipher
+      value: '{{aws.s3access.cipher_suite}}'
+      if: ctx.aws?.s3access?.cipher_suite != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.s3access?.tls_version != null
+      source: >-
+        def parts = ctx.aws.s3access.tls_version.toLowerCase().splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        ctx.tls.version = parts[1];
+        ctx.tls.version_protocol = parts[0]
+
+  #
+  # Remove temporary fields
+  #
+  - remove:
+      field:
+        - message
+        - _temp_
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

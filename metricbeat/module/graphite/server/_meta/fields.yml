@@ -2,7 +2,7 @@
   type: group
   description: >
     server
-  release: beta
+  release: ga
   fields:
     - name: example
       type: keyword

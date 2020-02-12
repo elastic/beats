@@ -1,0 +1,34 @@
+# This should start the environment with the latest snapshots.
+
+version: '2.3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:8.0.0-SNAPSHOT
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      retries: 300
+      interval: 1s
+    environment:
+    - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    - "network.host="
+    - "transport.host=127.0.0.1"
+    - "http.host=0.0.0.0"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:8.0.0-SNAPSHOT
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
+      retries: 600
+      interval: 1s
+    volumes:
+    - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    - ./docker/logstash/pki:/etc/pki:ro
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:8.0.0-SNAPSHOT
+    healthcheck:
+      test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://localhost:5601/api/status"); data = json.loads(response.read()); exit(1) if data["status"]["overall"]["state"] != "green" else exit(0);''']
+      retries: 600
+      interval: 1s
+
+

@@ -1,0 +1,19 @@
+[
+    {
+        "@timestamp": "2018-10-31T15:09:30.451-02:00",
+        "event.dataset": "kafka.log",
+        "event.module": "kafka",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kafka.log.class": "state.change.logger",
+        "kafka.log.component": "Broker id=20",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "TRACE",
+        "log.offset": 0,
+        "message": "Cached leader info PartitionState(controllerEpoch=5, leader=20, leaderEpoch=0, isr=[20], zkVersion=0, replicas=[20], offlineReplicas=[]) for partition foo-0 in response to UpdateMetadata request sent by controller 10 epoch 5 with correlation id 146",
+        "service.type": "kafka"
+    }
+]

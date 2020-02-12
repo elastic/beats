@@ -17,11 +17,11 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 [[multiline]]
 === Configuration options
 
-You can specify the following options in the `filebeat.prospectors` section of
-the +{beatname_lc}.yml+ config file to control how Filebeat deals with messages
+You can specify the following options in the +{beatname_lc}.inputs+ section of
+the +{beatname_lc}.yml+ config file to control how {beatname_uc} deals with messages
 that span multiple lines. 
 
-The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`).
+The following example shows how to configure {beatname_uc} to handle a multiline message where the first line of the message begins with a bracket (`[`).
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ multiline.match: after
 
 -------------------------------------------------------------------------------------
 
-Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event:
+{beatname_uc} takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event:
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Filebeat takes all the lines that do not start with `[` and combines them with t
 -------------------------------------------------------------------------------------
 
 
-*`multiline.pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by Filebeat
+*`multiline.pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by {beatname_uc}
 differ somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
 Depending on how you configure other multiline options, lines that match the specified regular expression are considered
 either continuations of a previous line or the start of a new multiline event. You can set the `negate` option to negate
@@ -51,7 +51,7 @@ the pattern.
 
 *`multiline.negate`*:: Defines whether the pattern is negated. The default is `false`.
 
-*`multiline.match`*:: Specifies how Filebeat combines matching lines into an event. The settings are `after` or `before`. The behavior of these settings depends on what you specify for `negate`:
+*`multiline.match`*:: Specifies how {beatname_uc} combines matching lines into an event. The settings are `after` or `before`. The behavior of these settings depends on what you specify for `negate`:
 +
 [options="header"]
 |=======================
@@ -64,13 +64,13 @@ the pattern.
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multline-message.
+*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message.
 
 *`multiline.max_lines`*:: The maximum number of lines that can be combined into one event. If
 the multiline message contains more than `max_lines`, any additional
 lines are discarded. The default is 500.
 
-*`multiline.timeout`*:: After the specified timeout, Filebeat sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
+*`multiline.timeout`*:: After the specified timeout, {beatname_uc} sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
 
 === Examples of multiline configuration
@@ -95,7 +95,7 @@ Exception in thread "main" java.lang.NullPointerException
         at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ Caused by: java.lang.NullPointerException
        ... 1 more
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ printf ("%10.10ld  \t %10.10ld \t %s\
   %f", w, x, y, z );
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ specific activity, as in this example:
 (/dev/disk1)]], net usable_space [34.5gb], net total_space [118.9gb], types [hfs]
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -192,7 +192,7 @@ Sometimes your application logs contain events, that begin and end with custom m
 [2015-08-24 11:49:14,399] End event
 -------------------------------------------------------------------------------------
 
-To consolidate this as a single event in Filebeat, use the following multiline configuration:
+To consolidate this as a single event in {beatname_uc}, use the following multiline configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------

@@ -1,0 +1,60 @@
+[[configuration-general-options]]
+== Specify general settings
+
+You can specify settings in the +{beatname_lc}.yml+ config file to control the
+general behavior of {beatname_uc}. This includes:
+
+* <<configuration-global-options,Global options>> that control things like
+publisher behavior and the location of some files.
+
+* <<configuration-general,General options>> that are supported by all Elastic
+Beats.
+
+[float]
+[[configuration-global-options]]
+=== Global {beatname_uc} configuration options
+
+These options are in the +{beatname_lc}+ namespace.
+
+[float]
+[id="{beatname_lc}-registry-file"]
+==== `registry_file`
+
+The name of the registry file. If a relative path is used, it is considered relative to the
+data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.registry_file: registry
+----
+
+[float]
+==== `backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
+
+This option is valid as a global setting under the +{beatname_lc}+ namespace
+or under `paths`. For a description of this option, see
+<<{beatname_lc}-backoff,`backoff`>>.
+
+[float]
+==== `max_backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
+
+This option is valid as a global setting under the +{beatname_lc}+ namespace
+or under `paths`. For a description of this option, see
+<<{beatname_lc}-max-backoff,`max_backoff`>>.
+
+[float]
+==== `seek` deprecated:[5.6.1,Use the option under `paths` instead.]
+
+This option is valid as a global setting under the +{beatname_lc}+ namespace
+or under `paths`. For a description of this option, see
+<<seek,`seek`>>. 
+
+[float]
+==== `include_matches` deprecated:[5.6.1,Use the option under `paths` instead.]
+
+This option is valid as a global setting under the +{beatname_lc}+ namespace
+or under `paths`. For a description of this option, see
+<<include-matches,`include_matches`>>. 
+
+include::{libbeat-dir}/generalconfig.asciidoc[]
+

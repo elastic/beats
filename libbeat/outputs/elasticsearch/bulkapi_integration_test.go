@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration
 
 package elasticsearch
@@ -20,7 +37,6 @@ func TestBulk(t *testing.T) {
 		{
 			"index": map[string]interface{}{
 				"_index": index,
-				"_type":  "type1",
 				"_id":    "1",
 			},
 		},
@@ -37,7 +53,7 @@ func TestBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, err := client.Bulk(index, "", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -49,8 +65,8 @@ func TestBulk(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	if result.Hits.Total.Value != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	_, _, err = client.Delete(index, "", "", nil)
@@ -70,7 +86,7 @@ func TestEmptyBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Bulk(index, "type1", params, body)
+	resp, err := client.Bulk(index, "", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -89,7 +105,6 @@ func TestBulkMoreOperations(t *testing.T) {
 		{
 			"index": map[string]interface{}{
 				"_index": index,
-				"_type":  "type1",
 				"_id":    "1",
 			},
 		},
@@ -100,7 +115,6 @@ func TestBulkMoreOperations(t *testing.T) {
 		{
 			"delete": map[string]interface{}{
 				"_index": index,
-				"_type":  "type1",
 				"_id":    "2",
 			},
 		},
@@ -108,7 +122,6 @@ func TestBulkMoreOperations(t *testing.T) {
 		{
 			"create": map[string]interface{}{
 				"_index": index,
-				"_type":  "type1",
 				"_id":    "3",
 			},
 		},
@@ -120,7 +133,6 @@ func TestBulkMoreOperations(t *testing.T) {
 			"update": map[string]interface{}{
 				"_id":    "1",
 				"_index": index,
-				"_type":  "type1",
 			},
 		},
 		{
@@ -138,7 +150,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Bulk(index, "type1", params, body)
+	resp, err := client.Bulk(index, "", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s [%s]", err, resp)
 	}
@@ -150,8 +162,8 @@ func TestBulkMoreOperations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	if result.Hits.Total.Value != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	params = map[string]string{
@@ -161,8 +173,8 @@ func TestBulkMoreOperations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	if result.Hits.Total.Value != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	_, _, err = client.Delete(index, "", "", nil)

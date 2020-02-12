@@ -1,12 +1,31 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -40,6 +59,11 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	h := &HttpServer{
 		done:       make(chan struct{}),
@@ -49,8 +73,11 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 	}
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", config.Host, config.Port),
+		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
 		Handler: http.HandlerFunc(h.handleFunc),
+	}
+	if tlsConfig != nil {
+		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
 	}
 	h.server = httpServer
 
@@ -59,11 +86,19 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 
 func (h *HttpServer) Start() error {
 	go func() {
-
-		logp.Info("Starting http server on %s", h.server.Addr)
-		err := h.server.ListenAndServe()
-		if err != nil {
-			logp.Critical("Unable to start HTTP server due to error: %v", err)
+		if h.server.TLSConfig != nil {
+			logp.Info("Starting HTTPS server on %s", h.server.Addr)
+			//certificate is already loaded. That's why the parameters are empty
+			err := h.server.ListenAndServeTLS("", "")
+			if err != nil && err != http.ErrServerClosed {
+				logp.Critical("Unable to start HTTPS server due to error: %v", err)
+			}
+		} else {
+			logp.Info("Starting HTTP server on %s", h.server.Addr)
+			err := h.server.ListenAndServe()
+			if err != nil && err != http.ErrServerClosed {
+				logp.Critical("Unable to start HTTP server due to error: %v", err)
+			}
 		}
 	}()
 
@@ -113,6 +148,11 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 
 	case "GET":
 		writer.WriteHeader(http.StatusOK)
-		writer.Write([]byte("HTTP Server accepts data via POST"))
+		if req.TLS != nil {
+			writer.Write([]byte("HTTPS Server accepts data via POST"))
+		} else {
+			writer.Write([]byte("HTTP Server accepts data via POST"))
+		}
+
 	}
 }

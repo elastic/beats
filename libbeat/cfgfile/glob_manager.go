@@ -1,8 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cfgfile
 
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -93,6 +111,7 @@ func (g *GlobManager) ListEnabled() []*CfgFile {
 		}
 	}
 
+	sort.Sort(byCfgFileDisplayNames(enabled))
 	return enabled
 }
 
@@ -105,6 +124,7 @@ func (g *GlobManager) ListDisabled() []*CfgFile {
 		}
 	}
 
+	sort.Sort(byCfgFileDisplayNames(disabled))
 	return disabled
 }
 
@@ -164,4 +184,32 @@ func (g *GlobManager) Disable(name string) error {
 	}
 
 	return errors.Errorf("module %s not found", name)
+}
+
+// For sorting config files in the desired order, so variants will
+// show up after the default, e.g. elasticsearch-xpack will show up
+// after elasticsearch.
+type byCfgFileDisplayNames []*CfgFile
+
+func (s byCfgFileDisplayNames) Len() int {
+	return len(s)
+}
+
+func (s byCfgFileDisplayNames) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s byCfgFileDisplayNames) Less(i, j int) bool {
+	namei := s[i].Name
+	namej := s[j].Name
+
+	if strings.HasPrefix(namei, namej) {
+		// namei starts with namej, so namei is longer and we want it to come after namej
+		return false
+	} else if strings.HasPrefix(namej, namei) {
+		// namej starts with namei, so namej is longer and we want it to come after namei
+		return true
+	} else {
+		return namei < namej
+	}
 }

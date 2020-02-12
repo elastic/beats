@@ -1,0 +1,736 @@
+- name: eve
+  type: group
+  description: >
+    Fields exported by the EVE JSON logs
+  fields:
+    - name: event_type
+      type: keyword
+
+    - name: app_proto_orig
+      type: keyword
+
+    - name: tcp
+      type: group
+      fields:
+      - name: tcp_flags
+        type: keyword
+
+      - name: psh
+        type: boolean
+
+      - name: tcp_flags_tc
+        type: keyword
+
+      - name: ack
+        type: boolean
+
+      - name: syn
+        type: boolean
+
+      - name: state
+        type: keyword
+
+      - name: tcp_flags_ts
+        type: keyword
+
+      - name: rst
+        type: boolean
+
+      - name: fin
+        type: boolean
+
+    - name: fileinfo
+      type: group
+      fields:
+      - name: sha1
+        type: keyword
+
+      - name: filename
+        type: alias
+        path: file.path
+
+      - name: tx_id
+        type: long
+
+      - name: state
+        type: keyword
+
+      - name: stored
+        type: boolean
+
+      - name: gaps
+        type: boolean
+
+      - name: sha256
+        type: keyword
+
+      - name: md5
+        type: keyword
+
+      - name: size
+        type: alias
+        path: file.size
+
+    - name: icmp_type
+      type: long
+
+    - name: dest_port
+      type: alias
+      path: destination.port
+
+    - name: src_port
+      type: alias
+      path: source.port
+
+    - name: proto
+      type: alias
+      path: network.transport
+
+    - name: pcap_cnt
+      type: long
+
+    - name: src_ip
+      type: alias
+      path: source.ip
+
+    - name: dns
+      type: group
+      fields:
+      - name: type
+        type: keyword
+
+      - name: rrtype
+        type: keyword
+
+      - name: rrname
+        type: keyword
+
+      - name: rdata
+        type: keyword
+
+      - name: tx_id
+        type: long
+
+      - name: ttl
+        type: long
+
+      - name: rcode
+        type: keyword
+
+      - name: id
+        type: long
+
+    - name: flow_id
+      type: keyword
+
+    - name: email
+      type: group
+      fields:
+      - name: status
+        type: keyword
+
+    - name: dest_ip
+      type: alias
+      path: destination.ip
+
+    - name: icmp_code
+      type: long
+
+    - name: http
+      type: group
+      fields:
+      - name: status
+        type: alias
+        path: http.response.status_code
+
+      - name: redirect
+        type: keyword
+
+      - name: http_user_agent
+        type: alias
+        path: user_agent.original
+
+      - name: protocol
+        type: keyword
+
+      - name: http_refer
+        type: alias
+        path: http.request.referrer
+
+      - name: url
+        type: alias
+        path: url.original
+
+      - name: hostname
+        type: alias
+        path: url.domain
+
+      - name: length
+        type: alias
+        path: http.response.body.bytes
+
+      - name: http_method
+        type: alias
+        path: http.request.method
+
+      - name: http_content_type
+        type: keyword
+
+    - name: timestamp
+      type: alias
+      path: '@timestamp'
+
+    - name: in_iface
+      type: keyword
+
+    - name: alert
+      type: group
+      fields:
+      - name: category
+        type: keyword
+
+      - name: severity
+        type: alias
+        path: event.severity
+
+      - name: rev
+        type: long
+
+      - name: gid
+        type: long
+
+      - name: signature
+        type: keyword
+
+      - name: action
+        type: alias
+        path: event.outcome
+
+      - name: signature_id
+        type: long
+
+    - name: ssh
+      type: group
+      fields:
+      - name: client
+        type: group
+        fields:
+        - name: proto_version
+          type: keyword
+
+        - name: software_version
+          type: keyword
+
+      - name: server
+        type: group
+        fields:
+        - name: proto_version
+          type: keyword
+
+        - name: software_version
+          type: keyword
+
+    - name: stats
+      type: group
+      fields:
+      - name: capture
+        type: group
+        fields:
+        - name: kernel_packets
+          type: long
+
+        - name: kernel_drops
+          type: long
+
+        - name: kernel_ifdrops
+          type: long
+
+      - name: uptime
+        type: long
+
+      - name: detect
+        type: group
+        fields:
+        - name: alert
+          type: long
+
+      - name: http
+        type: group
+        fields:
+        - name: memcap
+          type: long
+
+        - name: memuse
+          type: long
+
+      - name: file_store
+        type: group
+        fields:
+        - name: open_files
+          type: long
+
+      - name: defrag
+        type: group
+        fields:
+        - name: max_frag_hits
+          type: long
+
+        - name: ipv4
+          type: group
+          fields:
+          - name: timeouts
+            type: long
+
+          - name: fragments
+            type: long
+
+          - name: reassembled
+            type: long
+
+        - name: ipv6
+          type: group
+          fields:
+          - name: timeouts
+            type: long
+
+          - name: fragments
+            type: long
+
+          - name: reassembled
+            type: long
+
+      - name: flow
+        type: group
+        fields:
+        - name: tcp_reuse
+          type: long
+
+        - name: udp
+          type: long
+
+        - name: memcap
+          type: long
+
+        - name: emerg_mode_entered
+          type: long
+
+        - name: emerg_mode_over
+          type: long
+
+        - name: tcp
+          type: long
+
+        - name: icmpv6
+          type: long
+
+        - name: icmpv4
+          type: long
+
+        - name: spare
+          type: long
+
+        - name: memuse
+          type: long
+
+      - name: tcp
+        type: group
+        fields:
+        - name: pseudo_failed
+          type: long
+
+        - name: ssn_memcap_drop
+          type: long
+
+        - name: insert_data_overlap_fail
+          type: long
+
+        - name: sessions
+          type: long
+
+        - name: pseudo
+          type: long
+
+        - name: synack
+          type: long
+
+        - name: insert_data_normal_fail
+          type: long
+
+        - name: syn
+          type: long
+
+        - name: memuse
+          type: long
+
+        - name: invalid_checksum
+          type: long
+
+        - name: segment_memcap_drop
+          type: long
+
+        - name: overlap
+          type: long
+
+        - name: insert_list_fail
+          type: long
+
+        - name: rst
+          type: long
+
+        - name: stream_depth_reached
+          type: long
+
+        - name: reassembly_memuse
+          type: long
+
+        - name: reassembly_gap
+          type: long
+
+        - name: overlap_diff_data
+          type: long
+
+        - name: no_flow
+          type: long
+
+      - name: decoder
+        type: group
+        fields:
+        - name: avg_pkt_size
+          type: long
+
+        - name: bytes
+          type: long
+
+        - name: tcp
+          type: long
+
+        - name: raw
+          type: long
+
+        - name: ppp
+          type: long
+
+        - name: vlan_qinq
+          type: long
+
+        - name: 'null'
+          type: long
+
+        - name: ltnull
+          type: group
+          fields:
+          - name: unsupported_type
+            type: long
+
+          - name: pkt_too_small
+            type: long
+
+        - name: invalid
+          type: long
+
+        - name: gre
+          type: long
+
+        - name: ipv4
+          type: long
+
+        - name: ipv6
+          type: long
+
+        - name: pkts
+          type: long
+
+        - name: ipv6_in_ipv6
+          type: long
+
+        - name: ipraw
+          type: group
+          fields:
+          - name: invalid_ip_version
+            type: long
+
+        - name: pppoe
+          type: long
+
+        - name: udp
+          type: long
+
+        - name: dce
+          type: group
+          fields:
+          - name: pkt_too_small
+            type: long
+
+        - name: vlan
+          type: long
+
+        - name: sctp
+          type: long
+
+        - name: max_pkt_size
+          type: long
+
+        - name: teredo
+          type: long
+
+        - name: mpls
+          type: long
+
+        - name: sll
+          type: long
+
+        - name: icmpv6
+          type: long
+
+        - name: icmpv4
+          type: long
+
+        - name: erspan
+          type: long
+
+        - name: ethernet
+          type: long
+
+        - name: ipv4_in_ipv6
+          type: long
+
+        - name: ieee8021ah
+          type: long
+
+      - name: dns
+        type: group
+        fields:
+        - name: memcap_global
+          type: long
+
+        - name: memcap_state
+          type: long
+
+        - name: memuse
+          type: long
+
+      - name: flow_mgr
+        type: group
+        fields:
+        - name: rows_busy
+          type: long
+
+        - name: flows_timeout
+          type: long
+
+        - name: flows_notimeout
+          type: long
+
+        - name: rows_skipped
+          type: long
+
+        - name: closed_pruned
+          type: long
+
+        - name: new_pruned
+          type: long
+
+        - name: flows_removed
+          type: long
+
+        - name: bypassed_pruned
+          type: long
+
+        - name: est_pruned
+          type: long
+
+        - name: flows_timeout_inuse
+          type: long
+
+        - name: flows_checked
+          type: long
+
+        - name: rows_maxlen
+          type: long
+
+        - name: rows_checked
+          type: long
+
+        - name: rows_empty
+          type: long
+
+      - name: app_layer
+        type: group
+        fields:
+        - name: flow
+          type: group
+          fields:
+          - name: tls
+            type: long
+
+          - name: ftp
+            type: long
+
+          - name: http
+            type: long
+
+          - name: failed_udp
+            type: long
+
+          - name: dns_udp
+            type: long
+
+          - name: dns_tcp
+            type: long
+
+          - name: smtp
+            type: long
+
+          - name: failed_tcp
+            type: long
+
+          - name: msn
+            type: long
+
+          - name: ssh
+            type: long
+
+          - name: imap
+            type: long
+
+          - name: dcerpc_udp
+            type: long
+
+          - name: dcerpc_tcp
+            type: long
+
+          - name: smb
+            type: long
+
+        - name: tx
+          type: group
+          fields:
+          - name: tls
+            type: long
+
+          - name: ftp
+            type: long
+
+          - name: http
+            type: long
+
+          - name: dns_udp
+            type: long
+
+          - name: dns_tcp
+            type: long
+
+          - name: smtp
+            type: long
+
+          - name: ssh
+            type: long
+
+          - name: dcerpc_udp
+            type: long
+
+          - name: dcerpc_tcp
+            type: long
+
+          - name: smb
+            type: long
+
+    - name: tls
+      type: group
+      fields:
+      - name: notbefore
+        type: date
+
+      - name: issuerdn
+        type: keyword
+
+      - name: sni
+        type: keyword
+
+      - name: version
+        type: keyword
+
+      - name: session_resumed
+        type: boolean
+
+      - name: fingerprint
+        type: keyword
+
+      - name: serial
+        type: keyword
+
+      - name: notafter
+        type: date
+
+      - name: subject
+        type: keyword
+
+    - name: app_proto_ts
+      type: keyword
+
+    - name: flow
+      type: group
+      fields:
+      - name: bytes_toclient
+        type: alias
+        path: destination.bytes
+
+      - name: start
+        type: alias
+        path: event.start
+
+      - name: pkts_toclient
+        type: alias
+        path: destination.packets
+
+      - name: age
+        type: long
+
+      - name: state
+        type: keyword
+
+      - name: bytes_toserver
+        type: alias
+        path: source.bytes
+
+      - name: reason
+        type: keyword
+
+      - name: pkts_toserver
+        type: alias
+        path: source.packets
+
+      - name: end
+        type: date
+
+      - name: alerted
+        type: boolean
+
+    - name: app_proto
+      type: alias
+      path: network.protocol
+
+    - name: tx_id
+      type: long
+
+    - name: app_proto_tc
+      type: keyword
+
+    - name: smtp
+      type: group
+      fields:
+      - name: rcpt_to
+        type: keyword
+
+      - name: mail_from
+        type: keyword
+
+      - name: helo
+        type: keyword
+
+    - name: app_proto_expected
+      type: keyword
+
+    - name: flags
+      type: group
+      fields:

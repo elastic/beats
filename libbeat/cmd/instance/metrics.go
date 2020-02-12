@@ -1,44 +1,47 @@
-// +build darwin linux windows
-// +build cgo
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// +build darwin,cgo freebsd,cgo linux windows
 
 package instance
 
 import (
 	"fmt"
-	"os"
 	"runtime"
-	"time"
 
-	"github.com/satori/go.uuid"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/report/log"
 )
 
 var (
 	beatProcessStats *process.Stats
-	ephemeralID      uuid.UUID
+	systemMetrics    *monitoring.Registry
 )
 
 func init() {
-	beatMetrics := monitoring.Default.NewRegistry("beat")
-	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "info", reportInfo, monitoring.Report)
-
-	systemMetrics := monitoring.Default.NewRegistry("system")
-	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-	if runtime.GOOS != "windows" {
-		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	}
-
-	ephemeralID = uuid.NewV4()
+	systemMetrics = monitoring.Default.NewRegistry("system")
 }
 
 func setupMetrics(name string) error {
+	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
+
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
 		EnvWhitelist: nil,
@@ -46,9 +49,29 @@ func setupMetrics(name string) error {
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 	}
-	err := beatProcessStats.Init()
 
-	return err
+	err := beatProcessStats.Init()
+	if err != nil {
+		return err
+	}
+
+	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "runtime", reportRuntime, monitoring.Report)
+
+	setupPlatformSpecificMetrics()
+
+	return nil
+}
+
+func setupPlatformSpecificMetrics() {
+	if runtime.GOOS != "windows" {
+		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	} else {
+		setupWindowsHandlesMetrics()
+	}
+
+	setupLinuxBSDFDMetrics()
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
@@ -73,10 +96,9 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getRSSSize() (uint64, error) {
-	beatPID := os.Getpid()
-	state, err := beatProcessStats.GetOne(beatPID)
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0, fmt.Errorf("error retrieving process stats")
+		return 0, err
 	}
 
 	iRss, err := state.GetValue("memory.rss.bytes")
@@ -86,22 +108,23 @@ func getRSSSize() (uint64, error) {
 
 	rss, ok := iRss.(uint64)
 	if !ok {
-		return 0, fmt.Errorf("error converting Resident Set Size: %v", err)
+		return 0, fmt.Errorf("error converting Resident Set Size to uint64: %v", iRss)
 	}
 	return rss, nil
 }
 
-func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
+func getBeatProcessState() (common.MapStr, error) {
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		return nil, fmt.Errorf("error getting PID for self process: %v", err)
+	}
 
-	delta := time.Since(log.StartTime)
-	uptime := int64(delta / time.Millisecond)
-	monitoring.ReportNamespace(V, "uptime", func() {
-		monitoring.ReportInt(V, "ms", uptime)
-	})
+	state, err := beatProcessStats.GetOne(pid)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving process stats: %v", err)
+	}
 
-	monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
+	return state, nil
 }
 
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
@@ -122,24 +145,29 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 
 	monitoring.ReportNamespace(V, "user", func() {
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.User))
-		monitoring.ReportInt(V, "time", userTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", userTime)
+		})
 	})
 	monitoring.ReportNamespace(V, "system", func() {
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.System))
-		monitoring.ReportInt(V, "time", systemTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", systemTime)
+		})
 	})
 	monitoring.ReportNamespace(V, "total", func() {
 		monitoring.ReportFloat(V, "value", totalCPUUsage)
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.Total))
-		monitoring.ReportInt(V, "time", userTime+systemTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", userTime+systemTime)
+		})
 	})
 }
 
 func getCPUUsage() (float64, *process.Ticks, error) {
-	beatPID := os.Getpid()
-	state, err := beatProcessStats.GetOne(beatPID)
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error retrieving process stats")
+		return 0.0, nil, err
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
@@ -149,7 +177,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUUsage, ok := iTotalCPUUsage.(float64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start")
+		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start to float64: %v", iTotalCPUUsage)
 	}
 
 	iTotalCPUUserTicks, err := state.GetValue("cpu.user.ticks")
@@ -159,7 +187,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUUserTicks, ok := iTotalCPUUserTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start")
+		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64: %v", iTotalCPUUserTicks)
 	}
 
 	iTotalCPUSystemTicks, err := state.GetValue("cpu.system.ticks")
@@ -169,7 +197,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUSystemTicks, ok := iTotalCPUSystemTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start")
+		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64: %v", iTotalCPUSystemTicks)
 	}
 
 	iTotalCPUTicks, err := state.GetValue("cpu.total.ticks")
@@ -179,7 +207,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUTicks, ok := iTotalCPUTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start")
+		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64: %v", iTotalCPUTicks)
 	}
 
 	p := process.Ticks{
@@ -218,4 +246,11 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	defer V.OnRegistryFinished()
 
 	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
+}
+
+func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	monitoring.ReportInt(V, "goroutines", int64(runtime.NumGoroutine()))
 }

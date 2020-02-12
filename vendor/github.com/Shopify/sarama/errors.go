@@ -37,6 +37,18 @@ var ErrShuttingDown = errors.New("kafka: message received by producer in process
 // ErrMessageTooLarge is returned when the next message to consume is larger than the configured Consumer.Fetch.Max
 var ErrMessageTooLarge = errors.New("kafka: message is larger than Consumer.Fetch.Max")
 
+// ErrConsumerOffsetNotAdvanced is returned when a partition consumer didn't advance its offset after parsing
+// a RecordBatch.
+var ErrConsumerOffsetNotAdvanced = errors.New("kafka: consumer offset was not advanced after a RecordBatch")
+
+// ErrControllerNotAvailable is returned when server didn't give correct controller id. May be kafka server's version
+// is lower than 0.10.0.0.
+var ErrControllerNotAvailable = errors.New("kafka: controller is not available")
+
+// ErrNoTopicsToUpdateMetadata is returned when Meta.Full is set to false but no specific topics were found to update
+// the metadata.
+var ErrNoTopicsToUpdateMetadata = errors.New("kafka: no specific topics to update metadata")
+
 // PacketEncodingError is returned from a failure while encoding a Kafka packet. This can happen, for example,
 // if you try to encode a string over 2^15 characters in length, since Kafka's encoding rules do not permit that.
 type PacketEncodingError struct {
@@ -69,54 +81,114 @@ func (err ConfigurationError) Error() string {
 // See https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol#AGuideToTheKafkaProtocol-ErrorCodes
 type KError int16
 
+// MultiError is used to contain multi error.
+type MultiError struct {
+	Errors *[]error
+}
+
+func (mErr MultiError) Error() string {
+	var errString = ""
+	for _, err := range *mErr.Errors {
+		errString += err.Error() + ","
+	}
+	return errString
+}
+
+// ErrDeleteRecords is the type of error returned when fail to delete the required records
+type ErrDeleteRecords struct {
+	MultiError
+}
+
+func (err ErrDeleteRecords) Error() string {
+	return "kafka server: failed to delete records " + err.MultiError.Error()
+}
+
 // Numeric error codes returned by the Kafka server.
 const (
-	ErrNoError                         KError = 0
-	ErrUnknown                         KError = -1
-	ErrOffsetOutOfRange                KError = 1
-	ErrInvalidMessage                  KError = 2
-	ErrUnknownTopicOrPartition         KError = 3
-	ErrInvalidMessageSize              KError = 4
-	ErrLeaderNotAvailable              KError = 5
-	ErrNotLeaderForPartition           KError = 6
-	ErrRequestTimedOut                 KError = 7
-	ErrBrokerNotAvailable              KError = 8
-	ErrReplicaNotAvailable             KError = 9
-	ErrMessageSizeTooLarge             KError = 10
-	ErrStaleControllerEpochCode        KError = 11
-	ErrOffsetMetadataTooLarge          KError = 12
-	ErrNetworkException                KError = 13
-	ErrOffsetsLoadInProgress           KError = 14
-	ErrConsumerCoordinatorNotAvailable KError = 15
-	ErrNotCoordinatorForConsumer       KError = 16
-	ErrInvalidTopic                    KError = 17
-	ErrMessageSetSizeTooLarge          KError = 18
-	ErrNotEnoughReplicas               KError = 19
-	ErrNotEnoughReplicasAfterAppend    KError = 20
-	ErrInvalidRequiredAcks             KError = 21
-	ErrIllegalGeneration               KError = 22
-	ErrInconsistentGroupProtocol       KError = 23
-	ErrInvalidGroupId                  KError = 24
-	ErrUnknownMemberId                 KError = 25
-	ErrInvalidSessionTimeout           KError = 26
-	ErrRebalanceInProgress             KError = 27
-	ErrInvalidCommitOffsetSize         KError = 28
-	ErrTopicAuthorizationFailed        KError = 29
-	ErrGroupAuthorizationFailed        KError = 30
-	ErrClusterAuthorizationFailed      KError = 31
-	ErrInvalidTimestamp                KError = 32
-	ErrUnsupportedSASLMechanism        KError = 33
-	ErrIllegalSASLState                KError = 34
-	ErrUnsupportedVersion              KError = 35
-	ErrTopicAlreadyExists              KError = 36
-	ErrInvalidPartitions               KError = 37
-	ErrInvalidReplicationFactor        KError = 38
-	ErrInvalidReplicaAssignment        KError = 39
-	ErrInvalidConfig                   KError = 40
-	ErrNotController                   KError = 41
-	ErrInvalidRequest                  KError = 42
-	ErrUnsupportedForMessageFormat     KError = 43
-	ErrPolicyViolation                 KError = 44
+	ErrNoError                            KError = 0
+	ErrUnknown                            KError = -1
+	ErrOffsetOutOfRange                   KError = 1
+	ErrInvalidMessage                     KError = 2
+	ErrUnknownTopicOrPartition            KError = 3
+	ErrInvalidMessageSize                 KError = 4
+	ErrLeaderNotAvailable                 KError = 5
+	ErrNotLeaderForPartition              KError = 6
+	ErrRequestTimedOut                    KError = 7
+	ErrBrokerNotAvailable                 KError = 8
+	ErrReplicaNotAvailable                KError = 9
+	ErrMessageSizeTooLarge                KError = 10
+	ErrStaleControllerEpochCode           KError = 11
+	ErrOffsetMetadataTooLarge             KError = 12
+	ErrNetworkException                   KError = 13
+	ErrOffsetsLoadInProgress              KError = 14
+	ErrConsumerCoordinatorNotAvailable    KError = 15
+	ErrNotCoordinatorForConsumer          KError = 16
+	ErrInvalidTopic                       KError = 17
+	ErrMessageSetSizeTooLarge             KError = 18
+	ErrNotEnoughReplicas                  KError = 19
+	ErrNotEnoughReplicasAfterAppend       KError = 20
+	ErrInvalidRequiredAcks                KError = 21
+	ErrIllegalGeneration                  KError = 22
+	ErrInconsistentGroupProtocol          KError = 23
+	ErrInvalidGroupId                     KError = 24
+	ErrUnknownMemberId                    KError = 25
+	ErrInvalidSessionTimeout              KError = 26
+	ErrRebalanceInProgress                KError = 27
+	ErrInvalidCommitOffsetSize            KError = 28
+	ErrTopicAuthorizationFailed           KError = 29
+	ErrGroupAuthorizationFailed           KError = 30
+	ErrClusterAuthorizationFailed         KError = 31
+	ErrInvalidTimestamp                   KError = 32
+	ErrUnsupportedSASLMechanism           KError = 33
+	ErrIllegalSASLState                   KError = 34
+	ErrUnsupportedVersion                 KError = 35
+	ErrTopicAlreadyExists                 KError = 36
+	ErrInvalidPartitions                  KError = 37
+	ErrInvalidReplicationFactor           KError = 38
+	ErrInvalidReplicaAssignment           KError = 39
+	ErrInvalidConfig                      KError = 40
+	ErrNotController                      KError = 41
+	ErrInvalidRequest                     KError = 42
+	ErrUnsupportedForMessageFormat        KError = 43
+	ErrPolicyViolation                    KError = 44
+	ErrOutOfOrderSequenceNumber           KError = 45
+	ErrDuplicateSequenceNumber            KError = 46
+	ErrInvalidProducerEpoch               KError = 47
+	ErrInvalidTxnState                    KError = 48
+	ErrInvalidProducerIDMapping           KError = 49
+	ErrInvalidTransactionTimeout          KError = 50
+	ErrConcurrentTransactions             KError = 51
+	ErrTransactionCoordinatorFenced       KError = 52
+	ErrTransactionalIDAuthorizationFailed KError = 53
+	ErrSecurityDisabled                   KError = 54
+	ErrOperationNotAttempted              KError = 55
+	ErrKafkaStorageError                  KError = 56
+	ErrLogDirNotFound                     KError = 57
+	ErrSASLAuthenticationFailed           KError = 58
+	ErrUnknownProducerID                  KError = 59
+	ErrReassignmentInProgress             KError = 60
+	ErrDelegationTokenAuthDisabled        KError = 61
+	ErrDelegationTokenNotFound            KError = 62
+	ErrDelegationTokenOwnerMismatch       KError = 63
+	ErrDelegationTokenRequestNotAllowed   KError = 64
+	ErrDelegationTokenAuthorizationFailed KError = 65
+	ErrDelegationTokenExpired             KError = 66
+	ErrInvalidPrincipalType               KError = 67
+	ErrNonEmptyGroup                      KError = 68
+	ErrGroupIDNotFound                    KError = 69
+	ErrFetchSessionIDNotFound             KError = 70
+	ErrInvalidFetchSessionEpoch           KError = 71
+	ErrListenerNotFound                   KError = 72
+	ErrTopicDeletionDisabled              KError = 73
+	ErrFencedLeaderEpoch                  KError = 74
+	ErrUnknownLeaderEpoch                 KError = 75
+	ErrUnsupportedCompressionType         KError = 76
+	ErrStaleBrokerEpoch                   KError = 77
+	ErrOffsetNotAvailable                 KError = 78
+	ErrMemberIdRequired                   KError = 79
+	ErrPreferredLeaderNotAvailable        KError = 80
+	ErrGroupMaxSizeReached                KError = 81
+	ErrFencedInstancedId                  KError = 82
 )
 
 func (err KError) Error() string {
@@ -215,6 +287,82 @@ func (err KError) Error() string {
 		return "kafka server: The requested operation is not supported by the message format version."
 	case ErrPolicyViolation:
 		return "kafka server: Request parameters do not satisfy the configured policy."
+	case ErrOutOfOrderSequenceNumber:
+		return "kafka server: The broker received an out of order sequence number."
+	case ErrDuplicateSequenceNumber:
+		return "kafka server: The broker received a duplicate sequence number."
+	case ErrInvalidProducerEpoch:
+		return "kafka server: Producer attempted an operation with an old epoch."
+	case ErrInvalidTxnState:
+		return "kafka server: The producer attempted a transactional operation in an invalid state."
+	case ErrInvalidProducerIDMapping:
+		return "kafka server: The producer attempted to use a producer id which is not currently assigned to its transactional id."
+	case ErrInvalidTransactionTimeout:
+		return "kafka server: The transaction timeout is larger than the maximum value allowed by the broker (as configured by max.transaction.timeout.ms)."
+	case ErrConcurrentTransactions:
+		return "kafka server: The producer attempted to update a transaction while another concurrent operation on the same transaction was ongoing."
+	case ErrTransactionCoordinatorFenced:
+		return "kafka server: The transaction coordinator sending a WriteTxnMarker is no longer the current coordinator for a given producer."
+	case ErrTransactionalIDAuthorizationFailed:
+		return "kafka server: Transactional ID authorization failed."
+	case ErrSecurityDisabled:
+		return "kafka server: Security features are disabled."
+	case ErrOperationNotAttempted:
+		return "kafka server: The broker did not attempt to execute this operation."
+	case ErrKafkaStorageError:
+		return "kafka server: Disk error when trying to access log file on the disk."
+	case ErrLogDirNotFound:
+		return "kafka server: The specified log directory is not found in the broker config."
+	case ErrSASLAuthenticationFailed:
+		return "kafka server: SASL Authentication failed."
+	case ErrUnknownProducerID:
+		return "kafka server: The broker could not locate the producer metadata associated with the Producer ID."
+	case ErrReassignmentInProgress:
+		return "kafka server: A partition reassignment is in progress."
+	case ErrDelegationTokenAuthDisabled:
+		return "kafka server: Delegation Token feature is not enabled."
+	case ErrDelegationTokenNotFound:
+		return "kafka server: Delegation Token is not found on server."
+	case ErrDelegationTokenOwnerMismatch:
+		return "kafka server: Specified Principal is not valid Owner/Renewer."
+	case ErrDelegationTokenRequestNotAllowed:
+		return "kafka server: Delegation Token requests are not allowed on PLAINTEXT/1-way SSL channels and on delegation token authenticated channels."
+	case ErrDelegationTokenAuthorizationFailed:
+		return "kafka server: Delegation Token authorization failed."
+	case ErrDelegationTokenExpired:
+		return "kafka server: Delegation Token is expired."
+	case ErrInvalidPrincipalType:
+		return "kafka server: Supplied principalType is not supported."
+	case ErrNonEmptyGroup:
+		return "kafka server: The group is not empty."
+	case ErrGroupIDNotFound:
+		return "kafka server: The group id does not exist."
+	case ErrFetchSessionIDNotFound:
+		return "kafka server: The fetch session ID was not found."
+	case ErrInvalidFetchSessionEpoch:
+		return "kafka server: The fetch session epoch is invalid."
+	case ErrListenerNotFound:
+		return "kafka server: There is no listener on the leader broker that matches the listener on which metadata request was processed."
+	case ErrTopicDeletionDisabled:
+		return "kafka server: Topic deletion is disabled."
+	case ErrFencedLeaderEpoch:
+		return "kafka server: The leader epoch in the request is older than the epoch on the broker."
+	case ErrUnknownLeaderEpoch:
+		return "kafka server: The leader epoch in the request is newer than the epoch on the broker."
+	case ErrUnsupportedCompressionType:
+		return "kafka server: The requesting client does not support the compression type of given partition."
+	case ErrStaleBrokerEpoch:
+		return "kafka server: Broker epoch has changed"
+	case ErrOffsetNotAvailable:
+		return "kafka server: The leader high watermark has not caught up from a recent leader election so the offsets cannot be guaranteed to be monotonically increasing"
+	case ErrMemberIdRequired:
+		return "kafka server: The group member needs to have a valid member id before actually entering a consumer group"
+	case ErrPreferredLeaderNotAvailable:
+		return "kafka server: The preferred leader was not available"
+	case ErrGroupMaxSizeReached:
+		return "kafka server: Consumer group The consumer group has reached its max size. already has the configured maximum number of members."
+	case ErrFencedInstancedId:
+		return "kafka server: The broker rejected this static consumer since another consumer with the same group.instance.id has registered with a different member.id."
 	}
 
 	return fmt.Sprintf("Unknown error, how did this happen? Error code = %d", err)

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package monitoring
 
 import (
@@ -6,7 +23,9 @@ import (
 	"math"
 	"strconv"
 	"sync"
+	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
@@ -107,6 +126,30 @@ func (v *Float) Add(delta float64) {
 	}
 }
 
+// Bool is a Bool variable satisfying the Var interface.
+type Bool struct{ f atomic.Bool }
+
+// NewBool creates and registers a new bool variable.
+//
+// Note: If the registry is configured to publish variables to expvar, the
+// variable will be available via expvars package as well, but can not be removed
+// anymore.
+func NewBool(r *Registry, name string, opts ...Option) *Bool {
+	if r == nil {
+		r = Default
+	}
+
+	v := &Bool{}
+	addVar(r, name, opts, v, makeExpvar(func() string {
+		return strconv.FormatBool(v.Get())
+	}))
+	return v
+}
+
+func (v *Bool) Get() bool                { return v.f.Load() }
+func (v *Bool) Set(value bool)           { v.f.Store(value) }
+func (v *Bool) Visit(_ Mode, vs Visitor) { vs.OnBool(v.Get()) }
+
 // String is a string variable satisfying the Var interface.
 type String struct {
 	mu sync.RWMutex
@@ -190,4 +233,58 @@ func fullName(r *Registry, name string) string {
 		return name
 	}
 	return r.name + "." + name
+}
+
+// Timestamp is a timestamp variable satisfying the Var interface.
+type Timestamp struct {
+	mu     sync.RWMutex
+	ts     time.Time
+	cached string
+}
+
+// NewTimestamp creates and registeres a new timestamp variable.
+func NewTimestamp(r *Registry, name string, opts ...Option) *Timestamp {
+	if r == nil {
+		r = Default
+	}
+
+	v := &Timestamp{}
+	addVar(r, name, opts, v, makeExpvar(func() string {
+		return v.toString()
+
+	}))
+	return v
+}
+
+func (v *Timestamp) Set(t time.Time) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	v.ts = t
+	v.cached = ""
+}
+
+func (v *Timestamp) Get() time.Time {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	return v.ts
+}
+
+func (v *Timestamp) Visit(_ Mode, vs Visitor) {
+	vs.OnString(v.toString())
+}
+
+func (v *Timestamp) toString() string {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	if v.ts.IsZero() {
+		return ""
+	}
+
+	if v.cached == "" {
+		v.cached = v.ts.Format(common.TsLayout)
+	}
+	return v.cached
 }

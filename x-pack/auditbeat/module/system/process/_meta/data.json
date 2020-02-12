@@ -1,0 +1,48 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "action": "process_stopped",
+        "dataset": "process",
+        "kind": "event",
+        "module": "system"
+    },
+    "message": "Process zsh (PID: 9086) by user elastic STOPPED",
+    "process": {
+        "args": [
+            "zsh"
+        ],
+        "entity_id": "+fYshazplsMYlr0y",
+        "executable": "/bin/zsh",
+        "hash": {
+            "sha1": "33646536613061316366353134643135613631643363383733653261373130393737633131303364"
+        },
+        "name": "zsh",
+        "pid": 9086,
+        "ppid": 9085,
+        "start": "2019-01-01T00:00:01Z",
+        "working_directory": "/home/elastic"
+    },
+    "service": {
+        "type": "system"
+    },
+    "user": {
+        "effective": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        },
+        "group": {
+            "id": "1000",
+            "name": "elastic"
+        },
+        "id": "1000",
+        "name": "elastic",
+        "saved": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        }
+    }
+}

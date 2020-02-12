@@ -7,11 +7,12 @@ own metricsets.
 [float]
 ==== Requirements
 
-To create your own Beat, you must have Golang {go-version} or later installed, and the `$GOPATH`
+To create your own Beat, you must have Go {go-version} or later installed, and the `$GOPATH`
 must be set up correctly. In addition, the following tools are required:
 
 * https://www.python.org/downloads/[python]
 * https://virtualenv.pypa.io/en/stable/[virtualenv]
+* https://github.com/magefile/mage[mage]
 
 Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
 
@@ -26,12 +27,12 @@ go get github.com/elastic/beats/metricbeat
 ----
 
 This will clone the beats repository into `GOPATH`. By default `go get`  fetches the master branch. To build your beat
-on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+on a specific version of libbeat, check out the specific branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
 cd ${GOPATH}/src/github.com/elastic/beats
-git checkout {doc-branch}
+git checkout {branch}
 ----
 
 Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
@@ -43,34 +44,20 @@ This directory is normally located under `$GOPATH/src/github.com/{your-github-na
 [float]
 ==== Step 2 - Create the Beat
 
-Run the command:
+Run the command from the root `beats` directory:
 
 [source,bash]
 ----
-python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+NEWBEAT_TYPE=metricbeat mage GenerateCustomBeat
 ----
 
-When prompted, enter the Beat name and path.
+When prompted, enter the Beat name and path, along with an initial module and metricset name for your beat. For more details about creating a metricset, see the docs <<creating-metricsets>>.
+
+After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-name}/{beat}`
 
 
 [float]
-==== Step 3 - Init and create the metricset
-
-After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-name}/{beat}` and run:
-
-[source,bash]
-----
-make setup
-----
-
-This will do the initial setup for your Beat and also run `make create-metricset`, which will ask you for the
-module name and metricset name of your Beat.
-
-For more details about creating a metricset, see the docs <<creating-metricsets>>.
-
-
-[float]
-==== Step 4 - Build & Run
+==== Step 3 - Build & Run
 
 To create a binary run the `make` command. This will create the binary in your beats directory.
 
@@ -84,14 +71,14 @@ To run it, execute the binary. This will automatically load the default configur
 This will run the beat with debug output enabled to the console to directly see what is happening. Stop the beat with `CTRL-C`.
 
 [float]
-==== Step 5 - Package
+==== Step 4 - Package
 
-To create packages and binaries for different plaforms, https://www.docker.com/[docker] is required.
+To create packages and binaries for different platforms, https://www.docker.com/[docker] is required.
 The first step is to get the most recent packaging tools into your beat:
 
 [source,bash]
 ----
-make package
+make release
 ----
 
 This will fetch the most recent packaging tools and start the packaging of your beat. This can take a little bit longer.

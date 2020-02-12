@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-redis]]
@@ -7,11 +7,17 @@ This file is generated! See scripts/docs_collector.py
 
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
+The defaut metricsets are `info` and `keyspace`.
+
 [float]
 === Module-specific configuration notes
 
 The Redis module has these additional config options:
 
+*`hosts`*:: URLs that are used to connect to Redis.
+URL format:
+redis://[:password@]host[:port][/db-number][?option=value]
+redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
 *`password`*:: The password to authenticate, by default it's empty.
 *`idle_timeout`*:: The duration to remain idle before closing connections. If
   the value is zero, then idle connections are not closed. The default value
@@ -27,8 +33,8 @@ The Redis module has these additional config options:
 [float]
 === Compatibility
 
-The Redis metricsets were tested with Redis 3.2.4 and are expected to work with all version
->= 3.0.
+The Redis metricsets were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4,  and are expected
+to work with all versions >= 3.0.
 
 
 [float]
@@ -42,6 +48,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: redis
   metricsets: ["info", "keyspace"]
+  enabled: true
   period: 10s
 
   # Redis hosts
@@ -78,9 +85,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-redis-info,info>>
 
+* <<metricbeat-metricset-redis-key,key>>
+
 * <<metricbeat-metricset-redis-keyspace,keyspace>>
 
 include::redis/info.asciidoc[]
+
+include::redis/key.asciidoc[]
 
 include::redis/keyspace.asciidoc[]
 

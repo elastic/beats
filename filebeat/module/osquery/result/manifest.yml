@@ -14,4 +14,4 @@ var:
 
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/result.yml
+input: config/result.yml

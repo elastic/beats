@@ -1,0 +1,4 @@
+Dec 10 12:01:46 voyager haproxy[19312]: 127.0.0.1:35982 [10/Dec/2018:12:01:46.395] http-webservices http-webservices/<NOSRV> 0/-1/-1/-1/0 503 213 - - SC-- 1/1/0/0/0 0/0 "GET / HTTP/1.1"
+Dec 10 15:46:49 voyager haproxy[29785]: 127.0.0.1:43738 [10/Dec/2018:15:46:49.497] http-webservices http-webservices/<NOSRV> 0/-1/-1/-1/0 503 213 - - SC-- 1/1/0/0/0 0/0 {localhost:8888||} "GET /foo HTTP/1.1"
+Dec 10 15:48:56 voyager haproxy[7873]: 127.0.0.1:44542 [10/Dec/2018:15:48:56.017] http-webservices http-webservices/<NOSRV> 0/-1/-1/-1/0 503 213 - - SC-- 1/1/0/0/0 0/0 {localhost:8888||} {|} "GET /foo HTTP/1.1"
+

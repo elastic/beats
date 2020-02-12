@@ -1,0 +1,15 @@
+# This yml file is for testing cloudwatch metricset to get EC2 metrics.
+# Please make sure you have EC2 instances running with tags. Then replace aws.yml
+# content with this and start metricbeat. You should see ec2 metrics from Cloudwatch
+# at Elasticseach including tags.
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  metrics:
+    - namespace: AWS/EC2
+      resource_type_filter: ec2

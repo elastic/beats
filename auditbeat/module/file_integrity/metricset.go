@@ -1,11 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package file_integrity
 
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 	"time"
 
-	"github.com/boltdb/bolt"
+	bolt "github.com/coreos/bbolt"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"
@@ -22,6 +40,8 @@ const (
 	// Use old namespace for data until we do some field renaming for GA.
 	namespace = "."
 )
+
+var underTest = false
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
@@ -74,13 +94,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config:        config,
 		reader:        r,
 		log:           logp.NewLogger(moduleName),
-	}
-
-	if config.ScanAtStart {
-		ms.scanner, err = NewFileSystemScanner(config)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to initialize file scanner")
-		}
 	}
 
 	ms.log.Debugf("Initialized the file event reader. Running as euid=%v", os.Geteuid())
@@ -147,7 +160,15 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	}
 
 	ms.scanStart = time.Now().UTC()
-	if ms.scanner != nil {
+	if ms.config.ScanAtStart {
+		ms.scanner, err = NewFileSystemScanner(ms.config, ms.findNewPaths())
+		if err != nil {
+			err = errors.Wrap(err, "failed to initialize file scanner")
+			reporter.Error(err)
+			ms.log.Errorw("Failed to initialize", "error", err)
+			return false
+		}
+
 		ms.scanChan, err = ms.scanner.Start(reporter.Done())
 		if err != nil {
 			err = errors.Wrap(err, "failed to start file scanner")
@@ -158,6 +179,32 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	}
 
 	return true
+}
+
+// findNewPaths determines which - if any - paths have been newly added to the config.
+func (ms *MetricSet) findNewPaths() map[string]struct{} {
+	newPaths := make(map[string]struct{})
+
+	for _, path := range ms.config.Paths {
+		// Resolve symlinks to ensure we have an absolute path.
+		evalPath, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			ms.log.Warnw("Failed to resolve", "file_path", path, "error", err)
+			continue
+		}
+
+		lastEvent, err := load(ms.bucket, evalPath)
+		if err != nil {
+			ms.log.Warnw("Failed during DB load", "error", err)
+			continue
+		}
+
+		if lastEvent == nil {
+			newPaths[evalPath] = struct{}{}
+		}
+	}
+
+	return newPaths
 }
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool {

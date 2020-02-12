@@ -1,15 +1,34 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package sys
 
 import (
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"time"
 )
 
 // UnmarshalEventXML unmarshals the given XML into a new Event.
 func UnmarshalEventXML(rawXML []byte) (Event, error) {
 	var event Event
-	err := xml.Unmarshal(rawXML, &event)
+	decoder := xml.NewDecoder(newXMLSafeReader(rawXML))
+	err := decoder.Decode(&event)
 	return event, err
 }
 
@@ -18,7 +37,7 @@ type Event struct {
 	// System
 	Provider        Provider        `xml:"System>Provider"`
 	EventIdentifier EventIdentifier `xml:"System>EventID"`
-	Version         uint8           `xml:"System>Version"`
+	Version         Version         `xml:"System>Version"`
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
 	OpcodeRaw       uint8           `xml:"System>Opcode"`
@@ -43,7 +62,7 @@ type Event struct {
 	// ProcessingErrorData
 	RenderErrorCode         uint32 `xml:"ProcessingErrorData>ErrorCode"`
 	RenderErrorDataItemName string `xml:"ProcessingErrorData>DataItemName"`
-	RenderErr               string
+	RenderErr               []string
 }
 
 // Provider identifies the provider that logged the event. The Name and GUID
@@ -183,5 +202,26 @@ func (kv *KeyValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 	kv.Value = elem.Value
 
+	return nil
+}
+
+// Version contains the version number of the event's definition.
+type Version uint8
+
+// UnmarshalXML unmarshals the version number as an xsd:unsignedByte. Invalid
+// values are ignored an no error is returned.
+func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+
+	version, err := strconv.ParseUint(s, 10, 8)
+	if err != nil {
+		// Ignore invalid version values.
+		return nil
+	}
+
+	*v = Version(version)
 	return nil
 }

@@ -16,14 +16,16 @@ package afpacket
 import (
 	"errors"
 	"fmt"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
 	"net"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/tsg/gopacket"
+	"github.com/tsg/gopacket/layers"
+	"github.com/tsg/gopacket/pcap"
 )
 
 /*
@@ -70,6 +72,8 @@ type TPacket struct {
 	pollset C.struct_pollfd
 	// shouldReleasePacket is set to true whenever we return packet data, to make sure we remember to release that data back to the kernel.
 	shouldReleasePacket bool
+	// headerNextNeeded is set to true when header need to move to the next packet. No need to move it case of poll error.
+	headerNextNeeded bool
 	// stats is simple statistics on TPacket's run.
 	stats Stats
 	// tpVersion is the version of TPacket actually in use, set by setRequestedTPacketVersion.
@@ -215,7 +219,7 @@ func (h *TPacket) releaseCurrentPacket() error {
 // TPacket.  Each call to ZeroCopyReadPacketData invalidates any data previously
 // returned by ZeroCopyReadPacketData.  Care must be taken not to keep pointers
 // to old bytes when using ZeroCopyReadPacketData... if you need to keep data past
-// the next time you call ZeroCopyReadPacketData, use ReadPacketDataData, which copies
+// the next time you call ZeroCopyReadPacketData, use ReadPacketData, which copies
 // the bytes into a new buffer for you.
 //  tp, _ := NewTPacket(...)
 //  data1, _, _ := tp.ZeroCopyReadPacketData()
@@ -223,12 +227,13 @@ func (h *TPacket) releaseCurrentPacket() error {
 //  data2, _, _ := tp.ZeroCopyReadPacketData()  // invalidates bytes in data1
 func (h *TPacket) ZeroCopyReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	h.mu.Lock()
-	if h.current == nil || !h.current.next() {
+	if h.current == nil || !h.headerNextNeeded || !h.current.next() {
 		if h.shouldReleasePacket {
 			h.releaseCurrentPacket()
 		}
 		h.current = h.getTPacketHeader()
 		if err = h.pollForFirstPacket(h.current); err != nil {
+			h.headerNextNeeded = false
 			h.mu.Unlock()
 			return
 		}
@@ -238,6 +243,7 @@ func (h *TPacket) ZeroCopyReadPacketData() (data []byte, ci gopacket.CaptureInfo
 	ci.CaptureLength = len(data)
 	ci.Length = h.current.getLength()
 	h.stats.Packets++
+	h.headerNextNeeded = true
 	h.mu.Unlock()
 	return
 }
@@ -310,12 +316,19 @@ func (h *TPacket) pollForFirstPacket(hdr header) error {
 		h.pollset.events = C.POLLIN
 		h.pollset.revents = 0
 		timeout := C.int(h.opts.timeout / time.Millisecond)
-		_, err := C.poll(&h.pollset, 1, timeout)
+		n, err := C.poll(&h.pollset, 1, timeout)
+		if n == 0 {
+			/* propagate timeout when no packets are available
+			   otherwise it will loop forever until a packet
+			  is received. */
+			return syscall.EINTR
+		}
 		h.stats.Polls++
 		if err != nil {
 			return err
 		}
 	}
+
 	h.shouldReleasePacket = true
 	return nil
 }

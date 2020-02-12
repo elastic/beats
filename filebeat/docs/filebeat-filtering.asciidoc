@@ -1,29 +1,28 @@
 [[filtering-and-enhancing-data]]
 == Filter and enhance the exported data
 
-Your use case might require only a subset of the data exported by Filebeat, or
-you might need to enhance the exported data (for example, by adding metadata).
-Filebeat provides a couple of options for filtering and enhancing exported
-data.
+Your use case might require only a subset of the data exported by {beatname_uc},
+or you might need to enhance the exported data (for example, by adding
+metadata). {beatname_uc} provides a couple of options for filtering and
+enhancing exported data.
 
-You can configure each prospector to include or exclude specific lines or files.
-This allows you to specify different filtering criteria for each prospector.
-To do this, you use the <<include-lines,`include_lines`>>,
-<<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>
-options under the `filebeat.prospectors` section of the config file (see
-<<configuration-filebeat-options>>). The disadvantage of this approach is that
-you need to implement a configuration option for each filtering criteria that
-you need.
+You can configure each input to include or exclude specific lines or files. This
+allows you to specify different filtering criteria for each input. To do this,
+you use the `include_lines`, `exclude_lines`, and `exclude_files` options under
+the +{beatname_lc}.inputs+ section of the config file (see
+<<configuration-{beatname_lc}-options>>). The disadvantage of this approach is
+that you need to implement a configuration option for each filtering criteria
+that you need.
 
 Another approach (the one described here) is to define processors to configure
-global processing across all data exported by Filebeat.
+global processing across all data exported by {beatname_uc}.
 
 
 [float]
 [[using-processors]]
 === Processors
 
-include::../../libbeat/docs/processors.asciidoc[]
+include::{libbeat-dir}/processors.asciidoc[]
 
 [float]
 [[drop-event-example]]
@@ -55,7 +54,7 @@ processors:
 [[decode-json-example]]
 ==== Decode JSON example
 
-In the following example, the fields exported by Filebeat include a
+In the following example, the fields exported by {beatname_uc} include a
 field, `inner`, whose value is a JSON object encoded as a string:
 
 [source,json]
@@ -65,10 +64,11 @@ field, `inner`, whose value is a JSON object encoded as a string:
 
 The following configuration decodes the inner JSON object:
 
-[source,yaml]
+["source","yaml",subs="attributes"]
 -----------------------------------------------------
-filebeat.prospectors:
-- paths:
+{beatname_lc}.inputs:
+- type: log
+  paths:
     - input.json
   json.keys_under_root: true
 
@@ -93,7 +93,7 @@ The resulting output looks something like this:
   "inner": {
     "data": "value"
   },
-  "prospector": {
+  "input": {
     "type": "log",
   },
   "offset": 55,
@@ -103,4 +103,4 @@ The resulting output looks something like this:
 }
 -----------------------------------------------------
 
-include::../../libbeat/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]

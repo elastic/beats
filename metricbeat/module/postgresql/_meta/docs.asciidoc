@@ -1,6 +1,17 @@
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
 
+Default metricsets are `activity`, `bgwriter` and `database`.
+
+
+[float]
+=== Dashboard
+
+The PostgreSQL module comes with a predefined dashboard showing databse related metrics. For example:
+
+image::./images/metricbeat-postgresql-overview.png[]
+
+
 [float]
 === Module-specific configuration notes
 

@@ -1,25 +1,43 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package channel
 
 import (
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/common/atomic"
+	"sync"
+
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 type subOutlet struct {
-	isOpen atomic.Bool
-	done   chan struct{}
-	ch     chan *util.Data
-	res    chan bool
+	done      chan struct{}
+	ch        chan beat.Event
+	res       chan bool
+	mutex     sync.Mutex
+	closeOnce sync.Once
 }
 
 // SubOutlet create a sub-outlet, which can be closed individually, without closing the
 // underlying outlet.
 func SubOutlet(out Outleter) Outleter {
 	s := &subOutlet{
-		isOpen: atomic.MakeBool(true),
-		done:   make(chan struct{}),
-		ch:     make(chan *util.Data),
-		res:    make(chan bool, 1),
+		done: make(chan struct{}),
+		ch:   make(chan beat.Event),
+		res:  make(chan bool, 1),
 	}
 
 	go func() {
@@ -32,24 +50,37 @@ func SubOutlet(out Outleter) Outleter {
 }
 
 func (o *subOutlet) Close() error {
-	isOpen := o.isOpen.Swap(false)
-	if isOpen {
+	o.closeOnce.Do(func() {
+		// Signal OnEvent() to terminate
 		close(o.done)
-	}
+		// This mutex prevents the event channel to be closed if OnEvent is
+		// still running.
+		o.mutex.Lock()
+		defer o.mutex.Unlock()
+		close(o.ch)
+	})
 	return nil
 }
 
-func (o *subOutlet) OnEvent(d *util.Data) bool {
-	if !o.isOpen.Load() {
+func (o *subOutlet) Done() <-chan struct{} {
+	return o.done
+}
+
+func (o *subOutlet) OnEvent(event beat.Event) bool {
+
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	select {
+	case <-o.done:
 		return false
+	default:
 	}
 
 	select {
 	case <-o.done:
-		close(o.ch)
 		return false
 
-	case o.ch <- d:
+	case o.ch <- event:
 		select {
 		case <-o.done:
 
@@ -62,12 +93,10 @@ func (o *subOutlet) OnEvent(d *util.Data) bool {
 			//  update state on 'true' response).
 			//  The state update will appear after the current event in the publisher pipeline.
 			//  That is, by returning true here, the final state update will
-			//  be presented to the reigstrar, after the last event being processed.
+			//  be presented to the registrar, after the last event being processed.
 			//  Once all messages are in the publisher pipeline, in correct order,
 			//  it depends on registrar/publisher pipeline if state is finally updated
 			//  in the registrar.
-
-			close(o.ch)
 			return true
 
 		case ret := <-o.res:
@@ -80,8 +109,12 @@ func (o *subOutlet) OnEvent(d *util.Data) bool {
 func CloseOnSignal(outlet Outleter, sig <-chan struct{}) Outleter {
 	if sig != nil {
 		go func() {
-			<-sig
-			outlet.Close()
+			select {
+			case <-outlet.Done():
+				return
+			case <-sig:
+				outlet.Close()
+			}
 		}()
 	}
 	return outlet

@@ -1,0 +1,86 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+processors:
+  - drop_fields:
+      fields: ["json.actions"]
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.notice"
+
+        - from: "zeek.notice.src"
+          to: "source.address"
+
+        - from: "zeek.notice.dst"
+          to: "destination.address"
+
+        - from: "zeek.notice.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.notice.p"
+          to: "destination.port"
+
+        - from: "zeek.notice.conn"
+          to: "zeek.notice.connnection_id"
+
+        - from: "zeek.notice.iconn"
+          to: "zeek.notice.icmp_id"
+
+        - from: "zeek.notice.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.notice.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.notice.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.notice.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.notice.proto"
+          to: "network.transport"
+
+        - from: "zeek.notice.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.notice.f.id"
+          to: "zeek.notice.file.id"
+
+        - from: "zeek.notice.f.parent_id"
+          to: "zeek.notice.file.parent_id"
+
+        - from: "zeek.notice.f.source"
+          to: "zeek.notice.file.source"
+
+        - from: "zeek.notice.f.is_orig"
+          to: "zeek.notice.file.is_orig"
+
+        - from: "zeek.notice.f.seen_bytes"
+          to: "zeek.notice.file.seen_bytes"
+
+        - from: "zeek.notice.f.total_bytes"
+          to: "zeek.notice.file.total_bytes"
+
+        - from: "zeek.notice.file_mime_type"
+          to: "zeek.notice.file.mime_type"
+
+      ignore_missing: true
+      fail_on_error: false
+
+  - drop_fields:
+      fields: ["zeek.notice.remote_location", "zeek.notice.f"]
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

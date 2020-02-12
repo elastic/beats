@@ -1,0 +1,168 @@
+- name: apiserver
+  type: group
+  description: >
+    Kubernetes API server metrics
+  release: ga
+  fields:
+    - name: request.client
+      type: keyword
+      description: >
+        Client executing requests
+    - name: request.resource
+      type: keyword
+      description: >
+        Requested resource
+    - name: request.subresource
+      type: keyword
+      description: >
+        Requested subresource
+    - name: request.scope
+      type: keyword
+      description: >
+        Request scope (cluster, namespace, resource)
+    - name: request.verb
+      type: keyword
+      description: >
+        HTTP verb
+    - name: request.code
+      type: keyword
+      description: >
+        HTTP code
+    - name: request.content_type
+      type: keyword
+      description: >
+        Request HTTP content type
+    - name: request.dry_run
+      type: keyword
+      description: >
+        Wether the request uses dry run
+    - name: request.kind
+      type: keyword
+      description: >
+        Kind of request
+    - name: request.component
+      type: keyword
+      description: >
+        Component handling the request
+    - name: request.group
+      type: keyword
+      description: >
+        API group for the resource
+    - name: request.version
+      type: keyword
+      description: >
+        version for the group
+    - name: request.handler
+      type: keyword
+      description: >
+        Request handler
+    - name: request.method
+      type: keyword
+      description: >
+        HTTP method
+    - name: request.host
+      type: keyword
+      description: >
+        Request host
+    - name: process
+      type: group
+      fields:
+        - name: cpu.sec
+          type: double
+          description: CPU seconds
+        - name: memory.resident.bytes
+          type: long
+          format: bytes
+          description: Bytes in resident memory
+        - name: memory.virtual.bytes
+          type: long
+          format: bytes
+          description: Bytes in virtual memory
+        - name: fds.open.count
+          type: long
+          description: Number of open file descriptors
+        - name: started.sec
+          type: double
+          description: Seconds since the process started
+    - name: http
+      type: group
+      fields:
+        - name: request.duration.us.percentile.*
+          type: object
+          object_type: double
+          description: Request duration microseconds percentiles
+        - name: request.duration.us.sum
+          type: double
+          description: Request duration microseconds cumulative sum
+        - name: request.duration.us.count
+          type: long
+          description: Request count for duration
+        - name: request.size.bytes.percentile.*
+          type: object
+          object_type: long
+          description: Request size percentiles
+        - name: request.size.bytes.sum
+          type: long
+          format: bytes
+          description: Request size cumulative sum
+        - name: request.size.bytes.count
+          type: long
+          description: Request count for size
+        - name: response.size.bytes.percentile.*
+          type: object
+          object_type: long
+          description: Response size percentiles
+        - name: response.size.bytes.sum
+          type: long
+          format: bytes
+          description: Response size cumulative sum
+        - name: response.size.bytes.count
+          type: long
+          description: Response count
+        - name: request.count
+          type: long
+          description: Request count for response
+    - name: client.request.count
+      type: long
+      description: Number of requests as client
+    - name: request
+      type: group
+      fields:
+        - name: count
+          type: long
+          description: Number of requests
+        - name: latency.sum
+          type: long
+          description: Requests latency, sum of latencies in microseconds
+        - name: latency.count
+          type: long
+          description: Request latency, number of requests
+        - name: latency.bucket.*
+          type: object
+          object_type: long
+          description: Request latency histogram buckets
+        - name: duration.us.sum
+          type: long
+          description: Request duration, sum in microseconds
+        - name: duration.us.count
+          type: long
+          description: Request duration, number of operations
+        - name: duration.us.bucket.*
+          type: object
+          object_type: long
+          description: Request duration, histogram buckets
+        - name: current.count
+          type: long
+          description: Inflight requests
+        - name: longrunning.count
+          type: long
+          description: Number of requests active long running requests
+    - name: etcd.object.count
+      type: long
+      description: Number of kubernetes objects at etcd
+    - name: audit.event.count
+      type: long
+      description: Number of audit events
+    - name: audit.rejected.count
+      type: long
+      description: Number of audit rejected events

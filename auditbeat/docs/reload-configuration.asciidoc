@@ -5,8 +5,8 @@ beta[]
 
 You can configure {beatname_uc} to dynamically reload configuration files when
 there are changes. To do this, you specify a path
-(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for module
-configuration changes. When the files found by the Glob change, new modules are
+(https://golang.org/pkg/path/filepath/#Glob[glob]) to watch for module
+configuration changes. When the files found by the glob change, new modules are
 started/stopped according to changes in the configuration files.
 
 To enable dynamic config reloading, you specify the `path` and `reload` options
@@ -20,7 +20,7 @@ auditbeat.config.modules:
   reload.period: 10s
 ------------------------------------------------------------------------------
 
-*`path`*:: A Glob that defines the files to check for changes.
+*`path`*:: A glob that defines the files to check for changes.
 
 *`reload.enabled`*:: When set to `true`, enables dynamic config reload.
 
@@ -29,13 +29,11 @@ set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
-Each file found by the Glob must contain a list of one or more module
+Each file found by the glob must contain a list of one or more module
 definitions. For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-auditbeat.modules:
-
 - module: file_integrity
   paths:
   - /www/wordpress
@@ -46,4 +44,4 @@ auditbeat.modules:
 
 NOTE: On systems with POSIX file permissions, all Beats configuration files are
 subject to ownership and file permission checks. If you encounter config loading
-errors related to file ownership, see {libbeat}/config-file-permissions.html.
+errors related to file ownership, see {beats-ref}/config-file-permissions.html.

@@ -1,36 +1,49 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "type":"metricsets",
-    "beat":{
-        "hostname":"localhost",
-        "name":"localhost",
-        "version": "6.0.0-alpha1"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "kafka.consumergroup",
+        "duration": 115000,
+        "module": "kafka"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"kafka",
-        "name":"consumergroup",
-        "rtt":269
-    },
-    "kafka":{
-        "consumergroup":{
-            "id": "group",
-            "topic": "test",
-            "partition": 0,
-            "client": {
-              "host": "127.0.0.1",
-              "id": "client0",
-              "member_id": "client0-d20b677a-5740-433e-a7f8-fbdab1f0f150"
-            },
+    "kafka": {
+        "broker": {
+            "address": "localhost:32768",
+            "id": 0
+        },
+        "consumergroup": {
             "broker": {
-                "address": "kafka0:9092",
+                "address": "localhost:32768",
                 "id": 0
             },
-            "error": {
-              "code": 0
+            "client": {
+                "host": "127.0.0.1",
+                "id": "consumer-1",
+                "member_id": "consumer-1-a12ac7d4-00aa-45a0-8b35-0a9c6e880bf4"
             },
+            "consumer_lag": 1059,
+            "error": {
+                "code": 0
+            },
+            "id": "console-consumer-50413",
             "meta": "",
-            "offset": 0
+            "offset": -1,
+            "partition": 0,
+            "topic": "test"
+        },
+        "partition": {
+            "id": 0,
+            "topic_id": "0-test"
+        },
+        "topic": {
+            "name": "test"
         }
+    },
+    "metricset": {
+        "name": "consumergroup",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:32768",
+        "type": "kafka"
     }
 }

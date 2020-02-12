@@ -1,7 +1,8 @@
-from filebeat import BaseTest
 import gzip
 import os
 import time
+import unittest
+from filebeat import BaseTest
 
 """
 Tests that Filebeat shuts down cleanly.
@@ -26,6 +27,7 @@ class Test(BaseTest):
             time.sleep(.5)
             proc.check_kill_and_wait()
 
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")
     def test_shutdown_wait_ok(self):
         """
         Test stopping filebeat under load: wait for all events being published.
@@ -64,8 +66,13 @@ class Test(BaseTest):
 
         # we allow for a potential race in the harvester shutdown here.
         # In some cases the registry offset might match the penultimate offset.
-        assert (offset == outputs[-1]["offset"] or
-                offset == outputs[-2]["offset"])
+
+        eol_offset = 1
+        if os.name == "nt":
+            eol_offset += 1
+
+        assert (offset == (outputs[-1]["log.offset"] + eol_offset + len(outputs[-1]["message"])) or
+                offset == (outputs[-2]["log.offset"] + eol_offset + len(outputs[-2]["message"])))
 
     def test_shutdown_wait_timeout(self):
         """
@@ -74,8 +81,9 @@ class Test(BaseTest):
 
         self.nasa_logs()
 
+        # Use 'localhost' so connection is refused instantly
         self.render_config_template(
-            logstash={"host": "does.not.exist:12345"},
+            logstash={"host": "localhost:12345", "timeout": 1},
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="1s",
@@ -143,36 +151,35 @@ class Test(BaseTest):
     def nasa_logs(self):
 
         # Uncompress the nasa log file.
-        nasa_log = '../files/logs/nasa-50k.log'
+        nasa_log = os.path.join(self.beat_path, "tests", "files", "logs", "nasa-50k.log")
         if not os.path.isfile(nasa_log):
-            with gzip.open('../files/logs/nasa-50k.log.gz', 'rb') as infile:
+            with gzip.open(nasa_log + ".gz", 'rb') as infile:
                 with open(nasa_log, 'w') as outfile:
                     for line in infile:
                         outfile.write(line)
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/nasa-50k.log"],
-                        source_dir="../files",
                         target_dir="log")
 
     def test_stopping_empty_path(self):
         """
-        Test filebeat stops properly when 1 prospector has an invalid config.
+        Test filebeat stops properly when 1 input has an invalid config.
         """
 
-        prospector_raw = """
+        input_raw = """
 - type: log
   paths: []
 """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            prospector_raw=prospector_raw,
+            input_raw=input_raw,
         )
         filebeat = self.start_beat()
         time.sleep(2)
 
         # Wait until first flush
-        msg = "No paths were defined for prospector"
+        msg = "No paths were defined for input"
         self.wait_until(
             lambda: self.log_contains_count(msg) >= 1,
             max_timeout=5)

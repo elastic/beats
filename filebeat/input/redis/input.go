@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package redis
 
 import (
@@ -9,6 +26,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -31,7 +49,7 @@ type Input struct {
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
@@ -41,14 +59,18 @@ func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.C
 		return nil, err
 	}
 
-	outlet, err := outletFactory(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	p := &Input{
 		started:  false,
-		outlet:   outlet,
+		outlet:   out,
 		config:   config,
 		cfg:      cfg,
 		registry: harvester.NewRegistry(),
@@ -63,6 +85,10 @@ func (p *Input) LoadStates(states []file.State) error {
 }
 
 // Run runs the input
+// Note: Filebeat is required to call the redis input's Run() method multiple times. It is expected to be called
+// once initially when the input starts up and then again periodically, where the period is determined
+// by the value of the `scan_frequency` setting.
+// Also see https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-redis.html#redis-scan_frequency.
 func (p *Input) Run() {
 	logp.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
 
@@ -76,7 +102,11 @@ func (p *Input) Run() {
 		pool := CreatePool(host, p.config.Password, p.config.Network,
 			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
 
-		h := NewHarvester(pool.Get())
+		h, err := NewHarvester(pool.Get())
+		if err != nil {
+			logp.Err("Failed to create harvester: %v", err)
+			continue
+		}
 		h.forwarder = forwarder
 
 		if err := p.registry.Start(h); err != nil {

@@ -1,0 +1,786 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Alerting Hosts [Filebeat Suricata] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "host.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Top Alerting Hosts [Filebeat Suricata] ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "494fa290-86d2-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Alert Signatures [Filebeat Suricata] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Alert Signature",
+                "field": "suricata.eve.alert.signature",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Alert Category",
+                "field": "suricata.eve.alert.category",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Top Alert Signatures [Filebeat Suricata] ECS",
+          "type": "table"
+        }
+      },
+      "id": "16033310-86d3-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "host.name",
+          "suricata.eve.flow_id",
+          "source.ip",
+          "source.port",
+          "destination.ip",
+          "destination.port",
+          "source.geo.country_iso_code",
+          "destination.geo.country_iso_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "filebeat-*",
+                  "key": "suricata.eve.event_type",
+                  "negate": false,
+                  "params": {
+                    "query": "alert",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "alert"
+                },
+                "query": {
+                  "match": {
+                    "suricata.eve.event_type": {
+                      "query": "alert",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "filebeat-*",
+                  "key": "event.module",
+                  "negate": false,
+                  "params": {
+                    "query": "suricata",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "suricata"
+                },
+                "query": {
+                  "match": {
+                    "event.module": {
+                      "query": "suricata",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "index": "filebeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Alerts [Filebeat Suricata] ECS",
+        "version": 1
+      },
+      "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+      "type": "search",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Alert - Source Location [Filebeat Suricata] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "source.geo.location",
+                "isFilteredByCollar": true,
+                "mapCenter": [
+                  0,
+                  0
+                ],
+                "mapZoom": 2,
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "params": {
+            "addTooltip": true,
+            "colorSchema": "Yellow to Red",
+            "heatClusterSize": 1.5,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Scaled Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "baseLayersAreLoaded": {},
+              "enabled": false,
+              "options": {
+                "format": "image/png",
+                "transparent": true
+              },
+              "selectedTmsLayer": {
+                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                "id": "road_map",
+                "maxZoom": 18,
+                "minZoom": 0,
+                "subdomains": [],
+                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.0\u0026license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+              },
+              "tmsLayers": [
+                {
+                  "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                  "id": "road_map",
+                  "maxZoom": 18,
+                  "minZoom": 0,
+                  "subdomains": [],
+                  "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.0\u0026license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+                }
+              ]
+            }
+          },
+          "title": "Alert - Source Location [Filebeat Suricata] ECS",
+          "type": "tile_map"
+        }
+      },
+      "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Alert - Destination Location [Filebeat Suricata] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "destination.geo.location",
+                "isFilteredByCollar": true,
+                "mapCenter": [
+                  0,
+                  0
+                ],
+                "mapZoom": 2,
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "params": {
+            "addTooltip": true,
+            "colorSchema": "Yellow to Red",
+            "heatClusterSize": 1.5,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Scaled Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "baseLayersAreLoaded": {},
+              "enabled": false,
+              "options": {
+                "format": "image/png",
+                "transparent": true
+              },
+              "selectedTmsLayer": {
+                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                "id": "road_map",
+                "maxZoom": 18,
+                "minZoom": 0,
+                "subdomains": [],
+                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.0\u0026license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+              },
+              "tmsLayers": [
+                {
+                  "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                  "id": "road_map",
+                  "maxZoom": 18,
+                  "minZoom": 0,
+                  "subdomains": [],
+                  "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.0\u0026license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+                }
+              ]
+            }
+          },
+          "title": "Alert - Destination Location [Filebeat Suricata] ECS",
+          "type": "tile_map"
+        }
+      },
+      "id": "a09ca070-86d7-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Alerts - Top Destination Countries [Filebeat Suricata] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Source Country",
+                "field": "destination.geo.country_iso_code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Alerts - Top Destination Countries [Filebeat Suricata] ECS",
+          "type": "table"
+        }
+      },
+      "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "title": "Alerts - Top Source Countries [Filebeat Suricata] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Source Country",
+                "field": "source.geo.country_iso_code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Alerts - Top Source Countries [Filebeat Suricata] ECS",
+          "type": "table"
+        }
+      },
+      "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c-ecs",
+      "type": "visualization",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Overview of the Suricata Alerts dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "1",
+              "w": 23,
+              "x": 0,
+              "y": 0
+            },
+            "id": "494fa290-86d2-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 22,
+              "i": "2",
+              "w": 25,
+              "x": 23,
+              "y": 0
+            },
+            "id": "16033310-86d3-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "3",
+              "w": 48,
+              "x": 0,
+              "y": 37
+            },
+            "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "3",
+            "type": "search",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                38.548165423046584,
+                -6.328125000000001
+              ],
+              "mapZoom": 2
+            },
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 23,
+              "x": 0,
+              "y": 22
+            },
+            "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                41.77131167976407,
+                1.9335937500000002
+              ],
+              "mapZoom": 2
+            },
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 25,
+              "x": 23,
+              "y": 22
+            },
+            "id": "a09ca070-86d7-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "7",
+              "w": 12,
+              "x": 11,
+              "y": 10
+            },
+            "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "8",
+              "w": 11,
+              "x": 0,
+              "y": 10
+            },
+            "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "6.3.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Suricata] Alert Overview ECS",
+        "version": 1
+      },
+      "id": "05268ee0-86d1-11e8-b59d-21efb914e65c-ecs",
+      "type": "dashboard",
+      "updated_at": "2018-11-07T22:56:23.933Z",
+      "version": 1
+    }
+  ],
+  "version": "6.4.3"
+}

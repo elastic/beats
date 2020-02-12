@@ -1,10 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "etcd": {
+        "api_version": "2",
         "store": {
             "compareanddelete": {
                 "fail": 0,
@@ -26,12 +23,12 @@
                 "count": 0
             },
             "gets": {
-                "fail": 1,
-                "success": 35
+                "fail": 4,
+                "success": 2
             },
             "sets": {
                 "fail": 0,
-                "success": 2
+                "success": 12
             },
             "update": {
                 "fail": 0,
@@ -40,10 +37,16 @@
             "watchers": 0
         }
     },
+    "event": {
+        "dataset": "etcd.store",
+        "duration": 115000,
+        "module": "etcd"
+    },
     "metricset": {
-        "host": "etcd:2379",
-        "module": "etcd",
-        "name": "store",
-        "rtt": 115
+        "name": "store"
+    },
+    "service": {
+        "address": "127.0.0.1:2379",
+        "type": "etcd"
     }
 }

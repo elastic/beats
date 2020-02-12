@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cloudid
 
 import (
@@ -34,14 +51,39 @@ func TestDecode(t *testing.T) {
 			expectedEsURL:     "https://8a0283af041f195f7729bc04c66a0fce.us-central1.gcp.cloud.es.io:443",
 			expectedKibanaURL: "https://0cd5cd568eebe53c89eb7cae5bac8b37.us-central1.gcp.cloud.es.io:443",
 		},
+		{
+			cloudID:           "custom-port:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjkyNDMkYWMzMWViYjkwMjQxNzczMTU3MDQzYzM0ZmQyNmZkNDYkYTRjMDYyMzBlNDhjOGZjZTdiZTg4YTA3NGEzYmIzZTA=",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9243",
+		},
+		{
+			cloudID:           "different-es-kb-port:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2OjkyNDMkYTRjMDYyMzBlNDhjOGZjZTdiZTg4YTA3NGEzYmIzZTA6OTI0NA==",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
+		{
+			cloudID:           "only-kb-set:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2JGE0YzA2MjMwZTQ4YzhmY2U3YmU4OGEwNzRhM2JiM2UwOjkyNDQ=",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:443",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
+		{
+			cloudID:           "host-and-kb-set:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjkyNDMkYWMzMWViYjkwMjQxNzczMTU3MDQzYzM0ZmQyNmZkNDYkYTRjMDYyMzBlNDhjOGZjZTdiZTg4YTA3NGEzYmIzZTA6OTI0NA==",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
+		{
+			cloudID:           "extra-items:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2JGE0YzA2MjMwZTQ4YzhmY2U3YmU4OGEwNzRhM2JiM2UwJGFub3RoZXJpZCRhbmRhbm90aGVy",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:443",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:443",
+		},
 	}
 
 	for _, test := range tests {
-		esURL, kbURL, err := decodeCloudID(test.cloudID)
+		cid, err := NewCloudID(test.cloudID, "")
 		assert.NoError(t, err, test.cloudID)
 
-		assert.Equal(t, esURL, test.expectedEsURL, test.cloudID)
-		assert.Equal(t, kbURL, test.expectedKibanaURL, test.cloudID)
+		assert.Equal(t, cid.ElasticsearchURL(), test.expectedEsURL, test.cloudID)
+		assert.Equal(t, cid.KibanaURL(), test.expectedKibanaURL, test.cloudID)
 	}
 }
 
@@ -61,7 +103,7 @@ func TestDecodeError(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, _, err := decodeCloudID(test.cloudID)
+		_, err := NewCloudID(test.cloudID, "")
 		assert.Error(t, err, test.cloudID)
 		assert.Contains(t, err.Error(), test.errorMsg, test.cloudID)
 	}

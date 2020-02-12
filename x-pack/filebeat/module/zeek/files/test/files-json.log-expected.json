@@ -1,0 +1,76 @@
+[
+    {
+        "@timestamp": 1547688796000,
+        "event.dataset": "zeek.files",
+        "event.id": "C8I0zn3r9EPbfLgta6",
+        "event.module": "zeek",
+        "fileset.name": "files",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.files"
+        ],
+        "zeek.files.analyzers": [
+            "X509",
+            "MD5",
+            "SHA1"
+        ],
+        "zeek.files.depth": 0,
+        "zeek.files.duration": 0,
+        "zeek.files.fuid": "FMkioa222mEuM2RuQ9",
+        "zeek.files.is_orig": false,
+        "zeek.files.local_orig": false,
+        "zeek.files.md5": "79e4a9840d7d3a96d7c04fe2434c892e",
+        "zeek.files.mime_type": "application/pkix-cert",
+        "zeek.files.missing_bytes": 0,
+        "zeek.files.overflow_bytes": 0,
+        "zeek.files.rx_host": "10.178.98.102",
+        "zeek.files.seen_bytes": 947,
+        "zeek.files.session_ids": [
+            "C8I0zn3r9EPbfLgta6"
+        ],
+        "zeek.files.sha1": "a8985d3a65e5e5c4b2d7d66d40c6dd2fb19c5436",
+        "zeek.files.source": "SSL",
+        "zeek.files.timedout": false,
+        "zeek.files.tx_host": "35.199.178.4",
+        "zeek.session_id": "C8I0zn3r9EPbfLgta6"
+    },
+    {
+        "@timestamp": 1547688801000,
+        "event.dataset": "zeek.files",
+        "event.id": "C6sjVo23iNApLnlAt6",
+        "event.module": "zeek",
+        "fileset.name": "files",
+        "input.type": "log",
+        "log.offset": 452,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.files"
+        ],
+        "zeek.files.analyzers": [
+            "X509",
+            "MD5",
+            "SHA1"
+        ],
+        "zeek.files.depth": 0,
+        "zeek.files.duration": 0,
+        "zeek.files.fuid": "FShtIS1gydeSFf8M63",
+        "zeek.files.is_orig": false,
+        "zeek.files.local_orig": false,
+        "zeek.files.md5": "b9742f12eb97eff531d94f7800c6706c",
+        "zeek.files.mime_type": "application/pkix-cert",
+        "zeek.files.missing_bytes": 0,
+        "zeek.files.overflow_bytes": 0,
+        "zeek.files.rx_host": "10.178.98.102",
+        "zeek.files.seen_bytes": 2089,
+        "zeek.files.session_ids": [
+            "C6sjVo23iNApLnlAt6"
+        ],
+        "zeek.files.sha1": "b88d13fe319d342e7a808ce3a0a1158111fc3c2a",
+        "zeek.files.source": "SSL",
+        "zeek.files.timedout": false,
+        "zeek.files.tx_host": "17.134.127.250",
+        "zeek.session_id": "C6sjVo23iNApLnlAt6"
+    }
+]

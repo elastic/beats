@@ -1,29 +1,28 @@
 [[faq]]
-== Frequently asked questions
+== Common problems
 
-This section contains frequently asked questions about Filebeat. Also check out the
-https://discuss.elastic.co/c/beats/filebeat[Filebeat discussion forum].
+This section describes common problems you might encounter with
+{beatname_uc}. Also check out the
+https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
-[float]
 [[filebeat-network-volumes]]
-=== Can't read log files from network volumes?
+=== Can't read log files from network volumes
 
-We do not recommend reading log files from network volumes. Whenever possible, install Filebeat on the host machine and
+We do not recommend reading log files from network volumes. Whenever possible, install {beatname_uc} on the host machine and
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
-effects. For example, changed file identifiers may result in Filebeat reading a log file from scratch again.
+effects. For example, changed file identifiers may result in {beatname_uc} reading a log file from scratch again.
 
-[float]
 [[filebeat-not-collecting-lines]]
-=== Filebeat isn't collecting lines from a file?
+=== {beatname_uc} isn't collecting lines from a file
 
-Filebeat might be incorrectly configured or unable to send events to the output. To resolve the issue:
+{beatname_uc} might be incorrectly configured or unable to send events to the output. To resolve the issue:
 
 * Make sure the config file specifies the correct path to the file that you are collecting. See <<filebeat-configuration>>
 for more information.
-* Verify that the file is not older than the value specified by <<ignore-older,`ignore_older`>>. ignore_older is disable by
+* Verify that the file is not older than the value specified by <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>. `ignore_older` is disable by
 default so this depends on the value you have set. You can change this behavior by specifying a different value for
-<<ignore-older,`ignore_older`>>.
-* Make sure that Filebeat is able to send events to the configured output. Run Filebeat in debug mode to determine whether
+<<{beatname_lc}-input-log-ignore-older,`ignore_older`>>.
+* Make sure that {beatname_uc} is able to send events to the configured output. Run {beatname_uc} in debug mode to determine whether
 it's publishing events successfully:
 +
 ["source","sh",subs="attributes,callouts"]
@@ -31,103 +30,98 @@ it's publishing events successfully:
 ./filebeat -c config.yml -e -d "*"
 ----------------------------------------------------------------------
 
-[float]
 [[open-file-handlers]]
-=== Too many open file handlers?
+=== Too many open file handlers
 
-Filebeat keeps the file handler open in case it reaches the end of a file so that it can read new log lines in near real time. If Filebeat is harvesting a large number of files, the number of open files can become an issue. In most environments, the number of files that are actively updated is low. The `close_inactive` configuration option should be set accordingly to close files that are no longer active.
+{beatname_uc} keeps the file handler open in case it reaches the end of a file so that it can read new log lines in near real time. If {beatname_uc} is harvesting a large number of files, the number of open files can become an issue. In most environments, the number of files that are actively updated is low. The `close_inactive` configuration option should be set accordingly to close files that are no longer active.
 
 There are additional configuration options that you can use to close file handlers, but all of them should be used carefully because they can have side effects. The options are:
 
-* <<close-renamed,`close_renamed`>>
-* <<close-removed,`close_removed`>>
-* <<close-eof,`close_eof`>>
-* <<close-timeout,`close_timeout`>>
-* <<harvester-limit,`harvester_limit`>>
+* <<{beatname_lc}-input-log-close-renamed,`close_renamed`>>
+* <<{beatname_lc}-input-log-close-removed,`close_removed`>>
+* <<{beatname_lc}-input-log-close-eof,`close_eof`>>
+* <<{beatname_lc}-input-log-close-timeout,`close_timeout`>>
+* <<{beatname_lc}-input-log-harvester-limit,`harvester_limit`>>
 
 The `close_renamed` and `close_removed` options can be useful on Windows to resolve issues related to file rotation. See <<windows-file-rotation>>. The `close_eof` option can be useful in environments with a large number of files that have only very few entries. The `close_timeout` option is useful in environments where closing file handlers is more important than sending all log lines. For more details, see <<configuration-filebeat-options>>.
 
 Make sure that you read the documentation for these configuration options before using any of them.
 
-[float]
 [[reduce-registry-size]]
-=== Registry file is too large?
+=== Registry file is too large
 
-Filebeat keeps the state of each file and persists the state to disk in the `registry_file`. The file state is used to continue file reading at a previous position when Filebeat is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<clean-removed,`clean_removed`>> and <<clean-inactive,`clean_inactive`>>.
+{beatname_uc} keeps the state of each file and persists the state to disk in the registry file. The file state is used to continue file reading at a previous position when {beatname_uc} is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>.
 
-For old files that you no longer touch and are ignored (see <<ignore-older,`ignore_older`>>), we recommended that you use `clean_inactive`. If old files get removed from disk, then use the `clean_removed` option.
+For old files that you no longer touch and are ignored (see <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>), we recommended that you use `clean_inactive`. If old files get removed from disk, then use the `clean_removed` option.
 
 
-[float]
 [[inode-reuse-issue]]
-=== Inode reuse causes Filebeat to skip lines?
+=== Inode reuse causes {beatname_uc} to skip lines
 
-On Linux file systems, Filebeat uses the inode and device to identify files. When a file is removed from disk, the inode may be assigned to a new file. In use cases involving file rotation, if an old file is removed and a new one is created immediately afterwards, the new file may have the exact same inode as the file that was removed. In this case, Filebeat assumes that the new file is the same as the old and tries to continue reading at the old position, which is not correct.
+On Linux file systems, {beatname_uc} uses the inode and device to identify files. When a file is removed from disk, the inode may be assigned to a new file. In use cases involving file rotation, if an old file is removed and a new one is created immediately afterwards, the new file may have the exact same inode as the file that was removed. In this case, {beatname_uc} assumes that the new file is the same as the old and tries to continue reading at the old position, which is not correct.
 
-By default states are never removed from the registry file. To resolve the inode reuse issue, we recommend that you use the <<clean-options,`clean_*`>> options, especially <<clean-inactive,`clean_inactive`>>, to remove the state of inactive files. For example, if your files get rotated every 24 hours, and the rotated files are not updated anymore, you can set <<ignore-older,`ignore_older`>> to 48 hours and <<clean-inactive,`clean_inactive`>> to 72 hours.
+By default states are never removed from the registry file. To resolve the inode reuse issue, we recommend that you use the <<{beatname_lc}-input-log-clean-options,`clean_*`>> options, especially <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>, to remove the state of inactive files. For example, if your files get rotated every 24 hours, and the rotated files are not updated anymore, you can set <<{beatname_lc}-input-log-ignore-older,`ignore_older`>> to 48 hours and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>> to 72 hours.
 
-You can use <<clean-removed,`clean_removed`>> for files that are removed from disk. Be aware that `clean_removed` cleans the file state from the registry whenever a file cannot be found during a scan. If the file shows up again later, it will be sent again from scratch.
+You can use <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> for files that are removed from disk. Be aware that `clean_removed` cleans the file state from the registry whenever a file cannot be found during a scan. If the file shows up again later, it will be sent again from scratch.
 
-[float]
+include::filebeat-log-rotation.asciidoc[]
+
 [[windows-file-rotation]]
-=== Open file handlers cause issues with Windows file rotation?
+=== Open file handlers cause issues with Windows file rotation
 
-On Windows, you might have problems renaming or removing files because Filebeat keeps the file handlers open. This can lead to issues with the file rotating system. To avoid this issue, you can use the <<close-removed,`close_removed`>> and <<close-renamed,`close_renamed`>> options together.
+On Windows, you might have problems renaming or removing files because {beatname_uc} keeps the file handlers open. This can lead to issues with the file rotating system. To avoid this issue, you can use the <<{beatname_lc}-input-log-close-removed,`close_removed`>> and <<{beatname_lc}-input-log-close-renamed,`close_renamed`>> options together.
 
-IMPORTANT: When you configure these options, files may be closed before the harvester has finished reading the files. If the file cannot be picked up again by the prospector and the harvester hasn't finish reading the file, the missing lines will never be sent to the output.
+IMPORTANT: When you configure these options, files may be closed before the harvester has finished reading the files. If the file cannot be picked up again by the input and the harvester hasn't finish reading the file, the missing lines will never be sent to the output.
 
 
-[float]
 [[filebeat-cpu]]
-=== Filebeat is using too much CPU?
+=== {beatname_uc} is using too much CPU
 
-Filebeat might be configured to scan for files too frequently. Check the setting for `scan_frequency` in the `filebeat.yml`
-config file. Setting `scan_frequency` to less than 1s may cause Filebeat to scan the disk in a tight loop.
+{beatname_uc} might be configured to scan for files too frequently. Check the setting for `scan_frequency` in the `filebeat.yml`
+config file. Setting `scan_frequency` to less than 1s may cause {beatname_uc} to scan the disk in a tight loop.
 
-[float]
 [[dashboard-fields-incorrect-filebeat]]
-=== Dashboard in Kibana is breaking up data fields incorrectly?
+=== Dashboard in {kib} is breaking up data fields incorrectly
 
 The index template might not be loaded correctly. See <<filebeat-template>>.
 
-[float]
 [[fields-not-indexed]]
-=== Fields are not indexed or usable in Kibana visualizations?
+=== Fields are not indexed or usable in {kib} visualizations
 
 If you have recently performed an operation that loads or parses custom, structured logs,
-you might need to refresh the index to make the fields available in Kibana. To refresh
-the index, use the {elasticsearch}/indices-refresh.html[refresh API]. For example:
+you might need to refresh the index to make the fields available in {kib}. To refresh
+the index, use the {ref}/indices-refresh.html[refresh API]. For example:
 
 ["source","sh"]
 ----------------------------------------------------------------------
 curl -XPOST 'http://localhost:9200/filebeat-2016.08.09/_refresh'
 ----------------------------------------------------------------------
 
-[float]
 [[newline-character-required-eof]]
-=== Filebeat isn't shipping the last line of a file?
+=== {beatname_uc} isn't shipping the last line of a file
 
-Filebeat uses a newline character to detect the end of an event. If lines are added incrementally to a file that's being
-harvested, a newline character is required after the last line, or Filebeat will not read the last line of
+{beatname_uc} uses a newline character to detect the end of an event. If lines are added incrementally to a file that's being
+harvested, a newline character is required after the last line, or {beatname_uc} will not read the last line of
 the file.
 
-[float]
 [[faq-deleted-files-are-not-freed]]
-=== Filebeat keeps open file handlers of deleted files for a long time?
+=== {beatname_uc} keeps open file handlers of deleted files for a long time
 
-In the default behaviour, Filebeat opens the files and keeps them open until it
+In the default behaviour, {beatname_uc} opens the files and keeps them open until it
 reaches the end of them.  In situations when the configured output is blocked
-(e.g. Elasticsearch or Logstash is unavailable) for a long time, this can cause
-Filebeat to keep file handlers to files that were deleted from the file system
-in the mean time. As long as Filebeat keeps the deleted files open, the
+(e.g. {es} or {ls} is unavailable) for a long time, this can cause
+{beatname_uc} to keep file handlers to files that were deleted from the file system
+in the mean time. As long as {beatname_uc} keeps the deleted files open, the
 operating system doesn't free up the space on disk, which can lead to increase
 disk utilisation or even out of disk situations.
 
-To mitigate this issue, you can set the <<close-timeout>> setting to `5m`. This
-will ensure every file handler is closed once every 5 minutes, regardless of
-whether it reached EOF or not. Note that this option can lead to data loss if the
-file is deleted before Filebeat reaches the end of the file.
+To mitigate this issue, you can set the
+<<{beatname_lc}-input-log-close-timeout>> setting to `5m`. This will ensure
+every file handler is closed once every 5 minutes, regardless of whether it
+reached EOF or not. Note that this option can lead to data loss if the file is
+deleted before {beatname_uc} reaches the end of the file.
 
 
-include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
-include::../../libbeat/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/faq-limit-bandwidth.asciidoc[]
+
+include::{libbeat-dir}/shared-faq.asciidoc[]

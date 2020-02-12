@@ -1,0 +1,376 @@
+#=========================== Filebeat inputs =============================
+
+# List of inputs to fetch data.
+filebeat.inputs:
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+
+# Type of the files. Based on this the way the file is read is decided.
+# The different types cannot be mixed in one input
+#
+# Possible options are:
+# * log: Reads every line of the log file (default)
+# * stdin: Reads the standard in
+
+#------------------------------ Log input --------------------------------
+- type: log
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  # To fetch all ".log" files from a specific level of subdirectories
+  # /var/log/*/*.log can be used.
+  # For each file found under this path, a harvester is started.
+  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Configure the file encoding for reading files with international characters
+  # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+  # Some sample encodings:
+  #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+  #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
+  #encoding: plain
+
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, no lines are dropped.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, all the lines are exported.
+  #include_lines: ['^ERR', '^WARN']
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #exclude_files: ['.gz$']
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+  # Set to true to store the additional fields as top level fields instead
+  # of under the "fields" sub-dictionary. In case of name conflicts with the
+  # fields added by Filebeat itself, the custom fields overwrite the default
+  # fields.
+  #fields_under_root: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
+  # Ignore files which were modified more then the defined timespan in the past.
+  # ignore_older is disabled by default, so no files are ignored by setting it to 0.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #ignore_older: 0
+
+  # How often the input checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
+  #scan_frequency: 10s
+
+  # Defines the buffer size every harvester uses when fetching the file
+  #harvester_buffer_size: 16384
+
+  # Maximum number of bytes a single log event can have
+  # All bytes after max_bytes are discarded and not sent. The default is 10MB.
+  # This is especially useful for multiline log messages which can get large.
+  #max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
+
+  ### Recursive glob configuration
+
+  # Expand "**" patterns into regular glob patterns.
+  #recursive_glob.enabled: true
+
+  ### JSON configuration
+
+  # Decode JSON options. Enable this if your logs are structured in JSON.
+  # JSON key on which to apply the line filtering and multiline settings. This key
+  # must be top level and its value must be string, otherwise it is ignored. If
+  # no text key is defined, the line filtering and multiline features cannot be used.
+  #json.message_key:
+
+  # By default, the decoded JSON is placed under a "json" key in the output document.
+  # If you enable this setting, the keys are copied top level in the output document.
+  #json.keys_under_root: false
+
+  # If keys_under_root and this setting are enabled, then the values from the decoded
+  # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
+  # in case of conflicts.
+  #json.overwrite_keys: false
+
+  # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
+  # unmarshaling errors or when a text key is defined in the configuration but cannot
+  # be used.
+  #json.add_error_key: false
+
+  ### Multiline options
+
+  # Multiline can be used for log messages spanning multiple lines. This is common
+  # for Java Stack Traces or C-Line Continuation
+
+  # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+  #multiline.pattern: ^\[
+
+  # Defines if the pattern set under pattern should be negated or not. Default is false.
+  #multiline.negate: false
+
+  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+  # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  #multiline.match: after
+
+  # The maximum number of lines that are combined to one event.
+  # In case there are more the max_lines the additional lines are discarded.
+  # Default is 500
+  #multiline.max_lines: 500
+
+  # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+  # Default is 5s.
+  #multiline.timeout: 5s
+
+  # Setting tail_files to true means filebeat starts reading new files at the end
+  # instead of the beginning. If this is used in combination with log rotation
+  # this can mean that the first entries of a new file are skipped.
+  #tail_files: false
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
+  # original for harvesting but will report the symlink name as source.
+  #symlinks: false
+
+  # Backoff values define how aggressively filebeat crawls new files for updates
+  # The default values can be used in most cases. Backoff defines how long it is waited
+  # to check a file again after EOF is reached. Default is 1s which means the file
+  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # Every time a new line appears, backoff is reset to the initial value.
+  #backoff: 1s
+
+  # Max backoff defines what the maximum backoff time is. After having backed off multiple times
+  # from checking the files, the waiting time will never exceed max_backoff independent of the
+  # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
+  # file after having backed off multiple times, it takes a maximum of 10s to read the new line
+  #max_backoff: 10s
+
+  # The backoff factor defines how fast the algorithm backs off. The bigger the backoff factor,
+  # the faster the max_backoff value is reached. If this value is set to 1, no backoff will happen.
+  # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
+  #backoff_factor: 2
+
+  # Max number of harvesters that are started in parallel.
+  # Default is 0 which means unlimited
+  #harvester_limit: 0
+
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close_inactive: 5m
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  #close_removed: true
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_eof: false
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: true
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
+
+  # Defines if inputs is enabled
+  #enabled: true
+
+#----------------------------- Stdin input -------------------------------
+# Configuration to use stdin input
+#- type: stdin
+
+#------------------------- Redis slowlog input ---------------------------
+# Experimental: Config options for the redis slow log input
+#- type: redis
+  #enabled: false
+
+  # List of hosts to pool to retrieve the slow log information.
+  #hosts: ["localhost:6379"]
+
+  # How often the input checks for redis slow log.
+  #scan_frequency: 10s
+
+  # Timeout after which time the input should return an error
+  #timeout: 1s
+
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
+
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
+
+  # Redis AUTH password. Empty by default.
+  #password: foobared
+
+#------------------------------ Udp input --------------------------------
+# Experimental: Config options for the udp input
+#- type: udp
+  #enabled: false
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # Size of the UDP read buffer in bytes
+  #read_buffer: 0
+
+
+#------------------------------ TCP input --------------------------------
+# Experimental: Config options for the TCP input
+#- type: tcp
+  #enabled: false
+
+  # The host and port to receive the new event
+  #host: "localhost:9000"
+
+  # Character used to split new message
+  #line_delimiter: "\n"
+
+  # Maximum size in bytes of the message received over TCP
+  #max_message_size: 20MiB
+
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
+
+  # The number of seconds of inactivity before a remote connection is closed.
+  #timeout: 300s
+
+  # Use SSL settings for TCP.
+  #ssl.enabled: true
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # SSL configuration. By default is off.
+  # List of root certificates for client verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL server authentication.
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Server Certificate Key,
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
+
+  # Configure cipher suites to be used for SSL connections.
+  #ssl.cipher_suites: []
+
+  # Configure curve types for ECDHE based cipher suites.
+  #ssl.curve_types: []
+
+  # Configure what types of client authentication are supported. Valid options
+  # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+  # default to `required` otherwise it will be set to `none`.
+  #ssl.client_authentication: "required"
+
+#------------------------------ Syslog input --------------------------------
+# Experimental: Config options for the Syslog input
+# Accept RFC3164 formatted syslog event via UDP.
+#- type: syslog
+  #enabled: false
+  #protocol.udp:
+    # The host and port to receive the new event
+    #host: "localhost:9000"
+
+    # Maximum size of the message received over UDP
+    #max_message_size: 10KiB
+
+# Accept RFC3164 formatted syslog event via TCP.
+#- type: syslog
+  #enabled: false
+
+  #protocol.tcp:
+    # The host and port to receive the new event
+    #host: "localhost:9000"
+
+    # Character used to split new message
+    #line_delimiter: "\n"
+
+    # Maximum size in bytes of the message received over TCP
+    #max_message_size: 20MiB
+
+    # The number of seconds of inactivity before a remote connection is closed.
+    #timeout: 300s
+
+    # Use SSL settings for TCP.
+    #ssl.enabled: true
+
+    # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+    # 1.2 are enabled.
+    #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+    # SSL configuration. By default is off.
+    # List of root certificates for client verifications
+    #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+    # Certificate for SSL server authentication.
+    #ssl.certificate: "/etc/pki/client/cert.pem"
+
+    # Server Certificate Key,
+    #ssl.key: "/etc/pki/client/cert.key"
+
+    # Optional passphrase for decrypting the Certificate Key.
+    #ssl.key_passphrase: ''
+
+    # Configure cipher suites to be used for SSL connections.
+    #ssl.cipher_suites: []
+
+    # Configure curve types for ECDHE based cipher suites.
+    #ssl.curve_types: []
+
+    # Configure what types of client authentication are supported. Valid options
+    # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+    # default to `required` otherwise it will be set to `none`.
+    #ssl.client_authentication: "required"
+
+#------------------------------ Container input --------------------------------
+#- type: container
+  #enabled: false
+
+  # Paths for container logs that should be crawled and fetched.
+  #paths:
+  #  -/var/lib/docker/containers/*/*.log
+
+  # Configure stream to filter to a specific stream: stdout, stderr or all (default)
+  #stream: all
+

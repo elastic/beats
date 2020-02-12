@@ -1,0 +1,253 @@
+- name: server
+  type: group
+  release: ga
+  description: >
+    Contains envoy proxy server stats
+  fields:
+    - name: cluster_manager
+      type: group
+      fields:
+        - name: active_clusters 
+          type: integer
+          description: >
+            Number of currently active (warmed) clusters
+        - name: cluster_added
+          type: integer
+          description: >
+            Total clusters added (either via static config or CDS)
+        - name: cluster_modified
+          type: integer
+          description: >
+            Total clusters modified (via CDS)
+        - name: cluster_removed
+          type: integer
+          description: >
+            Total clusters removed (via CDS)
+        - name: warming_clusters
+          type: integer
+          description: >
+            Number of currently warming (not active) clusters
+        - name: cluster_updated
+          type: integer
+          description: >
+            Total cluster updates
+        - name: cluster_updated_via_merge
+          type: integer
+          description: >
+            Total cluster updates applied as merged updates
+        - name: update_merge_cancelled
+          type: integer
+          description: >
+            Total merged updates that got cancelled and delivered early
+        - name: update_out_of_merge_window
+          type: integer
+          description: >
+            Total updates which arrived out of a merge window
+
+    - name: filesystem
+      type: group
+      fields:
+        - name: flushed_by_timer
+          type: integer
+          description: >
+            Total number of times internal flush buffers are written to a file due to flush timeout
+        - name: reopen_failed
+          type: integer
+          description: >
+            Total number of times a file was failed to be opened
+        - name: write_buffered
+          type: integer
+          description: >
+            Total number of times file data is moved to Envoys internal flush buffer
+        - name: write_completed
+          type: integer
+          description: >
+            Total number of times a file was written
+        - name: write_total_buffered 
+          type: integer
+          description: >
+            Current total size of internal flush buffer in bytes
+        - name: write_failed
+          type: integer
+          description: >
+            Total number of times an error occurred during a file write operation
+
+    - name: runtime
+      type: group
+      fields:
+        - name: load_error
+          type: integer
+          description: >
+            Total number of load attempts that resulted in an error in any layer
+        - name: load_success
+          type: integer
+          description: >
+            Total number of load attempts that were successful at all layers
+        - name: num_keys 
+          type: integer
+          description: >
+            Number of keys currently loaded
+        - name: override_dir_exists
+          type: integer
+          description: >
+            Total number of loads that did use an override directory
+        - name: override_dir_not_exists
+          type: integer
+          description: >
+            Total number of loads that did not use an override directory
+        - name: admin_overrides_active
+          type: integer
+          description: >
+            1 if any admin overrides are active otherwise 0
+        - name: deprecated_feature_use
+          type: integer
+          description: >
+            Total number of times deprecated features were used.
+        - name: num_layers
+          type: integer
+          description: >
+            Number of layers currently active (without loading errors)
+
+    - name: listener_manager
+      type: group
+      fields:
+        - name: listener_added
+          type: integer
+          description: >
+            Total listeners added (either via static config or LDS)
+        - name: listener_create_failure
+          type: integer
+          description: >
+            Total failed listener object additions to workers
+        - name: listener_create_success
+          type: integer
+          description: >
+            Total listener objects successfully added to workers
+        - name: listener_modified
+          type: integer
+          description: >
+            Total listeners modified (via LDS)
+        - name: listener_removed
+          type: integer
+          description: >
+            Total listeners removed (via LDS)
+        - name: total_listeners_active
+          type: integer
+          description: >
+            Number of currently active listeners
+        - name: total_listeners_draining
+          type: integer
+          description: >
+            Number of currently draining listeners
+        - name: total_listeners_warming
+          type: integer
+          description: >
+            Number of currently warming listeners
+        - name: listener_stopped
+          type: integer
+          description: >
+            Total listeners stopped
+
+    - name: stats
+      type: group
+      fields:
+        - name: overflow
+          type: integer
+          description: >
+            Total number of times Envoy cannot allocate a statistic due to a shortage of shared memory
+
+    - name: server
+      type: group
+      fields:      
+        - name: days_until_first_cert_expiring
+          type: integer
+          description: >
+            Number of days until the next certificate being managed will expire
+        - name: live
+          type: integer
+          description: >
+            1 if the server is not currently draining, 0 otherwise
+        - name: memory_allocated
+          type: integer
+          description: >
+            Current amount of allocated memory in bytes
+        - name: memory_heap_size
+          type: integer
+          description: >
+            Current reserved heap size in bytes
+        - name: parent_connections
+          type: integer
+          description: >
+            Total connections of the old Envoy process on hot restart
+        - name: total_connections
+          type: integer
+          description: >
+            Total connections of both new and old Envoy processes
+        - name: uptime
+          type: integer
+          description: >
+            Current server uptime in seconds
+        - name: version
+          type: integer
+          description: >
+            Integer represented version number based on SCM revision
+        - name: watchdog_mega_miss
+          type: integer
+        - name: watchdog_miss
+          type: integer
+        - name: hot_restart_epoch
+          type: integer
+          description: >
+            Current hot restart epoch
+        - name: concurrency
+          type: integer
+          description: >
+            Number of worker threads
+        - name: debug_assertion_failures
+          type: integer
+        - name: dynamic_unknown_fields
+          type: integer
+          description: >
+            Number of messages in dynamic configuration with unknown fields
+        - name: state
+          type: integer
+          description: >
+            Current state of the Server
+        - name: static_unknown_fields
+          type: integer
+          description: >
+            Number of messages in static configuration with unknown fields
+        - name: stats_recent_lookups
+          type: integer
+
+    - name: http2
+      type: group
+      fields:
+        - name: header_overflow
+          type: integer
+          description: >
+            Total number of connections reset due to the headers being larger than Envoy::Http::Http2::ConnectionImpl::StreamImpl::MAX_HEADER_SIZE (63k)
+        - name: headers_cb_no_stream
+          type: integer
+          description: >
+            Total number of errors where a header callback is called without an associated stream. This tracks an unexpected occurrence due to an as yet undiagnosed bug
+        - name: rx_messaging_error
+          type: integer
+          description: >
+            Total number of invalid received frames that violated section 8 of the HTTP/2 spec. This will result in a tx_reset
+        - name: rx_reset
+          type: integer
+          description: >
+            Total number of reset stream frames received by Envoy
+        - name: too_many_header_frames
+          type: integer
+          description: >
+            Total number of times an HTTP2 connection is reset due to receiving too many headers frames. Envoy currently supports proxying at most one header frame for 100-Continue one non-100 response code header frame and one frame with trailers
+        - name: trailers
+          type: integer
+          description: >
+            Total number of trailers seen on requests coming from downstream
+        - name: tx_reset
+          type: integer
+          description: >
+            Total number of reset stream frames transmitted by Envoy

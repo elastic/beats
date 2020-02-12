@@ -1,0 +1,21 @@
+[
+    {
+        "@timestamp": "2019-01-08T14:58:35.605Z",
+        "event.dataset": "logstash.slowlog",
+        "event.duration": 5026401704,
+        "event.module": "logstash",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 0,
+        "logstash.slowlog.event": "{\"sequence\":0,\"host\":\"matbook-pro.lan\",\"message\":\"Hello world!\",\"@version\":\"1\",\"@timestamp\":\"2019-01-08T14:58:30.399Z\"}",
+        "logstash.slowlog.module": "slowlog.logstash.filters.ruby",
+        "logstash.slowlog.plugin_name": "ruby",
+        "logstash.slowlog.plugin_params_object.code": "sleep(5)",
+        "logstash.slowlog.plugin_params_object.id": "9746eeec777fcb4c7ea30366dab5445873a8560b7f1766ee1272e59b08d731fb",
+        "logstash.slowlog.plugin_type": "filters",
+        "logstash.slowlog.thread": "Ruby-0-Thread-6: :1",
+        "logstash.slowlog.took_in_millis": 5026,
+        "service.type": "logstash"
+    }
+]

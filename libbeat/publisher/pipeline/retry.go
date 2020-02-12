@@ -1,6 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pipeline
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -19,9 +38,10 @@ type retryer struct {
 
 	consumer *eventConsumer
 
-	sig chan retryerSignal
-	out workQueue
-	in  retryQueue
+	sig        chan retryerSignal
+	out        workQueue
+	in         retryQueue
+	doneWaiter sync.WaitGroup
 }
 
 type retryQueue chan batchEvent
@@ -58,20 +78,24 @@ func newRetryer(
 	c *eventConsumer,
 ) *retryer {
 	r := &retryer{
-		logger:   log,
-		observer: observer,
-		done:     make(chan struct{}),
-		sig:      make(chan retryerSignal, 3),
-		in:       retryQueue(make(chan batchEvent, 3)),
-		out:      out,
-		consumer: c,
+		logger:     log,
+		observer:   observer,
+		done:       make(chan struct{}),
+		sig:        make(chan retryerSignal, 3),
+		in:         retryQueue(make(chan batchEvent, 3)),
+		out:        out,
+		consumer:   c,
+		doneWaiter: sync.WaitGroup{},
 	}
+	r.doneWaiter.Add(1)
 	go r.loop()
 	return r
 }
 
 func (r *retryer) close() {
 	close(r.done)
+	//Block until loop() is properly closed
+	r.doneWaiter.Wait()
 }
 
 func (r *retryer) sigOutputAdded() {
@@ -98,6 +122,7 @@ func (r *retryer) cancelled(b *Batch) {
 }
 
 func (r *retryer) loop() {
+	defer r.doneWaiter.Done()
 	var (
 		out             workQueue
 		consumerBlocked bool
@@ -114,7 +139,6 @@ func (r *retryer) loop() {
 		select {
 		case <-r.done:
 			return
-
 		case evt := <-r.in:
 			var (
 				countFailed  int

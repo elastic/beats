@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package mongodb
@@ -37,10 +54,12 @@ func mongodbModForTests() (*eventStore, *mongodbPlugin) {
 func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 6512, DstPort: 27017,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 6512, DstPort: 27017,
+		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 
@@ -332,4 +351,42 @@ func TestMaxDocSize(t *testing.T) {
 	res := expectTransaction(t, results)
 
 	assert.Equal(t, "\"1234 ...\n\"123\"\n\"12\"", res["response"])
+}
+
+func TestOpCodeNames(t *testing.T) {
+	for _, testData := range []struct {
+		code     int32
+		expected string
+	}{
+		{1, "OP_REPLY"},
+		{-1, "(value=-1)"},
+	} {
+		assert.Equal(t, testData.expected, opCode(testData.code).String())
+	}
+}
+
+// Test for a (recovered) panic parsing document length in request/response messages
+func TestDocumentLengthBoundsChecked(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
+
+	_, mongodb := mongodbModForTests()
+
+	// request and response from tests/pcaps/mongo_one_row.pcap
+	reqData, err := hex.DecodeString(
+		// Request message with out of bounds document
+		"320000000a000000ffffffffd4070000" +
+			"00000000746573742e72667374617572" +
+			"616e7473000000000001000000" +
+			// Document length (including itself)
+			"06000000" +
+			// Document (1 byte instead of 2)
+			"00")
+	assert.Nil(t, err)
+
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
+	private := protos.ProtocolData(new(mongodbConnectionData))
+
+	private = mongodb.Parse(&req, tcptuple, 0, private)
+	assert.NotNil(t, private, "mongodb parser recovered from a panic")
 }

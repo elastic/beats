@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package wineventlog
 
 import (
@@ -223,17 +240,78 @@ func (et EventLevel) String() string {
 	return EventLevelToString[et]
 }
 
+// EvtQueryFlag defines the values that specify how to return the query results
+// and whether you are query against a channel or log file.
+type EvtQueryFlag uint32
+
+const (
+	// EvtQueryChannelPath specifies that the query is against one or more
+	// channels. The Path parameter of the EvtQuery function must specify the
+	// name of a channel or NULL.
+	EvtQueryChannelPath EvtQueryFlag = 0x1
+	// EvtQueryFilePath specifies that the query is against one or more log
+	// files. The Path parameter of the EvtQuery function must specify the full
+	// path to a log file or NULL.
+	EvtQueryFilePath EvtQueryFlag = 0x2
+	// EvtQueryForwardDirection specifies that the events in the query result
+	// are ordered from oldest to newest. This is the default.
+	EvtQueryForwardDirection EvtQueryFlag = 0x100
+	// EvtQueryReverseDirection specifies that the events in the query result
+	// are ordered from newest to oldest.
+	EvtQueryReverseDirection EvtQueryFlag = 0x200
+	// EvtQueryTolerateQueryErrors specifies that EvtQuery should run the query
+	// even if the part of the query generates an error (is not well formed).
+	EvtQueryTolerateQueryErrors EvtQueryFlag = 0x1000
+)
+
+// EvtOpenLogFlag defines the values that specify whether to open a channel or
+// exported log file. This maps to EVT_OPEN_LOG_FLAGS in Windows.
+type EvtOpenLogFlag uint32
+
+const (
+	// EvtOpenChannelPath opens a channel.
+	EvtOpenChannelPath EvtOpenLogFlag = 0x1
+	// EvtOpenFilePath opens an exported log file.
+	EvtOpenFilePath EvtOpenLogFlag = 0x2
+)
+
+// EvtSeekFlag defines the relative position in the result set from which to seek.
+type EvtSeekFlag uint32
+
+const (
+	// EvtSeekRelativeToFirst seeks to the specified offset from the first entry
+	// in the result set. The offset must be a positive value.
+	EvtSeekRelativeToFirst EvtSeekFlag = 1
+	// EvtSeekRelativeToLast seeks to the specified offset from the last entry
+	// in the result set. The offset must be a negative value.
+	EvtSeekRelativeToLast EvtSeekFlag = 2
+	// EvtSeekRelativeToCurrent seeks to the specified offset from the current
+	// entry in the result set. The offset can be a positive or negative value.
+	EvtSeekRelativeToCurrent EvtSeekFlag = 3
+	// EvtSeekRelativeToBookmark seek to the specified offset from the
+	// bookmarked entry in the result set. The offset can be a positive or
+	// negative value.
+	EvtSeekRelativeToBookmark EvtSeekFlag = 4
+	// EvtSeekOriginMask is a bitmask that you can use to determine which of the
+	// following flags is set:
+	EvtSeekOriginMask EvtSeekFlag = 7
+	// EvtSeekStrict forces the function to fail if the event does not exist.
+	EvtSeekStrict EvtSeekFlag = 0x10000
+)
+
 // Add -trace to enable debug prints around syscalls.
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zsyscall_windows.go syscall_windows.go
 
 // Windows API calls
 //sys   _EvtOpenLog(session EvtHandle, path *uint16, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenLog
+//sys   _EvtQuery(session EvtHandle, path *uint16, query *uint16, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtQuery
 //sys   _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, query *uint16, bookmark EvtHandle, context uintptr, callback syscall.Handle, flags EvtSubscribeFlag) (handle EvtHandle, err error) = wevtapi.EvtSubscribe
 //sys   _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
 //sys   _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) = wevtapi.EvtUpdateBookmark
 //sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
 //sys   _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32, propertyCount *uint32) (err error) = wevtapi.EvtRender
 //sys   _EvtClose(object EvtHandle) (err error) = wevtapi.EvtClose
+//sys   _EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, timeout uint32, flags uint32) (success bool, err error) [!success] = wevtapi.EvtSeek
 //sys   _EvtNext(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) = wevtapi.EvtNext
 //sys   _EvtOpenChannelEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenChannelEnum
 //sys   _EvtNextChannelPath(channelEnum EvtHandle, channelPathBufferSize uint32, channelPathBuffer *uint16, channelPathBufferUsed *uint32) (err error) = wevtapi.EvtNextChannelPath

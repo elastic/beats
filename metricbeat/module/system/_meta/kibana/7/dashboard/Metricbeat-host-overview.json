@@ -1,0 +1,2387 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Network Traffic (Packets) [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "listeners": {},
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "-system.network.name:l*",
+                        "id": "da1046f0-faa0-11e6-86b1-cd7735ff7e23",
+                        "index_pattern": "*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(0,156,224,1)",
+                                "fill": "1",
+                                "formatter": "0.[00]a",
+                                "id": "da1046f1-faa0-11e6-86b1-cd7735ff7e23",
+                                "label": "Inbound",
+                                "line_width": "0",
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.packets",
+                                        "id": "da1046f2-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "da1046f2-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "f41f9280-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "field": "f41f9280-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "c0da3d80-1b93-11e7-8ada-3df93aab833e",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "ecaad010-2c2c-11e7-be71-3162da85303f",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(250,40,255,1)",
+                                "fill": "1",
+                                "formatter": "0.[00]a",
+                                "id": "fbbd5720-faa0-11e6-86b1-cd7735ff7e23",
+                                "label": "Outbound",
+                                "line_width": "0",
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.packets",
+                                        "id": "fbbd7e30-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "fbbd7e30-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "fbbd7e31-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "id": "17e597a0-faa1-11e6-86b1-cd7735ff7e23",
+                                        "script": "params.rate != null && params.rate > 0 ? params.rate * -1 : null",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "fbbd7e31-faa0-11e6-86b1-cd7735ff7e23",
+                                                "id": "1940bad0-faa1-11e6-86b1-cd7735ff7e23",
+                                                "name": "rate"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "fe5fbdc0-2c2c-11e7-be71-3162da85303f",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            }
+                        ],
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "Mericbeat: Network Traffic (Packets) ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "6b7b9a40-faa1-11e6-86b1-cd7735ff7e23-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "System Load [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "id": "f6264ad0-1b14-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(115,216,255,1)",
+                                "fill": "0",
+                                "formatter": "number",
+                                "id": "f62671e0-1b14-11e7-b09e-037021c4f8df",
+                                "label": "1m",
+                                "line_width": "3",
+                                "metrics": [
+                                    {
+                                        "field": "system.load.1",
+                                        "id": "f62671e1-1b14-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(0,156,224,1)",
+                                "fill": "0",
+                                "formatter": "number",
+                                "id": "1c324850-1b15-11e7-b09e-037021c4f8df",
+                                "label": "5m",
+                                "line_width": "3",
+                                "metrics": [
+                                    {
+                                        "field": "system.load.5",
+                                        "id": "1c324851-1b15-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(0,98,177,1)",
+                                "fill": "0",
+                                "formatter": "number",
+                                "id": "3287e740-1b15-11e7-b09e-037021c4f8df",
+                                "label": "15m",
+                                "line_width": "3",
+                                "metrics": [
+                                    {
+                                        "field": "system.load.15",
+                                        "id": "32880e50-1b15-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "System Load [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "4d546850-1b15-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Network Traffic (Bytes) [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "listeners": {},
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "-system.network.name:l*",
+                        "id": "da1046f0-faa0-11e6-86b1-cd7735ff7e23",
+                        "index_pattern": "*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(0,156,224,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "da1046f1-faa0-11e6-86b1-cd7735ff7e23",
+                                "label": "Inbound ",
+                                "line_width": "0",
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.bytes",
+                                        "id": "da1046f2-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "da1046f2-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "f41f9280-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "field": "f41f9280-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "a87398e0-1b93-11e7-8ada-3df93aab833e",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "2d533df0-2c2d-11e7-be71-3162da85303f",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(250,40,255,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "fbbd5720-faa0-11e6-86b1-cd7735ff7e23",
+                                "label": "Outbound ",
+                                "line_width": "0",
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.bytes",
+                                        "id": "fbbd7e30-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "fbbd7e30-faa0-11e6-86b1-cd7735ff7e23",
+                                        "id": "fbbd7e31-faa0-11e6-86b1-cd7735ff7e23",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "id": "17e597a0-faa1-11e6-86b1-cd7735ff7e23",
+                                        "script": "params.rate != null && params.rate > 0 ? params.rate * -1 : null",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "fbbd7e31-faa0-11e6-86b1-cd7735ff7e23",
+                                                "id": "1940bad0-faa1-11e6-86b1-cd7735ff7e23",
+                                                "name": "rate"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "533da9b0-2c2d-11e7-be71-3162da85303f",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            }
+                        ],
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "Mericbeat: Network Traffic (Bytes) ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "089b85d0-1b16-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Memory Usage [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "id": "32f46f40-1b16-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(211,49,21,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "4ff61fd0-1b16-11e7-b09e-037021c4f8df",
+                                "label": "Used",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.actual.used.bytes",
+                                        "id": "4ff61fd1-1b16-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(0,156,224,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "753a6080-1b16-11e7-b09e-037021c4f8df",
+                                "label": "Cache",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.actual.used.bytes",
+                                        "id": "753a6081-1b16-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "field": "system.memory.used.bytes",
+                                        "id": "7c9d3f00-1b16-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "id": "869cc160-1b16-11e7-b09e-037021c4f8df",
+                                        "script": "params.actual != null && params.used != null ? params.used - params.actual : null",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "753a6081-1b16-11e7-b09e-037021c4f8df",
+                                                "id": "890f9620-1b16-11e7-b09e-037021c4f8df",
+                                                "name": "actual"
+                                            },
+                                            {
+                                                "field": "7c9d3f00-1b16-11e7-b09e-037021c4f8df",
+                                                "id": "8f3ab7f0-1b16-11e7-b09e-037021c4f8df",
+                                                "name": "used"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "32f46f41-1b16-11e7-b09e-037021c4f8df",
+                                "label": "Free",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.free",
+                                        "id": "32f46f42-1b16-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "Memory Usage [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "bfa5e400-1b16-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Top Processes By CPU [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "bar_color_rules": [
+                            {
+                                "bar_color": "rgba(104,188,0,1)",
+                                "id": "60e11be0-1b18-11e7-b09e-037021c4f8df",
+                                "operator": "gte",
+                                "value": 0
+                            }
+                        ],
+                        "drilldown_url": "",
+                        "filter": "",
+                        "id": "5f5b8d50-1b18-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "5f5b8d51-1b18-11e7-b09e-037021c4f8df",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.process.cpu.total.pct",
+                                        "id": "5f5b8d52-1b18-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "process.name",
+                                "terms_order_by": "5f5b8d52-1b18-11e7-b09e-037021c4f8df"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "top_n"
+                    },
+                    "title": "Top Processes By CPU [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "e0f001c0-1b18-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Processes By Memory [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "bar_color_rules": [
+                            {
+                                "bar_color": "rgba(104,188,0,1)",
+                                "id": "efb9b660-1b18-11e7-b09e-037021c4f8df",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "bar_color": "rgba(254,146,0,1)",
+                                "id": "17fcb820-1b19-11e7-b09e-037021c4f8df",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "bar_color": "rgba(211,49,21,1)",
+                                "id": "1dd61070-1b19-11e7-b09e-037021c4f8df",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "drilldown_url": "",
+                        "filter": "",
+                        "id": "edfceb30-1b18-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "edfceb31-1b18-11e7-b09e-037021c4f8df",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.process.memory.rss.pct",
+                                        "id": "edfceb32-1b18-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "process.name",
+                                "terms_order_by": "edfceb32-1b18-11e7-b09e-037021c4f8df"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "top_n"
+                    },
+                    "title": "Processes By Memory [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "2e224660-1b19-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "CPU Usage [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "id": "80a04950-1b19-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "80a04951-1b19-11e7-b09e-037021c4f8df",
+                                "label": "user",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.user.pct",
+                                        "id": "80a04952-1b19-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(211,49,21,1)",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "993acf30-1b19-11e7-b09e-037021c4f8df",
+                                "label": "system",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.system.pct",
+                                        "id": "993acf31-1b19-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(123,100,255,1)",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "65ca35e0-1b1a-11e7-b09e-037021c4f8df",
+                                "label": "nice",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.nice.pct",
+                                        "id": "65ca5cf0-1b1a-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(226,115,0,1)",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "741b5f20-1b1a-11e7-b09e-037021c4f8df",
+                                "label": "irq",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.irq.pct",
+                                        "id": "741b5f21-1b1a-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(176,188,0,1)",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "2efc5d40-1b1a-11e7-b09e-037021c4f8df",
+                                "label": "softirq",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.softirq.pct",
+                                        "id": "2efc5d41-1b1a-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(15,20,25,1)",
+                                "fill": "1",
+                                "formatter": "percent",
+                                "id": "ae644a30-1b19-11e7-b09e-037021c4f8df",
+                                "label": "iowait",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.iowait.pct",
+                                        "id": "ae644a31-1b19-11e7-b09e-037021c4f8df",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "stacked"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "CPU Usage [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "ab2d1e90-1b1a-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Disk IO (Bytes) [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "",
+                        "id": "d3c67db0-1b1a-11e7-b09e-037021c4f8df",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(22,165,165,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "d3c67db1-1b1a-11e7-b09e-037021c4f8df",
+                                "label": "reads",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.diskio.read.bytes",
+                                        "id": "d3c67db2-1b1a-11e7-b09e-037021c4f8df",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "d3c67db2-1b1a-11e7-b09e-037021c4f8df",
+                                        "id": "f55b9910-1b1a-11e7-b09e-037021c4f8df",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "field": "f55b9910-1b1a-11e7-b09e-037021c4f8df",
+                                        "id": "dcbbb100-1b93-11e7-8ada-3df93aab833e",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none",
+                                "value_template": "{{value}}/s"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "rgba(251,158,0,1)",
+                                "fill": "1",
+                                "formatter": "bytes",
+                                "id": "144124d0-1b1b-11e7-b09e-037021c4f8df",
+                                "label": "writes",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.diskio.write.bytes",
+                                        "id": "144124d1-1b1b-11e7-b09e-037021c4f8df",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "144124d1-1b1b-11e7-b09e-037021c4f8df",
+                                        "id": "144124d2-1b1b-11e7-b09e-037021c4f8df",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "id": "144124d4-1b1b-11e7-b09e-037021c4f8df",
+                                        "script": "params.rate > 0 ? params.rate * -1 : 0",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "144124d2-1b1b-11e7-b09e-037021c4f8df",
+                                                "id": "144124d3-1b1b-11e7-b09e-037021c4f8df",
+                                                "name": "rate"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "point_size": "0",
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none",
+                                "value_template": "{{value}}/s"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "timeseries"
+                    },
+                    "title": "Disk IO (Bytes) [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "4e4bb1e0-1b1b-11e7-b09e-037021c4f8df-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Load Gauge [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "background_color_rules": [
+                            {
+                                "id": "feefabd0-1b90-11e7-bec4-a5e9ec5cab8b"
+                            }
+                        ],
+                        "gauge_color_rules": [
+                            {
+                                "id": "ffd94880-1b90-11e7-bec4-a5e9ec5cab8b"
+                            }
+                        ],
+                        "gauge_inner_width": 10,
+                        "gauge_style": "half",
+                        "gauge_width": 10,
+                        "id": "fdcc6180-1b90-11e7-bec4-a5e9ec5cab8b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "number",
+                                "id": "fdcc6181-1b90-11e7-bec4-a5e9ec5cab8b",
+                                "label": "5m Load",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.load.5",
+                                        "id": "fdcc6182-1b90-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "gauge"
+                    },
+                    "title": "Load Gauge [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "26732e20-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "CPU Usage Gauge [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "",
+                        "gauge_color_rules": [
+                            {
+                                "gauge": "rgba(104,188,0,1)",
+                                "id": "4ef2c3b0-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "gauge": "rgba(254,146,0,1)",
+                                "id": "e6561ae0-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "gauge": "rgba(211,49,21,1)",
+                                "id": "ec655040-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "gauge_inner_width": 10,
+                        "gauge_max": "1",
+                        "gauge_style": "half",
+                        "gauge_width": 10,
+                        "id": "4c9e2550-1b91-11e7-bec4-a5e9ec5cab8b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "4c9e2551-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "label": "CPU Usage",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.cpu.user.pct",
+                                        "id": "4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "field": "system.cpu.system.pct",
+                                        "id": "225c2140-5fd7-11e7-a63a-a937b7c1a7e1",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "field": "system.cpu.cores",
+                                        "id": "837a30c0-5fd7-11e7-a63a-a937b7c1a7e1",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "id": "587aa510-1b91-11e7-bec4-a5e9ec5cab8b",
+                                        "script": "params.n > 0 ? (params.user+params.system)/params.n : null",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b",
+                                                "id": "5a19af10-1b91-11e7-bec4-a5e9ec5cab8b",
+                                                "name": "user"
+                                            },
+                                            {
+                                                "field": "225c2140-5fd7-11e7-a63a-a937b7c1a7e1",
+                                                "id": "32b54f80-5fd7-11e7-a63a-a937b7c1a7e1",
+                                                "name": "system"
+                                            },
+                                            {
+                                                "field": "837a30c0-5fd7-11e7-a63a-a937b7c1a7e1",
+                                                "id": "8ba6eef0-5fd7-11e7-a63a-a937b7c1a7e1",
+                                                "name": "n"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "gauge"
+                    },
+                    "title": "CPU Usage Gauge [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Memory Usage Gauge [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "",
+                        "gauge_color_rules": [
+                            {
+                                "gauge": "rgba(104,188,0,1)",
+                                "id": "a0d522e0-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "gauge": "rgba(254,146,0,1)",
+                                "id": "b45ad8f0-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "gauge": "rgba(211,49,21,1)",
+                                "id": "c06e9550-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "gauge_inner_width": 10,
+                        "gauge_max": "1",
+                        "gauge_style": "half",
+                        "gauge_width": 10,
+                        "id": "9f51b730-1b91-11e7-bec4-a5e9ec5cab8b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "9f51b731-1b91-11e7-bec4-a5e9ec5cab8b",
+                                "label": "Memory Usage",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.actual.used.pct",
+                                        "id": "9f51b732-1b91-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "gauge"
+                    },
+                    "title": "Memory Usage Gauge [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Inbound Traffic [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "background_color_rules": [
+                            {
+                                "id": "0e346760-1b92-11e7-bec4-a5e9ec5cab8b"
+                            }
+                        ],
+                        "filter": "-system.network.name:l*",
+                        "id": "0c761590-1b92-11e7-bec4-a5e9ec5cab8b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "0c761591-1b92-11e7-bec4-a5e9ec5cab8b",
+                                "label": "Inbound Traffic",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.bytes",
+                                        "id": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "field": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "f2074f70-1b92-11e7-a416-41f5ccdba2e6",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "c40e18f0-2c55-11e7-a0ad-277ce466684d",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "37f70440-1b92-11e7-bec4-a5e9ec5cab8b",
+                                "label": "Total Transferred",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.bytes",
+                                        "id": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "derivative",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "field": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "field": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6",
+                                        "function": "overall_sum",
+                                        "id": "3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "sigma": "",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "metric"
+                    },
+                    "title": "Inbound Traffic [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Outbound Traffic [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "background_color_rules": [
+                            {
+                                "id": "0e346760-1b92-11e7-bec4-a5e9ec5cab8b"
+                            }
+                        ],
+                        "filter": "-system.network.name:l*",
+                        "id": "0c761590-1b92-11e7-bec4-a5e9ec5cab8b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "0c761591-1b92-11e7-bec4-a5e9ec5cab8b",
+                                "label": "Outbound Traffic",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.bytes",
+                                        "id": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "derivative",
+                                        "unit": "1s"
+                                    },
+                                    {
+                                        "field": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "f2074f70-1b92-11e7-a416-41f5ccdba2e6",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "function": "sum",
+                                        "id": "a1737470-2c55-11e7-a0ad-277ce466684d",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}/s"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "37f70440-1b92-11e7-bec4-a5e9ec5cab8b",
+                                "label": "Total Transferred",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.bytes",
+                                        "id": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "max"
+                                    },
+                                    {
+                                        "field": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "type": "derivative",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "field": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "id": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6",
+                                        "type": "positive_only",
+                                        "unit": ""
+                                    },
+                                    {
+                                        "field": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6",
+                                        "function": "overall_sum",
+                                        "id": "3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b",
+                                        "sigma": "",
+                                        "type": "series_agg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "value_template": "{{value}}"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "metric"
+                    },
+                    "title": "Outbound Traffic [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "1aae9140-1b93-11e7-8ada-3df93aab833e-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Disk Usage [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "bar_color_rules": [
+                            {
+                                "bar_color": "rgba(104,188,0,1)",
+                                "id": "bf525310-1b95-11e7-8ada-3df93aab833e",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "bar_color": "rgba(254,146,0,1)",
+                                "id": "125fc4c0-1b96-11e7-8ada-3df93aab833e",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "bar_color": "rgba(211,49,21,1)",
+                                "id": "1a5c7240-1b96-11e7-8ada-3df93aab833e",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "drilldown_url": "",
+                        "filter": "-system.filesystem.mount_point:\\/run* AND -system.filesystem.mount_point:\\/sys* AND -system.filesystem.mount_point:\\/dev* AND -system.filesystem.mount_point:\\/proc* AND -system.filesystem.mount_point:\\/var* AND -system.filesystem.mount_point:\\/boot",
+                        "id": "9f7e48a0-1b95-11e7-8ada-3df93aab833e",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "9f7e48a1-1b95-11e7-8ada-3df93aab833e",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.filesystem.used.pct",
+                                        "id": "9f7e48a2-1b95-11e7-8ada-3df93aab833e",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.filesystem.mount_point"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "top_n"
+                    },
+                    "title": "Disk Usage [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "34f97ee0-1b96-11e7-8ada-3df93aab833e-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "System Navigation [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "fontSize": 12,
+                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview-ecs)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container-ecs)"
+                    },
+                    "title": "System Navigation [Metricbeat System] ECS",
+                    "type": "markdown"
+                }
+            },
+            "id": "System-Navigation-ecs",
+            "type": "visualization",
+            "version": 3
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Swap usage [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "",
+                        "gauge_color_rules": [
+                            {
+                                "gauge": "rgba(104,188,0,1)",
+                                "id": "d17c1e90-4d59-11e7-aee5-fdc812cc3bec",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "gauge": "rgba(251,158,0,1)",
+                                "id": "fc1d3490-4d59-11e7-aee5-fdc812cc3bec",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "gauge": "rgba(211,49,21,1)",
+                                "id": "0e204240-4d5a-11e7-aee5-fdc812cc3bec",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "gauge_inner_width": 10,
+                        "gauge_max": "",
+                        "gauge_style": "half",
+                        "gauge_width": 10,
+                        "id": "cee2fd20-4d59-11e7-aee5-fdc812cc3bec",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "cee2fd21-4d59-11e7-aee5-fdc812cc3bec",
+                                "label": "Swap usage",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.swap.used.pct",
+                                        "id": "cee2fd22-4d59-11e7-aee5-fdc812cc3bec",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "gauge"
+                    },
+                    "title": "Swap usage [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "19e123b0-4d5a-11e7-aee5-fdc812cc3bec-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Memory usage vs total [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "listeners": {},
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "background_color_rules": [
+                            {
+                                "id": "6f7618b0-4d5c-11e7-aa29-87a97a796de6"
+                            }
+                        ],
+                        "id": "6bc65720-4d5c-11e7-aa29-87a97a796de6",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "6bc65721-4d5c-11e7-aa29-87a97a796de6",
+                                "label": "Memory usage",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.actual.used.bytes",
+                                        "id": "6bc65722-4d5c-11e7-aa29-87a97a796de6",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "b8fe6820-4d5c-11e7-aa29-87a97a796de6",
+                                "label": "Total Memory",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.memory.total",
+                                        "id": "b8fe6821-4d5c-11e7-aa29-87a97a796de6",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "metric"
+                    },
+                    "title": "Memory usage vs total ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "d2e80340-4d5c-11e7-aa29-87a97a796de6-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Disk used [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "filter": "",
+                        "gauge_color_rules": [
+                            {
+                                "gauge": "rgba(104,188,0,1)",
+                                "id": "51921d10-4d1d-11e7-b5f2-2b7c1895bf32",
+                                "operator": "gte",
+                                "value": 0
+                            },
+                            {
+                                "gauge": "rgba(251,158,0,1)",
+                                "id": "f26de750-4d54-11e7-b5f2-2b7c1895bf32",
+                                "operator": "gte",
+                                "value": 0.7
+                            },
+                            {
+                                "gauge": "rgba(211,49,21,1)",
+                                "id": "fa31d190-4d54-11e7-b5f2-2b7c1895bf32",
+                                "operator": "gte",
+                                "value": 0.85
+                            }
+                        ],
+                        "gauge_inner_width": 10,
+                        "gauge_max": "1",
+                        "gauge_style": "half",
+                        "gauge_width": 10,
+                        "id": "4e4dc780-4d1d-11e7-b5f2-2b7c1895bf32",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "percent",
+                                "id": "4e4dee90-4d1d-11e7-b5f2-2b7c1895bf32",
+                                "label": "Disk used",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.fsstat.total_size.used",
+                                        "id": "4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "field": "system.fsstat.total_size.total",
+                                        "id": "57c96ee0-4d54-11e7-b5f2-2b7c1895bf32",
+                                        "type": "avg"
+                                    },
+                                    {
+                                        "id": "6304cca0-4d54-11e7-b5f2-2b7c1895bf32",
+                                        "script": "params.total != null && params.total > 0 ? params.used/params.total : null",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "field": "4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32",
+                                                "id": "6da10430-4d54-11e7-b5f2-2b7c1895bf32",
+                                                "name": "used"
+                                            },
+                                            {
+                                                "field": "57c96ee0-4d54-11e7-b5f2-2b7c1895bf32",
+                                                "id": "73b8c510-4d54-11e7-b5f2-2b7c1895bf32",
+                                                "name": "total"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "gauge"
+                    },
+                    "title": "Disk used [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Packetloss [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "background_color_rules": [
+                            {
+                                "id": "6ba9b1f0-4d5d-11e7-aa29-87a97a796de6"
+                            }
+                        ],
+                        "id": "6984af10-4d5d-11e7-aa29-87a97a796de6",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "number",
+                                "id": "6984af11-4d5d-11e7-aa29-87a97a796de6",
+                                "label": "In Packetloss",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.dropped",
+                                        "id": "6984af12-4d5d-11e7-aa29-87a97a796de6",
+                                        "type": "max"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            },
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "number",
+                                "id": "ac2e6b30-4d5d-11e7-aa29-87a97a796de6",
+                                "label": "Out Packetloss",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.dropped",
+                                        "id": "ac2e6b31-4d5d-11e7-aa29-87a97a796de6",
+                                        "type": "max"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "everything",
+                                "stacked": "none"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "metric"
+                    },
+                    "title": "Packetloss [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "96976150-4d5d-11e7-aa29-87a97a796de6-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Interfaces by Incoming traffic [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "bar_color_rules": [
+                            {
+                                "id": "44596d40-4d60-11e7-9a4c-ed99bbcaa42b"
+                            }
+                        ],
+                        "id": "42ceae90-4d60-11e7-9a4c-ed99bbcaa42b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "42ced5a0-4d60-11e7-9a4c-ed99bbcaa42b",
+                                "label": "Interfaces by Incoming traffic",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.in.bytes",
+                                        "id": "42ced5a1-4d60-11e7-9a4c-ed99bbcaa42b",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "terms_order_by": "42ced5a1-4d60-11e7-9a4c-ed99bbcaa42b"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "top_n"
+                    },
+                    "title": "Interfaces by Incoming traffic [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "99381c80-4d60-11e7-9a4c-ed99bbcaa42b-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Interfaces by Outgoing traffic [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "axis_formatter": "number",
+                        "axis_position": "left",
+                        "bar_color_rules": [
+                            {
+                                "id": "9db20be0-4d60-11e7-9a4c-ed99bbcaa42b"
+                            }
+                        ],
+                        "id": "9cdba910-4d60-11e7-9a4c-ed99bbcaa42b",
+                        "index_pattern": "metricbeat-*",
+                        "interval": "auto",
+                        "series": [
+                            {
+                                "axis_position": "right",
+                                "chart_type": "line",
+                                "color": "#68BC00",
+                                "fill": 0.5,
+                                "formatter": "bytes",
+                                "id": "9cdba911-4d60-11e7-9a4c-ed99bbcaa42b",
+                                "label": "Interfaces by Outgoing traffic",
+                                "line_width": 1,
+                                "metrics": [
+                                    {
+                                        "field": "system.network.out.bytes",
+                                        "id": "9cdba912-4d60-11e7-9a4c-ed99bbcaa42b",
+                                        "type": "avg"
+                                    }
+                                ],
+                                "point_size": 1,
+                                "seperate_axis": 0,
+                                "split_mode": "terms",
+                                "stacked": "none",
+                                "terms_field": "system.network.name",
+                                "terms_order_by": "9cdba912-4d60-11e7-9a4c-ed99bbcaa42b"
+                            }
+                        ],
+                        "show_grid": 1,
+                        "show_legend": 1,
+                        "time_field": "@timestamp",
+                        "type": "top_n"
+                    },
+                    "title": "Interfaces by Outgoing traffic [Metricbeat System] ECS",
+                    "type": "metrics"
+                }
+            },
+            "id": "c5e3cf90-4d60-11e7-9a4c-ed99bbcaa42b-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Number of processes [Metricbeat System] ECS",
+                "uiStateJSON": {
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Processes",
+                                "field": "process.pid"
+                            },
+                            "schema": "metric",
+                            "type": "cardinality"
+                        }
+                    ],
+                    "listeners": {},
+                    "params": {
+                        "addLegend": false,
+                        "addTooltip": true,
+                        "gauge": {
+                            "autoExtend": false,
+                            "backStyle": "Full",
+                            "colorSchema": "Green to Red",
+                            "colorsRange": [
+                                {
+                                    "from": 0,
+                                    "to": 100
+                                }
+                            ],
+                            "gaugeColorMode": "None",
+                            "gaugeStyle": "Full",
+                            "gaugeType": "Metric",
+                            "invertColors": false,
+                            "labels": {
+                                "color": "black",
+                                "show": true
+                            },
+                            "orientation": "vertical",
+                            "percentageMode": false,
+                            "scale": {
+                                "color": "#333",
+                                "labels": false,
+                                "show": false,
+                                "width": 2
+                            },
+                            "style": {
+                                "bgColor": false,
+                                "bgFill": "#000",
+                                "fontSize": 60,
+                                "labelColor": false,
+                                "subText": ""
+                            },
+                            "type": "simple",
+                            "useRange": false,
+                            "verticalSplit": false
+                        },
+                        "type": "gauge"
+                    },
+                    "title": "Number of processes ECS",
+                    "type": "metric"
+                }
+            },
+            "id": "590a60f0-5d87-11e7-8884-1bb4c3b890e4-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                },
+                "title": "Tip [Metricbeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "fontSize": 12,
+                        "markdown": "**TIP:** To select another host, go to the [System Overview](#/dashboard/Metricbeat-system-overview-ecs) dashboard and double-click a host name."
+                    },
+                    "title": "Tip [Metricbeat System] ECS",
+                    "type": "markdown"
+                }
+            },
+            "id": "3d65d450-a9c3-11e7-af20-67db8aecb295-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "Overview of host metrics",
+                "hits": 0,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "query": {
+                            "language": "kuery",
+                            "query": "host.name:\"CHANGEME_HOSTNAME\""
+                        },
+                        "version": true
+                    }
+                },
+                "optionsJSON": {
+                    "darkTheme": false
+                },
+                "panelsJSON": [
+                    {
+                        "col": 1,
+                        "id": "6b7b9a40-faa1-11e6-86b1-cd7735ff7e23-ecs",
+                        "panelIndex": 1,
+                        "row": 12,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "4d546850-1b15-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 2,
+                        "row": 6,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "089b85d0-1b16-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 3,
+                        "row": 12,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "bfa5e400-1b16-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 4,
+                        "row": 9,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "e0f001c0-1b18-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 5,
+                        "row": 15,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "2e224660-1b19-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 6,
+                        "row": 15,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "ab2d1e90-1b1a-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 7,
+                        "row": 6,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "4e4bb1e0-1b1b-11e7-b09e-037021c4f8df-ecs",
+                        "panelIndex": 8,
+                        "row": 9,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 5,
+                        "id": "26732e20-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+                        "panelIndex": 9,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+                        "panelIndex": 10,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 3,
+                        "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+                        "panelIndex": 11,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b-ecs",
+                        "panelIndex": 12,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 9,
+                        "id": "1aae9140-1b93-11e7-8ada-3df93aab833e-ecs",
+                        "panelIndex": 13,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 9,
+                        "id": "34f97ee0-1b96-11e7-8ada-3df93aab833e-ecs",
+                        "panelIndex": 14,
+                        "row": 4,
+                        "size_x": 4,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "System-Navigation-ecs",
+                        "panelIndex": 16,
+                        "row": 1,
+                        "size_x": 6,
+                        "size_y": 1,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "19e123b0-4d5a-11e7-aee5-fdc812cc3bec-ecs",
+                        "panelIndex": 21,
+                        "row": 4,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 3,
+                        "id": "d2e80340-4d5c-11e7-aa29-87a97a796de6-ecs",
+                        "panelIndex": 22,
+                        "row": 4,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32-ecs",
+                        "panelIndex": 23,
+                        "row": 4,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 11,
+                        "id": "96976150-4d5d-11e7-aa29-87a97a796de6-ecs",
+                        "panelIndex": 25,
+                        "row": 2,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "99381c80-4d60-11e7-9a4c-ed99bbcaa42b-ecs",
+                        "panelIndex": 27,
+                        "row": 18,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "c5e3cf90-4d60-11e7-9a4c-ed99bbcaa42b-ecs",
+                        "panelIndex": 28,
+                        "row": 18,
+                        "size_x": 6,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 5,
+                        "id": "590a60f0-5d87-11e7-8884-1bb4c3b890e4-ecs",
+                        "panelIndex": 29,
+                        "row": 4,
+                        "size_x": 2,
+                        "size_y": 2,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "3d65d450-a9c3-11e7-af20-67db8aecb295-ecs",
+                        "panelIndex": 30,
+                        "row": 1,
+                        "size_x": 6,
+                        "size_y": 1,
+                        "type": "visualization"
+                    }
+                ],
+                "timeRestore": false,
+                "title": "[Metricbeat System] Host overview ECS",
+                "uiStateJSON": {
+                    "P-29": {
+                        "vis": {
+                            "defaultColors": {
+                                "0 - 100": "rgb(0,104,55)"
+                            }
+                        }
+                    }
+                },
+                "version": 1
+            },
+            "id": "79ffd6e0-faa0-11e6-947f-177f697178b8-ecs",
+            "type": "dashboard",
+            "version": 12
+        }
+    ],
+    "version": "6.0.0-rc1-SNAPSHOT"
+}

@@ -4,6 +4,12 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
 
+{% if af_packet %}
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
+packetbeat.interfaces.auto_promisc_mode: true
+{% endif %}
+
 {% if bpf_filter %}
 packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
 {% endif %}
@@ -26,6 +32,9 @@ packetbeat.protocols:
   enabled: true
 {% if icmp_send_request %}  send_request: true{%- endif %}
 {% if icmp_send_response %}  send_response: true{%- endif %}
+
+- type: dhcpv4
+  ports: [{{ dhcp_ports|default([67, 68])|join(", ") }}]
 
 - type: dns
   ports: [{{ dns_ports|default([53])|join(", ") }}]
@@ -81,6 +90,7 @@ packetbeat.protocols:
   ]
 {%- endif %}
 {%- if http_max_message_size %}  max_message_size: {{ http_max_message_size }} {%- endif %}
+{%- if http_transaction_timeout %}  transaction_timeout: {{ http_transaction_timeout }} {%- endif %}
 
 - type: memcache
   ports: [{{ memcache_ports|default([11211])|join(", ") }}]
@@ -123,6 +133,13 @@ packetbeat.protocols:
 {%- endif %}
 {% if thrift_send_request %}  send_request: true{%- endif %}
 {% if thrift_send_response %}  send_response: true{%- endif %}
+
+- type: tls
+  ports: [{{ tls_ports|default([443])|join(", ") }}]
+{% if tls_send_certificates is defined %}  send_certificates: {{tls_send_certificates}}{%- endif %}
+{% if tls_include_raw_certificates is defined  %}  include_raw_certificates: {{tls_include_raw_certificates}}{%- endif %}
+{% if tls_include_detailed_fields is defined %}  include_detailed_fields: {{tls_include_detailed_fields}}{%- endif %}
+{% if tls_fingerprints is defined %}  fingerprints: {{tls_fingerprints}}{%- endif %}
 
 - type: mongodb
   ports: [{{ mongodb_ports|default([27017])|join(", ") }}]

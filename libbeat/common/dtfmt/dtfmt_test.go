@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dtfmt
 
 import (
@@ -81,6 +98,11 @@ func TestFormat(t *testing.T) {
 		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
 			"2017-01-02T04:06:07.123Z"},
+
+		// beats timestamp
+		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
+			"yyyy-MM-dd'T'HH:mm:ss.SSSz",
+			"2017-01-02T04:06:07.123-08:00"},
 	}
 
 	for i, test := range tests {
@@ -106,5 +128,9 @@ func mkTime(h, m, s, S int) time.Time {
 }
 
 func mkDateTime(y, M, d, h, m, s, S int) time.Time {
-	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, time.UTC)
+	return mkDateTimeWithLocation(y, M, d, h, m, s, S, time.UTC)
+}
+
+func mkDateTimeWithLocation(y, M, d, h, m, s, S int, l *time.Location) time.Time {
+	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, l)
 }

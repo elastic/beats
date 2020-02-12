@@ -1,363 +1,276 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package scheduler
 
 import (
+	"context"
 	"errors"
-	"runtime/debug"
+	"fmt"
+	"math"
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
+	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
-type Scheduler struct {
-	limit   uint
-	running bool
-
-	location *time.Location
-
-	jobs   []*job
-	active uint // number of active entries
-
-	add, rm  chan *job
-	finished chan taskOverSignal
-
-	// list of active tasks waiting to be executed
-	tasks []task
-
-	done chan struct{}
-	wg   sync.WaitGroup
-}
-
-type Canceller func() error
-
-// A job is a re-schedulable entry point in a set of tasks. Each task can return
-// a new set of tasks being executed (subject to active task limits). Only after
-// all tasks of a job have been finished, the job is marked as done and subject
-// to be re-scheduled.
-type job struct {
-	name     string
-	next     time.Time
-	schedule Schedule
-	fn       TaskFunc
-
-	registered bool
-	running    uint32 // count number of active task for job
-}
-
-// A single task in an active job.
-type task struct {
-	job *job
-	fn  TaskFunc
-}
-
-// Single task in an active job. Optionally returns continuation of tasks to
-// be executed within current job.
-type TaskFunc func() []TaskFunc
-
-type taskOverSignal struct {
-	entry *job
-	cont  []task // continuation tasks to be executed by concurrently for job at hand
-}
-
-type Schedule interface {
-	Next(time.Time) time.Time
-}
+const (
+	statePreRunning int = iota + 1
+	stateRunning
+	stateStopped
+)
 
 var debugf = logp.MakeDebug("scheduler")
 
-func New(limit uint) *Scheduler {
-	return NewWithLocation(limit, time.Local)
+// ErrInvalidTransition is returned from start/stop when making an invalid state transition, say from preRunning to stopped
+var ErrInvalidTransition = fmt.Errorf("invalid state transition")
+
+// Scheduler represents our async timer based scheduler.
+type Scheduler struct {
+	limit      int64
+	limitSem   *semaphore.Weighted
+	state      atomic.Int
+	location   *time.Location
+	timerQueue *timerqueue.TimerQueue
+	ctx        context.Context
+	cancelCtx  context.CancelFunc
+	stats      schedulerStats
 }
 
-func NewWithLocation(limit uint, location *time.Location) *Scheduler {
-	return &Scheduler{
-		limit:    limit,
-		location: location,
+type schedulerStats struct {
+	activeJobs         *monitoring.Uint // gauge showing number of active jobs
+	activeTasks        *monitoring.Uint // gauge showing number of active tasks
+	waitingTasks       *monitoring.Uint // number of tasks waiting to run, but constrained by scheduler limit
+	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
+	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
+}
 
-		running: false,
-		jobs:    nil,
-		active:  0,
+// TaskFunc represents a single task in a job. Optionally returns continuation of tasks to
+// be executed within current job.
+type TaskFunc func(ctx context.Context) []TaskFunc
 
-		add:      make(chan *job),
-		rm:       make(chan *job),
-		finished: make(chan taskOverSignal),
+// Schedule defines an interface for getting the next scheduled runtime for a job
+type Schedule interface {
+	// Next returns the next runAt a scheduled event occurs after the given runAt
+	Next(now time.Time) (next time.Time)
+	// Returns true if this schedule type should run once immediately before checking Next.
+	// Cron tasks run at exact times so should set this to false.
+	RunOnInit() bool
+}
 
-		done: make(chan struct{}),
-		wg:   sync.WaitGroup{},
+// New creates a new Scheduler
+func New(limit int64, registry *monitoring.Registry) *Scheduler {
+	return NewWithLocation(limit, registry, time.Local)
+}
+
+// NewWithLocation creates a new Scheduler using the given runAt zone.
+func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location) *Scheduler {
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
+	if limit < 1 {
+		limit = math.MaxInt64
 	}
+
+	jobsMissedDeadlineCounter := monitoring.NewUint(registry, "jobs.missed_deadline")
+	activeJobsGauge := monitoring.NewUint(registry, "jobs.active")
+	activeTasksGauge := monitoring.NewUint(registry, "tasks.active")
+	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
+
+	sched := &Scheduler{
+		limit:     limit,
+		location:  location,
+		state:     atomic.MakeInt(statePreRunning),
+		ctx:       ctx,
+		cancelCtx: cancelCtx,
+		limitSem:  semaphore.NewWeighted(limit),
+
+		timerQueue: timerqueue.NewTimerQueue(ctx),
+
+		stats: schedulerStats{
+			activeJobs:         activeJobsGauge,
+			activeTasks:        activeTasksGauge,
+			waitingTasks:       waitingTasksGauge,
+			jobsMissedDeadline: jobsMissedDeadlineCounter,
+		},
+	}
+
+	return sched
 }
 
+// Start the scheduler. Starting a stopped scheduler returns an error.
 func (s *Scheduler) Start() error {
-	if s.running {
-		return errors.New("scheduler already running")
+	if s.state.Load() == stateStopped {
+		return ErrInvalidTransition
+	}
+	if !s.state.CAS(statePreRunning, stateRunning) {
+		return nil // we already running, just exit
 	}
 
-	s.running = true
-	go s.run()
-	return nil
-}
+	s.timerQueue.Start()
 
-func (s *Scheduler) Stop() error {
-	if !s.running {
-		return errors.New("scheduler already stopped")
-	}
-
-	s.running = false
-	close(s.done)
-	s.wg.Wait()
-	return nil
-}
-
-func (s *Scheduler) Add(sched Schedule, name string, entrypoint TaskFunc) func() error {
-	debugf("Add scheduler job '%v'.", name)
-
-	j := &job{
-		name:       name,
-		fn:         entrypoint,
-		schedule:   sched,
-		registered: false,
-		running:    0,
-	}
-	if !s.running {
-		s.doAdd(j)
-	} else {
-		s.add <- j
-	}
-
-	return func() error { return s.remove(j) }
-}
-
-func (s *Scheduler) remove(j *job) error {
-	debugf("Remove scheduler job '%v'", j.name)
-
-	if !s.running {
-		s.doRemove(j)
-	} else {
-		s.rm <- j
-	}
+	// Missed deadline reporter
+	go s.missedDeadlineReporter()
 
 	return nil
 }
 
-func (s *Scheduler) run() {
-	defer func() {
-		// drain finished queue for active jobs to not leak
-		// go-routines on exit
-		for i := uint(0); i < s.active; i++ {
-			<-s.finished
-		}
-	}()
+func (s *Scheduler) missedDeadlineReporter() {
+	interval := time.Second * 15
 
-	debugf("Start scheduler.")
-	defer debugf("Scheduler stopped.")
+	t := time.NewTicker(interval)
 
-	now := time.Now().In(s.location)
-	for _, j := range s.jobs {
-		j.next = j.schedule.Next(now)
-	}
-
-	resched := true
-
-	var timer *time.Timer
+	// Counter used to check if we're missing more checks now than before
+	missedAtLastCheck := uint64(0)
 	for {
-		if resched {
-			sortEntries(s.jobs)
-		}
-		resched = true
-
-		if (s.limit == 0 || s.active < s.limit) && len(s.jobs) > 0 {
-			next := s.jobs[0].next
-			debugf("Next wakeup time: %v", next)
-
-			if timer != nil {
-				timer.Stop()
-			}
-			timer = time.NewTimer(next.Sub(time.Now().In(s.location)))
-		}
-
-		var timeSignal <-chan time.Time
-		if timer != nil {
-			timeSignal = timer.C
-		}
-
 		select {
-		case now = <-timeSignal:
-			for _, j := range s.jobs {
-				if now.Before(j.next) {
-					break
-				}
-
-				if j.running > 0 {
-					debugf("Scheduled job '%v' still active.", j.name)
-					reschedActive(j, now)
-					continue
-				}
-
-				if s.limit > 0 && s.active == s.limit {
-					logp.Info("Scheduled job '%v' waiting.", j.name)
-					timer = nil
-					continue
-				}
-
-				s.startJob(j)
-			}
-
-		case sig := <-s.finished:
-			s.active--
-			j := sig.entry
-			debugf("Job '%v' returned at %v (cont=%v).", j.name, time.Now(), len(sig.cont))
-
-			// add number of job continuation tasks returned to current job task
-			// counter and remove count for task just being finished
-			j.running += uint32(len(sig.cont)) - 1
-
-			count := 0 // number of rescheduled waiting jobs
-
-			// try to start waiting jobs
-			for _, waiting := range s.jobs {
-				if now.Before(waiting.next) {
-					break
-				}
-
-				if waiting.running > 0 {
-					count++
-					reschedActive(waiting, now)
-					continue
-				}
-
-				debugf("Start waiting job: %v", waiting.name)
-				s.startJob(waiting)
-				break
-			}
-
-			// Try to start waiting tasks of already running jobs.
-			// The s.tasks waiting list will only have any entries if `s.limit > 0`.
-			if s.limit > 0 && (s.active < s.limit) {
-				if T := uint(len(s.tasks)); T > 0 {
-					N := s.limit - s.active
-					debugf("start up to %v waiting tasks (%v)", N, T)
-					if N > T {
-						N = T
-					}
-
-					tasks := s.tasks[:N]
-					s.tasks = s.tasks[N:]
-					for _, t := range tasks {
-						s.runTask(t)
-					}
-				}
-			}
-
-			// try to start returned tasks for current job and put left-over tasks into
-			// waiting list.
-			if N := len(sig.cont); N > 0 {
-				if s.limit > 0 {
-					limit := int(s.limit - s.active)
-					if N > limit {
-						N = limit
-					}
-				}
-
-				if N > 0 {
-					debugf("start returned tasks")
-					tasks := sig.cont[:N]
-					sig.cont = sig.cont[N:]
-					for _, t := range tasks {
-						s.runTask(t)
-					}
-				}
-			}
-			if len(sig.cont) > 0 {
-				s.tasks = append(s.tasks, sig.cont...)
-			}
-
-			// reschedule (sort) list of tasks, if any task to be run next is
-			// still active.
-			resched = count > 0
-
-		case j := <-s.add:
-			j.next = j.schedule.Next(time.Now().In(s.location))
-			s.doAdd(j)
-
-		case j := <-s.rm:
-			s.doRemove(j)
-
-		case <-s.done:
-			debugf("done")
+		case <-s.ctx.Done():
+			t.Stop()
 			return
-
-		}
-	}
-}
-
-func reschedActive(j *job, now time.Time) {
-	logp.Info("Scheduled job '%v' already active.", j.name)
-	if !now.Before(j.next) {
-		j.next = j.schedule.Next(j.next)
-	}
-}
-
-func (s *Scheduler) startJob(j *job) {
-	j.running++
-	j.next = j.schedule.Next(j.next)
-	debugf("Start job '%v' at %v.", j.name, time.Now())
-
-	s.runTask(task{j, j.fn})
-}
-
-func (s *Scheduler) runTask(t task) {
-	j := t.job
-	s.active++
-
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				logp.Err("Panic in job '%v'. Recovering, but please report this: %s.",
-					j.name, r)
-				logp.Err("Stacktrace: %s", debug.Stack())
-				s.signalFinished(j, nil)
+		case <-t.C:
+			missingNow := s.stats.jobsMissedDeadline.Get()
+			missedDelta := missingNow - missedAtLastCheck
+			if missedDelta > 0 {
+				logp.Warn("%d tasks have missed their schedule deadlines in the last %s.", missedDelta, interval)
 			}
-		}()
-
-		cont := t.fn()
-		s.signalFinished(j, cont)
-	}()
-}
-
-func (s *Scheduler) doAdd(j *job) {
-	j.registered = true
-	s.jobs = append(s.jobs, j)
-}
-
-func (s *Scheduler) doRemove(j *job) {
-	// find entry
-	idx := -1
-	for i, other := range s.jobs {
-		if j == other {
-			idx = i
-			break
+			missedAtLastCheck = missingNow
 		}
 	}
-	if idx == -1 {
-		return
-	}
-
-	// delete entry, not preserving order
-	s.jobs[idx] = s.jobs[len(s.jobs)-1]
-	s.jobs = s.jobs[:len(s.jobs)-1]
-
-	// mark entry as unregistered
-	j.registered = false
 }
 
-func (s *Scheduler) signalFinished(j *job, cont []TaskFunc) {
-	var tasks []task
-	if len(cont) > 0 {
-		tasks = make([]task, len(cont))
-		for i, f := range cont {
-			tasks[i] = task{j, f}
+// Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
+func (s *Scheduler) Stop() error {
+	if s.state.CAS(stateRunning, stateStopped) {
+		s.cancelCtx()
+		return nil
+	} else if s.state.Load() == stateStopped {
+		return nil
+	}
+
+	return ErrInvalidTransition
+}
+
+// ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler
+// has already stopped.
+var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
+
+// Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
+// is done.
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
+	if s.state.Load() == stateStopped {
+		return nil, ErrAlreadyStopped
+	}
+
+	jobCtx, jobCtxCancel := context.WithCancel(s.ctx)
+
+	// lastRanAt stores the last runAt the task was invoked
+	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
+	lastRanAt := time.Now().In(s.location)
+
+	var taskFn timerqueue.TimerTaskFn
+
+	taskFn = func(_ time.Time) {
+		s.stats.activeJobs.Inc()
+		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
+		s.stats.activeJobs.Dec()
+		s.runOnce(sched.Next(lastRanAt), taskFn)
+		debugf("Job '%v' returned at %v", id, time.Now())
+	}
+
+	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
+	// You might think it'd be simpler to just invoke runOnce in either case with 0 as a lastRanAt value,
+	// however, that would caused the missed deadline stats to be incremented. Given that, it's easier
+	// and slightly more efficient to simply run these tasks immediately in a goroutine.
+	if sched.RunOnInit() {
+		go taskFn(time.Now())
+	} else {
+		s.runOnce(sched.Next(lastRanAt), taskFn)
+	}
+
+	return func() {
+		debugf("Remove scheduler job '%v'", id)
+		jobCtxCancel()
+	}, nil
+}
+
+func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
+	now := time.Now().In(s.location)
+	if runAt.Before(now) {
+		// Our last invocation went long!
+		s.stats.jobsMissedDeadline.Inc()
+	}
+
+	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
+	// block the timer thread.
+	asyncTask := func(now time.Time) { go taskFn(now) }
+	s.timerQueue.Push(runAt, asyncTask)
+}
+
+// runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
+// Subtasks are run in separate goroutines.
+// returns the time execution began on its first task
+func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) (startedAt time.Time) {
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	startedAt = s.runRecursiveTask(jobCtx, task, wg)
+	wg.Wait()
+	return startedAt
+}
+
+// runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
+// Since task funcs can emit continuations recursively we need a function to execute
+// recursively.
+// The wait group passed into this function expects to already have its count incremented by one.
+func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup) (startedAt time.Time) {
+	defer wg.Done()
+
+	// The accounting for waiting/active tasks is done using atomics.
+	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
+	s.stats.waitingTasks.Inc()
+
+	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
+	s.limitSem.Acquire(s.ctx, 1)
+	defer s.limitSem.Release(1)
+
+	// Record the time this task started now that we have a resource to execute with
+	startedAt = time.Now()
+
+	// Check if the scheduler has been shut down. If so, exit early
+	select {
+	case <-jobCtx.Done():
+		return startedAt
+	default:
+		s.stats.activeTasks.Inc()
+		s.stats.waitingTasks.Dec()
+
+		continuations := task(jobCtx)
+		s.stats.activeTasks.Dec()
+
+		wg.Add(len(continuations))
+		for _, cont := range continuations {
+			// Run continuations in parallel, note that these each will acquire their own slots
+			// We can discard the started at times for continuations as those are irrelevant
+			go s.runRecursiveTask(jobCtx, cont, wg)
 		}
 	}
 
-	s.finished <- taskOverSignal{j, tasks}
+	return startedAt
 }

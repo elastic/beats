@@ -1,70 +1,70 @@
-// Copyright 2013 The Go Authors.  All rights reserved.
+// Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !nacl,!plan9,!windows
+// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
 
 package ipv6
 
 import (
 	"net"
-	"syscall"
+
+	"golang.org/x/net/internal/socket"
 )
 
 // ReadFrom reads a payload of the received IPv6 datagram, from the
-// endpoint c, copying the payload into b.  It returns the number of
+// endpoint c, copying the payload into b. It returns the number of
 // bytes copied into b, the control message cm and the source address
 // src of the received datagram.
 func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) {
 	if !c.ok() {
-		return 0, nil, nil, syscall.EINVAL
+		return 0, nil, nil, errInvalidConn
 	}
-	oob := newControlMessage(&c.rawOpt)
-	var oobn int
-	switch c := c.PacketConn.(type) {
+	c.rawOpt.RLock()
+	m := socket.Message{
+		Buffers: [][]byte{b},
+		OOB:     NewControlMessage(c.rawOpt.cflags),
+	}
+	c.rawOpt.RUnlock()
+	switch c.PacketConn.(type) {
 	case *net.UDPConn:
-		if n, oobn, _, src, err = c.ReadMsgUDP(b, oob); err != nil {
-			return 0, nil, nil, err
+		if err := c.RecvMsg(&m, 0); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
 		}
 	case *net.IPConn:
-		if n, oobn, _, src, err = c.ReadMsgIP(b, oob); err != nil {
-			return 0, nil, nil, err
+		if err := c.RecvMsg(&m, 0); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
 		}
 	default:
-		return 0, nil, nil, errInvalidConnType
+		return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: errInvalidConnType}
 	}
-	if cm, err = parseControlMessage(oob[:oobn]); err != nil {
-		return 0, nil, nil, err
+	if m.NN > 0 {
+		cm = new(ControlMessage)
+		if err := cm.Parse(m.OOB[:m.NN]); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
+		cm.Src = netAddrToIP16(m.Addr)
 	}
-	if cm != nil {
-		cm.Src = netAddrToIP16(src)
-	}
-	return
+	return m.N, cm, m.Addr, nil
 }
 
 // WriteTo writes a payload of the IPv6 datagram, to the destination
-// address dst through the endpoint c, copying the payload from b.  It
-// returns the number of bytes written.  The control message cm allows
-// the IPv6 header fields and the datagram path to be specified.  The
+// address dst through the endpoint c, copying the payload from b. It
+// returns the number of bytes written. The control message cm allows
+// the IPv6 header fields and the datagram path to be specified. The
 // cm may be nil if control of the outgoing datagram is not required.
 func (c *payloadHandler) WriteTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) {
 	if !c.ok() {
-		return 0, syscall.EINVAL
+		return 0, errInvalidConn
 	}
-	oob := marshalControlMessage(cm)
-	if dst == nil {
-		return 0, errMissingAddress
+	m := socket.Message{
+		Buffers: [][]byte{b},
+		OOB:     cm.Marshal(),
+		Addr:    dst,
 	}
-	switch c := c.PacketConn.(type) {
-	case *net.UDPConn:
-		n, _, err = c.WriteMsgUDP(b, oob, dst.(*net.UDPAddr))
-	case *net.IPConn:
-		n, _, err = c.WriteMsgIP(b, oob, dst.(*net.IPAddr))
-	default:
-		return 0, errInvalidConnType
-	}
+	err = c.SendMsg(&m, 0)
 	if err != nil {
-		return 0, err
+		err = &net.OpError{Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Addr: opAddr(dst), Err: err}
 	}
-	return
+	return m.N, err
 }

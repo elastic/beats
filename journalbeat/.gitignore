@@ -1,0 +1,9 @@
+/.idea
+/build
+.DS_Store
+.journalbeat_position
+/journalbeat
+/journalbeat.test
+*.pyc
+data/meta.json
+/*.journal

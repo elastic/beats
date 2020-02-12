@@ -1,0 +1,19 @@
+/usr/sbin/mysqld, Version: 8.0.15 (MySQL Community Server - GPL). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+# Time: 2019-03-24T14:01:47.811234Z
+# User@Host: root[root] @ localhost []  Id:    14
+# Query_time: 2.475469  Lock_time: 0.000287 Rows_sent: 10  Rows_examined: 3145718
+use employees;
+SET timestamp=1553436105;
+SELECT last_name, MAX(salary) AS salary FROM employees INNER JOIN salaries ON employees.emp_no = salaries.emp_no GROUP BY last_name ORDER BY salary DESC LIMIT 10;
+# Time: 2019-03-24T14:04:53.713951Z
+# User@Host: root[root] @ localhost []  Id:    16
+# Query_time: 2.631844  Lock_time: 0.000145 Rows_sent: 10  Rows_examined: 3145718 Thread_id: 16 Errno: 0 Killed: 0 Bytes_received: 0 Bytes_sent: 312 Read_first: 1 Read_last: 0 Read_key: 3144072 Read_next: 2844047 Read_prev: 0 Read_rnd: 10 Read_rnd_next: 301663 Sort_merge_passes: 0 Sort_range_count: 0 Sort_rows: 10 Sort_scan_count: 1 Created_tmp_disk_tables: 0 Created_tmp_tables: 1 Start: 2019-03-24T14:04:51.082107Z End: 2019-03-24T14:04:53.713951Z
+use employees;
+SET timestamp=1553436291;
+SELECT last_name, MAX(salary) AS salary FROM employees
+    INNER JOIN salaries ON employees.emp_no = salaries.emp_no
+    GROUP BY last_name
+    ORDER BY salary DESC
+    LIMIT 10;

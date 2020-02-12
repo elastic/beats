@@ -1,0 +1,40 @@
+[
+    {
+        "@timestamp": "2015-05-10T18:02:14.000Z",
+        "aws.vpcflow.account_id": "123456789010",
+        "aws.vpcflow.action": "-",
+        "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
+        "aws.vpcflow.log_status": "NODATA",
+        "aws.vpcflow.version": "2",
+        "event.category": "network_traffic",
+        "event.dataset": "aws.vpcflow",
+        "event.end": "2015-05-10T18:02:14.000Z",
+        "event.module": "aws",
+        "event.original": "2 123456789010 eni-1235b8ca123456789 - - - - - - - 1431280876 1431280934 - NODATA",
+        "event.start": "2015-05-10T18:01:16.000Z",
+        "event.type": "flow",
+        "fileset.name": "vpcflow",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "aws"
+    },
+    {
+        "@timestamp": "2015-05-10T18:02:14.000Z",
+        "aws.vpcflow.account_id": "123456789010",
+        "aws.vpcflow.action": "-",
+        "aws.vpcflow.interface_id": "eni-11111111aaaaaaaaa",
+        "aws.vpcflow.log_status": "SKIPDATA",
+        "aws.vpcflow.version": "2",
+        "event.category": "network_traffic",
+        "event.dataset": "aws.vpcflow",
+        "event.end": "2015-05-10T18:02:14.000Z",
+        "event.module": "aws",
+        "event.original": "2 123456789010 eni-11111111aaaaaaaaa - - - - - - - 1431280876 1431280934 - SKIPDATA",
+        "event.start": "2015-05-10T18:01:16.000Z",
+        "event.type": "flow",
+        "fileset.name": "vpcflow",
+        "input.type": "log",
+        "log.offset": 82,
+        "service.type": "aws"
+    }
+]

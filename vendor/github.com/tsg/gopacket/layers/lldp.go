@@ -9,6 +9,7 @@ package layers
 import (
 	"encoding/binary"
 	"fmt"
+
 	"github.com/tsg/gopacket"
 )
 
@@ -737,7 +738,7 @@ func decodeLinkLayerDiscovery(data []byte, p gopacket.PacketBuilder) error {
 	for len(vData) > 0 {
 		nbit := vData[0] & 0x01
 		t := LLDPTLVType(vData[0] >> 1)
-		val := LinkLayerDiscoveryValue{Type: t, Length: uint16(nbit<<8 + vData[1])}
+		val := LinkLayerDiscoveryValue{Type: t, Length: uint16(nbit)<<8 + uint16(vData[1])}
 		if val.Length > 0 {
 			val.Value = vData[2 : val.Length+2]
 		}

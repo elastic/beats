@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -46,8 +63,9 @@ var (
 	tInterfaceArray = reflect.TypeOf([]interface{}(nil))
 
 	// interface types
-	tError     = reflect.TypeOf((*error)(nil)).Elem()
-	tValidator = reflect.TypeOf((*Validator)(nil)).Elem()
+	tError       = reflect.TypeOf((*error)(nil)).Elem()
+	iInitializer = reflect.TypeOf((*Initializer)(nil)).Elem()
+	tValidator   = reflect.TypeOf((*Validator)(nil)).Elem()
 
 	// primitives
 	tBool     = reflect.TypeOf(true)
@@ -64,6 +82,18 @@ func New() *Config {
 	return &Config{
 		fields: &fields{nil, nil},
 	}
+}
+
+// MustNewFrom creates a new config object normalizing and copying from into the new
+// Config object. MustNewFrom uses Merge to copy from.
+//
+// MustNewFrom supports the options: PathSep, MetaData, StructTag, VarExp
+func MustNewFrom(from interface{}, opts ...Option) *Config {
+	c := New()
+	if err := c.Merge(from, opts...); err != nil {
+		panic(err)
+	}
+	return c
 }
 
 // NewFrom creates a new config object normalizing and copying from into the new
@@ -97,10 +127,48 @@ func (c *Config) GetFields() []string {
 	return names
 }
 
+// Has checks if a field by the given path+idx configuration exists.
+// Has returns an error if the path can not be resolved because a primitive
+// value is found in the middle of the traversal.
+func (c *Config) Has(name string, idx int, options ...Option) (bool, error) {
+	opts := makeOptions(options)
+	p := parsePathIdx(name, opts.pathSep, idx)
+	return p.Has(c, opts)
+}
+
 // HasField checks if c has a top-level named key name.
 func (c *Config) HasField(name string) bool {
 	_, ok := c.fields.get(name)
 	return ok
+}
+
+// Remove removes a setting from the config. If the configuration references
+// another configuration namespace, then the setting will be removed from the
+// linked reference.
+// Remove returns true if the setting was removed. If the path can't be
+// resolved (e.g. due to type mismatch) Remove will return an error.
+//
+// Settings can be created on Unpack via Env, Resolve, and ResolveEnv. Settings
+// generated dynamically on Unpack can not be removed. Remove ignores any
+// configured environments and will return an error if a value can not be
+// removed for this reason.
+//
+// The setting path is constructed from name and idx. If name is set and idx is -1,
+// only the name is used to access the setting by name. If name is empty, idx
+// must be >= 0, assuming the Config is a list. If both name and idx are set,
+// the name must point to a list.
+//
+// Remove supports the options: PathSep
+func (c *Config) Remove(name string, idx int, options ...Option) (bool, error) {
+	opts := makeOptions(options)
+
+	// ignore environments
+	opts.env = nil
+	opts.resolvers = nil
+	opts.noParse = true
+
+	p := parsePathIdx(name, opts.pathSep, idx)
+	return p.Remove(c, opts)
 }
 
 // Path gets the absolute path of c separated by sep. If c is a root-Config an
@@ -190,6 +258,26 @@ func (f *fields) array() []value {
 	return f.a
 }
 
+func (f *fields) del(name string) bool {
+	_, exists := f.d[name]
+	if exists {
+		delete(f.d, name)
+	}
+	return exists
+}
+
+func (f *fields) delAt(i int) bool {
+	a := f.a
+	if i < 0 || len(a) <= i {
+		return false
+	}
+
+	copy(a[i:], a[i+1:])
+	a[len(a)-1] = nil
+	f.a = a[:len(a)-1]
+	return true
+}
+
 func (f *fields) set(name string, v value) {
 	if f.d == nil {
 		f.d = map[string]value{}
@@ -216,4 +304,28 @@ func (f *fields) setAt(idx int, parent, v value) {
 	}
 
 	f.a[idx] = v
+}
+
+func (f *fields) append(parent value, a []value) {
+	l := len(f.a)
+	count := len(a)
+	if count == 0 {
+		return
+	}
+
+	for i := 0; i < count; i, l = i+1, l+1 {
+		ctx := context{
+			parent: parent,
+			field:  fmt.Sprintf("%v", l),
+		}
+		f.setAt(l, parent, a[i].cpy(ctx))
+	}
+}
+
+func (o *fieldOptions) configHandling() configHandling {
+	h := o.tag.cfgHandling
+	if h == cfgDefaultHandling {
+		h = o.opts.configValueHandling
+	}
+	return h
 }
