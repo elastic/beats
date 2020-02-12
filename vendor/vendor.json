@@ -3268,76 +3268,76 @@
 			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "a1x0prr3ix+QFOdJpNfM3Q4G6Es=",
+			"checksumSHA1": "VPcK6uPDligSrbdi1yVeGivPvno=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "B58nBBiUIstpkXfr9yaYN9GzdLE=",
 			"path": "github.com/elastic/go-ucfg/diff",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "E6k6DWkpI+LOKDIFRqRmNH9GORc=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "NhiQQjYMs/ViCbmEq9tll2uCaYo=",
 			"path": "github.com/elastic/go-ucfg/hjson",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
 			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
 			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "cfMNsyQm0gZOV0hRJrBSdKDQSBo=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "ZISq+zzSb0OLzvwLlf1ObdgnFmM=",
 			"path": "github.com/elastic/go-ucfg/parse",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "cnJVnptTvXNLzxVhd266k19/pQg=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "iI1JCWsrAPpoKcEo/i6G3lRLIVs=",
