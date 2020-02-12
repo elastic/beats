@@ -3268,76 +3268,76 @@
 			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "a1x0prr3ix+QFOdJpNfM3Q4G6Es=",
+			"checksumSHA1": "VPcK6uPDligSrbdi1yVeGivPvno=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "B58nBBiUIstpkXfr9yaYN9GzdLE=",
 			"path": "github.com/elastic/go-ucfg/diff",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "E6k6DWkpI+LOKDIFRqRmNH9GORc=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "NhiQQjYMs/ViCbmEq9tll2uCaYo=",
 			"path": "github.com/elastic/go-ucfg/hjson",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
 			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
 			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "cfMNsyQm0gZOV0hRJrBSdKDQSBo=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "ZISq+zzSb0OLzvwLlf1ObdgnFmM=",
 			"path": "github.com/elastic/go-ucfg/parse",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "cnJVnptTvXNLzxVhd266k19/pQg=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "093a6898c440d2e5e93abf09850068c60428b2cd",
-			"revisionTime": "2020-01-31T13:55:22Z",
-			"version": "v0.8.1",
-			"versionExact": "v0.8.1"
+			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
+			"revisionTime": "2020-02-07T21:56:35Z",
+			"version": "v0.8.2",
+			"versionExact": "v0.8.2"
 		},
 		{
 			"checksumSHA1": "iI1JCWsrAPpoKcEo/i6G3lRLIVs=",
@@ -3495,34 +3495,52 @@
 			"version": "3.1.1"
 		},
 		{
-			"checksumSHA1": "rasgUuf7DVFShc3hKeh9wjWBWO0=",
+			"checksumSHA1": "JypuKPz8JKalgIqGADXfwWxiV78=",
+			"path": "github.com/gogo/protobuf",
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
+		},
+		{
+			"checksumSHA1": "NeKpDVhUY91w23M3j6STWeGlvQ8=",
 			"path": "github.com/gogo/protobuf/gogoproto",
-			"revision": "4c00d2f19fb91be5fecd8681fa83450a2a979e69",
-			"revisionTime": "2019-08-18T16:08:50Z"
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
-			"checksumSHA1": "6VyMn387vNTCIxqwLuScKb+CDgQ=",
+			"checksumSHA1": "BAVJhQm6l/IS8B1zFSaaihkq+pc=",
 			"path": "github.com/gogo/protobuf/proto",
-			"revision": "65acae22fc9d1fe290b33faa2bd64cdc20a463a0",
-			"revisionTime": "2019-07-23T19:02:41Z"
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
-			"checksumSHA1": "uA3fNRcrMhh6Y8ugPuoyEK72nvk=",
+			"checksumSHA1": "0yCPXjaFqMcZtYvtvwUR/tcgNEE=",
 			"path": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
-			"revision": "4c00d2f19fb91be5fecd8681fa83450a2a979e69",
-			"revisionTime": "2019-08-18T16:08:50Z"
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "HPVQZu059/Rfw2bAWM538bVTcUc=",
 			"path": "github.com/gogo/protobuf/sortkeys",
-			"revision": "65acae22fc9d1fe290b33faa2bd64cdc20a463a0",
-			"revisionTime": "2019-07-23T19:02:41Z"
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
-			"checksumSHA1": "Humj7F03I9Yl+gUp29qHZK+3vgo=",
+			"checksumSHA1": "nunVpxnhwi/1xFD7Ps6blkcfCvc=",
 			"path": "github.com/gogo/protobuf/types",
-			"revision": "4c00d2f19fb91be5fecd8681fa83450a2a979e69",
-			"revisionTime": "2019-08-18T16:08:50Z"
+			"revision": "5628607bb4c51c3157aacc3a50f0ab707582b805",
+			"revisionTime": "2019-10-14T06:15:17Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",

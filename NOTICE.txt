@@ -1391,8 +1391,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.8.1
-Revision: 093a6898c440d2e5e93abf09850068c60428b2cd
+Version: v0.8.2
+Revision: ab69586e10820006b250d04c98cc3b848e227808
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -2396,7 +2396,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gogo/protobuf
-Revision: 4c00d2f19fb91be5fecd8681fa83450a2a979e69
+Version: v1.3.1
+Revision: 5628607bb4c51c3157aacc3a50f0ab707582b805
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/gogo/protobuf/LICENSE:
 --------------------------------------------------------------------
