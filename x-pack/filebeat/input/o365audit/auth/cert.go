@@ -48,7 +48,7 @@ func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, k
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "error loading X509 certificate from '%s'", cfg.Certificate)
 	}
-	if len(tlsCert.Certificate) < 1 {
+	if tlsCert == nil || len(tlsCert.Certificate) < 1 {
 		return nil, nil, fmt.Errorf("no certificates loaded from '%s'", cfg.Certificate)
 	}
 	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])

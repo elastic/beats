@@ -128,8 +128,19 @@ func defaultConfig() Config {
 
 // Validate checks that the configuration is correct.
 func (c *Config) Validate() (err error) {
-	if err = c.CertificateConfig.Validate(); err != nil {
-		return err
+	hasSecret := c.ClientSecret != ""
+	hasCert := c.CertificateConfig.Certificate != ""
+
+	if !hasSecret && !hasCert {
+		return errors.New("no authentication configured. Configure a client_secret or a certificate and key.")
+	}
+	if hasSecret && hasCert {
+		return errors.New("both client_secret and certificate are configured. Only one authentication method can be used.")
+	}
+	if hasCert {
+		if err = c.CertificateConfig.Validate(); err != nil {
+			return errors.Wrap(err, "invalid certificate config")
+		}
 	}
 	if c.tenants, err = asStringList(c.TenantID); err != nil {
 		return errors.Wrap(err, "error validating tenant_id")

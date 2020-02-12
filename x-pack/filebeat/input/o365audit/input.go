@@ -62,10 +62,18 @@ func NewInput(
 	inputContext input.Context,
 ) (inp input.Input, err error) {
 	cfgwarn.Beta("The %s input is beta", inputName)
+	inp, err = newInput(cfg, connector, inputContext)
+	return inp, errors.Wrap(err, inputName)
+}
 
+func newInput(
+	cfg *common.Config,
+	connector channel.Connector,
+	inputContext input.Context,
+) (inp input.Input, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, errors.Wrap(err, "reading config")
 	}
 
 	log := logp.NewLogger(inputName)

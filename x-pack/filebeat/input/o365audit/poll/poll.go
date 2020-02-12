@@ -93,6 +93,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 		}
 		decorators = append(decorators, autorest.WithBearerAuthorization(token))
 	}
+
 	request, err := autorest.Prepare(&http.Request{}, decorators...)
 	if err != nil {
 		return errors.Wrap(err, "failed preparing request")
