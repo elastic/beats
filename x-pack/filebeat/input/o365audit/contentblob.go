@@ -48,10 +48,7 @@ func (c contentBlob) Delay() time.Duration {
 // OnResponse parses the response for a content blob.
 func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action) {
 	if response.StatusCode != 200 {
-		// TODO:
-		return append(actions, poll.Terminate(
-			fmt.Errorf("operation %s returned HTTP code %d %s",
-				c, response.StatusCode, response.Status)))
+		return c.handleError(response)
 	}
 	var js []common.MapStr
 	if err := readJSONBody(response, &js); err != nil {
@@ -90,6 +87,33 @@ func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action)
 	return actions
 }
 
+func (c contentBlob) handleError(response *http.Response) (actions []poll.Action) {
+	var msg apiError
+	readJSONBody(response, &msg)
+	c.env.Logger.Warnf("Got error %s: %+v", response.Status, msg)
+
+	if _, found := fatalErrors[msg.Error.Code]; found {
+		return []poll.Action{
+			c.env.ReportAPIError(msg),
+			poll.Terminate(errors.New(msg.Error.Message)),
+		}
+	}
+
+	switch response.StatusCode {
+	case 401: // Authentication error. Renew oauth token and repeat this op.
+		return []poll.Action{
+			poll.RenewToken(),
+			poll.Fetch(withDelay{contentBlob: c, delay: c.env.Config.LiveWindowPollInterval}),
+		}
+	case 404:
+		return nil
+	}
+	if msg.Error.Code != "" {
+		actions = append(actions, c.env.ReportAPIError(msg))
+	}
+	return append(actions, poll.Fetch(withDelay{contentBlob: c, delay: c.env.Config.ErrorRetryInterval}))
+}
+
 // ContentBlob creates a new contentBlob.
 func ContentBlob(url string, cursor cursor, env apiEnvironment) contentBlob {
 	return contentBlob{
@@ -109,4 +133,14 @@ func (c contentBlob) WithID(id string) contentBlob {
 func (c contentBlob) WithSkipLines(nlines int) contentBlob {
 	c.skipLines = nlines
 	return c
+}
+
+type withDelay struct {
+	contentBlob
+	delay time.Duration
+}
+
+// Delay overrides the contentBlob's delay.
+func (w withDelay) Delay() time.Duration {
+	return w.delay
 }

@@ -156,13 +156,10 @@ func (l listBlob) Next() listBlob {
 }
 
 var fatalErrors = map[string]struct{}{
-	// The permission set ({0}) sent in the request did not include the expected permission ActivityFeed.Read.
-	"AF10001": {},
 	// Missing parameter: {0}.
 	"AF20001": {},
 	// Invalid parameter type: {0}. Expected type: {1}
 	"AF20002": {},
-	// TODO:
 	// Expiration {0} provided is set to past date and time.
 	"AF20003": {},
 	// The tenant ID passed in the URL ({0}) does not match the tenant ID passed in the access token ({1}).
@@ -177,15 +174,11 @@ var fatalErrors = map[string]struct{}{
 	"AF20020": {},
 	// The webhook endpoint {{0}) could not be validated. {1}
 	"AF20021": {},
-	// Invalid nextPage Input: {0}.
-	"AF20031": {},
 }
 
 func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	var msg apiError
-	if err := readJSONBody(response, &msg); err != nil {
-		return []poll.Action{poll.Terminate(err)}
-	}
+	readJSONBody(response, &msg)
 	l.env.Logger.Warnf("Got error %s: %+v", response.Status, msg)
 
 	if response.StatusCode == 401 {
@@ -197,8 +190,14 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		}
 	}
 
-	switch msg.Error.Code {
+	if _, found := fatalErrors[msg.Error.Code]; found {
+		return []poll.Action{
+			l.env.ReportAPIError(msg),
+			poll.Terminate(errors.New(msg.Error.Message)),
+		}
+	}
 
+	switch msg.Error.Code {
 	// AF20022: No subscription found for the specified content type
 	// AF20023: The subscription was disabled by [..]
 	case "AF20022", "AF20023":
@@ -235,15 +234,19 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 				"difference", delta)
 		}
 	case "AF429":
-		// ...
+		// Too many requests.
 	case "AF50000":
 		// ...
+	// Invalid nextPage Input: {0}.
+	case "AF20031":
+		// Can be ignored.
+	}
+
+	if msg.Error.Code != "" {
+		actions = append(actions, l.env.ReportAPIError(msg))
 	}
 	l.delay = l.env.Config.ErrorRetryInterval
-	return []poll.Action{
-		l.env.ReportAPIError(msg),
-		poll.Fetch(l),
-	}
+	return append(actions, poll.Fetch(l))
 }
 
 func readJSONBody(response *http.Response, dest interface{}) error {
