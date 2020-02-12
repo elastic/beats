@@ -9,7 +9,7 @@ def run(mc):
     mc.set('cnt', 0)
     mc.incr('cnt', 2)
     mc.decr('cnt', 5)
-    print(mc.get('cnt')))
+    print(mc.get('cnt'))
 
 
 if __name__ == '__main__':
