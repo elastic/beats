@@ -97,13 +97,11 @@
                 "c213fde94857"
             ],
             "osdmap": {
-                "osdmap": {
-                    "epoch": 21,
-                    "num_osds": 1,
-                    "num_up_osds": 1,
-                    "num_in_osds": 1,
-                    "num_remapped_pgs": 0
-                }
+                "epoch": 21,
+                "num_osds": 1,
+                "num_up_osds": 1,
+                "num_in_osds": 1,
+                "num_remapped_pgs": 0
             },
             "fsmap": {
                 "in": 1,

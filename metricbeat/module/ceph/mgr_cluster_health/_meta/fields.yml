@@ -6,3 +6,75 @@
     - name: fsid
       type: keyword
       description: File System ID, a unique identifier for the cluster
+    - name: quorum_age
+      type: long
+      description: Cluster quarum age
+    - name: monmap
+      type: group
+      description: >
+        `monmap` contains information about cluster monitors.
+      fields:
+        - name: min_mon_release
+          type: long
+          description: Minimal monitor release
+        - name: min_mon_release_name
+          type: keyword
+          description: Minimal monitor release name
+        - name: features
+          type: group
+          description: >
+            `features` contains information about available cluster features.
+          fields:
+            - name: persistent
+              type: keyword
+              description: Persistent feature
+            - name: optional
+              type: keyword
+              description: Optional feature
+        - name: mons
+          type: group
+          description: >
+            `mons` contains information about monitor configurations.
+          fields:
+            - name: public_addr
+              type: keyword
+              description: Monitor public address
+            - name: rank
+              type: long
+              description: Monitor rank
+            - name: name
+              type: keyword
+              description: Monitor name
+            - name: public_addrs
+              type: group
+              description: Monitor public addresses
+              fields:
+                - name: addrvec
+                  type: group
+                  description: >
+                    `addrvec` contains details of all public addresses.
+                  fields:
+                    - name: type
+                      type: keyword
+                      description: Address type
+                    - name: addr
+                      type: keyword
+                      description: Host and port of monitor
+                    - name: nonce
+                      type: long
+                      description: Nonce value
+            - name: addr
+              type: keyword
+              description: Monitor address
+        - name: epoch
+          type: long
+          description: Epoch version
+        - name: fsid
+          type: keyword
+          description: File System ID, a unique identifier for the cluster
+        - name: modified
+          type: date
+          description: Last modification time and date
+        - name: created
+          type: date
+          description: Creation time and date

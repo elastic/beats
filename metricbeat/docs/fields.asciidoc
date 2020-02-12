@@ -4110,6 +4110,184 @@ type: keyword
 
 --
 
+*`ceph.mgr_cluster_health.quorum_age`*::
++
+--
+Cluster quarum age
+
+type: long
+
+--
+
+[float]
+=== monmap
+
+`monmap` contains information about cluster monitors.
+
+
+
+*`ceph.mgr_cluster_health.monmap.min_mon_release`*::
++
+--
+Minimal monitor release
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.monmap.min_mon_release_name`*::
++
+--
+Minimal monitor release name
+
+type: keyword
+
+--
+
+[float]
+=== features
+
+`features` contains information about available cluster features.
+
+
+
+*`ceph.mgr_cluster_health.monmap.features.persistent`*::
++
+--
+Persistent feature
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.features.optional`*::
++
+--
+Optional feature
+
+type: keyword
+
+--
+
+[float]
+=== mons
+
+`mons` contains information about monitor configurations.
+
+
+
+*`ceph.mgr_cluster_health.monmap.mons.public_addr`*::
++
+--
+Monitor public address
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.mons.rank`*::
++
+--
+Monitor rank
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.monmap.mons.name`*::
++
+--
+Monitor name
+
+type: keyword
+
+--
+
+[float]
+=== public_addrs
+
+Monitor public addresses
+
+
+[float]
+=== addrvec
+
+`addrvec` contains details of all public addresses.
+
+
+
+*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.type`*::
++
+--
+Address type
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.addr`*::
++
+--
+Host and port of monitor
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.nonce`*::
++
+--
+Nonce value
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.monmap.mons.addr`*::
++
+--
+Monitor address
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.epoch`*::
++
+--
+Epoch version
+
+type: long
+
+--
+
+*`ceph.mgr_cluster_health.monmap.fsid`*::
++
+--
+File System ID, a unique identifier for the cluster
+
+type: keyword
+
+--
+
+*`ceph.mgr_cluster_health.monmap.modified`*::
++
+--
+Last modification time and date
+
+type: date
+
+--
+
+*`ceph.mgr_cluster_health.monmap.created`*::
++
+--
+Creation time and date
+
+type: date
+
+--
+
 [float]
 === mgr_osd_disk
 

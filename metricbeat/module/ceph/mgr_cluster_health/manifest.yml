@@ -21,6 +21,11 @@ processors:
       fields: ["ceph.request.outb"]
       process_array: true
       target: "ceph.mgr_cluster_status"
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "ceph.mgr_cluster_status.osdmap.osdmap"
+        - to: "ceph.mgr_cluster_status._tmp_osdmap"
   - drop_fields:
       ignore_missing: true
       fields:
@@ -30,3 +35,9 @@ processors:
         - "ceph.mgr_cluster_status.servicemap"
         - "ceph.mgr_cluster_status.health.checks"
         - "ceph.mgr_cluster_status.progress_events"
+        - "ceph.mgr_cluster_status.osdmap"
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "ceph.mgr_cluster_status._tmp_osdmap"
+        - to: "ceph.mgr_cluster_status.osdmap"
