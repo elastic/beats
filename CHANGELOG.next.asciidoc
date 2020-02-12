@@ -169,7 +169,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
@@ -190,7 +189,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
-- Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
 - Add ingress nginx controller fileset {pull}16197[16197]
 - move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
