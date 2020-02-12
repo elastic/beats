@@ -22,4 +22,33 @@ processors:
       process_array: true
       target: "ceph.mgr_osd_disk"
   - drop_fields:
-      fields: ["http", "ceph.request"]
+      ignore_missing: true
+      fields: ["http", "ceph.request", "ceph.mgr_osd_disk.nodes.pool_weight"]
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var nodes = event.Get("ceph.mgr_osd_disk.nodes")
+          if (nodes != null) {
+            var filtered = [];
+            nodes.forEach(function(node, index) {
+              if (node["pool_weights"] !== undefined) {
+                delete node["pool_weights"];
+              }
+              filtered.push(node);
+            });
+            event.Put("ceph.mgr_osd_disk.nodes", filtered);
+          }
+
+          var stray = event.Get("ceph.mgr_osd_disk.stray")
+          if (stray != null) {
+            var filtered = [];
+            stray.forEach(function(node, index) {
+              if (node["pool_weights"] !== undefined) {
+                delete node["pool_weights"];
+              }
+              filtered.push(node);
+            });
+            event.Put("ceph.mgr_osd_disk.stray", filtered);
+          }
+        }

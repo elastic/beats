@@ -1,29 +1,32 @@
 {
-    "@timestamp": "2020-02-12T10:19:09.058Z",
+    "@timestamp": "2020-02-12T12:25:29.572Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
     "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "service": {
-        "address": "localhost:8003",
-        "type": "ceph"
-    },
-    "ecs": {
-        "version": "1.4.0"
+        "type": "metricbeat",
+        "ephemeral_id": "62fb1ff9-4f2a-4347-bbd1-cee5df88c9da",
+        "hostname": "host",
+        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
+        "version": "8.0.0"
     },
     "event": {
-        "duration": 13115609,
         "dataset": "http.json_namespace",
-        "module": "ceph"
+        "module": "ceph",
+        "duration": 27722184
     },
     "metricset": {
         "name": "mgr_osd_perf",
         "period": 60000
+    },
+    "service": {
+        "type": "ceph",
+        "address": "localhost:8003"
+    },
+    "ecs": {
+        "version": "1.4.0"
     },
     "ceph": {
         "mgr_osd_perf": {
@@ -33,10 +36,10 @@
                     {
                         "id": 0,
                         "perf_stats": {
-                            "commit_latency_ms": 0,
-                            "apply_latency_ms": 0,
-                            "commit_latency_ns": 3,
-                            "apply_latency_ns": 0
+                            "commit_latency_ms": 23,
+                            "apply_latency_ms": 23,
+                            "commit_latency_ns": 23000000,
+                            "apply_latency_ns": 23000000
                         }
                     }
                 ]

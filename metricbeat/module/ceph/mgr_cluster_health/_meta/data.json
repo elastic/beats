@@ -1,17 +1,38 @@
 {
-    "@timestamp": "2020-02-12T11:53:41.177Z",
+    "@timestamp": "2020-02-12T12:22:57.142Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
+    },
+    "agent": {
+        "id": "host",
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "59b80233-4d5c-48c9-a3db-a40d6e172aae",
+        "hostname": "MacBook-Elastic.local"
+    },
+    "event": {
+        "duration": 29973749,
+        "dataset": "http.json_namespace",
+        "module": "ceph"
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "mgr_cluster_health"
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
     },
     "ecs": {
         "version": "1.4.0"
     },
     "ceph": {
         "mgr_cluster_status": {
+            "fsid": "ac9834a6-7dc8-434f-b9f8-86fca6849c5b",
+            "quorum_age": 226,
             "monmap": {
-                "created": "2020-02-12 11:52:57.443798",
                 "min_mon_release": 14,
                 "min_mon_release_name": "nautilus",
                 "features": {
@@ -26,8 +47,9 @@
                 },
                 "mons": [
                     {
+                        "public_addr": "172.30.0.2:3300/0",
                         "rank": 0,
-                        "name": "a7b86c4500b7",
+                        "name": "c213fde94857",
                         "public_addrs": {
                             "addrvec": [
                                 {
@@ -37,85 +59,69 @@
                                 }
                             ]
                         },
-                        "addr": "172.30.0.2:3300/0",
-                        "public_addr": "172.30.0.2:3300/0"
+                        "addr": "172.30.0.2:3300/0"
                     }
                 ],
                 "epoch": 1,
-                "fsid": "6032ef6c-b305-44c7-96fc-9a10e6e36783",
-                "modified": "2020-02-12 11:52:57.443798"
+                "fsid": "ac9834a6-7dc8-434f-b9f8-86fca6849c5b",
+                "modified": "2020-02-12 12:19:11.154113",
+                "created": "2020-02-12 12:19:11.154113"
             },
-            "progress_events": {},
-            "fsid": "6032ef6c-b305-44c7-96fc-9a10e6e36783",
+            "pgmap": {
+                "num_pgs": 164,
+                "bytes_avail": 6950027264,
+                "read_bytes_sec": 85,
+                "write_bytes_sec": 746908239,
+                "bytes_used": 3787390976,
+                "bytes_total": 10737418240,
+                "read_op_per_sec": 0,
+                "write_op_per_sec": 318,
+                "pgs_by_state": [
+                    {
+                        "state_name": "active+clean",
+                        "count": 164
+                    }
+                ],
+                "num_pools": 9,
+                "num_objects": 950,
+                "data_bytes": 3070235948
+            },
             "health": {
-                "status": "HEALTH_OK"
+                "status": "HEALTH_WARN"
             },
             "election_epoch": 3,
             "quorum": [
                 0
             ],
             "quorum_names": [
-                "a7b86c4500b7"
+                "c213fde94857"
             ],
-            "quorum_age": 43,
             "osdmap": {
                 "osdmap": {
-                    "epoch": 18,
+                    "epoch": 21,
                     "num_osds": 1,
                     "num_up_osds": 1,
                     "num_in_osds": 1,
                     "num_remapped_pgs": 0
                 }
             },
-            "pgmap": {
-                "pgs_by_state": [
-                    {
-                        "state_name": "active+clean",
-                        "count": 64
-                    }
-                ],
-                "num_pgs": 64,
-                "num_pools": 8,
-                "num_objects": 218,
-                "data_bytes": 5420,
-                "bytes_used": 1077542912,
-                "bytes_avail": 9659875328,
-                "bytes_total": 10737418240
-            },
             "fsmap": {
+                "in": 1,
                 "max": 1,
                 "by_rank": [
                     {
+                        "filesystem_id": 1,
+                        "rank": 0,
                         "name": "demo",
                         "status": "up:active",
-                        "gid": 4129,
-                        "filesystem_id": 1,
-                        "rank": 0
+                        "gid": 4129
                     }
                 ],
                 "up:standby": 0,
-                "epoch": 4,
+                "epoch": 5,
                 "id": 1,
-                "up": 1,
-                "in": 1
+                "up": 1
             }
         }
-    },
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "event": {
-        "module": "ceph",
-        "duration": 19257753,
-        "dataset": "http.json_namespace"
-    },
-    "metricset": {
-        "name": "mgr_cluster_health",
-        "period": 60000
-    },
-    "service": {
-        "address": "localhost:8003",
-        "type": "ceph"
     }
 }

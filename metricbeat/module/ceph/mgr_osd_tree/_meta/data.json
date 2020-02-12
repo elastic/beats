@@ -1,78 +1,81 @@
 {
-    "@timestamp": "2020-02-12T10:25:58.283Z",
+    "@timestamp": "2020-02-12T13:05:44.386Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "service": {
-        "type": "ceph",
-        "address": "localhost:8003"
+        "address": "localhost:8003",
+        "type": "ceph"
     },
     "event": {
         "dataset": "http.json_namespace",
         "module": "ceph",
-        "duration": 21934403
-    },
-    "metricset": {
-        "period": 60000,
-        "name": "mgr_osd_tree"
+        "duration": 30426747
     },
     "ecs": {
         "version": "1.4.0"
     },
     "ceph": {
         "mgr_osd_tree": {
-            "stray": [
-                {
-                    "children": [
-                        0
-                    ],
-                    "id": -3,
-                    "name": "bc30f9fcab61",
-                    "type": "host",
-                    "type_id": 1,
-                    "pool_weights": {}
-                }
-            ],
             "nodes": [
                 {
-                    "id": -1,
                     "name": "default",
                     "type": "root",
                     "type_id": 11,
                     "children": [
                         -2
-                    ]
+                    ],
+                    "id": -1
                 },
                 {
+                    "type_id": 1,
                     "children": [
                         0
                     ],
                     "id": -2,
-                    "name": "aa72f9faae85",
-                    "type": "host",
-                    "type_id": 1,
-                    "pool_weights": {}
+                    "name": "c213fde94857",
+                    "type": "host"
                 },
                 {
-                    "name": "osd.0",
-                    "type": "osd",
-                    "exists": 1,
                     "reweight": 1,
                     "id": 0,
-                    "crush_weight": 0.009796142578125,
                     "depth": 2,
-                    "pool_weights": {},
+                    "exists": 1,
                     "status": "up",
                     "primary_affinity": 1,
-                    "type_id": 0
+                    "name": "osd.0",
+                    "type": "osd",
+                    "type_id": 0,
+                    "crush_weight": 0.009796142578125
+                }
+            ],
+            "stray": [
+                {
+                    "reweight": 1,
+                    "id": 2,
+                    "depth": 2,
+                    "exists": 1,
+                    "status": "down",
+                    "primary_affinity": 1,
+                    "name": "osd.1",
+                    "type": "osd",
+                    "type_id": 0,
+                    "crush_weight": 0.004796132578111
                 }
             ]
         }
+    },
+    "agent": {
+        "ephemeral_id": "fcabd35f-6792-47d9-9cb1-611030bff6e8",
+        "hostname": "host",
+        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "mgr_osd_tree"
     }
 }

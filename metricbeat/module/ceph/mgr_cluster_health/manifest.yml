@@ -22,9 +22,11 @@ processors:
       process_array: true
       target: "ceph.mgr_cluster_status"
   - drop_fields:
+      ignore_missing: true
       fields:
         - "http"
         - "ceph.request"
         - "ceph.mgr_cluster_status.mgrmap"
         - "ceph.mgr_cluster_status.servicemap"
         - "ceph.mgr_cluster_status.health.checks"
+        - "ceph.mgr_cluster_status.progress_events"

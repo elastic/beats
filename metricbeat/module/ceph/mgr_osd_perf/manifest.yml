@@ -22,4 +22,5 @@ processors:
       process_array: true
       target: "ceph.mgr_osd_perf"
   - drop_fields:
+      ignore_missing: true
       fields: ["http", "ceph.request"]

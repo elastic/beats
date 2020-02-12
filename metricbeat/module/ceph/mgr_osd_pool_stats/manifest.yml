@@ -23,3 +23,22 @@ processors:
       target: "ceph.mgr_osd_pool_stats"
   - drop_fields:
       fields: ["http", "ceph.request"]
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var pools = event.Get("ceph.mgr_osd_pool_stats")
+          if (pools != null) {
+            var filtered = [];
+            pools.forEach(function(pool, index) {
+              if (pool["recovery"] !== undefined) {
+                delete pool["recovery"];
+              }
+              if (pool["recovery_rate"] !== undefined) {
+                delete pool["recovery_rate"];
+              }
+              filtered.push(pool);
+            });
+            event.Put("ceph.mgr_osd_pool_stats", filtered);
+          }
+        }

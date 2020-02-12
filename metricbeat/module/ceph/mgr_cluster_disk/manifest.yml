@@ -22,4 +22,5 @@ processors:
       process_array: true
       target: "ceph.mgr_cluster_disk"
   - drop_fields:
-      fields: ["http", "ceph.request"]
+      ignore_missing: true
+      fields: ["http", "ceph.request", "ceph.mgr_cluster_disk.stats_by_class" ]
