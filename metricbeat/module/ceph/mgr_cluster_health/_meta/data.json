@@ -1,35 +1,33 @@
 {
-    "@timestamp": "2020-02-12T10:05:51.130Z",
+    "@timestamp": "2020-02-12T11:53:41.177Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
-    "service": {
-        "address": "localhost:8003",
-        "type": "ceph"
-    },
-    "event": {
-        "dataset": "http.json_namespace",
-        "module": "ceph",
-        "duration": 12981066
+    "ecs": {
+        "version": "1.4.0"
     },
     "ceph": {
         "mgr_cluster_status": {
-            "progress_events": {},
-            "health": {
-                "status": "HEALTH_WARN"
-            },
-            "election_epoch": 3,
-            "quorum": [
-                0
-            ],
-            "quorum_age": 669,
             "monmap": {
+                "created": "2020-02-12 11:52:57.443798",
+                "min_mon_release": 14,
+                "min_mon_release_name": "nautilus",
+                "features": {
+                    "persistent": [
+                        "kraken",
+                        "luminous",
+                        "mimic",
+                        "osdmap-prune",
+                        "nautilus"
+                    ],
+                    "optional": []
+                },
                 "mons": [
                     {
                         "rank": 0,
-                        "name": "aa72f9faae85",
+                        "name": "a7b86c4500b7",
                         "public_addrs": {
                             "addrvec": [
                                 {
@@ -44,55 +42,47 @@
                     }
                 ],
                 "epoch": 1,
-                "fsid": "17af221e-4129-4886-950b-adfb9c2c851f",
-                "modified": "2020-02-12 09:54:42.262674",
-                "created": "2020-02-12 09:54:42.262674",
-                "min_mon_release": 14,
-                "min_mon_release_name": "nautilus",
-                "features": {
-                    "persistent": [
-                        "kraken",
-                        "luminous",
-                        "mimic",
-                        "osdmap-prune",
-                        "nautilus"
-                    ],
-                    "optional": []
-                }
+                "fsid": "6032ef6c-b305-44c7-96fc-9a10e6e36783",
+                "modified": "2020-02-12 11:52:57.443798"
             },
-            "pgmap": {
-                "pgs_by_state": [
-                    {
-                        "state_name": "active+clean",
-                        "count": 164
-                    }
-                ],
-                "num_pgs": 164,
-                "num_pools": 9,
-                "num_objects": 1964,
-                "data_bytes": 7319065924,
-                "bytes_used": 8397062144,
-                "bytes_avail": 2340356096,
-                "bytes_total": 10737418240
+            "progress_events": {},
+            "fsid": "6032ef6c-b305-44c7-96fc-9a10e6e36783",
+            "health": {
+                "status": "HEALTH_OK"
             },
-            "fsid": "17af221e-4129-4886-950b-adfb9c2c851f",
-            "quorum_names": [
-                "aa72f9faae85"
+            "election_epoch": 3,
+            "quorum": [
+                0
             ],
+            "quorum_names": [
+                "a7b86c4500b7"
+            ],
+            "quorum_age": 43,
             "osdmap": {
                 "osdmap": {
-                    "epoch": 21,
+                    "epoch": 18,
                     "num_osds": 1,
                     "num_up_osds": 1,
                     "num_in_osds": 1,
                     "num_remapped_pgs": 0
                 }
             },
+            "pgmap": {
+                "pgs_by_state": [
+                    {
+                        "state_name": "active+clean",
+                        "count": 64
+                    }
+                ],
+                "num_pgs": 64,
+                "num_pools": 8,
+                "num_objects": 218,
+                "data_bytes": 5420,
+                "bytes_used": 1077542912,
+                "bytes_avail": 9659875328,
+                "bytes_total": 10737418240
+            },
             "fsmap": {
-                "epoch": 4,
-                "id": 1,
-                "up": 1,
-                "in": 1,
                 "max": 1,
                 "by_rank": [
                     {
@@ -103,7 +93,11 @@
                         "rank": 0
                     }
                 ],
-                "up:standby": 0
+                "up:standby": 0,
+                "epoch": 4,
+                "id": 1,
+                "up": 1,
+                "in": 1
             }
         }
     },
@@ -111,11 +105,17 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "ecs": {
-        "version": "1.4.0"
+    "event": {
+        "module": "ceph",
+        "duration": 19257753,
+        "dataset": "http.json_namespace"
     },
     "metricset": {
         "name": "mgr_cluster_health",
         "period": 60000
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
     }
 }

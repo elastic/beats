@@ -45,7 +45,28 @@
                     "utilization": 78.2037353515625
                 }
             ],
-            "stray": []
+            "stray": [
+                {
+                    "pool_weights": {},
+                    "kb_avail": 2285504,
+                    "status": "up",
+                    "type": "osd",
+                    "kb": 10485760,
+                    "kb_used": 1256,
+                    "kb_used_data": 864,
+                    "kb_used_meta": 164,
+                    "id": 0,
+                    "reweight": 1,
+                    "kb_used_omap": 0,
+                    "var": 1,
+                    "pgs": 164,
+                    "name": "osd.0",
+                    "type_id": 0,
+                    "crush_weight": 0.005991142478123,
+                    "depth": 2,
+                    "utilization": 0.00001573562622
+                }
+            ]
         }
     },
     "agent": {

@@ -27,7 +27,18 @@
     },
     "ceph": {
         "mgr_osd_tree": {
-            "stray": [],
+            "stray": [
+                {
+                    "children": [
+                        0
+                    ],
+                    "id": -3,
+                    "name": "bc30f9fcab61",
+                    "type": "host",
+                    "type_id": 1,
+                    "pool_weights": {}
+                }
+            ],
             "nodes": [
                 {
                     "id": -1,
