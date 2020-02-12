@@ -15,7 +15,6 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/filebeat/input/o365audit/poll"
 )
 
@@ -214,7 +213,20 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		// As of writing this, the server fails a request if it's more than
 		// retention_time(7d)+1h in the past.
 		// On the other hand, requests can be days into the future without error.
-		delta := getServerTimeDelta(response)
+
+		// First check if this is caused by a request close to  that's been
+		// queued for hours because of server being down. Repeat the request
+		// with updated times.
+		now := l.env.Clock()
+		delta := now.Sub(l.startTime)
+		l.delay = l.env.Config.LiveWindowPollInterval
+		if delta > (l.env.Config.MaxRetention + 30*time.Minute) {
+			return []poll.Action{
+				poll.Fetch(l.adjustTimes(l.startTime)),
+			}
+		}
+
+		delta = getServerTimeDelta(response)
 		l.env.Logger.Errorf("Server is complaining about query interval. "+
 			"This is usually a problem with the local clock and the server's clock "+
 			"being out of sync. Time difference with server is %v.", delta)
@@ -224,14 +236,14 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 			}
 			l.delay = l.env.Config.ErrorRetryInterval
 			l.env.Logger.Info("Compensating for time difference")
-			return []poll.Action{
-				poll.Fetch(l.adjustTimes(l.startTime)),
-			}
 		} else {
 			l.env.Logger.Infow("Not adjusting for time offset.",
 				"api.adjust_clock", l.env.Config.AdjustClock,
 				"api.adjust_clock_min_difference", l.env.Config.AdjustClockMinDifference,
 				"difference", delta)
+		}
+		return []poll.Action{
+			poll.Fetch(l.adjustTimes(l.startTime)),
 		}
 	case "AF429":
 		// Too many requests.
