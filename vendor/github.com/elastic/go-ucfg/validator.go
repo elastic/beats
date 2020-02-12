@@ -392,31 +392,53 @@ func validateRequired(v interface{}, name string) error {
 		}
 		return nil
 	}
-	if err := validateNonEmpty(v, name); err != nil {
-		return ErrRequired
+	if err := validateNonEmptyWithAllowNil(v, name, false); err != nil {
+		return err
 	}
 	return nil
 }
 
-func validateNonEmpty(v interface{}, _ string) error {
+func validateNonEmpty(v interface{}, name string) error {
+	return validateNonEmptyWithAllowNil(v, name, true)
+}
+
+func validateNonEmptyWithAllowNil(v interface{}, _ string, allowNil bool) error {
 	if s, ok := v.(string); ok {
 		if s == "" {
-			return ErrEmpty
+			return ErrStringEmpty
 		}
 		return nil
 	}
 
 	if r, ok := v.(regexp.Regexp); ok {
 		if r.String() == "" {
-			return ErrEmpty
+			return ErrRegexEmpty
 		}
 		return nil
 	}
 
 	val := reflect.ValueOf(v)
 	if val.Kind() == reflect.Array || val.Kind() == reflect.Slice {
+		if val.IsNil() {
+			if allowNil {
+				return nil
+			}
+			return ErrRequired
+		}
 		if val.Len() == 0 {
-			return ErrEmpty
+			return ErrArrayEmpty
+		}
+		return nil
+	}
+	if val.Kind() == reflect.Map {
+		if val.IsNil() {
+			if allowNil {
+				return nil
+			}
+			return ErrRequired
+		}
+		if val.Len() == 0 {
+			return ErrMapEmpty
 		}
 		return nil
 	}
