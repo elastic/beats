@@ -1,6 +1,6 @@
 # This is the latest 6.0 environment.
 
-version: '2.3'
+version: '3.7'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-platinum:6.0.1
