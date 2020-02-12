@@ -14,6 +14,35 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.8.2]
+
+### Fixed
+- Fixed nonzero validator to not fail on nil array or slice. #147
+- Fixed nonzero validator to validate maps.
+- Fixed required validator to validate maps.
+
+## [0.8.1]
+
+### Fixed
+- Prevent Validate from being called when value is a pointer or interface and is nil. #144
+
+## [0.8.0]
+
+### Added
+- Add support for HJSON. #131
+- Add new parse.Config to adjust parsing of varibles returned by a Resolve. #139
+- Add call to InitDefaults when map, primitives, or structs implement Initializer interface during Unpack. #104
+
+### Changed
+- Moved internal/parse to parse module. #139
+- Add parse.Config to resolvers return. #139
+
+### Fixed
+- Call Validate on custom slice types. #133
+- Call Validate on custom map types. #136
+- Disabled object parsing of environment variables. #139
+- Apply validation to defaults passed into Unpack when Config doesn't contain a value. #42
+
 ## [0.7.0]
 
 ### Added
@@ -234,7 +263,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/elastic/go-ucfg/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/elastic/go-ucfg/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/elastic/go-ucfg/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/elastic/go-ucfg/compare/v0.6.5...v0.7.0
 [0.6.5]: https://github.com/elastic/go-ucfg/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/elastic/go-ucfg/compare/v0.6.3...v0.6.4

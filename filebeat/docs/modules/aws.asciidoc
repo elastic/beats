@@ -15,21 +15,13 @@ beta[]
 This is a module for aws logs. It uses filebeat s3 input to get log files from
 AWS S3 buckets with SQS notification. This module supports reading s3 server
 access logs with `s3access` fileset, ELB access logs with `elb` fileset, VPC
-flow logs with `vpc` fileset, and CloudTrail logs with `cloudtrail` fileset.
+flow logs with `vpcflow` fileset, and CloudTrail logs with `cloudtrail` fileset.
 
 Access logs contain detailed information about the requests made to these
 services. VPC flow logs captures information about the IP traffic going to and
-from network interfaces in AWS VPC.  CloudTrail logs contain events
+from network interfaces in AWS VPC. ELB access logs captures detailed information
+about requests sent to the load balancer. CloudTrail logs contain events
 that represent actions taken by a user, role or AWS service.
-
-[float]
-=== Example dashboard
-
-This module comes with several predefined dashboards. For example, here is the
-dashboard for `s3access` fileset:
-
-[role="screenshot"]
-image::./images/filebeat-aws-s3access-overview.png[]
 
 [float]
 === Module configuration
@@ -45,8 +37,14 @@ Example config:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
     # Profile name for aws credential
-    #var.credential_profile_name: fb-aws
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
 
   elb:
     enabled: false
@@ -54,8 +52,14 @@ Example config:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
     # Profile name for aws credential
-    #var.credential_profile_name: fb-aws
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
 
   vpcflow:
     enabled: false
@@ -63,8 +67,14 @@ Example config:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
     # Profile name for aws credential
-      #var.credential_profile_name: fb-aws
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
 
   cloudtrail:
     enabled: false
@@ -72,23 +82,85 @@ Example config:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    # var.shared_credential_file: /etc/filebeat/aws_credentials
+
     # Profile name for aws credential
-    #var.credential_profile_name: fb-aws
+    # If not set the default profile is used
+    # var.credential_profile_name: fb-aws
 ----
 
 *`var.queue_url`*::
 
 AWS SQS queue url.
 
+*`var.shared_credential_file`*::
+
+Filename of AWS credential file.
+
 *`var.credential_profile_name`*::
 
 AWS credential profile name.
 
-=== CloudTrail fileset
+[float]
+=== cloudtrail fileset
 
+CloudTrail monitors events for the account. If user creates a trail, it
+delivers those events as log files to a specific Amazon S3 bucket.
 The `cloudtrail` fileset does not read the CloudTrail Digest files
 that are delivered to the S3 bucket when Log File Integrity is turned
 on, it only reads the CloudTrail logs.
+
+[float]
+=== elb fileset
+
+Elastic Load Balancing provides access logs that capture detailed information
+about requests sent to the load balancer. Each log contains information such
+as the time the request was received, the client's IP address, latencies,
+request paths, and server responses. Users can use these access logs to analyze
+traffic patterns and to troubleshoot issues.
+
+Please follow https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html[enable access logs for classic load balancer]
+for sending Classic ELB access logs to S3 bucket.
+For application load balancer, please follow https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#enable-access-logging[enable access log for application load balancer].
+For network load balancer, please follow https://docs.aws.amazon.com/elasticloadbalancing/latest//network/load-balancer-access-logs.html[enable access log for network load balancer].
+
+This fileset comes with a predefined dashboard:
+
+[role="screenshot"]
+image::./images/filebeat-aws-elb-overview.png[]
+
+[float]
+=== s3access fileset
+
+Server access logging provides detailed records for the requests that are made
+to a bucket. Server access logs are useful for many applications. For example,
+access log information can be useful in security and access audits. It can also
+help you learn about customer base and understand Amazon S3 bill.
+
+Please follow https://docs.aws.amazon.com/AmazonS3/latest/dev/ServerLogs.html#server-access-logging-overview[how to enable server access logging]
+for sending server access logs to S3 bucket.
+
+This fileset comes with a predefined dashboard:
+
+[role="screenshot"]
+image::./images/filebeat-aws-s3access-overview.png[]
+
+[float]
+=== vpcflow fileset
+
+VPC Flow Logs is a feature in AWS that enables users to capture information
+about the IP traffic going to and from network interfaces in VPC. Flow log data
+needs to be published to Amazon S3 in order for `vpcflow` fileset to retrieve.
+Flow logs can help users to monitor traffic that is reaching each instance and
+determine the direction of the traffic to and from the network interfaces.
+
+This fileset comes with a predefined dashboard:
+
+[role="screenshot"]
+image::./images/filebeat-aws-vpcflow-overview.png[]
 
 
 [float]

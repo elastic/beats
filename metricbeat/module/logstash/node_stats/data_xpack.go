@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/module/logstash"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -94,6 +96,9 @@ type nodeInfo struct {
 	Status      string   `json:"status"`
 	HTTPAddress string   `json:"http_address"`
 	Pipeline    pipeline `json:"pipeline"`
+	Monitoring  struct {
+		ClusterID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
 }
 
 type reloads struct {
@@ -166,7 +171,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
-	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, nodeStats.Monitoring.ClusterID)
 
 	for clusterUUID, clusterPipelines := range clusterToPipelinesMap {
 		logstashStats := LogstashStats{
@@ -197,24 +202,22 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	return nil
 }
 
-func makeClusterToPipelinesMap(pipelines []PipelineStats) map[string][]PipelineStats {
+func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID string) map[string][]PipelineStats {
 	var clusterToPipelinesMap map[string][]PipelineStats
 	clusterToPipelinesMap = make(map[string][]PipelineStats)
+
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
 
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
 		for _, vertex := range pipeline.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs = append(clusterUUIDs, clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one

@@ -174,5 +174,11 @@ func calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 
 	if value < 0 {
 		value = 0
 	}
-	return value / duration.Seconds()
+
+	timeSec := duration.Seconds()
+	if timeSec == 0 {
+		return 0
+	}
+
+	return value / timeSec
 }

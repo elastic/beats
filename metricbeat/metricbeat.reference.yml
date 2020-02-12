@@ -73,12 +73,13 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
@@ -130,6 +131,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
@@ -455,9 +459,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -486,6 +491,7 @@ metricbeat.modules:
     - state_service
     - state_persistentvolume
     - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -706,7 +712,7 @@ metricbeat.modules:
   #password: "secret"
 
   # This can be used for service account based authorization:
-  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
@@ -1177,9 +1183,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -1202,6 +1208,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1269,9 +1281,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1295,6 +1307,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1442,9 +1460,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -1554,9 +1572,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1752,7 +1770,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1779,7 +1796,7 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'metricbeat-%{[agent.version]}'.
+# 'metricbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
@@ -1823,9 +1840,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1999,9 +2016,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications

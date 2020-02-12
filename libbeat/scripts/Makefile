@@ -40,6 +40,8 @@ ES_HOST?=elasticsearch
 ES_PORT?=9200
 ES_USER?=beats
 ES_PASS?=testing
+ES_HOST_SSL?=elasticsearchssl
+ES_PORT_SSL?=9200
 KIBANA_HOST?=kibana
 KIBANA_PORT?=5601
 # Kibana's Elaticsearch user
@@ -197,7 +199,7 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	mage goIntegTest
+	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
@@ -207,7 +209,12 @@ integration-tests-environment: prepare-tests build-image
 	#
 	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
 	# by default because it can create noise if the test inside the container fails.
-	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
+	${DOCKER_COMPOSE} run \
+	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
+	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
+	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
+	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  beat make integration-tests
 
 # Runs the system tests
 .PHONY: system-tests
@@ -393,6 +400,8 @@ write-environment:
 	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
 	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_HOST_SSL=${ES_HOST_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT_SSL=${ES_PORT_SSL}" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
 	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
@@ -412,8 +421,7 @@ env-logs:
 	${DOCKER_COMPOSE} logs -f
 
 fix-permissions:
-	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
+	sh ${ES_BEATS}/script/fix_permissions.sh "${PWD}"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}

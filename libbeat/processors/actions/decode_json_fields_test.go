@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -92,6 +93,38 @@ func TestInvalidJSONMultiple(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestDocumentID(t *testing.T) {
+	logp.TestingSetup()
+
+	input := common.MapStr{
+		"msg": `{"log": "message", "myid": "myDocumentID"}`,
+	}
+
+	config := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":      []string{"msg"},
+		"document_id": "myid",
+	})
+
+	p, err := NewDecodeJSONFields(config)
+	if err != nil {
+		logp.Err("Error initializing decode_json_fields")
+		t.Fatal(err)
+	}
+
+	actual, err := p.Run(&beat.Event{Fields: input})
+	require.NoError(t, err)
+
+	wantFields := common.MapStr{
+		"msg": map[string]interface{}{"log": "message"},
+	}
+	wantMeta := common.MapStr{
+		"_id": "myDocumentID",
+	}
+
+	assert.Equal(t, wantFields, actual.Fields)
+	assert.Equal(t, wantMeta, actual.Meta)
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
