@@ -229,16 +229,19 @@ datasources:
         - type: s3
           credential_profile_name: fb-aws
           #shared_credential_file: /etc/filebeat/aws_credentials
-          queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           streams:
           - id?: {id}
             dataset: aws.s3
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           - id?: {id}
             dataset: aws.s3access
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           - id?: {id}
             dataset: aws.vpcflow
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           - id?: {id}
             dataset: aws.cloudtrail
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
        - type: aws/metrics
          access_key_id: '${AWS_ACCESS_KEY_ID:""}'
          secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
