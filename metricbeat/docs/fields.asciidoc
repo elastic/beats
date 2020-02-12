@@ -3938,160 +3938,23 @@ type: long
 Disk metrics of Ceph cluster
 
 
-[float]
-=== stats
-
+*`ceph.mgr_cluster_disk.stats`*::
++
+--
 `stats` contains disk availability statistics.
 
 
+type: nested
 
-*`ceph.mgr_cluster_disk.stats.total_bytes`*::
+--
+
+*`ceph.mgr_cluster_disk.pools`*::
 +
 --
-Total bytes of the cluster
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.stats.total_avail_bytes`*::
-+
---
-Available bytes of the cluster
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.stats.total_used_bytes`*::
-+
---
-Used bytes of the cluster
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.stats.total_used_raw_bytes`*::
-+
---
-Used raw bytes of the cluster
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.stats.total_used_raw_ratio`*::
-+
---
-Used raw bytes ratio
-
-type: scaled_float
-
---
-
-*`ceph.mgr_cluster_disk.stats.num_osds`*::
-+
---
-Number of OSDs in the cluster
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.stats.num_per_pool_osds`*::
-+
---
-Number of OSDs per pool in the cluster
-
-type: long
-
---
-
-[float]
-=== pools
-
 `pools` contains disk pool statistics.
 
 
-
-*`ceph.mgr_cluster_disk.pools.name`*::
-+
---
-Pool name
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_disk.pools.id`*::
-+
---
-Pool ID
-
-type: long
-
---
-
-[float]
-=== stats
-
-Pool statistics
-
-
-*`ceph.mgr_cluster_disk.pools.stats.kb_used`*::
-+
---
-Used space in kilobytes
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.pools.stats.bytes_used`*::
-+
---
-Used space in bytes
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.pools.stats.percent_used`*::
-+
---
-Used space in pct
-
-type: scaled_float
-
-format: percent
-
---
-
-*`ceph.mgr_cluster_disk.pools.stats.max_avail`*::
-+
---
-Maximum available space in bytes
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.pools.stats.stored`*::
-+
---
-Stored bytes
-
-type: long
-
---
-
-*`ceph.mgr_cluster_disk.pools.stats.objects`*::
-+
---
-Number of stored objects
-
-type: long
+type: nested
 
 --
 
@@ -4209,37 +4072,13 @@ type: keyword
 Monitor public addresses
 
 
-[float]
-=== addrvec
-
+*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec`*::
++
+--
 `addrvec` contains details of all public addresses.
 
 
-
-*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.type`*::
-+
---
-Address type
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.addr`*::
-+
---
-Host and port of monitor
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_health.monmap.mons.public_addrs.addrvec.nonce`*::
-+
---
-Nonce value
-
-type: long
+type: nested
 
 --
 
@@ -4367,28 +4206,13 @@ type: long
 
 --
 
-[float]
-=== pgs_by_state
-
+*`ceph.mgr_cluster_health.pgmap.pgs_by_state`*::
++
+--
 `pgs_by_state` contains information about PGs' states.
 
 
-
-*`ceph.mgr_cluster_health.pgmap.pgs_by_state.state_name`*::
-+
---
-State name
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_health.pgmap.pgs_by_state.count`*::
-+
---
-Count
-
-type: long
+type: nested
 
 --
 
@@ -4566,55 +4390,13 @@ type: long
 
 --
 
-[float]
-=== by_rank
-
+*`ceph.mgr_cluster_health.fsmap.by_rank`*::
++
+--
 `by_rank` contains information about file systems sorted by rank.
 
 
-
-*`ceph.mgr_cluster_health.fsmap.by_rank.filesystem_id`*::
-+
---
-File system ID
-
-type: long
-
---
-
-*`ceph.mgr_cluster_health.fsmap.by_rank.rank`*::
-+
---
-File system rank
-
-type: long
-
---
-
-*`ceph.mgr_cluster_health.fsmap.by_rank.name`*::
-+
---
-File system name
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_health.fsmap.by_rank.status`*::
-+
---
-File system status
-
-type: keyword
-
---
-
-*`ceph.mgr_cluster_health.fsmap.by_rank.gid`*::
-+
---
-File system GID
-
-type: long
+type: nested
 
 --
 
@@ -4625,323 +4407,23 @@ OSD disk metrics of Ceph cluster
 
 
 
-[float]
-=== nodes
-
+*`ceph.mgr_osd_disk.nodes`*::
++
+--
 `nodes` contains information about active nodes.
 
 
+type: nested
 
-*`ceph.mgr_osd_disk.nodes.depth`*::
+--
+
+*`ceph.mgr_osd_disk.stray`*::
 +
 --
-Depth
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.reweight`*::
-+
---
-Reweight (controls how much data the system tries to allocate to the OSD)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.pgs`*::
-+
---
-Number of PGs
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.crush_weight`*::
-+
---
-CRUSH weight
-
-type: scaled_float
-
---
-
-*`ceph.mgr_osd_disk.nodes.status`*::
-+
---
-Node status
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.nodes.id`*::
-+
---
-ID
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.name`*::
-+
---
-Name
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.nodes.type_id`*::
-+
---
-Type ID
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb_used_data`*::
-+
---
-Used data (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb_used_omap`*::
-+
---
-Used omap (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb_used_meta`*::
-+
---
-Used meta (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb_avail`*::
-+
---
-Available space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.var`*::
-+
---
-Var
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.type`*::
-+
---
-Type
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb`*::
-+
---
-Total space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.kb_used`*::
-+
---
-Used space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.nodes.Utilization`*::
-+
---
-Space utilization
-
-type: long
-
---
-
-[float]
-=== stray
-
 `stray` contains information about stray OSD nodes.
 
 
-
-*`ceph.mgr_osd_disk.stray.depth`*::
-+
---
-Depth
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.reweight`*::
-+
---
-Reweight (controls how much data the system tries to allocate to the OSD)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.pgs`*::
-+
---
-Number of PGs
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.crush_weight`*::
-+
---
-CRUSH weight
-
-type: scaled_float
-
---
-
-*`ceph.mgr_osd_disk.stray.status`*::
-+
---
-Node status
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.stray.id`*::
-+
---
-ID
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.name`*::
-+
---
-Name
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.stray.type_id`*::
-+
---
-Type ID
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.kb_used_data`*::
-+
---
-Used space for data (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.kb_used_omap`*::
-+
---
-Used space for omap (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.kb_used_meta`*::
-+
---
-Used space for meta (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.kb_avail`*::
-+
---
-Available space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.var`*::
-+
---
-Var
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.type`*::
-+
---
-Type
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_disk.stray.kb`*::
-+
---
-Total space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.kb_used`*::
-+
---
-Used space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.stray.utilization`*::
-+
---
-Space utilization
-
-type: long
+type: nested
 
 --
 
@@ -5065,119 +4547,22 @@ type: boolean
 
 
 
-[float]
-=== osd_perf_infos
-
+*`ceph.mgr_osd_perf.osdstats.osd_perf_infos`*::
++
+--
 OSD performance statistics
 
+type: nested
 
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos.id`*::
+--
+
+*`ceph.mgr_osd_pool_stats`*::
 +
 --
-OSD ID
-
-type: long
-
---
-
-[float]
-=== perf_stats
-
-Perforance statistics
-
-
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos.perf_stats.commit_latency_ms`*::
-+
---
-Commit latency in ms
-
-type: long
-
---
-
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos.perf_stats.apply_latency_ms`*::
-+
---
-Apply latency in ms
-
-type: long
-
---
-
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos.perf_stats.commit_latency_ns`*::
-+
---
-Commit latency in ns
-
-type: long
-
---
-
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos.perf_stats.apply_latency_ns`*::
-+
---
-Apply latency in ns
-
-type: long
-
---
-
-[float]
-=== mgr_osd_pool_stats
-
 OSD pool stats of Ceph cluster
 
 
-
-*`ceph.mgr_osd_pool_stats.pool_name`*::
-+
---
-Pool name
-
-type: keyword
-
---
-
-*`ceph.mgr_osd_pool_stats.pool_id`*::
-+
---
-Pool ID
-
-type: keyword
-
---
-
-[float]
-=== client_io_rate
-
-Client I/O rates
-
-
-*`ceph.mgr_osd_pool_stats.client_io_rate.read_bytes_sec`*::
-+
---
-type: long
-
---
-
-*`ceph.mgr_osd_pool_stats.client_io_rate.write_bytes_sec`*::
-+
---
-type: long
-
---
-
-*`ceph.mgr_osd_pool_stats.client_io_rate.read_op_per_sec`*::
-+
---
-type: long
-
---
-
-*`ceph.mgr_osd_pool_stats.client_io_rate.write_op_per_sec`*::
-+
---
-type: long
+type: nested
 
 --
 
@@ -5188,14 +4573,24 @@ OSD tree stats of Ceph cluster
 
 
 
-[float]
-=== nodes
-
+*`ceph.mgr_osd_tree.nodes`*::
++
+--
 `nodes` contains disk active OSD nodes.
 
 
+type: nested
 
-*`ceph.mgr_osd_tree.nodes.name`*::
+--
+
+[float]
+=== stray
+
+`stray` contains stray OSD nodes.
+
+
+
+*`ceph.mgr_osd_tree.stray.name`*::
 +
 --
 Node name
@@ -5204,7 +4599,7 @@ type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.nodes.root`*::
+*`ceph.mgr_osd_tree.stray.root`*::
 +
 --
 Node type
@@ -5213,7 +4608,7 @@ type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.nodes.type_id`*::
+*`ceph.mgr_osd_tree.stray.type_id`*::
 +
 --
 Type ID
@@ -5222,7 +4617,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.id`*::
+*`ceph.mgr_osd_tree.stray.id`*::
 +
 --
 Node ID
@@ -5231,7 +4626,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.children`*::
+*`ceph.mgr_osd_tree.stray.children`*::
 +
 --
 Node children
@@ -5240,7 +4635,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.reweight`*::
+*`ceph.mgr_osd_tree.stray.reweight`*::
 +
 --
 Reweight
@@ -5249,7 +4644,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.depth`*::
+*`ceph.mgr_osd_tree.stray.depth`*::
 +
 --
 Depth
@@ -5258,7 +4653,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.exists`*::
+*`ceph.mgr_osd_tree.stray.exists`*::
 +
 --
 Exists
@@ -5267,7 +4662,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.status`*::
+*`ceph.mgr_osd_tree.stray.status`*::
 +
 --
 Node status
@@ -5276,7 +4671,7 @@ type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.nodes.primary_affinity`*::
+*`ceph.mgr_osd_tree.stray.primary_affinity`*::
 +
 --
 Primary affinity
@@ -5285,7 +4680,7 @@ type: long
 
 --
 
-*`ceph.mgr_osd_tree.nodes.crush_weight`*::
+*`ceph.mgr_osd_tree.stray.crush_weight`*::
 +
 --
 CRUSH weight

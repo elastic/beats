@@ -5,7 +5,7 @@
   release: beta
   fields:
     - name: nodes
-      type: group
+      type: nested
       description: >
         `nodes` contains information about active nodes.
       fields:
@@ -61,7 +61,7 @@
           type: long
           description: Space utilization
     - name: stray
-      type: group
+      type: nested
       description: >
         `stray` contains information about stray OSD nodes.
       fields:

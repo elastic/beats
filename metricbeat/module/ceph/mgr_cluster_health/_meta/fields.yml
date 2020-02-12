@@ -50,7 +50,7 @@
               description: Monitor public addresses
               fields:
                 - name: addrvec
-                  type: group
+                  type: nested
                   description: >
                     `addrvec` contains details of all public addresses.
                   fields:
@@ -108,7 +108,7 @@
           type: long
           description: Write operations per second
         - name: pgs_by_state
-          type: group
+          type: nested
           description: >
             `pgs_by_state` contains information about PGs' states.
           fields:
@@ -185,7 +185,7 @@
           type: long
           description: File system up
         - name: by_rank
-          type: group
+          type: nested
           description: >
             `by_rank` contains information about file systems sorted by rank.
           fields:

@@ -1,5 +1,5 @@
 - name: mgr_osd_pool_stats
-  type: group
+  type: nested
   description: >
     OSD pool stats of Ceph cluster
   release: beta

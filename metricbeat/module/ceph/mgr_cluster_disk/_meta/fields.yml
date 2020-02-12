@@ -4,7 +4,7 @@
   release: beta
   fields:
     - name: stats
-      type: group
+      type: nested
       description: >
         `stats` contains disk availability statistics.
       fields:
@@ -30,7 +30,7 @@
           type: long
           description: Number of OSDs per pool in the cluster
     - name: pools
-      type: group
+      type: nested
       description: >
         `pools` contains disk pool statistics.
       fields:
@@ -41,7 +41,7 @@
           type: long
           description: Pool ID
         - name: stats
-          type: group
+          type: object
           description: Pool statistics
           fields:
             - name: kb_used

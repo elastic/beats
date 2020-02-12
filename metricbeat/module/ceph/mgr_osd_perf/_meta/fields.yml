@@ -13,7 +13,7 @@
         `stray` contains OSD statistics.
       fields:
         - name: osd_perf_infos
-          type: group
+          type: nested
           description: OSD performance statistics
           fields:
             - name: id

@@ -57,3 +57,5 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         for evt in output:
             assert 'ceph' in evt
+            # Fails due to nested objects:
+            # assert self.assert_fields_are_documented(evt)

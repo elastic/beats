@@ -5,9 +5,47 @@
   release: beta
   fields:
     - name: nodes
-      type: group
+      type: nested
       description: >
         `nodes` contains disk active OSD nodes.
+      fields:
+        - name: name
+          type: keyword
+          description: Node name
+        - name: root
+          type: keyword
+          description: Node type
+        - name: type_id
+          type: long
+          description: Type ID
+        - name: id
+          type: long
+          description: Node ID
+        - name: children
+          type: long
+          description: Node children
+        - name: reweight
+          type: long
+          description: Reweight
+        - name: depth
+          type: long
+          description: Depth
+        - name: exists
+          type: long
+          description: Exists
+        - name: status
+          type: keyword
+          description: Node status
+        - name: primary_affinity
+          type: long
+          description: Primary affinity
+        - name: crush_weight
+          type: scaled_float
+          description: CRUSH weight
+    - name: stray
+      type: group
+      description: >
+        `stray` contains stray OSD nodes.
       fields:
         - name: name
           type: keyword
