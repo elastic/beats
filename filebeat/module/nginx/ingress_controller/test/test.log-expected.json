@@ -268,7 +268,7 @@
         "user_agent.os.full": "Mac OS X 10.14.6",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.6",
-        "user_agent.version": "79.0.3945"
+        "user_agent.version": "79.0.3945.130"
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
@@ -306,7 +306,7 @@
         "user_agent.os.full": "Mac OS X 10.14.6",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.6",
-        "user_agent.version": "79.0.3945"
+        "user_agent.version": "79.0.3945.130"
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
@@ -344,7 +344,7 @@
         "user_agent.os.full": "Mac OS X 10.14.6",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.6",
-        "user_agent.version": "79.0.3945"
+        "user_agent.version": "79.0.3945.130"
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
@@ -382,7 +382,7 @@
         "user_agent.os.full": "Mac OS X 10.14.6",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.6",
-        "user_agent.version": "79.0.3945"
+        "user_agent.version": "79.0.3945.130"
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
@@ -683,7 +683,7 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
         "user_agent.original": "python-requests/2.22.0",
-        "user_agent.version": "2.22"
+        "user_agent.version": "2.22.0"
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
