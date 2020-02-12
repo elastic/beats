@@ -2865,6 +2865,18 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
+			"checksumSHA1": "OSx+nvOfDkLfsBTZmsDUD2xw1gw=",
+			"path": "github.com/eclipse/paho.mqtt.golang",
+			"revision": "0d940dd29fd24f905cd16b28b1209b4977b97e1a",
+			"revisionTime": "2020-01-21T10:57:43Z"
+		},
+		{
+			"checksumSHA1": "59nucqU3g1fgFTJiaIoxtKHYGmE=",
+			"path": "github.com/eclipse/paho.mqtt.golang/packets",
+			"revision": "0d940dd29fd24f905cd16b28b1209b4977b97e1a",
+			"revisionTime": "2020-01-21T10:57:43Z"
+		},
+		{
 			"checksumSHA1": "Tt1KFInyaxjtvhGI75+crc75n/Q=",
 			"path": "github.com/elastic/ecs/code/go/ecs",
 			"revision": "cc4b36eebec29975f57cd0475c3987c9bde5c15a",
@@ -3796,6 +3808,12 @@
 			"path": "github.com/gorhill/cronexpr",
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",
 			"revisionTime": "2016-12-05T14:13:22Z"
+		},
+		{
+			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
+			"revisionTime": "2019-08-25T01:20:11Z"
 		},
 		{
 			"checksumSHA1": "dF75743hHL364Dx3HKdZbBBFrpE=",
@@ -5799,6 +5817,12 @@
 			"versionExact": "v0.14.0"
 		},
 		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
 			"checksumSHA1": "nN+zggDyWr8HPYzwltMkzJJr1Jc=",
 			"path": "google.golang.org/api/internal/third_party/uritemplates",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
@@ -5885,6 +5909,30 @@
 			"revisionTime": "2019-10-07T22:26:40Z",
 			"version": "v1.6.5",
 			"versionExact": "v1.6.5"
+		},
+		{
+			"checksumSHA1": "5XkGWfndn+Th+AOFw9u7xLO8Qp8=",
+			"path": "google.golang.org/appengine/datastore",
+			"revision": "b2f4a3cf3c67576a2ee09e1fe62656a5086ce880",
+			"revisionTime": "2019-06-06T17:30:15Z",
+			"version": "v1.6.1",
+			"versionExact": "v1.6.1"
+		},
+		{
+			"checksumSHA1": "BmZtAIDebUf0ivXIeQ33/3H4094=",
+			"path": "google.golang.org/appengine/datastore/internal/cloudkey",
+			"revision": "b2f4a3cf3c67576a2ee09e1fe62656a5086ce880",
+			"revisionTime": "2019-06-06T17:30:15Z",
+			"version": "v1.6.1",
+			"versionExact": "v1.6.1"
+		},
+		{
+			"checksumSHA1": "mqxlap2M+qVsEvWvXZ4hOfwLVvw=",
+			"path": "google.golang.org/appengine/datastore/internal/cloudpb",
+			"revision": "b2f4a3cf3c67576a2ee09e1fe62656a5086ce880",
+			"revisionTime": "2019-06-06T17:30:15Z",
+			"version": "v1.6.1",
+			"versionExact": "v1.6.1"
 		},
 		{
 			"checksumSHA1": "/R9+Y0jX9ijye8Ea6oh/RBwOOg4=",
