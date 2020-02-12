@@ -57,6 +57,45 @@ func TestToEvent(t *testing.T) {
 				},
 			},
 		},
+		// 'syslog.pid' field without user append
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": int64(123456),
+				},
+			},
+		},
+		// 'syslog.pid' field with user append
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456,root",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": int64(123456),
+				},
+			},
+		},
+		// 'syslog.pid' field empty
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": "",
+				},
+			},
+		},
 		// custom field
 		ToEventTestCase{
 			entry: sdjournal.JournalEntry{

@@ -40,6 +40,8 @@ ES_HOST?=elasticsearch
 ES_PORT?=9200
 ES_USER?=beats
 ES_PASS?=testing
+ES_HOST_SSL?=elasticsearchssl
+ES_PORT_SSL?=9200
 KIBANA_HOST?=kibana
 KIBANA_PORT?=5601
 # Kibana's Elaticsearch user
@@ -404,6 +406,8 @@ write-environment:
 	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
 	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_HOST_SSL=${ES_HOST_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT_SSL=${ES_PORT_SSL}" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
 	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
@@ -423,8 +427,7 @@ env-logs:
 	${DOCKER_COMPOSE} logs -f
 
 fix-permissions:
-	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
+	sh ${ES_BEATS}/script/fix_permissions.sh "${PWD}"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
