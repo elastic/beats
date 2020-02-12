@@ -96,7 +96,7 @@ func TestEnroll(t *testing.T) {
 		},
 	))
 
-	t.Run("succesfully enroll with TLS and save access api key in the store", withTLSServer(
+	t.Run("successfully enroll with TLS and save access api key in the store", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +156,7 @@ func TestEnroll(t *testing.T) {
 		},
 	))
 
-	t.Run("succesfully enroll without TLS and save access api key in the store", withServer(
+	t.Run("successfully enroll without TLS and save access api key in the store", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
