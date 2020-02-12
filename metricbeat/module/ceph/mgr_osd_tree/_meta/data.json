@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2020-02-12T10:25:58.283Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "service": {
+        "type": "ceph",
+        "address": "localhost:8003"
+    },
+    "event": {
+        "dataset": "http.json_namespace",
+        "module": "ceph",
+        "duration": 21934403
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "mgr_osd_tree"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "ceph": {
+        "mgr_osd_tree": {
+            "stray": [],
+            "nodes": [
+                {
+                    "id": -1,
+                    "name": "default",
+                    "type": "root",
+                    "type_id": 11,
+                    "children": [
+                        -2
+                    ]
+                },
+                {
+                    "children": [
+                        0
+                    ],
+                    "id": -2,
+                    "name": "aa72f9faae85",
+                    "type": "host",
+                    "type_id": 1,
+                    "pool_weights": {}
+                },
+                {
+                    "name": "osd.0",
+                    "type": "osd",
+                    "exists": 1,
+                    "reweight": 1,
+                    "id": 0,
+                    "crush_weight": 0.009796142578125,
+                    "depth": 2,
+                    "pool_weights": {},
+                    "status": "up",
+                    "primary_affinity": 1,
+                    "type_id": 0
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,234 @@
+{
+    "@timestamp": "2020-02-12T10:05:51.130Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
+    },
+    "event": {
+        "dataset": "http.json_namespace",
+        "module": "ceph",
+        "duration": 12981066
+    },
+    "ceph": {
+        "mgr_cluster_status": {
+            "progress_events": {},
+            "health": {
+                "checks": {
+                    "POOL_APP_NOT_ENABLED": {
+                        "severity": "HEALTH_WARN",
+                        "summary": {
+                            "message": "application not enabled on 1 pool(s)"
+                        }
+                    }
+                },
+                "status": "HEALTH_WARN"
+            },
+            "election_epoch": 3,
+            "quorum": [
+                0
+            ],
+            "quorum_age": 669,
+            "monmap": {
+                "mons": [
+                    {
+                        "rank": 0,
+                        "name": "aa72f9faae85",
+                        "public_addrs": {
+                            "addrvec": [
+                                {
+                                    "type": "v2",
+                                    "addr": "172.30.0.2:3300",
+                                    "nonce": 0
+                                }
+                            ]
+                        },
+                        "addr": "172.30.0.2:3300/0",
+                        "public_addr": "172.30.0.2:3300/0"
+                    }
+                ],
+                "epoch": 1,
+                "fsid": "17af221e-4129-4886-950b-adfb9c2c851f",
+                "modified": "2020-02-12 09:54:42.262674",
+                "created": "2020-02-12 09:54:42.262674",
+                "min_mon_release": 14,
+                "min_mon_release_name": "nautilus",
+                "features": {
+                    "persistent": [
+                        "kraken",
+                        "luminous",
+                        "mimic",
+                        "osdmap-prune",
+                        "nautilus"
+                    ],
+                    "optional": []
+                }
+            },
+            "pgmap": {
+                "pgs_by_state": [
+                    {
+                        "state_name": "active+clean",
+                        "count": 164
+                    }
+                ],
+                "num_pgs": 164,
+                "num_pools": 9,
+                "num_objects": 1964,
+                "data_bytes": 7319065924,
+                "bytes_used": 8397062144,
+                "bytes_avail": 2340356096,
+                "bytes_total": 10737418240
+            },
+            "fsid": "17af221e-4129-4886-950b-adfb9c2c851f",
+            "quorum_names": [
+                "aa72f9faae85"
+            ],
+            "osdmap": {
+                "osdmap": {
+                    "epoch": 21,
+                    "num_osds": 1,
+                    "num_up_osds": 1,
+                    "num_in_osds": 1,
+                    "num_remapped_pgs": 0
+                }
+            },
+            "fsmap": {
+                "epoch": 4,
+                "id": 1,
+                "up": 1,
+                "in": 1,
+                "max": 1,
+                "by_rank": [
+                    {
+                        "name": "demo",
+                        "status": "up:active",
+                        "gid": 4129,
+                        "filesystem_id": 1,
+                        "rank": 0
+                    }
+                ],
+                "up:standby": 0
+            },
+            "servicemap": {
+                "epoch": 3,
+                "modified": "2020-02-12 09:55:02.463222",
+                "services": {
+                    "rbd-mirror": {
+                        "daemons": {
+                            "4164": {
+                                "start_epoch": 3,
+                                "start_stamp": "2020-02-12 09:55:01.596669",
+                                "gid": 4164,
+                                "addr": "172.30.0.2:0/1853666642",
+                                "metadata": {
+                                    "ceph_release": "nautilus",
+                                    "ceph_version": "ceph version 14.2.7 (3d58626ebeec02d8385a4cefb92c6cbc3a45bfe8) nautilus (stable)",
+                                    "mem_swap_kb": "2097148",
+                                    "os": "Linux",
+                                    "arch": "x86_64",
+                                    "instance_id": "4164",
+                                    "cpu": "Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz",
+                                    "hostname": "aa72f9faae85",
+                                    "id": "admin",
+                                    "kernel_description": "#1 SMP Tue Jul 2 22:58:16 UTC 2019",
+                                    "distro_version": "7",
+                                    "distro": "centos",
+                                    "distro_description": "CentOS Linux 7 (Core)",
+                                    "kernel_version": "4.9.184-linuxkit",
+                                    "mem_total_kb": "8164244",
+                                    "ceph_version_short": "14.2.7"
+                                }
+                            },
+                            "summary": ""
+                        }
+                    },
+                    "rgw": {
+                        "daemons": {
+                            "summary": "",
+                            "aa72f9faae85": {
+                                "start_epoch": 2,
+                                "start_stamp": "2020-02-12 09:54:59.401638",
+                                "gid": 4144,
+                                "addr": "172.30.0.2:0/681525861",
+                                "metadata": {
+                                    "distro_version": "7",
+                                    "mem_swap_kb": "2097148",
+                                    "zone_id": "1fb88fdf-f239-4fc8-8a84-932626130a03",
+                                    "zonegroup_id": "b5fba8f9-ec19-4925-a56d-e0440fdf2137",
+                                    "ceph_version_short": "14.2.7",
+                                    "frontend_config#0": "beast  endpoint=0.0.0.0:8080",
+                                    "frontend_type#0": "beast",
+                                    "kernel_version": "4.9.184-linuxkit",
+                                    "arch": "x86_64",
+                                    "mem_total_kb": "8164244",
+                                    "pid": "966",
+                                    "zone_name": "default",
+                                    "distro_description": "CentOS Linux 7 (Core)",
+                                    "ceph_version": "ceph version 14.2.7 (3d58626ebeec02d8385a4cefb92c6cbc3a45bfe8) nautilus (stable)",
+                                    "cpu": "Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz",
+                                    "distro": "centos",
+                                    "hostname": "aa72f9faae85",
+                                    "kernel_description": "#1 SMP Tue Jul 2 22:58:16 UTC 2019",
+                                    "num_handles": "1",
+                                    "os": "Linux",
+                                    "ceph_release": "nautilus",
+                                    "zonegroup_name": "default"
+                                }
+                            }
+                        }
+                    },
+                    "rgw-nfs": {
+                        "daemons": {
+                            "summary": "",
+                            "aa72f9faae85": {
+                                "start_stamp": "2020-02-12 09:55:01.635512",
+                                "gid": 4166,
+                                "addr": "172.30.0.2:0/108157315",
+                                "metadata": {
+                                    "ceph_version_short": "14.2.7",
+                                    "kernel_version": "4.9.184-linuxkit",
+                                    "mem_total_kb": "8164244",
+                                    "zonegroup_name": "default",
+                                    "hostname": "aa72f9faae85",
+                                    "num_handles": "1",
+                                    "os": "Linux",
+                                    "pid": "1997",
+                                    "ceph_release": "nautilus",
+                                    "ceph_version": "ceph version 14.2.7 (3d58626ebeec02d8385a4cefb92c6cbc3a45bfe8) nautilus (stable)",
+                                    "cpu": "Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz",
+                                    "frontend_type#0": "rgw-nfs",
+                                    "zone_name": "default",
+                                    "zonegroup_id": "b5fba8f9-ec19-4925-a56d-e0440fdf2137",
+                                    "frontend_config#0": "rgwlib",
+                                    "kernel_description": "#1 SMP Tue Jul 2 22:58:16 UTC 2019",
+                                    "mem_swap_kb": "2097148",
+                                    "zone_id": "1fb88fdf-f239-4fc8-8a84-932626130a03",
+                                    "arch": "x86_64",
+                                    "distro": "centos",
+                                    "distro_description": "CentOS Linux 7 (Core)",
+                                    "distro_version": "7"
+                                },
+                                "start_epoch": 3
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "metricset": {
+        "name": "mgr_cluster_health",
+        "period": 60000
+    }
+}

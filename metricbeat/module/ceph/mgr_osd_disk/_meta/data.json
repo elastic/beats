@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2020-02-12T10:07:05.597Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
+    },
+    "ceph": {
+        "mgr_osd_disk": {
+            "summary": {
+                "total_kb_used": 8200256,
+                "total_kb_used_data": 7151552,
+                "total_kb_used_meta": 1048576,
+                "total_kb_avail": 2285504,
+                "average_utilization": 78.2037353515625,
+                "max_var": 1,
+                "dev": 0,
+                "total_kb": 10485760,
+                "min_var": 1,
+                "total_kb_used_omap": 0
+            },
+            "nodes": [
+                {
+                    "pool_weights": {},
+                    "kb_avail": 2285504,
+                    "status": "up",
+                    "type": "osd",
+                    "kb": 10485760,
+                    "kb_used": 8200256,
+                    "kb_used_data": 7151552,
+                    "kb_used_meta": 1048576,
+                    "id": 0,
+                    "reweight": 1,
+                    "kb_used_omap": 0,
+                    "var": 1,
+                    "pgs": 164,
+                    "name": "osd.0",
+                    "type_id": 0,
+                    "crush_weight": 0.009796142578125,
+                    "depth": 2,
+                    "utilization": 78.2037353515625
+                }
+            ],
+            "stray": []
+        }
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "event": {
+        "dataset": "http.json_namespace",
+        "module": "ceph",
+        "duration": 10084520
+    },
+    "metricset": {
+        "name": "mgr_osd_disk",
+        "period": 60000
+    }
+}

@@ -1,0 +1,100 @@
+{
+    "@timestamp": "2020-02-12T10:21:15.766Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "http.json_namespace",
+        "module": "ceph",
+        "duration": 15642520
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "mgr_osd_pool_stats"
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "ceph": {
+        "mgr_osd_pool_stats": [
+            {
+                "pool_name": "rbd",
+                "pool_id": "1",
+                "recovery": {},
+                "recovery_rate": {},
+                "client_io_rate": {}
+            },
+            {
+                "pool_name": "cephfs_data",
+                "pool_id": "2",
+                "recovery": {},
+                "recovery_rate": {},
+                "client_io_rate": {}
+            },
+            {
+                "pool_name": "cephfs_metadata",
+                "pool_id": "3",
+                "recovery": {},
+                "recovery_rate": {},
+                "client_io_rate": {}
+            },
+            {
+                "recovery_rate": {},
+                "client_io_rate": {},
+                "pool_name": ".rgw.root",
+                "pool_id": "4",
+                "recovery": {}
+            },
+            {
+                "recovery_rate": {},
+                "client_io_rate": {},
+                "pool_name": "default.rgw.control",
+                "pool_id": "5",
+                "recovery": {}
+            },
+            {
+                "client_io_rate": {},
+                "pool_name": "default.rgw.meta",
+                "pool_id": "6",
+                "recovery": {},
+                "recovery_rate": {}
+            },
+            {
+                "client_io_rate": {},
+                "pool_name": "default.rgw.log",
+                "pool_id": "7",
+                "recovery": {},
+                "recovery_rate": {}
+            },
+            {
+                "client_io_rate": {},
+                "pool_name": "default.rgw.buckets.index",
+                "pool_id": "8",
+                "recovery": {},
+                "recovery_rate": {}
+            },
+            {
+                "pool_name": "scbench",
+                "pool_id": "9",
+                "recovery": {},
+                "recovery_rate": {},
+                "client_io_rate": {
+                    "read_op_per_sec": "156",
+                    "write_op_per_sec": "0",
+                    "read_bytes_sec": "654312204",
+                    "write_bytes_sec": "85",
+                }
+            }
+        ]
+    }
+}

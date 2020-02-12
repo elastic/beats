@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2020-02-12T10:19:09.058Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "service": {
+        "address": "localhost:8003",
+        "type": "ceph"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "event": {
+        "duration": 13115609,
+        "dataset": "http.json_namespace",
+        "module": "ceph"
+    },
+    "metricset": {
+        "name": "mgr_osd_perf",
+        "period": 60000
+    },
+    "ceph": {
+        "mgr_osd_perf": {
+            "pg_ready": true,
+            "osdstats": {
+                "osd_perf_infos": [
+                    {
+                        "id": 0,
+                        "perf_stats": {
+                            "commit_latency_ms": 0,
+                            "apply_latency_ms": 0,
+                            "commit_latency_ns": 3,
+                            "apply_latency_ns": 0
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

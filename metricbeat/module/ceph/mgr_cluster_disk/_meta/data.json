@@ -1,0 +1,152 @@
+{
+    "@timestamp": "2020-02-12T10:00:49.733Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "event": {
+        "dataset": "http.json_namespace",
+        "module": "ceph",
+        "duration": 9219357
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "mgr_cluster_disk"
+    },
+    "service": {
+        "type": "ceph",
+        "address": "localhost:8003"
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "mgr_cluster_disk": {
+            "pools": [
+                {
+                    "stats": {
+                        "max_avail": 4307550208,
+                        "stored": 0,
+                        "objects": 0,
+                        "kb_used": 0,
+                        "bytes_used": 0,
+                        "percent_used": 0
+                    },
+                    "name": "rbd",
+                    "id": 1
+                },
+                {
+                    "name": "cephfs_data",
+                    "id": 2,
+                    "stats": {
+                        "stored": 0,
+                        "objects": 0,
+                        "kb_used": 0,
+                        "bytes_used": 0,
+                        "percent_used": 0,
+                        "max_avail": 4307550208
+                    }
+                },
+                {
+                    "name": "cephfs_metadata",
+                    "id": 3,
+                    "stats": {
+                        "max_avail": 4307550208,
+                        "stored": 2286,
+                        "objects": 22,
+                        "kb_used": 512,
+                        "bytes_used": 524288,
+                        "percent_used": 0.00012169891851954162
+                    }
+                },
+                {
+                    "name": ".rgw.root",
+                    "id": 4,
+                    "stats": {
+                        "stored": 2398,
+                        "objects": 6,
+                        "kb_used": 384,
+                        "bytes_used": 393216,
+                        "percent_used": 9.127696830546483e-05,
+                        "max_avail": 4307550208
+                    }
+                },
+                {
+                    "name": "default.rgw.control",
+                    "id": 5,
+                    "stats": {
+                        "stored": 0,
+                        "objects": 8,
+                        "kb_used": 0,
+                        "bytes_used": 0,
+                        "percent_used": 0,
+                        "max_avail": 4307550208
+                    }
+                },
+                {
+                    "stats": {
+                        "stored": 736,
+                        "objects": 5,
+                        "kb_used": 256,
+                        "bytes_used": 262144,
+                        "percent_used": 6.085316272219643e-05,
+                        "max_avail": 4307550208
+                    },
+                    "name": "default.rgw.meta",
+                    "id": 6
+                },
+                {
+                    "stats": {
+                        "stored": 0,
+                        "objects": 176,
+                        "kb_used": 0,
+                        "bytes_used": 0,
+                        "percent_used": 0,
+                        "max_avail": 4307550208
+                    },
+                    "name": "default.rgw.log",
+                    "id": 7
+                },
+                {
+                    "name": "default.rgw.buckets.index",
+                    "id": 8,
+                    "stats": {
+                        "objects": 1,
+                        "kb_used": 0,
+                        "bytes_used": 0,
+                        "percent_used": 0,
+                        "max_avail": 4307550208,
+                        "stored": 0
+                    }
+                },
+                {
+                    "name": "scbench",
+                    "id": 9,
+                    "stats": {
+                        "stored": 5020581888,
+                        "objects": 1188,
+                        "kb_used": 4902912,
+                        "bytes_used": 5020581888,
+                        "percent_used": 0.5382194519042969,
+                        "max_avail": 4307550208
+                    }
+                }
+            ],
+            "stats": {
+                "total_bytes": 10737418240,
+                "total_avail_bytes": 4844421120,
+                "total_used_bytes": 4819255296,
+                "total_used_raw_bytes": 5892997120,
+                "total_used_raw_ratio": 0.548828125,
+                "num_osds": 1,
+                "num_per_pool_osds": 1
+            },
+            "stats_by_class": {}
+        }
+    },
+    "ecs": {
+        "version": "1.4.0"
+    }
+}
