@@ -178,6 +178,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
 - Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
+- Add vpc metricset for aws module. {pull}16111[16111] {issue}14854[14854]
 
 *Functionbeat*
 
