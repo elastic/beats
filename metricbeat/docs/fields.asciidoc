@@ -4100,28 +4100,48 @@ OSD performance metrics of Ceph cluster
 
 
 
-*`ceph.mgr_osd_perf.pg_ready`*::
+*`ceph.mgr_osd_perf.id`*::
 +
 --
-Placement Group readiness status
+OSD ID
 
-type: boolean
+type: long
 
 --
 
-[float]
-=== osdstats
-
-`stray` contains OSD statistics.
-
-
-
-*`ceph.mgr_osd_perf.osdstats.osd_perf_infos`*::
+*`ceph.mgr_osd_perf.stats.commit_latency_ms`*::
 +
 --
-OSD performance statistics
+Commit latency in ms
 
-type: nested
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ms`*::
++
+--
+Apply latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ns`*::
++
+--
+Commit latency in ns
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ns`*::
++
+--
+Apply latency in ns
+
+type: long
 
 --
 
