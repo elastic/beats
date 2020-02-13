@@ -45,6 +45,8 @@ const (
 	defaultWaitRetry    = 1 * time.Second
 	defaultMaxWaitRetry = 60 * time.Second
 	defaultPort         = 6379
+	redisScheme         = "redis://"
+	tlsRedisScheme      = "rediss://"
 )
 
 func init() {
@@ -122,9 +124,21 @@ func makeRedis(
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
-		enc, err := codec.CreateEncoder(beat, config.Codec)
+		if parts := strings.SplitN(host, "://", 2); len(parts) != 2 {
+			host = redisScheme + host
+		}
+
+		url, err := url.Parse(host)
 		if err != nil {
 			return outputs.Fail(err)
+		}
+
+		if url.Scheme != redisScheme && url.Scheme != tlsRedisScheme {
+			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", url.Scheme))
+		}
+
+		if url.Scheme == tlsRedisScheme {
+			// @todo how can I force tls if there is no tls config :thinking:
 		}
 
 		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
@@ -133,18 +147,14 @@ func makeRedis(
 		}
 
 		pass := config.Password
-		if parts := strings.SplitN(host, "://", 2); len(parts) != 2 {
-			// Add scheme.
-			host = fmt.Sprintf("redis://%s", host)
-		}
-		url, err := url.Parse(host)
-		if err != nil {
-			return outputs.Fail(err)
-		}
-
 		hostPass, passSet := url.User.Password()
 		if passSet {
 			pass = hostPass
+		}
+
+		enc, err := codec.CreateEncoder(beat, config.Codec)
+		if err != nil {
+			return outputs.Fail(err)
 		}
 
 		client := newClient(conn, observer, config.Timeout,
