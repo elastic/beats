@@ -1,6 +1,5 @@
-
 syntax = "proto3";
-package remoteconfig;
+package grpc;
 
 message ConfigRequest {
     string config = 1;

@@ -28,7 +28,10 @@ var (
 // CreateConfiguratorClient creates a new client from a connection passed in.
 // This wraps generated grpc implementation so the change of the underlying
 // technology is just the change of the namespace.
-func CreateConfiguratorClient(conn interface{}, delay, maxDelay time.Duration) (remoteconfig.ConfiguratorClient, error) {
+func CreateConfiguratorClient(
+	conn interface{},
+	delay, maxDelay time.Duration,
+) (remoteconfig.ConfiguratorClient, error) {
 	grpcConn, ok := conn.(*rpc.ClientConn)
 	if !ok {
 		return nil, ErrNotGrpcClient

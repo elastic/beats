@@ -8,14 +8,9 @@
 package grpc
 
 import (
-	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
-	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -170,141 +165,25 @@ func (m *StatusResponse) GetStatus() string {
 }
 
 func init() {
-	proto.RegisterType((*ConfigRequest)(nil), "remoteconfig.ConfigRequest")
-	proto.RegisterType((*ConfigResponse)(nil), "remoteconfig.ConfigResponse")
-	proto.RegisterType((*StatusRequest)(nil), "remoteconfig.StatusRequest")
-	proto.RegisterType((*StatusResponse)(nil), "remoteconfig.StatusResponse")
+	proto.RegisterType((*ConfigRequest)(nil), "grpc.ConfigRequest")
+	proto.RegisterType((*ConfigResponse)(nil), "grpc.ConfigResponse")
+	proto.RegisterType((*StatusRequest)(nil), "grpc.StatusRequest")
+	proto.RegisterType((*StatusResponse)(nil), "grpc.StatusResponse")
 }
 
 func init() { proto.RegisterFile("remote_config.proto", fileDescriptor_16fc0d99571fe457) }
 
 var fileDescriptor_16fc0d99571fe457 = []byte{
-	// 175 bytes of a gzipped FileDescriptorProto
+	// 173 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2e, 0x4a, 0xcd, 0xcd,
 	0x2f, 0x49, 0x8d, 0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0xe2, 0x81, 0x08, 0x42, 0xc4, 0x94, 0xd4, 0xb9, 0x78, 0x9d, 0xc1, 0xac, 0xa0, 0xd4, 0xc2, 0xd2,
-	0xd4, 0xe2, 0x12, 0x21, 0x31, 0x2e, 0x36, 0x88, 0x94, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10,
-	0x94, 0xa7, 0x24, 0xc0, 0xc5, 0x07, 0x53, 0x58, 0x5c, 0x90, 0x9f, 0x57, 0x9c, 0xaa, 0xc4, 0xcf,
-	0xc5, 0x1b, 0x5c, 0x92, 0x58, 0x52, 0x5a, 0x0c, 0xd5, 0xaa, 0xa4, 0xc1, 0xc5, 0x07, 0x13, 0x80,
-	0x28, 0x01, 0x19, 0x06, 0x11, 0x81, 0x19, 0x06, 0xe1, 0x19, 0xcd, 0x61, 0xe4, 0xe2, 0x81, 0x98,
-	0x56, 0x5a, 0x94, 0x58, 0x92, 0x5f, 0x24, 0xe4, 0xca, 0xc5, 0x06, 0xe1, 0x0b, 0x49, 0xeb, 0x21,
-	0xbb, 0x4f, 0x0f, 0xc5, 0x71, 0x52, 0x32, 0xd8, 0x25, 0xa1, 0x0e, 0x62, 0x00, 0x19, 0x03, 0xb1,
-	0x01, 0xdd, 0x18, 0x14, 0x87, 0xa2, 0x1b, 0x83, 0xea, 0x68, 0x25, 0x86, 0x24, 0x36, 0x70, 0x48,
-	0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x06, 0x93, 0xe1, 0x10, 0x40, 0x01, 0x00, 0x00,
-}
-
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConn
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
-
-// ConfiguratorClient is the client API for Configurator service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ConfiguratorClient interface {
-	Config(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error)
-	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
-}
-
-type configuratorClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewConfiguratorClient(cc *grpc.ClientConn) ConfiguratorClient {
-	return &configuratorClient{cc}
-}
-
-func (c *configuratorClient) Config(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error) {
-	out := new(ConfigResponse)
-	err := c.cc.Invoke(ctx, "/remoteconfig.Configurator/Config", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *configuratorClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
-	out := new(StatusResponse)
-	err := c.cc.Invoke(ctx, "/remoteconfig.Configurator/Status", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// ConfiguratorServer is the server API for Configurator service.
-type ConfiguratorServer interface {
-	Config(context.Context, *ConfigRequest) (*ConfigResponse, error)
-	Status(context.Context, *StatusRequest) (*StatusResponse, error)
-}
-
-// UnimplementedConfiguratorServer can be embedded to have forward compatible implementations.
-type UnimplementedConfiguratorServer struct {
-}
-
-func (*UnimplementedConfiguratorServer) Config(ctx context.Context, req *ConfigRequest) (*ConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Config not implemented")
-}
-func (*UnimplementedConfiguratorServer) Status(ctx context.Context, req *StatusRequest) (*StatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
-}
-
-func RegisterConfiguratorServer(s *grpc.Server, srv ConfiguratorServer) {
-	s.RegisterService(&_Configurator_serviceDesc, srv)
-}
-
-func _Configurator_Config_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConfiguratorServer).Config(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/remoteconfig.Configurator/Config",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConfiguratorServer).Config(ctx, req.(*ConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Configurator_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConfiguratorServer).Status(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/remoteconfig.Configurator/Status",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConfiguratorServer).Status(ctx, req.(*StatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _Configurator_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "remoteconfig.Configurator",
-	HandlerType: (*ConfiguratorServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Config",
-			Handler:    _Configurator_Config_Handler,
-		},
-		{
-			MethodName: "Status",
-			Handler:    _Configurator_Status_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "remote_config.proto",
+	0x62, 0x49, 0x2f, 0x2a, 0x48, 0x56, 0x52, 0xe7, 0xe2, 0x75, 0x06, 0x8b, 0x06, 0xa5, 0x16, 0x96,
+	0xa6, 0x16, 0x97, 0x08, 0x89, 0x71, 0xb1, 0x41, 0x94, 0x49, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06,
+	0x41, 0x79, 0x4a, 0x02, 0x5c, 0x7c, 0x30, 0x85, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9, 0x4a, 0xfc,
+	0x5c, 0xbc, 0xc1, 0x25, 0x89, 0x25, 0xa5, 0xc5, 0x50, 0xad, 0x4a, 0x1a, 0x5c, 0x7c, 0x30, 0x01,
+	0x88, 0x12, 0x90, 0x61, 0x10, 0x11, 0x98, 0x61, 0x10, 0x9e, 0x51, 0x0d, 0x17, 0x0f, 0xc4, 0xb0,
+	0xd2, 0xa2, 0xc4, 0x92, 0xfc, 0x22, 0x21, 0x53, 0x2e, 0x36, 0x08, 0x5f, 0x48, 0x58, 0x0f, 0xe4,
+	0x2c, 0x3d, 0x14, 0x37, 0x49, 0x89, 0xa0, 0x0a, 0x42, 0xed, 0x67, 0x00, 0x69, 0x83, 0x18, 0x08,
+	0xd3, 0x86, 0xe2, 0x1e, 0x98, 0x36, 0x54, 0x37, 0x29, 0x31, 0x24, 0xb1, 0x81, 0x03, 0xc0, 0x18,
+	0x10, 0x00, 0x00, 0xff, 0xff, 0xc8, 0xa5, 0x92, 0x22, 0x17, 0x01, 0x00, 0x00,
 }

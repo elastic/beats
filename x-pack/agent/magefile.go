@@ -34,6 +34,7 @@ import (
 const (
 	goLintRepo     = "golang.org/x/lint/golint"
 	goLicenserRepo = "github.com/elastic/go-licenser"
+	goProtoc       = "github.com/golang/protobuf/protoc-gen-go"
 	buildDir       = "build"
 	metaDir        = "_meta"
 )
@@ -366,7 +367,12 @@ func flags() string {
 
 // Update is an alias for executing fields, dashboards, config, includes.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(
+		Config,
+		BuildSpec,
+		BuildFleetCfg,
+		BuildGRPC,
+	)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -384,6 +390,18 @@ func Config() {
 	mg.Deps(configYML)
 }
 
+func BuildGRPC() error {
+	fmt.Println(">> Building GRPC service file")
+	if err := GoGet(goProtoc); err != nil {
+		return err
+	}
+
+	out := devtools.XPackBeatDir("pkg", "core", "remoteconfig", "grpc")
+	in := devtools.XPackBeatDir("proto")
+
+	return sh.RunV("protoc", "--go_out", out, "--proto_path="+in, "remote_config.proto")
+}
+
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
 	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
@@ -391,7 +409,7 @@ func BuildSpec() error {
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
-	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	fmt.Printf(">> Building program spec from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -463,6 +481,6 @@ func BuildFleetCfg() error {
 	in := filepath.Join("_meta", "agent.fleet.yml")
 	out := filepath.Join("pkg", "agent", "application", "configuration_embed.go")
 
-	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
+	fmt.Printf(">> Building default fleet configuration %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
