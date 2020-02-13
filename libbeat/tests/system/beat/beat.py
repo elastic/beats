@@ -644,6 +644,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT", "9200"),
         )
 
+    def get_elasticsearch_url_ssl(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "https://{host}:{port}".format(
+            host=os.getenv("ES_HOST_SSL", "localhost"),
+            port=os.getenv("ES_PORT_SSL", "9205"),
+        )
+
     def get_kibana_url(self):
         """
         Returns kibana host URL
