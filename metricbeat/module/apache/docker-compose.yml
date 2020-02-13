@@ -4,7 +4,7 @@ services:
   apache:
     image: docker.elastic.co/integrations-ci/beats-apache:${APACHE_VERSION:-2.4.20}-1
     build:
-      context: ./_meta
+      context: ${APACHE_PATH:-.}/_meta
       args:
         APACHE_VERSION: ${APACHE_VERSION:-2.4.20}
     ports:

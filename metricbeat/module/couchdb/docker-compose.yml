@@ -4,7 +4,7 @@ services:
   couchdb:
     image: docker.elastic.co/integrations-ci/beats-couchdb:${COUCHDB_VERSION:-1.7}-1
     build:
-      context: ./_meta
+      context: ${COUCHDB_PATH:-.}/_meta
       args:
         COUCHDB_VERSION: ${COUCHDB_VERSION:-1.7}
     ports:

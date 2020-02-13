@@ -3,7 +3,7 @@ version: '2.3'
 services:
   appsearch:
     build:
-      context: ./_meta
+      context: ${APPSEARCH_PATH:-.}/_meta
     depends_on:
       - elasticsearch
     environment:

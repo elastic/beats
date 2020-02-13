@@ -4,6 +4,6 @@ services:
   http:
     image: docker.elastic.co/integrations-ci/beats-http:1
     build:
-      context: ./_meta
+      context: ${HTTP_PATH:-.}/_meta
     ports:
       - 8080

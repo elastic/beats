@@ -4,7 +4,7 @@ services:
   mysql:
     image: docker.elastic.co/integrations-ci/beats-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-5.7.12}-1
     build:
-      context: ./_meta
+      context: ${MYSQL_PATH:-.}/_meta
       args:
         MYSQL_IMAGE: ${MYSQL_VARIANT:-mysql}:${MYSQL_VERSION:-5.7.12}
     ports:

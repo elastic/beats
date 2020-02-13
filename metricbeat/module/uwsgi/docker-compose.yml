@@ -4,7 +4,7 @@ services:
   uwsgi_tcp:
     image: docker.elastic.co/integrations-ci/beats-uwsgi:py${PYTHON_VERSION:-3.6}-1
     build:
-      context: ./_meta
+      context: ${UWSGI_PATH:-.}/_meta
       args:
         PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
     command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
@@ -14,7 +14,7 @@ services:
   uwsgi_http:
     image: docker.elastic.co/integrations-ci/beats-uwsgi:py${PYTHON_VERSION:-3.6}-1
     build:
-      context: ./_meta
+      context: ${UWSGI_PATH:-.}/_meta
       args:
         PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
     command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py

@@ -4,7 +4,7 @@ services:
   redis:
     image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-3.2.12}-1
     build:
-      context: ./_meta
+      context: ${REDIS_PATH:-.}/_meta
       args:
         REDIS_VERSION: ${REDIS_VERSION:-3.2.12}
     ports:

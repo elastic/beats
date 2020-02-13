@@ -4,7 +4,7 @@ services:
   traefik:
     image: docker.elastic.co/integrations-ci/beats-traefik:${TRAEFIK_VERSION:-1.6}-1
     build:
-      context: ./_meta
+      context: ${TRAEFIK_PATH:-.}/_meta
       args:
         TRAEFIK_VERSION: ${TRAEFIK_VERSION:-1.6}
     ports:

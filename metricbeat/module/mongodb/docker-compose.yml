@@ -4,7 +4,7 @@ services:
   mongodb:
     image: docker.elastic.co/integrations-ci/beats-mongodb:${MONGODB_VERSION:-3.4}-1
     build:
-      context: ./_meta
+      context: ${MONGODB_PATH:-.}/_meta
       args:
         MONGODB_VERSION: ${MONGODB_VERSION:-3.4}
     command: mongod --replSet beats

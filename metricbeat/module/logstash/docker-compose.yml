@@ -4,7 +4,7 @@ services:
   logstash:
     image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.5.2}-1
     build:
-      context: ./_meta
+      context: ${LOGSTASH_PATH:-.}/_meta
       args:
         LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.5.2}
     ports:

@@ -4,7 +4,7 @@ services:
   etcd:
     image: docker.elastic.co/integrations-ci/beats-etcd:${ETCD_VERSION:-3.3.10}-1
     build:
-      context: ./_meta
+      context: ${ETCD_PATH:-.}/_meta
       args:
         ETCD_VERSION: ${ETCD_VERSION:-3.3.10}
     ports:

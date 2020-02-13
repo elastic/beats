@@ -4,7 +4,7 @@ services:
   nginx:
     image: docker.elastic.co/integrations-ci/beats-nginx:${NGINX_VERSION:-1.9}-1
     build: 
-      context: ./_meta
+      context: ${NGINX_PATH:-.}/_meta
       args:
         NGINX_VERSION: ${NGINX_VERSION:-1.9}
     ports:

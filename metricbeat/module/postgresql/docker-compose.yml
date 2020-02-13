@@ -4,7 +4,7 @@ services:
   postgresql:
     image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-9.5.3}-1
     build:
-      context: ./_meta
+      context: ${POSTGRESQL_PATH:-.}/_meta
       args:
         POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-9.5.3}
     ports:

@@ -4,6 +4,6 @@ services:
   munin:
     image: docker.elastic.co/integrations-ci/beats-munin:1
     build:
-      context: ./_meta
+      context: ${MUNIN_PATH:-.}/_meta
     ports:
       - 4949

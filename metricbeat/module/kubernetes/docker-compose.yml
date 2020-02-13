@@ -16,7 +16,7 @@ services:
 
   #kubestate:
   #  build:
-  #    context: ./_meta
+  #    context: ${KUBERNETES_PATH:-.}/_meta
   #    dockerfile: Dockerfile.kube-state
   #  depends_on:
   #    - kubernetes

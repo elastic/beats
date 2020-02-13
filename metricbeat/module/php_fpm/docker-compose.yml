@@ -4,7 +4,7 @@ services:
   phpfpm:
     image: docker.elastic.co/integrations-ci/beats-phpfpm:${PHPFPM_VERSION:-7.1}-1
     build: 
-      context: ./_meta
+      context: ${PHPFPM_PATH:-.}/_meta
       args:
         PHPFPM_VERSION: ${PHPFPM_VERSION:-7.1}
     ports:

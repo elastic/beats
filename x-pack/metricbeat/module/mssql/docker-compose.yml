@@ -4,7 +4,7 @@ services:
   mssql:
     image: docker.elastic.co/integrations-ci/beats-mssql:${MSSQL_VERSION:-2017-GA}-1
     build:
-      context: ./_meta
+      context: ${MSSQL_PATH:-.}/_meta
       args:
         MSSQL_VERSION: ${MSSQL_VERSION:-2017-GA}
     ports:

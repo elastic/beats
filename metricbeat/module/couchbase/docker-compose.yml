@@ -4,7 +4,7 @@ services:
   couchbase:
     image: docker.elastic.co/integrations-ci/beats-couchbase:${COUCHBASE_VERSION:-4.5.1}-1
     build:
-      context: ./_meta
+      context: ${COUCHBASE_PATH:-.}/_meta
       args:
         COUCHBASE_VERSION: ${COUCHBASE_VERSION:-4.5.1}
     ports:

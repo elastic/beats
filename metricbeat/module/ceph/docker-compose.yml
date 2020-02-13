@@ -4,7 +4,7 @@ services:
   ceph:
     image: docker.elastic.co/integrations-ci/beats-ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}-1
     build:
-      context: ./_meta
+      context: ${CEPH_PATH:-.}/_meta
       args:
         CEPH_VERSION: ${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}
     ports:
