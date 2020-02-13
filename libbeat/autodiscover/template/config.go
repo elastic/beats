@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-ucfg"
 )
@@ -81,7 +82,7 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 			continue
 		}
 
-		configs := ApplyConfigTemplate(event, mapping.Configs)
+		configs := ApplyConfigTemplate(event, mapping.Configs, true)
 		if configs != nil {
 			result = append(result, configs...)
 		}
@@ -90,7 +91,7 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 }
 
 // ApplyConfigTemplate takes a set of templated configs and applys information in an event map
-func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Config {
+func ApplyConfigTemplate(event bus.Event, configs []*common.Config, keystoreEnabled bool) []*common.Config {
 	var result []*common.Config
 	// unpack input
 	vars, err := ucfg.NewFrom(map[string]interface{}{
@@ -105,6 +106,11 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
 	}
+
+	if keystoreEnabled {
+		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(keystore.CentralKeystore)))
+	}
+
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
 		if err != nil {

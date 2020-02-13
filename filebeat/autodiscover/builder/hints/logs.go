@@ -108,7 +108,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, false)
 	}
 
 	tempCfg := common.MapStr{}
@@ -162,7 +162,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 	logp.Debug("hints.builder", "generated config %+v", config)
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, []*common.Config{config})
+	return template.ApplyConfigTemplate(event, []*common.Config{config}, false)
 }
 
 func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {

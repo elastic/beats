@@ -585,6 +585,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	b.keystore = store
+	keystore.CentralKeystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
 		return err
