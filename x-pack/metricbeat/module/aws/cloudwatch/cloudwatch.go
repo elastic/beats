@@ -140,10 +140,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// check if endpoint is given from configuration
 			if m.Endpoint != "" {
-				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + m.Endpoint)
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + awsConfig.Region + "." + m.Endpoint)
 			}
 
 			svcCloudwatch := cloudwatch.New(awsConfig)
+
+			// check if endpoint is given from configuration
+			if m.Endpoint != "" {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://resourcegroupstaggingapi." + awsConfig.Region + "." + m.Endpoint)
+			}
 			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
 			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
@@ -164,7 +169,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// check if endpoint is given from configuration
 		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + m.Endpoint)
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + awsConfig.Region + "." + m.Endpoint)
 		}
 
 		svcCloudwatch := cloudwatch.New(awsConfig)

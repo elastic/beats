@@ -89,6 +89,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Get IAM account name
 	// check if endpoint is given from configuration
 	if config.AWSConfig.Endpoint != "" {
+		metricSet.Endpoint = config.AWSConfig.Endpoint
 		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://iam." + config.AWSConfig.Endpoint)
 	}
 

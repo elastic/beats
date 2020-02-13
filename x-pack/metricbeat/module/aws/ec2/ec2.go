@@ -94,7 +94,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// check if endpoint is given from configuration
 		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + m.Endpoint)
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + awsConfig.Region + "." + m.Endpoint)
 		}
 
 		svcEC2 := ec2.New(awsConfig)
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// check if endpoint is given from configuration
 		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + m.Endpoint)
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + awsConfig.Region + "." + m.Endpoint)
 		}
 
 		svcCloudwatch := cloudwatch.New(awsConfig)
