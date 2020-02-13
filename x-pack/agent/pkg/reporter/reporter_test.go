@@ -5,6 +5,7 @@
 package reporter
 
 import (
+	"context"
 	"errors"
 	"testing"
 )
@@ -14,7 +15,7 @@ var result Event
 type testReporter struct{}
 
 func (t *testReporter) Close() error { return nil }
-func (t *testReporter) Report(r Event) error {
+func (t *testReporter) Report(_ context.Context, r Event) error {
 	result = r
 	return nil
 }
@@ -24,9 +25,9 @@ type info struct{}
 func (*info) AgentID() string { return "id" }
 
 func TestTypes(t *testing.T) {
-	rep := NewReporter(nil, &info{}, &testReporter{})
+	rep := NewReporter(context.Background(), nil, &info{}, &testReporter{})
 	// test starting
-	rep.OnStarting("a1")
+	rep.OnStarting(context.Background(), "a1")
 	if r := result.Type(); r != EventTypeState {
 		t.Errorf("OnStarting: expected record type '%v', got '%v'", EventTypeState, r)
 	}
@@ -36,7 +37,7 @@ func TestTypes(t *testing.T) {
 	}
 
 	// test in progress
-	rep.OnRunning("a2")
+	rep.OnRunning(context.Background(), "a2")
 	if r := result.Type(); r != EventTypeState {
 		t.Errorf("OnRunning: expected record type '%v', got '%v'", EventTypeState, r)
 	}
@@ -46,7 +47,7 @@ func TestTypes(t *testing.T) {
 	}
 
 	// test stopping
-	rep.OnStopping("a3")
+	rep.OnStopping(context.Background(), "a3")
 	if r := result.Type(); r != EventTypeState {
 		t.Errorf("OnStopping: expected record type '%v', got '%v'", EventTypeState, r)
 	}
@@ -56,7 +57,7 @@ func TestTypes(t *testing.T) {
 	}
 
 	// test stopped
-	rep.OnStopped("a4")
+	rep.OnStopped(context.Background(), "a4")
 	if r := result.Type(); r != EventTypeState {
 		t.Errorf("OnStopped: expected record type '%v', got '%v'", EventTypeState, r)
 	}
@@ -67,7 +68,7 @@ func TestTypes(t *testing.T) {
 
 	// test failing
 	err := errors.New("e1")
-	rep.OnFailing("a5", err)
+	rep.OnFailing(context.Background(), "a5", err)
 	if r := result.Type(); r != EventTypeError {
 		t.Errorf("OnFailing: expected record type '%v', got '%v'", EventTypeState, r)
 	}
@@ -78,7 +79,7 @@ func TestTypes(t *testing.T) {
 
 	// test fatal
 	err = errors.New("e2")
-	rep.OnFatal("a6", err)
+	rep.OnFatal(context.Background(), "a6", err)
 	if r := result.Type(); r != EventTypeError {
 		t.Errorf("OnFatal: expected record type '%v', got '%v'", EventTypeState, r)
 	}

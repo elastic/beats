@@ -5,6 +5,7 @@
 package operation
 
 import (
+	"context"
 	"os"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -55,14 +56,14 @@ func (o *operationInstall) Check() (bool, error) {
 }
 
 // Run runs the operation
-func (o *operationInstall) Run(application Application) (err error) {
+func (o *operationInstall) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.New(err,
 				o.Name(),
 				errors.TypeApplication,
 				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(application.Name(), err)
+			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 		}
 	}()
 

@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +22,7 @@ func (*agentinfo) AgentID() string { return "id" }
 
 func TestCheckin(t *testing.T) {
 	const withAPIKey = "secret"
+	ctx := context.Background()
 	agentInfo := &agentinfo{}
 
 	t.Run("Propagate any errors from the server", withServerWithAuthClient(
@@ -42,7 +44,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			_, err := cmd.Execute(&request)
+			_, err := cmd.Execute(ctx, &request)
 			require.Error(t, err)
 		},
 	))
@@ -93,7 +95,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -155,7 +157,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -193,7 +195,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -243,7 +245,7 @@ Something went wrong
 
 			request := CheckinRequest{Metadata: meta}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -281,7 +283,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 

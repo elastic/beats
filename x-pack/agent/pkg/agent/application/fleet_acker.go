@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -35,7 +36,7 @@ func newActionAcker(
 	}, nil
 }
 
-func (f *actionAcker) Ack(action fleetapi.Action) error {
+func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
@@ -44,7 +45,7 @@ func (f *actionAcker) Ack(action fleetapi.Action) error {
 		},
 	}
 
-	_, err := cmd.Execute(req)
+	_, err := cmd.Execute(ctx, req)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("acknowledge action '%s' failed", action.ID()), errors.TypeNetwork)
 	}
@@ -52,7 +53,7 @@ func (f *actionAcker) Ack(action fleetapi.Action) error {
 	return nil
 }
 
-func (f *actionAcker) AckBatch(actions []fleetapi.Action) error {
+func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
 	// checkin
 	ids := make([]string, 0, len(actions))
 	for _, action := range actions {
@@ -64,7 +65,7 @@ func (f *actionAcker) AckBatch(actions []fleetapi.Action) error {
 		Actions: ids,
 	}
 
-	_, err := cmd.Execute(req)
+	_, err := cmd.Execute(ctx, req)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' failed", len(actions), actions), errors.TypeNetwork)
 	}
@@ -72,7 +73,7 @@ func (f *actionAcker) AckBatch(actions []fleetapi.Action) error {
 	return nil
 }
 
-func (f *actionAcker) Commit() error {
+func (f *actionAcker) Commit(ctx context.Context) error {
 	return nil
 }
 
@@ -82,11 +83,11 @@ func newNoopAcker() *noopAcker {
 	return &noopAcker{}
 }
 
-func (f *noopAcker) Ack(action fleetapi.Action) error {
+func (f *noopAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	return nil
 }
 
-func (*noopAcker) Commit() error { return nil }
+func (*noopAcker) Commit(ctx context.Context) error { return nil }
 
 var _ fleetAcker = &actionAcker{}
 var _ fleetAcker = &noopAcker{}

@@ -5,6 +5,7 @@
 package operation
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -122,8 +123,8 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	operator, err := NewOperator(l, "p1", cfg, fetcher, installer, stateResolver, nil)
+	ctx := context.Background()
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,9 +139,11 @@ type testMonitorableApp struct {
 	monitor *beats.Monitor
 }
 
-func (*testMonitorableApp) Name() string                                  { return "" }
-func (*testMonitorableApp) Start(cfg map[string]interface{}) error        { return nil }
-func (*testMonitorableApp) Stop()                                         {}
-func (*testMonitorableApp) Configure(config map[string]interface{}) error { return nil }
-func (*testMonitorableApp) State() state.State                            { return state.State{} }
-func (a *testMonitorableApp) Monitor() monitoring.Monitor                 { return a.monitor }
+func (*testMonitorableApp) Name() string                                              { return "" }
+func (*testMonitorableApp) Start(_ context.Context, cfg map[string]interface{}) error { return nil }
+func (*testMonitorableApp) Stop()                                                     {}
+func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
+	return nil
+}
+func (*testMonitorableApp) State() state.State            { return state.State{} }
+func (a *testMonitorableApp) Monitor() monitoring.Monitor { return a.monitor }

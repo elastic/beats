@@ -5,6 +5,8 @@
 package application
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
@@ -54,13 +56,15 @@ func createApplication(
 		return nil, errors.New(err, "initiating application")
 	}
 
+	ctx := context.Background()
+
 	switch mgmt.Mode {
 	case localMode:
 		log.Info("Agent is managed locally")
-		return newLocal(log, pathConfigFile, config)
+		return newLocal(ctx, log, pathConfigFile, config)
 	case fleetMode:
 		log.Info("Agent is managed by Fleet")
-		return newManaged(log, config)
+		return newManaged(ctx, log, config)
 	default:
 		return nil, ErrInvalidMgmtMode
 	}

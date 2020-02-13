@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -97,7 +98,7 @@ func TestActionStore(t *testing.T) {
 			acker := newActionStoreAcker(&testAcker{}, store)
 			require.Equal(t, 0, len(store.Actions()))
 
-			require.NoError(t, acker.Ack(actionPolicyChange))
+			require.NoError(t, acker.Ack(context.Background(), actionPolicyChange))
 			require.Equal(t, 1, len(store.Actions()))
 		}))
 }

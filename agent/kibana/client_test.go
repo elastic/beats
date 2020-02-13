@@ -19,6 +19,7 @@ package kibana
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -35,6 +36,7 @@ import (
 
 // - Prefix.
 func TestHTTPClient(t *testing.T) {
+	ctx := context.Background()
 	t.Run("Simple call", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
@@ -51,7 +53,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -78,7 +80,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -106,7 +108,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -134,7 +136,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 		},
@@ -160,7 +162,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -189,7 +191,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -221,7 +223,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, bytes.NewBuffer([]byte("hello")))
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, bytes.NewBuffer([]byte("hello")))
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)

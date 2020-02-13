@@ -6,6 +6,7 @@ package fleetapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -61,7 +62,7 @@ func NewAckCmd(info agentInfo, client clienter) *AckCmd {
 }
 
 // Execute ACK of actions to the Fleet.
-func (e *AckCmd) Execute(r *AckRequest) (*AckResponse, error) {
+func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, error) {
 	if err := r.Validate(); err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func (e *AckCmd) Execute(r *AckRequest) (*AckResponse, error) {
 	}
 
 	ap := fmt.Sprintf(ackPath, e.info.AgentID())
-	resp, err := e.client.Send("POST", ap, nil, nil, bytes.NewBuffer(b))
+	resp, err := e.client.Send(ctx, "POST", ap, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to ack to fleet",

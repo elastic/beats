@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"sync"
 	"testing"
 
@@ -43,7 +44,7 @@ func TestPolicyChange(t *testing.T) {
 
 		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
-		err := handler.Handle(action, ack)
+		err := handler.Handle(context.Background(), action, ack)
 		require.NoError(t, err)
 		require.Equal(t, config.MustNewConfigFrom(policy), emitter.policy)
 	})
@@ -61,7 +62,7 @@ func TestPolicyChange(t *testing.T) {
 
 		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
-		err := handler.Handle(action, ack)
+		err := handler.Handle(context.Background(), action, ack)
 		require.Error(t, err)
 	})
 }
@@ -84,7 +85,7 @@ func TestPolicyAcked(t *testing.T) {
 
 		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
-		err := handler.Handle(action, tacker)
+		err := handler.Handle(context.Background(), action, tacker)
 		require.Error(t, err)
 
 		actions := tacker.Items()
@@ -106,7 +107,7 @@ func TestPolicyAcked(t *testing.T) {
 
 		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
-		err := handler.Handle(action, tacker)
+		err := handler.Handle(context.Background(), action, tacker)
 		require.NoError(t, err)
 
 		actions := tacker.Items()
@@ -120,7 +121,7 @@ type testAcker struct {
 	ackedLock sync.Mutex
 }
 
-func (t *testAcker) Ack(action fleetapi.Action) error {
+func (t *testAcker) Ack(_ context.Context, action fleetapi.Action) error {
 	t.ackedLock.Lock()
 	defer t.ackedLock.Unlock()
 
@@ -132,7 +133,7 @@ func (t *testAcker) Ack(action fleetapi.Action) error {
 	return nil
 }
 
-func (t *testAcker) Commit() error {
+func (t *testAcker) Commit(_ context.Context) error {
 	return nil
 }
 

@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -163,6 +164,7 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 // - The caller of this method is free to overrides any values found in the headers.
 // - The magic of unpack kibana errors is not done in the Send method, an helper methods is provided.
 func (c *Client) Send(
+	ctx context.Context,
 	method, path string,
 	params url.Values,
 	headers http.Header,
@@ -188,7 +190,7 @@ func (c *Client) Send(
 		}
 	}
 
-	return c.client.Do(req)
+	return c.client.Do(req.WithContext(ctx))
 }
 
 // URI returns the remote URI.

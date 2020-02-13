@@ -6,6 +6,7 @@ package fleetapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -164,7 +165,7 @@ type EnrollCmd struct {
 }
 
 // Execute enroll the Agent in the Fleet.
-func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
+func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollResponse, error) {
 	const p = "/api/fleet/agents/enroll"
 	const key = "Authorization"
 	const prefix = "ApiKey "
@@ -182,7 +183,7 @@ func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 		return nil, errors.New(err, "fail to encode the enrollment request")
 	}
 
-	resp, err := e.client.Send("POST", p, nil, headers, bytes.NewBuffer(b))
+	resp, err := e.client.Send(ctx, "POST", p, nil, headers, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}

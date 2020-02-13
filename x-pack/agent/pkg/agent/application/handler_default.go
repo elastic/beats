@@ -4,13 +4,17 @@
 
 package application
 
-import "github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+import (
+	"context"
+
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+)
 
 type handlerDefault struct {
 	log *logger.Logger
 }
 
-func (h *handlerDefault) Handle(a action, acker fleetAcker) error {
+func (h *handlerDefault) Handle(_ context.Context, a action, acker fleetAcker) error {
 	h.log.Errorf("HandlerDefault: action '%+v' received", a)
 	return nil
 }

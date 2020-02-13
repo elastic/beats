@@ -28,7 +28,7 @@ type backoffClient interface {
 }
 
 // Configure configures the application with the passed configuration.
-func (a *Application) Configure(config map[string]interface{}) (err error) {
+func (a *Application) Configure(ctx context.Context, config map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -51,7 +51,7 @@ func (a *Application) Configure(config map[string]interface{}) (err error) {
 
 		// TODO: check versions(logical clock) in between retries in case newer version sneaked in
 
-		ctx, cancelFn := context.WithTimeout(context.Background(), DefaultTimeout)
+		ctx, cancelFn := context.WithTimeout(ctx, DefaultTimeout)
 		defer cancelFn()
 
 		if a.grpcClient == nil {

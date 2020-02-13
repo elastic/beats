@@ -5,6 +5,8 @@
 package application
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -30,9 +32,11 @@ var ErrNoConfiguration = errors.New("no configuration found", errors.TypeConfig)
 // Local represents a standalone agents, that will read his configuration directly from disk.
 // Some part of the configuration can be reloaded.
 type Local struct {
-	log       *logger.Logger
-	source    source
-	agentInfo *info.AgentInfo
+	bgContext   context.Context
+	cancelCtxFn context.CancelFunc
+	log         *logger.Logger
+	source      source
+	agentInfo   *info.AgentInfo
 }
 
 type source interface {
@@ -42,6 +46,7 @@ type source interface {
 
 // newLocal return a agent managed by local configuration.
 func newLocal(
+	ctx context.Context,
 	log *logger.Logger,
 	pathConfigFile string,
 	config *config.Config,
@@ -53,7 +58,6 @@ func newLocal(
 			return nil, err
 		}
 	}
-
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
@@ -71,9 +75,11 @@ func newLocal(
 		agentInfo: agentInfo,
 	}
 
-	reporter := reporting.NewReporter(log, localApplication.agentInfo, logR)
+	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
 
-	router, err := newRouter(log, streamFactory(config, nil, reporter))
+	reporter := reporting.NewReporter(localApplication.bgContext, log, localApplication.agentInfo, logR)
+
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, config, nil, reporter))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -109,6 +115,7 @@ func (l *Local) Start() error {
 
 // Stop stops a local agent.
 func (l *Local) Stop() error {
+	l.cancelCtxFn()
 	return l.source.Stop()
 }
 

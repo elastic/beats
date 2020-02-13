@@ -5,6 +5,7 @@
 package log
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -37,7 +38,7 @@ func TestReport(t *testing.T) {
 		log := newTestLogger()
 		rep := NewReporter(log, cfg)
 
-		rep.Report(tc.event)
+		rep.Report(context.Background(), tc.event)
 
 		if got := log.info(); tc.expectedInfo != got {
 			t.Errorf("[%s.%s(%v)] expected info '%s' got '%s'", tc.event.Type(), tc.event.SubType(), tc.format, tc.expectedInfo, got)

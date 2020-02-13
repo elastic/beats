@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -56,10 +57,10 @@ func TestAcker(t *testing.T) {
 		}
 	}()
 
-	if err := acker.Ack(testAction); err != nil {
+	if err := acker.Ack(context.Background(), testAction); err != nil {
 		t.Fatal(err)
 	}
-	if err := acker.Commit(); err != nil {
+	if err := acker.Commit(context.Background()); err != nil {
 		t.Fatal(err)
 	}
 }

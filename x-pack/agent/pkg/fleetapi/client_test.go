@@ -5,11 +5,13 @@
 package fleetapi
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,35 +23,36 @@ import (
 )
 
 func TestHTTPClient(t *testing.T) {
-	t.Run("Ensure we validate the remote Kibana version is higher or equal",
-		withServer(
-			func(t *testing.T) *http.ServeMux {
-				msg := `{ message: "hello" }`
-				mux := http.NewServeMux()
-				mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
-					v := r.Header.Get("kbn-version")
-					assert.Equal(t, release.Version(), v)
-					w.WriteHeader(http.StatusOK)
-					fmt.Fprintf(w, msg)
-				}, "abc123"))
-				return mux
-			}, func(t *testing.T, host string) {
-				cfg := &kibana.Config{
-					Host: host,
-				}
+	ctx := context.Background()
 
-				l, err := logger.New()
-				client, err := NewAuthWithConfig(l, "abc123", cfg)
-				require.NoError(t, err)
-				resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
-				require.NoError(t, err)
+	t.Run("Ensure we validate the remote Kibana version is higher or equal", withServer(
+		func(t *testing.T) *http.ServeMux {
+			msg := `{ message: "hello" }`
+			mux := http.NewServeMux()
+			mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
+				v := r.Header.Get("kbn-version")
+				assert.Equal(t, release.Version(), v)
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, msg)
+			}, "abc123"))
+			return mux
+		}, func(t *testing.T, host string) {
+			cfg := &kibana.Config{
+				Host: host,
+			}
 
-				body, err := ioutil.ReadAll(resp.Body)
-				require.NoError(t, err)
-				defer resp.Body.Close()
-				assert.Equal(t, `{ message: "hello" }`, string(body))
-			},
-		))
+			l, err := logger.New()
+			client, err := NewAuthWithConfig(l, "abc123", cfg)
+			require.NoError(t, err)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			require.NoError(t, err)
+
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			assert.Equal(t, `{ message: "hello" }`, string(body))
+		},
+	))
 
 	t.Run("API Key is valid", withServer(
 		func(t *testing.T) *http.ServeMux {
@@ -70,7 +73,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -99,7 +102,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+			_, err = client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.Error(t, err)
 		},
 	))
@@ -124,7 +127,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -139,16 +142,18 @@ func TestHTTPClient(t *testing.T) {
 			"host": "127.0.0.0:7278",
 		})
 
+		timeoutCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+		defer cancel()
 		client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 			return NewFleetAuthRoundTripper(wrapped, "abc123")
 		})
 
-		_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+		_, err = client.Send(timeoutCtx, "GET", "/echo-hello", nil, nil, nil)
 		require.Error(t, err)
 	})
 }
 
-// NOTE(ph): Usually I would be agaisnt testing private methods as much as possible but in this
+// NOTE(ph): Usually I would be against testing private methods as much as possible but in this
 // case since we might deal with different format or error I make sense to test this method in
 // isolation.
 func TestExtract(t *testing.T) {

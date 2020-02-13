@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -21,16 +22,17 @@ import (
 
 // EventProcessor is an processor of application event
 type reporter interface {
-	OnStarting(app string)
-	OnRunning(app string)
-	OnFailing(app string, err error)
-	OnStopping(app string)
-	OnStopped(app string)
-	OnFatal(app string, err error)
+	OnStarting(ctx context.Context, app string)
+	OnRunning(ctx context.Context, app string)
+	OnFailing(ctx context.Context, app string, err error)
+	OnStopping(ctx context.Context, app string)
+	OnStopped(ctx context.Context, app string)
+	OnFatal(ctx context.Context, app string, err error)
 }
 
 type sender interface {
 	Send(
+		ctx context.Context,
 		method string,
 		path string,
 		params url.Values,
@@ -52,10 +54,10 @@ func (b *operatorStream) Execute(cfg *configRequest) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
-func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (stream, error) {
+func streamFactory(ctx context.Context, cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
-		operator, err := newOperator(log, id, cfg, r)
+		operator, err := newOperator(ctx, log, id, cfg, r)
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +69,7 @@ func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.L
 	}
 }
 
-func newOperator(log *logger.Logger, id routingKey, config *config.Config, r reporter) (*operation.Operator, error) {
+func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *config.Config, r reporter) (*operation.Operator, error) {
 	operatorConfig := &operatorCfg.Config{}
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
@@ -85,6 +87,7 @@ func newOperator(log *logger.Logger, id routingKey, config *config.Config, r rep
 	}
 
 	return operation.NewOperator(
+		ctx,
 		log,
 		id,
 		config,
