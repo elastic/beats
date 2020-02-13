@@ -137,8 +137,8 @@ func makeRedis(
 			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", url.Scheme))
 		}
 
-		if url.Scheme == tlsRedisScheme {
-			// @todo how can I force tls if there is no tls config :thinking:
+		if url.Scheme == tlsRedisScheme && transp.TLS == nil {
+			return outputs.Fail(errors.New("using 'rediss' scheme requires a tls config"))
 		}
 
 		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
