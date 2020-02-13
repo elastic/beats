@@ -57,4 +57,3 @@ from
 group by 1,2,3
 order by 1,2,3
 ",0,,"postgres.c",1632,
-2020-02-13 15:39:46.112749 UTC,"mpload","mp_prd",p232068,th-656316288,"10.110.113.62","50094",2020-02-13 15:39:24 UTC,0,con7145447,cmd54,seg-1,,dx12000082,,sx1,"NOTICE","00000","Using default RANDOM distribution since no distribution was specified.",,"Consider including the 'DISTRIBUTED BY' clause to determine the distribution of rows.",,,,"create temp table oio AS ( SELECT has_order, has_item, cnt AS COUNT, ROUND(cnt/SUM(cnt) over (),2)*100 AS percentage_of_transactions FROM ( SELECT CASE WHEN o.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_order, CASE WHEN i.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_item, COUNT(*) AS cnt FROM ( SELECT order_id FROM mp.mp_order_trans_1_prt_31637)o FULL OUTER JOIN ( SELECT order_id FROM mp.mp_item_trans_1_prt_31637)i ON o.order_id = i.order_id GROUP BY 1,2)a GROUP BY 1,2,3 )",0,,"cdbmutate.c",424,
