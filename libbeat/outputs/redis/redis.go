@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,8 +46,8 @@ const (
 	defaultWaitRetry    = 1 * time.Second
 	defaultMaxWaitRetry = 60 * time.Second
 	defaultPort         = 6379
-	redisScheme         = "redis://"
-	tlsRedisScheme      = "rediss://"
+	redisScheme         = "redis"
+	tlsRedisScheme      = "rediss"
 )
 
 func init() {
@@ -125,7 +126,7 @@ func makeRedis(
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		if parts := strings.SplitN(host, "://", 2); len(parts) != 2 {
-			host = redisScheme + host
+			host = fmt.Sprintf("%s://%s", redisScheme, host)
 		}
 
 		hostUrl, err := url.Parse(host)
@@ -138,10 +139,15 @@ func makeRedis(
 		}
 
 		if hostUrl.Scheme == tlsRedisScheme && transp.TLS == nil {
-			return outputs.Fail(errors.New("using 'rediss' scheme requires a tls config"))
+			transp.TLS = &transport.TLSConfig{}
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
+		port := defaultPort
+		if hostUrl.Port() != "" {
+			port, _ = strconv.Atoi(hostUrl.Port())
+		}
+
+		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, port)
 		if err != nil {
 			return outputs.Fail(err)
 		}
