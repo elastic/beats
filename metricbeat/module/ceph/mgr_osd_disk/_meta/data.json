@@ -1,89 +1,31 @@
 {
-    "@timestamp": "2020-02-12T13:08:24.727Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "agent": {
-        "type": "metricbeat",
-        "ephemeral_id": "ee373afc-c2ca-4308-91a2-651e4081d823",
-        "hostname": "host",
-        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
-        "version": "8.0.0"
-    },
-    "event": {
-        "dataset": "http.json_namespace",
-        "module": "ceph",
-        "duration": 43294329
-    },
-    "metricset": {
-        "name": "mgr_osd_disk",
-        "period": 60000
-    },
-    "service": {
-        "address": "localhost:8003",
-        "type": "ceph"
-    },
-    "ecs": {
-        "version": "1.4.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "mgr_osd_disk": {
-            "nodes": [
-                {
-                    "depth": 2,
-                    "reweight": 1,
-                    "pgs": 164,
-                    "crush_weight": 0.009796142578125,
-                    "status": "up",
-                    "id": 0,
-                    "name": "osd.0",
-                    "type_id": 0,
-                    "kb_used_data": 6950784,
-                    "kb_used_omap": 7,
-                    "kb_used_meta": 1048568,
-                    "kb_avail": 2486336,
-                    "var": 1,
-                    "type": "osd",
-                    "kb": 10485760,
-                    "kb_used": 7999424,
-                    "utilization": 76.2884521484375
+        "pool_disk": {
+            "id": 0,
+            "name": "rbd",
+            "stats": {
+                "available": {
+                    "bytes": 0
+                },
+                "objects": 0,
+                "used": {
+                    "bytes": 0,
+                    "kb": 0
                 }
-            ],
-            "stray": [
-                {
-                    "depth": 2,
-                    "reweight": 1,
-                    "pgs": 164,
-                    "crush_weight": 0.009796142578125,
-                    "status": "down",
-                    "id": 1,
-                    "name": "osd.1",
-                    "type_id": 0,
-                    "kb_used_data": 6950784,
-                    "kb_used_omap": 7,
-                    "kb_used_meta": 1048568,
-                    "kb_avail": 2486336,
-                    "var": 1,
-                    "type": "osd",
-                    "kb": 10485760,
-                    "kb_used": 7999424,
-                    "utilization": 76.2884521484375
-                }
-            ],
-            "summary": {
-                "total_kb_used_omap": 7,
-                "average_utilization": 76.2884521484375,
-                "dev": 0,
-                "total_kb_avail": 2486336,
-                "min_var": 1,
-                "max_var": 1,
-                "total_kb": 10485760,
-                "total_kb_used": 7999424,
-                "total_kb_used_data": 6950784,
-                "total_kb_used_meta": 1048568
             }
         }
+    },
+    "event": {
+        "dataset": "ceph.mgr_osd_disk",
+        "duration": 115000,
+        "module": "ceph"
+    },
+    "metricset": {
+        "name": "mgr_osd_disk"
+    },
+    "service": {
+        "address": "127.0.0.1:8003",
+        "type": "ceph"
     }
 }

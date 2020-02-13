@@ -17,17 +17,16 @@
 
 // +build integration,linux
 
-package mgr_cluster_health
+package mgr_osd_disk
 
 import (
 	"testing"
-
-	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 )
 
 const user = "demo"
@@ -40,10 +39,11 @@ func TestData(t *testing.T) {
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	require.NoError(t, err)
 }
+
 func getConfig(host, password string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                "ceph",
-		"metricsets":            []string{"mgr_cluster_health"},
+		"metricsets":            []string{"mgr_osd_disk"},
 		"hosts":                 []string{host},
 		"username":              user,
 		"password":              password,

@@ -36,6 +36,8 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand([
         "mgr_cluster_disk",
+        "mgr_cluster_health",
+        "mgr_osd_disk"
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_ceph_mgr(self, metricset):

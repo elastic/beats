@@ -4025,122 +4025,69 @@ type: keyword
 [float]
 === mgr_osd_disk
 
-OSD disk metrics of Ceph cluster
+mgr_osd_disk
 
 
 
-*`ceph.mgr_osd_disk.nodes`*::
+*`ceph.mgr_osd_disk.id`*::
 +
 --
-`nodes` contains information about active nodes.
+Id of the pool
 
-
-type: nested
-
---
-
-*`ceph.mgr_osd_disk.stray`*::
-+
---
-`stray` contains information about stray OSD nodes.
-
-
-type: nested
-
---
-
-[float]
-=== summary
-
-`summary` contains general information about OSDs.
-
-
-
-*`ceph.mgr_osd_disk.summary.total_kb_used_omap`*::
-+
---
-Total used space for omap (in KB)
 
 type: long
 
 --
 
-*`ceph.mgr_osd_disk.summary.average_utilization`*::
+*`ceph.mgr_osd_disk.name`*::
 +
 --
-Average space utilization
+Name of the pool
+
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_disk.stats.available.bytes`*::
++
+--
+Available bytes of the pool
+
+
+type: long
+
+format: bytes
+
+--
+
+*`ceph.mgr_osd_disk.stats.objects`*::
++
+--
+Number of objects of the pool
+
 
 type: long
 
 --
 
-*`ceph.mgr_osd_disk.summary.dev`*::
+*`ceph.mgr_osd_disk.stats.used.bytes`*::
 +
 --
-Deviation
+Used bytes of the pool
+
 
 type: long
 
+format: bytes
+
 --
 
-*`ceph.mgr_osd_disk.summary.total_kb_avail`*::
+*`ceph.mgr_osd_disk.stats.used.kb`*::
 +
 --
-Total available space (in KB)
+Used kb of the pool
 
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.min_var`*::
-+
---
-Minimal variant
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.max_var`*::
-+
---
-Maximal variant
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.total_kb`*::
-+
---
-Total space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.total_kb_used`*::
-+
---
-Total used space (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.total_kb_used_data`*::
-+
---
-Total used space for data (in KB)
-
-type: long
-
---
-
-*`ceph.mgr_osd_disk.summary.total_kb_used_meta`*::
-+
---
-Total used space for meta (in KB)
 
 type: long
 

@@ -1,153 +1,32 @@
 - name: mgr_osd_disk
   type: group
   description: >
-    OSD disk metrics of Ceph cluster
+    mgr_osd_disk
   release: beta
   fields:
-    - name: nodes
-      type: nested
+    - name: id
+      type: long
       description: >
-        `nodes` contains information about active nodes.
-      fields:
-        - name: depth
-          type: long
-          description: Depth
-        - name: reweight
-          type: long
-          description: Reweight (controls how much data the system tries to allocate to the OSD)
-        - name: pgs
-          type: long
-          description: Number of PGs
-        - name: crush_weight
-          type: scaled_float
-          description: CRUSH weight
-        - name: status
-          type: keyword
-          description: Node status
-        - name: id
-          type: long
-          description: ID
-        - name: name
-          type: keyword
-          description: Name
-        - name: type_id
-          type: long
-          description: Type ID
-        - name: kb_used_data
-          type: long
-          description: Used data (in KB)
-        - name: kb_used_omap
-          type: long
-          description: Used omap (in KB)
-        - name: kb_used_meta
-          type: long
-          description: Used meta (in KB)
-        - name: kb_avail
-          type: long
-          description: Available space (in KB)
-        - name: var
-          type: long
-          description: Var
-        - name: type
-          type: keyword
-          description: Type
-        - name: kb
-          type: long
-          description: Total space (in KB)
-        - name: kb_used
-          type: long
-          description: Used space (in KB)
-        - name: Utilization
-          type: long
-          description: Space utilization
-    - name: stray
-      type: nested
+        Id of the pool
+    - name: name
+      type: keyword
       description: >
-        `stray` contains information about stray OSD nodes.
-      fields:
-        - name: depth
-          type: long
-          description: Depth
-        - name: reweight
-          type: long
-          description: Reweight (controls how much data the system tries to allocate to the OSD)
-        - name: pgs
-          type: long
-          description: Number of PGs
-        - name: crush_weight
-          type: scaled_float
-          description: CRUSH weight
-        - name: status
-          type: keyword
-          description: Node status
-        - name: id
-          type: long
-          description: ID
-        - name: name
-          type: keyword
-          description: Name
-        - name: type_id
-          type: long
-          description: Type ID
-        - name: kb_used_data
-          type: long
-          description: Used space for data (in KB)
-        - name: kb_used_omap
-          type: long
-          description: Used space for omap (in KB)
-        - name: kb_used_meta
-          type: long
-          description: Used space for meta (in KB)
-        - name: kb_avail
-          type: long
-          description: Available space (in KB)
-        - name: var
-          type: long
-          description: Var
-        - name: type
-          type: keyword
-          description: Type
-        - name: kb
-          type: long
-          description: Total space (in KB)
-        - name: kb_used
-          type: long
-          description: Used space (in KB)
-        - name: utilization
-          type: long
-          description: Space utilization
-    - name: summary
-      type: group
+        Name of the pool
+    - name: stats.available.bytes
+      type: long
       description: >
-        `summary` contains general information about OSDs.
-      fields:
-        - name: total_kb_used_omap
-          type: long
-          description: Total used space for omap (in KB)
-        - name: average_utilization
-          type: long
-          description: Average space utilization
-        - name: dev
-          type: long
-          description: Deviation
-        - name: total_kb_avail
-          type: long
-          description: Total available space (in KB)
-        - name: min_var
-          type: long
-          description: Minimal variant
-        - name: max_var
-          type: long
-          description: Maximal variant
-        - name: total_kb
-          type: long
-          description: Total space (in KB)
-        - name: total_kb_used
-          type: long
-          description: Total used space (in KB)
-        - name: total_kb_used_data
-          type: long
-          description: Total used space for data (in KB)
-        - name: total_kb_used_meta
-          type: long
-          description: Total used space for meta (in KB)
+        Available bytes of the pool
+      format: bytes
+    - name: stats.objects
+      type: long
+      description: >
+        Number of objects of the pool
+    - name: stats.used.bytes
+      type: long
+      description: >
+        Used bytes of the pool
+      format: bytes
+    - name: stats.used.kb
+      type: long
+      description: >
+        Used kb of the pool

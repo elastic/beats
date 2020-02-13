@@ -17,15 +17,15 @@
         }
     },
     "event": {
-        "dataset": "ceph.cluster_health",
+        "dataset": "ceph.mgr_cluster_health",
         "duration": 115000,
         "module": "ceph"
     },
     "metricset": {
-        "name": "cluster_health"
+        "name": "mgr_cluster_health"
     },
     "service": {
-        "address": "127.0.0.1:5000",
+        "address": "127.0.0.1:8003",
         "type": "ceph"
     }
 }

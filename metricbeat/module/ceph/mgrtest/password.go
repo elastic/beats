@@ -15,38 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration,linux
-
-package mgr_cluster_disk
+package mgrtest
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 )
 
-const user = "demo"
-
-func TestData(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 120, "ceph-mgr")
-
-	f := mbtest.NewReportingMetricSetV2Error(t,
-		getConfig(service.HostForPort(8003), mgrtest.GetPassword(t, service.HostForPort(5000), user)))
-	err := mbtest.WriteEventsReporterV2Error(f, t, "")
+// GetPassword method returns the password of the given user. Used to authenticate client with Restful API.
+func GetPassword(t *testing.T, host, user string) string {
+	response, err := http.Get(fmt.Sprintf("http://%s/restful-list-keys.json", host))
 	require.NoError(t, err)
-}
 
-func getConfig(host, password string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":                "ceph",
-		"metricsets":            []string{"mgr_cluster_disk"},
-		"hosts":                 []string{host},
-		"username":              user,
-		"password":              password,
-		"ssl.verification_mode": "none",
-	}
+	defer response.Body.Close()
+
+	accounts := map[string]string{}
+	json.NewDecoder(response.Body).Decode(&accounts)
+	return accounts[user]
 }
