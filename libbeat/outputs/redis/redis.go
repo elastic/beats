@@ -128,16 +128,16 @@ func makeRedis(
 			host = redisScheme + host
 		}
 
-		url, err := url.Parse(host)
+		hostUrl, err := url.Parse(host)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		if url.Scheme != redisScheme && url.Scheme != tlsRedisScheme {
-			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", url.Scheme))
+		if hostUrl.Scheme != redisScheme && hostUrl.Scheme != tlsRedisScheme {
+			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
 		}
 
-		if url.Scheme == tlsRedisScheme && transp.TLS == nil {
+		if hostUrl.Scheme == tlsRedisScheme && transp.TLS == nil {
 			return outputs.Fail(errors.New("using 'rediss' scheme requires a tls config"))
 		}
 
@@ -147,7 +147,7 @@ func makeRedis(
 		}
 
 		pass := config.Password
-		hostPass, passSet := url.User.Password()
+		hostPass, passSet := hostUrl.User.Password()
 		if passSet {
 			pass = hostPass
 		}
