@@ -1,0 +1,45 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: httpjson
+  - name: api_key
+    default: ""
+  - name: http_client_timeout
+    default: 60
+  - name: http_method
+    default: GET
+  - name: http_headers
+    default: |-
+      {}
+  - name: http_request_body
+    default: |-
+      {}
+  - name: interval
+    default: 0
+  - name: json_objects_array
+    default: ""
+  - name: json_top_level_array
+    default: true
+  - name: pagination
+    default: |-
+      {
+        "enabled": true,
+        "extra_body_content": {},
+        "header_link": "rel=\"next\""
+        "id_field": "",
+        "req_field": "",
+        "url": ""
+      }
+  - name: url
+    default: ""
+  - name: ssl
+    default: |-
+      {}
+
+input: config/input.yml
+ingest_pipeline: ingest/pipeline.json
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip
