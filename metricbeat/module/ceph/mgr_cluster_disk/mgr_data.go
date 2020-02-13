@@ -18,25 +18,11 @@
 package mgr_cluster_disk
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/ceph/mgr"
 )
-
-type Request struct {
-	HasFailed bool     `json:"has_failed"`
-	Finished  []Result `json:"finished"`
-	Failed    []Result `json:"failed"`
-}
-
-type Result struct {
-	Command string `json:"command"`
-	Outb    string `json:"outb"`
-	Outs    string `json:"outs"`
-}
 
 type DfResponse struct {
 	Stats struct {
@@ -47,25 +33,8 @@ type DfResponse struct {
 }
 
 func eventMapping(content []byte) (common.MapStr, error) {
-	var request Request
-	err := json.Unmarshal(content, &request)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not get request data")
-	}
-
-	if request.HasFailed {
-		if len(request.Failed) != 1 {
-			return nil, errors.New("expected single failed command")
-		}
-		return nil, fmt.Errorf("%s: %s", request.Failed[0].Outs, request.Failed[0].Command)
-	}
-
-	if len(request.Finished) != 1 {
-		return nil, errors.New("expected single finished command")
-	}
-
 	var response DfResponse
-	err = json.Unmarshal([]byte(request.Finished[0].Outb), &response)
+	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get response data")
 	}

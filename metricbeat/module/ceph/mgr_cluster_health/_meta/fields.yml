@@ -1,206 +1,22 @@
 - name: mgr_cluster_health
   type: group
-  description: Status metrics of Ceph cluster
+  description: >
+    mgr_cluster_health
   release: beta
   fields:
-    - name: fsid
+    - name: overall_status
       type: keyword
-      description: File System ID, a unique identifier for the cluster
-    - name: quorum_age
-      type: long
-      description: Cluster quarum age
-    - name: monmap
-      type: group
       description: >
-        `monmap` contains information about cluster monitors.
-      fields:
-        - name: min_mon_release
-          type: long
-          description: Minimal monitor release
-        - name: min_mon_release_name
-          type: keyword
-          description: Minimal monitor release name
-        - name: features
-          type: group
-          description: >
-            `features` contains information about available cluster features.
-          fields:
-            - name: persistent
-              type: keyword
-              description: Persistent feature
-            - name: optional
-              type: keyword
-              description: Optional feature
-        - name: mons
-          type: group
-          description: >
-            `mons` contains information about monitor configurations.
-          fields:
-            - name: public_addr
-              type: keyword
-              description: Monitor public address
-            - name: rank
-              type: long
-              description: Monitor rank
-            - name: name
-              type: keyword
-              description: Monitor name
-            - name: public_addrs
-              type: group
-              description: Monitor public addresses
-              fields:
-                - name: addrvec
-                  type: nested
-                  description: >
-                    `addrvec` contains details of all public addresses.
-                  fields:
-                    - name: type
-                      type: keyword
-                      description: Address type
-                    - name: addr
-                      type: keyword
-                      description: Host and port of monitor
-                    - name: nonce
-                      type: long
-                      description: Nonce value
-            - name: addr
-              type: keyword
-              description: Monitor address
-        - name: epoch
-          type: long
-          description: Epoch version
-        - name: fsid
-          type: keyword
-          description: File System ID, a unique identifier for the cluster
-        - name: modified
-          type: date
-          description: Last modification time and date
-        - name: created
-          type: date
-          description: Creation time and date
-    - name: pgmap
-      type: group
-      description: >
-        `pgmap` contains information about placement groups.
-      fields:
-        - name: num_pgs
-          type: long
-          description: Number of PGs
-        - name: bytes_avail
-          type: long
-          description: Available bytes
-        - name: read_bytes_sec
-          type: long
-          description: Average number of bytes read per second
-        - name: write_bytes_sec
-          type: long
-          description: Average number of bytes written per second
-        - name: bytes_used
-          type: long
-          description: Used bytes
-        - name: bytes_total
-          type: long
-          description: Total bytes
-        - name: read_op_per_sec
-          type: long
-          description: Read operations per second
-        - name: write_op_per_sec
-          type: long
-          description: Write operations per second
-        - name: pgs_by_state
-          type: nested
-          description: >
-            `pgs_by_state` contains information about PGs' states.
-          fields:
-            - name: state_name
-              type: keyword
-              description: State name
-            - name: count
-              type: long
-              description: Count
-        - name: num_pools
-          type: long
-          description: Number of pools
-        - name: num_objects
-          type: long
-          description: Number of objects
-        - name: data_bytes
-          type: long
-          description: Data bytes
-    - name: health
-      type: group
-      description: >
-        `health` contains general information about cluster status.
-      fields:
-        - name: status
-          type: keyword
-          description: Health status
-    - name: election_epoch
+        Overall status of the cluster
+    - name: timechecks.epoch
       type: long
-      description: Election epoch
-    - name: quorum
+      description: >
+        Map version
+    - name: timechecks.round.value
       type: long
-      description: Quorum ID
-    - name: quorum_names
+      description: >
+        timecheck round
+    - name: timechecks.round.status
       type: keyword
-      description: Quorum names
-    - name: osdmap
-      type: group
       description: >
-        `osdmap` contains information about OSDs.
-      fields:
-        - name: epoch
-          type: long
-          description: Epoch version
-        - name: num_osds
-          type: long
-          description: Number of OSDs
-        - name: num_up_osds
-          type: long
-          description: Number of up OSDs
-        - name: num_in_osds
-          type: long
-          description: Number of in OSDs
-        - name: num_remapped_pgs
-          type: long
-          description: Number of remapped OSDs
-    - name: fsmap
-      type: group
-      description: >
-        `fsmap` contains information about file systems.
-      fields:
-        - name: in
-          type: long
-          description: File system in
-        - name: max
-          type: long
-          description: File system max
-        - name: up:standby
-          type: long
-          description: File system up:standby
-        - name: epoch
-          type: long
-          description: Epoch version
-        - name: up
-          type: long
-          description: File system up
-        - name: by_rank
-          type: nested
-          description: >
-            `by_rank` contains information about file systems sorted by rank.
-          fields:
-            - name: filesystem_id
-              type: long
-              description: File system ID
-            - name: rank
-              type: long
-              description: File system rank
-            - name: name
-              type: keyword
-              description: File system name
-            - name: status
-              type: keyword
-              description: File system status
-            - name: gid
-              type: long
-              description: File system GID
+        Status of the round
