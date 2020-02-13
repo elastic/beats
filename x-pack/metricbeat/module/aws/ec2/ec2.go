@@ -94,10 +94,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// check if endpoint is given from configuration
 		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + awsConfig.Region + "." + m.Endpoint)
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + regionName + "." + m.Endpoint)
 		}
-
 		svcEC2 := ec2.New(awsConfig)
+
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -108,10 +108,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// check if endpoint is given from configuration
 		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + awsConfig.Region + "." + m.Endpoint)
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + regionName + "." + m.Endpoint)
 		}
-
 		svcCloudwatch := cloudwatch.New(awsConfig)
+
 		namespace := "AWS/EC2"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
@@ -142,7 +142,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// Create Cloudwatch Events for EC2
 			events, err := m.createCloudWatchEvents(metricDataOutput, instancesOutputs, regionName)
-
 			if err != nil {
 				m.Logger().Error(err.Error())
 				report.Error(err)

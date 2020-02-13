@@ -121,23 +121,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		metricSet.AccountID = *outputIdentity.Account
 	}
 
-	// Construct MetricSet when endpoint is given
-	// When endpoint is given, use endpoint_region as RegionsList.
-	if config.AWSConfig.Endpoint != "" {
-		// When use an endpoint with no Region, AWS routes the request to US East
-		// (N. Virginia) (us-east-1), which is the default Region for API calls.
-		metricSet.RegionsList = []string{"us-east-1"}
-		if config.AWSConfig.EndpointRegion != "" {
-			metricSet.RegionsList = []string{config.AWSConfig.EndpointRegion}
-		}
-
-		return &metricSet, nil
-	}
-
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		// set default region to make initial aws api call
-		awsConfig.Region = "us-west-1"
+		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + config.AWSConfig.Endpoint)
 		svcEC2 := ec2.New(awsConfig)
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
