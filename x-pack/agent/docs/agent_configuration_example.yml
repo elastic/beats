@@ -89,38 +89,55 @@ datasources:
          - id?: {id}
            enabled?: false # default true
            metricset: cpu
-           period: 10s
            dataset: system.cpu
            metrics: ["percentages", "normalized_percentages"]
+           period: 10s
          - metricset: memory
            dataset: system.memory
+           period: 10s
          - metricset: diskio
            dataset: system.diskio
+           period: 10s
          - metricset: load
            dataset: system.load
+           period: 10s
          - metricset: memory
            dataset: system.memory
+           period: 10s
          - metricset: process
            dataset: system.process
            processes: ["firefox*"]
+           include_top_n:
+              by_cpu: 5      # include top 5 processes by CPU
+              by_memory: 5   # include top 5 processes by memory
+           period: 10s
          - metricset: process_summary
            dataset: system.process_summary
+           period: 10s
          - metricset: uptime
            dataset: system.uptime
+           period: 15m
          - metricset: socket_summary
            dataset: system.socket_summary
+           period: 10s
          - metricset: filesystem
            dataset: system.filesystem
+           period: 10s
          - metricset: raid
            dataset: system.raid
+           period: 10s
          - metricset: socket
            dataset: system.socket
+           period: 10s
          - metricset: service
            dataset: system.service
+           period: 10s
          - metricset: fsstat
            dataset: system.fsstat
+           period: 10s
          - metricset: foo
            dataset: system.foo
+           period: 10s
 
 
   #################################################################################################
@@ -211,23 +228,26 @@ datasources:
         # buckets?
         - type: s3
           credential_profile_name: fb-aws
+          #shared_credential_file: /etc/filebeat/aws_credentials
           streams:
           - id?: {id}
-            metricset: s3
-            dataset: aws/s3
-            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+            dataset: aws.s3
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           - id?: {id}
-            metricset: s3access
-            dataset: aws/s3access
+            dataset: aws.s3access
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
           - id?: {id}
-            metricset: s3access
             dataset: aws.vpcflow
-            queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
+          - id?: {id}
+            dataset: aws.cloudtrail
+            queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
        - type: aws/metrics
-         # access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-         # secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-         # session_token: '${AWS_SESSION_TOKEN:""}'
-         credential_profile_name: test-mb
+         access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+         secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+         session_token: '${AWS_SESSION_TOKEN:""}'
+         #credential_profile_name: test-mb
+         #shared_credential_file: ...
          streams:
           - id?: {id}
             metricset: usage
@@ -270,19 +290,19 @@ datasources:
           - id?: {id}
             metricset: billing
             dataset: aws.billing
-            period: 12
+            period: 12h
           - id?: {id}
             metricset: billing
             dataset: aws.billing
-            period: 12
+            period: 12h
           - id?: {id}
             metricset: s3_daily_storage
             dataset: aws.s3_daily_storage
-            period: 24
+            period: 24h
           - id?: {id}
             metricset: s3_request
             dataset: aws.s3_request
-            period: 24
+            period: 24h
 
 
   #################################################################################################
