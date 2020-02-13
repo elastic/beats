@@ -46,7 +46,7 @@ type MetricSet struct {
 
 // Config for the iis website metricset.
 type Config struct {
-	Names []string `config:"app_pool_name"`
+	Names []string `config:"application_pool.name"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -58,12 +58,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := NewReader()
+	reader, err := newReader()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := reader.InitCounters(config.Names); err != nil {
+	if err := reader.initCounters(config.Names); err != nil {
 		return nil, err
 	}
 	return &MetricSet{
@@ -82,7 +82,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return nil
 	}
 
-	events, err := m.reader.Fetch(config.Names)
+	events, err := m.reader.fetch(config.Names)
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
@@ -93,10 +93,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-
 	return nil
 }
-
-
-
-

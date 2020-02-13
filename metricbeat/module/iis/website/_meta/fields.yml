@@ -1,6 +1,8 @@
-- name: website
-  type: group
+- name: website.*
+  release: beta
+  type: object
+  object_type: float
+  object_type_mapping_type: "*"
   description: >
     website
-  release: beta
 

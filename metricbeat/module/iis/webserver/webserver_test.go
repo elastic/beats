@@ -15,4 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build windows
+
 package webserver
+
+import (
+	"github.com/elastic/beats/metricbeat/mb"
+	"os"
+)
+
+func init() {
+	// To be moved to some kind of helper
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+}

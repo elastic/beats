@@ -4,7 +4,11 @@
   description: >
     application_pool
   fields:
-    - name: example
+    - name: name
       type: keyword
       description: >
-        Example field
+        application pool name
+    - name: worker_processor_id
+      type: keyword
+      description: >
+        worker processor id

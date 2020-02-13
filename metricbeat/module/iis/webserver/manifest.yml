@@ -5,7 +5,7 @@ input:
   defaults:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
-    perfmon.group_all_counter: true
+    perfmon.group_all_counter: "worker_process_count"
     perfmon.counters:
     #network
     - instance_label: ''

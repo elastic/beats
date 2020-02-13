@@ -1,19 +1,57 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp" : "2020-02-12T15:40:39.727Z",
+    "service" : {
+        "type" : "iis"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"iis",
-        "name":"webserver",
-        "rtt":44269
-    },
-    "iis":{
-        "webserver":{
-            "example": "webserver"
+    "iis" : {
+        "webserver" : {
+            "process" : {
+                "worker_process_count" : 4,
+                "virtual_bytes" : 2.699976704E9,
+                "io_read_operations_per_sec" : 0,
+                "page_faults_per_Sec" : 0,
+                "private_byte" : 6.5712128E7,
+                "working_set" : 1396736.0,
+                "handle_count" : 0,
+                "cpu_usage_perc" : 0,
+                "io_write_operations_per_sec" : 0,
+                "thread_count" : 0
+            },
+            "network" : {
+                "total_delete_requests" : 0,
+                "bytes_received_per_sec" : 0,
+                "total_post_requests" : 0,
+                "delete_requests_per_sec" : 0,
+                "total_connection_attempts" : 73,
+                "bytes_sent_per_sec" : 0,
+                "get_requests_per_sec" : 0,
+                "maximum_connections" : 11,
+                "total_bytes_received" : 68170,
+                "service_uptime" : 588930,
+                "total_get_requests" : 162,
+                "total_bytes_sent" : 2898527.0,
+                "post_requests_per_sec" : 0
+            },
+            "cache" : {
+                "total_uris_cached" : 24,
+                "uri_cache_misses" : 161,
+                "file_cache_hits" : 21,
+                "maximum_file_cache_memory_usage" : 696,
+                "output_cache_current_memory_usage" : 0,
+                "total_files_cached" : 4,
+                "current_file_cache_memory_usage" : 0,
+                "uri_cache_hits" : 21,
+                "file_cache_misses" : 45,
+                "current_files_cached" : 0,
+                "output_cache_total_hits" : 0,
+                "output_cache_current_items" : 0,
+                "output_cache_total_misses" : 182,
+                "current_uris_cached" : 0
+            }
         }
     },
-    "type":"metricsets"
+    "metricset" : {
+        "name" : "webserver",
+        "period" : 10000
+    }
 }

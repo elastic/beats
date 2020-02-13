@@ -20,7 +20,6 @@
 package application_pool
 
 import (
-	"github.com/elastic/beats/metricbeat/module/iis"
 	"github.com/elastic/go-sysinfo"
 	"strings"
 
@@ -32,7 +31,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// Reader will contain the config options
+// Reader  strucr will contain the pdh query and config options
 type Reader struct {
 	Query            pdh.Query         // PDH Query
 	ApplicationPools []ApplicationPool // Mapping of counter path to key used for the label (e.g. processor.name)
@@ -41,20 +40,39 @@ type Reader struct {
 	WorkerProcesses  map[string]string
 }
 
+// ApplicationPool struct contains the list of applications and their worker processes
 type ApplicationPool struct {
 	Name             string
 	WorkerProcessIds []int
 	counters         map[string]string
 }
 
+// WorkerProcess struct contains the worker process details
 type WorkerProcess struct {
 	ProcessId    int
 	InstanceName string
-	counters     map[string]string
 }
 
-// NewReader creates a new instance of Reader.
-func NewReader() (*Reader, error) {
+var appPoolCounters = map[string]string{
+	"worker_process_id":                    "\\Process(w3wp*)\\ID Process",
+	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
+	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
+	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
+	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
+	"process.private_byte":                 "\\Process(w3wp*)\\Private Bytes",
+	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
+	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
+	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
+	"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
+	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
+	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
+	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
+	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
+	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
+}
+
+// newReader creates a new instance of Reader.
+func newReader() (*Reader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
@@ -67,12 +85,20 @@ func NewReader() (*Reader, error) {
 	return reader, nil
 }
 
-func (re *Reader) InitCounters(filtered []string) error {
+// initCounters func retrieves the running application worker processes and adds the counters to the pdh query
+func (re *Reader) initCounters(filtered []string) error {
 	apps, err := getApplicationPools(filtered)
+	if err != nil {
+		return errors.Wrap(err, "failed retrieving running worker processes")
+	}
+	if len(apps) == 0 {
+		re.log.Info("no running application pools found")
+		return nil
+	}
 	re.ApplicationPools = apps
 	re.WorkerProcesses = make(map[string]string)
 	var newQueries []string
-	for key, value := range iis.AppPoolCounters {
+	for key, value := range appPoolCounters {
 		counters, err := re.Query.ExpandWildCardPath(value)
 		if err != nil {
 			return errors.Wrapf(err, `failed to expand counter path (query="%v")`, value)
@@ -92,24 +118,22 @@ func (re *Reader) InitCounters(filtered []string) error {
 	return nil
 }
 
-// Read executes a query and returns those values in an event.
-func (re *Reader) Fetch(names []string) ([]mb.Event, error) {
-	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
-	if len(re.Query.Counters) == 0 {
-		return nil, errors.New("no counters to read")
-	}
-
+// fetch executes collects the query data and maps the counter values to events.
+func (re *Reader) fetch(names []string) ([]mb.Event, error) {
 	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
-	if re.hasRun {
-		err := re.InitCounters(names)
+	if re.hasRun || len(re.Query.Counters) == 0 {
+		err := re.initCounters(names)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed retrieving counters")
 		}
 	}
-
+	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
+	if len(re.Query.Counters) == 0 {
+		return nil, nil
+	}
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := re.Query.CollectData(); err != nil {
@@ -121,6 +145,7 @@ func (re *Reader) Fetch(names []string) ([]mb.Event, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
+
 	workers := getProcessIds(values)
 	events := make(map[string]mb.Event)
 	for _, appPool := range re.ApplicationPools {
@@ -157,11 +182,11 @@ func (re *Reader) Fetch(names []string) ([]mb.Event, error) {
 }
 
 // Close will close the PDH query for now.
-func (re *Reader) Close() error {
+func (re *Reader) close() error {
 	return re.Query.Close()
 }
 
-// getInstances method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
+// getApplicationPools method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
 func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	processes, err := getw3wpProceses()
 	if err != nil {
@@ -170,15 +195,11 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	var appPools = make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
-		//if _, ok:= applicationPools[value]; ok {
-		//	applicationPools[value] = append(applicationPools[value], key)
-		//}
 	}
 	var applicationPools []ApplicationPool
 	for key, value := range appPools {
 		applicationPools = append(applicationPools, ApplicationPool{Name: key, WorkerProcessIds: value})
 	}
-
 	if len(names) == 0 {
 		return applicationPools, nil
 	}
@@ -193,6 +214,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	return filtered, nil
 }
 
+// getw3wpProceses func retrieves the running w3wp process ids
 func getw3wpProceses() (map[int]string, error) {
 	processes, err := sysinfo.Processes()
 	if err != nil {
@@ -218,6 +240,7 @@ func getw3wpProceses() (map[int]string, error) {
 	return wps, nil
 }
 
+// getProcessIds func maps the process ids from the counter values to worker process obj
 func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess {
 	var workers []WorkerProcess
 	for key, values := range counterValues {
@@ -228,6 +251,7 @@ func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess 
 	return workers
 }
 
+// hasWorkerProcess func checks if workerprocess list contains the process id
 func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool {
 	for _, worker := range workers {
 		if worker.InstanceName == instance {

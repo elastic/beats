@@ -18,26 +18,35 @@
 // +build integration
 // +build windows
 
-package application_pool
+package website
 
 import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
+	// Register input module and metricset
+	_ "github.com/elastic/beats/metricbeat/module/windows"
+	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
 )
 
-func TestMetricsetNoErrors(t *testing.T) {
-	config := map[string]interface{}{
-		"module":     "iis",
-		"metricsets": []string{"application_pool"},
-	}
+func TestData(t *testing.T) {
+	m := mbtest.NewFetcher(t, getConfig())
+	m.WriteEvents(t, "")
+}
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, config)
-	mbtest.ReportingFetchV2Error(ms)
-	time.Sleep(60 * time.Millisecond)
-
-	_, errs := mbtest.ReportingFetchV2Error(ms)
+func TestFetch(t *testing.T) {
+	m := mbtest.NewFetcher(t, getConfig())
+	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
-		t.Fatal(errs)
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "iis",
+		"metricsets": []string{"website"},
 	}
 }

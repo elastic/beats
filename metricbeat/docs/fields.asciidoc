@@ -16835,27 +16835,45 @@ application_pool
 
 
 
-*`iis.application_pool.example`*::
+*`iis.application_pool.name`*::
 +
 --
-Example field
+application pool name
 
 
 type: keyword
 
 --
 
-[float]
-=== webserver
+*`iis.application_pool.worker_processor_id`*::
++
+--
+worker processor id
 
+
+type: keyword
+
+--
+
+*`iis.webserver.*.*`*::
++
+--
 webserver
 
 
-[float]
-=== website
+type: object
 
+--
+
+*`iis.website.*`*::
++
+--
 website
 
+
+type: object
+
+--
 
 [[exported-fields-istio]]
 == istio fields

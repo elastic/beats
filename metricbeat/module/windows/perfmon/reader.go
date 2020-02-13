@@ -20,6 +20,7 @@
 package perfmon
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -149,7 +150,7 @@ func (this *Reader) Read(metricset string) ([]mb.Event, error) {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event
-	if this.config.GroupAllCounters && (metricsetName != metricset) {
+	if this.config.GroupAllCountersTo != "" && (metricsetName != metricset) {
 		event := this.groupToEvent(values)
 		events = append(events, event)
 	} else {
@@ -242,7 +243,7 @@ func (this *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Even
 			if val == 1 {
 				continue
 			} else {
-				event.MetricSetFields.Put(strings.Split(key, ".")[0]+".instances", val)
+				event.MetricSetFields.Put(fmt.Sprintf("%s.%s", strings.Split(key, ".")[0], this.config.GroupAllCountersTo), val)
 			}
 		} else {
 			event.MetricSetFields.Put(key, val)

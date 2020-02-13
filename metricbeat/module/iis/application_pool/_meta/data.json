@@ -1,19 +1,26 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp" : "2020-02-13T14:55:27.000Z",
+    "metricset" : {
+        "name" : "application_pool",
+        "period" : 10000
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"iis",
-        "name":"application_pool",
-        "rtt":44269
+    "service" : {
+        "type" : "iis"
     },
-    "iis":{
-        "application_pool":{
-            "example": "application_pool"
+    "iis" : {
+        "application_pool" : {
+            "net_clr" : {
+                "total_exceptions_thrown" : 0
+            },
+            "worker_process_id" : 11956,
+            "name" : "test.local",
+            "process" : {
+                "thread_count" : 32,
+                "private_byte" : 3.4684928E7,
+                "handle_count" : 743,
+                "virtual_bytes" : 6.49535488E8,
+                "working_set" : 4.2012672E7
+            }
         }
-    },
-    "type":"metricsets"
+    }
 }

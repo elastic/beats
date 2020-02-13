@@ -1,5 +1,8 @@
-- name: webserver
-  type: group
+- name: webserver.*.*
+  release: beta
+  type: object
+  object_type: float
+  object_type_mapping_type: "*"
   description: >
     webserver
-  release: beta
+
