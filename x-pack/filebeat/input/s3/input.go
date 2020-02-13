@@ -183,14 +183,14 @@ func (p *s3Input) Run() {
 		awsConfig.Region = regionName
 
 		// check if endpoint is given from configuration
-		if p.config.AwsConfig.Endpoint!= "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://sqs." + regionName + "."+ p.config.AwsConfig.Endpoint)
+		if p.config.AwsConfig.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://sqs." + regionName + "." + p.config.AwsConfig.Endpoint)
 		}
 		svcSQS := sqs.New(awsConfig)
 
 		// check if endpoint is given from configuration
-		if p.config.AwsConfig.Endpoint!= "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://s3." + regionName + "."+ p.config.AwsConfig.Endpoint)
+		if p.config.AwsConfig.Endpoint != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://s3." + regionName + "." + p.config.AwsConfig.Endpoint)
 		}
 		svcS3 := s3.New(awsConfig)
 
