@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -58,7 +59,13 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	if config.Regions == nil {
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
+
+		// check if endpoint is given from configuration
+		if config.AWSConfig.Endpoint != "" {
+			awsCfg.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + awsCfg.Region + "." + config.AWSConfig.Endpoint)
+		}
 		svcEC2 := ec2.New(awsCfg)
+
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
 			return nil, err
@@ -79,6 +86,11 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 		}
 		awsCfg.Region = region
+
+		// check if endpoint is given from configuration
+		if config.AWSConfig.Endpoint != "" {
+			awsCfg.EndpointResolver = awssdk.ResolveWithEndpointURL("https://elasticloadbalancing." + region + "." + config.AWSConfig.Endpoint)
+		}
 		clients = append(clients, elasticloadbalancingv2.New(awsCfg))
 	}
 
