@@ -5,35 +5,12 @@
 package database_account
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+	"os"
 )
 
-var (
-	missingResourcesConfig = common.MapStr{
-		"module":          "azure",
-		"period":          "60s",
-		"metricsets":      []string{"database_account"},
-		"client_secret":   "unique identifier",
-		"client_id":       "unique identifier",
-		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
-	}
-
-	resourceConfig = common.MapStr{
-		"module":          "azure",
-		"period":          "60s",
-		"metricsets":      []string{"database_account"},
-		"client_secret":   "unique identifier",
-		"client_id":       "unique identifier",
-		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
-		"resources": []common.MapStr{
-			{
-				"resource_id": "test",
-				"metrics": []map[string]interface{}{
-					{
-						"name": []string{"*"},
-					}},
-			}},
-	}
-)
+func init() {
+	// To be moved to some kind of helper
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+}
