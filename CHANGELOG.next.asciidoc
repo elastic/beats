@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
 - Update to ECS 1.4.0. {pull}14844[14844]
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
-
+- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
 
 *Auditbeat*
 
@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 
 *Auditbeat*
 

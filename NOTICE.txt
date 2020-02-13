@@ -1518,8 +1518,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.7.0
-Revision: 0539807037ce820e147797f051ff32b05f4f9288
+Version: v0.8.1
+Revision: 093a6898c440d2e5e93abf09850068c60428b2cd
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -6610,6 +6610,34 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/hjson/hjson-go.v3
+Revision: 8f44e1182a33737b57cb6855fe656ece998e9b3c
+License type (autodetected): MIT
+./vendor/gopkg.in/hjson/hjson-go.v3/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2016, 2017 Christian Zangl
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
