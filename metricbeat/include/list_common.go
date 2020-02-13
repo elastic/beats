@@ -36,6 +36,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/ceph/mgr_cluster_health"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/mgr_osd_disk"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/mgr_osd_perf"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/mgr_osd_pool_stats"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/mgr_osd_tree"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/monitor_health"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/osd_df"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/osd_tree"

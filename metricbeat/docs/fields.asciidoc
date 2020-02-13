@@ -4145,136 +4145,174 @@ type: long
 
 --
 
-*`ceph.mgr_osd_pool_stats`*::
-+
---
+[float]
+=== mgr_osd_pool_stats
+
 OSD pool stats of Ceph cluster
 
 
-type: nested
+
+*`ceph.mgr_osd_pool_stats.pool_name`*::
++
+--
+Pool name
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_pool_stats.pool_id`*::
++
+--
+Pool ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_pool_stats.client_io_rate`*::
++
+--
+Client I/O rates
+
+type: object
 
 --
 
 [float]
 === mgr_osd_tree
 
-OSD tree stats of Ceph cluster
+OSD tree information
 
 
 
-*`ceph.mgr_osd_tree.nodes`*::
+*`ceph.mgr_osd_tree.id`*::
 +
 --
-`nodes` contains disk active OSD nodes.
+OSD or bucket node ID
 
 
-type: nested
+type: long
 
 --
 
-[float]
-=== stray
-
-`stray` contains stray OSD nodes.
-
-
-
-*`ceph.mgr_osd_tree.stray.name`*::
+*`ceph.mgr_osd_tree.name`*::
 +
 --
-Node name
+OSD or bucket node name
+
 
 type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.stray.root`*::
+*`ceph.mgr_osd_tree.type`*::
 +
 --
-Node type
+OSD or bucket node type, illegal type include OSD, host, root etc.
+
 
 type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.stray.type_id`*::
+*`ceph.mgr_osd_tree.type_id`*::
 +
 --
-Type ID
+OSD or bucket node type ID
+
 
 type: long
 
 --
 
-*`ceph.mgr_osd_tree.stray.id`*::
+*`ceph.mgr_osd_tree.children`*::
 +
 --
-Node ID
+Bucket children list, separated by comma.
 
-type: long
-
---
-
-*`ceph.mgr_osd_tree.stray.children`*::
-+
---
-Node children
-
-type: long
-
---
-
-*`ceph.mgr_osd_tree.stray.reweight`*::
-+
---
-Reweight
-
-type: long
-
---
-
-*`ceph.mgr_osd_tree.stray.depth`*::
-+
---
-Depth
-
-type: long
-
---
-
-*`ceph.mgr_osd_tree.stray.exists`*::
-+
---
-Exists
-
-type: long
-
---
-
-*`ceph.mgr_osd_tree.stray.status`*::
-+
---
-Node status
 
 type: keyword
 
 --
 
-*`ceph.mgr_osd_tree.stray.primary_affinity`*::
+*`ceph.mgr_osd_tree.crush_weight`*::
 +
 --
-Primary affinity
+OSD node CRUSH weight
+
+
+type: float
+
+--
+
+*`ceph.mgr_osd_tree.depth`*::
++
+--
+Node depth
+
 
 type: long
 
 --
 
-*`ceph.mgr_osd_tree.stray.crush_weight`*::
+*`ceph.mgr_osd_tree.exists`*::
 +
 --
-CRUSH weight
+Node exists (1-yes, 0-no)
 
-type: scaled_float
+
+type: boolean
+
+--
+
+*`ceph.mgr_osd_tree.primary_affinity`*::
++
+--
+Weight of reading data from primary OSD
+
+
+type: float
+
+--
+
+*`ceph.mgr_osd_tree.reweight`*::
++
+--
+Reweight of osd
+
+
+type: long
+
+--
+
+*`ceph.mgr_osd_tree.status`*::
++
+--
+Status of OSD, it should be up or down
+
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_tree.device_class`*::
++
+--
+Device class of OSD, like HDD, SSD etc.
+
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_tree.father`*::
++
+--
+Parent node of this OSD or bucket node
+
+
+type: keyword
 
 --
 

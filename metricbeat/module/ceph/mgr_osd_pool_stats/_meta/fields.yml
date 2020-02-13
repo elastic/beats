@@ -1,5 +1,5 @@
 - name: mgr_osd_pool_stats
-  type: nested
+  type: group
   description: >
     OSD pool stats of Ceph cluster
   release: beta
@@ -8,10 +8,10 @@
       type: keyword
       description: Pool name
     - name: pool_id
-      type: keyword
+      type: long
       description: Pool ID
     - name: client_io_rate
-      type: group
+      type: object
       description: Client I/O rates
       fields:
         - name: read_bytes_sec

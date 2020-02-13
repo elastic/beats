@@ -1,85 +1,27 @@
 {
-    "@timestamp": "2020-02-12T12:59:59.964Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "service": {
-        "address": "localhost:8003",
-        "type": "ceph"
-    },
-    "agent": {
-        "type": "metricbeat",
-        "ephemeral_id": "457300cc-fa5e-4818-b95e-54ca42b978cb",
-        "hostname": "host",
-        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
-        "version": "8.0.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "mgr_osd_pool_stats": [
-            {
-                "pool_name": "rbd",
-                "pool_id": "1",
-                "client_io_rate": {}
-            },
-            {
-                "pool_id": "2",
-                "client_io_rate": {},
-                "pool_name": "cephfs_data"
-            },
-            {
-                "client_io_rate": {},
-                "pool_name": "cephfs_metadata",
-                "pool_id": "3"
-            },
-            {
-                "client_io_rate": {},
-                "pool_name": ".rgw.root",
-                "pool_id": "4"
-            },
-            {
-                "pool_name": "default.rgw.control",
-                "pool_id": "5",
-                "client_io_rate": {}
-            },
-            {
-                "pool_name": "default.rgw.meta",
-                "pool_id": "6",
-                "client_io_rate": {}
-            },
-            {
-                "client_io_rate": {},
-                "pool_name": "default.rgw.log",
-                "pool_id": "7"
-            },
-            {
-                "pool_name": "default.rgw.buckets.index",
-                "pool_id": "8",
-                "client_io_rate": {}
-            },
-            {
-                "pool_name": "scbench",
-                "pool_id": "9",
-                "client_io_rate": {
-                    "read_bytes_sec": "85",
-                    "write_bytes_sec": "802631707",
-                    "read_op_per_sec": "0",
-                    "write_op_per_sec": "336"
-                }
+        "mgr_osd_pool_stats": {
+            "pool_id": "9",
+            "pool_name": "scbench",
+            "client_io_rate": {
+                "read_bytes_sec": "85",
+                "write_bytes_sec": "802631707",
+                "read_op_per_sec": "0",
+                "write_op_per_sec": "336"
             }
-        ]
-    },
-    "ecs": {
-        "version": "1.4.0"
+        }
     },
     "event": {
-        "duration": 9206093,
-        "dataset": "http.json_namespace",
+        "dataset": "ceph.mgr_osd_pool_stats",
+        "duration": 115000,
         "module": "ceph"
     },
     "metricset": {
-        "name": "mgr_osd_pool_stats",
-        "period": 60000
+        "name": "mgr_osd_pool_stats"
+    },
+    "service": {
+        "address": "127.0.0.1:8003",
+        "type": "ceph"
     }
 }

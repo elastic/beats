@@ -1,82 +1,58 @@
 - name: mgr_osd_tree
   type: group
   description: >
-    OSD tree stats of Ceph cluster
+    OSD tree information
   release: beta
   fields:
-    - name: nodes
-      type: nested
+    - name: id
+      type: long
       description: >
-        `nodes` contains disk active OSD nodes.
-      fields:
-        - name: name
-          type: keyword
-          description: Node name
-        - name: root
-          type: keyword
-          description: Node type
-        - name: type_id
-          type: long
-          description: Type ID
-        - name: id
-          type: long
-          description: Node ID
-        - name: children
-          type: long
-          description: Node children
-        - name: reweight
-          type: long
-          description: Reweight
-        - name: depth
-          type: long
-          description: Depth
-        - name: exists
-          type: long
-          description: Exists
-        - name: status
-          type: keyword
-          description: Node status
-        - name: primary_affinity
-          type: long
-          description: Primary affinity
-        - name: crush_weight
-          type: scaled_float
-          description: CRUSH weight
-    - name: stray
-      type: group
+        OSD or bucket node ID
+    - name: name
+      type: keyword
       description: >
-        `stray` contains stray OSD nodes.
-      fields:
-        - name: name
-          type: keyword
-          description: Node name
-        - name: root
-          type: keyword
-          description: Node type
-        - name: type_id
-          type: long
-          description: Type ID
-        - name: id
-          type: long
-          description: Node ID
-        - name: children
-          type: long
-          description: Node children
-        - name: reweight
-          type: long
-          description: Reweight
-        - name: depth
-          type: long
-          description: Depth
-        - name: exists
-          type: long
-          description: Exists
-        - name: status
-          type: keyword
-          description: Node status
-        - name: primary_affinity
-          type: long
-          description: Primary affinity
-        - name: crush_weight
-          type: scaled_float
-          description: CRUSH weight
+        OSD or bucket node name
+    - name: type
+      type: keyword
+      description: >
+        OSD or bucket node type, illegal type include OSD, host, root etc.
+    - name: type_id
+      type: long
+      description: >
+        OSD or bucket node type ID
+    - name: children
+      type: keyword
+      description: >
+        Bucket children list, separated by comma.
+    - name: crush_weight
+      type: float
+      description: >
+        OSD node CRUSH weight
+    - name: depth
+      type: long
+      description: >
+        Node depth
+    - name: exists
+      type: boolean
+      description: >
+        Node exists (1-yes, 0-no)
+    - name: primary_affinity
+      type: float
+      description: >
+        Weight of reading data from primary OSD
+    - name: reweight
+      type: long
+      description: >
+        Reweight of osd
+    - name: status
+      type: keyword
+      description: >
+        Status of OSD, it should be up or down
+    - name: device_class
+      type: keyword
+      description: >
+        Device class of OSD, like HDD, SSD etc.
+    - name: father
+      type: keyword
+      description: >
+        Parent node of this OSD or bucket node
