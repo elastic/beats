@@ -3935,26 +3935,43 @@ type: long
 [float]
 === mgr_cluster_disk
 
-Disk metrics of Ceph cluster
+mgr_cluster_disk
 
 
-*`ceph.mgr_cluster_disk.stats`*::
+
+*`ceph.mgr_cluster_disk.available.bytes`*::
 +
 --
-`stats` contains disk availability statistics.
+Available bytes of the cluster
 
 
-type: nested
+type: long
+
+format: bytes
 
 --
 
-*`ceph.mgr_cluster_disk.pools`*::
+*`ceph.mgr_cluster_disk.total.bytes`*::
 +
 --
-`pools` contains disk pool statistics.
+Total bytes of the cluster
 
 
-type: nested
+type: long
+
+format: bytes
+
+--
+
+*`ceph.mgr_cluster_disk.used.bytes`*::
++
+--
+Used bytes of the cluster
+
+
+type: long
+
+format: bytes
 
 --
 

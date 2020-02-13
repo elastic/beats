@@ -36,11 +36,6 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand([
         "mgr_cluster_disk",
-        "mgr_cluster_health",
-        "mgr_osd_disk",
-        "mgr_osd_perf",
-        "mgr_osd_pool_stats",
-        "mgr_osd_tree",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_ceph_mgr(self, metricset):
@@ -57,5 +52,4 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         for evt in output:
             assert 'ceph' in evt
-            # Fails due to nested objects:
-            # assert self.assert_fields_are_documented(evt)
+            self.assert_fields_are_documented(evt)
