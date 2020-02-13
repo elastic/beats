@@ -5,7 +5,7 @@
 2020-01-29 00:00:01.640393 UTC,"gpadmin","dq_data_model",p713944,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682065,con408755,cmd1,seg-1,,dx889920,x190682065,sx1,"LOG","00000","statement: select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",,,,,,"select count(*) from pg_tables where tablename='heartbeat' and schemaname='public';",0,,"postgres.c",1632,
 2020-01-29 00:00:01.640757 UTC,"gpadmin","vds_prd",p713961,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682066,con408756,cmd1,seg-1,,dx889921,x190682066,sx1,"LOG","00000","statement: select version()",,,,,,"select version()",0,,"postgres.c",1632,
 2020-01-29 00:00:01.650141 UTC,"gpadmin","vds_prd",p714144,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682070,con408757,cmd1,seg-1,,dx889922,x190682070,sx1,"LOG","00000","statement: select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",,,,,,"select count(case when current_query not like '%<IDLE>%' and lower(current_query) <> 'select 1' then 1 end) active_queries from pg_stat_activity;",0,,"postgres.c",1632,
-2020-01-29 00:00:01.653023 UTC,"gpadmin","vds_prd",p714201,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682072,con408759,cmd1,seg-1,,dx889924,x190682072,sx1,"LOG","00000","statement: 
+2020-01-29 00:00:01.653023 UTC,"gpadmin","vds_prd",p714201,th-2019006592,"[local]",,2020-01-29 00:00:01 UTC,190682072,con408759,cmd1,seg-1,,dx889924,x190682072,sx1,"LOG","00000","statement:
 SELECT procpid as w_pid, usename as w_user, 'con' || sess_id  as w_connection,
     string_agg(l_procpid,',') as l_pids,
     string_agg(l_usename,',') as l_users,
@@ -57,4 +57,4 @@ from
 group by 1,2,3
 order by 1,2,3
 ",0,,"postgres.c",1632,
-
+2020-02-13 15:39:46.112749 UTC,"mpload","mp_prd",p232068,th-656316288,"10.110.113.62","50094",2020-02-13 15:39:24 UTC,0,con7145447,cmd54,seg-1,,dx12000082,,sx1,"NOTICE","00000","Using default RANDOM distribution since no distribution was specified.",,"Consider including the 'DISTRIBUTED BY' clause to determine the distribution of rows.",,,,"create temp table oio AS ( SELECT has_order, has_item, cnt AS COUNT, ROUND(cnt/SUM(cnt) over (),2)*100 AS percentage_of_transactions FROM ( SELECT CASE WHEN o.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_order, CASE WHEN i.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_item, COUNT(*) AS cnt FROM ( SELECT order_id FROM mp.mp_order_trans_1_prt_31637)o FULL OUTER JOIN ( SELECT order_id FROM mp.mp_item_trans_1_prt_31637)i ON o.order_id = i.order_id GROUP BY 1,2)a GROUP BY 1,2,3 )",0,,"cdbmutate.c",424,
