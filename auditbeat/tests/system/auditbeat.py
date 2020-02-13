@@ -24,7 +24,7 @@ class BaseTest(MetricbeatTest):
 
     def create_file(self, path, contents):
         f = open(path, 'wb')
-        f.write(contents)
+        f.write(bytes(contents, "utf-8"))
         f.close()
 
     def check_event(self, event, expected):

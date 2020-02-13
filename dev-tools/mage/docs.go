@@ -75,7 +75,7 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 		return err
 	}
 
-	python, err := LookVirtualenvPath(ve, "python")
+	python, err := LookVirtualenvPath(ve, pythonExe)
 	if err != nil {
 		return err
 	}

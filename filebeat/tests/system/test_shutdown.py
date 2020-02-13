@@ -155,7 +155,7 @@ class Test(BaseTest):
             with gzip.open(nasa_log + ".gz", 'rb') as infile:
                 with open(nasa_log, 'w') as outfile:
                     for line in infile:
-                        outfile.write(line)
+                        outfile.write(line.decode("utf-8"))
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/nasa-50k.log"],
                         target_dir="log")
