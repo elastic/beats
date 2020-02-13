@@ -29,9 +29,10 @@ var (
 // This is just a safeguard in case the date format used by the API is
 // updated to include sub-second resolution or timezone information.
 var apiDateFormats = dateFormats{
+	apiDateFormat,
+	apiDateFormat + "Z",
 	time.RFC3339Nano,
 	time.RFC3339,
-	apiDateFormat,
 }
 
 // Date formats used by HTTP/1.1 servers.
