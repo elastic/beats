@@ -15,36 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventlog
+// +build windows
+
+package wineventlog
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type factory func(*common.Config) (EventLog, error)
-type teardown func()
+func TestPublisherMetadataStore(t *testing.T) {
+	logp.TestingSetup()
 
-func fatalErr(t *testing.T, err error) {
+	s, err := newPublisherMetadataStore(
+		NilHandle,
+		"Microsoft-Windows-Security-Auditing",
+		logp.NewLogger("metadata"))
 	if err != nil {
 		t.Fatal(err)
 	}
-}
+	defer s.Close()
 
-func newTestEventLog(t *testing.T, factory factory, options map[string]interface{}) EventLog {
-	config, err := common.NewConfigFrom(options)
-	fatalErr(t, err)
-	eventLog, err := factory(config)
-	fatalErr(t, err)
-	return eventLog
-}
+	assert.NotEmpty(t, s.Events)
+	assert.Empty(t, s.EventFingerprints)
 
-func setupEventLog(t *testing.T, factory factory, recordID uint64, options map[string]interface{}) (EventLog, teardown) {
-	eventLog := newTestEventLog(t, factory, options)
-	fatalErr(t, eventLog.Open(checkpoint.EventLogState{
-		RecordNumber: recordID,
-	}))
-	return eventLog, func() { fatalErr(t, eventLog.Close()) }
+	t.Run("event_metadata_from_handle", func(t *testing.T) {
+		log := openLog(t, security4752File)
+		defer log.Close()
+
+		h := mustNextHandle(t, log)
+		defer h.Close()
+
+		em, err := newEventMetadataFromEventHandle(s.Metadata, h)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.EqualValues(t, 4752, em.EventID)
+		assert.EqualValues(t, 0, em.Version)
+		assert.Empty(t, em.MsgStatic)
+		assert.NotNil(t, em.MsgTemplate)
+		assert.NotEmpty(t, em.EventData)
+	})
 }
