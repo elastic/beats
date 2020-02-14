@@ -34,7 +34,6 @@ var (
 	ErrKeyDoesntExists = errors.New("cannot retrieve the key")
 )
 
-
 // Keystore implement a way to securely saves and retrieves secrets to be used in the configuration
 // Currently all credentials are loaded upfront and are not lazy retrieved, we will eventually move
 // to that concept, so we can deal with tokens that has a limited duration or can be revoked by a

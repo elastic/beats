@@ -305,6 +305,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
 		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
+		autodiscover.SetAutodiscoverKeystore(b.Keystore)
 		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return err

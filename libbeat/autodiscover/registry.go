@@ -58,7 +58,7 @@ func GetAutodiscoverKeystore() keystore.Keystore {
 	return Registry.keystore
 }
 
-// SetAutodiscoverKeystore returns the Keystore object that is coupled with the autodiscover registry
+// SetAutodiscoverKeystore sets the Keystore object that is coupled with the autodiscover registry
 func SetAutodiscoverKeystore(keystore keystore.Keystore) {
 	Registry.keystore = keystore
 }
