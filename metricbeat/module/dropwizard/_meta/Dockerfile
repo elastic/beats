@@ -2,7 +2,6 @@ FROM maven:3.6-jdk-8
 
 # Variables used in pom.xml
 ARG DROPWIZARD_VERSION
-ENV DROPWIZARD_VERSION=${DROPWIZARD_VERSION}
 
 # Build the deployable war
 COPY test /test
