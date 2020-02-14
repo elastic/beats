@@ -2,13 +2,14 @@
 
 type: httpjson
 api_key: {{ .api_key }}
+authentication_scheme: {{.authentication_scheme}}
 http_client_timeout: {{ .http_client_timeout }}
 http_method: {{ .http_method }}
 http_headers: {{ .http_headers }}
 http_request_body: {{ .http_request_body }}
+no_http_body: {{ .no_http_body }}
 interval: {{ .interval }}
 json_objects_array: {{ .json_objects_array }}
-json_top_level_array: {{ .json_top_level_array }}
 pagination: {{ .pagination }}
 url: {{ .url }}
 ssl: {{ .ssl }}
@@ -29,9 +30,5 @@ processors:
       lang: javascript
       id: okta_system_script
       file: ${path.home}/module/okta/system/config/pipeline.js
-  - timestamp:
-      field: json.timestamp
-      layouts:
-        - UNIX
-  - drop_fields:
-      fields: [json]
+      params:
+        keep_original_message: {{ .keep_original_message }}
