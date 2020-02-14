@@ -11,6 +11,7 @@ import metricbeat
 
 logger = logging.getLogger(__name__)
 
+
 @metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['uwsgi_http', 'uwsgi_tcp']
@@ -75,4 +76,3 @@ class Test(metricbeat.BaseTest):
 
     def get_host(self, proto):
         return proto + "://" + self.compose_host(service="uwsgi_"+proto)
-
