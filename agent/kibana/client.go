@@ -77,7 +77,7 @@ func New(
 }
 
 // NewConfigFromURL returns a Kibana Config based on a received host.
-func NewConfigFromURL(kURL string, CAs []string) (*Config, error) {
+func NewConfigFromURL(kURL string) (*Config, error) {
 	u, err := url.Parse(kURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not parse Kibana url")
@@ -96,12 +96,6 @@ func NewConfigFromURL(kURL string, CAs []string) (*Config, error) {
 	c.Path = u.Path
 	c.Username = username
 	c.Password = password
-
-	if len(CAs) > 0 {
-		c.TLS = &tlscommon.Config{
-			CAs: CAs,
-		}
-	}
 
 	return &c, nil
 }

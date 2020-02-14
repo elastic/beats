@@ -15,10 +15,42 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/agent/kibana"
+	"github.com/elastic/beats/agent/release"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
 func TestHTTPClient(t *testing.T) {
+	t.Run("Ensure we validate the remote Kibana version is higher or equal",
+		withServer(
+			func(t *testing.T) *http.ServeMux {
+				msg := `{ message: "hello" }`
+				mux := http.NewServeMux()
+				mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
+					v := r.Header.Get("kbn-version")
+					assert.Equal(t, release.Version(), v)
+					w.WriteHeader(http.StatusOK)
+					fmt.Fprintf(w, msg)
+				}, "abc123"))
+				return mux
+			}, func(t *testing.T, host string) {
+				cfg := &kibana.Config{
+					Host: host,
+				}
+
+				l, err := logger.New()
+				client, err := NewAuthWithConfig(l, "abc123", cfg)
+				require.NoError(t, err)
+				resp, err := client.Send("GET", "/echo-hello", nil, nil, nil)
+				require.NoError(t, err)
+
+				body, err := ioutil.ReadAll(resp.Body)
+				require.NoError(t, err)
+				defer resp.Body.Close()
+				assert.Equal(t, `{ message: "hello" }`, string(body))
+			},
+		))
+
 	t.Run("API Key is valid", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
