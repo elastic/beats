@@ -96,5 +96,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
+* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
+
 include::googlecloud/compute.asciidoc[]
+
+include::googlecloud/loadbalancing.asciidoc[]
 
