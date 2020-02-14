@@ -140,8 +140,11 @@ func (p *Provider) publish(event bus.Event) {
 		event["config"] = config
 	} else {
 		// If there isn't a default template then attempt to use builders
-		if config := p.builders.GetConfig(p.eventer.GenerateHints(event)); config != nil {
+		e := p.eventer.GenerateHints(event)
+		if config := p.builders.GetConfig(e); config != nil {
 			event["config"] = config
+		} else {
+
 		}
 	}
 

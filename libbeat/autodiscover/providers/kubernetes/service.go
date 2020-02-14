@@ -144,6 +144,15 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 
 	hints := builder.GenerateHints(annotations, "", s.config.Prefix)
 	s.logger.Debugf("Generated hints %+v", hints)
+
+	// Fall back to defaults on the namespace if there were no hints on the pods
+	if len(hints) == 0 {
+		if rawAnn, ok := kubeMeta["defaults"]; ok {
+			annotations = rawAnn.(common.MapStr)
+			hints = builder.GenerateHints(annotations, "", s.config.Prefix)
+		}
+	}
+
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
@@ -190,6 +199,19 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		safemapstr.Put(annotations, k, v)
 	}
 	kubemeta["annotations"] = annotations
+
+	if s.namespaceWatcher != nil {
+		if rawNs, ok, err := s.namespaceWatcher.Store().GetByKey(svc.Namespace); ok && err == nil {
+			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
+				defaults := common.MapStr{}
+
+				for k, v := range namespace.GetAnnotations() {
+					safemapstr.Put(defaults, k, v)
+				}
+				kubemeta["defaults"] = defaults
+			}
+		}
+	}
 
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{

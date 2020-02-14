@@ -23,6 +23,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -42,6 +43,7 @@ type pod struct {
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
+	namespaceStore   cache.Store
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
@@ -188,10 +190,18 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
 	p.logger.Debugf("Generated hints %+v", hints)
+
+	// Fall back to defaults on the namespace if there were no hints on the pods
+	if len(hints) == 0 {
+		if rawAnn, ok := kubeMeta["defaults"]; ok {
+			annotations = rawAnn.(common.MapStr)
+			hints = builder.GenerateHints(annotations, cname, p.config.Prefix)
+		}
+	}
+
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
-
 	p.logger.Debugf("Generated builder event %+v", e)
 
 	return e
@@ -296,6 +306,18 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
+		if p.namespaceWatcher != nil {
+			if rawNs, ok, err := p.namespaceWatcher.Store().GetByKey(pod.Namespace); ok && err == nil {
+				if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
+					defaults := common.MapStr{}
+
+					for k, v := range namespace.GetAnnotations() {
+						safemapstr.Put(defaults, k, v)
+					}
+					kubemeta["defaults"] = defaults
+				}
+			}
+		}
 
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
