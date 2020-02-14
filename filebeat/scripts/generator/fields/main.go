@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/filebeat/generator/fields"
+	"github.com/elastic/beats/v7/filebeat/generator/fields"
 )
 
 func main() {
