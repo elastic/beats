@@ -1,9 +1,9 @@
 [id="configuration-{beatname_lc}-options"]
 [role="xpack"]
-== Configure functions
+== Configure AWS functions
 
 ++++
-<titleabbrev>Configure functions</titleabbrev>
+<titleabbrev>Configure AWS functions</titleabbrev>
 ++++
 
 {beatname_uc} runs as a function in your serverless environment.
