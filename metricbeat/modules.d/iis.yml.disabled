@@ -8,3 +8,8 @@
     - application_pool
   enabled: true
   period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
+ # filter on site names
+ # website.name: []

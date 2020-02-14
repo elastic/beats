@@ -3,6 +3,9 @@ input:
   module: windows
   metricset: perfmon
   defaults:
+    website_params:
+    - field: names
+      option: website.name
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
     perfmon.counters:
@@ -51,5 +54,5 @@ input:
       query: '\Web Service(*)\Service Uptime'
 processors:
 - drop_event.when.equals:
-    iis.website.name: '_Total'
+        iis.website.name: '_Total'
 

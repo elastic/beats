@@ -1,8 +1,10 @@
-- name: website.*
+- name: website
+  type: group
   release: beta
-  type: object
-  object_type: float
-  object_type_mapping_type: "*"
   description: >
     website
-
+  fields:
+  - name: name
+    type: keyword
+    description: >
+      website name

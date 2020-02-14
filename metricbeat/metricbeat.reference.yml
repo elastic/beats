@@ -355,6 +355,11 @@ metricbeat.modules:
   enabled: true
   period: 10s
 
+ # filter on application pool names
+ # application_pool.name: []
+ # filter on site names
+ # website.name: []
+
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]

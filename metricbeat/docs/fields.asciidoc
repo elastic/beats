@@ -16865,13 +16865,20 @@ type: object
 
 --
 
-*`iis.website.*`*::
-+
---
+[float]
+=== website
+
 website
 
 
-type: object
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
 
 --
 
