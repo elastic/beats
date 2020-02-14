@@ -22,8 +22,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 )
 
 var (
@@ -87,13 +87,12 @@ func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 		config.Path = defaultPath
 	}
 
-	logp.Debug("keystore", "Loading file keystore from %s", config.Path)
 	keystore, err := NewFileKeystore(config.Path)
 	return keystore, err
 }
 
 // ResolverFromConfig create a resolver from a configuration.
-func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, error), error) {
+func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
 	keystore, err := Factory(cfg, dataPath)
 
 	if err != nil {
@@ -104,25 +103,24 @@ func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (stri
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.
-func ResolverWrap(keystore Keystore) func(string) (string, error) {
-	return func(keyName string) (string, error) {
+func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) {
+	return func(keyName string) (string, parse.Config, error) {
 		key, err := keystore.Retrieve(keyName)
 
 		if err != nil {
 			// If we cannot find the key, its a non fatal error
 			// and we pass to other resolver.
 			if err == ErrKeyDoesntExists {
-				return "", ucfg.ErrMissing
+				return "", parse.DefaultConfig, ucfg.ErrMissing
 			}
-			return "", err
+			return "", parse.DefaultConfig, err
 		}
 
 		v, err := key.Get()
 		if err != nil {
-			return "", err
+			return "", parse.DefaultConfig, err
 		}
 
-		logp.Debug("keystore", "accessing key '%s' from the keystore", keyName)
-		return string(v), nil
+		return string(v), parse.DefaultConfig, nil
 	}
 }

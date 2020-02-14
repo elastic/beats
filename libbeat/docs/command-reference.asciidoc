@@ -17,6 +17,8 @@
 
 :deploy-command-short-desc: Deploys the specified function to your serverless environment
 
+:apikey-command-short-desc: Manage API Keys for communication between APM agents and server.
+
 ifndef::serverless[]
 ifndef::no_dashboards[]
 :export-command-short-desc: Exports the configuration, index template, ILM policy, or a dashboard to stdout
@@ -98,9 +100,14 @@ more information, see https://www.elastic.co/subscriptions and
 ifeval::["{beatname_lc}"=="functionbeat"]
 |<<deploy-command,`deploy`>> | {deploy-command-short-desc}.
 endif::[]
+ifdef::apm-server[]
+|<<apikey-command,`apikey`>> |{apikey-command-short-desc}.
+endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
+ifndef::serverless[]
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
+endif::[]
 ifeval::["{beatname_lc}"=="functionbeat"]
 |<<package-command,`package`>> |{package-command-short-desc}.
 |<<remove-command,`remove`>> |{remove-command-short-desc}.
@@ -120,6 +127,115 @@ endif::[]
 |=======================
 
 Also see <<global-flags,Global flags>>.
+
+ifdef::apm-server[]
+[[apikey-command]]
+==== `apikey` command
+
+experimental::[]
+
+Communication between APM agents and APM Server now supports sending an
+<<api-key,API Key in the Authorization header>>.
+APM Server provides an `apikey` command that can create, verify, invalidate,
+and show information about API Keys for agent/server communication.
+Most operations require the `manage_api_key` cluster privilege,
+and you must ensure that `apm-server.api_key` or `output.elasticsearch` are configured appropriately.
+
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} apikey SUBCOMMAND [FLAGS]
+----
+
+*SUBCOMMANDS*
+
+// tag::apikey-subcommands[]
+*`create`*::
+Create an API Key with the specified privilege(s). No required flags.
++
+The user requesting to create an API Key needs to have APM privileges used by the APM Server.
+A superuser, by default, has these privileges. For other users,
+you can create them. Create a role that is then assigned to the user:
++
+["source","sh",subs="attributes"]
+----
+PUT /_security/role/apm-privileges {
+	"applications": [{
+	  "application": "apm",
+	  "privileges": ["sourcemap:write", "event:write", "config_agent:read"],
+	  "resources": ["*"]
+	}]
+}
+----
+
+*`info`*::
+Query API Key(s). `--id` or `--name` required.
+
+*`invalidate`*::
+Invalidate API Key(s). `--id` or `--name` required.
+
+*`verify`*::
+Check if a credentials string has the given privilege(s).
+ `--credentials` required.
+// end::apikey-subcommands[]
+
+*FLAGS*
+
+*`--agent-config`*::
+Required for agents to read configuration remotely. Valid with the `create` and `verify` subcommands.
+When used with `create`, gives the `config_agent:read` privilege to the created key.
+When used with `verify`, asks for the `config_agent:read` privilege.
+
+*`--credentials CREDS`*::
+Required for the `verify` subcommand. Specifies the credentials for which to to check privileges.
+Credentials are the base64 encoded representation of the API key's `id:name`.
+
+*`--expiration TIME`*::
+When used with `create`, specifies the expiration for the key, e.g., "1d" (default never).
+
+*`--id ID`*::
+ID of the API key. Valid with the `info` and `invalidate` subcommands.
+When used with `info`, queries the specified ID.
+When used with `invalidate`, deletes the specified ID.
+
+*`--ingest`*::
+Required for ingesting events. Valid with the `create` and `verify` subcommands.
+When used with `create`, gives the `event:write` privilege to the created key.
+When used with `verify`, asks for the `event:write` privilege.
+
+*`--json`*::
+Prints the output of the command as JSON.
+Valid with all `apikey` subcommands.
+
+*`--name NAME`*::
+Name of the API key(s). Valid with the `create`, `info`, and `invalidate` subcommands.
+When used with `create`, specifies the name of the API key to be created (default: "apm-key").
+When used with `info`, specifies the API key to query (multiple matches are possible).
+When used with `invalidate`, specifies the API key to delete (multiple matches are possible).
+
+*`--sourcemap`*::
+Required for uploading sourcemaps. Valid with the `create` and `verify` subcommands.
+When used with `create`, gives the `sourcemap:write` privilege to the created key.
+When used with `verify`, asks for the `sourcemap:write` privilege.
+
+*`--valid-only`*::
+When used with `info`, only returns valid API Keys (not expired or invalidated).
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} apikey create --ingest --agent-config --name example-001
+{beatname_lc} apikey info --name example-001 --valid-only
+{beatname_lc} apikey invalidate --name example-001
+-----
+
+For more information, see <<api-key>>.
+
+endif::[]
 
 ifeval::["{beatname_lc}"=="functionbeat"]
 [[deploy-command]]
@@ -320,6 +436,7 @@ Specifies the name of the command to show help for.
 {beatname_lc} help export
 -----
 
+ifndef::serverless[]
 [[keystore-command]]
 ==== `keystore` command
 
@@ -375,6 +492,8 @@ Shows help for the `keystore` command.
 
 See <<keystore>> for more examples.
 
+endif::[]
+
 ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
@@ -394,7 +513,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 Shows help for the `package` command.
 
 *`-o, --output`*::
-Specifies the full path to the zip file that will contain the package.
+Specifies the full path pattern to use when creating the packages. 
 
 {global-flags}
 
@@ -402,7 +521,7 @@ Specifies the full path to the zip file that will contain the package.
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} package /path/to/file.zip
+{beatname_lc} package --output /path/to/folder/package-{{.Provider}}.zip
 -----
 
 [[remove-command]]

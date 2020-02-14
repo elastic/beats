@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -80,7 +81,7 @@ func readConfig(cfg *common.Config, info beat.Info) (*Config, error) {
 	}
 
 	if c.Index == "" {
-		c.Index = info.IndexPrefix
+		c.Index = strings.ToLower(info.IndexPrefix)
 	}
 
 	return &c, nil

@@ -133,7 +133,7 @@
 		"tok": "%{?key} %{\u0026key}",
 		"msg": "hello world",
 		"expected": {
-			"hello": "world",
+			"hello": "world"
 		},
 		"skip": false,
 		"fail": false
