@@ -83,6 +83,11 @@ type APIConfig struct {
 	// MaxRequestsPerMinute sets the limit on the number of API requests that
 	// can be sent, per tenant.
 	MaxRequestsPerMinute int `config:"max_requests_per_minute" validate:"positive"`
+
+	// SetIDFromAuditRecord controls whether the unique "Id" field in audit
+	// record is used as the document id for ingestion. This helps avoiding
+	// duplicates.
+	SetIDFromAuditRecord bool `config:"set_id_from_audit_record"`
 }
 
 func defaultConfig() Config {
@@ -122,6 +127,8 @@ func defaultConfig() Config {
 			// According to the docs this is the max requests that are allowed
 			// per tenant per minute.
 			MaxRequestsPerMinute: 2000,
+
+			SetIDFromAuditRecord: true,
 		},
 	}
 }

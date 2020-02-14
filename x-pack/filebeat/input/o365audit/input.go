@@ -255,7 +255,7 @@ var errTerminated = errors.New("terminated due to output closed")
 // Report returns an action that produces a beat.Event from the given object.
 func (env apiEnvironment) Report(doc common.MapStr, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
-		if !env.Callback(toBeatEvent(doc, private)) {
+		if !env.Callback(env.toBeatEvent(doc, private)) {
 			return errTerminated
 		}
 		return nil
@@ -272,7 +272,7 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	}
 }
 
-func toBeatEvent(doc common.MapStr, private interface{}) beat.Event {
+func (env apiEnvironment) toBeatEvent(doc common.MapStr, private interface{}) beat.Event {
 	var errs multierror.Errors
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
@@ -285,6 +285,11 @@ func toBeatEvent(doc common.MapStr, private interface{}) beat.Event {
 			fieldsPrefix: doc,
 		},
 		Private: private,
+	}
+	if env.Config.SetIDFromAuditRecord {
+		if id, err := getString(doc, "Id"); err == nil && len(id) > 0 {
+			b.SetID(id)
+		}
 	}
 	if len(errs) > 0 {
 		msgs := make([]string, len(errs))
