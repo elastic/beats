@@ -20,8 +20,9 @@
 package application_pool
 
 import (
-	"github.com/elastic/go-sysinfo"
 	"strings"
+
+	"github.com/elastic/go-sysinfo"
 
 	"github.com/pkg/errors"
 

@@ -20,8 +20,9 @@
 package website
 
 import (
-	"github.com/elastic/beats/metricbeat/mb"
 	"os"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func init() {

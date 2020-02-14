@@ -20,10 +20,11 @@
 package application_pool
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -40,8 +41,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log            *logp.Logger
-	reader         *Reader
+	log    *logp.Logger
+	reader *Reader
 }
 
 // Config for the iis website metricset.
@@ -67,9 +68,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	return &MetricSet{
-		BaseMetricSet:  base,
-		log:            logp.NewLogger("application pool"),
-		reader:         reader,
+		BaseMetricSet: base,
+		log:           logp.NewLogger("application pool"),
+		reader:        reader,
 	}, nil
 }
 

@@ -21,9 +21,12 @@
 package webserver
 
 import (
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/windows"
 	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"

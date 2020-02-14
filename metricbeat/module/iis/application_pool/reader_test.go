@@ -20,9 +20,11 @@
 package application_pool
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
 )
 
 // TestNewReaderValid should successfully instantiate the reader.

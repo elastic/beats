@@ -3,12 +3,9 @@ input:
   module: windows
   metricset: perfmon
   defaults:
-    website_params:
-    - field: names
-      option: website.name
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
-    perfmon.filter_by_instance: {{.names}}
+    perfmon.filter_by_instance: [""]
     perfmon.counters:
     #network
     - instance_label: 'name'

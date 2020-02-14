@@ -20,6 +20,22 @@ The `iis` module will periodically retrieve IIS related metrics using performanc
 
 The `iis` module mericsets are `webserver`, `website` and `application_pool`.
 
+[source,yaml]
+----
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
+ # filter on site names
+ # website.name: []
+----
+
 [float]
 == Metricsets
 

@@ -21,9 +21,10 @@
 package application_pool
 
 import (
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"testing"
 	"time"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestMetricsetNoErrors(t *testing.T) {

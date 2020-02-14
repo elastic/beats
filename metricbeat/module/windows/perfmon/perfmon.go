@@ -43,8 +43,8 @@ type Config struct {
 	IgnoreNECounters   bool            `config:"perfmon.ignore_non_existent_counters"`
 	GroupMeasurements  bool            `config:"perfmon.group_measurements_by_instance"`
 	CounterConfig      []CounterConfig `config:"perfmon.counters" validate:"required"`
-	GroupAllCountersTo string          `config:"perfmon.group_all_counter"`  // only available for the iis/webserver metricset at the moment
-	FilterByInstance   []string        `config:"perfmon.filter_by_instance"` // only available for the iis/webserver metricset at the moment
+	GroupAllCountersTo string          `config:"perfmon.group_all_counter"` // only available for the iis/webserver metricset at the moment
+	FilterByInstance   []string        `config:"perfmon.filter_by_instance"`        // only available for the iis/webserver metricset at the moment
 }
 
 const metricsetName = "perfmon"
