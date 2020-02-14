@@ -2,6 +2,9 @@
 [role="xpack"]
 === Export AWS CloudFormation template
 
+//REVIEWERS: I don't think we need a separate topic for this. I've added this
+//info as a step for manual deployment. Are you OK with me removing this topic?  
+
 You can use {beatname_uc} to export an {cloudformation-ref} template then use
 the template with automation software to deploy {beatname_uc} code to your cloud
 environment.

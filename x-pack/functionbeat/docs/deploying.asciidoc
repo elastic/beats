@@ -4,11 +4,8 @@
 
 After configuring {beatname_uc} and defining cloud functions for the services
 you want to monitor, deploy the functions to your cloud provider. To do this,
-you can:
-
-* <<manager-deployment,Use the {beatname_uc} manager>> (good for getting
-  started), 
-* Or <<own-deployment,use your own deployment infrastructure>>.
+you can use the {beatname_uc} manager (good for getting started), or use your
+own deployment infrastructure.
 
 [[manager-deployment]]
 ==== Use the {beatname_uc} manager
@@ -18,8 +15,9 @@ when you don't have your own deployment infrastructure or process in place.
 
 During deployment, the {beatname_uc} manager:
 
-* Exports an AWS CloudFormation template. You can inspect the template by
-running the <<export-command,`export`>> command.
+* Exports a function template to use for deployment. For AWS, it exports an
+{cloudformation-ref} template. For Google Cloud, it exports a YAML configuration
+file. To inspect the template, run the <<export-command,`export`>> command.
 * Creates a zip package that includes the function code and +{beatname_lc}.yml+
 config file.
 * Uploads the package to the specified cloud provider.
@@ -33,20 +31,6 @@ functions by using the {beatname_uc} manager.
 If you don't want to use the {beatname_uc} manager, use your own deployment
 infrastructure. To do this, create a package, then deploy it to your cloud
 provider:
-
-//Questions:
-//
-// -  Have the following steps changed for deploying AWS Lambda functions, or
-//    can users still enable and export specific functions?
-//
-// -  PR #13598 says, "Make sure all three zip files are generated and
-//    the --output flag is applied correctly." Please clarify with an example.
-//
-//    I can run the package command a few different ways and get unexpected
-//    results. I wanted to also try deploying with Google Cloud Deployment
-//    manager and didn't have much success.
-
-
 
 . Set the following environment variables:
 +
@@ -81,26 +65,77 @@ archive. For example:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-./{beatname_lc} -v -e -d "*" package --output /path/to/file.zip
+./{beatname_lc} -v -e -d "*" package --output /path/to/folder/package-{{.Provider}}.zip
 ----------------------------------------------------------------------
 +
 *win:*
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-.{backslash}{beatname_lc}.exe -v -e -d "*" package --output /path/to/file.zip
+.{backslash}{beatname_lc}.exe -v -e -d "*" package --output /path/to/folder/package-{{.Provider}}.zip
 ----------------------------------------------------------------------
 +
-This command generates a deployment package (called `file.zip` in the example)
-that contains:
+For `--output` specify a full path pattern.
 +
-* a binary, called `functionbeat-aws`, that contains the function code
+The `package` command generates deployment packages for each provider specified
+in the configuration. Each package contains:
++
+* a binary with the function code
 * the `functionbeat.yml` config file
 
 . If certificates are required, add the cert files to the zip package under the
-same path as the configured +{beatname_lc}.yml+ file. 
+same path as the configured +{beatname_lc}.yml+ file.
+
+. Export a function template to use for deployment:
++
+*linux and mac:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} export function FUNCTION_NAME
+----------------------------------------------------------------------
++
+*win:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+.{backslash}{beatname_lc}.exe export function FUNCTION_NAME
+----------------------------------------------------------------------
++
+{beatname_uc} writes the template to stdout. For AWS functions, it writes an
+{cloudformation-ref} tempalte. For Google Cloud, it writes a YAML configuration
+file.
+
+. Modify the template to work with your infrastructure.
 
 . Deploy the package, using the infrastructure and automation supported by your
-cloud provider. For example, to deploy the package to AWS,
-<<export-cloudformation-template,export the AWS CloudFormation template>>
-managed by {beatname_uc}, and modify it to work with your infrastructure. 
+cloud provider, for example, {cloudformation-ref} or
+https://cloud.google.com/deployment-manager[Google Cloud Deployment manager].
++
+For more information about deployment, see your cloud provider's documentation.
+
+// REVIEWERS: A few questions about this topic:
+//
+// -  Is the ENABLED_FUNCTIONS env var still required, or only required for AWS?
+//    If I try to enable a function under gcp and 
+//    these steps and got a zip file containing a binary called
+//    "functionbeat-aws" even though the function I enabled was a cloud
+//    function. The ENABLED_FUNCTIONS env var seems to be ignored for GCP?
+//
+// -  In the current docs, we tell users to put a certificate in the zip file.
+//    Does this work for Google cloud, too?
+
+// -  I thought I would be able to export the YAML file and deploy to GCP
+//    by using this command:
+//    gcloud deployment-manager deployments create mydeployment --config myconfig.yaml
+//
+//    However this resulted in the following error:
+//
+//    errors:
+//     - code: RESOURCE_NOT_FOUND
+//       message: The type [google.cloud.functions.v1.CloudFunction] was not found.
+//
+//     Can you provide the steps for deploying in google cloud manager so I can
+//     make sure the steps leading up to it are accurate? I don't plan to document
+//     google deployment steps; just want to be able to make sure what I've written
+//     works.

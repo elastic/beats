@@ -171,7 +171,7 @@ include::{libbeat-dir}/shared-template-load.asciidoc[]
 [role="xpack"]
 === Step 4: Deploy {beatname_uc}
 
-To deploy the {beatname_uc} functions to your cloud provider, either use the
+To deploy {beatname_uc} functions to your cloud provider, either use the
 {beatname_uc} manager, as described here, or <<own-deployment,use your own
 deployment infrastructure>>.
 
@@ -181,9 +181,8 @@ the <<update-command,`update` command>> to update your deployment.
 [[deploy-to-aws]]
 ==== Deploy to AWS
 
-. Make sure the user has the credentials required to authenticate with your
-cloud service provider. For example, if you're deploying an AWS Lambda
-function, you can set environment variables that contain your credentials:
+. Make sure you have the credentials required to authenticate with AWS. You can
+set environment variables that contain your credentials:
 +
 *linux and mac*:
 +
@@ -234,7 +233,7 @@ If deployment fails, see <<faq>> for help troubleshooting.
 [[deploy-to-gcp]]
 ==== Deploy to Google Cloud Platform
 
-. Create (or use) a service account that has these roles:
+. In Google Cloud, create a service account that has these required roles:
 +
 --
 include::iam-permissions.asciidoc[tag=gcp-roles-deployment]
