@@ -52,12 +52,15 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	ecs := common.MapStr{
 		ECSCloud: common.MapStr{
-			ECSCloudAvailabilityZone: availabilityZone,
 			ECSCloudAccount: common.MapStr{
 				ECSCloudAccountID: accountID,
 			},
 			ECSCloudProvider: "googlecloud",
 		},
+	}
+
+	if availabilityZone != "" {
+		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
 	}
 
 	//Remove keys from resource that refers to ECS fields
