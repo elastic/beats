@@ -182,17 +182,8 @@ func (p *s3Input) Run() {
 		awsConfig := p.awsConfig.Copy()
 		awsConfig.Region = regionName
 
-		// check if endpoint is given from configuration
-		if p.config.AwsConfig.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://sqs." + regionName + "." + p.config.AwsConfig.Endpoint)
-		}
-		svcSQS := sqs.New(awsConfig)
-
-		// check if endpoint is given from configuration
-		if p.config.AwsConfig.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://s3." + regionName + "." + p.config.AwsConfig.Endpoint)
-		}
-		svcS3 := s3.New(awsConfig)
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)

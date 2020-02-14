@@ -40,11 +40,6 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 			Value: awsCredentials,
 		}
-
-		// check if endpoint is given from configuration
-		if config.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(config.Endpoint)
-		}
 		return awsConfig, nil
 	}
 
@@ -68,10 +63,18 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if err != nil {
 		return awsConfig, err
 	}
-
-	// check if endpoint is given from configuration
-	if config.Endpoint != "" {
-		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(config.Endpoint)
-	}
 	return awsConfig, nil
+}
+
+// EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
+// service clients when endpoint is given in config.
+func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
+	if endpoint != "" {
+		if regionName == "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		} else {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+		}
+	}
+	return awsConfig
 }

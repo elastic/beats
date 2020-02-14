@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -20,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
@@ -138,18 +138,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
 
-			// check if endpoint is given from configuration
-			if m.Endpoint != "" {
-				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + regionName + "." + m.Endpoint)
-			}
+			svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "monitoring", regionName, awsConfig))
 
-			svcCloudwatch := cloudwatch.New(awsConfig)
-
-			// check if endpoint is given from configuration
-			if m.Endpoint != "" {
-				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://tagging." + regionName + "." + m.Endpoint)
-			}
-			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+			svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "tagging", regionName, awsConfig))
 
 			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
@@ -167,17 +160,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
-		// check if endpoint is given from configuration
-		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + regionName + "." + m.Endpoint)
-		}
-		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
 
-		// check if endpoint is given from configuration
-		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://tagging." + regionName + "." + m.Endpoint)
-		}
-		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "tagging", regionName, awsConfig))
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {

@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
@@ -76,12 +76,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
-		// check if endpoint is given from configuration
-		if m.Endpoint != "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://monitoring." + awsConfig.Region + "." + m.Endpoint)
-		}
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
 
-		svcCloudwatch := cloudwatch.New(awsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			m.Logger().Error(err.Error())

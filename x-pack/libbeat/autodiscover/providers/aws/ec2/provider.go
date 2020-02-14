@@ -10,7 +10,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -58,12 +57,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	if config.Regions == nil {
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
-
-		// check if endpoint is given from configuration
-		if config.AWSConfig.Endpoint != "" {
-			awsCfg.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + awsCfg.Region + "." + config.AWSConfig.Endpoint)
-		}
-		svcEC2 := ec2.New(awsCfg)
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
@@ -79,12 +74,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
 		}
 		awsCfg.Region = region
-
-		// check if endpoint is given from configuration
-		if config.AWSConfig.Endpoint != "" {
-			awsCfg.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + region + "." + config.AWSConfig.Endpoint)
-		}
-		clients = append(clients, ec2.New(awsCfg))
+		clients = append(clients, ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", region, awsCfg)))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))

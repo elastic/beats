@@ -87,14 +87,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account name
-	// check if endpoint is given from configuration
-	if config.AWSConfig.Endpoint != "" {
-		metricSet.Endpoint = config.AWSConfig.Endpoint
-		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://iam." + config.AWSConfig.Endpoint)
-	}
-
 	awsConfig.Region = "us-east-1"
-	svcIam := iam.New(awsConfig)
+	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "iam", "", awsConfig))
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
 	if err != nil {
@@ -108,11 +103,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account id
-	// check if endpoint is given from configuration
-	if config.AWSConfig.Endpoint != "" {
-		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://sts." + config.AWSConfig.Endpoint)
-	}
-	svcSts := sts.New(awsConfig)
+	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "sts", "", awsConfig))
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
@@ -123,8 +115,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://ec2." + config.AWSConfig.Endpoint)
-		svcEC2 := ec2.New(awsConfig)
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", "", awsConfig))
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
