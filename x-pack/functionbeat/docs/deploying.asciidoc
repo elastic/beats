@@ -36,8 +36,8 @@ provider:
 +
 `BEAT_STRICT_PERMS=false`:: This setting makes the function skip the ownership
 check on the configuration file.
-`ENABLED_FUNCTIONS=function-name-1,function-name-2`:: Specifies a comma-
-separated list of functions that are enabled in the configuration file. For
+`ENABLED_FUNCTIONS=function-name-1,function-name-2`:: Specifies a
+comma-separated list of functions that are enabled in the configuration file. For
 example, to package functions called `my-kinesis` and `my-cloudwatch-logs`, run:
 +
 *linux and mac*:

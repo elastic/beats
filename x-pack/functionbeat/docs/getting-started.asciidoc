@@ -123,7 +123,7 @@ function.
 +
 See <<configuration-{beatname_lc}-options>> for more examples.
 
-* *Google cloud example*: The following example configures a function called
+* *Google cloud example*: This example configures a function called
 `storage` that collects log events from Google Cloud Storage. When the specified
 event type occurs on the Cloud Storage bucket, the cloud function executes and
 sends events to the configured output:
@@ -232,6 +232,8 @@ If deployment fails, see <<faq>> for help troubleshooting.
 
 [[deploy-to-gcp]]
 ==== Deploy to Google Cloud Platform
+
+beta[]
 
 . In Google Cloud, create a service account that has these required roles:
 +
