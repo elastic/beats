@@ -56,7 +56,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error"},
+		"nginx":  {"access", "error", "ingress_controller"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
@@ -347,8 +347,8 @@ func TestMcfgFromConfig(t *testing.T) {
 				Filesets: map[string]*FilesetConfig{
 					"error": {
 						Enabled: &falseVar,
-						Var:     map[string]interface{}{},
-						Input:   map[string]interface{}{},
+						Var:     nil,
+						Input:   nil,
 					},
 				},
 			},
@@ -366,7 +366,7 @@ func TestMcfgFromConfig(t *testing.T) {
 						Var: map[string]interface{}{
 							"test": false,
 						},
-						Input: map[string]interface{}{},
+						Input: nil,
 					},
 				},
 			},

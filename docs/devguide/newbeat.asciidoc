@@ -428,6 +428,8 @@ When you add fields to the event object, you also need to add them to the `_meta
 
 Remember to run `make update` to apply your updates.
 
+For more information on defining field mappings in `_meta/fields.yml`, see <<event-fields-yml>>.
+
 For more detail about naming the fields in an event, see <<event-conventions>>.
 
 [[stop-method]]

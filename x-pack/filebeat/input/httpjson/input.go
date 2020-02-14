@@ -213,14 +213,14 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			return errors.Wrapf(err, "failed to read http.response.body")
 		}
 		if msg.StatusCode != http.StatusOK {
-			in.log.Errorw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
+			in.log.Debugw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
 			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
 		var m, v interface{}
 		var mm map[string]interface{}
 		err = json.Unmarshal(responseData, &m)
 		if err != nil {
-			in.log.Errorw("failed to unmarshal http.response.body", string(responseData))
+			in.log.Debugw("failed to unmarshal http.response.body", string(responseData))
 			return errors.Wrapf(err, "failed to unmarshal http.response.body")
 		}
 		switch obj := m.(type) {

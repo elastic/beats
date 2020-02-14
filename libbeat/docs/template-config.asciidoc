@@ -11,7 +11,7 @@ connecting to Elasticsearch.
 ifndef::no-output-logstash[]
 
 NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is Logstash, you must <<load-template-manually,load the template
+the configured output is not Elasticsearch (or Elastic Cloud), you must <<load-template-manually,load the template
 manually>>.
 
 endif::[]
