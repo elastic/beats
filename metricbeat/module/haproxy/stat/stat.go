@@ -19,6 +19,7 @@ package stat
 
 import (
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 
@@ -44,16 +45,21 @@ func init() {
 // MetricSet for haproxy stats.
 type MetricSet struct {
 	mb.BaseMetricSet
+	*helper.HTTP
 }
 
 // New creates a new haproxy stat MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+	return &MetricSet{BaseMetricSet: base, HTTP: http}, nil
 }
 
 // Fetch methods returns a list of stats metrics.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI)
+	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI, m.HTTP)
 	if err != nil {
 		return errors.Wrap(err, "failed creating haproxy client")
 	}

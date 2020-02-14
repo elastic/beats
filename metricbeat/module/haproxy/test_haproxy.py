@@ -90,10 +90,11 @@ class HaproxyTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["stat"],
-            "hosts": ["https://%s/stats" % (self.compose_host(port="14570/tcp"))],
+            "hosts": ["https://localhost:14570/stats"],
             "period": "5s",
             "extras": {
-                "ssl.certificate": os.path.join(os.path.dirname(__file__), '_meta/certs/client.crt'),
+                "ssl.certificate_authorities": [os.path.join(os.path.dirname(__file__), '_meta/certs/ca.pem')],
+                "ssl.certificate": os.path.join(os.path.dirname(__file__), '_meta/certs/client.pem'),
                 "ssl.key": os.path.join(os.path.dirname(__file__), '_meta/certs/client.key')
             }
         }])
