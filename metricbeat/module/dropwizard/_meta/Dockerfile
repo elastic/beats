@@ -1,22 +1,17 @@
-ARG DROPWIZARD_MAVEN_VERSION
-FROM maven:${DROPWIZARD_MAVEN_VERSION}
+FROM maven:3.6-jdk-8
 
 # Variables used in pom.xml
 ARG DROPWIZARD_VERSION
 ENV DROPWIZARD_VERSION=${DROPWIZARD_VERSION}
-ARG DROPWIZARD_GROUPID
-ENV DROPWIZARD_GROUPID=${DROPWIZARD_GROUPID}
 
+# Build the deployable war
 COPY test /test
+WORKDIR /test
+RUN mvn verify
+
+# Build the final image
+FROM jetty:9.4.26-jre8
+COPY --from=0 /test/target/test-1.0-SNAPSHOT.war /var/lib/jetty/webapps/test.war
 
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f http://localhost:8080/test/helloworld
 EXPOSE 8080
-
-WORKDIR /test
-
-# Install dependencies when building so they are stored in the image
-# Change path of local repository because default one is in a volume
-ENV MAVEN_OPTS="-Dmaven.repo.local=/opt/m2-repository"
-RUN mvn ${MAVEN_OPTS} verify dependency:go-offline
-
-CMD mvn ${MAVEN_OPTS} --offline jetty:run
