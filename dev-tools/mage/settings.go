@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -561,13 +562,80 @@ var (
 // import path and the current directory's import path.
 func GetProjectRepoInfo() (*ProjectRepoInfo, error) {
 	repoInfoOnce.Do(func() {
-		repoInfoValue, repoInfoErr = getProjectRepoInfo()
+		if isUnderGOPATH() {
+			repoInfoValue, repoInfoErr = getProjectRepoInfoUnderGopath()
+		} else {
+			repoInfoValue, repoInfoErr = getProjectRepoInfoWithModules()
+		}
 	})
 
 	return repoInfoValue, repoInfoErr
 }
 
-func getProjectRepoInfo() (*ProjectRepoInfo, error) {
+func isUnderGOPATH() bool {
+	rel, err := filepath.Rel(build.Default.GOPATH, CWD())
+	if err != nil {
+		return false
+	}
+
+	if strings.Contains(rel, "..") {
+		return false
+	}
+
+	return true
+}
+
+func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
+	var (
+		cwd            = CWD()
+		rootImportPath string
+		rootDir        string
+		subDir         string
+	)
+
+	possibleRoot := cwd
+	var errs []string
+	for {
+		isRoot, err := isRepoRoot(possibleRoot)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+
+		if isRoot {
+			rootDir = possibleRoot
+			break
+		}
+
+		subDir = path.Base(possibleRoot)
+		possibleRoot = path.Dir(possibleRoot)
+	}
+
+	rootImportPath = "github.com/elastic/beats"
+	if path.Base(rootDir) != "beats" {
+		rootImportPath = rootDir
+	}
+	return &ProjectRepoInfo{
+		RootImportPath: rootImportPath,
+		RootDir:        rootDir,
+		SubDir:         subDir,
+		ImportPath:     filepath.Join(rootImportPath, subDir),
+	}, nil
+}
+
+func isRepoRoot(path string) (bool, error) {
+	gomodPath := filepath.Join(path, "go.mod")
+	_, err := os.Stat(gomodPath)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	var (
 		cwd            = CWD()
 		rootImportPath string
