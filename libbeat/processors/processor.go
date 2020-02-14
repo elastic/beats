@@ -48,6 +48,14 @@ type Closer interface {
 	Close() error
 }
 
+// Close closes a processor if it implements the Closer interface
+func Close(p Processor) error {
+	if closer, ok := p.(Closer); ok {
+		return closer.Close()
+	}
+	return nil
+}
+
 // NewList creates a new empty processor list.
 // Additional processors can be added to the List field.
 func NewList(log *logp.Logger) *Processors {
@@ -164,11 +172,9 @@ func (procs *Processors) All() []beat.Processor {
 func (procs *Processors) Close() error {
 	var errs multierror.Errors
 	for _, p := range procs.List {
-		if closer, ok := p.(Closer); ok {
-			err := closer.Close()
-			if err != nil {
-				errs = append(errs, err)
-			}
+		err := Close(p)
+		if err != nil {
+			errs = append(errs, err)
 		}
 	}
 	return errs.Err()

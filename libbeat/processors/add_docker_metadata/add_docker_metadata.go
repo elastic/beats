@@ -212,11 +212,9 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (d *addDockerMetadata) Close() error {
-	if closer, ok := d.sourceProcessor.(processors.Closer); ok {
-		err := closer.Close()
-		if err != nil {
-			d.log.Debugf("Failed to close source processor of add_docker_metadata processor: %v", err)
-		}
+	err := processors.Close(d.sourceProcessor)
+	if err != nil {
+		d.log.Debugf("Failed to close source processor of add_docker_metadata processor: %v", err)
 	}
 	d.watcher.Stop()
 	return nil
