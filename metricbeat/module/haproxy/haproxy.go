@@ -25,7 +25,7 @@ import (
 	"net"
 	"net/url"
 	"strings"
-	
+
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
