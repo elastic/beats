@@ -178,6 +178,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	if config.Autodiscover != nil {
 		var err error
 		adapter := autodiscover.NewFactoryAdapter(factory)
+		autodiscover.SetAutodiscoverKeystore(b.Keystore)
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return nil, err

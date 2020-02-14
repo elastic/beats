@@ -21,6 +21,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/keystore"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -55,6 +56,7 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	logger    *logp.Logger
 	eventer   Eventer
+	keystore  keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider

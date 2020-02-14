@@ -19,6 +19,7 @@ package beat
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/management"
 )
 
@@ -66,6 +67,8 @@ type Beat struct {
 	Fields []byte // Data from fields.yml
 
 	ConfigManager management.ConfigManager // config manager
+
+	Keystore   keystore.Keystore
 }
 
 // BeatConfig struct contains the basic configuration of every beat
