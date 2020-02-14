@@ -57,3 +57,11 @@ from
 group by 1,2,3
 order by 1,2,3
 ",0,,"postgres.c",1632,
+2020-02-14 00:00:07.076297 UTC,"gpadmin","vds_prd",p751024,th1452697472,"[local]",,2020-02-14 00:00:07 UTC,193249667,con399541,cmd3,seg-1,slice1,dx853045,x193249667,sx1,"LOG","00000","statement: INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",,,,,,"INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",0,,"postgres.c",1175,
+2020-02-14 03:36:44.311183 UTC,,,p7548,th1452697472,,,2020-02-14 03:36:44 UTC,0,,,seg-1,,,,,"LOG","00000","connection received: host=10.110.181.132 port=51628",,,,,,,0,,"postmaster.c",6841,
