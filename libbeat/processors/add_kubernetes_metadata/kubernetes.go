@@ -223,6 +223,16 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+func (k *kubernetesAnnotator) Close() error {
+	if k.watcher != nil {
+		k.watcher.Stop()
+	}
+	if k.cache != nil {
+		k.cache.stop()
+	}
+	return nil
+}
+
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
 	for _, m := range metadata {

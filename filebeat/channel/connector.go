@@ -101,10 +101,18 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return nil, err
 	}
 
-	outlet := newOutlet(client, c.parent.wgEvents)
+	var outlet Outleter = newOutlet(client, c.parent.wgEvents)
 	if c.parent.done != nil {
-		return CloseOnSignal(outlet, c.parent.done), nil
+		outlet, err = CloseOnSignal(outlet, c.parent.done), nil
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	go func() {
+		<-outlet.Done()
+		procs.Close()
+	}()
 	return outlet, nil
 }
 

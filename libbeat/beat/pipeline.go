@@ -142,6 +142,7 @@ type PipelineACKHandler struct {
 
 type ProcessorList interface {
 	Processor
+	Close() error
 	All() []Processor
 }
 

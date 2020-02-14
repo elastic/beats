@@ -211,6 +211,17 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+func (d *addDockerMetadata) Close() error {
+	if closer, ok := d.sourceProcessor.(processors.Closer); ok {
+		err := closer.Close()
+		if err != nil {
+			d.log.Debugf("Failed to close source processor of add_docker_metadata processor: %v", err)
+		}
+	}
+	d.watcher.Stop()
+	return nil
+}
+
 func (d *addDockerMetadata) String() string {
 	return fmt.Sprintf("%v=[match_fields=[%v] match_pids=[%v]]",
 		processorName, strings.Join(d.fields, ", "), strings.Join(d.pidFields, ", "))
