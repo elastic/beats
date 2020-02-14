@@ -76,6 +76,10 @@ func (p *group) add(processor processors.Processor) {
 	}
 }
 
+func (p *group) Close() error {
+	return nil
+}
+
 func (p *group) String() string {
 	var s []string
 	for _, p := range p.list {

@@ -83,6 +83,7 @@ type watcher struct {
 	cleanupTimeout             time.Duration
 	lastValidTimestamp         int64
 	lastWatchReceivedEventTime time.Time
+	stopped                    sync.WaitGroup
 	bus                        bus.Bus
 	shortID                    bool // whether to store short ID in "containers" too
 }
@@ -225,6 +226,7 @@ func (w *watcher) Start() error {
 		}
 	}()
 
+	w.stopped.Add(2)
 	go w.watch()
 	go w.cleanupWorker()
 
@@ -330,6 +332,7 @@ func (w *watcher) watch() {
 
 			case <-w.ctx.Done():
 				log.Debug("Watcher stopped")
+				w.stopped.Done()
 				return
 			}
 		}
@@ -397,6 +400,7 @@ func (w *watcher) cleanupWorker() {
 
 		select {
 		case <-w.ctx.Done():
+			w.stopped.Done()
 			return
 		case <-time.After(w.cleanupTimeout):
 			// Check entries for timeout
