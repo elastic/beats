@@ -83,6 +83,23 @@ class HaproxyTest(metricbeat.BaseTest):
         self._test_stat()
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_stat_https(self):
+        """
+        haproxy stat https metricset test
+        """
+        self.render_config_template(modules=[{
+            "name": "haproxy",
+            "metricsets": ["stat"],
+            "hosts": ["https://%s/stats" % (self.compose_host(port="14570/tcp"))],
+            "period": "5s",
+            "extras": {
+                "ssl.certificate": os.path.join(os.path.dirname(__file__), '_meta/certs/client.crt'),
+                "ssl.key": os.path.join(os.path.dirname(__file__), '_meta/certs/client.key')
+            }
+        }])
+        self._test_stat()
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stat_http_auth(self):
         """
         haproxy stat http basic auth metricset test
