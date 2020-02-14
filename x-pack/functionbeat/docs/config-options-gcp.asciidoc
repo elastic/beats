@@ -123,9 +123,6 @@ The execution timeout in seconds. If the function does not finish in time,
 it is considered failed and terminated. The default is `60s`. Increase this
 value if you see timeout messages is the Google Stackdriver logs.
 
-// REVIEWERS: I had to change the timeout manually for pubsub and storage.
-// I wonder why we don't set a longer timeout by default.
-
 [float]
 [id="{beatname_lc}-gcp-service_account_email"]
 ==== `service_account_email`
@@ -157,8 +154,6 @@ URI.
 The maximum instances that can be running at the same time. The default is
 unlimited.
 
-//REVIEWERS: Does 0 mean unlimited?
-
 [float]
 [id="{beatname_lc}-gcp-triggers"]
 ===== `trigger`
@@ -168,18 +163,10 @@ The trigger that will cause the function to execute.
 * If `type` is `pubsub`, specify the name of the Pub/Sub topic to watch for
 messages.
 
-// REVIEWERS: When would you change `trigger.service`? Sorry I'm not very
-// familiar with pub/sub.
-
 * If `type` is `storage`, specify the Cloud Storage bucket to watch for object
 events. For `event_type`, specify the type of object event that will trigger the
 function. See the https://cloud.google.com/functions/docs/calling/storage[Google Cloud
 docs] for a list of available event types.
-
-// REVIEWERS: Do we want to link to the google docs as I have here, or provide a
-// list of supported event types? Currently the google docs list:
-// google.storage.object.finalize, google.storage.object.delete, 
-// google.storage.object.archive, and google.storage.object.metadataUpdate
 
 [float]
 [id="{beatname_lc}-gcp-keep_null"]

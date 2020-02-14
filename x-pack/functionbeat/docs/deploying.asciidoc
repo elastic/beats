@@ -113,29 +113,3 @@ cloud provider, for example, {cloudformation-ref} or
 https://cloud.google.com/deployment-manager[Google Cloud Deployment manager].
 +
 For more information about deployment, see your cloud provider's documentation.
-
-// REVIEWERS: A few questions about this topic:
-//
-// -  Is the ENABLED_FUNCTIONS env var still required, or only required for AWS?
-//    If I try to enable a function under gcp and 
-//    these steps and got a zip file containing a binary called
-//    "functionbeat-aws" even though the function I enabled was a cloud
-//    function. The ENABLED_FUNCTIONS env var seems to be ignored for GCP?
-//
-// -  In the current docs, we tell users to put a certificate in the zip file.
-//    Does this work for Google cloud, too?
-
-// -  I thought I would be able to export the YAML file and deploy to GCP
-//    by using this command:
-//    gcloud deployment-manager deployments create mydeployment --config myconfig.yaml
-//
-//    However this resulted in the following error:
-//
-//    errors:
-//     - code: RESOURCE_NOT_FOUND
-//       message: The type [google.cloud.functions.v1.CloudFunction] was not found.
-//
-//     Can you provide the steps for deploying in google cloud manager so I can
-//     make sure the steps leading up to it are accurate? I don't plan to document
-//     google deployment steps; just want to be able to make sure what I've written
-//     works.
