@@ -395,13 +395,11 @@ func (w *watcher) cleanupWorker() {
 	log := w.log
 
 	for {
-		// Wait a full period
-		time.Sleep(w.cleanupTimeout)
-
 		select {
 		case <-w.ctx.Done():
 			w.stopped.Done()
 			return
+		// Wait a full period
 		case <-time.After(w.cleanupTimeout):
 			// Check entries for timeout
 			var toDelete []string
