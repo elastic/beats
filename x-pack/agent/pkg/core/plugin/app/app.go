@@ -5,6 +5,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -33,7 +34,7 @@ var (
 )
 
 // ReportFailureFunc is a callback func used to report async failures due to crashes.
-type ReportFailureFunc func(string, error)
+type ReportFailureFunc func(context.Context, string, error)
 
 // Application encapsulates a concrete application ran by agent e.g Beat.
 type Application struct {
@@ -66,7 +67,8 @@ type ArgsDecorator func([]string) []string
 
 // NewApplication creates a new instance of an applications. It will not automatically start
 // the application.
-func NewApplication(id, appName, pipelineID string,
+func NewApplication(
+	id, appName, pipelineID string,
 	spec Specifier,
 	factory remoteconfig.ConnectionCreator,
 	cfg *config.Config,
@@ -146,7 +148,7 @@ func (a *Application) State() state.State {
 	return a.state
 }
 
-func (a *Application) watch(proc *os.Process, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, proc *os.Process, cfg map[string]interface{}) {
 	go func() {
 		procState, err := proc.Wait()
 		if err != nil {
@@ -167,13 +169,13 @@ func (a *Application) watch(proc *os.Process, cfg map[string]interface{}) {
 		if s == state.Running {
 			// it was a crash, report it async not to block
 			// process management with networking issues
-			go a.reportCrash()
-			a.Start(cfg)
+			go a.reportCrash(ctx)
+			a.Start(ctx, cfg)
 		}
 	}()
 }
 
-func (a *Application) reportCrash() {
+func (a *Application) reportCrash(ctx context.Context) {
 	a.monitor.Cleanup()
 
 	// TODO: reporting crash
@@ -183,6 +185,6 @@ func (a *Application) reportCrash() {
 			errors.TypeApplicationCrash,
 			errors.M(errors.MetaKeyAppName, a.name),
 			errors.M(errors.MetaKeyAppName, a.id))
-		a.failureReporter(a.name, crashError)
+		a.failureReporter(ctx, a.name, crashError)
 	}
 }

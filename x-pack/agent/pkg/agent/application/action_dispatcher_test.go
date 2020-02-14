@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,7 +17,7 @@ type mockHandler struct {
 	err      error
 }
 
-func (h *mockHandler) Handle(a action, acker fleetAcker) error {
+func (h *mockHandler) Handle(_ context.Context, a action, acker fleetAcker) error {
 	h.called = true
 	h.received = a
 	return h.err
@@ -45,7 +46,7 @@ func TestActionDispatcher(t *testing.T) {
 
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
 		def := &mockHandler{}
-		d, err := newActionDispatcher(nil, def)
+		d, err := newActionDispatcher(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		success1 := &mockHandler{}
@@ -71,9 +72,9 @@ func TestActionDispatcher(t *testing.T) {
 		require.Nil(t, def.received)
 	})
 
-	t.Run("Unknown action are catched by the unknown handler", func(t *testing.T) {
+	t.Run("Unknown action are caught by the unknown handler", func(t *testing.T) {
 		def := &mockHandler{}
-		d, err := newActionDispatcher(nil, def)
+		d, err := newActionDispatcher(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		action := &mockActionUnknown{}
@@ -88,7 +89,7 @@ func TestActionDispatcher(t *testing.T) {
 		success2 := &mockHandler{}
 
 		def := &mockHandler{}
-		d, err := newActionDispatcher(nil, def)
+		d, err := newActionDispatcher(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		err = d.Register(&mockAction{}, success1)

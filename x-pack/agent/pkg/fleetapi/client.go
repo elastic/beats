@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -22,6 +23,7 @@ import (
 
 type clienter interface {
 	Send(
+		ctx context.Context,
 		method string,
 		path string,
 		params url.Values,

@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,14 +46,17 @@ type apiClient interface {
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
-	log       *logger.Logger
-	Config    FleetAgentConfig
-	api       apiClient
-	agentInfo *info.AgentInfo
-	gateway   *fleetGateway
+	bgContext   context.Context
+	cancelCtxFn context.CancelFunc
+	log         *logger.Logger
+	Config      FleetAgentConfig
+	api         apiClient
+	agentInfo   *info.AgentInfo
+	gateway     *fleetGateway
 }
 
 func newManaged(
+	ctx context.Context,
 	log *logger.Logger,
 	rawConfig *config.Config,
 ) (*Managed, error) {
@@ -104,15 +108,17 @@ func newManaged(
 		agentInfo: agentInfo,
 	}
 
+	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
+
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
 	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
 	if err != nil {
 		return nil, errors.New(err, "fail to create reporters")
 	}
 
-	combinedReporter := reporting.NewReporter(log, agentInfo, logR, fleetR)
+	combinedReporter := reporting.NewReporter(managedApplication.bgContext, log, agentInfo, logR, fleetR)
 
-	router, err := newRouter(log, streamFactory(rawConfig, client, combinedReporter))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, client, combinedReporter))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -132,7 +138,7 @@ func newManaged(
 	}
 	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
 
-	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
+	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
 	if err != nil {
 		return nil, err
 	}
@@ -161,6 +167,7 @@ func newManaged(
 	}
 
 	gateway, err := newFleetGateway(
+		managedApplication.bgContext,
 		log,
 		gatewaySettings,
 		agentInfo,
@@ -188,6 +195,7 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.gateway.Stop()
+	m.cancelCtxFn()
 	return nil
 }
 

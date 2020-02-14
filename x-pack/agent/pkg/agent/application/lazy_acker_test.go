@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -71,17 +72,18 @@ func TestLazyAcker(t *testing.T) {
 		for range ch {
 		}
 	}()
+	c := context.Background()
 
-	if err := lacker.Ack(testAction1); err != nil {
+	if err := lacker.Ack(c, testAction1); err != nil {
 		t.Fatal(err)
 	}
-	if err := lacker.Ack(testAction2); err != nil {
+	if err := lacker.Ack(c, testAction2); err != nil {
 		t.Fatal(err)
 	}
-	if err := lacker.Ack(testAction3); err != nil {
+	if err := lacker.Ack(c, testAction3); err != nil {
 		t.Fatal(err)
 	}
-	if err := lacker.Commit(); err != nil {
+	if err := lacker.Commit(c); err != nil {
 		t.Fatal(err)
 	}
 

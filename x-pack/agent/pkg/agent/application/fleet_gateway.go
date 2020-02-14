@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -28,8 +29,8 @@ type fleetReporter interface {
 }
 
 type fleetAcker interface {
-	Ack(action fleetapi.Action) error
-	Commit() error
+	Ack(ctx context.Context, action fleetapi.Action) error
+	Commit(ctx context.Context) error
 }
 
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
@@ -37,6 +38,7 @@ type fleetAcker interface {
 // call the API to send the events and will receive actions to be executed locally.
 // The only supported action for now is a "ActionPolicyChange".
 type fleetGateway struct {
+	bgContext  context.Context
 	log        *logger.Logger
 	dispatcher dispatcher
 	client     clienter
@@ -62,6 +64,7 @@ type backoffSettings struct {
 }
 
 func newFleetGateway(
+	ctx context.Context,
 	log *logger.Logger,
 	settings *fleetGatewaySettings,
 	agentInfo agentInfo,
@@ -72,6 +75,7 @@ func newFleetGateway(
 ) (*fleetGateway, error) {
 	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
 	return newFleetGatewayWithScheduler(
+		ctx,
 		log,
 		settings,
 		agentInfo,
@@ -84,6 +88,7 @@ func newFleetGateway(
 }
 
 func newFleetGatewayWithScheduler(
+	ctx context.Context,
 	log *logger.Logger,
 	settings *fleetGatewaySettings,
 	agentInfo agentInfo,
@@ -96,6 +101,7 @@ func newFleetGatewayWithScheduler(
 	done := make(chan struct{})
 
 	return &fleetGateway{
+		bgContext:  ctx,
 		log:        log,
 		dispatcher: d,
 		client:     client,
@@ -140,6 +146,9 @@ func (f *fleetGateway) worker() {
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
 		case <-f.done:
 			return
+		case <-f.bgContext.Done():
+			f.Stop()
+			return
 		}
 	}
 }
@@ -147,7 +156,8 @@ func (f *fleetGateway) worker() {
 func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	f.backoff.Reset()
 	for {
-		resp, err := f.execute()
+		// TODO: wrap with timeout context
+		resp, err := f.execute(f.bgContext)
 		if err != nil {
 			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
 			if !f.backoff.Wait() {
@@ -163,7 +173,7 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	}
 }
 
-func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
+func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, error) {
 	// get events
 	ee, ack := f.reporter.Events()
 
@@ -179,7 +189,7 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 		Metadata: metaData,
 	}
 
-	resp, err := cmd.Execute(req)
+	resp, err := cmd.Execute(ctx, req)
 	if err != nil {
 		return nil, err
 	}

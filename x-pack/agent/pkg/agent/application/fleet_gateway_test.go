@@ -6,6 +6,7 @@ package application
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -34,6 +35,7 @@ type testingClient struct {
 }
 
 func (t *testingClient) Send(
+	_ context.Context,
 	method string,
 	path string,
 	params url.Values,
@@ -99,6 +101,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		rep := getReporter(agentInfo, log, t)
 
 		gateway, err := newFleetGatewayWithScheduler(
+			context.Background(),
 			log,
 			settings,
 			agentInfo,
@@ -224,6 +227,7 @@ func TestFleetGateway(t *testing.T) {
 
 		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
+			context.Background(),
 			log,
 			settings,
 			agentInfo,
@@ -268,7 +272,7 @@ func TestFleetGateway(t *testing.T) {
 		scheduler *scheduler.Stepper,
 		rep repo.Backend,
 	) {
-		rep.Report(&testStateEvent{})
+		rep.Report(context.Background(), &testStateEvent{})
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				cr := &request{}
@@ -305,6 +309,7 @@ func TestFleetGateway(t *testing.T) {
 
 		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
+			context.Background(),
 			log,
 			&fleetGatewaySettings{
 				Duration: d,
@@ -353,7 +358,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			scheduler *scheduler.Stepper,
 			rep repo.Backend,
 		) {
-			rep.Report(&testStateEvent{})
+			rep.Report(context.Background(), &testStateEvent{})
 
 			fail := func(_ http.Header, _ io.Reader) (*http.Response, error) {
 				return wrapStrToResp(http.StatusInternalServerError, "something is bad"), nil
@@ -407,7 +412,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			scheduler *scheduler.Stepper,
 			rep repo.Backend,
 		) {
-			rep.Report(&testStateEvent{})
+			rep.Report(context.Background(), &testStateEvent{})
 
 			fail := func(_ http.Header, _ io.Reader) (*http.Response, error) {
 				return wrapStrToResp(http.StatusInternalServerError, "something is bad"), nil

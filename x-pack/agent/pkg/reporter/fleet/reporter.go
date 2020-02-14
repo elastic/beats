@@ -5,6 +5,7 @@
 package fleet
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -68,7 +69,7 @@ func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig) (*R
 }
 
 // Report enqueue event into reporter queue.
-func (r *Reporter) Report(e reporter.Event) error {
+func (r *Reporter) Report(ctx context.Context, e reporter.Event) error {
 	r.qlock.Lock()
 	defer r.qlock.Unlock()
 

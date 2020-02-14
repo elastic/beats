@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -18,7 +19,7 @@ type handlerPolicyChange struct {
 	emitter emitterFunc
 }
 
-func (h *handlerPolicyChange) Handle(a action, acker fleetAcker) error {
+func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetAcker) error {
 	h.log.Debugf("HandlerPolicyChange: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionPolicyChange)
 	if !ok {
@@ -35,5 +36,5 @@ func (h *handlerPolicyChange) Handle(a action, acker fleetAcker) error {
 		return err
 	}
 
-	return acker.Ack(action)
+	return acker.Ack(ctx, action)
 }

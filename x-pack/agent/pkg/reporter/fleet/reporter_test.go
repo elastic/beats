@@ -5,6 +5,7 @@
 package fleet
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -54,7 +55,7 @@ func TestReporting(t *testing.T) {
 	firstBatchSize := 5
 	ee := getEvents(firstBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check after delay for output
@@ -70,7 +71,7 @@ func TestReporting(t *testing.T) {
 	secondBatchSize := threshold + 1
 	ee = getEvents(secondBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check events are dropped
@@ -89,7 +90,7 @@ func TestInfoDrop(t *testing.T) {
 	ee := []reporter.Event{testStateEvent{}, testErrorEvent{}, testErrorEvent{}}
 
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check after delay for output
@@ -113,7 +114,7 @@ func TestOutOfOrderAck(t *testing.T) {
 	firstBatchSize := 5
 	ee := getEvents(firstBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check after delay for output
@@ -126,7 +127,7 @@ func TestOutOfOrderAck(t *testing.T) {
 	secondBatchSize := threshold + 1
 	ee = getEvents(secondBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check all events are returned
@@ -166,7 +167,7 @@ func TestAfterDrop(t *testing.T) {
 	firstBatchSize := 5
 	ee := getEvents(firstBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check after delay for output
@@ -179,7 +180,7 @@ func TestAfterDrop(t *testing.T) {
 	secondBatchSize := 5
 	ee = getEvents(secondBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check all events are returned

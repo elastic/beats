@@ -6,6 +6,7 @@ package application
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -32,6 +33,7 @@ type storeLoad interface {
 
 type clienter interface {
 	Send(
+		ctx context.Context,
 		method string,
 		path string,
 		params url.Values,
@@ -152,7 +154,7 @@ func (c *EnrollCmd) Execute() error {
 		},
 	}
 
-	resp, err := cmd.Execute(r)
+	resp, err := cmd.Execute(context.Background(), r)
 	if err != nil {
 		return errors.New(err,
 			"fail to execute request to Kibana",

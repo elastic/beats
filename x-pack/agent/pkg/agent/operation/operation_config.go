@@ -5,6 +5,8 @@
 package operation
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -51,15 +53,15 @@ func (o *operationConfig) Name() string {
 func (o *operationConfig) Check() (bool, error) { return true, nil }
 
 // Run runs the operation
-func (o *operationConfig) Run(application Application) (err error) {
+func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.New(err,
 				o.Name(),
 				errors.TypeApplication,
 				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(application.Name(), err)
+			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 		}
 	}()
-	return application.Configure(o.cfg)
+	return application.Configure(ctx, o.cfg)
 }

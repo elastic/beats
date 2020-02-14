@@ -5,6 +5,7 @@
 package log
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -41,7 +42,7 @@ func NewReporter(l logger, cfg *Config) *Reporter {
 }
 
 // Report in noop reporter does nothing
-func (r *Reporter) Report(record reporter.Event) error {
+func (r *Reporter) Report(ctx context.Context, record reporter.Event) error {
 	if record.Type() == reporter.EventTypeError {
 		r.logger.Error(r.formatFunc(record))
 		return nil
