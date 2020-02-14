@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
 - Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
+- Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 
 *Packetbeat*
 
@@ -110,13 +111,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
 - Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
+- Add ingress nginx controller fileset {pull}16197[16197]
 - move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
+- Add MQTT input. {issue}15602[15602] {pull}16204[16204]
 
 *Heartbeat*
 
