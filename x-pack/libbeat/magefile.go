@@ -9,12 +9,12 @@ package main
 import (
 	"context"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 )
 
 func init() {

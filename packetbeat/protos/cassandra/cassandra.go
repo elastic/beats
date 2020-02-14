@@ -20,13 +20,13 @@ package cassandra
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 
-	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
+	gocql "github.com/elastic/beats/v7/packetbeat/protos/cassandra/internal/gocql"
 )
 
 // cassandra application level protocol analyzer plugin

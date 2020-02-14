@@ -11,8 +11,8 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Update target namespace.
@@ -61,21 +61,21 @@ func (Update) VendorBeats() error {
 			return err
 		}
 
-		deps, err := gotool.ListDeps("github.com/elastic/beats/x-pack/functionbeat/provider/gcp/" + f)
+		deps, err := gotool.ListDeps("github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/" + f)
 		if err != nil {
 			return err
 		}
 
 		for _, d := range deps {
 			var in string
-			if strings.HasPrefix(d, "github.com/elastic/beats") {
-				in = strings.ReplaceAll(d, "github.com/elastic/beats/", "")
+			if strings.HasPrefix(d, "github.com/elastic/beats/v7") {
+				in = strings.ReplaceAll(d, "github.com/elastic/beats/v7/", "")
 				in = filepath.Join("..", "..", in)
 			} else {
 				in = filepath.Join("..", "..", "vendor", d)
 			}
 
-			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
+			out := strings.ReplaceAll(d, "github.com/elastic/beats/v7/vendor", "")
 
 			cp := &devtools.CopyTask{
 				Source: in,

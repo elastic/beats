@@ -31,7 +31,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const defaultCrossBuildTarget = "golangCrossBuild"
