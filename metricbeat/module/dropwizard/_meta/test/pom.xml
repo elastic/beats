@@ -17,7 +17,34 @@
     <dependency>
      <groupId>io.dropwizard.metrics</groupId>
      <artifactId>metrics-servlets</artifactId>
-     <version>4.0.0</version>
+     <version>${env.DROPWIZARD_VERSION}</version>
+    </dependency>
+
+    <!-- jetty:run dependencies -->
+    <dependency>
+     <groupId>org.mortbay.jetty</groupId>
+     <artifactId>maven-jetty-plugin</artifactId>
+     <version>6.1.26</version>
+    </dependency>
+    <dependency>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-compiler-plugin</artifactId>
+     <version>2.3.2</version>
+    </dependency>
+    <dependency>
+     <groupId>org.apache.maven</groupId>
+     <artifactId>maven-repository-metadata</artifactId>
+     <version>2.0.3</version>
+    </dependency>
+    <dependency>
+     <groupId>org.codehaus.plexus</groupId>
+     <artifactId>plexus-utils</artifactId>
+     <version>1.1</version>
+    </dependency>
+    <dependency>
+     <groupId>junit</groupId>
+     <artifactId>junit</artifactId>
+     <version>3.8.2</version>
     </dependency>
   </dependencies>
   <build>
@@ -32,8 +59,9 @@
         </configuration>
       </plugin>
       <plugin>
-	  <groupId>org.mortbay.jetty</groupId>
-         <artifactId>maven-jetty-plugin</artifactId>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.26</version>
       </plugin>
     </plugins>
   </build>
