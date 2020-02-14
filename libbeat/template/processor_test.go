@@ -34,6 +34,7 @@ func TestProcessor(t *testing.T) {
 	pEsVersion2 := &Processor{EsVersion: *common.MustNewVersion("2.0.0")}
 	pEsVersion64 := &Processor{EsVersion: *common.MustNewVersion("6.4.0")}
 	pEsVersion63 := &Processor{EsVersion: *common.MustNewVersion("6.3.6")}
+	pEsVersion76 := &Processor{EsVersion: *common.MustNewVersion("7.6.0")}
 
 	tests := []struct {
 		output   common.MapStr
@@ -299,6 +300,14 @@ func TestProcessor(t *testing.T) {
 		{
 			output:   migrationP.alias(&mapping.Field{Type: "alias", AliasPath: "a.f", MigrationAlias: true}),
 			expected: common.MapStr{"path": "a.f", "type": "alias"},
+		},
+		{
+			output:   p.histogram(&mapping.Field{Type: "histogram"}),
+			expected: nil,
+		},
+		{
+			output:   pEsVersion76.histogram(&mapping.Field{Type: "histogram"}),
+			expected: common.MapStr{"type": "histogram"},
 		},
 	}
 
