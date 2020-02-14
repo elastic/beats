@@ -150,9 +150,14 @@ func (this *Reader) Read(metricset string) ([]mb.Event, error) {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event
-	if this.config.GroupAllCountersTo != "" && (metricsetName != metricset) {
-		event := this.groupToEvent(values)
-		events = append(events, event)
+	if metricsetName != metricset {
+		if len(this.config.FilterByInstance) > 0 {
+			values = filterValuesByInstances(this.config.FilterByInstance, values)
+		}
+		if this.config.GroupAllCountersTo != "" {
+			event := this.groupToEvent(values)
+			events = append(events, event)
+		}
 	} else {
 		events = this.groupToEvents(values)
 	}
@@ -264,4 +269,28 @@ func matchesParentProcess(instanceName string) (bool, string) {
 		return true, matches[1]
 	}
 	return false, instanceName
+}
+
+// filterValuesByInstances func filters the counter valus based on the instances provided by the user, this is applied to the 'website' metricset at the moment so the _Total instance should be filtered out
+func filterValuesByInstances(instances []string, counterValues map[string][]pdh.CounterValue) map[string][]pdh.CounterValue {
+	filteredValues := make(map[string][]pdh.CounterValue)
+	for key, values := range counterValues {
+		filteredValues[key] = []pdh.CounterValue{}
+		for _, value := range values {
+			if containsInstance(value, instances) && value.Instance != "_Total" {
+				filteredValues[key] = append(filteredValues[key], value)
+			}
+		}
+	}
+	return filteredValues
+}
+
+// containsInstance func checks if the counter value contains a filtered instance
+func containsInstance(counterValue pdh.CounterValue, array []string) bool {
+	for _, ins := range array {
+		if ins == counterValue.Instance {
+			return true
+		}
+	}
+	return false
 }
