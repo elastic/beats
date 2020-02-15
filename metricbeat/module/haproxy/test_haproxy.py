@@ -46,7 +46,7 @@ class HaproxyTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.assert_no_logged_warnings(replace=['SSL/TLS verifications disabled.'])
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -95,7 +95,10 @@ class HaproxyTest(metricbeat.BaseTest):
             "extras": {
                 "ssl.certificate_authorities": [os.path.join(os.path.dirname(__file__), '_meta/certs/ca.pem')],
                 "ssl.certificate": os.path.join(os.path.dirname(__file__), '_meta/certs/client.pem'),
-                "ssl.key": os.path.join(os.path.dirname(__file__), '_meta/certs/client.key')
+                "ssl.key": os.path.join(os.path.dirname(__file__), '_meta/certs/client.key'),
+                # TODO: verification_mode: "certificate"
+                # compose uses dynamic IP addresses and there are no IP SAN records in the certificate
+                "ssl.verification_mode": "none"
             }
         }])
         self._test_stat()
