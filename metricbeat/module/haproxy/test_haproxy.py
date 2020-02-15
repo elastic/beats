@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import unittest
 from nose.plugins.attrib import attr
 
@@ -44,6 +45,7 @@ class HaproxyTest(metricbeat.BaseTest):
 
     def _test_stat(self):
         proc = self.start_beat()
+        time.sleep(10)
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
