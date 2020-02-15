@@ -135,6 +135,7 @@ var WithHost modifier = builtinModifier(func(info beat.Info) common.MapStr {
 	return common.MapStr{
 		"host": common.MapStr{
 			"name": info.Name,
+			"ip":   info.HostIp,
 		},
 	}
 })
@@ -147,6 +148,7 @@ func WithBeatMeta(key string) modifier {
 			"type":         info.Beat,
 			"ephemeral_id": info.EphemeralID.String(),
 			"hostname":     info.Hostname,
+			"hostip":       info.HostIp,
 			"id":           info.ID.String(),
 			"version":      info.Version,
 		}

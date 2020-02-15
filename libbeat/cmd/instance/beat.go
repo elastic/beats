@@ -28,6 +28,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"net"
 	"os"
 	"runtime"
 	"strings"
@@ -174,7 +175,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
-
+		monitoring.NewString(registry, "hostip").Set(b.Info.HostIp)
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
 		serviceRegistry := stateRegistry.NewRegistry("service")
@@ -199,6 +200,24 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 	}
 	return b, nil
 }
+func getIPs() (ips []string) {
+
+	interfaceAddr, err := net.InterfaceAddrs()
+	if err != nil {
+		fmt.Printf("fail to get net interface addrs: %v", err)
+		return ips
+	}
+
+	for _, address := range interfaceAddr {
+		ipNet, isValidIpNet := address.(*net.IPNet)
+		if isValidIpNet && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				ips = append(ips, ipNet.IP.String())
+			}
+		}
+	}
+	return ips
+}
 
 // NewBeat creates a new beat instance
 func NewBeat(name, indexPrefix, v string) (*Beat, error) {
@@ -210,6 +229,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	}
 
 	hostname, err := os.Hostname()
+	hostip := getIPs()
 	if err != nil {
 		return nil, err
 	}
@@ -231,6 +251,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Version:     v,
 			Name:        hostname,
 			Hostname:    hostname,
+			HostIp:      hostip[0],
 			ID:          id,
 			EphemeralID: ephemeralID,
 		},

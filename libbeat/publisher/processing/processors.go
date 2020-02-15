@@ -100,7 +100,9 @@ func (p *group) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, sub := range p.list {
 		var err error
-
+		//if i == 1 {
+		//	continue;
+		//}
 		event, err = sub.Run(event)
 		if err != nil {
 			// XXX: We don't drop the event, but continue filtering here if the most

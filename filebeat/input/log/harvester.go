@@ -54,6 +54,8 @@ import (
 	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/libbeat/reader/readjson"
+
+	"path/filepath"
 )
 
 var (
@@ -523,7 +525,20 @@ func (h *Harvester) openFile() error {
 	h.source = File{File: f}
 	return nil
 }
+/**
+ * 删除已经采集完比的文件
+ */
+func (h *Harvester) DeleteCompleteFile() error {
+	path,_ := filepath.Abs(h.source.Name())
+	err := os.Remove(path)
+	if err != nil{
+		logp.Err("Initialising encoding for '%v' failed: %v", h.source.Name(), err)
+	} else {
+		logp.Info("Delete Complete File '%v' success.",h.source.Name())
+	}
 
+	return err
+}
 func (h *Harvester) validateFile(f *os.File) error {
 	info, err := f.Stat()
 	if err != nil {
@@ -612,6 +627,9 @@ func (h *Harvester) cleanup() {
 	}
 
 	harvesterClosed.Add(1)
+	if h.config.DeleteComplete {
+		_ = h.DeleteCompleteFile()
+	}
 }
 
 // newLogFileReader creates a new reader to read log files
