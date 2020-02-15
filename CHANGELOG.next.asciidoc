@@ -77,6 +77,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
+
 *Heartbeat*
 
 
