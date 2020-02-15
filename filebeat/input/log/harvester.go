@@ -525,16 +525,17 @@ func (h *Harvester) openFile() error {
 	h.source = File{File: f}
 	return nil
 }
+
 /**
- * 删除已经采集完比的文件
+ * delete complete file
  */
 func (h *Harvester) DeleteCompleteFile() error {
-	path,_ := filepath.Abs(h.source.Name())
+	path, _ := filepath.Abs(h.source.Name())
 	err := os.Remove(path)
-	if err != nil{
+	if err != nil {
 		logp.Err("Initialising encoding for '%v' failed: %v", h.source.Name(), err)
 	} else {
-		logp.Info("Delete Complete File '%v' success.",h.source.Name())
+		logp.Info("Delete Complete File '%v' success.", h.source.Name())
 	}
 
 	return err
