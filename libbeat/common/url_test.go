@@ -24,6 +24,8 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -112,5 +114,46 @@ func TestURLParamsEncode(t *testing.T) {
 		urlWithParams := EncodeURLParams(urlNew, params)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlWithParams)
+	}
+}
+
+func TestParseURL(t *testing.T) {
+	tests := map[string]struct {
+		input           string
+		expected        string
+		errorAssertFunc require.ErrorAssertionFunc
+	}{
+		"http": {
+			"http://host:1234/path",
+			"http://host:1234/path",
+			require.NoError,
+		},
+		"https": {
+			"https://host:1234/path",
+			"https://host:1234/path",
+			require.NoError,
+		},
+		"no_scheme": {
+			"host:1234/path",
+			"http://host:1234/path",
+			require.NoError,
+		},
+		"invalid": {
+			"foobar:port",
+			"",
+			require.Error,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			url, err := ParseURL(test.input)
+			test.errorAssertFunc(t, err)
+			if test.expected != "" {
+				require.Equal(t, test.expected, url.String())
+			} else {
+				require.Nil(t, url)
+			}
+		})
 	}
 }

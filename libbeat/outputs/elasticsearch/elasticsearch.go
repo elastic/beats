@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -68,7 +67,7 @@ func makeES(
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err = esclientleg.ParseProxyURL(config.ProxyURL)
+		proxyURL, err = common.ParseURL(config.ProxyURL)
 		if err != nil {
 			return outputs.Fail(err)
 		}

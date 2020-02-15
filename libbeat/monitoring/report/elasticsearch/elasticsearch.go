@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -131,7 +130,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		windowSize = 1
 	}
 
-	proxyURL, err := esclientleg.ParseProxyURL(config.ProxyURL)
+	proxyURL, err := common.ParseURL(config.ProxyURL)
 	if err != nil {
 		return nil, err
 	}

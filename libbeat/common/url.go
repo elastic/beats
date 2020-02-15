@@ -83,3 +83,19 @@ func EncodeURLParams(url string, params url.Values) string {
 
 	return strings.Join([]string{url, "?", params.Encode()}, "")
 }
+
+// ParseURL tries to parse a URL and return the parsed result.
+func ParseURL(raw string) (*url.URL, error) {
+	if raw == "" {
+		return nil, nil
+	}
+
+	url, err := url.Parse(raw)
+	if err == nil && strings.HasPrefix(url.Scheme, "http") {
+		return url, err
+	}
+
+	// Proxy was bogus. Try prepending "http://" to it and
+	// see if that parses correctly.
+	return url.Parse("http://" + raw)
+}

@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 )
 
 type elasticsearchConfig struct {
@@ -79,7 +79,7 @@ var (
 
 func (c *elasticsearchConfig) Validate() error {
 	if c.ProxyURL != "" && !c.ProxyDisable {
-		if _, err := esclientleg.ParseProxyURL(c.ProxyURL); err != nil {
+		if _, err := common.ParseURL(c.ProxyURL); err != nil {
 			return err
 		}
 	}

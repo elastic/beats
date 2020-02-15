@@ -266,7 +266,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err = esclientleg.ParseProxyURL(config.ProxyURL)
+		proxyURL, err = common.ParseURL(config.ProxyURL)
 		if err != nil {
 			return nil, err
 		}
