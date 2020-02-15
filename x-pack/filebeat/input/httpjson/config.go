@@ -26,6 +26,7 @@ type config struct {
 	JSONObjects          string            `config:"json_objects_array"`
 	NoHTTPBody           bool              `config:"no_http_body"`
 	Pagination           *Pagination       `config:"pagination"`
+	RateLimit            *RateLimit        `config:"rate_limit"`
 	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  string            `config:"url" validate:"required"`
 }
@@ -40,9 +41,17 @@ type Pagination struct {
 	URL              string        `config:"url"`
 }
 
+// HTTP Header information for pagination
 type Header struct {
 	FieldName    string `config:"field_name"`
 	RegexPattern string `config:"regex_pattern"`
+}
+
+// HTTP Header Rate Limit information
+type RateLimit struct {
+	Limit     string `config:"limit"`
+	Reset     string `config:"reset"`
+	Remaining string `config:"remaining"`
 }
 
 func (c *config) Validate() error {

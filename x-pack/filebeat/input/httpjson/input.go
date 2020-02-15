@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
@@ -180,12 +181,16 @@ func (in *httpjsonInput) processEventArray(events []interface{}) (map[string]int
 	return m, nil
 }
 
+// getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
 func getNextLinkFromHeader(header http.Header, fieldName string, regexPattern string) (string, error) {
 	re, err := regexp.Compile(regexPattern)
 	if err != nil {
 		return "", err
 	}
-	links := header[fieldName]
+	links, ok := header[fieldName]
+	if !ok {
+		return "", errors.Errorf("field %s does not exist in the HTTP Header", fieldName)
+	}
 	for _, link := range links {
 		matchArray := re.FindAllStringSubmatch(link, -1)
 		if len(matchArray) == 1 {
@@ -193,6 +198,37 @@ func getNextLinkFromHeader(header http.Header, fieldName string, regexPattern st
 		}
 	}
 	return "", nil
+}
+
+// applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
+func (in *httpjsonInput) applyRateLimit(header http.Header, rateLimit *RateLimit) error {
+	if rateLimit != nil {
+		if rateLimit.Remaining != "" {
+			remaining := header.Get(rateLimit.Remaining)
+			if remaining == "" {
+				return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Remaining)
+			}
+			m, err := strconv.ParseInt(remaining, 10, 64)
+			if err != nil {
+				return errors.Wrapf(err, "failed to parse rate-limit remaining value")
+			}
+			in.log.Debugf("Rate Limit: The number of allowed remaining requests is %d.", m)
+			if m == 0 {
+				reset := header.Get(rateLimit.Reset)
+				if reset == "" {
+					return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Reset)
+				}
+				epoch, err := strconv.ParseInt(reset, 10, 64)
+				if err != nil {
+					return errors.Wrapf(err, "failed to parse rate-limit reset value")
+				}
+				t := time.Unix(epoch, 0)
+				in.log.Debugw("Rate Limit: Wait until %v for the rate limit to reset.", t)
+				time.Sleep(time.Until(t))
+			}
+		}
+	}
+	return nil
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
@@ -261,20 +297,24 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				// Pagination control using HTTP Header
 				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
 				if err != nil {
-					return err
+					return errors.Wrapf(err, "failed to retrieve the next URL for pagination")
 				}
 				if ri.URL == url || url == "" {
-					in.log.Info("Successfully processed HTTP request. Pagination finished.")
+					in.log.Info("Pagination finished.")
 					return nil
 				}
 				ri.URL = url
+				err = in.applyRateLimit(header, in.config.RateLimit)
+				if err != nil {
+					return err
+				}
 				in.log.Info("Continuing with pagination to URL: ", ri.URL)
 				continue
 			} else {
 				// Pagination control using HTTP Body fields
 				v, err = common.MapStr(mm).GetValue(in.config.Pagination.IDField)
 				if err != nil {
-					in.log.Info("Successfully processed HTTP request. Pagination finished.")
+					in.log.Info("Pagination finished.")
 					return nil
 				}
 				if in.config.Pagination.RequestField != "" {
@@ -292,6 +332,10 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				}
 				if in.config.Pagination.ExtraBodyContent != nil {
 					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
+				}
+				err = in.applyRateLimit(header, in.config.RateLimit)
+				if err != nil {
+					return err
 				}
 				in.log.Info("Continuing with pagination to URL: ", ri.URL)
 				continue
