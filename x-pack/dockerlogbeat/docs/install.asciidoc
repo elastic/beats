@@ -29,7 +29,7 @@ https://github.com/elastic/beats[beats] GitHub repo.
 +
 ["source","sh",subs="attributes"]
 ----
-docker plugin install store/elastic/{log-driver-alias}:{version} --alias {log-driver-alias}
+docker plugin install elastic/{log-driver-alias}:{version}
 ----
 +
 *To build and install from source:*

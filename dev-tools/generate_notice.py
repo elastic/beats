@@ -307,6 +307,10 @@ CC_SA_4_LICENSE_TITLE = [
     "Creative Commons Attribution-ShareAlike 4.0 International"
 ]
 
+ECLIPSE_PUBLIC_LICENSE_TITLES = [
+    "Eclipse Public License - v 1.0"
+]
+
 LGPL_3_LICENSE_TITLE = [
     "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
 ]
@@ -346,16 +350,18 @@ def detect_license_summary(content):
         return "LGPL-3.0"
     if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
         return "UPL-1.0"
-
+    if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
+        return "EPL-1.0"
     return "UNKNOWN"
 
 
 ACCEPTED_LICENSES = [
     "Apache-2.0",
-    "MIT",
     "BSD-4-Clause",
     "BSD-3-Clause",
     "BSD-2-Clause",
+    "EPL-1.0",
+    "MIT",
     "MPL-2.0",
     "UPL-1.0",
 ]
