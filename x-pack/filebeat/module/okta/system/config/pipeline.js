@@ -94,12 +94,14 @@ function OktaSystem(keep_original_message) {
     // Update nested fields 
     var renameNestedFields = function(evt) {
         var arr = evt.Get("okta.target");
-        for (var i = 0; i < arr.length; i++) {
-            arr[i].alternate_id = arr[i].alternateId;
-            arr[i].display_name = arr[i].displayName;
-            delete arr[i].alternateId;
-            delete arr[i].displayName;
-            delete arr[i].detailEntry;
+        if (arr != null) {
+            for (var i = 0; i < arr.length; i++) {
+                arr[i].alternate_id = arr[i].alternateId;
+                arr[i].display_name = arr[i].displayName;
+                delete arr[i].alternateId;
+                delete arr[i].displayName;
+                delete arr[i].detailEntry;
+	    }
         }
     };
 

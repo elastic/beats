@@ -642,6 +642,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------------- OKTA Module ---------------------------------
+- module: okta
+  system:
+    enabled: true
+    # API key to access OKTA
+    #var.api_key
+
+    # URL of the OKTA REST API
+    #var.url
+
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:

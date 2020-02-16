@@ -69,6 +69,11 @@
   type: group
   fields:
 
+  - name: ip
+    type: ip
+    description: >
+      The IP address of the client.
+    
   - name: user_agent
     description: >
       Fields about the user agent information of the client.
@@ -113,6 +118,11 @@
   type: group
   fields:
 
+  - name: reason
+    type: keyword
+    description: >
+      The reason of the outcome.
+
   - name: result
     type: keyword
     description: >
@@ -123,7 +133,7 @@
   short: The list of targets.
   description: >
     The list of targets.
-  type: group
+  type: array
   fields:
 
   - name: id
@@ -178,30 +188,30 @@
     type: group
     fields:
 
-    - name: request_uri
+    - name: device_fingerprint
       type: keyword
       description: >
-        The request URI.
+        The fingerprint of the device.
 
     - name: request_id
       type: keyword
       description: >
         The identifier of the request.
 
-    - name: url
+    - name: request_uri
       type: keyword
       description: >
-        The URL.
+        The request URI.
 
     - name: threat_suspected
       type: keyword
       description: >
         Threat suspected.
 
-    - name: device_fingerprint
+    - name: url
       type: keyword
       description: >
-        The fingerprint of the device.
+        The URL.
 
 - name: authentication_context
   title: Authentication Context
@@ -216,6 +226,11 @@
     description: >
       The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
 
+  - name: authentication_step
+    type: integer
+    description: >
+      The authentication step.
+
   - name: credential_provider
     type: keyword
     description: >
@@ -229,7 +244,7 @@
   - name: issuer
     description: >
       The information about the issuer.
-    type: group
+    type: array
     fields:
 
     - name: id
@@ -260,15 +275,27 @@
   type: group
   fields:
 
-  - name: as_number
-    type: keyword
+  - name: as 
+    type: group
     description: >
-      The AS number.
+      The autonomous system.
+    fields:
 
-  - name: as_org
-    type: keyword
-    description: >
-      The organization that owns the AS number.
+    - name: number
+      type: integer
+      description: >
+        The AS number.
+
+    - name: organization
+      type: group
+      description: >
+        The organization that owns the AS number.
+      fields:
+      
+      - name: name
+        type: keyword
+        description: >
+          The organization name.
 
   - name: isp
     type: keyword

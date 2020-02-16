@@ -48,6 +48,7 @@ grouped in the following categories:
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-okta>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -20137,6 +20138,574 @@ alias to: process.thread.id
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-okta]]
+== OKTA fields
+
+Module for handling system logs from OKTA.
+
+
+
+[float]
+=== okta
+
+Fields from OKTA.
+
+
+
+*`okta.uuid`*::
++
+--
+The unique identifier of the OKTA LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.event_type`*::
++
+--
+The type of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.version`*::
++
+--
+The version of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.severity`*::
++
+--
+The severity of the LogEvent. Must be one of DEBUG, INFO, WARN, or ERROR.
+
+
+type: keyword
+
+--
+
+*`okta.display_message`*::
++
+--
+The display message of the LogEvent.
+
+
+type: keyword
+
+--
+
+[float]
+=== actor
+
+Fields that let you store information of the actor for the LogEvent.
+
+
+
+*`okta.actor.id`*::
++
+--
+Identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.type`*::
++
+--
+Type of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.alternate_id`*::
++
+--
+Alternate identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.display_name`*::
++
+--
+Display name of the actor.
+
+
+type: keyword
+
+--
+
+[float]
+=== client
+
+Fields that let you store information about the client of the actor.
+
+
+
+*`okta.client.ip`*::
++
+--
+The IP address of the client.
+
+
+type: ip
+
+--
+
+[float]
+=== user_agent
+
+Fields about the user agent information of the client.
+
+
+
+*`okta.client.user_agent.raw_user_agent`*::
++
+--
+The raw informaton of the user agent.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.os`*::
++
+--
+The OS informaton.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.browser`*::
++
+--
+The browser informaton of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.zone`*::
++
+--
+The zone information of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.device`*::
++
+--
+The information of the client device.
+
+
+type: keyword
+
+--
+
+*`okta.client.id`*::
++
+--
+The identifier of the client.
+
+
+type: keyword
+
+--
+
+[float]
+=== outcome
+
+Fields that let you store information about the outcome.
+
+
+
+*`okta.outcome.reason`*::
++
+--
+The reason of the outcome.
+
+
+type: keyword
+
+--
+
+*`okta.outcome.result`*::
++
+--
+The result of the outcome. Must be one of: SUCCESS, FAILURE, SKIPPED, ALLOW, DENY, CHALLENGE, UNKNOWN.
+
+
+type: keyword
+
+--
+
+*`okta.target`*::
++
+--
+The list of targets.
+
+
+type: array
+
+--
+
+[float]
+=== transaction
+
+Fields that let you store information about related transaction.
+
+
+
+*`okta.transaction.id`*::
++
+--
+Identifier of the transaction.
+
+
+type: keyword
+
+--
+
+*`okta.transaction.type`*::
++
+--
+The type of transaction. Must be one of "WEB", "JOB".
+
+
+type: keyword
+
+--
+
+[float]
+=== debug_context
+
+Fields that let you store information about the debug context.
+
+
+
+[float]
+=== debug_data
+
+The debug data.
+
+
+
+*`okta.debug_context.debug_data.device_fingerprint`*::
++
+--
+The fingerprint of the device.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_id`*::
++
+--
+The identifier of the request.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_uri`*::
++
+--
+The request URI.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.threat_suspected`*::
++
+--
+Threat suspected.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.url`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+[float]
+=== authentication_context
+
+Fields that let you store information about authentication context.
+
+
+
+*`okta.authentication_context.authentication_provider`*::
++
+--
+The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.authentication_step`*::
++
+--
+The authentication step.
+
+
+type: integer
+
+--
+
+*`okta.authentication_context.credential_provider`*::
++
+--
+The information about credential provider. Must be one of OKTA_CREDENTIAL_PROVIDER, RSA, SYMANTEC, GOOGLE, DUO, YUBIKEY.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.credential_type`*::
++
+--
+The information about credential type. Must be one of OTP, SMS, PASSWORD, ASSERTION, IWA, EMAIL, OAUTH2, JWT, CERTIFICATE, PRE_SHARED_SYMMETRIC_KEY, OKTA_CLIENT_SESSION, DEVICE_UDID.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.issuer`*::
++
+--
+The information about the issuer.
+
+
+type: array
+
+--
+
+*`okta.authentication_context.external_session_id`*::
++
+--
+The session identifer of the external session if any.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.interface`*::
++
+--
+The interface used. e.g., Outlook, Office365, wsTrust
+
+
+type: keyword
+
+--
+
+[float]
+=== security_context
+
+Fields that let you store information about security context.
+
+
+
+[float]
+=== as
+
+The autonomous system.
+
+
+
+*`okta.security_context.as.number`*::
++
+--
+The AS number.
+
+
+type: integer
+
+--
+
+[float]
+=== organization
+
+The organization that owns the AS number.
+
+
+
+*`okta.security_context.as.organization.name`*::
++
+--
+The organization name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.isp`*::
++
+--
+The Internet Service Provider.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.domain`*::
++
+--
+The domain name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.is_proxy`*::
++
+--
+Whether it is a proxy or not.
+
+
+type: boolean
+
+--
+
+[float]
+=== request
+
+Fields that let you store information about the request, in the form of list of ip_chain.
+
+
+
+[float]
+=== ip_chain
+
+List of ip_chain objects.
+
+
+
+*`okta.request.ip_chain.ip`*::
++
+--
+IP address.
+
+
+type: ip
+
+--
+
+*`okta.request.ip_chain.version`*::
++
+--
+IP version. Must be one of V4, V6.
+
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.source`*::
++
+--
+Source information.
+
+
+type: keyword
+
+--
+
+[float]
+=== geographical_context
+
+Geographical information.
+
+
+
+*`okta.request.ip_chain.geographical_context.city`*::
++
+--
+The city.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.state`*::
++
+--
+The state.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.postal_code`*::
++
+--
+The postal code.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.country`*::
++
+--
+The country.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.geolocation`*::
++
+--
+Geolocation information.
+
+
+type: geo_point
 
 --
 
