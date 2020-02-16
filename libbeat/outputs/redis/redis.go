@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -116,17 +115,12 @@ func makeRedis(
 		return outputs.Fail(err)
 	}
 
-	transp := &transport.Config{
-		Timeout: config.Timeout,
-		Proxy:   &config.Proxy,
-		TLS:     tls,
-		Stats:   observer,
-	}
-
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, h := range hosts {
+		hasScheme := true
 		if parts := strings.SplitN(h, "://", 2); len(parts) != 2 {
 			h = fmt.Sprintf("%s://%s", redisScheme, h)
+			hasScheme = false
 		}
 
 		hostUrl, err := url.Parse(h)
@@ -142,22 +136,25 @@ func makeRedis(
 			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
 		}
 
-		if hostUrl.Scheme == tlsRedisScheme && transp.TLS == nil {
-			transp.TLS = &transport.TLSConfig{}
+		transp := &transport.Config{
+			Timeout: config.Timeout,
+			Proxy:   &config.Proxy,
+			TLS:     tls,
+			Stats:   observer,
 		}
 
-		var host string
-		var port int
-		if hostUrl.Port() != "" {
-			parts := strings.SplitN(hostUrl.Host, ":", 2)
-			host = parts[0]
-			port, _ = strconv.Atoi(parts[1])
-		} else {
-			host = strings.ReplaceAll(hostUrl.Host, ":", "")
-			port = defaultPort
+		switch hostUrl.Scheme {
+		case redisScheme:
+			if hasScheme {
+				transp.TLS = nil // disable TLS if user explicitely set `redis` scheme
+			}
+		case tlsRedisScheme:
+			if transp.TLS == nil {
+				transp.TLS = &transport.TLSConfig{} // enable with system default if TLS was not configured
+			}
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", host, port)
+		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort)
 		if err != nil {
 			return outputs.Fail(err)
 		}
