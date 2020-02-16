@@ -8,8 +8,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
@@ -128,6 +131,9 @@ func (in *httpjsonInput) Run() {
 func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
 	b, _ := json.Marshal(ri.ContentMap)
 	body := bytes.NewReader(b)
+	if in.config.NoHTTPBody {
+		body = bytes.NewReader([]byte{})
+	}
 	req, err := http.NewRequest(in.config.HTTPMethod, ri.URL, body)
 	if err != nil {
 		return nil, err
@@ -137,7 +143,11 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", userAgent)
 	if in.config.APIKey != "" {
-		req.Header.Set("Authorization", in.config.APIKey)
+		if in.config.AuthenticationScheme != "" {
+			req.Header.Set("Authorization", fmt.Sprintf("%s %s", in.config.AuthenticationScheme, in.config.APIKey))
+		} else {
+			req.Header.Set("Authorization", in.config.APIKey)
+		}
 	}
 	for k, v := range ri.Headers {
 		switch vv := v.(type) {
@@ -147,6 +157,78 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 		}
 	}
 	return req, nil
+}
+
+// processEvent processes an array of events
+func (in *httpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
+	var m map[string]interface{}
+	for _, t := range events {
+		switch v := t.(type) {
+		case map[string]interface{}:
+			m = v
+			d, err := json.Marshal(v)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to marshal %+v", v)
+			}
+			ok := in.outlet.OnEvent(makeEvent(string(d)))
+			if !ok {
+				return nil, errors.New("function OnEvent returned false")
+			}
+		default:
+			return nil, errors.Errorf("invalid JSON object")
+		}
+	}
+	return m, nil
+}
+
+// getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
+func getNextLinkFromHeader(header http.Header, fieldName string, regexPattern string) (string, error) {
+	re, err := regexp.Compile(regexPattern)
+	if err != nil {
+		return "", err
+	}
+	links, ok := header[fieldName]
+	if !ok {
+		return "", errors.Errorf("field %s does not exist in the HTTP Header", fieldName)
+	}
+	for _, link := range links {
+		matchArray := re.FindAllStringSubmatch(link, -1)
+		if len(matchArray) == 1 {
+			return matchArray[0][1], nil
+		}
+	}
+	return "", nil
+}
+
+// applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
+func (in *httpjsonInput) applyRateLimit(header http.Header, rateLimit *RateLimit) error {
+	if rateLimit != nil {
+		if rateLimit.Remaining != "" {
+			remaining := header.Get(rateLimit.Remaining)
+			if remaining == "" {
+				return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Remaining)
+			}
+			m, err := strconv.ParseInt(remaining, 10, 64)
+			if err != nil {
+				return errors.Wrapf(err, "failed to parse rate-limit remaining value")
+			}
+			in.log.Debugf("Rate Limit: The number of allowed remaining requests is %d.", m)
+			if m == 0 {
+				reset := header.Get(rateLimit.Reset)
+				if reset == "" {
+					return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Reset)
+				}
+				epoch, err := strconv.ParseInt(reset, 10, 64)
+				if err != nil {
+					return errors.Wrapf(err, "failed to parse rate-limit reset value")
+				}
+				t := time.Unix(epoch, 0)
+				in.log.Debugw("Rate Limit: Wait until %v for the rate limit to reset.", t)
+				time.Sleep(time.Until(t))
+			}
+		}
+	}
+	return nil
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
@@ -161,6 +243,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			return errors.Wrapf(err, "failed to execute http client.Do")
 		}
 		responseData, err := ioutil.ReadAll(msg.Body)
+		header := msg.Header
 		msg.Body.Close()
 		if err != nil {
 			return errors.Wrapf(err, "failed to read http.response.body")
@@ -170,47 +253,68 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
 		var m, v interface{}
+		var mm map[string]interface{}
 		err = json.Unmarshal(responseData, &m)
 		if err != nil {
+			in.log.Debugw("failed to unmarshal http.response.body", string(responseData))
 			return errors.Wrapf(err, "failed to unmarshal http.response.body")
 		}
-		switch mmap := m.(type) {
+		switch obj := m.(type) {
+		// Top level Array
+		case []interface{}:
+			mm, err = in.processEventArray(obj)
+			if err != nil {
+				return err
+			}
 		case map[string]interface{}:
 			if in.config.JSONObjects == "" {
-				ok := in.outlet.OnEvent(makeEvent(string(responseData)))
-				if !ok {
-					return errors.New("function OnEvent returned false")
+				mm, err = in.processEventArray([]interface{}{obj})
+				if err != nil {
+					return err
 				}
 			} else {
-				v, err = common.MapStr(mmap).GetValue(in.config.JSONObjects)
+				v, err = common.MapStr(mm).GetValue(in.config.JSONObjects)
 				if err != nil {
 					return err
 				}
 				switch ts := v.(type) {
 				case []interface{}:
-					for _, t := range ts {
-						switch tv := t.(type) {
-						case map[string]interface{}:
-							d, err := json.Marshal(tv)
-							if err != nil {
-								return errors.Wrapf(err, "failed to marshal json_objects_array")
-							}
-							ok := in.outlet.OnEvent(makeEvent(string(d)))
-							if !ok {
-								return errors.New("function OnEvent returned false")
-							}
-						default:
-							return errors.New("invalid json_objects_array configuration")
-						}
+					mm, err = in.processEventArray(ts)
+					if err != nil {
+						return err
 					}
 				default:
-					return errors.New("invalid json_objects_array configuration")
+					return errors.Errorf("content of %s is not a valid array", in.config.JSONObjects)
 				}
 			}
-			if in.config.Pagination != nil && in.config.Pagination.IsEnabled {
-				v, err = common.MapStr(mmap).GetValue(in.config.Pagination.IDField)
+		default:
+			in.log.Debugw("http.response.body is not valid JSON", string(responseData))
+			return errors.New("http.response.body is not valid JSON")
+		}
+
+		if mm != nil && in.config.Pagination != nil && in.config.Pagination.IsEnabled {
+			if in.config.Pagination.Header != nil {
+				// Pagination control using HTTP Header
+				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
 				if err != nil {
-					in.log.Info("Successfully processed HTTP request. Pagination finished.")
+					return errors.Wrapf(err, "failed to retrieve the next URL for pagination")
+				}
+				if ri.URL == url || url == "" {
+					in.log.Info("Pagination finished.")
+					return nil
+				}
+				ri.URL = url
+				err = in.applyRateLimit(header, in.config.RateLimit)
+				if err != nil {
+					return err
+				}
+				in.log.Info("Continuing with pagination to URL: ", ri.URL)
+				continue
+			} else {
+				// Pagination control using HTTP Body fields
+				v, err = common.MapStr(mm).GetValue(in.config.Pagination.IDField)
+				if err != nil {
+					in.log.Info("Pagination finished.")
 					return nil
 				}
 				if in.config.Pagination.RequestField != "" {
@@ -229,13 +333,15 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				if in.config.Pagination.ExtraBodyContent != nil {
 					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
 				}
+				err = in.applyRateLimit(header, in.config.RateLimit)
+				if err != nil {
+					return err
+				}
+				in.log.Info("Continuing with pagination to URL: ", ri.URL)
 				continue
 			}
-			return nil
-		default:
-			in.log.Debugw("http.response.body is not valid JSON", string(responseData))
-			return errors.New("http.response.body is not valid JSON")
 		}
+		return nil
 	}
 }
 
