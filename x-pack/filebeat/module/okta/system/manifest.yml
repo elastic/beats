@@ -34,6 +34,13 @@ var:
           "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"
         },
       }
+  - name: rate_limit
+    default: |-
+      {
+        "limit": "X-Rate-Limit-Limit",
+        "remaining": "X-Rate-Limit-Remaining",
+        "reset": "X-Rate-Limit-Reset"
+      }
   - name: url
     default: ""
   - name: ssl

@@ -11,6 +11,7 @@ no_http_body: {{ .no_http_body }}
 interval: {{ .interval }}
 json_objects_array: {{ .json_objects_array }}
 pagination: {{ .pagination }}
+rate_limit: {{ .rate_limit }}
 url: {{ .url }}
 ssl: {{ .ssl }}
 
