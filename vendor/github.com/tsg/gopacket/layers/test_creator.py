@@ -96,8 +96,8 @@ def main():
   for arg in args.files:
     for path in glob.glob(arg):
       for i, packet in enumerate(TcpdumpOutputToPackets(GetTcpdumpOutput(path))):
-        print '\n'.join(packet.Test(
-          args.name % i, args.link_type))
+        print('\n'.join(packet.Test(
+          args.name % i, args.link_type)))
 
 if __name__ == '__main__':
     main()
