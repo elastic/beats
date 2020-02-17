@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import glob
 import os
 import datetime
@@ -309,6 +307,10 @@ CC_SA_4_LICENSE_TITLE = [
     "Creative Commons Attribution-ShareAlike 4.0 International"
 ]
 
+ECLIPSE_PUBLIC_LICENSE_TITLES = [
+    "Eclipse Public License - v 1.0"
+]
+
 LGPL_3_LICENSE_TITLE = [
     "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
 ]
@@ -328,7 +330,7 @@ def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     # replace smart quotes with less intelligent ones
-    content = content.replace(b'\xe2\x80\x9c', '"').replace(b'\xe2\x80\x9d', '"')
+    content = content.replace(bytes(b'\xe2\x80\x9c').decode(), '"').replace(bytes(b'\xe2\x80\x9d').decode(), '"')
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
@@ -348,16 +350,18 @@ def detect_license_summary(content):
         return "LGPL-3.0"
     if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
         return "UPL-1.0"
-
+    if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
+        return "EPL-1.0"
     return "UNKNOWN"
 
 
 ACCEPTED_LICENSES = [
     "Apache-2.0",
-    "MIT",
     "BSD-4-Clause",
     "BSD-3-Clause",
     "BSD-2-Clause",
+    "EPL-1.0",
+    "MIT",
     "MPL-2.0",
     "UPL-1.0",
 ]

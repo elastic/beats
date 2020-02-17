@@ -7036,7 +7036,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 
@@ -20992,7 +20992,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
 
 
 type: scaled_float
@@ -22492,6 +22492,58 @@ The desired generation per StatefulSet
 
 
 type: long
+
+--
+
+[float]
+=== storageclass
+
+kubernetes storage class metrics
+
+
+
+*`kubernetes.storageclass.name`*::
++
+--
+Storage class name.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.provisioner`*::
++
+--
+Volume provisioner for the storage class.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.reclaim_policy`*::
++
+--
+Reclaim policy for dynamically created volumes
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.volume_binding_mode`*::
++
+--
+Mode for default provisioning and binding
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.created`*::
++
+--
+Storage class creation date
+
+type: date
 
 --
 

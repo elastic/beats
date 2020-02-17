@@ -75,7 +75,7 @@ class BaseTest(TestCase):
             for r in replace:
                 pattern = self.build_log_regex(r)
                 log = pattern.sub("", log)
-        self.assertNotRegexpMatches(log, "\tERROR\t|\tWARN\t")
+        self.assertNotRegex(log, "\tERROR\t|\tWARN\t")
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
@@ -97,14 +97,14 @@ class BaseTest(TestCase):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        print output
+        print(output)
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
 
         fields = COMMON_FIELDS + fields
-        print fields
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        print(fields)
+        self.assertCountEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
 
