@@ -1,0 +1,4 @@
+type: http
+url: "/request?wait=1"
+suffix: json
+remove_fields_from_comparison:

@@ -1,7 +1,7 @@
-- name: cluster_health
+- name: mgr_cluster_health
   type: group
   description: >
-    cluster_health
+    mgr_cluster_health
   release: beta
   fields:
     - name: overall_status

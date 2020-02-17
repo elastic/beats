@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "ceph": {
-        "cluster_health": {
+        "mgr_cluster_health": {
             "overall_status": "HEALTH_OK",
             "timechecks": {
                 "epoch": 3,
@@ -17,7 +17,7 @@
         }
     },
     "event": {
-        "dataset": "ceph.cluster_health",
+        "dataset": "ceph.mgr_cluster_health",
         "duration": 115000,
         "module": "ceph"
     },

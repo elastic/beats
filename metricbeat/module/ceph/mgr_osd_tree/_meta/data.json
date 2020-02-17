@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "osd_tree": {
+        "mgr_osd_tree": {
             "children": [
                 "-2"
             ],
@@ -13,7 +13,7 @@
         }
     },
     "event": {
-        "dataset": "ceph.osd_tree",
+        "dataset": "ceph.mgr_osd_tree",
         "duration": 115000,
         "module": "ceph"
     },

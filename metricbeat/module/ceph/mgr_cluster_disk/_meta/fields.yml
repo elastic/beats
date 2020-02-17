@@ -1,7 +1,7 @@
-- name: cluster_disk
+- name: mgr_cluster_disk
   type: group
   description: >
-    cluster_disk
+    mgr_cluster_disk
   release: beta
   fields:
     - name: available.bytes

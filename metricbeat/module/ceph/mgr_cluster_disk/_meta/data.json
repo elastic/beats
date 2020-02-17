@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "ceph": {
-        "cluster_disk": {
+        "mgr_cluster_disk": {
             "available": {
                 "bytes": 0
             },
@@ -18,7 +18,7 @@
         }
     },
     "event": {
-        "dataset": "ceph.cluster_disk",
+        "dataset": "ceph.mgr_cluster_disk",
         "duration": 115000,
         "module": "ceph"
     },

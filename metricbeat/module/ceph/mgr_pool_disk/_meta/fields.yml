@@ -1,7 +1,7 @@
-- name: pool_disk
+- name: mgr_pool_disk
   type: group
   description: >
-    pool_disk
+    mgr_pool_disk
   release: beta
   fields:
     - name: id

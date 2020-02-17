@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/metricbeat/module/ceph"
 )
 
 func TestData(t *testing.T) {

@@ -3933,13 +3933,13 @@ type: long
 --
 
 [float]
-=== cluster_disk
+=== mgr_cluster_disk
 
-cluster_disk
+mgr_cluster_disk
 
 
 
-*`ceph.cluster_disk.available.bytes`*::
+*`ceph.mgr_cluster_disk.available.bytes`*::
 +
 --
 Available bytes of the cluster
@@ -3951,7 +3951,7 @@ format: bytes
 
 --
 
-*`ceph.cluster_disk.total.bytes`*::
+*`ceph.mgr_cluster_disk.total.bytes`*::
 +
 --
 Total bytes of the cluster
@@ -3963,7 +3963,7 @@ format: bytes
 
 --
 
-*`ceph.cluster_disk.used.bytes`*::
+*`ceph.mgr_cluster_disk.used.bytes`*::
 +
 --
 Used bytes of the cluster
@@ -3976,13 +3976,13 @@ format: bytes
 --
 
 [float]
-=== cluster_health
+=== mgr_cluster_health
 
-cluster_health
+mgr_cluster_health
 
 
 
-*`ceph.cluster_health.overall_status`*::
+*`ceph.mgr_cluster_health.overall_status`*::
 +
 --
 Overall status of the cluster
@@ -3992,7 +3992,7 @@ type: keyword
 
 --
 
-*`ceph.cluster_health.timechecks.epoch`*::
+*`ceph.mgr_cluster_health.timechecks.epoch`*::
 +
 --
 Map version
@@ -4002,7 +4002,7 @@ type: long
 
 --
 
-*`ceph.cluster_health.timechecks.round.value`*::
+*`ceph.mgr_cluster_health.timechecks.round.value`*::
 +
 --
 timecheck round
@@ -4012,7 +4012,7 @@ type: long
 
 --
 
-*`ceph.cluster_health.timechecks.round.status`*::
+*`ceph.mgr_cluster_health.timechecks.round.status`*::
 +
 --
 Status of the round
@@ -4109,13 +4109,13 @@ type: object
 --
 
 [float]
-=== osd_tree
+=== mgr_osd_tree
 
 OSD tree information
 
 
 
-*`ceph.osd_tree.id`*::
+*`ceph.mgr_osd_tree.id`*::
 +
 --
 OSD or bucket node ID
@@ -4125,7 +4125,7 @@ type: long
 
 --
 
-*`ceph.osd_tree.name`*::
+*`ceph.mgr_osd_tree.name`*::
 +
 --
 OSD or bucket node name
@@ -4135,7 +4135,7 @@ type: keyword
 
 --
 
-*`ceph.osd_tree.type`*::
+*`ceph.mgr_osd_tree.type`*::
 +
 --
 OSD or bucket node type, illegal type include OSD, host, root etc.
@@ -4145,7 +4145,7 @@ type: keyword
 
 --
 
-*`ceph.osd_tree.type_id`*::
+*`ceph.mgr_osd_tree.type_id`*::
 +
 --
 OSD or bucket node type ID
@@ -4155,7 +4155,7 @@ type: long
 
 --
 
-*`ceph.osd_tree.children`*::
+*`ceph.mgr_osd_tree.children`*::
 +
 --
 Bucket children list, separated by comma.
@@ -4165,7 +4165,7 @@ type: keyword
 
 --
 
-*`ceph.osd_tree.crush_weight`*::
+*`ceph.mgr_osd_tree.crush_weight`*::
 +
 --
 OSD node CRUSH weight
@@ -4175,7 +4175,7 @@ type: float
 
 --
 
-*`ceph.osd_tree.depth`*::
+*`ceph.mgr_osd_tree.depth`*::
 +
 --
 Node depth
@@ -4185,7 +4185,7 @@ type: long
 
 --
 
-*`ceph.osd_tree.exists`*::
+*`ceph.mgr_osd_tree.exists`*::
 +
 --
 Node exists (1-yes, 0-no)
@@ -4195,7 +4195,7 @@ type: boolean
 
 --
 
-*`ceph.osd_tree.primary_affinity`*::
+*`ceph.mgr_osd_tree.primary_affinity`*::
 +
 --
 Weight of reading data from primary OSD
@@ -4205,7 +4205,7 @@ type: float
 
 --
 
-*`ceph.osd_tree.reweight`*::
+*`ceph.mgr_osd_tree.reweight`*::
 +
 --
 Reweight of osd
@@ -4215,7 +4215,7 @@ type: long
 
 --
 
-*`ceph.osd_tree.status`*::
+*`ceph.mgr_osd_tree.status`*::
 +
 --
 Status of OSD, it should be up or down
@@ -4225,7 +4225,7 @@ type: keyword
 
 --
 
-*`ceph.osd_tree.device_class`*::
+*`ceph.mgr_osd_tree.device_class`*::
 +
 --
 Device class of OSD, like HDD, SSD etc.
@@ -4235,7 +4235,7 @@ type: keyword
 
 --
 
-*`ceph.osd_tree.father`*::
+*`ceph.mgr_osd_tree.father`*::
 +
 --
 Parent node of this OSD or bucket node
@@ -4246,13 +4246,13 @@ type: keyword
 --
 
 [float]
-=== pool_disk
+=== mgr_pool_disk
 
-pool_disk
+mgr_pool_disk
 
 
 
-*`ceph.pool_disk.id`*::
+*`ceph.mgr_pool_disk.id`*::
 +
 --
 Id of the pool
@@ -4262,7 +4262,7 @@ type: long
 
 --
 
-*`ceph.pool_disk.name`*::
+*`ceph.mgr_pool_disk.name`*::
 +
 --
 Name of the pool
@@ -4272,7 +4272,7 @@ type: keyword
 
 --
 
-*`ceph.pool_disk.stats.available.bytes`*::
+*`ceph.mgr_pool_disk.stats.available.bytes`*::
 +
 --
 Available bytes of the pool
@@ -4284,7 +4284,7 @@ format: bytes
 
 --
 
-*`ceph.pool_disk.stats.objects`*::
+*`ceph.mgr_pool_disk.stats.objects`*::
 +
 --
 Number of objects of the pool
@@ -4294,7 +4294,7 @@ type: long
 
 --
 
-*`ceph.pool_disk.stats.used.bytes`*::
+*`ceph.mgr_pool_disk.stats.used.bytes`*::
 +
 --
 Used bytes of the pool
@@ -4306,7 +4306,7 @@ format: bytes
 
 --
 
-*`ceph.pool_disk.stats.used.kb`*::
+*`ceph.mgr_pool_disk.stats.used.kb`*::
 +
 --
 Used kb of the pool
