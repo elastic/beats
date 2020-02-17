@@ -106,16 +106,23 @@ Another command properly formats go source files and adds a copyright header:
 make fmt
 --------------------------------------------------------------------------------
 
+Both of these commands should be run before submitting a PR. You can view all
+the available make targets with `make help`.
+
 These commands have the following dependencies:
 
 * Python >= {python}
-* https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
+* Python https://docs.python.org/3/library/venv.html[venv module]
 * https://github.com/magefile/mage[Mage]
 
-Virtualenv can be installed with the command `easy_install virtualenv` or `pip
-install virtualenv`. More details can be found
-https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR. You can view all the available make targets with `make help`.
+Python venv module is included in the standard library in Python 3. On Debian/Ubuntu
+systems it also requires to install the `python3-venv` package, that includes
+additional support scripts:
 
+[source,shell]
+--------------------------------------------------------------------------------
+sudo apt-get install python3-venv
+--------------------------------------------------------------------------------
 
 [float]
 [[build-target-env-vars]]

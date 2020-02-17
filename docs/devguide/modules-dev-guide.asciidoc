@@ -102,7 +102,8 @@ $ ./export_dashboards -yml '../../../filebeat/module/{module}/module.yml'
 ----
 
 New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards
-that are compatible with 5.x, run the following command inside the developer virtualenv:
+that are compatible with 5.x, run the following command inside the developer
+virtual environment:
 
 [source,shell]
 ----

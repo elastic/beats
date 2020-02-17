@@ -2,6 +2,6 @@
 :doc-branch: 7.x
 :go-version: 1.13.8
 :release-state: unreleased
-:python: 2.7.9
+:python: 3.7
 :docker: 1.12
 :docker-compose: 1.11
