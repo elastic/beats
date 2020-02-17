@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
 - Update to ECS 1.4.0. {pull}14844[14844]
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
-
+- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
 
 *Auditbeat*
 
@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 
 *Auditbeat*
 
@@ -168,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
@@ -188,8 +190,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
+- Add ingress nginx controller fileset {pull}16197[16197]
 - move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
+- Add MQTT input. {issue}15602[15602] {pull}16204[16204]
+- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
+- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320] 
 
 *Heartbeat*
 
