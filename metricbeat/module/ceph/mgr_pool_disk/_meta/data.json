@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "mgr_osd_disk": {
+        "pool_disk": {
             "id": 0,
             "name": "rbd",
             "stats": {
@@ -17,12 +17,12 @@
         }
     },
     "event": {
-        "dataset": "ceph.mgr_osd_disk",
+        "dataset": "ceph.pool_disk",
         "duration": 115000,
         "module": "ceph"
     },
     "metricset": {
-        "name": "mgr_osd_disk"
+        "name": "mgr_pool_disk"
     },
     "service": {
         "address": "127.0.0.1:8003",

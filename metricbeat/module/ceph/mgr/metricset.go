@@ -15,14 +15,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mgr_osd_tree
+package mgr
 
 import (
-	"testing"
+	"fmt"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "ceph", "mgr_osd_tree")
+type MetricSet struct {
+	mb.BaseMetricSet
+	*helper.HTTP
+}
+
+var _ mb.MetricSet = new(MetricSet)
+
+// NewMetricSet creates an metric set that can be used to build other metricsets that query Ceph mgr API.
+func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+	http.SetMethod("POST")
+	http.SetHeader("Content-Type", "application/json")
+	http.SetHeader("Accept", "application/json")
+	return &MetricSet{
+		base,
+		http,
+	}, nil
+}
+
+func (m *MetricSet) WithPrefix(prefix string) *MetricSet {
+	m.HTTP.SetBody([]byte(fmt.Sprintf(`{"prefix": "%s", "format": "json"}`, prefix)))
+	return m
 }

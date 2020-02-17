@@ -22,12 +22,11 @@ package mgr_cluster_health
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 )
 
 const user = "demo"

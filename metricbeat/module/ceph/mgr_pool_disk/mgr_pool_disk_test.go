@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mgr_osd_tree
+package mgr_pool_disk
 
 import (
 	"testing"
@@ -24,5 +24,5 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "ceph", "mgr_osd_tree")
+	mbtest.TestDataFiles(t, "ceph", "mgr_pool_disk")
 }

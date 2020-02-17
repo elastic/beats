@@ -15,14 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mgr_osd_disk
+package mgr_pool_disk
 
 import (
-	"fmt"
-
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/ceph/mgr"
 )
 
 const (
@@ -42,30 +40,22 @@ var (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("ceph", "mgr_osd_disk", New,
+	mb.Registry.MustAddMetricSet("ceph", "mgr_pool_disk", New,
 		mb.WithHostParser(hostParser),
 	)
 }
 
 type MetricSet struct {
-	mb.BaseMetricSet
-	*helper.HTTP
+	*mgr.MetricSet
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	http, err := helper.NewHTTP(base)
+	metricSet, err := mgr.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
-	http.SetMethod("POST")
-	http.SetHeader("Content-Type", "application/json")
-	http.SetHeader("Accept", "application/json")
-	http.SetBody([]byte(fmt.Sprintf(`{"prefix": "%s", "format": "json"}`, cephPrefix)))
-
-	return &MetricSet{
-		base,
-		http,
-	}, nil
+	metricSet = metricSet.WithPrefix(cephPrefix)
+	return &MetricSet{metricSet}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -85,7 +75,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, event := range events {
 		reported := reporter.Event(mb.Event{MetricSetFields: event})
 		if !reported {
-			m.Logger().Debug("error reporting event")
 			return nil
 		}
 	}

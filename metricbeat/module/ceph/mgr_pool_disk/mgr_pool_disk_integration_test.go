@@ -17,7 +17,7 @@
 
 // +build integration,linux
 
-package mgr_osd_disk
+package mgr_pool_disk
 
 import (
 	"testing"
@@ -43,7 +43,7 @@ func TestData(t *testing.T) {
 func getConfig(host, password string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                "ceph",
-		"metricsets":            []string{"mgr_osd_disk"},
+		"metricsets":            []string{"mgr_pool_disk"},
 		"hosts":                 []string{host},
 		"username":              user,
 		"password":              password,

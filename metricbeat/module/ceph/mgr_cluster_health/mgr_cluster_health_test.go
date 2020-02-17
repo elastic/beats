@@ -38,7 +38,7 @@ type clientRequest struct {
 }
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/testdata/")
+	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
 	statusResponse, err := ioutil.ReadFile(absPath + "/mgr_status_sample_response.json")
@@ -90,7 +90,7 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestFetchEventContents_Failed(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/testdata/")
+	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
 	response, err := ioutil.ReadFile(absPath + "/mgr_failed_response.json")

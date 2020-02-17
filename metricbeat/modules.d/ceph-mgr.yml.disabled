@@ -1,0 +1,23 @@
+# Module: ceph
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-ceph.html
+
+- module: ceph
+  metricsets:
+    - mgr_cluster_health
+  period: 10s
+  hosts: [ "https://localhost:8003" ]
+  #username: "user"
+  #password: "secret"
+
+- module: ceph
+  metricsets:
+    - mgr_cluster_disk
+    - mgr_cluster_health
+    - mgr_osd_disk
+    - mgr_osd_perf
+  #  - mgr_osd_pool_stats
+  #  - mgr_osd_tree
+  period: 1m
+  hosts: [ "https://localhost:8003" ]
+  #username: "user"
+  #password: "secret"

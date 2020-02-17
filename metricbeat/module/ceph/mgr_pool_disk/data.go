@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mgr_osd_disk
+package mgr_pool_disk
 
 import (
 	"github.com/pkg/errors"
