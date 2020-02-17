@@ -49,7 +49,10 @@ type kubernetesAnnotator struct {
 	kubernetesAvailable bool
 }
 
-const selector = "kubernetes"
+const (
+	selector          = "kubernetes"
+	nodeReadyAttempts = 10
+)
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
@@ -108,71 +111,80 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		kubernetesAvailable: false,
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
-	if err != nil {
-		if kubernetes.IsInCluster(config.KubeConfig) {
-			log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
-		} else if config.KubeConfig == "" {
-			log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
-		} else {
-			log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
+	// complete processor's initialisation asyncronously so as to re-try on failing k8s client initialisations in case
+	// the k8s node is not yet ready.
+	go func(processor *kubernetesAnnotator) {
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+		if err != nil {
+			if kubernetes.IsInCluster(config.KubeConfig) {
+				log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
+			} else if config.KubeConfig == "" {
+				log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
+			} else {
+				log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
+			}
+			return
 		}
-		return processor, nil
-	}
 
-	if !isKubernetesAvailable(client) {
-		return processor, nil
-	}
+		connectionAttempts := 1
+		for ok := true; ok; ok = !isKubernetesAvailable(client) {
+			if connectionAttempts > nodeReadyAttempts {
+				return
+			}
+			time.Sleep(3 * time.Second)
+			connectionAttempts += 1
+		}
 
-	matchers := NewMatchers(config.Matchers)
+		matchers := NewMatchers(config.Matchers)
 
-	if matchers.Empty() {
-		log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
-		return processor, nil
-	}
+		if matchers.Empty() {
+			log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
+			return
+		}
 
-	processor.matchers = matchers
+		processor.matchers = matchers
 
-	config.Host = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Host = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-	log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
+		log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Host,
-		Namespace:   config.Namespace,
-	}, nil)
-	if err != nil {
-		log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
-		return nil, err
-	}
+		watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Node:        config.Host,
+			Namespace:   config.Namespace,
+		}, nil)
+		if err != nil {
+			log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
+			return
+		}
 
-	metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
-	processor.indexers = NewIndexers(config.Indexers, metaGen)
-	processor.watcher = watcher
-	processor.kubernetesAvailable = true
+		metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+		processor.indexers = NewIndexers(config.Indexers, metaGen)
+		processor.watcher = watcher
+		processor.kubernetesAvailable = true
 
-	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			pod := obj.(*kubernetes.Pod)
-			log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
-			processor.addPod(pod)
-		},
-		UpdateFunc: func(obj interface{}) {
-			pod := obj.(*kubernetes.Pod)
-			log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
-			processor.updatePod(pod)
-		},
-		DeleteFunc: func(obj interface{}) {
-			pod := obj.(*kubernetes.Pod)
-			log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
-			processor.removePod(pod)
-		},
-	})
+		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				pod := obj.(*kubernetes.Pod)
+				log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				processor.addPod(pod)
+			},
+			UpdateFunc: func(obj interface{}) {
+				pod := obj.(*kubernetes.Pod)
+				log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				processor.updatePod(pod)
+			},
+			DeleteFunc: func(obj interface{}) {
+				pod := obj.(*kubernetes.Pod)
+				log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				processor.removePod(pod)
+			},
+		})
 
-	if err := watcher.Start(); err != nil {
-		return nil, err
-	}
+		if err := watcher.Start(); err != nil {
+			return
+		}
+	}(processor)
 
 	return processor, nil
 }
