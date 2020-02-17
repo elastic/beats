@@ -35,11 +35,14 @@ func testSetup(t *testing.T) {
 	})
 }
 
-func runTest(t *testing.T, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
-	// Setup httpbin environment
+func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
 	testSetup(t)
-	// Create test http server
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// Create an http test server according to whether TLS is used
+	var newServer = httptest.NewServer
+	if isTLS {
+		newServer = httptest.NewTLSServer
+	}
+	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			req, err := ioutil.ReadAll(r.Body)
 			defer r.Body.Close()
@@ -154,7 +157,29 @@ func TestGET(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestGetHTTPS(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":           "GET",
+		"interval":              0,
+		"ssl.verification_mode": "none",
+	}
+	runTest(t, true, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -176,7 +201,7 @@ func TestPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          0,
 	}
-	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -198,7 +223,7 @@ func TestRepeatedPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          10 ^ 9,
 	}
-	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -219,7 +244,7 @@ func TestRunStop(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		input.Run()
 		input.Stop()
 		input.Run()
