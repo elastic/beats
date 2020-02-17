@@ -103,22 +103,43 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server
 	return server, port
 }
 
+// newLocalhostTestServer starts a server listening on the IP resolved from `localhost`
+// httptest.NewServer() binds explicitly on 127.0.0.1 (or [::1] if ipv4 is not available).
+// The IP resolved from `localhost` can be a different one, like 127.0.1.1.
+func newLocalhostTestServer(handler http.Handler) *httptest.Server {
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		panic("failed to listen on localhost: " + err.Error())
+	}
+
+	server := &httptest.Server{
+		Listener: listener,
+		Config:   &http.Server{Handler: handler},
+	}
+	server.Start()
+
+	return server
+}
+
 func TestUpEndpointJob(t *testing.T) {
-	server, port := setupServer(t, httptest.NewServer)
+	server, port := setupServer(t, newLocalhostTestServer)
 	defer server.Close()
+
+	serverURL, err := url.Parse(server.URL)
+	require.NoError(t, err)
 
 	event := testTCPCheck(t, "localhost", port)
 
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up", "tcp"),
+			hbtest.BaseChecks(serverURL.Hostname(), "up", "tcp"),
 			hbtest.SummaryChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
 			hbtest.RespondingTCPChecks(),
 			lookslike.MustCompile(map[string]interface{}{
 				"resolve": map[string]interface{}{
-					"ip":     "127.0.0.1",
+					"ip":     serverURL.Hostname(),
 					"rtt.us": isdef.IsDuration,
 				},
 			}),
