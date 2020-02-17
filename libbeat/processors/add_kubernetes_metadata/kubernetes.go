@@ -51,7 +51,7 @@ type kubernetesAnnotator struct {
 
 const (
 	selector          = "kubernetes"
-	nodeReadyAttempts = 10
+	checkNodeReadyAttempts = 10
 )
 
 func init() {
@@ -111,7 +111,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		kubernetesAvailable: false,
 	}
 
-	// complete processor's initialisation asyncronously so as to re-try on failing k8s client initialisations in case
+	// complete processor's initialisation asynchronously so as to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
 	go func(processor *kubernetesAnnotator) {
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
@@ -128,7 +128,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 		connectionAttempts := 1
 		for ok := true; ok; ok = !isKubernetesAvailable(client) {
-			if connectionAttempts > nodeReadyAttempts {
+			if connectionAttempts > checkNodeReadyAttempts {
 				return
 			}
 			time.Sleep(3 * time.Second)
