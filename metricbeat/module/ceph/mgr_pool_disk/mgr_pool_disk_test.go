@@ -24,6 +24,6 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/ceph"
 )
 
-func TestData(t *testing.T) {
+func TestDataFiles(t *testing.T) {
 	mbtest.TestDataFiles(t, "ceph", "mgr_pool_disk")
 }

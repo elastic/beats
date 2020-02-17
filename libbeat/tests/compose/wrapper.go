@@ -181,6 +181,12 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, "--force-recreate")
 	}
 
+	if len(opts.Environment) > 0 {
+		for _, keyValue := range opts.Environment {
+			d.Environment = append(d.Environment, keyValue)
+		}
+	}
+
 	if service != "" {
 		args = append(args, service)
 	}

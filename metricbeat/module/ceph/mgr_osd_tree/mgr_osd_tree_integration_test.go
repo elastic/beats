@@ -21,6 +21,7 @@ package mgr_osd_tree
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -32,7 +33,11 @@ import (
 const user = "demo"
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 120, "ceph-mgr")
+	service := compose.EnsureUp(t, "ceph",
+		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithEnvironmentVariable("CEPH_CODENAME=nautilus"),
+		compose.UpWithEnvironmentVariable("CEPH_VERSION=master-97985eb-nautilus-centos-7-x86_64"),
+	)
 
 	f := mbtest.NewReportingMetricSetV2Error(t,
 		getConfig(service.HostForPort(8003), mgrtest.GetPassword(t, service.HostForPort(5000), user)))
