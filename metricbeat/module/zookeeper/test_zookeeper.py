@@ -41,7 +41,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(ZK_FIELDS), evt.keys())
         zk_mntr = evt["zookeeper"]["mntr"]
 
         zk_mntr.pop("pending_syncs", None)
@@ -50,7 +50,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         zk_mntr.pop("max_file_descriptor_count", None)
         zk_mntr.pop("followers", None)
 
-        self.assertItemsEqual(self.de_dot(MNTR_FIELDS), zk_mntr.keys())
+        self.assertCountEqual(self.de_dot(MNTR_FIELDS), zk_mntr.keys())
 
         self.assert_fields_are_documented(evt)
 
@@ -75,7 +75,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(ZK_FIELDS), evt.keys())
         zk_srvr = evt["zookeeper"]["server"]
 
         assert zk_srvr["connections"] >= 0
@@ -103,7 +103,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(ZK_FIELDS + ["client"]), evt.keys())
+        self.assertCountEqual(self.de_dot(ZK_FIELDS + ["client"]), evt.keys())
         zk_conns = evt["zookeeper"]["connection"]
 
         assert zk_conns["queued"] >= 0

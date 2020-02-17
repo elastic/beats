@@ -30,9 +30,7 @@
       All values are stored as keyword.
 
       Example: `docker` and `k8s` labels.'
-    example:
-      application: foo-bar
-      env: production
+    example: '{ "application": "foo-bar", "env": "production" }'
   - name: message
     level: core
     type: text

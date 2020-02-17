@@ -251,7 +251,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 

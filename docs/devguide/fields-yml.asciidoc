@@ -1,0 +1,104 @@
+[[event-fields-yml]]
+=== Defining field mappings
+
+Fields used by your Beat, along with their mapping details, must be defined in `_meta/fields.yml`. After editing this file, you must re-run `make update`.
+
+Define the field mappings in the `fields` array:
+
+[source,yaml]
+----------------------------------------------------------------------
+- key: mybeat
+  title: mybeat
+  description: These are the fields used by mybeat.
+  fields:
+    - name: last_name <1>
+      type: keyword <2>
+      required: true <3>
+      description: > <4>
+        The last name.
+    - name: first_name
+      type: keyword
+      required: true
+      description: >
+        The first name.
+    - name: comment
+      type: text
+      required: false
+      description: >
+        Comment made by the user.
+----------------------------------------------------------------------
+
+<1> `name`: The field name
+<2> `type`: The field type. The value for the `type` key can be any of the datatypes https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html[available in Elasticsearch]. If no value is specified, the field will default to being a `keyword`.
+<3> `required`: Whether or not a field value is required
+<4> `description`: Some information about the field contents
+
+==== Mapping parameters
+Other mapping parameters can be specified for each field. Consult the https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-params.html[Elasticsearch reference] for more details on each of these parameters.
+
+[horizontal]
+`format`:: Specify a custom date format used by the field.
+`multi_fields`:: For `text` or `keyword` fields, `multi_fields` can be used to define multi-field mappings.
+`enabled`:: Whether or not the field is enabled.
+`analyzer`:: Which analyzer to use when indexing.
+`search_analyzer`:: Which analyzer to use when searching.
+`norms`:: Applies to `text` and `keyword` fields. Default is `false`.
+`dynamic`:: Dynamic field control. Can be one of `true` (default), `false` or `strict`.
+`index`:: Whether or not the field should be indexed.
+`doc_values`:: Whether or not the field should have doc values generated. See docs.
+`copy_to`:: Which field to copy the field value into.
+`ignore_above`:: When this property value is missing or is `0`, it receives the `libbeat` default value of `1024`. If the value is `-1`, the Elasticsearch default value will be applied. Any other specified value will be applied as-is.
+
+For example, we could use the `copy_to` mapping parameter to copy the `last_name` and `first_name` fields into the `full_name` field at index time:
+
+[source,yaml]
+----------------------------------------------------------------------
+- key: mybeat
+  title: mybeat
+  description: These are the fields used by mybeat.
+  fields:
+    - name: last_name
+      type: text
+      required: true
+      copy_to: full_name <1>
+      description: >
+        The last name.
+    - name: first_name
+      type: text
+      required: true
+      copy_to: full_name <2>
+      description: >
+        The first name.
+    - name: full_name
+      type: text
+      required: false
+      description: >
+        The last_name and first_name combined into one field for easy searchability.
+----------------------------------------------------------------------
+<1> Copy the value of `last_name` into `full_name`
+<2> Copy the value of `first_name` into `full_name`
+
+There are also some Kibana-specific properties, not detailed here. These are: `analyzed`, `count`, `searchable`, `aggregatable`, `script`. Kibana parameters can also be described using the `pattern`, `input_format`, `output_format`, `output_precision`, `label_template`, `url_template` and `open_link_in_current_tab`.
+
+==== Defining text multi-fields
+There are various options that can be applied when using text fields. A simple text field using the default analyzer can be defined without any other options, as in the example above.
+
+To keep the original keyword value when using `text` mappings, for instance to use in aggregations or ordering, a multi-field mapping can be used:
+
+[source,yaml]
+----------------------------------------------------------------------
+- key: mybeat
+  title: mybeat
+  description: These are the fields used by mybeat.
+  fields:
+    - name: city
+      type: text
+      multi_fields: <1>
+        - name: keyword <2>
+          type: keyword <3>
+----------------------------------------------------------------------
+<1> `multi_fields`: Define the `multi_fields` mapping parameter
+<2> `name`: This is a conventional name for a multi-field. It can be anything (`raw` is another common option) but the convention is to use `keyword`.
+<3> `type`: Specify the `keyword` type so we can use the field in aggregations or to order documents.
+
+Consult the https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html[reference] for more information on multi-fields.
