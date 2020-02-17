@@ -32,8 +32,6 @@ The `iis` module mericsets are `webserver`, `website` and `application_pool`.
 
  # filter on application pool names
  # application_pool.name: []
- # filter on site names
- # website.name: []
 ----
 
 [float]
@@ -54,8 +52,6 @@ This metricset will collect metrics of specific application pools, users can con
 
 [float]
 === Module-specific configuration notes
-
-`website.name`:: []string, users can specify the sites they would like to monitor.
 
 `application_pool.name`:: []string, users can specify the application pools they would like to monitor.
 
@@ -80,8 +76,6 @@ metricbeat.modules:
 
  # filter on application pool names
  # application_pool.name: []
- # filter on site names
- # website.name: []
 ----
 
 [float]

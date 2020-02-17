@@ -5,7 +5,6 @@ input:
   defaults:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
-    perfmon.filter_by_instance: [""]
     perfmon.counters:
     #network
     - instance_label: 'name'
@@ -51,3 +50,6 @@ input:
       measurement_label: service_uptime
       query: '\Web Service(*)\Service Uptime'
 
+processors:
+- drop_event.when.equals:
+    iis.website.name: '_Total'

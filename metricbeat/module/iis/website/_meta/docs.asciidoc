@@ -7,9 +7,6 @@ The metrics contain the IIS Performance counter values like:
     Web Service: Current Connections (through experience with their apps app, users can identify what is a normal value for this) and others.
 
 
-Users can specify the sites they would like to monitor using the configuration option `website.name`, else, all websites are considered.
-
-
 
 
 

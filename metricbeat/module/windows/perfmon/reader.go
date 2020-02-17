@@ -151,9 +151,10 @@ func (this *Reader) Read(metricset string) ([]mb.Event, error) {
 	}
 	var events []mb.Event
 	if metricsetName != metricset {
-		if len(this.config.FilterByInstance) > 0 {
-			values = filterValuesByInstances(this.config.FilterByInstance, values)
-		}
+		// will be enabled when https://github.com/elastic/beats/issues/16366
+		//if len(this.config.FilterByInstance) > 0 {
+		//	values = filterValuesByInstances(this.config.FilterByInstance, values)
+		//}
 		if this.config.GroupAllCountersTo != "" {
 			event := this.groupToEvent(values)
 			events = append(events, event)
@@ -277,7 +278,7 @@ func filterValuesByInstances(instances []string, counterValues map[string][]pdh.
 	for key, values := range counterValues {
 		filteredValues[key] = []pdh.CounterValue{}
 		for _, value := range values {
-			if containsInstance(value, instances) && value.Instance != "_Total" {
+			if containsInstance(value, instances) {
 				filteredValues[key] = append(filteredValues[key], value)
 			}
 		}
