@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 
+	k8s "k8s.io/client-go/kubernetes"
+
 	"github.com/elastic/beats/libbeat/common"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
@@ -39,29 +41,35 @@ var (
 // to that concept, so we can deal with tokens that has a limited duration or can be revoked by a
 // remote keystore.
 type Keystore interface {
-	// Store add keys to the keystore, wont be persisted until we save.
-	Store(key string, secret []byte) error
-
 	// Retrieve returns a SecureString instance of the searched key or an error.
 	Retrieve(key string) (*SecureString, error)
-
-	// Delete removes a specific key from the keystore.
-	Delete(key string) error
-
-	// List returns the list of keys in the keystore, return an empty list if none is found.
-	List() ([]string, error)
 
 	// GetConfig returns the key value pair in the config format to be merged with other configuration.
 	GetConfig() (*common.Config, error)
 
+	// IsPersisted check if the current keystore is persisted.
+	IsPersisted() bool
+}
+
+type WritableKeystore interface {
+	Keystore
+	// Store add keys to the keystore, wont be persisted until we save.
+	Store(key string, secret []byte) error
+
+	// Delete removes a specific key from the keystore.
+	Delete(key string) error
+
 	// Create Allow to create an empty keystore.
 	Create(override bool) error
 
-	// IsPersisted check if the current keystore is persisted.
-	IsPersisted() bool
-
 	// Save persist the changes to the keystore.
 	Save() error
+}
+
+type ListingKeystore interface {
+	WritableKeystore
+	// List returns the list of keys in the keystore, return an empty list if none is found.
+	List() ([]string, error)
 }
 
 // Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
@@ -71,7 +79,7 @@ type Packager interface {
 }
 
 // Factory Create the right keystore with the configured options.
-func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
+func Factory(cfg *common.Config, defaultPath string) (ListingKeystore, error) {
 	config := defaultConfig
 
 	if cfg == nil {
@@ -91,10 +99,15 @@ func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 	return keystore, err
 }
 
+// Factoryk8s Create the right keystore with the configured options.
+func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface) (Keystore, error) {
+	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client)
+	return keystore, err
+}
+
 // ResolverFromConfig create a resolver from a configuration.
 func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
 	keystore, err := Factory(cfg, dataPath)
-
 	if err != nil {
 		return nil, err
 	}

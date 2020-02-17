@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/keystore"
+
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
@@ -297,6 +299,8 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 		kubemeta["annotations"] = annotations
 
+		k8sKeystore, _ := keystore.Factoryk8s(pod.Namespace, p.watcher.Getk8sClient())
+
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			event := bus.Event{
@@ -308,6 +312,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"meta": common.MapStr{
 					"kubernetes": meta,
 				},
+				"keystore": k8sKeystore,
 			}
 			p.publish(event)
 		}
@@ -323,6 +328,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"meta": common.MapStr{
 					"kubernetes": meta,
 				},
+				"keystore": k8sKeystore,
 			}
 			p.publish(event)
 		}

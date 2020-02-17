@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-ucfg"
 )
@@ -105,6 +106,8 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
 	}
+	opts = updateOptsWithk8sSecretsKeystore(event, opts)
+
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
 		if err != nil {
@@ -127,4 +130,12 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 		result = append(result, res)
 	}
 	return result
+}
+
+func updateOptsWithk8sSecretsKeystore(event bus.Event, opts []ucfg.Option) []ucfg.Option {
+	if val, ok := event["keystore"]; ok {
+		eventKeystore := val.(keystore.Keystore)
+		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(eventKeystore)))
+	}
+	return opts
 }

@@ -69,13 +69,13 @@ type serializableSecureString struct {
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their
 // own password on the keystore, the default password will be an empty string. When the keystore
 // is initialized the secrets are automatically loaded into memory.
-func NewFileKeystore(keystoreFile string) (Keystore, error) {
+func NewFileKeystore(keystoreFile string) (ListingKeystore, error) {
 	return NewFileKeystoreWithPassword(keystoreFile, NewSecureString([]byte("")))
 }
 
 // NewFileKeystoreWithPassword return a new File based keystore or an error, allow to define what
 // password to use to create the keystore.
-func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (Keystore, error) {
+func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (ListingKeystore, error) {
 	keystore := FileKeystore{
 		Path:     keystoreFile,
 		dirty:    false,
