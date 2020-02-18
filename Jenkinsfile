@@ -563,7 +563,7 @@ def withBeatsEnv(Closure body){
     "LANG=C.UTF-8",
     "LANGUAGE=C.UTF-8",
     "PYTHONUTF8=1",
-    "PYTHON_ENV?=${WORKSPACE}/python-env"
+    "PYTHON_ENV=${WORKSPACE}/python-env"
   ]){
     deleteDir()
     unstash 'source'
