@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "pool_disk": {
+        "mgr_pool_disk": {
             "id": 0,
             "name": "rbd",
             "stats": {
@@ -17,7 +17,7 @@
         }
     },
     "event": {
-        "dataset": "ceph.pool_disk",
+        "dataset": "ceph.mgr_pool_disk",
         "duration": 115000,
         "module": "ceph"
     },

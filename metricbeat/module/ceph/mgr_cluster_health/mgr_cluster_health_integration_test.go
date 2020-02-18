@@ -21,11 +21,9 @@ package mgr_cluster_health
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 )
@@ -33,11 +31,7 @@ import (
 const user = "demo"
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "ceph",
-		compose.UpWithTimeout(120*time.Second),
-		compose.UpWithEnvironmentVariable("CEPH_CODENAME=nautilus"),
-		compose.UpWithEnvironmentVariable("CEPH_VERSION=master-97985eb-nautilus-centos-7-x86_64"),
-	)
+	service := mgrtest.EnsureUp(t)
 
 	f := mbtest.NewReportingMetricSetV2Error(t,
 		getConfig(service.HostForPort(8003), mgrtest.GetPassword(t, service.HostForPort(5000), user)))

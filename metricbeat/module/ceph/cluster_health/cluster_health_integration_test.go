@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// build integration,linux
+// +build integration,linux
 
 package cluster_health
 
@@ -27,7 +27,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
+	service := compose.EnsureUpWithTimeout(t, 120, "ceph-api")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 

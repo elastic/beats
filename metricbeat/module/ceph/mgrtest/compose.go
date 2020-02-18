@@ -15,31 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration,linux
-
-package cluster_status
+package mgrtest
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 120, "ceph-api")
+const (
+	upTimeout = 120 * time.Second
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	defaultCodename = "nautilus"
+	defaultVersion  = "master-97985eb-nautilus-centos-7-x86_64"
+)
 
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "ceph",
-		"metricsets": []string{"cluster_status"},
-		"hosts":      []string{host},
-	}
+func EnsureUp(t *testing.T) compose.HostInfo {
+	return compose.EnsureUp(t, "ceph",
+		compose.UpWithTimeout(upTimeout),
+		compose.UpWithEnvironmentVariable(fmt.Sprintf("CEPH_CODENAME=%s", defaultCodename)),
+		compose.UpWithEnvironmentVariable(fmt.Sprintf("CEPH_VERSION=%s", defaultVersion)),
+	)
 }
