@@ -69,13 +69,29 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func isKubernetesAvailable(client k8sclient.Interface) bool {
+func isKubernetesAvailable(client k8sclient.Interface) (bool, error) {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
-		return false
+		return false, err
 	}
 	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
-	return true
+	return true, nil
+}
+
+func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
+	connectionAttempts := 1
+	for {
+		kubernetesAvailable, err := isKubernetesAvailable(client)
+		if kubernetesAvailable {
+			return true
+		}
+		if connectionAttempts > checkNodeReadyAttempts {
+			logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+			return false
+		}
+		time.Sleep(3 * time.Second)
+		connectionAttempts += 1
+	}
 }
 
 // New constructs a new add_kubernetes_metadata processor.
@@ -133,14 +149,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		connectionAttempts := 1
-		for ok := true; ok; ok = !isKubernetesAvailable(client) {
-			if connectionAttempts > checkNodeReadyAttempts {
-				logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
-				return
-			}
-			time.Sleep(3 * time.Second)
-			connectionAttempts += 1
+		if !isKubernetesAvailableWithRetry(client) {
+			return
 		}
 
 		matchers := NewMatchers(config.Matchers)
