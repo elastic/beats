@@ -7,6 +7,7 @@ var:
   - name: credential_profile_name
   - name: visibility_timeout
   - name: api_timeout
+  - name: endpoint
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
