@@ -46,6 +46,9 @@ func (e apiError) ToBeatEvent() beat.Event {
 				"code":    code,
 				"message": msg,
 			},
+			"event": common.MapStr{
+				"kind": "pipeline_error",
+			},
 		},
 	}
 }

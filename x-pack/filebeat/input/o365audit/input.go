@@ -194,6 +194,7 @@ func (inp *o365input) runPoller(poller *poll.Poller, start cursor) {
 			ctx.Logger.Errorf("API polling terminated with error: %v", err.Error())
 			msg := common.MapStr{}
 			msg.Put("error.message", err.Error())
+			msg.Put("event.kind", "pipeline_error")
 			event := beat.Event{
 				Timestamp: time.Now(),
 				Fields:    msg,
