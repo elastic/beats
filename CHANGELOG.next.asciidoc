@@ -158,7 +158,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
 - Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
+- Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
+- Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 
 *Packetbeat*
