@@ -1,21 +1,6 @@
-- name: cluster_disk
+- name: mgr_cluster_disk
   type: group
   description: >
-    cluster_disk
+    see: cluster_disk
   release: beta
   fields:
-    - name: available.bytes
-      type: long
-      description: >
-        Available bytes of the cluster
-      format: bytes
-    - name: total.bytes
-      type: long
-      description: >
-        Total bytes of the cluster
-      format: bytes
-    - name: used.bytes
-      type: long
-      description: >
-        Used bytes of the cluster
-      format: bytes
