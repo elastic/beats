@@ -29,7 +29,7 @@ rules:
 
 - filter_values_with_regexp:
     key: type
-    re: ^metrics/.+
+    re: ^.+/metrics$
     selector: inputs
 
 - filter_values:
@@ -43,7 +43,7 @@ rules:
     rules:
     - translate_with_regexp:
         path: type
-        re: ^metrics/(?P<type>.+)
+        re: ^(?P<type>.+)/metrics$
         with: $type
     - rename:
         from: type

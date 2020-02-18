@@ -47,7 +47,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 					"use_output": "special",
 				},
@@ -86,7 +86,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 					"use_output": "special",
 				},
@@ -154,7 +154,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 					"use_output": "special",
 				},
@@ -200,7 +200,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 				},
 				map[string]interface{}{
@@ -236,7 +236,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 				},
 				map[string]interface{}{
@@ -282,7 +282,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 				},
 				map[string]interface{}{
@@ -319,7 +319,7 @@ func TestGroupBy(t *testing.T) {
 				},
 				map[string]interface{}{
 					"inputs": map[string]interface{}{
-						"type": "metrics/system",
+						"type": "system/metrics",
 					},
 				},
 			},

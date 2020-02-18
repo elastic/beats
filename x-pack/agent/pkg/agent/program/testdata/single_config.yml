@@ -22,7 +22,7 @@ outputs:
 datasources:
   - use_output: default
     inputs:
-    - type: metrics/docker
+    - type: docker/metrics
       streams:
         - metricset: status
           dataset: docker.status
@@ -34,7 +34,7 @@ datasources:
   - namespace: testing
     use_output: default
     inputs:
-      - type: metrics/apache
+      - type: apache/metrics
         streams:
           - enabled: true
             metricset: info

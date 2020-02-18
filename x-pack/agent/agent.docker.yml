@@ -20,7 +20,7 @@ datasources:
           - enabled: false
             dataset: sample.error
             paths: /var/log/sample/error.log
-      - type: metrics/system
+      - type: system/metrics
         streams:
           - metricset: cpu
 
