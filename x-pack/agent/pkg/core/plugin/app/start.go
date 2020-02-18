@@ -36,7 +36,7 @@ type stateClient interface {
 }
 
 // Start starts the application with a specified config.
-func (a *Application) Start(cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -108,7 +108,7 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 	a.state.Status = state.Running
 
 	// setup watcher
-	a.watch(a.state.ProcessInfo.Process, cfg)
+	a.watch(ctx, a.state.ProcessInfo.Process, cfg)
 
 	return nil
 }

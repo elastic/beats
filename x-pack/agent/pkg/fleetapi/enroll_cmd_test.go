@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -21,7 +22,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("Successful enroll", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 
@@ -84,7 +85,7 @@ func TestEnroll(t *testing.T) {
 			}
 
 			cmd := &EnrollCmd{client: client}
-			resp, err := cmd.Execute(req)
+			resp, err := cmd.Execute(context.Background(), req)
 			require.NoError(t, err)
 
 			require.Equal(t, "my-access-api-key", resp.Item.AccessAPIKey)
@@ -96,7 +97,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("Raise back any server errors", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(`{"statusCode": 500, "error":"Something is really bad here"}`))
@@ -123,7 +124,7 @@ func TestEnroll(t *testing.T) {
 			}
 
 			cmd := &EnrollCmd{client: client}
-			_, err = cmd.Execute(req)
+			_, err = cmd.Execute(context.Background(), req)
 			require.Error(t, err)
 
 			require.True(t, strings.Index(err.Error(), "500") > 0)

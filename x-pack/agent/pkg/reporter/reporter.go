@@ -5,6 +5,7 @@
 package reporter
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -48,7 +49,7 @@ type Reporter struct {
 }
 
 // NewReporter creates a new reporter with provided set of Backends.
-func NewReporter(logger *logger.Logger, info agentInfo, backends ...Backend) *Reporter {
+func NewReporter(ctx context.Context, logger *logger.Logger, info agentInfo, backends ...Backend) *Reporter {
 	return &Reporter{
 		info:     info,
 		backends: backends,
@@ -64,52 +65,52 @@ func (r *Reporter) Close() {
 }
 
 // OnStarting reports application starting event.
-func (r *Reporter) OnStarting(application string) {
+func (r *Reporter) OnStarting(ctx context.Context, application string) {
 	msg := fmt.Sprintf("Application: %s[%s]: State change: STARTING", application, r.info.AgentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStarting, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
 // OnRunning reports application running event.
-func (r *Reporter) OnRunning(application string) {
+func (r *Reporter) OnRunning(ctx context.Context, application string) {
 	msg := fmt.Sprintf("Application: %s[%s]: State change: IN_PROGRESS", application, r.info.AgentID())
 	rec := generateRecord(EventTypeState, EventSubTypeInProgress, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
 // OnFailing reports application failed event.
-func (r *Reporter) OnFailing(application string, err error) {
+func (r *Reporter) OnFailing(ctx context.Context, application string, err error) {
 	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.info.AgentID(), err)
 	rec := generateRecord(EventTypeError, EventSubTypeConfig, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
 // OnStopping reports application stopped event.
-func (r *Reporter) OnStopping(application string) {
+func (r *Reporter) OnStopping(ctx context.Context, application string) {
 	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPING", application, r.info.AgentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStopping, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
 // OnStopped reports application stopped event.
-func (r *Reporter) OnStopped(application string) {
+func (r *Reporter) OnStopped(ctx context.Context, application string) {
 	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPED", application, r.info.AgentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStopped, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
 // OnFatal reports applications fatal event.
-func (r *Reporter) OnFatal(application string, err error) {
+func (r *Reporter) OnFatal(ctx context.Context, application string, err error) {
 	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.info.AgentID(), err)
 	rec := generateRecord(EventTypeError, EventSubTypeConfig, msg)
-	r.report(rec)
+	r.report(ctx, rec)
 }
 
-func (r *Reporter) report(e event) {
+func (r *Reporter) report(ctx context.Context, e event) {
 	var err error
 
 	for _, b := range r.backends {
-		if er := b.Report(e); er != nil {
+		if er := b.Report(ctx, e); er != nil {
 			err = multierror.Append(err, er)
 		}
 	}

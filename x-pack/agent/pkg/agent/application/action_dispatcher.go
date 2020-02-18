@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
@@ -17,18 +18,19 @@ import (
 type action = fleetapi.Action
 
 type actionHandler interface {
-	Handle(a action, acker fleetAcker) error
+	Handle(ctx context.Context, a action, acker fleetAcker) error
 }
 
 type actionHandlers map[string]actionHandler
 
 type actionDispatcher struct {
+	ctx      context.Context
 	log      *logger.Logger
 	handlers actionHandlers
 	def      actionHandler
 }
 
-func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
+func newActionDispatcher(ctx context.Context, log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New()
@@ -42,6 +44,7 @@ func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatch
 	}
 
 	return &actionDispatcher{
+		ctx:      ctx,
 		log:      log,
 		handlers: make(actionHandlers),
 		def:      def,
@@ -89,16 +92,16 @@ func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 
-	return acker.Commit()
+	return acker.Commit(ad.ctx)
 }
 
 func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
-		return ad.def.Handle(a, acker)
+		return ad.def.Handle(ad.ctx, a, acker)
 	}
 
-	return handler.Handle(a, acker)
+	return handler.Handle(ad.ctx, a, acker)
 }
 
 func detectTypes(actions []action) []string {

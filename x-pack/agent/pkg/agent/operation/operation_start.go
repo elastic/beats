@@ -5,6 +5,8 @@
 package operation
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -55,8 +57,8 @@ func (o *operationStart) Check() (bool, error) {
 }
 
 // Run runs the operation
-func (o *operationStart) Run(application Application) (err error) {
-	o.eventProcessor.OnStarting(application.Name())
+func (o *operationStart) Run(ctx context.Context, application Application) (err error) {
+	o.eventProcessor.OnStarting(ctx, application.Name())
 	defer func() {
 		if err != nil {
 			// kill the process if something failed
@@ -64,11 +66,11 @@ func (o *operationStart) Run(application Application) (err error) {
 				o.Name(),
 				errors.TypeApplication,
 				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(application.Name(), err)
+			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 		} else {
-			o.eventProcessor.OnRunning(application.Name())
+			o.eventProcessor.OnRunning(ctx, application.Name())
 		}
 	}()
 
-	return application.Start(o.cfg)
+	return application.Start(ctx, o.cfg)
 }

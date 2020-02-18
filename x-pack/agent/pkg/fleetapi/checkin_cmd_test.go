@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +22,7 @@ func (*agentinfo) AgentID() string { return "id" }
 
 func TestCheckin(t *testing.T) {
 	const withAPIKey = "secret"
+	ctx := context.Background()
 	agentInfo := &agentinfo{}
 
 	t.Run("Propagate any errors from the server", withServerWithAuthClient(
@@ -30,7 +32,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, raw)
@@ -42,7 +44,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			_, err := cmd.Execute(&request)
+			_, err := cmd.Execute(ctx, &request)
 			require.Error(t, err)
 		},
 	))
@@ -80,7 +82,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -92,7 +94,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -143,7 +145,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -155,7 +157,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -181,7 +183,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -193,7 +195,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -210,7 +212,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				type Request struct {
 					Metadata map[string]interface{} `json:"local_metadata"`
@@ -243,7 +245,7 @@ Something went wrong
 
 			request := CheckinRequest{Metadata: meta}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 
@@ -260,7 +262,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				req := make(map[string]interface{})
 
@@ -281,7 +283,7 @@ Something went wrong
 
 			request := CheckinRequest{}
 
-			r, err := cmd.Execute(&request)
+			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
 			require.True(t, r.Success)
 

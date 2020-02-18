@@ -5,6 +5,7 @@
 package operation
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -33,6 +34,7 @@ import (
 // Enables running sidecars for processes.
 // TODO: implement retry strategies
 type Operator struct {
+	bgContext      context.Context
 	pipelineID     string
 	logger         *logger.Logger
 	config         *operatorCfg.Config
@@ -52,6 +54,7 @@ type Operator struct {
 // a collection of running processes, back it up
 // Based on backed up collection it prepares clients, watchers... on init
 func NewOperator(
+	ctx context.Context,
 	logger *logger.Logger,
 	pipelineID string,
 	config *config.Config,
@@ -74,6 +77,7 @@ func NewOperator(
 	}
 
 	operator := &Operator{
+		bgContext:      ctx,
 		config:         operatorConfig,
 		pipelineID:     pipelineID,
 		logger:         logger,
@@ -220,7 +224,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			continue
 		}
 
-		if err := op.Run(app); err != nil {
+		if err := op.Run(o.bgContext, app); err != nil {
 			return err
 		}
 	}

@@ -5,6 +5,8 @@
 package application
 
 import (
+	"context"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
@@ -12,7 +14,7 @@ type handlerUnknown struct {
 	log *logger.Logger
 }
 
-func (h *handlerUnknown) Handle(a action, acker fleetAcker) error {
+func (h *handlerUnknown) Handle(_ context.Context, a action, acker fleetAcker) error {
 	h.log.Errorf("HandlerUnknown: action '%+v' received", a)
 	return nil
 }

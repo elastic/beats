@@ -54,7 +54,7 @@ func (h *HandlerStore) Save(in io.Reader) error {
 
 // ReplaceOnSuccessStore takes a target file, a replacement content and a wrapped store. This
 // store is useful if you want to trigger an action to replace another file when the wrapped store save method
-// is succesful. This store will take care of making a backup copy of the target file and will not
+// is successful. This store will take care of making a backup copy of the target file and will not
 // override the content of the target if the target has already the same content. If an error happen,
 // we will not replace the file.
 type ReplaceOnSuccessStore struct {

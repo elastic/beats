@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -77,7 +78,7 @@ func New(
 }
 
 // NewConfigFromURL returns a Kibana Config based on a received host.
-func NewConfigFromURL(kURL string, CAs []string) (*Config, error) {
+func NewConfigFromURL(kURL string) (*Config, error) {
 	u, err := url.Parse(kURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not parse Kibana url")
@@ -96,12 +97,6 @@ func NewConfigFromURL(kURL string, CAs []string) (*Config, error) {
 	c.Path = u.Path
 	c.Username = username
 	c.Password = password
-
-	if len(CAs) > 0 {
-		c.TLS = &tlscommon.Config{
-			CAs: CAs,
-		}
-	}
 
 	return &c, nil
 }
@@ -169,6 +164,7 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 // - The caller of this method is free to overrides any values found in the headers.
 // - The magic of unpack kibana errors is not done in the Send method, an helper methods is provided.
 func (c *Client) Send(
+	ctx context.Context,
 	method, path string,
 	params url.Values,
 	headers http.Header,
@@ -194,7 +190,7 @@ func (c *Client) Send(
 		}
 	}
 
-	return c.client.Do(req)
+	return c.client.Do(req.WithContext(ctx))
 }
 
 // URI returns the remote URI.

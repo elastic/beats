@@ -5,6 +5,7 @@
 package operation
 
 import (
+	"context"
 	"os"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
@@ -66,18 +67,18 @@ func (o *operationFetch) Check() (bool, error) {
 }
 
 // Run runs the operation
-func (o *operationFetch) Run(application Application) (err error) {
+func (o *operationFetch) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.New(err,
 				o.Name(),
 				errors.TypeApplication,
 				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(application.Name(), err)
+			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 		}
 	}()
 
-	fullPath, err := o.downloader.Download(o.program.BinaryName(), o.program.Version())
+	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.Version())
 	if err == nil {
 		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
 	}

@@ -4,7 +4,9 @@
 
 package download
 
+import "context"
+
 // Downloader is an interface allowing download of an artifact
 type Downloader interface {
-	Download(programName, version string) (string, error)
+	Download(ctx context.Context, programName, version string) (string, error)
 }
