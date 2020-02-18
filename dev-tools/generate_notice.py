@@ -15,13 +15,8 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    try:
-        with open(filename, 'r') as f:
-            return f.read()
-    except UnicodeDecodeError:
-        # try latin-1
-        with open(filename, 'r', encoding="ISO-8859-1") as f:
-            return f.read()
+    with open(filename, 'r', encoding='utf_8') as f:
+        return f.read()
 
 
 def get_library_path(license):
@@ -37,7 +32,7 @@ def get_library_path(license):
 
 def read_versions(vendor):
     libs = []
-    with open(os.path.join(vendor, "vendor.json")) as f:
+    with open(os.path.join(vendor, "vendor.json"), encoding='utf_8') as f:
         govendor = json.load(f)
         for package in govendor["package"]:
             libs.append(package)
@@ -222,11 +217,11 @@ def get_url(repo):
 def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=None):
     dependencies = gather_dependencies(vendor_dirs, overrides=overrides)
     if not csvfile:
-        with open(filename, "w+") as f:
+        with open(filename, "w+", encoding='utf_8') as f:
             write_notice_file(f, beat, copyright, dependencies)
             print("Available at {}".format(filename))
     else:
-        with open(csvfile, "wb") as f:
+        with open(csvfile, "wb", encoding='utf_8') as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
             print("Available at {}".format(csvfile))
