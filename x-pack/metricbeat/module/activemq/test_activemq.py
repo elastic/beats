@@ -24,6 +24,9 @@ class ActiveMqTest(XPackTest):
             'password': 'admin'
         }
 
+    def get_hosts(self):
+        return [self.compose_host(port='8161/tcp')]
+
     def get_stomp_host_port(self):
         host_port = self.compose_host(port='61613/tcp')
         s = host_port.split(':')
