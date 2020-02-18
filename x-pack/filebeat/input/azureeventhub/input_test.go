@@ -74,7 +74,8 @@ func TestParseMultipleMessages(t *testing.T) {
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
 	input := azureInput{}
-	messages := input.parseMultipleMessages([]byte(msg))
+	messages, err := input.parseMultipleMessages([]byte(msg))
+	assert.Nil(t, err)
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 3)
 	msgs := []string{

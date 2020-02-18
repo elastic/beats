@@ -49,7 +49,11 @@ func (a *azureInput) runWithEPH() error {
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
 			// partitionID is not yet mapped in the azure-eventhub sdk
-			return a.processEvents(e, "")
+			err := a.processEvents(e, "")
+			if err != nil {
+				a.Stop()
+			}
+			return err
 		})
 	if err != nil {
 		return err

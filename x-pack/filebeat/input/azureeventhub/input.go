@@ -184,7 +184,10 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) er
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
-	messages := a.parseMultipleMessages(event.Data)
+	messages, err := a.parseMultipleMessages(event.Data)
+	if err != nil {
+		return err
+	}
 	for _, msg := range messages {
 		azure.Put("offset", event.SystemProperties.Offset)
 		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
@@ -197,19 +200,21 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) er
 			},
 		})
 		if !ok {
-			return errors.New("event has not been sent")
+			err := errors.New("event has been processed but the send process has failed")
+			a.log.Error(err)
+			return err
 		}
 	}
 	return nil
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
+func (a *azureInput) parseMultipleMessages(bMessage []byte) ([]string, error) {
 	var obj map[string][]interface{}
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-		return []string{string(bMessage)}
+		return []string{string(bMessage)}, nil
 	}
 	var messages []string
 	if len(obj[expandEventListFromField]) > 0 {
@@ -219,8 +224,9 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 				messages = append(messages, string(js))
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				return nil, err
 			}
 		}
 	}
-	return messages
+	return messages, nil
 }
