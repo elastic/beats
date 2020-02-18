@@ -388,7 +388,6 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	${DOCKER_COMPOSE} pull --include-deps
 	${DOCKER_COMPOSE} up -d
 
 .PHONY: stop-environment
