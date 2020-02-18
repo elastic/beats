@@ -179,12 +179,20 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	var msg apiError
 	readJSONBody(response, &msg)
 	l.env.Logger.Warnf("Got error %s: %+v", response.Status, msg)
+	l.delay = l.env.Config.ErrorRetryInterval
 
-	if response.StatusCode == 401 {
+	switch response.StatusCode {
+	case 401:
 		// Authentication error. Renew oauth token and repeat this op.
 		l.delay = l.env.Config.LiveWindowPollInterval
 		return []poll.Action{
 			poll.RenewToken(),
+			poll.Fetch(l),
+		}
+	case 408, 503:
+		// Known errors when the backend is down.
+		//Repeat the request without reporting an error.
+		return []poll.Action{
 			poll.Fetch(l),
 		}
 	}
@@ -200,6 +208,7 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	// AF20022: No subscription found for the specified content type
 	// AF20023: The subscription was disabled by [..]
 	case "AF20022", "AF20023":
+		l.delay = 0
 		// Subscribe and retry
 		return []poll.Action{
 			poll.Fetch(Subscribe(l.env)),
@@ -219,8 +228,8 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		// with updated times.
 		now := l.env.Clock()
 		delta := now.Sub(l.startTime)
-		l.delay = l.env.Config.LiveWindowPollInterval
 		if delta > (l.env.Config.MaxRetention + 30*time.Minute) {
+			l.delay = l.env.Config.LiveWindowPollInterval
 			return []poll.Action{
 				poll.Fetch(l.adjustTimes(l.startTime)),
 			}
@@ -234,7 +243,6 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 			l.env.Clock = func() time.Time {
 				return time.Now().Add(delta)
 			}
-			l.delay = l.env.Config.ErrorRetryInterval
 			l.env.Logger.Info("Compensating for time difference")
 		} else {
 			l.env.Logger.Infow("Not adjusting for time offset.",
@@ -252,12 +260,16 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	// Invalid nextPage Input: {0}.
 	case "AF20031":
 		// Can be ignored.
+
+	//
+	// AF50005-AF50006: An internal error occurred. Retry the request.
+	case "AF50005", "AF50006":
+		return append(actions, poll.Fetch(l))
 	}
 
 	if msg.Error.Code != "" {
 		actions = append(actions, l.env.ReportAPIError(msg))
 	}
-	l.delay = l.env.Config.ErrorRetryInterval
 	return append(actions, poll.Fetch(l))
 }
 
