@@ -57,14 +57,14 @@ from
 group by 1,2,3
 order by 1,2,3
 ",0,,"postgres.c",1632,
-2020-02-14 00:00:07.076297 UTC,"gpadmin","vds_prd",p751024,th1452697472,"[local]",,2020-02-14 00:00:07 UTC,193249667,con399541,cmd3,seg-1,slice1,dx853045,x193249667,sx1,"LOG","00000","statement: INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)
+2020-02-14 00:00:07.076297 UTC,"gpadmin","vds_prd",p751024,th1452697472,"[local]",,2020-02-14 00:00:07 UTC,193249667,con399541,cmd3,seg-1,slice1,dx853045,x193249667,sx1,"LOG","00000","statement: INSERT INTO work_schema.gp_log_work (dbid,content,role,preferred_role ,mode,status,run_time)
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
-SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",,,,,,"INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)
+SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",,,,,,"INSERT INTO work_schema.gp_log_work (dbid,content,role,preferred_role ,mode,status,run_time)
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",0,,"postgres.c",1175,
-2020-02-14 03:36:44.311183 UTC,,,p7548,th1452697472,,,2020-02-14 03:36:44 UTC,0,,,seg-1,,,,,"LOG","00000","connection received: host=10.110.181.132 port=51628",,,,,,,0,,"postmaster.c",6841,
+2020-02-14 03:36:44.311183 UTC,,,p7548,th1452697472,,,2020-02-14 03:36:44 UTC,0,,,seg-1,,,,,"LOG","00000","connection received: host=10.110.192.149 port=51628",,,,,,,0,,"postmaster.c",6841,
 2020-02-18 18:58:03.536517 UTC,"user","db",p202744,th-968001664,"10.110.109.64","43940",2020-02-18 18:55:59 UTC,193808117,con106413,cmd229,seg-1,,dx172496,,sx5,"LOG","00000","Planner produced plan :0",,,,,"SQL statement ""select sum(pg_tot
 al_relation_size('schema.superb_business_table_1_prt_20190321'))::int8 from gp_dist_random('gp_id');""
 SQL statement ""select sum(pg_total_relation_size((partitionschemaname || '.' || partitiontablename)::regclass))::bigint total

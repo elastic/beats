@@ -257,7 +257,7 @@
         "greenplum.log.command_count": "3",
         "greenplum.log.cursor_position": "0",
         "greenplum.log.database": "vds_prd",
-        "greenplum.log.debug": "INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",
+        "greenplum.log.debug": "INSERT INTO work_schema.gp_log_work (dbid,content,role,preferred_role ,mode,status,run_time)\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",
         "greenplum.log.distributed_transaction_id": "dx853045",
         "greenplum.log.file.line": "1175",
         "greenplum.log.file.name": "postgres.c",
@@ -266,7 +266,7 @@
         "greenplum.log.host": "[local]",
         "greenplum.log.level": "LOG",
         "greenplum.log.local_transaction_id": "x193249667",
-        "greenplum.log.message": "statement: INSERT INTO dba_work.gp_usability_work (dbid,content,role,preferred_role ,mode,status,run_time)\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",
+        "greenplum.log.message": "statement: INSERT INTO work_schema.gp_log_work (dbid,content,role,preferred_role ,mode,status,run_time)\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL\nSELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",
         "greenplum.log.process_id": "p751024",
         "greenplum.log.session_id": "con399541",
         "greenplum.log.session_start": "2020-02-14 00:00:07 UTC",
@@ -297,7 +297,7 @@
         "greenplum.log.gp_segment.id": "1",
         "greenplum.log.gp_segment.type": "seg",
         "greenplum.log.level": "LOG",
-        "greenplum.log.message": "connection received: host=10.110.181.132 port=51628",
+        "greenplum.log.message": "connection received: host=10.110.192.149 port=51628",
         "greenplum.log.process_id": "p7548",
         "greenplum.log.session_start": "2020-02-14 03:36:44 UTC",
         "greenplum.log.stack": "",
@@ -306,7 +306,7 @@
         "greenplum.log.timestamp": "2020-02-14 03:36:44.311183 UTC",
         "greenplum.log.transaction_id": "0",
         "input.type": "log",
-        "log.offset": 5316,
+        "log.offset": 5310,
         "service.type": "greenplum"
     },
     {
@@ -343,7 +343,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 5506,
+        "log.offset": 5500,
         "service.type": "greenplum"
     }
 ]
