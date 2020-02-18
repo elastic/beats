@@ -7,4 +7,4 @@ The default metricset is `stats`.
 [float]
 === Compatibility
 
-The Beat module is expected to work with all versions of Beats >= 7.3.0.
+The Beat module works with Beats 7.3.0 and later.

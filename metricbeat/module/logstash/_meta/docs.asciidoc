@@ -5,4 +5,4 @@ The default metricsets are `node` and `node_stats`.
 [float]
 === Compatibility
 
-The Logstash module is expected to work with all versions of Logstash >= 7.3.0.
+The Logstash module works with Logstash 7.3.0 and later.
