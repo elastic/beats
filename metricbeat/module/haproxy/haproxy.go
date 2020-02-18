@@ -31,6 +31,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
@@ -167,7 +168,7 @@ type Client struct {
 }
 
 // NewHaproxyClient returns a new instance of HaproxyClient
-func NewHaproxyClient(address string, http *helper.HTTP) (*Client, error) {
+func NewHaproxyClient(address string, base mb.BaseMetricSet) (*Client, error) {
 	u, err := url.Parse(address)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid url")
@@ -179,6 +180,10 @@ func NewHaproxyClient(address string, http *helper.HTTP) (*Client, error) {
 	case "unix":
 		return &Client{&unixProto{Network: u.Scheme, Address: u.Path}}, nil
 	case "http", "https":
+		http, err := helper.NewHTTP(base)
+		if err != nil {
+			return nil, err
+		}
 		return &Client{&httpProto{HTTP: http}}, nil
 	default:
 		return nil, errors.Errorf("invalid protocol scheme: %s", u.Scheme)
