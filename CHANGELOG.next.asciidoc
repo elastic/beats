@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
+- Fix loading processors from annotation hints. {pull}16348[16348]
 
 *Auditbeat*
 
@@ -105,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
+- Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 
 *Auditbeat*
@@ -161,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
+- Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 
 *Packetbeat*
 
