@@ -23,7 +23,7 @@ func TestEventsHaveAgentID(t *testing.T) {
 	firstBatchSize := 5
 	ee := getEvents(firstBatchSize)
 	for _, e := range ee {
-		r.Report(e)
+		r.Report(context.Background(), e)
 	}
 
 	// check after delay for output
