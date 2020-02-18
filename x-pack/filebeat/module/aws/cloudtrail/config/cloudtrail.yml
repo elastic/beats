@@ -20,6 +20,10 @@ visibility_timeout: {{ .visibility_timeout }}
 api_timeout: {{ .api_timeout }}
 {{ end }}
 
+{{ if .endpoint }}
+endpoint: {{ .endpoint }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log

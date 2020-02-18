@@ -128,6 +128,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 - Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Add endpoint config in AWS config to support using custom endpoint accessing AWS APIs. {issue}16245[16245] {pull}16263[16263]
 
 *Auditbeat*
 
