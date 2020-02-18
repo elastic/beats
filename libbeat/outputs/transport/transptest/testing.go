@@ -193,9 +193,9 @@ func connectTLS(timeout time.Duration, certName string) TransportFactory {
 
 // GenCertForTestingPurpose generates a testing certificate.
 // Generated is used for CA, client-auth and server-auth. Use only for testing.
-func GenCertForTestingPurpose(t *testing.T, host, name, keyPassword string) error {
-	capem := name + ".pem"
-	cakey := name + ".key"
+func GenCertForTestingPurpose(t *testing.T, fileName, keyPassword string, hosts ...string) error {
+	capem := fileName + ".pem"
+	cakey := fileName + ".key"
 
 	_, err := os.Stat(capem)
 	if err == nil {
@@ -244,12 +244,15 @@ func GenCertForTestingPurpose(t *testing.T, host, name, keyPassword string) erro
 			x509.KeyUsageDigitalSignature |
 			x509.KeyUsageCertSign,
 	}
-	//Could be ip or dns format
-	ip := net.ParseIP(host)
-	if ip != nil {
-		caTemplate.IPAddresses = []net.IP{ip}
-	} else {
-		caTemplate.DNSNames = []string{host}
+
+	for _, host := range hosts {
+		//Could be ip or dns format
+		ip := net.ParseIP(host)
+		if ip != nil {
+			caTemplate.IPAddresses = append(caTemplate.IPAddresses, ip)
+		} else {
+			caTemplate.DNSNames = append(caTemplate.DNSNames, host)
+		}
 	}
 
 	pemBlock, err := genPrivatePem(4096, keyPassword)
