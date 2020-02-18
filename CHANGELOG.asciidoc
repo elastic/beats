@@ -13,8 +13,8 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
-- Libbeat: Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
-- Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
+- Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
+- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 
 *Filebeat*
 
@@ -40,6 +40,13 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Fix spooling to disk blocking infinitely if the lock file can not be acquired. {pull}15338[15338]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+- Fix existing agent.*, ecs.version, and host.name fields getting overwritten by Beats if they are already present in the original event. {pull}14407[14407]
+- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516[$15516]
+- Beats no longer attempts to load dashboards if they are unavailable. {pull}15802[15802]
+
+*Auditbeat*
+
+- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
 
@@ -52,6 +59,15 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
+- Add shared_credential_file to cloudtrail config. {issue}15652[15652] {pull}15656[15656]
+- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
+- Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+
+*Heartbeat*
+
+- Fix excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 
 *Metricbeat*
 
@@ -61,6 +77,10 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Fix panic exception with some unicode strings in perfmon metricset. {issue}15264[15264]
 - Make `logstash` module more resilient to Logstash unavailability. {issue}15276[15276] {pull}15306[15306]
 - Add username/password in Metricbeat autodiscover hints {pull}15349[15349]
+- Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
+- Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
 
 ==== Added
 
@@ -78,8 +98,9 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
-- Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
+- Add support to kubernetes autodiscovery to add additional metadata from other source to events. {pull}14875[14875]
 - Update to ECS 1.4.0. {pull}14844[14844]
+- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 
 *Filebeat*
 
@@ -97,6 +118,8 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - google-pubsub input: ACK pub/sub message when acknowledged by publisher. {issue}13346[13346] {pull}14715[14715]
 - Remove Beta label from google-pubsub input. {issue}13346[13346] {pull}14715[14715]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
+- Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
+- Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
 
 *Heartbeat*
 
@@ -109,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Add a `system/network_summary` metricset {pull}15196[15196]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 - Enable script processor. {pull}14711[14711]
+- Add STAN dashboard {pull}15654[15654]
 
 *Functionbeat*
 
@@ -227,7 +251,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 *Affecting all Beats*
 
 - Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
-- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files. {pull}13374[13374]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 - Use less restrictive API to check if template exists. {pull}13847[13847]
 - Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
@@ -299,6 +323,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
+- Made the event parser more lenient w.r.t. invalid event log definition version numbers. {issue}15838[15838]
 
 ==== Deprecated
 

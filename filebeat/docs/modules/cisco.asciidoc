@@ -295,11 +295,11 @@ include::../include/timezone-support.asciidoc[]
 [[dynamic-script-compilations]]
 === Dynamic Script Compilations
 
-The `asa` and `ftd` filesets are based on ingest pipelines and make extensive
+The `asa` and `ftd` filesets are based on Elasticsearch ingest pipelines and make extensive
 use of script processors and painless conditions. This can cause the pipelines
 to fail loading the first time the module is used, due to exceeding the maximum
 script compilation limits. It is recommended to tune the following parameters
-on your cluster:
+on your Elasticsearch cluster:
 
 - {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
   Increase to at least `100/5m`.
