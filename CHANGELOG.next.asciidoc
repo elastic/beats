@@ -44,8 +44,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
-
 - Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 
 *Heartbeat*
 
