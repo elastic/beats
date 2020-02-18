@@ -25,6 +25,9 @@
     # Default to be 120s
     #var.api_timeout: 120s
 
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   elb:
     enabled: false
 
@@ -47,6 +50,9 @@
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
 
   vpcflow:
     enabled: false
@@ -71,6 +77,9 @@
     # Default to be 120s
     #var.api_timeout: 120s
 
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   cloudtrail:
     enabled: false
 
@@ -93,3 +102,6 @@
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com

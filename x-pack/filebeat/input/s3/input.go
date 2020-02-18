@@ -181,8 +181,9 @@ func (p *s3Input) Run() {
 
 		awsConfig := p.awsConfig.Copy()
 		awsConfig.Region = regionName
-		svcSQS := sqs.New(awsConfig)
-		svcS3 := s3.New(awsConfig)
+
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
