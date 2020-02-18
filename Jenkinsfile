@@ -584,7 +584,9 @@ def withBeatsEnvWin(Closure body){
     "GOROOT=${goRoot}",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
-    "LANG=C.UTF-8",
+    "LC_ALL=en_US.UTF-8",
+    "LANG=en_US.UTF-8",
+    "LANGUAGE=en_US.UTF-8",
     "PYTHON_ENV?=${WORKSPACE}/python-env"
   ]){
     deleteDir()
