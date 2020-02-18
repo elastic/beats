@@ -11,8 +11,8 @@
         "pattern_definitions": {
           "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
           "GREEDYDATA": "(.|\n|\t)*",
-          "ONE": "\w{1}\b",
-          "THREE": "\b\w{3}"
+          "ONE": "[0-9A-Za-z_]{1}",
+          "THREE": "[0-9A-Za-z_]{3}"
         }
       }
     },
