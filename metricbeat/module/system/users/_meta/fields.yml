@@ -1,0 +1,16 @@
+- name: users
+  type: group
+  release: beta
+  description: >
+    Logged-in user data
+  fields:
+    - name: path
+      type: keyword
+      description: >
+        Dbus object path
+    - name: sessions
+      type: keyword
+      description: >
+        sessions associated with the user
+
+

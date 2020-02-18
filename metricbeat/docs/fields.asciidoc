@@ -35921,6 +35921,33 @@ format: duration
 
 --
 
+[float]
+=== users
+
+Logged-in user data
+
+
+
+*`system.users.path`*::
++
+--
+Dbus object path
+
+
+type: keyword
+
+--
+
+*`system.users.sessions`*::
++
+--
+sessions associated with the user
+
+
+type: keyword
+
+--
+
 [[exported-fields-tomcat]]
 == Tomcat fields
 

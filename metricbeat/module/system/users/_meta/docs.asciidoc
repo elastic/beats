@@ -1,0 +1,11 @@
+The system/users metricset reports logged in users and associated sessions via dbus and logind.
+
+This metricset is available on:
+
+- Linux
+
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.
