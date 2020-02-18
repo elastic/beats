@@ -232,6 +232,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
+- Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 
 *Packetbeat*
 
