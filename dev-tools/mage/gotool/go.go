@@ -18,6 +18,7 @@
 package gotool
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -54,6 +55,18 @@ type goTest func(opts ...ArgOpt) error
 
 // Test runs `go test` and provides optionals for adding command line arguments.
 var Test goTest = runGoTest
+
+// GetModuleName returns the name of the module.
+func GetModuleName() (string, error) {
+	lines, err := getLines(callGo(nil, "list", "-m"))
+	if err != nil {
+		return "", err
+	}
+	if len(lines) != 1 {
+		return "", fmt.Errorf("unexpected number of lines")
+	}
+	return lines[0], nil
+}
 
 // ListProjectPackages lists all packages in the current project
 func ListProjectPackages() ([]string, error) {

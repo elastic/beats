@@ -23,7 +23,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -34,6 +33,8 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 	"golang.org/x/tools/go/vcs"
+
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 const (
@@ -197,6 +198,7 @@ date                = {{ date }}
 elastic_beats_dir   = {{ elastic_beats_dir }}
 go_version          = {{ go_version }}
 repo.RootImportPath = {{ repo.RootImportPath }}
+repo.MountPoint     = {{ repo.MountPoint }}
 repo.RootDir        = {{ repo.RootDir }}
 repo.ImportPath     = {{ repo.ImportPath }}
 repo.SubDir         = {{ repo.SubDir }}
@@ -541,6 +543,7 @@ func parseDocBranch(data []byte) (string, error) {
 // ProjectRepoInfo contains information about the project's repo.
 type ProjectRepoInfo struct {
 	RootImportPath string // Import path at the project root.
+	MountPoint     string // Mount point for the crossBuilder.
 	RootDir        string // Root directory of the project.
 	ImportPath     string // Import path of the current directory.
 	SubDir         string // Relative path from the root dir to the current dir.
@@ -549,7 +552,7 @@ type ProjectRepoInfo struct {
 // IsElasticBeats returns true if the current project is
 // github.com/elastic/beats.
 func (r *ProjectRepoInfo) IsElasticBeats() bool {
-	return r.RootImportPath == elasticBeatsImportPath
+	return strings.HasPrefix(r.RootImportPath, elasticBeatsImportPath)
 }
 
 var (
@@ -573,30 +576,36 @@ func GetProjectRepoInfo() (*ProjectRepoInfo, error) {
 }
 
 func isUnderGOPATH() bool {
-	rel, err := filepath.Rel(build.Default.GOPATH, CWD())
+	underGOPATH := false
+	srcDirs, err := listSrcGOPATHs()
 	if err != nil {
 		return false
 	}
+	for _, srcDir := range srcDirs {
+		rel, err := filepath.Rel(srcDir, CWD())
+		if err != nil {
+			continue
+		}
 
-	if strings.Contains(rel, "..") {
-		return false
+		if !strings.Contains(rel, "..") {
+			underGOPATH = true
+		}
 	}
 
-	return true
+	return underGOPATH
 }
 
 func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 	var (
-		cwd            = CWD()
-		rootImportPath string
-		rootDir        string
-		subDir         string
+		cwd     = CWD()
+		rootDir string
+		subDir  string
 	)
 
 	possibleRoot := cwd
 	var errs []string
 	for {
-		isRoot, err := isRepoRoot(possibleRoot)
+		isRoot, err := isGoModRoot(possibleRoot)
 		if err != nil {
 			errs = append(errs, err.Error())
 		}
@@ -606,23 +615,32 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 			break
 		}
 
-		subDir = path.Base(possibleRoot)
-		possibleRoot = path.Dir(possibleRoot)
+		subDir, err = filepath.Rel(possibleRoot, cwd)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+		possibleRoot = filepath.Dir(possibleRoot)
 	}
 
-	rootImportPath = "github.com/elastic/beats"
-	if path.Base(rootDir) != "beats" {
-		rootImportPath = rootDir
+	if rootDir == "" {
+		return nil, errors.Errorf("failed to find root dir of module file: %v", errs)
 	}
+
+	rootImportPath, err := gotool.GetModuleName()
+	if err != nil {
+		return nil, err
+	}
+
 	return &ProjectRepoInfo{
 		RootImportPath: rootImportPath,
+		MountPoint:     extractMountPoint(rootImportPath),
 		RootDir:        rootDir,
 		SubDir:         subDir,
-		ImportPath:     filepath.Join(rootImportPath, subDir),
+		ImportPath:     filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
 	}, nil
 }
 
-func isRepoRoot(path string) (bool, error) {
+func isGoModRoot(path string) (bool, error) {
 	gomodPath := filepath.Join(path, "go.mod")
 	_, err := os.Stat(gomodPath)
 	if os.IsNotExist(err) {
@@ -637,13 +655,61 @@ func isRepoRoot(path string) (bool, error) {
 
 func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	var (
-		cwd            = CWD()
-		rootImportPath string
-		srcDir         string
+		cwd     = CWD()
+		errs    []string
+		rootDir string
 	)
 
-	// Search upward from the CWD to determine the project root based on VCS.
-	var errs []string
+	srcDirs, err := listSrcGOPATHs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, srcDir := range srcDirs {
+		_, root, err := vcs.FromDir(cwd, srcDir)
+		if err != nil {
+			// Try the next gopath.
+			errs = append(errs, err.Error())
+			continue
+		}
+		rootDir = filepath.Join(srcDir, root)
+		break
+	}
+
+	if rootDir == "" {
+		return nil, errors.Errorf("error while determining root directory: %v", errs)
+	}
+
+	subDir, err := filepath.Rel(rootDir, cwd)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get relative path to repo root")
+	}
+
+	rootImportPath, err := gotool.GetModuleName()
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProjectRepoInfo{
+		RootImportPath: rootImportPath,
+		MountPoint:     extractMountPoint(rootImportPath),
+		RootDir:        rootDir,
+		SubDir:         subDir,
+		ImportPath:     filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
+	}, nil
+}
+
+func extractMountPoint(rootImportPath string) string {
+	re := regexp.MustCompile(`/v[2-9][0-9]*$`) // ends with major version
+	return re.ReplaceAllString(rootImportPath, "")
+}
+
+func listSrcGOPATHs() ([]string, error) {
+	var (
+		cwd     = CWD()
+		errs    []string
+		srcDirs []string
+	)
 	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
 		gopath = filepath.Clean(gopath)
 
@@ -657,33 +723,12 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 			}
 		}
 
-		srcDir = filepath.Join(gopath, "src")
-		_, root, err := vcs.FromDir(cwd, srcDir)
-		if err != nil {
-			// Try the next gopath.
-			errs = append(errs, err.Error())
-			continue
-		}
-		rootImportPath = root
-		break
-	}
-	if rootImportPath == "" {
-		return nil, errors.Errorf("failed to determine root import path (Did "+
-			"you git init?, Is the project in the GOPATH? GOPATH=%v, CWD=%v?): %v",
-			build.Default.GOPATH, cwd, errs)
+		srcDirs = append(srcDirs, filepath.Join(gopath, "src"))
 	}
 
-	rootDir := filepath.Join(srcDir, rootImportPath)
-	subDir, err := filepath.Rel(rootDir, cwd)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get relative path to repo root")
+	if len(srcDirs) == 0 {
+		return srcDirs, errors.Errorf("failed to find any GOPATH %v", errs)
 	}
-	importPath := filepath.ToSlash(filepath.Join(rootImportPath, subDir))
 
-	return &ProjectRepoInfo{
-		RootImportPath: rootImportPath,
-		RootDir:        rootDir,
-		SubDir:         subDir,
-		ImportPath:     importPath,
-	}, nil
+	return srcDirs, nil
 }
