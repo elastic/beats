@@ -22,7 +22,10 @@ package add_kubernetes_metadata
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
+
+	"github.com/cloudflare/cfssl/log"
 
 	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 
@@ -37,8 +40,12 @@ import (
 )
 
 const (
-	timeout = time.Second * 5
+	timeout                = time.Second * 5
+	selector               = "kubernetes"
+	checkNodeReadyAttempts = 10
 )
+
+var once sync.Once
 
 type kubernetesAnnotator struct {
 	log                 *logp.Logger
@@ -48,11 +55,6 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 }
-
-const (
-	selector          = "kubernetes"
-	checkNodeReadyAttempts = 10
-)
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
@@ -70,7 +72,6 @@ func init() {
 func isKubernetesAvailable(client k8sclient.Interface) bool {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
-		logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
 		return false
 	}
 	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
@@ -113,7 +114,13 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	// complete processor's initialisation asynchronously so as to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
-	go func(processor *kubernetesAnnotator) {
+	go processor.init(config, cfg)
+
+	return processor, nil
+}
+
+func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
+	once.Do(func() {
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -129,6 +136,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		connectionAttempts := 1
 		for ok := true; ok; ok = !isKubernetesAvailable(client) {
 			if connectionAttempts > checkNodeReadyAttempts {
+				logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
 				return
 			}
 			time.Sleep(3 * time.Second)
@@ -142,9 +150,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 			return
 		}
 
-		processor.matchers = matchers
+		k.matchers = matchers
 
-		config.Host = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Host = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
 		log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
@@ -159,34 +167,33 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		}
 
 		metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
-		processor.indexers = NewIndexers(config.Indexers, metaGen)
-		processor.watcher = watcher
-		processor.kubernetesAvailable = true
+		k.indexers = NewIndexers(config.Indexers, metaGen)
+		k.watcher = watcher
+		k.kubernetesAvailable = true
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
 				log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
-				processor.addPod(pod)
+				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
 				log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
-				processor.updatePod(pod)
+				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
 				log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
-				processor.removePod(pod)
+				k.removePod(pod)
 			},
 		})
 
 		if err := watcher.Start(); err != nil {
+			logp.Debug("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
 			return
 		}
-	}(processor)
-
-	return processor, nil
+	})
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
