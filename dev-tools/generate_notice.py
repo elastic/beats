@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import glob
 import os
 import datetime
@@ -221,7 +222,7 @@ def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=Non
             write_notice_file(f, beat, copyright, dependencies)
             print("Available at {}".format(filename))
     else:
-        with open(csvfile, "wb", encoding='utf_8') as f:
+        with open(csvfile, "w") as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
             print("Available at {}".format(csvfile))
