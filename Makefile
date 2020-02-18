@@ -90,8 +90,8 @@ clean-vendor:
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-#	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-#	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers

@@ -559,12 +559,7 @@ def withBeatsEnv(Closure body){
     "MAGEFILE_CACHE=${WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
-    "LC_ALL=C.UTF-8",
-    "LANG=C.UTF-8",
-    "LANGUAGE=C.UTF-8",
-    "PYTHONUTF8=1",
-    "PYTHON_ENV=${WORKSPACE}/python-env"
-    "PYTHONIOENCODING=UTF-8"
+    "PYTHON_ENV=${WORKSPACE}/python-env",
   ]){
     deleteDir()
     unstash 'source'
