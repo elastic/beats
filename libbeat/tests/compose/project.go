@@ -73,7 +73,7 @@ func UpWithAdvertisedHostEnvFileForPort(port int) UpOption {
 	}
 }
 
-// UpWithEnvironmentVariable add environment variable.
+// UpWithEnvironmentVariable adds environment variable.
 func UpWithEnvironmentVariable(keyValue string) UpOption {
 	return func(options *UpOptions) { options.Environment = append(options.Environment, keyValue) }
 }
