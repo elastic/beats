@@ -33,7 +33,7 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		NetInfoEnabled: false,
+		NetInfoEnabled: true,
 		CacheTTL:       5 * time.Minute,
 	}
 }
