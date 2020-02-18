@@ -487,6 +487,18 @@ metricbeat.modules:
   # the options for this metricset are also available here.
   metrics_path: /metrics
 
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
+
 #-------------------------------- Istio Module --------------------------------
 # Istio mesh. To collect all Mixer-generated metrics
 - module: istio
