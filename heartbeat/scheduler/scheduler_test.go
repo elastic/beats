@@ -25,10 +25,11 @@ import (
 	"testing"
 	"time"
 
-	batomic "github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	batomic "github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 // The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
