@@ -4,7 +4,7 @@ args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-
 configurable: grpc
 rules:
 - inject_index:
-    type: metricbeat
+    type: metrics
 
 - extract_list_items:
     path: datasources

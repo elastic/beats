@@ -4,7 +4,7 @@ filebeat:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
-    index: filebeat-generic-default
+    index: logs-generic-default
 output:
   elasticsearch:
     hosts:

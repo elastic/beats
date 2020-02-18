@@ -2,10 +2,10 @@ metricbeat:
   modules:
   - module: docker
     metricsets: [status]
-    index: metricbeat-docker.status-default
+    index: metrics-docker.status-default
   - module: apache
     metricsets: [info]
-    index: metricbeat-generic-testing
+    index: metrics-generic-testing
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
