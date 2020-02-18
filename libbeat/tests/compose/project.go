@@ -45,8 +45,6 @@ type UpOptions struct {
 	// use to advertise itself to clients
 	SetupAdvertisedHostEnvFile     bool
 	SetupAdvertisedHostEnvFilePort int
-
-	Environment []string
 }
 
 // UpOption is a modifier for UpOptions
@@ -71,11 +69,6 @@ func UpWithAdvertisedHostEnvFileForPort(port int) UpOption {
 		options.SetupAdvertisedHostEnvFile = true
 		options.SetupAdvertisedHostEnvFilePort = port
 	}
-}
-
-// UpWithEnvironmentVariable adds environment variable.
-func UpWithEnvironmentVariable(keyValue string) UpOption {
-	return func(options *UpOptions) { options.Environment = append(options.Environment, keyValue) }
 }
 
 // Filter options for services

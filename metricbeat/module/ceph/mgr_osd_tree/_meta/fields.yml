@@ -1,4 +1,4 @@
-- name: mgr_osd_tree
+- name: osd_tree
   type: group
   description: >
     OSD tree information

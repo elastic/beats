@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "ceph": {
-        "mgr_pool_disk": {
+        "pool_disk": {
             "id": 0,
             "name": "rbd",
             "stats": {

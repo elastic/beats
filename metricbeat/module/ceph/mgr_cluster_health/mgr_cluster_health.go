@@ -20,6 +20,7 @@ package mgr_cluster_health
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/ceph/mgr"
@@ -81,6 +82,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return err
 	}
 
-	reporter.Event(mb.Event{MetricSetFields: event})
+	reporter.Event(mb.Event{
+		ModuleFields: common.MapStr{
+			"cluster_health": event,
+		}})
 	return nil
 }

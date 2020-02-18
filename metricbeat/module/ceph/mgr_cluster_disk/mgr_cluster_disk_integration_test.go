@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/ceph/mgrtest"
 )
@@ -31,7 +32,7 @@ import (
 const user = "demo"
 
 func TestData(t *testing.T) {
-	service := mgrtest.EnsureUp(t)
+	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
 
 	f := mbtest.NewReportingMetricSetV2Error(t,
 		getConfig(service.HostForPort(8003), mgrtest.GetPassword(t, service.HostForPort(5000), user)))

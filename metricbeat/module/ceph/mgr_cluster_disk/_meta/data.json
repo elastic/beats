@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "ceph": {
-        "mgr_cluster_disk": {
+        "cluster_disk": {
             "available": {
                 "bytes": 0
             },
