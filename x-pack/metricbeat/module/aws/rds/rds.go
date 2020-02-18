@@ -11,13 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
@@ -82,7 +82,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svc := rds.New(awsConfig)
+
+		svc := rds.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "rds", regionName, awsConfig))
+
 		// Get DBInstance IDs per region
 		dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
 		if err != nil {
@@ -96,7 +99,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
 		namespace := "AWS/RDS"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {

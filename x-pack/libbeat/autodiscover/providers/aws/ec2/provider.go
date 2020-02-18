@@ -68,7 +68,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	if config.Regions == nil {
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
-		svcEC2 := ec2.New(awsCfg)
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
+
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
 			return nil, err
@@ -83,7 +85,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
 		}
 		awsCfg.Region = region
-		clients = append(clients, ec2.New(awsCfg))
+		clients = append(clients, ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", region, awsCfg)))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))

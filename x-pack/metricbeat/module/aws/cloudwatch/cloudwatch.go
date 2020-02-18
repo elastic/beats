@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	awscommon "github.com/elastic/v7/beats/x-pack/libbeat/common/aws"
 )
 
 var (
@@ -136,8 +137,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		for _, regionName := range m.MetricSet.RegionsList {
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
-			svcCloudwatch := cloudwatch.New(awsConfig)
-			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+
+			svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "monitoring", regionName, awsConfig))
+
+			svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "tagging", regionName, awsConfig))
 
 			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
@@ -154,8 +159,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(awsConfig)
-		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
+		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "tagging", regionName, awsConfig))
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {
