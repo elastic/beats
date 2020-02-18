@@ -4,13 +4,8 @@ input:
   metricset: monitor
   defaults:
     default_resource_type: "Microsoft.DocumentDb/databaseAccounts"
-    resource_params:
-    - field: group
-      option: resource_group
-    - field: id
-      option: resource_id
     resources:
-    - resource_group: {.group}
+    - resource_group: ""
       resource_type: "Microsoft.DocumentDb/databaseAccounts"
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
@@ -30,7 +25,7 @@ input:
         dimensions:
         - name: "DatabaseName"
           value: "*"
-    - resource_id: {.id}
+    - resource_id: ""
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
                 "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
