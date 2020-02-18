@@ -15,18 +15,13 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    try:
-        with open(filename, 'r') as f:
-            return f.read()
-    except UnicodeDecodeError:
-        # try latin-1
-        with open(filename, 'r', encoding="ISO-8859-1") as f:
-            return f.read()
+    with open(filename, 'r', encoding='utf_8') as f:
+        return f.read()
 
 
 def read_go_mod(vendor_dir):
     lines = []
-    with open(os.path.join(vendor_dir, "modules.txt")) as f:
+    with open(os.path.join(vendor_dir, "modules.txt"), encoding="utf_8") as f:
         lines = f.readlines()
 
     deps = []
@@ -287,11 +282,11 @@ def get_url(repo):
 def create_notice(filename, beat, copyright, vendor_dir, csvfile, overrides=None):
     dependencies = gather_dependencies(vendor_dir, overrides=overrides)
     if not csvfile:
-        with open(filename, "w+") as f:
+        with open(filename, "w+", encoding='utf_8') as f:
             write_notice_file(f, beat, copyright, dependencies)
             print("Available at {}".format(filename))
     else:
-        with open(csvfile, "wb") as f:
+        with open(csvfile, "wb", encoding='utf_8') as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
             print("Available at {}".format(csvfile))
