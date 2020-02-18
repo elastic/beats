@@ -24,7 +24,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             top_level_fields = metricbeat.COMMON_FIELDS + ["uwsgi"]
-            self.assertItemsEqual(self.de_dot(top_level_fields), evt.keys())
+            self.assertCountEqual(self.de_dot(top_level_fields), evt.keys())
 
             self.assert_fields_are_documented(evt)
 

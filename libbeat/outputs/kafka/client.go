@@ -79,7 +79,7 @@ func newKafkaClient(
 		hosts:    hosts,
 		topic:    topic,
 		key:      key,
-		index:    index,
+		index:    strings.ToLower(index),
 		codec:    writer,
 		config:   *cfg,
 	}
