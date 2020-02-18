@@ -395,6 +395,26 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+#------------------------------ Greenplum Module ------------------------------
+- module: greenplum
+  # All logs
+  {fileset}:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#------------------------------ Greenplum Module ------------------------------
+- module: greenplum
+  # All logs
+  {fileset}:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs

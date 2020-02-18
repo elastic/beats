@@ -21,6 +21,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/coredns"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/googlecloud"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/greenplum"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/ibmmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/iptables"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/misp"
@@ -30,6 +31,5 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/zeek"
-	_ "github.com/elastic/beats/x-pack/filebeat/module/greenplum"
 	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_cef"
 )
