@@ -54,8 +54,8 @@ class Test(metricbeat.BaseTest):
         assert "requests" in cores[0]
         assert "static" in cores[0]["requests"]
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @parameterized.expand(["http", "tcp"])
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_status(self, proto):
         """
