@@ -65,3 +65,17 @@ SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp 
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration UNION ALL
 SELECT dbid,content,role,preferred_role,mode,status,'20200214 00:00'::timestamp FROM gp_segment_configuration;",0,,"postgres.c",1175,
 2020-02-14 03:36:44.311183 UTC,,,p7548,th1452697472,,,2020-02-14 03:36:44 UTC,0,,,seg-1,,,,,"LOG","00000","connection received: host=10.110.181.132 port=51628",,,,,,,0,,"postmaster.c",6841,
+2020-02-18 18:58:03.536517 UTC,"user","db",p202744,th-968001664,"10.110.109.64","43940",2020-02-18 18:55:59 UTC,193808117,con106413,cmd229,seg-1,,dx172496,,sx5,"LOG","00000","Planner produced plan :0",,,,,"SQL statement ""select sum(pg_tot
+al_relation_size('schema.superb_business_table_1_prt_20190321'))::int8 from gp_dist_random('gp_id');""
+SQL statement ""select sum(pg_total_relation_size((partitionschemaname || '.' || partitiontablename)::regclass))::bigint total
+         from pg_partitions p
+         where upper(p.tablename) = 'SUPERB_BUSINESS_TABLE'
+         and upper(p.schemaname) = 'SCHEMA'""
+PL/pgSQL function ""schema.excellent_business_function"" line 48 at execute statement
+SQL statement ""SELECT  schema.excellent_business_function( $1 ,  $2 ,  $3 ,  $4 ,  $5 ,  $6 , NULL, NULL, NULL)""
+PL/pgSQL function ""schema.excellent_business_function"" line 12 at perform
+SQL statement ""SELECT  schema.excellent_business_function( $1 ||'.'|| $2 ,  $3 ,  $4 , (clock_timestamp() -  $5 )::time without time zone,  $6 ,  $4 )""
+PL/pgSQL function ""excellent_business_function"" line 629 at perform","select sum(pg_total_relation_size((partitionschemaname || '.' || partitiontablename)::regclass))::bigint total
+         from pg_partitions p
+         where upper(p.tablename) = 'SUPERB_BUSINESS_TABLE'
+         and upper(p.schemaname) = 'SCHEMA'",0,,"planner.c",164,

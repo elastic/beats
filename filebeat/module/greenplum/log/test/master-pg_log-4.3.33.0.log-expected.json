@@ -308,5 +308,42 @@
         "input.type": "log",
         "log.offset": 5316,
         "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-02-18T18:58:03.536Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "229",
+        "greenplum.log.context": "SQL statement \"\"select sum(pg_tot\nal_relation_size('schema.superb_business_table_1_prt_20190321'))::int8 from gp_dist_random('gp_id');\"\"\nSQL statement \"\"select sum(pg_total_relation_size((partitionschemaname || '.' || partitiontablename)::regclass))::bigint total\n         from pg_partitions p\n         where upper(p.tablename) = 'SUPERB_BUSINESS_TABLE'\n         and upper(p.schemaname) = 'SCHEMA'\"\"\nPL/pgSQL function \"\"schema.excellent_business_function\"\" line 48 at execute statement\nSQL statement \"\"SELECT  schema.excellent_business_function( $1 ,  $2 ,  $3 ,  $4 ,  $5 ,  $6 , NULL, NULL, NULL)\"\"\nPL/pgSQL function \"\"schema.excellent_business_function\"\" line 12 at perform\nSQL statement \"\"SELECT  schema.excellent_business_function( $1 ||'.'|| $2 ,  $3 ,  $4 , (clock_timestamp() -  $5 )::time without time zone,  $6 ,  $4 )\"\"\nPL/pgSQL function \"\"excellent_business_function\"\" line 629 at perform",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "db",
+        "greenplum.log.debug": "select sum(pg_total_relation_size((partitionschemaname || '.' || partitiontablename)::regclass))::bigint total\n         from pg_partitions p\n         where upper(p.tablename) = 'SUPERB_BUSINESS_TABLE'\n         and upper(p.schemaname) = 'SCHEMA'",
+        "greenplum.log.distributed_transaction_id": "dx172496",
+        "greenplum.log.file.line": "164",
+        "greenplum.log.file.name": "planner.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.host": "10.110.109.64",
+        "greenplum.log.level": "LOG",
+        "greenplum.log.message": "Planner produced plan :0",
+        "greenplum.log.port": "43940",
+        "greenplum.log.process_id": "p202744",
+        "greenplum.log.session_id": "con106413",
+        "greenplum.log.session_start": "2020-02-18 18:55:59 UTC",
+        "greenplum.log.stack": "",
+        "greenplum.log.state_code": "00000",
+        "greenplum.log.subtransaction_id": "sx5",
+        "greenplum.log.thread_id": "-968001664",
+        "greenplum.log.timestamp": "2020-02-18 18:58:03.536517 UTC",
+        "greenplum.log.transaction_id": "193808117",
+        "greenplum.log.user": "user",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 5506,
+        "service.type": "greenplum"
     }
 ]
