@@ -41,9 +41,9 @@ func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
-	statusResponse, err := ioutil.ReadFile(absPath + "/mgr_status_sample_response.json")
+	statusResponse, err := ioutil.ReadFile(absPath + "/status.json")
 	assert.NoError(t, err)
-	timeSyncStatusResponse, err := ioutil.ReadFile(absPath + "/mgr_time_sync_status_sample_response.json")
+	timeSyncStatusResponse, err := ioutil.ReadFile(absPath + "/time_sync_status.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +93,7 @@ func TestFetchEventContents_Failed(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/mgr_failed_response.json")
+	response, err := ioutil.ReadFile(absPath + "/failed.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
