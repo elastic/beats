@@ -12,7 +12,6 @@
 - module: ceph
   metricsets:
     - mgr_cluster_disk
-    - mgr_cluster_health
     - mgr_osd_disk
     - mgr_osd_perf
   #  - mgr_osd_pool_stats
