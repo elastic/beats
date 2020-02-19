@@ -17,6 +17,7 @@ type ConfigAWS struct {
 	SessionToken         string `config:"session_token"`
 	ProfileName          string `config:"credential_profile_name"`
 	SharedCredentialFile string `config:"shared_credential_file"`
+	Endpoint             string `config:"endpoint"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -57,5 +58,23 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if config.SharedCredentialFile != "" {
 		options = append(options, external.WithSharedConfigFiles([]string{config.SharedCredentialFile}))
 	}
-	return external.LoadDefaultAWSConfig(options...)
+
+	awsConfig, err := external.LoadDefaultAWSConfig(options...)
+	if err != nil {
+		return awsConfig, err
+	}
+	return awsConfig, nil
+}
+
+// EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
+// service clients when endpoint is given in config.
+func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
+	if endpoint != "" {
+		if regionName == "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		} else {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+		}
+	}
+	return awsConfig
 }

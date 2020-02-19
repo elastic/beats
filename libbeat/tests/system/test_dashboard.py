@@ -361,8 +361,8 @@ class Test(BaseTest):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
             "/api/spaces/space"
         data = {
-            "id": "foo-bar",
-            "name": "Foo bar space"
+            "id": "libbeat-system-tests",
+            "name": "Libbeat System Tests"
         }
 
         headers = {
@@ -370,7 +370,8 @@ class Test(BaseTest):
         }
 
         r = requests.post(url, json=data, headers=headers)
-        assert r.status_code == 200
+        if r.status_code != 200 and r.status_code != 409:
+            self.fail('Bad Kibana status code when creating space: {}'.format(r.status_code))
 
     def get_version(self):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \

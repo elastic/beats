@@ -37,7 +37,7 @@ class Test(BaseTest):
             m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
                 " 'su root' failed for lonvick on /dev/pts/8 {}\n"
             m = m.format(n)
-            sock.send(m)
+            sock.send(m.encode("utf-8"))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 
@@ -76,7 +76,7 @@ class Test(BaseTest):
         sock.connect((host, port))
 
         for n in range(0, 2):
-            sock.send("invalid\n")
+            sock.send("invalid\n".encode("utf-8"))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 
@@ -118,7 +118,7 @@ class Test(BaseTest):
             m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
                 " 'su root' failed for lonvick on /dev/pts/8 {}\n"
             m = m.format(n)
-            sock.sendto(m, (host, port))
+            sock.sendto(m.encode("utf-8"), (host, port))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 
