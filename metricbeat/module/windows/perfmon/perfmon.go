@@ -139,6 +139,7 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
+// validateCounterConfig func will check if the instanceLabel has been set, the instance label is mandatory inside the pefrmon metricset
 func validateCounterConfig(counters []CounterConfig) error {
 	for _, counter := range counters {
 		if counter.InstanceLabel == "" {

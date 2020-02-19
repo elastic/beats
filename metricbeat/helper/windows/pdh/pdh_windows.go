@@ -51,7 +51,8 @@ type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
 
-const PERF_DETAIL_WIZARD = 400
+// counter detail level
+const PerformanceDetailWizard = 400
 
 // PdhCounterInfo struct contains the performance counter details
 type PdhCounterInfo struct {
@@ -267,7 +268,7 @@ func PdhEnumObjectItems(objectName string) ([]uint16, []uint16, error) {
 		&cBuffSize,
 		&iBuff[0],
 		&iBuffSize,
-		PERF_DETAIL_WIZARD,
+		PerformanceDetailWizard,
 		0); err != nil {
 		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
 			return nil, nil, PdhErrno(err.(syscall.Errno))
@@ -283,7 +284,7 @@ func PdhEnumObjectItems(objectName string) ([]uint16, []uint16, error) {
 			&cBuffSize,
 			&iBuff[0],
 			&iBuffSize,
-			PERF_DETAIL_WIZARD,
+			PerformanceDetailWizard,
 			0); err != nil {
 			return nil, nil, err
 		}

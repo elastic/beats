@@ -215,7 +215,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	return filtered, nil
 }
 
-// getw3wpProceses func retrieves the running w3wp process ids
+// getw3wpProceses func retrieves the running w3wp process ids. A worker process is a windows process (w3wp.exe) which runs Web applications, and is responsible for handling requests sent to a Web Server for a specific application pool.
 func getw3wpProceses() (map[int]string, error) {
 	processes, err := sysinfo.Processes()
 	if err != nil {
@@ -232,7 +232,7 @@ func getw3wpProceses() (map[int]string, error) {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
 						wps[info.PID] = info.Args[i+1]
-						continue
+						break
 					}
 				}
 			}

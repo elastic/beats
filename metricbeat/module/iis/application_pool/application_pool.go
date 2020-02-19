@@ -96,3 +96,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	return nil
 }
+
+// Close will be called when metricbeat is stopped, should close the query.
+func (m *MetricSet) Close() error {
+	err := m.reader.close()
+	if err != nil {
+		return errors.Wrap(err, "failed to close pdh query")
+	}
+	return nil
+}

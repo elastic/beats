@@ -30,10 +30,12 @@ The `iis` module mericsets are `webserver`, `website` and `application_pool`.
 
 [float]
 === `webserver`
-This metricset allows users to retrieve aggregated metrics for the entire webserver.
+A light metricset using the windows perfmon metricset as the base metricset.
+This metricset allows users to retrieve aggregated metrics for the entire webserver,
 
 [float]
 === `website`
+A light metricset using the windows perfmon metricset as the base metricset.
 This metricset will collect metrics of specific sites, users can configure which websites they want to monitor, else, all are considered.
 
 [float]
