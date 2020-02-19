@@ -26,10 +26,6 @@ configuration setting. For example:
 setup.ilm.policy_name: "%{[agent.name]}-%{[agent.version]}"
 ----
 
-// end::notable-breaking-changes[]
-
-//tag::notable-breaking-changes[]
-
 [float]
 ==== Two Beat instances can no longer share the same data path
 
