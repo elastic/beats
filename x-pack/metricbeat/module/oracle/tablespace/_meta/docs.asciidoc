@@ -1,5 +1,6 @@
 `tablespace` Metricset includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
 
+[float]
 === Required database access
 
 To ensure that the module has access to the appropriate metrics, the module requires that you configure a user with access to the following tables:
