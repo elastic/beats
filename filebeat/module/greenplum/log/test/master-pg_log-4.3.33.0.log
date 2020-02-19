@@ -79,3 +79,46 @@ PL/pgSQL function ""excellent_business_function"" line 629 at perform","select s
          from pg_partitions p
          where upper(p.tablename) = 'SUPERB_BUSINESS_TABLE'
          and upper(p.schemaname) = 'SCHEMA'",0,,"planner.c",164,
+ 2020-02-16 01:06:40.722812 UTC,"gpadmin","vds_prd",p229972,th-968001664,"10.110.114.33","7269",2020-02-16 01:01:01 UTC,193508422,con4585,cmd1198,seg-1,,dx6338,x193508422,sx1,"ERROR","XX000","Found zero distributed xid for local xid = 66
+ 4578 in distributed log (dtx start time = 1, page = 162, entryno = 1026) (distributedlog.c:244)  (seg42 slice2 dtord03gpbs108p.dc.dotomi.net:40000 pid=142679) (cdbdisp.c:1322)",,,,,,"
+           SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+           -- distribute catalog table from master, so that we can avoid to gather
+           CREATE TEMPORARY TABLE _tmp_master ON COMMIT DROP AS
+               SELECT gp_segment_id segid, attrelid,attname FROM pg_attribute;
+           SELECT attrelid,attname, exists, array_agg(segid order by segid) as segids
+           FROM
+           (
+             SELECT ideal.*,
+                    case when actual.segid is null then 'missing' else 'extra' end as exists,
+                    count(*) over (partition by attrelid,attname, actual.segid is null) as subcount
+             FROM (
+                  SELECT segid, attrelid,attname
+                  FROM(  SELECT distinct attrelid,attname FROM _tmp_master
+                         UNION
+                         SELECT distinct attrelid,attname FROM gp_dist_random('pg_attribute') ) all_pks,
+                       ( SELECT distinct content as segid from gp_segment_configuration) all_segs
+                ) ideal
+                LEFT OUTER JOIN
+                ( SELECT segid, attrelid,attname FROM _tmp_master
+                  UNION ALL
+                  SELECT gp_segment_id as segid, attrelid,attname FROM gp_dist_random('pg_attribute')
+                ) actual USING (segid, attrelid,attname)
+           ) missing_extra
+           WHERE subcount <= (1151+2)/2.0
+           GROUP BY attrelid,attname, exists;
+           ",0,,"cdbdisp.c",1322,"Stack trace:
+ 1    0xb0d20e postgres errstart (elog.c:502)
+ 2    0xbe5e15 postgres cdbdisp_finishCommand (cdbdisp.c:1320)
+ 3    0xbe5fe8 postgres cdbdisp_handleError (cdbdisp.c:1406)
+ 4    0x76f7fc postgres mppExecutorCleanup (execUtils.c:2377)
+ 5    0x7544d5 postgres ExecutorRun (execMain.c:954)
+ 6    0x9a6b49 postgres PortalRun (pquery.c:1260)
+ 7    0x99d7dc postgres <symbol not found> (postgres.c:1825)
+ 8    0x9a1bf9 postgres PostgresMain (postgres.c:4788)
+ 9    0x8fc319 postgres <symbol not found> (postmaster.c:6672)
+ 10   0x8fedc0 postgres PostmasterMain (postmaster.c:7603)
+ 11   0x7feccf postgres main (main.c:206)
+ 12   0x7fb0c1c98545 libc.so.6 __libc_start_main + 0xf5
+ 13   0x4bef79 postgres <symbol not found> + 0x4bef79
+ "
