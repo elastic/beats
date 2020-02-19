@@ -185,7 +185,11 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		rl.config.Reload.Period = 0
 	}
 
-	overwriteUpdate := true
+	// If forceReload is set, the configuration should be reloaded
+	// even if there are no changes. It is set on the first iteration,
+	// and whenever an attempted reload fails. It is unset whenever
+	// a reload succeeds.
+	forceReload := true
 
 	for {
 		select {
@@ -204,9 +208,8 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 				logp.Err("Error fetching new config files: %v", err)
 			}
 
-			// no file changes
-			if !updated && !overwriteUpdate {
-				overwriteUpdate = false
+			// if there are no changes, skip this reload unless forceReload is set.
+			if !updated && !forceReload {
 				continue
 			}
 
@@ -215,10 +218,11 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			debugf("Number of module configs found: %v", len(configs))
 
-			if err := list.Reload(configs); err != nil {
-				// Make sure the next run also updates because some runners were not properly loaded
-				overwriteUpdate = true
+			if err = list.Reload(configs); err != nil {
+				logp.Err("Error reloading module configurations: %v", err)
 			}
+			// force reload on the next iteration if and only if this one failed.
+			forceReload = err != nil
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
