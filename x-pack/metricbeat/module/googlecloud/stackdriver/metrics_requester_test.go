@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestStringInSlice(t *testing.T) {
@@ -43,10 +45,11 @@ func TestStringInSlice(t *testing.T) {
 }
 
 func TestGetFilterForMetric(t *testing.T) {
+	var logger = logp.NewLogger("test")
 	cases := []struct {
-		title string
-		m string
-		r stackdriverMetricsRequester
+		title          string
+		m              string
+		r              stackdriverMetricsRequester
 		expectedFilter string
 	}{
 		{
@@ -84,6 +87,12 @@ func TestGetFilterForMetric(t *testing.T) {
 			"loadbalancing.googleapis.com/https/backend_latencies",
 			stackdriverMetricsRequester{config: config{Region: "us-east1"}},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
+		},
+		{
+			"compute service with both region and zone in config",
+			"compute.googleapis.com/firewall/dropped_bytes_count",
+			stackdriverMetricsRequester{config: config{Region: "us-central1", Zone: "us-central1-a"}, logger: logger},
+			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1\")",
 		},
 	}
 
