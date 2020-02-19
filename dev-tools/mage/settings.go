@@ -191,17 +191,17 @@ VersionQualifier = {{.Qualifier}}
 
 ## Functions
 
-beat_doc_branch     = {{ beat_doc_branch }}
-beat_version        = {{ beat_version }}
-commit              = {{ commit }}
-date                = {{ date }}
-elastic_beats_dir   = {{ elastic_beats_dir }}
-go_version          = {{ go_version }}
-repo.RootImportPath = {{ repo.RootImportPath }}
-repo.MountPoint     = {{ repo.MountPoint }}
-repo.RootDir        = {{ repo.RootDir }}
-repo.ImportPath     = {{ repo.ImportPath }}
-repo.SubDir         = {{ repo.SubDir }}
+beat_doc_branch              = {{ beat_doc_branch }}
+beat_version                 = {{ beat_version }}
+commit                       = {{ commit }}
+date                         = {{ date }}
+elastic_beats_dir            = {{ elastic_beats_dir }}
+go_version                   = {{ go_version }}
+repo.RootImportPath          = {{ repo.RootImportPath }}
+repo.CanonicalRootImportPath = {{ repo.CanonicalRootImportPath }}
+repo.RootDir                 = {{ repo.RootDir }}
+repo.ImportPath              = {{ repo.ImportPath }}
+repo.SubDir                  = {{ repo.SubDir }}
 `
 
 	return Expand(dumpTemplate)
@@ -542,11 +542,11 @@ func parseDocBranch(data []byte) (string, error) {
 
 // ProjectRepoInfo contains information about the project's repo.
 type ProjectRepoInfo struct {
-	RootImportPath string // Import path at the project root.
-	MountPoint     string // Mount point for the crossBuilder.
-	RootDir        string // Root directory of the project.
-	ImportPath     string // Import path of the current directory.
-	SubDir         string // Relative path from the root dir to the current dir.
+	RootImportPath          string // Import path at the project root.
+	CanonicalRootImportPath string // Pre-modules root import path (does not contain semantic import version identifier).
+	RootDir                 string // Root directory of the project.
+	ImportPath              string // Import path of the current directory.
+	SubDir                  string // Relative path from the root dir to the current dir.
 }
 
 // IsElasticBeats returns true if the current project is
@@ -632,11 +632,11 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 	}
 
 	return &ProjectRepoInfo{
-		RootImportPath: rootImportPath,
-		MountPoint:     extractMountPoint(rootImportPath),
-		RootDir:        rootDir,
-		SubDir:         subDir,
-		ImportPath:     filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
+		RootImportPath:          rootImportPath,
+		CanonicalRootImportPath: filepath.ToSlash(extractCanonicalRootImportPath(rootImportPath)),
+		RootDir:                 rootDir,
+		SubDir:                  subDir,
+		ImportPath:              filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
 	}, nil
 }
 
@@ -691,16 +691,23 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	}
 
 	return &ProjectRepoInfo{
-		RootImportPath: rootImportPath,
-		MountPoint:     extractMountPoint(rootImportPath),
-		RootDir:        rootDir,
-		SubDir:         subDir,
-		ImportPath:     filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
+		RootImportPath:          rootImportPath,
+		CanonicalRootImportPath: filepath.ToSlash(extractCanonicalRootImportPath(rootImportPath)),
+		RootDir:                 rootDir,
+		SubDir:                  subDir,
+		ImportPath:              filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
 	}, nil
 }
 
-func extractMountPoint(rootImportPath string) string {
-	re := regexp.MustCompile(`/v[2-9][0-9]*$`) // ends with major version
+func extractCanonicalRootImportPath(rootImportPath string) string {
+	// In order to be compatible with go modules, the root import
+	// path of any module at major version v2 or higher must include
+	// the major version.
+	// Ref: https://github.com/golang/go/wiki/Modules#semantic-import-versioning
+	//
+	// Thus, Beats has to include the major version as well.
+	// This regex removes the major version from the import path.
+	re := regexp.MustCompile(`(/v[1-9][0-9]*)$`)
 	return re.ReplaceAllString(rootImportPath, "")
 }
 
