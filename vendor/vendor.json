@@ -4778,106 +4778,154 @@
 			"revisionTime": "2019-08-24T13:30:31Z"
 		},
 		{
-			"checksumSHA1": "V9z7TYyHu/Nnevtzyc4Lff0ZGzY=",
+			"checksumSHA1": "3MbnKrMX4OppP5XaeiHipERnTdY=",
 			"path": "go.elastic.co/apm",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "oaKKkmUl8HRP90bd+yNzJ/XVya4=",
 			"path": "go.elastic.co/apm/apmconfig",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
+		},
+		{
+			"path": "go.elastic.co/apm/internal/apmconfig",
+			"revision": "v1.7",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "k47GkPJ3iWtd4Fy5M/4vT7afxNE=",
 			"path": "go.elastic.co/apm/internal/apmcontext",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "8WOKARWQ+jfkpvMrjL7Xf43ih9k=",
 			"path": "go.elastic.co/apm/internal/apmhostutil",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "XXpcsqvhmzF38S9hDVRIo7k8vBo=",
 			"path": "go.elastic.co/apm/internal/apmhttputil",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "Hd2JFOVlVZ3knxswP3CZp5g0T4w=",
 			"path": "go.elastic.co/apm/internal/apmlog",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "FdWSzulcP6fvZat4Y2+T6S3hm6g=",
 			"path": "go.elastic.co/apm/internal/apmschema",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "1MDHkJKNWEEFp9GOWxtJfDFb+3A=",
 			"path": "go.elastic.co/apm/internal/apmstrings",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "GkJcbNJxemYM0vsoXu8swKJrJY4=",
 			"path": "go.elastic.co/apm/internal/apmversion",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "5oSAbJ9eS2yv0p/Gm8yPx+ttP2A=",
 			"path": "go.elastic.co/apm/internal/configutil",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "t3RBXEqNjYBOzkISQ2owvJ7O9ts=",
 			"path": "go.elastic.co/apm/internal/iochan",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "iumevVeKXptxLM5WDN7zvHAFChs=",
 			"path": "go.elastic.co/apm/internal/pkgerrorsutil",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "94vpBAGXi3+EKqka4Gj20QYv+dc=",
 			"path": "go.elastic.co/apm/internal/ringbuffer",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "YCmYIuI9nZS67lRGltx8/Zr16dk=",
 			"path": "go.elastic.co/apm/internal/wildcard",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "QDEig1Zf9bWTYALjjcHqlGy/YHs=",
 			"path": "go.elastic.co/apm/model",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
+		},
+		{
+			"checksumSHA1": "SRbhRuNfgVv46E9urLIgwsJgC+0=",
+			"path": "go.elastic.co/apm/module/apmhttp",
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "5bcIH490Gu1MkwPkphgK0JjIKko=",
 			"path": "go.elastic.co/apm/stacktrace",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "QU3jXVqVwkvR6JS9rtqt1Vurago=",
 			"path": "go.elastic.co/apm/transport",
-			"revision": "1a9f6b01e6715728268600afcc90c01781607b6b",
-			"revisionTime": "2020-02-10T02:20:45Z"
+			"revision": "bd04e1a7f15b96a6756b235a76645d7e10da5f99",
+			"revisionTime": "2020-01-10T03:30:49Z",
+			"version": "v1.7",
+			"versionExact": "v1.7.0"
 		},
 		{
 			"checksumSHA1": "ou8/GMlWF1EShL3NuomgkrmDwb0=",
@@ -5923,24 +5971,24 @@
 			"versionExact": "v0.7.0"
 		},
 		{
-			"path": "google.golang.org/api/internal/gensupport",
-			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
-		},
-		{
-			"path": "google.golang.org/api/internal/gensupport",
-			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
-		},
-		{
 			"checksumSHA1": "I4Oe5Q+AuaxmN3duL38r2evqGKk=",
 			"path": "google.golang.org/api/internal/gensupport",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
 			"revisionTime": "2019-11-15T18:09:15Z",
 			"version": "v0.14.0",
 			"versionExact": "v0.14.0"
+		},
+		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
+		},
+		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
 		},
 		{
 			"checksumSHA1": "nN+zggDyWr8HPYzwltMkzJJr1Jc=",

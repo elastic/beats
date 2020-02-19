@@ -167,6 +167,7 @@ pipeline {
           post {
             always {
               junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/build/junit-*.xml")
+              cleanWs(disableDeferredWipeout: true, notFailBuild: true)
             }
           }
         }
@@ -228,7 +229,6 @@ pipeline {
         stage('Opbeans') {
           environment {
             REPO_NAME = "${OPBEANS_REPO}"
-            GO_VERSION = "${params.GO_VERSION}"
           }
           steps {
             deleteDir()
