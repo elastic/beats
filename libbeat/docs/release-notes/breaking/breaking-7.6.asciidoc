@@ -27,3 +27,20 @@ setup.ilm.policy_name: "%{[agent.name]}-%{[agent.version]}"
 ----
 
 // end::notable-breaking-changes[]
+
+//tag::notable-breaking-changes[]
+
+[float]
+==== Two Beat instances can no longer share the same data path
+
+To prevent accidental overwriting of internal state, two instances of the
+same Beat running on the same host can no longer share the same data path.
+To customize the data path for a Beat, use the `path.data` configuration
+setting. For example:
+
+[source,yaml]
+----
+path.data: ${path.home}/data-instance1
+----
+
+// end::notable-breaking-changes[]
