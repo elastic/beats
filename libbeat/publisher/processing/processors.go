@@ -77,6 +77,12 @@ func (p *group) add(processor processors.Processor) {
 }
 
 func (p *group) Close() error {
+	for _, processor := range p.list {
+		err := processors.Close(processor)
+		if err != nil {
+			p.log.Warnf("Processor failed to close (%s): %v", processor, err)
+		}
+	}
 	return nil
 }
 
