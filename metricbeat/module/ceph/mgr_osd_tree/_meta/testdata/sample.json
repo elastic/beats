@@ -1,0 +1,17 @@
+{
+    "failed": [],
+    "finished": [
+        {
+            "command": "osd tree format=json-pretty",
+            "outb": "{\n        \"nodes\": [\n            {\n                \"children\": [\n                    -3\n                ],\n                \"id\": -1,\n                \"name\": \"default\",\n                \"type\": \"root\",\n                \"type_id\": 10\n            },\n            {\n                \"children\": [\n                    1,\n                    0\n                ],\n                \"id\": -3,\n                \"name\": \"ceph-mon1\",\n                \"pool_weights\": {},\n                \"type\": \"host\",\n                \"type_id\": 1\n            },\n            {\n                \"crush_weight\": 0.048691,\n                \"depth\": 2,\n                \"device_class\": \"hdd\",\n                \"exists\": 1,\n                \"id\": 0,\n                \"name\": \"osd.0\",\n                \"pool_weights\": {},\n                \"primary_affinity\": 1.0,\n                \"reweight\": 1.0,\n                \"status\": \"up\",\n                \"type\": \"osd\",\n                \"type_id\": 0\n            },\n            {\n                \"crush_weight\": 0.048691,\n                \"depth\": 2,\n                \"device_class\": \"hdd\",\n                \"exists\": 1,\n                \"id\": 1,\n                \"name\": \"osd.1\",\n                \"pool_weights\": {},\n                \"primary_affinity\": 1.0,\n                \"reweight\": 1.0,\n                \"status\": \"up\",\n                \"type\": \"osd\",\n                \"type_id\": 0\n            }\n        ],\n        \"stray\": []\n    }",
+            "outs": ""
+        }
+    ],
+    "has_failed": false,
+    "id": "140149339315152",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "success",
+    "waiting": []
+}
