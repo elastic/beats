@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -95,6 +96,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 
 // managePropertyName function will handle metric names, there are several formats the metric names are written
 func managePropertyName(metric string) string {
+
 	// replace spaces with underscores
 	resultMetricName := strings.Replace(metric, " ", "_", -1)
 	// replace backslashes with "per"
@@ -106,6 +108,9 @@ func managePropertyName(metric string) string {
 	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	// replace uppercases with underscores
+	resultMetricName = replaceUpperCase(resultMetricName)
+
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
 	obj := strings.Split(resultMetricName, ".")
 	for index := range obj {
@@ -116,6 +121,20 @@ func managePropertyName(metric string) string {
 	resultMetricName = strings.ToLower(strings.Join(obj, "_"))
 
 	return resultMetricName
+}
+
+// replaceUpperCase func will replace upper case with '_'
+func replaceUpperCase(src string) string {
+	var result string
+	// split into fields based on class of unicode character
+	for _, r := range src {
+		if unicode.IsUpper(r) {
+			result += "_" + strings.ToLower(string(r))
+		} else {
+			result += string(r)
+		}
+	}
+	return result
 }
 
 // createEvent will create a new base event

@@ -3194,6 +3194,16 @@ type: object
 
 --
 
+*`azure.container.*.*`*::
++
+--
+container
+
+
+type: object
+
+--
+
 [float]
 === monitor
 
