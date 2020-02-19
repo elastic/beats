@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 - Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 - Cleanup the x-pack licenser code to use the new license endpoint and the new format. Replaces the url /_xpack/license with /_license. {pull}15091[15091]
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
+- Two Beat instances with the same data path cannot be run concurrently. {pull}14069[14069]
 
 *Filebeat*
 
