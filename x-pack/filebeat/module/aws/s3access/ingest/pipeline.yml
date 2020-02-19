@@ -41,6 +41,11 @@ processors:
       field: client.ip
       value: "{{aws.s3access.remote_ip}}"
 
+  - append:
+      if: "ctx?.aws?.s3access?.remote_ip != null"
+      field: related.ip
+      value: "{{aws.s3access.remote_ip}}"
+
   - set:
       if: "ctx?.aws?.s3access?.remote_ip != null"
       field: client.address

@@ -319,7 +319,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.192",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.0,
@@ -368,7 +368,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.1.107",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.001,
@@ -417,7 +417,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.192",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.001,

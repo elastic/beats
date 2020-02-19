@@ -4,7 +4,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.1",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.001,
@@ -45,7 +45,7 @@
             "authenticate",
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.1",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.048,
@@ -92,7 +92,7 @@
         "aws.elb.action_executed": [
             "redirect"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.66",
         "aws.elb.backend.port": "9000",
         "aws.elb.backend_processing_time.sec": 0.002,
@@ -138,7 +138,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "101",
+        "aws.elb.backend.http.response.status_code": 101,
         "aws.elb.backend.ip": "10.0.1.192",
         "aws.elb.backend.port": "8010",
         "aws.elb.backend_processing_time.sec": 0.003,
@@ -175,7 +175,7 @@
     },
     {
         "@timestamp": "2018-07-02T22:23:00.186Z",
-        "aws.elb.backend.http.response.status_code": "101",
+        "aws.elb.backend.http.response.status_code": 101,
         "aws.elb.backend.ip": "10.0.0.171",
         "aws.elb.backend.port": "8010",
         "aws.elb.backend_processing_time.sec": 0.001,
@@ -214,7 +214,7 @@
         "aws.elb.action_executed": [
             "forward"
         ],
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend_processing_time.sec": 0.001,
         "aws.elb.matched_rule_priority": "0",
         "aws.elb.name": "app/my-loadbalancer/50dc6c495c0c9188",

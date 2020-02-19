@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2019-10-14T12:00:20.694Z",
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.1.185",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.000785,
@@ -41,7 +41,7 @@
     },
     {
         "@timestamp": "2019-10-14T12:01:41.918Z",
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.169",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.00491,
@@ -81,7 +81,7 @@
     },
     {
         "@timestamp": "2019-10-14T12:01:49.543Z",
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.1.185",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.00079,
@@ -121,7 +121,7 @@
     },
     {
         "@timestamp": "2019-10-14T12:01:50.199Z",
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.0.169",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.001184,
@@ -161,7 +161,7 @@
     },
     {
         "@timestamp": "2019-10-14T12:01:50.831Z",
-        "aws.elb.backend.http.response.status_code": "200",
+        "aws.elb.backend.http.response.status_code": 200,
         "aws.elb.backend.ip": "10.0.1.185",
         "aws.elb.backend.port": "80",
         "aws.elb.backend_processing_time.sec": 0.000787,

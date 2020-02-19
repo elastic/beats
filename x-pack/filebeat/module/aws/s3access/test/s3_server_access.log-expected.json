@@ -40,6 +40,9 @@
         "http.response.status_code": 200,
         "input.type": "log",
         "log.offset": 0,
+        "related.ip": [
+            "72.21.217.31"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
@@ -96,6 +99,9 @@
         "http.response.status_code": 200,
         "input.type": "log",
         "log.offset": 715,
+        "related.ip": [
+            "72.21.217.31"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
@@ -153,6 +159,9 @@
         "http.response.status_code": 200,
         "input.type": "log",
         "log.offset": 1429,
+        "related.ip": [
+            "72.21.217.31"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
@@ -209,6 +218,9 @@
         "http.response.status_code": 200,
         "input.type": "log",
         "log.offset": 2161,
+        "related.ip": [
+            "72.21.217.31"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
@@ -262,6 +274,9 @@
         "http.response.status_code": 204,
         "input.type": "log",
         "log.offset": 2875,
+        "related.ip": [
+            "77.227.156.41"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
@@ -308,6 +323,9 @@
         "http.response.status_code": 204,
         "input.type": "log",
         "log.offset": 3280,
+        "related.ip": [
+            "174.29.206.152"
+        ],
         "related.user": [
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
