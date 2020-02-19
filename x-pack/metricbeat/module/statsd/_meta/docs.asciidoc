@@ -1,16 +1,77 @@
-The Statsd module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible format.
+[role="xpack"]
+== Statsd module
+
+The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible
+format.
 
 [float]
-=== Compatibility
+=== Metric types
 
 The module supports the following types of metrics:
 
-* Counter (c) - a measurement which accumulates over period of time until flushed (value set to 0).
+*Counter (c)*:: Measurement which accumulates over period of time until flushed (value set to 0).
 
-* Gauge (g) - a measurement which can increase, decrease or be set to a value.
+*Gauge (g)*:: Measurement which can increase, decrease or be set to a value.
 
-* Timer (ms) - a time measurement (in milliseconds) of an event
+*Timer (ms)*:: Time measurement (in milliseconds) of an event.
 
-* Histogram (h) - a time measurement, alias for timer
+*Histogram (h)*:: Time measurement, alias for timer.
 
-* Set (s) - a measurement which counts unique occurrences until flushed (value set to 0).
+*Set (s)*:: Measurement which counts unique occurrences until flushed (value set to 0).
+
+[float]
+=== Configuration options
+
+This module has some configuration options for controlling its behavior. The
+following example shows all configuration options.
+
+[source,yaml]
+----
+- module: statsd
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8125"
+  #ttl: "30s"
+----
+
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
+
+*`ttl`*:: It defines how long a metric will be reported after it was last recorded.
+Irrespective of the given ttl, metrics will be reported at least once.
+A ttl of zero means metrics will never expire.
+
+[float]
+=== Metricsets
+
+Currently, there is only `server` metricset in `statsd` module.
+
+[float]
+==== `server`
+The metricset collects metric data sent using UDP and publishes them under the `statsd` prefix.
+
+[float]
+=== Development
+
+Run metricbeat locally with configured `statsd` module. Use favorite statsd client to emit metrics, e.g.:
+
+[source,shell script]
+----
+$ npm install statsd-client
+$ node
+----
+
+Emit some metrics:
+
+[source,javascript]
+----
+let SDC = require('statsd-client'), sdc = new SDC({host: 'localhost', port: 8125});
+sdc.increment('systemname.subsystem.value');
+sdc.gauge('what.you.gauge', 100);
+sdc.gaugeDelta('what.you.gauge', -70);
+sdc.gauge('gauge.with.tags', 100, {foo: 'bar'});
+sdc.set('set.with.tags', 100, {foo: 'bar'});
+sdc.set('set.with.tags', 200, {foo: 'bar'});
+sdc.set('set.with.tags', 100, {foo: 'baz'});
+----
