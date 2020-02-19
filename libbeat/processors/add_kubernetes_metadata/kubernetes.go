@@ -45,8 +45,6 @@ const (
 	checkNodeReadyAttempts = 10
 )
 
-var once sync.Once
-
 type kubernetesAnnotator struct {
 	log                 *logp.Logger
 	watcher             kubernetes.Watcher
@@ -54,6 +52,7 @@ type kubernetesAnnotator struct {
 	matchers            *Matchers
 	cache               *cache
 	kubernetesAvailable bool
+	initOnce            sync.Once
 }
 
 func init() {
@@ -136,7 +135,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
-	once.Do(func() {
+	k.initOnce.Do(func() {
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
