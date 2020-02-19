@@ -18,6 +18,8 @@
 package collector
 
 import (
+	"regexp"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -49,19 +51,27 @@ func init() {
 // MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus p.Prometheus
+	prometheus     p.Prometheus
+	includeMetrics *[]string
+	ignoreMetrics  *[]string
 }
 
 // New creates a new metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := defaultConfig
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
 	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		prometheus:    prometheus,
+		BaseMetricSet:  base,
+		prometheus:     prometheus,
+		ignoreMetrics:  config.MetricsFilters.IgnoreMetrics,
+		includeMetrics: config.MetricsFilters.IncludeMetrics,
 	}, nil
 }
 
@@ -81,6 +91,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, family := range families {
+		if m.includeMetrics != nil {
+			if !matchMetricFamily(*family.Name, m.includeMetrics) {
+				continue
+			}
+		} else if m.ignoreMetrics != nil {
+			if matchMetricFamily(*family.Name, m.ignoreMetrics) {
+				continue
+			}
+		}
+
 		promEvents := getPromEventsFromMetricFamily(family)
 
 		for _, promEvent := range promEvents {
@@ -139,4 +159,14 @@ func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 		"labels": upPromEvent.labels,
 	}
 
+}
+
+func matchMetricFamily(family string, matchMetrics *[]string) bool {
+	for _, checkMetric := range *matchMetrics {
+		matched, _ := regexp.MatchString(checkMetric, family)
+		if matched {
+			return true
+		}
+	}
+	return false
 }
