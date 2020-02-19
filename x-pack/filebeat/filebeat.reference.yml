@@ -111,6 +111,17 @@ filebeat.modules:
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   elb:
     enabled: false
 
@@ -125,6 +136,17 @@ filebeat.modules:
     # Profile name for aws credential
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
 
   vpcflow:
     enabled: false
@@ -141,6 +163,17 @@ filebeat.modules:
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   cloudtrail:
     enabled: false
 
@@ -155,6 +188,17 @@ filebeat.modules:
     # Profile name for aws credential
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -515,6 +559,12 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -609,6 +659,14 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+  # Ingress-nginx controller logs. This is disabled by default. It could be used in Kubernetes environments to parse ingress-nginx logs
+  #ingress_controller:
+  #  enabled: false
+  #
+  #  # Set custom paths for the log files. If left empty,
+  #  # Filebeat will choose the paths depending on your OS.
+  #  #var.paths:
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -1508,8 +1566,7 @@ filebeat.inputs:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -2253,7 +2310,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html

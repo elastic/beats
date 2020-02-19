@@ -166,12 +166,6 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
-    # Docs
-    - os: linux
-      env: TARGETS="docs"
-      go: $TRAVIS_GO_VERSION
-      stage: test
-
     # Kubernetes
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
@@ -199,7 +193,6 @@ jobs:
             retries: true
           update: true
           packages:
-            - python-virtualenv
             - libpcap-dev
             - xsltproc
             - libxml2-utils
@@ -218,16 +211,22 @@ addons:
     config:
       retries: true
     update: true
+    sources:
+      - deadsnakes
     packages:
-      - python-virtualenv
       - libpcap-dev
       - xsltproc
       - libxml2-utils
       - libsystemd-journal-dev
       - librpm-dev
+      # From deadsnakes PPA
+      - python3.6
+      - python3.6-venv
 
 before_install:
+  - if [ x$TRAVIS_DIST = xtrusty ]; then sudo ln -sf python3.6 /usr/bin/python3; fi
   - python --version
+  - python3 --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
@@ -235,7 +234,7 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
 
 
 # Skips installations step

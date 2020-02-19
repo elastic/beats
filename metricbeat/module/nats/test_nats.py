@@ -9,8 +9,8 @@ import metricbeat
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
 
+@metricbeat.parameterized_with_supported_versions
 class TestNats(metricbeat.BaseTest):
-
     COMPOSE_SERVICES = ['nats']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -34,7 +34,7 @@ class TestNats(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -59,7 +59,7 @@ class TestNats(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -84,7 +84,7 @@ class TestNats(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -109,10 +109,6 @@ class TestNats(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
-
-
-class TestNats1_3(TestNats):
-    COMPOSE_SERVICES = ['nats_1_3']

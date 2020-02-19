@@ -450,9 +450,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -481,6 +482,7 @@ metricbeat.modules:
     - state_service
     - state_persistentvolume
     - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -701,7 +703,7 @@ metricbeat.modules:
   #password: "secret"
 
   # This can be used for service account based authorization:
-  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
@@ -1002,8 +1004,7 @@ metricbeat.modules:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1747,7 +1748,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html

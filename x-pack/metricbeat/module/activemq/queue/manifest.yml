@@ -35,3 +35,13 @@ input:
         field: messages.enqueue.time.min
       - attr: ProducerCount
         field: producers.count
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var queue_memory_broker_pct = event.Get("activemq.queue.memory.broker.pct")
+          if (queue_memory_broker_pct != null) {
+            event.Put("activemq.queue.memory.broker.pct", queue_memory_broker_pct / 100.0)
+          }
+        }

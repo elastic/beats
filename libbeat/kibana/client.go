@@ -78,7 +78,7 @@ func extractError(result []byte) error {
 
 // NewKibanaClient builds and returns a new Kibana client
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
-	config := defaultClientConfig
+	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}

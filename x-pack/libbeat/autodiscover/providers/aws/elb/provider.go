@@ -5,10 +5,7 @@
 package elb
 
 import (
-	"context"
-
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
-
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
@@ -19,6 +16,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
 func init() {
@@ -27,7 +26,7 @@ func init() {
 
 // Provider implements autodiscover provider for aws ELBs.
 type Provider struct {
-	config        *Config
+	config        *awsauto.Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
 	appenders     autodiscover.Appenders
@@ -42,10 +41,32 @@ type Provider struct {
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_elb autodiscover is experimental")
 
-	config := defaultConfig()
+	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
+	}
+
+	awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+		AccessKeyID:     config.AWSConfig.AccessKeyID,
+		SecretAccessKey: config.AWSConfig.SecretAccessKey,
+		SessionToken:    config.AWSConfig.SessionToken,
+		ProfileName:     config.AWSConfig.ProfileName,
+	})
+
+	// Construct MetricSet with a full regions list if there is no region specified.
+	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsCfg.Region = "us-west-1"
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
+
+		completeRegionsList, err := awsauto.GetRegions(svcEC2)
+		if err != nil {
+			return nil, err
+		}
+
+		config.Regions = completeRegionsList
 	}
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
@@ -60,26 +81,17 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 		}
 		awsCfg.Region = region
-		clients = append(clients, elasticloadbalancingv2.New(awsCfg))
+		clients = append(clients, elasticloadbalancingv2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "elasticloadbalancing", region, awsCfg)))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(context.TODO(), clients))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetcher) (*Provider, error) {
+func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates)
-	if err != nil {
-		return nil, err
-	}
-
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +99,6 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetche
 	p := &Provider{
 		config:    config,
 		bus:       bus,
-		builders:  builders,
-		appenders: appenders,
 		templates: &mapper,
 		uuid:      uuid,
 	}

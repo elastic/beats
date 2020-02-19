@@ -56,7 +56,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error"},
+		"nginx":  {"access", "error", "ingress_controller"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
@@ -162,6 +162,7 @@ func TestApplyOverrides(t *testing.T) {
 					"a":   "test",
 					"b.c": "test",
 				},
+				Input: map[string]interface{}{},
 			},
 			module:  "nginx",
 			fileset: "access",
@@ -177,6 +178,7 @@ func TestApplyOverrides(t *testing.T) {
 					"a": "test1",
 					"b": map[string]interface{}{"c": "test2"},
 				},
+				Input: map[string]interface{}{},
 			},
 		},
 		{
@@ -186,6 +188,7 @@ func TestApplyOverrides(t *testing.T) {
 				Var: map[string]interface{}{
 					"paths": []string{"/var/log/nginx"},
 				},
+				Input: map[string]interface{}{},
 			},
 			module:  "nginx",
 			fileset: "access",
@@ -201,6 +204,7 @@ func TestApplyOverrides(t *testing.T) {
 				Var: map[string]interface{}{
 					"paths": []interface{}{"/var/local/nginx/log"},
 				},
+				Input: map[string]interface{}{},
 			},
 		},
 		{
@@ -219,14 +223,17 @@ func TestApplyOverrides(t *testing.T) {
 				Input: map[string]interface{}{
 					"close_eof": true,
 				},
+				Var: map[string]interface{}{},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		result, err := applyOverrides(&test.fcfg, test.module, test.fileset, test.overrides)
-		assert.NoError(t, err)
-		assert.Equal(t, &test.expected, result, test.name)
+		t.Run(test.name, func(t *testing.T) {
+			result, err := applyOverrides(&test.fcfg, test.module, test.fileset, test.overrides)
+			assert.NoError(t, err)
+			assert.Equal(t, &test.expected, result)
+		})
 	}
 }
 
@@ -314,9 +321,11 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := appendWithoutDuplicates(test.configs, test.modules)
-		assert.NoError(t, err, test.name)
-		assert.Equal(t, test.expected, result, test.name)
+		t.Run(test.name, func(t *testing.T) {
+			result, err := appendWithoutDuplicates(test.configs, test.modules)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, result)
+		})
 	}
 }
 
@@ -338,6 +347,8 @@ func TestMcfgFromConfig(t *testing.T) {
 				Filesets: map[string]*FilesetConfig{
 					"error": {
 						Enabled: &falseVar,
+						Var:     nil,
+						Input:   nil,
 					},
 				},
 			},
@@ -355,6 +366,7 @@ func TestMcfgFromConfig(t *testing.T) {
 						Var: map[string]interface{}{
 							"test": false,
 						},
+						Input: nil,
 					},
 				},
 			},
@@ -362,13 +374,15 @@ func TestMcfgFromConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := mcfgFromConfig(test.config)
-		assert.NoError(t, err, test.name)
-		assert.Equal(t, test.expected.Module, result.Module)
-		assert.Equal(t, len(test.expected.Filesets), len(result.Filesets))
-		for name, fileset := range test.expected.Filesets {
-			assert.Equal(t, fileset, result.Filesets[name])
-		}
+		t.Run(test.name, func(t *testing.T) {
+			result, err := mcfgFromConfig(test.config)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected.Module, result.Module)
+			assert.Equal(t, len(test.expected.Filesets), len(result.Filesets))
+			for name, fileset := range test.expected.Filesets {
+				assert.Equal(t, fileset, result.Filesets[name])
+			}
+		})
 	}
 }
 
@@ -428,7 +442,9 @@ func TestInterpretError(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		errResult := interpretError(errors.New("test"), []byte(test.Input))
-		assert.Equal(t, errResult.Error(), test.Output, test.Test)
+		t.Run(test.Test, func(t *testing.T) {
+			errResult := interpretError(errors.New("test"), []byte(test.Input))
+			assert.Equal(t, errResult.Error(), test.Output, test.Test)
+		})
 	}
 }
