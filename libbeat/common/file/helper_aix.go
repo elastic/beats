@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !aix,!windows
-
 package file
 
 import (
@@ -35,7 +33,9 @@ func SafeFileRotate(path, tempfile string) error {
 	// best-effort fsync on parent directory. The fsync is required by some
 	// filesystems, so to update the parents directory metadata to actually
 	// contain the new file being rotated in.
-	f, err := os.Open(parent)
+	// On AIX, fsync will fail if the file is opened in read-only mode,
+	// which is the case with os.Open.
+	f, err := os.OpenFile(parent, os.O_RDWR, 0)
 	if err != nil {
 		return nil // ignore error
 	}
