@@ -8,7 +8,6 @@ HEALTHCHECK --interval=1s --retries=300 \
   CMD curl -s -H "Accept: application/json" localhost:5000/api/v0.1/health \
         | jq .output.health.health_services[0].mons[0] \
         | grep health
-EXPOSE 5000
 
 ENV NETWORK_AUTO_DETECT 4
 ENV DEMO_DAEMONS osd,rest_api
