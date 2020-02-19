@@ -1,0 +1,21 @@
+- name: mgr_osd_perf
+  type: group
+  description: >
+    OSD performance metrics of Ceph cluster
+  release: beta
+  fields:
+    - name: id
+      type: long
+      description: OSD ID
+    - name: stats.commit_latency_ms
+      type: long
+      description: Commit latency in ms
+    - name: stats.apply_latency_ms
+      type: long
+      description: Apply latency in ms
+    - name: stats.commit_latency_ns
+      type: long
+      description: Commit latency in ns
+    - name: stats.apply_latency_ns
+      type: long
+      description: Apply latency in ns
