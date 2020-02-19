@@ -169,7 +169,7 @@ Set this option to an ARN that points to an SQS queue.
 [id="{beatname_lc}-batch-size"]
 ==== `batch_size`
 
-The number of events to read from a Kinesis stream, the minimal values is 100 and the maximun is
+The number of events to read from a Kinesis stream, the minimal values is 100 and the maximum is
 10000. The default is 100.
 
 [float]
