@@ -25,17 +25,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudflare/cfssl/log"
-
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
@@ -139,11 +136,11 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
-				log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
+				k.log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
 			} else if config.KubeConfig == "" {
-				log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
+				k.log.Debugf("Could not create kubernetes client using config: %v: %+v", os.Getenv("KUBECONFIG"), err)
 			} else {
-				log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
+				k.log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
 			}
 			return
 		}
@@ -155,7 +152,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		matchers := NewMatchers(config.Matchers)
 
 		if matchers.Empty() {
-			log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
+			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
 			return
 		}
 
@@ -163,7 +160,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		config.Host = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-		log.Debug("Initializing a new Kubernetes watcher using host: %s", config.Host)
+		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
 		watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
@@ -171,7 +168,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			Namespace:   config.Namespace,
 		}, nil)
 		if err != nil {
-			log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
+			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 			return
 		}
 
@@ -183,23 +180,23 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
-				log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				k.log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
-				log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				k.log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod := obj.(*kubernetes.Pod)
-				log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				k.log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
 				k.removePod(pod)
 			},
 		})
 
 		if err := watcher.Start(); err != nil {
-			logp.Debug("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
 			return
 		}
 	})
