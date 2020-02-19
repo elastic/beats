@@ -9,9 +9,8 @@
 - module: ceph
   metricsets:
     - mgr_cluster_disk
-    - mgr_cluster_health
-    - mgr_osd_disk
     - mgr_osd_perf
+    - mgr_pool_disk
   #  - mgr_osd_pool_stats
   #  - mgr_osd_tree
   period: 1m
