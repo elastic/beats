@@ -32,4 +32,6 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
       service: elasticsearch
+    environment:
+      script.cache.max_size: "500"
 
