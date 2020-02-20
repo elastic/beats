@@ -37,9 +37,11 @@ import (
 )
 
 func TestAddDockerMetadata(t *testing.T) {
-	// Start a container to have some data to enrich an event
+	// Start a container to have some data to enrich events
 	testClient, err := dockertest.NewClient()
 	require.NoError(t, err)
+	defer testClient.Close()
+
 	image := "busybox"
 	cmd := []string{"sleep", "60"}
 	labels := map[string]string{"label": "foo"}
@@ -51,7 +53,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	require.NoError(t, err)
 	pid := info.State.Pid
 
-	// Run the test under the goroutine leak checker
+	// Run the tests under the goroutine leak checker
 	resources.CallAndCheckGoroutines(t, func() {
 		// Explicitly close the docker client, what only closes the idle keep-alive connections.
 		// These idle connections affect the goroutines checker and will be eventually

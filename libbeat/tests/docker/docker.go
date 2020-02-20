@@ -88,3 +88,8 @@ func (c Client) ContainerKill(ID string) error {
 	ctx := context.Background()
 	return c.cli.ContainerKill(ctx, ID, "KILL")
 }
+
+// Close closes the underlying client
+func (c *Client) Close() error {
+	return c.cli.Close()
+}
