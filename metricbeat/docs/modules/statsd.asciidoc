@@ -50,6 +50,8 @@ described later.
 Irrespective of the given ttl, metrics will be reported at least once.
 A ttl of zero means metrics will never expire.
 
+include::{docdir}/metricbeat-options.asciidoc[]
+
 [float]
 === Metricsets
 
