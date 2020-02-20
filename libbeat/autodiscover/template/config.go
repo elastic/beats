@@ -105,7 +105,6 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
 	}
-
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
 		if err != nil {

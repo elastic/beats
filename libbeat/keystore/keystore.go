@@ -100,6 +100,7 @@ func Factory(cfg *common.Config, defaultPath string) (ListingKeystore, error) {
 // ResolverFromConfig create a resolver from a configuration.
 func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
 	keystore, err := Factory(cfg, dataPath)
+
 	if err != nil {
 		return nil, err
 	}
