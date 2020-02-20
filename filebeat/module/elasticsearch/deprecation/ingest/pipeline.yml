@@ -15,6 +15,23 @@ processors:
 - pipeline:
     if: ctx.first_char == '{'
     name: '{< IngestPipeline "pipeline-json" >}'
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value: database
+- set:
+    field: event.type
+    value: info
+- set:
+    field: host.id
+    value: "{{elasticsearch.node.id}}"
+    if: "ctx?.elasticsearch?.node?.id != null"
+- set:
+    field: host.name
+    value: "{{elasticsearch.node.name}}"
+    if: "ctx?.elasticsearch?.node?.name != null"
 - remove:
     field: elasticsearch.deprecation.timestamp
 - remove:
