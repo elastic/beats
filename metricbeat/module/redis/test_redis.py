@@ -34,6 +34,11 @@ class Test(metricbeat.BaseTest):
         """
         Test redis info metricset
         """
+
+        if not self.oss_distribution():
+            self.skipTest("only oss distribution is supported")
+            return
+
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
@@ -63,6 +68,10 @@ class Test(metricbeat.BaseTest):
         """
         Test redis keyspace metricset
         """
+
+        if not self.oss_distribution():
+            self.skipTest("only oss distribution is supported")
+            return
 
         # At least one event must be inserted so db stats exist
         host, port = self.compose_host().split(":")
@@ -99,6 +108,10 @@ class Test(metricbeat.BaseTest):
         """
         Test redis key metricset
         """
+
+        if not self.oss_distribution():
+            self.skipTest("only oss distribution is supported")
+            return
 
         # At least one event must be inserted so db stats exist
         host, port = self.compose_host().split(":")
@@ -137,6 +150,11 @@ class Test(metricbeat.BaseTest):
         """
         Test local processors for Redis info event.
         """
+
+        if not self.oss_distribution():
+            self.skipTest("only oss distribution is supported")
+            return
+
         fields = ["clients", "cpu"]
         eventFields = ['beat', 'metricset', 'service', 'event']
         eventFields += ['redis.info.' + f for f in fields]
@@ -164,3 +182,9 @@ class Test(metricbeat.BaseTest):
         self.assertCountEqual(fields, redis_info.keys())
         self.assertCountEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
         self.assertCountEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+
+    def oss_distribution(self):
+        if not 'REDIS_DISTRIBUTION' in self.COMPOSE_ENV:
+            return False
+
+        return self.COMPOSE_ENV['REDIS_DISTRIBUTION'] == 'oss'
