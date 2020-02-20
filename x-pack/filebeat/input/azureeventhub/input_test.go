@@ -57,9 +57,9 @@ func TestProcessEvents(t *testing.T) {
 		Data:             []byte(msg),
 		SystemProperties: &properties,
 	}
-	err = input.processEvents(&ev, "0")
-	if err != nil {
-		t.Fatal(err)
+	ok := input.processEvents(&ev, "0")
+	if !ok {
+		t.Fatal("OnEvent function returned false")
 	}
 	assert.Equal(t, len(o.Events), 1)
 	message, err := o.Events[0].Fields.GetValue("message")
@@ -74,8 +74,7 @@ func TestParseMultipleMessages(t *testing.T) {
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
 	input := azureInput{}
-	messages, err := input.parseMultipleMessages([]byte(msg))
-	assert.Nil(t, err)
+	messages := input.parseMultipleMessages([]byte(msg))
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 3)
 	msgs := []string{
