@@ -81,7 +81,7 @@
   - name: state_code
     description: Please add description
     example: Please add example
-    type: long
+    type: keyword
   - name: message
     description: Please add description
     example: Please add example
