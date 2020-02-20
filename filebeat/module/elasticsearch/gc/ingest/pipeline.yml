@@ -43,6 +43,15 @@ processors:
     - ISO8601
 - remove:
     field: timestamp
+- set:
+    field: event.kind
+    value: metric
+- set:
+    field: event.category
+    value: database
+- set:
+    field: event.type
+    value: info
 - split:
     field: elasticsearch.gc.tags
     separator: ','
