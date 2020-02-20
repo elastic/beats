@@ -10,7 +10,7 @@
             "highlightAll": true,
             "query": {
               "language": "kuery",
-              "query": "host.name:\"X1\""
+              "query": "host.name:\"CHANGEME_HOSTNAME\""
             },
             "version": true
           }
