@@ -26,6 +26,31 @@ processors:
 - remove:
     field: elasticsearch.slowlog.duration
     ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value: database
+- script:
+    lang: painless
+    source: >-
+      def errorLevels = ['FATAL', 'ERROR'];
+      if (ctx?.log?.level != null) {
+        if (errorLevels.contains(ctx.log.level)) {
+          ctx.event.type = 'error';
+        } else {
+          ctx.event.type = 'info';
+        }
+      }
+- set:
+    field: host.name
+    value: "{{elasticsearch.node.name}}"
+    if: "ctx?.elasticsearch?.node?.name != null"
+- set:
+    field: host.id
+    value: "{{elasticsearch.node.id}}"
+    if: "ctx?.elasticsearch?.node?.id != null"
 - remove:
     field:
     - first_char
