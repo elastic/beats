@@ -89,6 +89,15 @@ func (c Client) ContainerKill(ID string) error {
 	return c.cli.ContainerKill(ctx, ID, "KILL")
 }
 
+// ContainerRemove kills and removed the given container
+func (c Client) ContainerRemove(ID string) error {
+	ctx := context.Background()
+	return c.cli.ContainerRemove(ctx, ID, types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+	})
+}
+
 // Close closes the underlying client
 func (c *Client) Close() error {
 	return c.cli.Close()
