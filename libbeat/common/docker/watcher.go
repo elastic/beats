@@ -138,6 +138,7 @@ func NewWatcher(log *logp.Logger, host string, tls *TLSConfig, storeShortID bool
 	// Extra check to confirm that Docker is available
 	_, err = client.Info(context.Background())
 	if err != nil {
+		client.Close()
 		return nil, err
 	}
 
