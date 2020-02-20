@@ -53,8 +53,8 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus     p.Prometheus
-	includeMetrics *[]string
-	ignoreMetrics  *[]string
+	includeMetrics []*regexp.Regexp
+	ignoreMetrics  []*regexp.Regexp
 }
 
 // New creates a new metricset
@@ -71,8 +71,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet:  base,
 		prometheus:     prometheus,
-		ignoreMetrics:  config.MetricsFilters.IgnoreMetrics,
-		includeMetrics: config.MetricsFilters.IncludeMetrics,
+		ignoreMetrics:  compilePatternList(config.MetricsFilters.IgnoreMetrics),
+		includeMetrics: compilePatternList(config.MetricsFilters.IncludeMetrics),
 	}, nil
 }
 
@@ -139,35 +139,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
-	// example:
-	//	include_metrics:
-	//		- node_*
-	//	exclude_metrics:
-	//		- node_disk_*
-	//
-	// This would mean that we want to keep only the metrics that start with node_ prefix but
-	// are not related to disk so we exclude node_disk_* metrics from them.
-
-	if family == nil {
-		return true
-	}
-
-	// if include_metrics are defined, check if this metric should be included
-	if m.includeMetrics != nil {
-		if !matchMetricFamily(*family.Name, m.includeMetrics) {
-			return true
-		}
-	}
-	// now exclude the metric if it matches any of the given patterns
-	if m.ignoreMetrics != nil {
-		if matchMetricFamily(*family.Name, m.ignoreMetrics) {
-			return true
-		}
-	}
-	return false
-}
-
 func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 	upPromEvent := PromEvent{
 		labels: common.MapStr{
@@ -184,9 +155,54 @@ func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 
 }
 
-func matchMetricFamily(family string, matchMetrics *[]string) bool {
-	for _, checkMetric := range *matchMetrics {
-		matched, _ := regexp.MatchString(checkMetric, family)
+func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+	// example:
+	//	include_metrics:
+	//		- node_*
+	//	exclude_metrics:
+	//		- node_disk_*
+	//
+	// This would mean that we want to keep only the metrics that start with node_ prefix but
+	// are not related to disk so we exclude node_disk_* metrics from them.
+
+	if family == nil {
+		return true
+	}
+
+	// if include_metrics are defined, check if this metric should be included
+	if len(m.includeMetrics) > 0  {
+		if !matchMetricFamily(*family.Name, m.includeMetrics) {
+			return true
+		}
+	}
+	// now exclude the metric if it matches any of the given patterns
+	if len(m.ignoreMetrics) > 0 {
+		if matchMetricFamily(*family.Name, m.ignoreMetrics) {
+			return true
+		}
+	}
+	return false
+}
+
+func compilePatternList(patterns *[]string) []*regexp.Regexp{
+	var compiledPatterns []*regexp.Regexp
+	compiledPatterns = []*regexp.Regexp{}
+	if patterns != nil {
+		for _, pattern := range *patterns {
+			r, err := regexp.Compile(pattern)
+			if err != nil {
+				continue
+			}
+			compiledPatterns = append(compiledPatterns, r)
+		}
+		return compiledPatterns
+	}
+	return []*regexp.Regexp{}
+}
+
+func matchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
+	for _, checkMetric := range matchMetrics {
+		matched := checkMetric.MatchString(family)
 		if matched {
 			return true
 		}
