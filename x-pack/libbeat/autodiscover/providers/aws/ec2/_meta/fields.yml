@@ -1,11 +1,56 @@
-- key: ec2_listener
+- key: aws.ec2
   title: "EC2 Listener"
   description: >
     AWS EC2 Listeners
   short_config: false
   release: experimental
   fields:
-    - name: ec2_listener
+    - name: aws.ec2
       type: group
       description: >
         Represents an AWS EC2 Listener, e.g. state of an EC2.
+      fields:
+        - name: architecture
+          type: keyword
+          description: The EC2 instance architecture (i386 | x86_64 | arm64 ).
+        - name: image.id
+          type: keyword
+          description: The ID of the image used to launch the instance.
+        - name: kernel.id
+          type: keyword
+          description: The kernel associated with this instance, if applicable.
+        - name: monitoring.state
+          type: keyword
+          description: Indicates whether detailed monitoring is enabled (disabled | enabled).
+        - name: private.dns_name
+          type: keyword
+          description: The private DNS name.
+        - name: private.ip
+          type: keyword
+          description: The IPv4 address of the network interface within the subnet.
+        - name: public.dns_name
+          type: keyword
+          description: The public DNS name.
+        - name: public.ip
+          type: keyword
+          description: The public IPv4 address assigned to the instance, if applicable.
+        - name: root_device_name
+          type: keyword
+          description: The device name of the root device volume (for example, /dev/sda1).
+        - name: state.code
+          type: keyword
+          description:  The reason code for the state change.
+        - name: state.name
+          type: keyword
+          description: A message that describes the state change.
+        - name: subnet.id
+          type: keyword
+          description: The ID of the subnet in which the instance is running.
+        - name: vpc.id
+          type: keyword
+          description: The ID of the VPC that the instance is running in.
+        - name: tags.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: Tag key value pairs from aws resources.
