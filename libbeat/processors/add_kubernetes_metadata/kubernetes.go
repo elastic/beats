@@ -25,8 +25,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
