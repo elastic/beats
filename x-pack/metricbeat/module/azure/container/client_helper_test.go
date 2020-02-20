@@ -47,22 +47,26 @@ func MockNamespace() insights.MetricNamespaceCollection {
 func MockMetricDefinitions() *[]insights.MetricDefinition {
 	metric1 := "TotalRequests"
 	metric2 := "Capacity"
-	metric3 := "BytesRead"
+	requird := true
+	notRequired := false
+	dimension := "status"
+	dimensionValue := "*"
 	defs := []insights.MetricDefinition{
 		{
 			Name:                      &insights.LocalizableString{Value: &metric1},
 			PrimaryAggregationType:    insights.Average,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
+			IsDimensionRequired:       &notRequired,
 		},
 		{
 			Name:                      &insights.LocalizableString{Value: &metric2},
 			PrimaryAggregationType:    insights.Average,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
-		},
-		{
-			Name:                      &insights.LocalizableString{Value: &metric3},
-			PrimaryAggregationType:    insights.Minimum,
-			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
+			IsDimensionRequired:       &requird,
+			Dimensions: &[]insights.LocalizableString{{
+				Value:          &dimension,
+				LocalizedValue: &dimensionValue,
+			}},
 		},
 	}
 	return &defs
