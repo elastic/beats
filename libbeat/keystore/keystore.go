@@ -21,10 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	k8s "k8s.io/client-go/kubernetes"
-
 	"github.com/elastic/beats/libbeat/common"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 )
 
@@ -96,12 +94,6 @@ func Factory(cfg *common.Config, defaultPath string) (ListingKeystore, error) {
 	}
 
 	keystore, err := NewFileKeystore(config.Path)
-	return keystore, err
-}
-
-// Factoryk8s Create the right keystore with the configured options.
-func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface) (Keystore, error) {
-	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client)
 	return keystore, err
 }
 

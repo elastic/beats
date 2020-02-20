@@ -56,9 +56,6 @@ type Watcher interface {
 
 	// Store returns the store object for the watcher
 	Store() cache.Store
-
-	// Getk8sClient retrieves the Kubernetes Client with which the Watcher is coupled
-	Getk8sClient() kubernetes.Interface
 }
 
 // WatchOptions controls watch behaviors
@@ -142,11 +139,6 @@ func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 // Store returns the store object for the resource that is being watched
 func (w *watcher) Store() cache.Store {
 	return w.store
-}
-
-// Getk8sClient retrieves the Kubernetes Client with which the Watcher is coupled
-func (w *watcher) Getk8sClient() kubernetes.Interface {
-	return w.client
 }
 
 // Start watching pods
