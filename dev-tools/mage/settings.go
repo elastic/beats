@@ -262,39 +262,17 @@ func ElasticBeatsDir() (string, error) {
 	return elasticBeatsDirValue, elasticBeatsDirErr
 }
 
-// findElasticBeatsDir attempts to find the root of the Elastic Beats directory.
-// It checks to see if the current project is elastic/beats, and then if not
-// checks the vendor directory.
+// findElasticBeatsDir returns the root directory of the Elastic Beats module, using "go list".
 //
-// If your project places the Beats files in a different location (specifically
-// the dev-tools/ contents) then you can use SetElasticBeatsDir().
+// When running within the Elastic Beats repo, this will return the repo root. Otherwise,
+// it will return the root directory of the module from within the module cache or vendor
+// directory.
 func findElasticBeatsDir() (string, error) {
-	repo, err := GetProjectRepoInfo()
+	dir, err := gotool.ListModulePath(elasticBeatsImportPath)
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "failed to find %v", elasticBeatsImportPath)
 	}
-
-	if repo.IsElasticBeats() {
-		return repo.RootDir, nil
-	}
-
-	const devToolsImportPath = elasticBeatsImportPath + "/dev-tools/mage"
-
-	// Search in project vendor directories. Order is relevant
-	searchPaths := []string{
-		// beats directory of apm-server
-		filepath.Join(repo.RootDir, "_beats/dev-tools/vendor"),
-		filepath.Join(repo.RootDir, repo.SubDir, "vendor", devToolsImportPath),
-		filepath.Join(repo.RootDir, "vendor", devToolsImportPath),
-	}
-
-	for _, path := range searchPaths {
-		if _, err := os.Stat(path); err == nil {
-			return filepath.Join(path, "../.."), nil
-		}
-	}
-
-	return "", errors.Errorf("failed to find %v in the project's vendor", devToolsImportPath)
+	return dir, nil
 }
 
 var (
