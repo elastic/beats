@@ -17,10 +17,6 @@
 
 package collector
 
-import (
-	"github.com/elastic/beats/libbeat/logp"
-)
-
 type metricsetConfig struct {
 	MetricsFilters MetricFilters `config:"metrics_filters"`
 }
@@ -37,9 +33,6 @@ var defaultConfig = metricsetConfig{
 }
 
 func (c *metricsetConfig) Validate() error {
-	if c.MetricsFilters.IncludeMetrics != nil && c.MetricsFilters.IgnoreMetrics == nil {
-		logp.Debug("prometheus", "include_metrics and ignore_metrics are complementary and cannot be used together. Falling back to using only include_metrics")
-		c.MetricsFilters.IgnoreMetrics = nil
-	}
+	// validate configuration here
 	return nil
 }
