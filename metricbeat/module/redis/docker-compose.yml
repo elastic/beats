@@ -2,23 +2,14 @@ version: '2.3'
 
 services:
   redis:
-    image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-3.2.12}-1
+    image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-3.2.12}-${REDIS_DISTRIBUTION:-oss}-1
     build:
       context: ./_meta
-      dockerfile: Dockerfile.oss
+      dockerfile: Dockerfile.${REDIS_DISTRIBUTION:-oss}
       args:
-        REDIS_DISTRIBUTION: oss
+        REDIS_DISTRIBUTION: ${REDIS_DISTRIBUTION:-oss}
         REDIS_VERSION: ${REDIS_VERSION:-3.2.12}
-    ports:
-      - 6379
-  redis-enterprise:
-    image: docker.elastic.co/integrations-ci/beats-redis-enterprise:${REDIS_VERSION:-5.4.10-22}-1
-    build:
-      context: ./_meta
-      dockerfile: Dockerfile.enterprise
-      args:
-        REDIS_DISTRIBUTION: enterprise
-        REDIS_VERSION: ${REDIS_VERSION:-5.4.10-22}
     privileged: true
     ports:
+      - 6379
       - 127.0.0.1:8070:8070
