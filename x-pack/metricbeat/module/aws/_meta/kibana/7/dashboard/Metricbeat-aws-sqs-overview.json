@@ -198,8 +198,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-02-19T20:21:00.962Z",
-      "version": "Wzc0NCwxXQ=="
+      "updated_at": "2020-02-20T15:44:13.514Z",
+      "version": "Wzc4NywxXQ=="
     },
     {
       "attributes": {
@@ -268,7 +268,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -288,8 +288,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T19:55:49.258Z",
-      "version": "WzcxMywxXQ=="
+      "updated_at": "2020-02-20T15:42:09.980Z",
+      "version": "Wzc3MSwxXQ=="
     },
     {
       "attributes": {
@@ -345,7 +345,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -365,8 +365,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:13:55.042Z",
-      "version": "WzcyOSwxXQ=="
+      "updated_at": "2020-02-20T15:41:06.771Z",
+      "version": "Wzc2MSwxXQ=="
     },
     {
       "attributes": {
@@ -428,7 +428,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -448,8 +448,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:14:13.512Z",
-      "version": "WzczMCwxXQ=="
+      "updated_at": "2020-02-20T15:43:10.687Z",
+      "version": "Wzc4MywxXQ=="
     },
     {
       "attributes": {
@@ -500,7 +500,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -520,8 +520,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:14:34.617Z",
-      "version": "WzczMSwxXQ=="
+      "updated_at": "2020-02-20T15:43:21.430Z",
+      "version": "Wzc4NCwxXQ=="
     },
     {
       "attributes": {
@@ -572,7 +572,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -592,8 +592,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:14:55.374Z",
-      "version": "WzczMiwxXQ=="
+      "updated_at": "2020-02-20T15:44:04.576Z",
+      "version": "Wzc4NiwxXQ=="
     },
     {
       "attributes": {
@@ -649,7 +649,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -669,8 +669,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:15:31.921Z",
-      "version": "WzczNCwxXQ=="
+      "updated_at": "2020-02-20T15:43:31.048Z",
+      "version": "Wzc4NSwxXQ=="
     },
     {
       "attributes": {
@@ -826,7 +826,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null,
+                "terms_field": "aws.sqs.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -846,8 +846,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-19T20:06:45.040Z",
-      "version": "WzcyNCwxXQ=="
+      "updated_at": "2020-02-20T15:41:44.620Z",
+      "version": "Wzc2NSwxXQ=="
     }
   ],
   "version": "7.6.0"
