@@ -28,29 +28,13 @@ The module supports the following types of metrics:
 *Set (s)*:: Measurement which counts unique occurrences until flushed (value set to 0).
 
 [float]
-=== Configuration options
+=== Module-specific configuration notes
 
-This module has some configuration options for controlling its behavior. The
-following example shows all configuration options.
-
-[source,yaml]
-----
-- module: statsd
-  metricsets: ["server"]
-  host: "localhost"
-  port: "8125"
-  #ttl: "30s"
-----
-
-This module also supports the
-<<module-standard-options-{modulename},standard configuration options>>
-described later.
+The `statsd` module has these additional config options:
 
 *`ttl`*:: It defines how long a metric will be reported after it was last recorded.
 Irrespective of the given ttl, metrics will be reported at least once.
 A ttl of zero means metrics will never expire.
-
-include::{docdir}/metricbeat-options.asciidoc[]
 
 [float]
 === Metricsets
@@ -60,31 +44,6 @@ Currently, there is only `server` metricset in `statsd` module.
 [float]
 ==== `server`
 The metricset collects metric data sent using UDP and publishes them under the `statsd` prefix.
-
-[float]
-=== Development
-
-Run metricbeat locally with configured `statsd` module. Use favorite statsd client to emit metrics, e.g.:
-
-[source,shell script]
-----
-$ npm install statsd-client
-$ node
-----
-
-Emit some metrics:
-
-[source,javascript]
-----
-let SDC = require('statsd-client'), sdc = new SDC({host: 'localhost', port: 8125});
-sdc.increment('systemname.subsystem.value');
-sdc.gauge('what.you.gauge', 100);
-sdc.gaugeDelta('what.you.gauge', -70);
-sdc.gauge('gauge.with.tags', 100, {foo: 'bar'});
-sdc.set('set.with.tags', 100, {foo: 'bar'});
-sdc.set('set.with.tags', 200, {foo: 'bar'});
-sdc.set('set.with.tags', 100, {foo: 'baz'});
-----
 
 
 [float]
