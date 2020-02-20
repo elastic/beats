@@ -122,3 +122,26 @@ PL/pgSQL function ""excellent_business_function"" line 629 at perform","select s
 12   0x7fb0c1c98545 libc.so.6 __libc_start_main + 0xf5
 13   0x4bef79 postgres <symbol not found> + 0x4bef79
 "
+2020-02-20 00:00:35.968146 UTC,"gp_user","gp_prd",p670822,th-1394096256,"10.110.114.33","36016",2020-02-19 23:28:04 UTC,64626580,con144963,cmd6,seg0,slice1,dx323735,x64626580,sx1,"ERROR","38000","external table very_cool_business_table_ext_1_prt_20200125 command ended with error. Error:","
+Running: /usr/local/application/CPPORCReader_centos3-14.6.9  -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/* -t orc -rb 10000 -s 0 -ts 1152 -config /usr/local/application/hdfs-client-CPPORCReader.xml
+CPPORCReader: caught 2 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader:
+Command: execute:$CNVRHOME/CPPORCReader.sh -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/*",,,,,,0,,"url_execute.c",349,
+2020-02-20 04:30:59.360729 UTC,"gp_prd","gp_prd",p451780,th-968001664,"10.110.104.247","51559",2020-02-20 03:39:43 UTC,194024357,con149507,cmd820,seg-1,,dx332814,x194027110,sx118,"WARNING","42809","""external_business_table_4_1_prt_20150101_ext"" is an external table. ALTER TABLE for external tables is deprecated.",,"Use ALTER EXTERNAL TABLE instead",,,"SQL statement ""ALTER TABLE gpdb.external_business_table_4_1_prt_20150101_ext OWNER TO admin""
+PL/pgSQL function ""gp_generate_external_partition"" line 181 at execute statement
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )""
+PL/pgSQL function ""gp_generate_external_partition"" line 80 at return
+SQL statement ""SELECT  gpdb.gp_generate_external_partition(( $1  || '.' ||  $2 )::regclass, ( $3  || '.' ||  $4  || '_ext')::regclass)""
+PL/pgSQL function ""usp_pop_ext_partition_generic"" line 148 at assignment
+SQL function ""usp_pop_ext_partition_generic"" statement 1","ALTER TABLE gpdb.external_business_table_4_1_prt_20150101_ext OWNER TO admin",0,,"tablecmds.c",3816,
+2020-02-20 09:41:27.211015 UTC,"gp_prd","gp_prd",p263654,th-968001664,"10.110.104.247","60972",2020-02-20 09:38:10 UTC,194056242,con162786,cmd150,seg-1,,dx350318,,sx8,"WARNING","22P06","nonstandard use of \\ in a string literal",,"Use the escape string syntax for backslashes, e.g., E'\\'.","CREATE EXTERNAL WEB TABLE gpdb.new_great_business_table_1_prt_20200218_ext
+(like gp_logs.raw_log_ext_template)
+EXECUTE $EOF$$CNVRHOME/CPPORCReader.sh -c 34 -i /app/hive/warehouse/gpdb.db/raw_ecpm_log/partition_start_date=20200218/partition_end_date=20200218/dtm_id0_flag=0/*$EOF$ ON ALL FORMAT 'TEXT' (delimiter ' ' null '\\N' escape '\\')",338,"PL/pgSQL function ""gp_generate_external_partition"" line 177 at execute statement
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )""
+PL/pgSQL function ""gp_generate_external_partition"" line 80 at return
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 )""
+PL/pgSQL function ""usp_mgmt_add_internal_external_range_partition"" line 154 at assignment","SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )",0,,"scan.l",1238,
