@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // copyModule contains a module name and the list of files or directories

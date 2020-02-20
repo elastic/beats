@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Config options
