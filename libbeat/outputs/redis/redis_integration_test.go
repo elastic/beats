@@ -53,7 +53,7 @@ const (
 )
 
 func TestPublishListTCP(t *testing.T) {
-	key := "test_publist_tcp"
+	key := "test_publish_tcp"
 	db := 0
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getRedisAddr()},
@@ -67,7 +67,7 @@ func TestPublishListTCP(t *testing.T) {
 }
 
 func TestPublishListTLS(t *testing.T) {
-	key := "test_publist_tls"
+	key := "test_publish_tls"
 	db := 0
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getSRedisAddr()},
