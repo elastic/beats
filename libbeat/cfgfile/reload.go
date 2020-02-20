@@ -218,10 +218,10 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			debugf("Number of module configs found: %v", len(configs))
 
-			if err = list.Reload(configs); err != nil {
-				logp.Err("Error reloading module configurations: %v", err)
-			}
-			// force reload on the next iteration if and only if this one failed.
+			err = list.Reload(configs)
+			// Force reload on the next iteration if and only if this one failed.
+			// (Any errors are already logged by list.Reload, so we don't need to
+			// propagate the details further.)
 			forceReload = err != nil
 		}
 
