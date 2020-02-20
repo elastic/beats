@@ -66,3 +66,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
 - Fix dropped errors in the tests for the metricbeat Azure module. {pull}13773[13773]
 - New mage target for Functionbeat: generate pkg folder to make manager easier. {pull}15580[15880]
+- Vendor go.elastic.co/apm and wrap kibana client http.Client to enable tracing. {pull}9265[9265]
