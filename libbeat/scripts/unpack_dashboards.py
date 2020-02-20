@@ -27,7 +27,7 @@ def transform_data(data, method):
 
 
 def transform_file(path, method):
-    with open(path) as f:
+    with open(path, encoding='utf_8') as f:
         data = json.load(f)
 
     transform_data(data, method)
@@ -52,5 +52,5 @@ if __name__ == "__main__":
         data = transform_file(path, method)
         new_data = json.dumps(data, sort_keys=True, indent=4)
 
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf_8') as f:
             f.write(new_data)
