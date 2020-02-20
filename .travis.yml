@@ -225,6 +225,8 @@ addons:
       - libxml2-utils
       - libsystemd-journal-dev
       - librpm-dev
+      - bison
+      - flex
 
 before_install:
   - python --version
