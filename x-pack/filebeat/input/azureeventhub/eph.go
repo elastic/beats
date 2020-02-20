@@ -52,7 +52,7 @@ func (a *azureInput) runWithEPH() error {
 			// partitionID is not yet mapped in the azure-eventhub sdk
 			ok := a.processEvents(e, "")
 			if !ok {
-				onEventErr := errors.New("event has been processed but the send process has failed. Stopping input worker.")
+				onEventErr := errors.New("OnEvent function returned false. Stopping input worker")
 				a.log.Debug(onEventErr.Error())
 				a.Stop()
 				return onEventErr
