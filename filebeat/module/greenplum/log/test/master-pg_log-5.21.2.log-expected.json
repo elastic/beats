@@ -94,5 +94,42 @@
         "input.type": "log",
         "log.offset": 1147,
         "service.type": "greenplum"
+    },
+    {
+        "@timestamp": "2020-01-22T21:27:35.929Z",
+        "event.dataset": "greenplum.log",
+        "event.module": "greenplum",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "greenplum.log.command_count": "39",
+        "greenplum.log.cursor_position": "0",
+        "greenplum.log.database": "prd",
+        "greenplum.log.debug": "\n            INSERT\n            INTO\n                db.cool_business_table_ext30672\n            (\n                feed_type, gp_id, gp_item_sk, gp_order_sk, company_id, mk_file_id, feed_id, mk_sku_id, order_date, order_time, creation_date, creation_time, update_ts, mk_cust_id, order_id, num_unit_cnt, price_usd, custom_attr_xml, create_ts, order_date_str, creation_date_str, update_date_str, line_item_type_code, item_discount_usd, item_subtotal_usd, gpid, mkfile_id, timestamp\n            )\n            SELECT\n                feed_type, gp_id, gp_item_sk, gp_order_sk, company_id, mk_file_id, feed_id, mk_sku_id, order_date, order_time, creation_date, creation_time, update_ts, mk_cust_id, order_id, num_unit_cnt, price_usd, custom_attr_xml, create_ts, order_date_str, creation_date_str, update_date_str, line_item_type_code, item_discount_usd, item_subtotal_usd, gpid, mkfile_id, timestamp\n            FROM\n                pg_temp.cool_business_table\n        ",
+        "greenplum.log.detail": "\n\nPicked up _JAVA_OPTIONS: -Djava.io.tmpdir=/home/gpadmin\nPicked up _JAVA_OPTIONS: -Djava.io.tmpdir=/home/gpadmin\n20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuename;  Ignoring.\n20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuename;  Ignoring.\n20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuena",
+        "greenplum.log.distributed_transaction_id": "dx9770185",
+        "greenplum.log.file.line": "254",
+        "greenplum.log.file.name": "cdbdisp.c",
+        "greenplum.log.gp_segment.id": "1",
+        "greenplum.log.gp_segment.type": "seg",
+        "greenplum.log.host": "10.110.113.62",
+        "greenplum.log.level": "ERROR",
+        "greenplum.log.message": "could not write to external resource: (gphdfsprotocol.c:518)  (seg145 10.110.142.229:40001 pid=270048) (cdbdisp.c:254)",
+        "greenplum.log.port": "34898",
+        "greenplum.log.process_id": "p288650",
+        "greenplum.log.session_id": "con5605706",
+        "greenplum.log.session_start": "2020-01-22 15:54:06 UTC",
+        "greenplum.log.stack": "Stack trace:\n1    0x961a4b postgres errstart (elog.c:521)\n2    0x9eac60 postgres cdbdisp_finishCommand (cdbdisp.c:252)\n3    0x6b14c8 postgres mppExecutorFinishup (execUtils.c:2095)\n4    0x697bf2 postgres ExecutorEnd (discriminator 2)\n5    0x83fc55 postgres <symbol not found> (pquery.c:311)\n6    0x840058 postgres <symbol not found> (pquery.c:1479)\n7    0x8412ec postgres PortalRun (pquery.c:1033)\n8    0x83bcd6 postgres <symbol not found> (postgres.c:1783)\n9    0x83dee1 postgres PostgresMain (postgres.c:4962)\n10   0x7dd355 postgres <symbol not found> (postmaster.c:6406)\n11   0x7dfb2a postgres PostmasterMain (postmaster.c:1533)\n12   0x4cae97 postgres main (main.c:206)\n13   0x7fbd22726495 libc.so.6 __libc_start_main + 0xf5\n14   0x4cb3ec postgres <symbol not found> + 0x4cb3ec\n",
+        "greenplum.log.state_code": "XX000",
+        "greenplum.log.subtransaction_id": "sx1",
+        "greenplum.log.thread_id": "656316288",
+        "greenplum.log.timestamp": "2020-01-22 21:27:35.929165 UTC",
+        "greenplum.log.transaction_id": "0",
+        "greenplum.log.user": "gpload",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1503,
+        "service.type": "greenplum"
     }
 ]

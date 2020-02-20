@@ -1,3 +1,36 @@
 2020-02-13 15:39:46.112749 UTC,"gpload","prd",p232068,th-656316288,"10.110.113.62","50094",2020-02-13 15:39:24 UTC,0,con7145447,cmd54,seg-1,,dx12000082,,sx1,"NOTICE","00000","Using default RANDOM distribution since no distribution was specified.",,"Consider including the 'DISTRIBUTED BY' clause to determine the distribution of rows.",,,,"create temp table oio AS ( SELECT has_order, has_item, cnt AS COUNT, ROUND(cnt/SUM(cnt) over (),2)*100 AS percentage_of_transactions FROM ( SELECT CASE WHEN o.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_order, CASE WHEN i.order_id IS NOT NULL THEN 'True' ELSE 'False' END AS has_item, COUNT(*) AS cnt FROM ( SELECT order_id FROM prod.business_order_trans_1_prt_31637)o FULL OUTER JOIN ( SELECT order_id FROM prod.business_item_trans_1_prt_31637)i ON o.order_id = i.order_id GROUP BY 1,2)a GROUP BY 1,2,3 )",0,,"cdbmutate.c",424,
 2020-02-14 17:31:06.799529 UTC,"gpmon","gpperfmon",p198663,th656316288,"[local]",,2020-02-14 17:31:06 UTC,0,con7213463,cmd2,seg-1,slice1,,,,"LOG","00000","duration: 49.536 ms",,,,,,"insert into log_alert_history select * from log_alert_tail;",0,,"postgres.c",1400,
 2020-02-14 20:35:10.700358 UTC,"gpload","prd",p451957,th-1714256000,"10.110.152.846","33428",2020-02-14 20:35:00 UTC,14561533,con7219544,cmd11,seg0,,dx12115129,x14561534,sx2,"LOG","00000","duration: 143.587 ms  statement: SELECT state, segno FROM pg_aoseg.pg_aoseg_20873557",,,,,,"SELECT state, segno FROM pg_aoseg.pg_aoseg_20873557",0,,"postgres.c",1862,
+2020-01-22 21:27:35.929165 UTC,"gpload","prd",p288650,th656316288,"10.110.113.62","34898",2020-01-22 15:54:06 UTC,0,con5605706,cmd39,seg-1,,dx9770185,,sx1,"ERROR","XX000","could not write to external resource: (gphdfsprotocol.c:518)  (seg145 10.110.142.229:40001 pid=270048) (cdbdisp.c:254)","
+
+Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/home/gpadmin
+Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/home/gpadmin
+20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuename;  Ignoring.
+20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuename;  Ignoring.
+20/01/22 16:28:23 WARN conf.Configuration: mapred-default.xml:an attempt to override final parameter: mapreduce.job.queuena",,,,,"
+            INSERT
+            INTO
+                db.cool_business_table_ext30672
+            (
+                feed_type, gp_id, gp_item_sk, gp_order_sk, company_id, mk_file_id, feed_id, mk_sku_id, order_date, order_time, creation_date, creation_time, update_ts, mk_cust_id, order_id, num_unit_cnt, price_usd, custom_attr_xml, create_ts, order_date_str, creation_date_str, update_date_str, line_item_type_code, item_discount_usd, item_subtotal_usd, gpid, mkfile_id, timestamp
+            )
+            SELECT
+                feed_type, gp_id, gp_item_sk, gp_order_sk, company_id, mk_file_id, feed_id, mk_sku_id, order_date, order_time, creation_date, creation_time, update_ts, mk_cust_id, order_id, num_unit_cnt, price_usd, custom_attr_xml, create_ts, order_date_str, creation_date_str, update_date_str, line_item_type_code, item_discount_usd, item_subtotal_usd, gpid, mkfile_id, timestamp
+            FROM
+                pg_temp.cool_business_table
+        ",0,,"cdbdisp.c",254,"Stack trace:
+1    0x961a4b postgres errstart (elog.c:521)
+2    0x9eac60 postgres cdbdisp_finishCommand (cdbdisp.c:252)
+3    0x6b14c8 postgres mppExecutorFinishup (execUtils.c:2095)
+4    0x697bf2 postgres ExecutorEnd (discriminator 2)
+5    0x83fc55 postgres <symbol not found> (pquery.c:311)
+6    0x840058 postgres <symbol not found> (pquery.c:1479)
+7    0x8412ec postgres PortalRun (pquery.c:1033)
+8    0x83bcd6 postgres <symbol not found> (postgres.c:1783)
+9    0x83dee1 postgres PostgresMain (postgres.c:4962)
+10   0x7dd355 postgres <symbol not found> (postmaster.c:6406)
+11   0x7dfb2a postgres PostmasterMain (postmaster.c:1533)
+12   0x4cae97 postgres main (main.c:206)
+13   0x7fbd22726495 libc.so.6 __libc_start_main + 0xf5
+14   0x4cb3ec postgres <symbol not found> + 0x4cb3ec
+"
