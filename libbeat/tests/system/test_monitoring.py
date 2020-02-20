@@ -11,6 +11,7 @@ import string
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
+@unittest.skip("flaky: https://github.com/elastic/beats/issues/16247")
 class Test(BaseTest):
 
     def setUp(self):
@@ -207,8 +208,8 @@ class Test(BaseTest):
             self.assertIn(field_name, source)
 
     def assert_same_structure(self, dict1, dict2):
-        dict1_keys = dict1.keys()
-        dict2_keys = dict2.keys()
+        dict1_keys = list(dict1.keys())
+        dict2_keys = list(dict2.keys())
 
         self.assertEqual(len(dict1_keys), len(dict2_keys))
         for key in dict1_keys:
