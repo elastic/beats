@@ -68,12 +68,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	return &MetricSet{
-		BaseMetricSet:  base,
-		prometheus:     prometheus,
-		ignoreMetrics:  compilePatternList(config.MetricsFilters.IgnoreMetrics),
-		includeMetrics: compilePatternList(config.MetricsFilters.IncludeMetrics),
-	}, nil
+	ms := &MetricSet{
+		BaseMetricSet: base,
+		prometheus:    prometheus,
+	}
+	ms.ignoreMetrics, err = compilePatternList(config.MetricsFilters.IgnoreMetrics)
+	if err != nil {
+		return nil, err
+	}
+	ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
+	if err != nil {
+		return nil, err
+	}
+
+	return ms, nil
 }
 
 // Fetch fetches data and reports it
@@ -184,20 +192,20 @@ func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
 	return false
 }
 
-func compilePatternList(patterns *[]string) []*regexp.Regexp{
+func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error){
 	var compiledPatterns []*regexp.Regexp
 	compiledPatterns = []*regexp.Regexp{}
 	if patterns != nil {
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				continue
+				return nil, err
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}
-		return compiledPatterns
+		return compiledPatterns, nil
 	}
-	return []*regexp.Regexp{}
+	return []*regexp.Regexp{}, nil
 }
 
 func matchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
