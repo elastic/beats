@@ -115,6 +115,10 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 		zone:       zone,
 	}
 
+	if i == nil {
+		return s.computeMetadata, nil
+	}
+
 	if i.Labels != nil {
 		s.computeMetadata.User = i.Labels
 	}
