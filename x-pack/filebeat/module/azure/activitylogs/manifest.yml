@@ -7,6 +7,10 @@ var:
     default: "insights-operational-logs"
   - name: consumer_group
     default: "$Default"
+  - name: connection_string
+  - name: storage_account
+  - name: storage_account_key
+
 
 ingest_pipeline:
   - ingest/pipeline.json
