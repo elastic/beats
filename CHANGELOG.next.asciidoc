@@ -127,7 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320] 
+- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
 - Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
 
 *Heartbeat*
@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
+- Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 
 *Packetbeat*
 
