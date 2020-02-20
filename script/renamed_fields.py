@@ -6,9 +6,9 @@ def migration():
     beats = ["Auditbeat", "Filebeat", "Heartbeat", "Journalbeat", "Metricbeat", "Packetbeat", "Winlogbeat"]
 
     for beat in beats:
-        print ".{} renamed fields in 7.0".format(beat)
+        print(".{} renamed fields in 7.0".format(beat))
         migration_fields = read_migration_fields(beat.lower())
-        print get_table(migration_fields)
+        print(get_table(migration_fields))
 
 
 def get_table(migration_fields):
@@ -33,7 +33,7 @@ def read_migration_fields(beat):
         for k in migration:
             if "beat" not in k or k["beat"] == beat:
                 if "to" in k and "from" in k:
-                    if not isinstance(k["to"], basestring):
+                    if not isinstance(k["to"], str):
                         continue
                     migration_fields[k["from"]] = k["to"]
 

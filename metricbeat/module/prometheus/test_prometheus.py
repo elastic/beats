@@ -32,6 +32,6 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(PROMETHEUS_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(PROMETHEUS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
