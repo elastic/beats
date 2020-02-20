@@ -10,8 +10,8 @@ import (
 
 	"cloud.google.com/go/storage"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/executor"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
 )
 
 type opEnsureBucket struct {

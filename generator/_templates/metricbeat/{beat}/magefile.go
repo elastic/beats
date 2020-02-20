@@ -8,15 +8,15 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/build"
-	"github.com/elastic/beats/dev-tools/mage/target/collectors"
-	"github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/pkg"
-	"github.com/elastic/beats/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/dev-tools/mage/target/update"
-	"github.com/elastic/beats/generator/common/beatgen"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/collectors"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
+	"github.com/elastic/beats/v7/generator/common/beatgen"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 )
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 	devtools.BeatVendor = "{full_name}"
 }
 
-// VendorUpdate updates elastic/beats in the vendor dir
+// VendorUpdate updates elastic/beats/v7 in the vendor dir
 func VendorUpdate() error {
 	return beatgen.VendorUpdate()
 }
