@@ -56,26 +56,9 @@ func DefaultBuildArgs() BuildArgs {
 			"github.com/elastic/beats/libbeat/version.commit":    "{{ commit }}",
 		},
 	}
-
 	if versionQualified {
 		args.Vars["github.com/elastic/beats/libbeat/version.qualifier"] = "{{ .Qualifier }}"
 	}
-
-	repo, err := GetProjectRepoInfo()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to determine project repo info"))
-	}
-
-	if !repo.IsElasticBeats() {
-		// Assume libbeat is vendored and prefix the variables.
-		prefix := repo.RootImportPath + "/vendor/"
-		prefixedVars := map[string]string{}
-		for k, v := range args.Vars {
-			prefixedVars[prefix+k] = v
-		}
-		args.Vars = prefixedVars
-	}
-
 	return args
 }
 
