@@ -1,6 +1,3 @@
-[role="xpack"]
-== Statsd module
-
 The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible
 format.
 
