@@ -98,7 +98,6 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 			}
 			return nil, errors.Wrap(err, "decoding of metric family failed")
 		} else {
-			//families = p.filterFamilies(families)
 			families = append(families, mf)
 		}
 	}
