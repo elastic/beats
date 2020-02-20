@@ -106,40 +106,6 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	return families, nil
 }
 
-//func (p *prometheus) filterFamilies(families []*dto.MetricFamily) []*dto.MetricFamily {
-//	var ignoreMetrics *[]string
-//	// ignoreMetrics := &[]string{"go_*"}
-//	var includeMetrics *[]string
-//	includeMetrics = &[]string{"go_*"}
-//	filteredFamilies := []*dto.MetricFamily{}
-//	for _, family := range families {
-//		if includeMetrics != nil {
-//			if matchMetricFamily(*family.Name, includeMetrics){
-//				filteredFamilies = append(filteredFamilies, family)
-//			} else {
-//				continue
-//			}
-//		} else if ignoreMetrics != nil {
-//			if matchMetricFamily(*family.Name, ignoreMetrics){
-//				continue
-//			} else {
-//				filteredFamilies = append(filteredFamilies, family)
-//			}
-//		}
-//	}
-//	return filteredFamilies
-//}
-//
-//func matchMetricFamily(family string, matchMetrics *[]string) bool {
-//	for _, checkMetric := range *matchMetrics {
-//		matched, _ := regexp.MatchString(checkMetric, family)
-//		if matched {
-//			return true
-//		}
-//	}
-//	return false
-//}
-
 // MetricsMapping defines mapping settings for Prometheus metrics, to be used with `GetProcessedMetrics`
 type MetricsMapping struct {
 	// Metrics translates from prometheus metric name to Metricbeat fields
