@@ -1,133 +1,133 @@
 - name: log
-  description: Please add description
+  description: The log which can be queried via gp_log_database
   example: Please add example
   type: group
   fields:
   - name: timestamp
-    description: Please add description
+    description: The timestamp of the log message
     example: Please add example
   - name: user
-    description: Please add description
+    description: The name of the database user
     example: Please add example
     type: keyword
   - name: database
-    description: Please add description
+    description: The name of the database
     example: Please add example
     type: keyword
   - name: process_id
-    description: Please add description
+    description: The associated process id (prefixed with "p")
     example: Please add example
     type: keyword
   - name: thread_id
-    description: Please add description
+    description: The associated thread count (prefixed with "th")
     example: Please add example
     type: keyword
   - name: host
-    description: Please add description
+    description: The segment or master host name
     example: Please add example
     type: text
   - name: port
-    description: Please add description
+    description: The segment or master port
     example: Please add example
     type: long
   - name: session_start
-    description: Please add description
+    description: Time session connection was opened
     example: Please add example
   - name: transaction_id
-    description: Please add description
+    description: Global transaction id
     example: Please add example
     type: long
   - name: session_id
-    description: Please add description
+    description: The session identifier (prefixed with "con")
     example: Please add example
     type: keyword
   - name: command_count
-    description: Please add description
+    description: The command number within a session (prefixed with "cmd")
     example: Please add example
     type: long
   - name: gp_segment
-    description: Please add description
+    description: The segment content identifier
     example: Please add example
     type: group
     fields:
     - name: type
-      description: Please add description
+      description: The segment type
       example: Please add example
       type: keyword
     - name: id
-      description: Please add description
+      description: The segment identifier
       example: Please add example
       type: keyword
   - name: slice_id
-    description: Please add description
+    description: The slice id (portion of the query plan being executed)
     example: Please add example
     type: long
   - name: distributed_transaction_id
-    description: Please add description
+    description: Distributed transaction id
     example: Please add example
     type: keyword
   - name: local_transaction_id
-    description: Please add description
+    description: Local transaction id
     example: Please add example
     type: keyword
   - name: subtransaction_id
-    description: Please add description
+    description: Subtransaction id
     example: Please add example
     type: keyword
   - name: level
-    description: Please add description
+    description: LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
     example: Please add example
     type: keyword
   - name: state_code
-    description: Please add description
+    description: SQL state code associated with the log message
     example: Please add example
     type: keyword
   - name: message
-    description: Please add description
+    description: Log or error message text
     example: Please add example
     type: text
   - name: detail
-    description: Please add description
+    description: Detail message text associated with an error message
     example: Please add example
     type: text
   - name: hint
-    description: Please add description
+    description: Hint message text associated with an error message
     example: Please add example
     type: text
   - name: query
-    description: Please add description
+    description: The internally-generated query text
     example: Please add example
     type: text
   - name: query_position
-    description: Please add description
+    description: The cursor index into the internally-generated query text
     example: Please add example
     type: long
   - name: context
-    description: Please add description
+    description: The context in which this message gets generated
     example: Please add example
     type: text
   - name: debug
-    description: Please add description
+    description: Query string with full detail for debugging
     example: Please add example
     type: text
   - name: cursor_position
-    description: Please add description
+    description: The cursor index into the query string
     example: Please add example
     type: long
   - name: file
-    description: Please add description
+    description: Descriptions in child fields
     example: Please add example
     type: group
     fields:
     - name: name
-      description: Please add description
+      description: The log file in which this message is generated
       example: Please add example
       type: text
     - name: line
-      description: Please add description
+      description: The line in the log file in which this message is generated
       example: Please add example
       type: long
   - name: stack
-    description: Please add description
+    description: Full text of the stack trace associated with this message
     example: Please add example
     type: text

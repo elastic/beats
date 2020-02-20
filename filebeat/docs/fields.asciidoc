@@ -12493,13 +12493,13 @@ greenplum Module
 [float]
 === log
 
-Please add description
+The log which can be queried via gp_log_database
 
 
 *`greenplum.log.timestamp`*::
 +
 --
-Please add description
+The timestamp of the log message
 
 example: Please add example
 
@@ -12508,7 +12508,7 @@ example: Please add example
 *`greenplum.log.user`*::
 +
 --
-Please add description
+The name of the database user
 
 type: keyword
 
@@ -12519,7 +12519,7 @@ example: Please add example
 *`greenplum.log.database`*::
 +
 --
-Please add description
+The name of the database
 
 type: keyword
 
@@ -12530,7 +12530,7 @@ example: Please add example
 *`greenplum.log.process_id`*::
 +
 --
-Please add description
+The associated process id (prefixed with "p")
 
 type: keyword
 
@@ -12541,7 +12541,7 @@ example: Please add example
 *`greenplum.log.thread_id`*::
 +
 --
-Please add description
+The associated thread count (prefixed with "th")
 
 type: keyword
 
@@ -12552,7 +12552,7 @@ example: Please add example
 *`greenplum.log.host`*::
 +
 --
-Please add description
+The segment or master host name
 
 type: text
 
@@ -12563,7 +12563,7 @@ example: Please add example
 *`greenplum.log.port`*::
 +
 --
-Please add description
+The segment or master port
 
 type: long
 
@@ -12574,7 +12574,7 @@ example: Please add example
 *`greenplum.log.session_start`*::
 +
 --
-Please add description
+Time session connection was opened
 
 example: Please add example
 
@@ -12583,7 +12583,7 @@ example: Please add example
 *`greenplum.log.transaction_id`*::
 +
 --
-Please add description
+Global transaction id
 
 type: long
 
@@ -12594,7 +12594,7 @@ example: Please add example
 *`greenplum.log.session_id`*::
 +
 --
-Please add description
+The session identifier (prefixed with "con")
 
 type: keyword
 
@@ -12605,7 +12605,7 @@ example: Please add example
 *`greenplum.log.command_count`*::
 +
 --
-Please add description
+The command number within a session (prefixed with "cmd")
 
 type: long
 
@@ -12616,13 +12616,13 @@ example: Please add example
 [float]
 === gp_segment
 
-Please add description
+The segment content identifier
 
 
 *`greenplum.log.gp_segment.type`*::
 +
 --
-Please add description
+The segment type
 
 type: keyword
 
@@ -12633,7 +12633,7 @@ example: Please add example
 *`greenplum.log.gp_segment.id`*::
 +
 --
-Please add description
+The segment identifier
 
 type: keyword
 
@@ -12644,7 +12644,7 @@ example: Please add example
 *`greenplum.log.slice_id`*::
 +
 --
-Please add description
+The slice id (portion of the query plan being executed)
 
 type: long
 
@@ -12655,7 +12655,7 @@ example: Please add example
 *`greenplum.log.distributed_transaction_id`*::
 +
 --
-Please add description
+Distributed transaction id
 
 type: keyword
 
@@ -12666,7 +12666,7 @@ example: Please add example
 *`greenplum.log.local_transaction_id`*::
 +
 --
-Please add description
+Local transaction id
 
 type: keyword
 
@@ -12677,7 +12677,7 @@ example: Please add example
 *`greenplum.log.subtransaction_id`*::
 +
 --
-Please add description
+Subtransaction id
 
 type: keyword
 
@@ -12688,7 +12688,7 @@ example: Please add example
 *`greenplum.log.level`*::
 +
 --
-Please add description
+LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
 
 type: keyword
 
@@ -12699,7 +12699,7 @@ example: Please add example
 *`greenplum.log.state_code`*::
 +
 --
-Please add description
+SQL state code associated with the log message
 
 type: keyword
 
@@ -12710,7 +12710,7 @@ example: Please add example
 *`greenplum.log.message`*::
 +
 --
-Please add description
+Log or error message text
 
 type: text
 
@@ -12721,7 +12721,7 @@ example: Please add example
 *`greenplum.log.detail`*::
 +
 --
-Please add description
+Detail message text associated with an error message
 
 type: text
 
@@ -12732,7 +12732,7 @@ example: Please add example
 *`greenplum.log.hint`*::
 +
 --
-Please add description
+Hint message text associated with an error message
 
 type: text
 
@@ -12743,7 +12743,7 @@ example: Please add example
 *`greenplum.log.query`*::
 +
 --
-Please add description
+The internally-generated query text
 
 type: text
 
@@ -12754,7 +12754,7 @@ example: Please add example
 *`greenplum.log.query_position`*::
 +
 --
-Please add description
+The cursor index into the internally-generated query text
 
 type: long
 
@@ -12765,7 +12765,7 @@ example: Please add example
 *`greenplum.log.context`*::
 +
 --
-Please add description
+The context in which this message gets generated
 
 type: text
 
@@ -12776,7 +12776,7 @@ example: Please add example
 *`greenplum.log.debug`*::
 +
 --
-Please add description
+Query string with full detail for debugging
 
 type: text
 
@@ -12787,7 +12787,7 @@ example: Please add example
 *`greenplum.log.cursor_position`*::
 +
 --
-Please add description
+The cursor index into the query string
 
 type: long
 
@@ -12798,13 +12798,13 @@ example: Please add example
 [float]
 === file
 
-Please add description
+Descriptions in child fields
 
 
 *`greenplum.log.file.name`*::
 +
 --
-Please add description
+The log file in which this message is generated
 
 type: text
 
@@ -12815,7 +12815,7 @@ example: Please add example
 *`greenplum.log.file.line`*::
 +
 --
-Please add description
+The line in the log file in which this message is generated
 
 type: long
 
@@ -12826,7 +12826,7 @@ example: Please add example
 *`greenplum.log.stack`*::
 +
 --
-Please add description
+Full text of the stack trace associated with this message
 
 type: text
 
