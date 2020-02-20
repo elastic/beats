@@ -31,7 +31,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/apm-agent-go/module/apmhttp"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
