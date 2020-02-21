@@ -241,6 +241,15 @@ var ciscoIOS = (function() {
                 var dissect = facility_patterns[eventCode];
                 if (dissect) {
                     if (Array.isArray(dissect)) {
+                        /*Logically this seems to work as expect trying each pattern in order. 
+                        But the message being dissected doesn't seem to reset offset or something odd. 
+                        Not sure if dissect bug or something im missing 
+                       
+                        Configured from console by a_person on vty0 (123.123.123.123)  == OK
+                        Configured from memory by console (Switch-2) == GoError: could not find delimiter: ` by ` in remaining: `console (Switch-2)`, (offset: 26)
+                        Configured from console by desireddyp on console == GoError: could not find delimiter: ` on ` in remaining: `console`, (offset: 41)
+                        
+                        */
                         var pattern_count = dissect.length;
                         for (var i = 0; i < pattern_count; i++) {
                                 var dissect_fn = dissect[i];
