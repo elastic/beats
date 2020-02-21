@@ -48,7 +48,6 @@ func runGoInstall(opts ...ArgOpt) error {
 }
 
 func (goInstall) Package(pkg string) ArgOpt { return posArg(pkg) }
-func (goInstall) Vendored() ArgOpt          { return flagArg("-mod", "vendor") }
 
 type goTest func(opts ...ArgOpt) error
 
