@@ -1,6 +1,6 @@
 module github.com/elastic/beats
 
-go 1.13
+go 1.14
 
 require (
 	4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
