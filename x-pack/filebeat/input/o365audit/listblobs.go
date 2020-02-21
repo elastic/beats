@@ -61,7 +61,7 @@ func (l listBlob) adjustTimes(since time.Time) listBlob {
 			since = l.cursor.timestamp
 		}
 		to = now
-		delay = l.env.Config.LiveWindowPollInterval
+		delay = l.env.Config.PollInterval
 	}
 	l.startTime = since.UTC()
 	l.endTime = to.UTC()
@@ -184,7 +184,7 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	switch response.StatusCode {
 	case 401:
 		// Authentication error. Renew oauth token and repeat this op.
-		l.delay = l.env.Config.LiveWindowPollInterval
+		l.delay = l.env.Config.PollInterval
 		return []poll.Action{
 			poll.RenewToken(),
 			poll.Fetch(l),
@@ -229,7 +229,7 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		now := l.env.Clock()
 		delta := now.Sub(l.startTime)
 		if delta > (l.env.Config.MaxRetention + 30*time.Minute) {
-			l.delay = l.env.Config.LiveWindowPollInterval
+			l.delay = l.env.Config.PollInterval
 			return []poll.Action{
 				poll.Fetch(l.adjustTimes(l.startTime)),
 			}

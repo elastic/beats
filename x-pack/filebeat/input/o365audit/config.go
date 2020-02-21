@@ -22,6 +22,7 @@ type Config struct {
 	// ApplicationID (aka. client ID) of the Azure application.
 	ApplicationID string `config:"application_id" validate:"required"`
 
+	// ClientSecret (aka. API key) to use for authentication.
 	ClientSecret string `config:"client_secret"`
 
 	// TenantID (aka. Directory ID) is a list of tenants for which to fetch
@@ -70,10 +71,10 @@ type APIConfig struct {
 	// errors performing a request.
 	ErrorRetryInterval time.Duration `config:"error_retry_interval" validate:"positive"`
 
-	// LiveWindowPollInterval determines how often the input should poll for new
+	// PollInterval determines how often the input should poll for new
 	// data once it has finished scanning for past events and reached the live
 	// window.
-	LiveWindowPollInterval time.Duration `config:"live_window_poll_interval" validate:"positive"`
+	PollInterval time.Duration `config:"poll_interval" validate:"positive"`
 
 	// MaxRequestsPerMinute sets the limit on the number of API requests that
 	// can be sent, per tenant.
@@ -119,7 +120,7 @@ func defaultConfig() Config {
 
 			ErrorRetryInterval: 5 * time.Minute,
 
-			LiveWindowPollInterval: time.Minute,
+			PollInterval: 3 * time.Minute,
 
 			MaxQuerySize: timeDay,
 
