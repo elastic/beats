@@ -132,6 +132,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
 	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
+# Avoid running yacc to generate a parser for dependency.
 .PHONY: update-yacc-vendor
 update-yacc-vendor:
 	@touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
@@ -188,7 +189,7 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 
 # Preparation for tests
 .PHONY: prepare-tests
-prepare-tests:
+prepare-tests: update-yacc-vendor
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
 	go install -mod=vendor ${COVERAGE_TOOL_REPO}
