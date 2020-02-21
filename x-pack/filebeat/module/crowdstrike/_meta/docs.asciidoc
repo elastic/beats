@@ -3,7 +3,7 @@
 
 == Crowdstrike module
 
-This is the filebeat module for the Crowdstrike Falcon using the Falcon [SIEM connector](https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem/). By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format. This module collects this data, converts it to ECS, and ingests it to view in the SIEM.
+This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format. This module collects this data, converts it to ECS, and ingests it to view in the SIEM.
 
 include::../include/what-happens.asciidoc[]
 
