@@ -5,45 +5,45 @@
   fields:
   - name: timestamp
     description: The timestamp of the log message
-    example: Please add example
+    example: "2020-01-29 00:00:01.606881 UTC"
   - name: user
     description: The name of the database user
-    example: Please add example
+    example: "gpadmin"
     type: keyword
   - name: database
     description: The name of the database
-    example: Please add example
+    example: "postgres"
     type: keyword
   - name: process_id
     description: The associated process id (prefixed with "p")
-    example: Please add example
+    example: "p713507"
     type: keyword
   - name: thread_id
-    description: The associated thread count (prefixed with "th")
-    example: Please add example
+    description: The associated thread count
+    example: "1452697472"
     type: keyword
   - name: host
     description: The segment or master host name
-    example: Please add example
+    example: "[local]"
     type: text
   - name: port
     description: The segment or master port
-    example: Please add example
+    example: "43940"
     type: long
   - name: session_start
     description: Time session connection was opened
-    example: Please add example
+    example: "2020-01-29 00:00:01 UTC"
   - name: transaction_id
     description: Global transaction id
-    example: Please add example
+    example: "0"
     type: long
   - name: session_id
     description: The session identifier (prefixed with "con")
-    example: Please add example
+    example: "con408754"
     type: keyword
   - name: command_count
-    description: The command number within a session (prefixed with "cmd")
-    example: Please add example
+    description: The command number within a session
+    example: "1"
     type: long
   - name: gp_segment
     description: The segment content identifier
@@ -52,67 +52,67 @@
     fields:
     - name: type
       description: The segment type
-      example: Please add example
+      example: "seg"
       type: keyword
     - name: id
       description: The segment identifier
-      example: Please add example
+      example: "1"
       type: keyword
   - name: slice_id
     description: The slice id (portion of the query plan being executed)
-    example: Please add example
+    example: "1"
     type: long
   - name: distributed_transaction_id
     description: Distributed transaction id
-    example: Please add example
+    example: "dx853045"
     type: keyword
   - name: local_transaction_id
     description: Local transaction id
-    example: Please add example
+    example: "x193249667"
     type: keyword
   - name: subtransaction_id
     description: Subtransaction id
-    example: Please add example
+    example: "sx1"
     type: keyword
   - name: level
-    description: LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
-    example: Please add example
+    description: Severity of the log. LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
+    example: "LOG"
     type: keyword
   - name: state_code
     description: SQL state code associated with the log message
-    example: Please add example
+    example: "00000"
     type: keyword
   - name: message
     description: Log or error message text
-    example: Please add example
+    example: "connection received: host=[local]"
     type: text
   - name: detail
     description: Detail message text associated with an error message
-    example: Please add example
+    example: "\nRunning: /usr/local/application/CPPORCReader_centos3-14.6.9  -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/* -t orc -rb 10000 -s 0 -ts 1152 -config /usr/local/application/hdfs-client-CPPORCReader.xml\nCPPORCReader: caught 2 and exiting.\nCPPORCReader: caught 13 and exiting.\nCPPORCReader: caught 13 and exiting.\nCPPORCReader: caught 13 and exiting.\nCPPORCReader: caught 13 and exiting.\nCPPORCReader:\nCommand: execute:$CNVRHOME/CPPORCReader.sh -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/*"
     type: text
   - name: hint
     description: Hint message text associated with an error message
-    example: Please add example
+    example: "Use ALTER EXTERNAL TABLE instead"
     type: text
   - name: query
     description: The internally-generated query text
-    example: Please add example
+    example: "CREATE EXTERNAL WEB TABLE gpdb.new_great_business_table_1_prt_20200218_ext\n(like gp_logs.raw_log_ext_template)\nEXECUTE $EOF$$CNVRHOME/CPPORCReader.sh -c 34 -i /app/hive/warehouse/gpdb.db/raw_ecpm_log/partition_start_date=20200218/partition_end_date=20200218/dtm_id0_flag=0/*$EOF$ ON ALL FORMAT 'TEXT' (delimiter ' ' null '\\\\N' escape '\\\\')"
     type: text
   - name: query_position
     description: The cursor index into the internally-generated query text
-    example: Please add example
+    example: "338"
     type: long
   - name: context
     description: The context in which this message gets generated
-    example: Please add example
+    example: "PL/pgSQL function \"\"gp_generate_external_partition\"\" line 177 at execute statement\nSQL statement \"\"SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )\"\"\nPL/pgSQL function \"\"gp_generate_external_partition\"\" line 80 at return\nSQL statement \"\"SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 )\"\"\nPL/pgSQL function \"\"usp_mgmt_add_internal_external_range_partition\"\" line 154 at assignment"
     type: text
   - name: debug
     description: Query string with full detail for debugging
-    example: Please add example
+    example: "SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )"
     type: text
   - name: cursor_position
     description: The cursor index into the query string
-    example: Please add example
+    example: "0"
     type: long
   - name: file
     description: Descriptions in child fields
@@ -121,13 +121,13 @@
     fields:
     - name: name
       description: The log file in which this message is generated
-      example: Please add example
+      example: "scan.l"
       type: text
     - name: line
       description: The line in the log file in which this message is generated
-      example: Please add example
+      example: "1238"
       type: long
   - name: stack
     description: Full text of the stack trace associated with this message
-    example: Please add example
+    example: "Stack trace:\n1    0xb0d20e postgres errstart (elog.c:502)\n2    0xbe5e15 postgres cdbdisp_finishCommand (cdbdisp.c:1320)\n3    0xbe5fe8 postgres cdbdisp_handleError (cdbdisp.c:1406)\n4    0x76f7fc postgres mppExecutorCleanup (execUtils.c:2377)\n5    0x7544d5 postgres ExecutorRun (execMain.c:954)\n6    0x9a6b49 postgres PortalRun (pquery.c:1260)\n7    0x99d7dc postgres <symbol not found> (postgres.c:1825)\n8    0x9a1bf9 postgres PostgresMain (postgres.c:4788)\n9    0x8fc319 postgres <symbol not found> (postmaster.c:6672)\n10   0x8fedc0 postgres PostmasterMain (postmaster.c:7603)\n11   0x7feccf postgres main (main.c:206)\n12   0x7fb0c1c98545 libc.so.6 __libc_start_main + 0xf5\n13   0x4bef79 postgres <symbol not found> + 0x4bef79\n"
     type: text

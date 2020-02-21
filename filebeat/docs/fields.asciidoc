@@ -12501,7 +12501,7 @@ The log which can be queried via gp_log_database
 --
 The timestamp of the log message
 
-example: Please add example
+example: 2020-01-29 00:00:01.606881 UTC
 
 --
 
@@ -12512,7 +12512,7 @@ The name of the database user
 
 type: keyword
 
-example: Please add example
+example: gpadmin
 
 --
 
@@ -12523,7 +12523,7 @@ The name of the database
 
 type: keyword
 
-example: Please add example
+example: postgres
 
 --
 
@@ -12534,18 +12534,18 @@ The associated process id (prefixed with "p")
 
 type: keyword
 
-example: Please add example
+example: p713507
 
 --
 
 *`greenplum.log.thread_id`*::
 +
 --
-The associated thread count (prefixed with "th")
+The associated thread count
 
 type: keyword
 
-example: Please add example
+example: 1452697472
 
 --
 
@@ -12556,7 +12556,7 @@ The segment or master host name
 
 type: text
 
-example: Please add example
+example: [local]
 
 --
 
@@ -12567,7 +12567,7 @@ The segment or master port
 
 type: long
 
-example: Please add example
+example: 43940
 
 --
 
@@ -12576,7 +12576,7 @@ example: Please add example
 --
 Time session connection was opened
 
-example: Please add example
+example: 2020-01-29 00:00:01 UTC
 
 --
 
@@ -12587,7 +12587,7 @@ Global transaction id
 
 type: long
 
-example: Please add example
+example: 0
 
 --
 
@@ -12598,18 +12598,18 @@ The session identifier (prefixed with "con")
 
 type: keyword
 
-example: Please add example
+example: con408754
 
 --
 
 *`greenplum.log.command_count`*::
 +
 --
-The command number within a session (prefixed with "cmd")
+The command number within a session
 
 type: long
 
-example: Please add example
+example: 1
 
 --
 
@@ -12626,7 +12626,7 @@ The segment type
 
 type: keyword
 
-example: Please add example
+example: seg
 
 --
 
@@ -12637,7 +12637,7 @@ The segment identifier
 
 type: keyword
 
-example: Please add example
+example: 1
 
 --
 
@@ -12648,7 +12648,7 @@ The slice id (portion of the query plan being executed)
 
 type: long
 
-example: Please add example
+example: 1
 
 --
 
@@ -12659,7 +12659,7 @@ Distributed transaction id
 
 type: keyword
 
-example: Please add example
+example: dx853045
 
 --
 
@@ -12670,7 +12670,7 @@ Local transaction id
 
 type: keyword
 
-example: Please add example
+example: x193249667
 
 --
 
@@ -12681,18 +12681,18 @@ Subtransaction id
 
 type: keyword
 
-example: Please add example
+example: sx1
 
 --
 
 *`greenplum.log.level`*::
 +
 --
-LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
+Severity of the log. LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
 
 type: keyword
 
-example: Please add example
+example: LOG
 
 --
 
@@ -12703,7 +12703,7 @@ SQL state code associated with the log message
 
 type: keyword
 
-example: Please add example
+example: 00000
 
 --
 
@@ -12714,7 +12714,7 @@ Log or error message text
 
 type: text
 
-example: Please add example
+example: connection received: host=[local]
 
 --
 
@@ -12725,7 +12725,15 @@ Detail message text associated with an error message
 
 type: text
 
-example: Please add example
+example: 
+Running: /usr/local/application/CPPORCReader_centos3-14.6.9  -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/* -t orc -rb 10000 -s 0 -ts 1152 -config /usr/local/application/hdfs-client-CPPORCReader.xml
+CPPORCReader: caught 2 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader:
+Command: execute:$CNVRHOME/CPPORCReader.sh -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/*
 
 --
 
@@ -12736,7 +12744,7 @@ Hint message text associated with an error message
 
 type: text
 
-example: Please add example
+example: Use ALTER EXTERNAL TABLE instead
 
 --
 
@@ -12747,7 +12755,9 @@ The internally-generated query text
 
 type: text
 
-example: Please add example
+example: CREATE EXTERNAL WEB TABLE gpdb.new_great_business_table_1_prt_20200218_ext
+(like gp_logs.raw_log_ext_template)
+EXECUTE $EOF$$CNVRHOME/CPPORCReader.sh -c 34 -i /app/hive/warehouse/gpdb.db/raw_ecpm_log/partition_start_date=20200218/partition_end_date=20200218/dtm_id0_flag=0/*$EOF$ ON ALL FORMAT 'TEXT' (delimiter ' ' null '\\N' escape '\\')
 
 --
 
@@ -12758,7 +12768,7 @@ The cursor index into the internally-generated query text
 
 type: long
 
-example: Please add example
+example: 338
 
 --
 
@@ -12769,7 +12779,11 @@ The context in which this message gets generated
 
 type: text
 
-example: Please add example
+example: PL/pgSQL function ""gp_generate_external_partition"" line 177 at execute statement
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )""
+PL/pgSQL function ""gp_generate_external_partition"" line 80 at return
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 )""
+PL/pgSQL function ""usp_mgmt_add_internal_external_range_partition"" line 154 at assignment
 
 --
 
@@ -12780,7 +12794,7 @@ Query string with full detail for debugging
 
 type: text
 
-example: Please add example
+example: SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )
 
 --
 
@@ -12791,7 +12805,7 @@ The cursor index into the query string
 
 type: long
 
-example: Please add example
+example: 0
 
 --
 
@@ -12808,7 +12822,7 @@ The log file in which this message is generated
 
 type: text
 
-example: Please add example
+example: scan.l
 
 --
 
@@ -12819,7 +12833,7 @@ The line in the log file in which this message is generated
 
 type: long
 
-example: Please add example
+example: 1238
 
 --
 
@@ -12830,7 +12844,21 @@ Full text of the stack trace associated with this message
 
 type: text
 
-example: Please add example
+example: Stack trace:
+1    0xb0d20e postgres errstart (elog.c:502)
+2    0xbe5e15 postgres cdbdisp_finishCommand (cdbdisp.c:1320)
+3    0xbe5fe8 postgres cdbdisp_handleError (cdbdisp.c:1406)
+4    0x76f7fc postgres mppExecutorCleanup (execUtils.c:2377)
+5    0x7544d5 postgres ExecutorRun (execMain.c:954)
+6    0x9a6b49 postgres PortalRun (pquery.c:1260)
+7    0x99d7dc postgres <symbol not found> (postgres.c:1825)
+8    0x9a1bf9 postgres PostgresMain (postgres.c:4788)
+9    0x8fc319 postgres <symbol not found> (postmaster.c:6672)
+10   0x8fedc0 postgres PostmasterMain (postmaster.c:7603)
+11   0x7feccf postgres main (main.c:206)
+12   0x7fb0c1c98545 libc.so.6 __libc_start_main + 0xf5
+13   0x4bef79 postgres <symbol not found> + 0x4bef79
+
 
 --
 
