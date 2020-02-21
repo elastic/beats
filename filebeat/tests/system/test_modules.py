@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
+from deepdiff import DeepDiff
 
 
 def load_fileset_test_cases():
@@ -188,21 +189,19 @@ class Test(BaseTest):
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
 
-        for ev in expected:
-            found = False
-            for obj in objects:
+        for idx in range(len(expected)):
+            ev = expected[idx]
+            obj = objects[idx]
 
-                # Flatten objects for easier comparing
-                obj = self.flatten_object(obj, {}, "")
-                clean_keys(obj)
 
-                if ev == obj:
-                    found = True
-                    break
+            # Flatten objects for easier comparing
+            obj = self.flatten_object(obj, {}, "")
+            clean_keys(obj)
+            clean_keys(ev)
 
-            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev), pretty_json(objects))
+            d = DeepDiff(ev, obj, ignore_order=True)
 
+            assert len(d) == 0, "The following expected object doesn't match:\n Diff: \n {}".format(d, obj)
 
 def clean_keys(obj):
     # These keys are host dependent
@@ -216,7 +215,7 @@ def clean_keys(obj):
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]:
+    if obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog", 'iptables.log']:
         delete_key(obj, "@timestamp")
 
 
