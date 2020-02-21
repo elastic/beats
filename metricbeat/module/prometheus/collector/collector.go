@@ -184,8 +184,8 @@ func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
 		}
 	}
 	// now exclude the metric if it matches any of the given patterns
-	if len(m.ignoreMetrics) > 0 {
-		if matchMetricFamily(*family.Name, m.ignoreMetrics) {
+	if len(m.excludeMetrics) > 0 {
+		if matchMetricFamily(*family.Name, m.excludeMetrics) {
 			return true
 		}
 	}

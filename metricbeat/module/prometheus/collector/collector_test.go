@@ -20,6 +20,8 @@
 package collector
 
 import (
+	"fmt"
+	"github.com/elastic/beats/metricbeat/mb"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -198,6 +200,164 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 		event := getPromEventsFromMetricFamily(test.Family)
 		assert.Equal(t, test.Event, event)
 	}
+}
+
+func TestSkipMetricFamily(t *testing.T) {
+	testFamilies := []*dto.MetricFamily{
+		{
+			Name: proto.String("http_request_duration_microseconds_a_a_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_COUNTER.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Label: []*dto.LabelPair{
+						{
+							Name:  proto.String("handler"),
+							Value: proto.String("query"),
+						},
+					},
+					Counter: &dto.Counter{
+						Value: proto.Float64(10),
+					},
+				},
+			},
+		},
+		{
+			Name: proto.String("http_request_duration_microseconds_a_b_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_COUNTER.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Label: []*dto.LabelPair{
+						{
+							Name:  proto.String("handler"),
+							Value: proto.String("query"),
+						},
+					},
+					Counter: &dto.Counter{
+						Value: proto.Float64(10),
+					},
+				},
+			},
+		},
+		{
+			Name: proto.String("http_request_duration_microseconds_b_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_GAUGE.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Gauge: &dto.Gauge{
+						Value: proto.Float64(10),
+					},
+				},
+			},
+		},
+		{
+			Name: proto.String("http_request_duration_microseconds_c_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_SUMMARY.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Summary: &dto.Summary{
+						SampleCount: proto.Uint64(10),
+						SampleSum:   proto.Float64(10),
+						Quantile: []*dto.Quantile{
+							{
+								Quantile: proto.Float64(0.99),
+								Value:    proto.Float64(10),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: proto.String("http_request_duration_microseconds_d_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_HISTOGRAM.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Histogram: &dto.Histogram{
+						SampleCount: proto.Uint64(10),
+						SampleSum:   proto.Float64(10),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(10),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: proto.String("http_request_duration_microseconds_e_in"),
+			Help: proto.String("foo"),
+			Type: dto.MetricType_UNTYPED.Enum(),
+			Metric: []*dto.Metric{
+				{
+					Label: []*dto.LabelPair{
+						{
+							Name:  proto.String("handler"),
+							Value: proto.String("query"),
+						},
+					},
+					Untyped: &dto.Untyped{
+						Value: proto.Float64(10),
+					},
+				},
+			},
+		},
+	}
+
+	ms := &MetricSet{
+		BaseMetricSet: mb.BaseMetricSet{},
+	}
+
+	// test with no filters
+	ms.includeMetrics, _ = compilePatternList(&[]string{})
+	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	metricsToKeep := 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep += 1
+		}
+	}
+	assert.Equal(t, metricsToKeep, len(testFamilies))
+
+	// test with only one include filter
+	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	metricsToKeep = 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep += 1
+		}
+	}
+	assert.Equal(t, metricsToKeep, 2)
+
+	// test with only one exclude filter
+	ms.includeMetrics, _ = compilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	metricsToKeep = 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep += 1
+		}
+	}
+	assert.Equal(t, len(testFamilies) - 2, metricsToKeep)
+
+	// test with ine include and one exclude
+	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
+	metricsToKeep = 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep += 1
+		}
+	}
+	assert.Equal(t, 1, metricsToKeep)
+
 }
 
 func TestData(t *testing.T) {
