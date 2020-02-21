@@ -49,6 +49,10 @@ var crowdstrikeFalcon = (function() {
     var processEvent = function(evt) {
         var eventType = evt.Get("crowdstrike.metadata.eventType")
 
+        evt.Put("agent.type", "falcon")
+        evt.Put("event.kind", "event")
+        evt.Put("host.name", "")
+
         switch (eventType) {
             case "DetectionSummaryEvent":
                 var tactic = evt.Get("crowdstrike.event.Tactic").toLowerCase()
@@ -57,6 +61,7 @@ var crowdstrikeFalcon = (function() {
                 evt.Put("event.action", tactic + "_" + technique)
                 evt.Put("event.kind", "alert")
                 evt.Put("event.category", "malware")
+                evt.Put("event.severity", evt.Get("crowdstrike.event.Severity"))
                 evt.Put("message", evt.Get("crowdstrike.event.DetectDescription"))
                 evt.Put("process.name", evt.Get("crowdstrike.event.FileName"))
                 evt.Put("process.executable", evt.Get("crowdstrike.event.CommandLine"))
@@ -73,8 +78,6 @@ var crowdstrikeFalcon = (function() {
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
                 evt.Put("message", evt.Get("crowdstrike.event.OperationName"))
                 evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.kind", "event")
-                evt.Put("host.name", "")
 
                 break;
 
@@ -83,7 +86,6 @@ var crowdstrikeFalcon = (function() {
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
                 evt.Put("message", evt.Get("crowdstrike.event.ServiceName"))
                 evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
-                evt.Put("host.name", "")
  
                 break;
  

@@ -17,10 +17,17 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard. For example:
+The best way to view this data is in the SIEM. 
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+[role="screenshot"]
+image::./images/siem-alerts-cs.jpg[]
+
+For alerts, go to Detections -> External alerts.
+
+[role="screenshot"]
+image::./images/siem-events-cs.jpg[]
+
+For all over event Crowdstrike Falcon event types, go to Host -> Events.
 
 include::../include/configuring-intro.asciidoc[]
 
