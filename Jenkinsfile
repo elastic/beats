@@ -180,7 +180,23 @@ pipeline {
                 mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
                 //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
               }
+<<<<<<< HEAD
+=======
             }
+          }
+        }
+        stage('Auditbeat x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false"
+>>>>>>> ci: run test on Windows (#15570)
+            }
+          }
+          steps {
+            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
           }
         }
         stage('Auditbeat x-pack'){
@@ -559,6 +575,7 @@ def withBeatsEnv(Closure body){
     "MAGEFILE_CACHE=${WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
+    "PYTHON_ENV=${WORKSPACE}/python-env",
   ]){
     deleteDir()
     unstash 'source'

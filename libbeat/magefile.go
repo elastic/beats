@@ -26,6 +26,8 @@ import (
 
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 // Build builds the Beat binary.

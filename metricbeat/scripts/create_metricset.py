@@ -102,10 +102,10 @@ if __name__ == "__main__":
         print("Set default path for es_beats path: " + args.es_beats)
 
     if args.module is None or args.module == '':
-        args.module = raw_input("Module name: ")
+        args.module = input("Module name: ")
 
     if args.metricset is None or args.metricset == '':
-        args.metricset = raw_input("Metricset name: ")
+        args.metricset = input("Metricset name: ")
 
     path = os.path.abspath(args.path)
     metricbeat_path = os.path.abspath(args.es_beats + "/metricbeat")

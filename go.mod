@@ -27,6 +27,7 @@ require (
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
 	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
 	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
@@ -46,6 +47,7 @@ require (
 	github.com/dop251/goja v0.0.0-00010101000000-000000000000
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
+	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.4.0
 	github.com/elastic/go-libaudit v0.4.0
 	github.com/elastic/go-licenser v0.2.1
@@ -79,6 +81,7 @@ require (
 	github.com/googleapis/gnostic v0.3.1-0.20190624222214-25d8b0b66985 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20161205141322-d520615e531a
 	github.com/gorilla/mux v1.7.2 // indirect
+	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jcmturner/gofork v1.0.0 // indirect

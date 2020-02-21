@@ -18,6 +18,7 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
@@ -71,8 +72,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(awsConfig)
-		svcSQS := sqs.New(awsConfig)
+
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "sqs", regionName, awsConfig))
 
 		// Get queueUrls for each region
 		queueURLs, err := getQueueUrls(svcSQS)

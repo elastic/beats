@@ -84,7 +84,7 @@ func listenerProxyConfig(l net.Listener) *transport.ProxyConfig {
 func TestTransportReconnectsOnConnect(t *testing.T) {
 	certName := "ca_test"
 	timeout := 2 * time.Second
-	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
+	GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
 
 	testServer(t, timeout, certName, func(t *testing.T, server *MockServer) {
 		transp, err := server.Transp()
@@ -116,7 +116,7 @@ func TestTransportReconnectsOnConnect(t *testing.T) {
 func TestTransportFailConnectUnknownAddress(t *testing.T) {
 	timeout := 100 * time.Millisecond
 	certName := "ca_test"
-	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
+	GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
 
 	transports := map[string]TransportFactory{
 		"tcp": connectTCP(timeout),
@@ -159,7 +159,7 @@ func TestTransportFailConnectUnknownAddress(t *testing.T) {
 func TestTransportClosedOnWriteReadError(t *testing.T) {
 	certName := "ca_test"
 	timeout := 2 * time.Second
-	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
+	GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
 
 	testServer(t, timeout, certName, func(t *testing.T, server *MockServer) {
 		client, transp, err := server.ConnectPair()
