@@ -400,7 +400,14 @@ processors:
      if: "ctx._temp_.cisco.message_id == '338301'"
      field: "server.port"
      value: "{{source.port}}"
-
+ - dissect:
+     if: "ctx._temp_.cisco.message_id == '734001'"
+     field: "message"
+     pattern: "DAP: User %{user.email}, Addr %{source.ip}, Connection %{cisco.connection_type}: The following DAP records were selected for this connection: %{cisco.dap_records->}"
+ - split:
+     field: "cisco.dap_records"
+     separator: ",\\s+"
+     
 #
 # Handle 302xxx messages (Flow expiration a.k.a "Teardown")
 #

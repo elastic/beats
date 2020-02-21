@@ -4859,6 +4859,26 @@ type: short
 
 --
 
+*`cisco.asa.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.asa.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
+
+--
+
 [float]
 === ftd
 
@@ -5034,6 +5054,26 @@ type: short
 Raw fields for Security Events.
 
 type: object
+
+--
+
+*`cisco.ftd.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
 
 --
 
