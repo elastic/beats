@@ -1,0 +1,11 @@
+# Module: redis
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-redis.html
+
+- module: redis
+  metricsets:
+    - node
+  #  - proxy
+  period: 1m
+
+  # Metrics endpoint
+  hosts: ["https://127.0.0.1:8070/"]

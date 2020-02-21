@@ -1,3 +1,7 @@
+name: redis
+metricsets:
+  - node
+  - proxy
 dashboards:
-    - id: AV4YjZ5pux-M-tCAunxK
-      file: Metricbeat-redis-overview.json
+  - id: AV4YjZ5pux-M-tCAunxK
+    file: Metricbeat-redis-overview.json

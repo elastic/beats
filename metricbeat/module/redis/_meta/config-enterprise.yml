@@ -1,0 +1,8 @@
+- module: redis
+  metricsets:
+    - node
+  #  - proxy
+  period: 1m
+
+  # Metrics endpoint
+  hosts: ["https://127.0.0.1:8070/"]

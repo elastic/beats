@@ -1,0 +1,84 @@
+{
+    "@timestamp": "2020-02-21T08:25:46.123Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "metricset": {
+        "period": 60000,
+        "name": "node"
+    },
+    "service": {
+        "type": "redis",
+        "address": "127.0.0.1:8070"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "host": {
+        "hostname": "host",
+        "architecture": "x86_64",
+        "os": {
+            "family": "darwin",
+            "name": "Mac OS X",
+            "kernel": "18.7.0",
+            "build": "18G95",
+            "platform": "darwin",
+            "version": "10.14.6"
+        },
+        "name": "host",
+        "id": "24F065F8-4274-521D-8DD5-5D27557E15B4",
+        "ip": [
+            "fe80::aede:48ff:fe00:1122",
+            "fe80::1c05:593c:e271:97ed",
+            "192.168.0.14",
+            "fe80::488c:55ff:fe4e:3b46",
+            "fe80::def:1653:5676:ea4e",
+            "fe80::f191:956a:99ff:1b98",
+            "fe80::3128:a84c:7b38:e3a9"
+        ],
+        "mac": [
+            "ac:de:48:00:11:22",
+            "a6:83:e7:ae:70:01",
+            "a4:83:e7:ae:70:01",
+            "06:83:e7:ae:70:01"
+        ]
+    },
+    "agent": {
+        "ephemeral_id": "de3a043f-a71f-441e-b730-ca12a8f7fc49",
+        "hostname": "MacBook-Elastic.local",
+        "id": "993db589-f9d8-40f3-94cb-43b2b69fa9f4",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    },
+    "prometheus": {
+        "labels": {
+            "cluster": "cluster.local",
+            "node": "1",
+            "instance": "127.0.0.1:8070",
+            "job": "redis"
+        },
+        "metrics": {
+            "node_cpu_steal_median": 0,
+            "node_cpu_irqs_max": 0.001,
+            "node_cpu_user_min": 0.021,
+            "node_cpu_iowait_median": 0,
+            "node_cur_aof_rewrites": 0,
+            "node_ingress_bytes_min": 0,
+            "node_ingress_bytes_median": 0,
+            "node_cpu_idle_min": 0.929,
+            "node_cpu_iowait_max": 0,
+            "node_cpu_irqs": 0.0003333333333333333,
+            "node_available_memory": 6.262083584e+09,
+            "node_provisional_memory_no_overbooking": 4.757468584333e+09,
+            "node_cpu_idle": 0.9303333333333335,
+            "node_cpu_steal_max": 0
+        }
+    },
+    "event": {
+        "dataset": "redis.node",
+        "module": "redis",
+        "duration": 51870343
+    }
+}
