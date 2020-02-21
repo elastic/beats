@@ -8,7 +8,3 @@
       type: keyword
       description: >
         application pool name
-    - name: worker_processor_id
-      type: keyword
-      description: >
-        worker processor id

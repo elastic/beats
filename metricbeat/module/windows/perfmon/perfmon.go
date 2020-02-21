@@ -22,6 +22,8 @@ package perfmon
 import (
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -43,15 +45,13 @@ type Config struct {
 	IgnoreNECounters   bool            `config:"perfmon.ignore_non_existent_counters"`
 	GroupMeasurements  bool            `config:"perfmon.group_measurements_by_instance"`
 	CounterConfig      []CounterConfig `config:"perfmon.counters" validate:"required"`
-	GroupAllCountersTo string          `config:"perfmon.group_all_counter"` // only available for the iis/webserver metricset at the moment
-	// could be used in the future if any solutions are built for https://github.com/elastic/beats/issues/16366
-	//FilterByInstance   []string        `config:"perfmon.filter_by_instance"` // only available for the iis/webserver metricset at the moment
+	GroupAllCountersTo string          `config:"perfmon.group_all_counter"`
 }
 
 const metricsetName = "perfmon"
 
 func init() {
-	mb.Registry.MustAddMetricSet("windows", metricsetName, New)
+	mb.Registry.MustAddMetricSet("windows", metricsetName, New, mb.WithHostParser(parse.EmptyHostParser))
 }
 
 type MetricSet struct {
@@ -67,12 +67,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-	if metricsetName == base.Name() {
-		err := validateCounterConfig(config.CounterConfig)
-		if err != nil {
-			return nil, err
-		}
 	}
 	for _, value := range config.CounterConfig {
 		form := strings.ToLower(value.Format)
@@ -115,7 +109,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			return errors.Wrap(err, "failed retrieving counters")
 		}
 	}
-	events, err := m.reader.Read(m.BaseMetricSet.Name())
+	events, err := m.reader.Read()
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
@@ -135,16 +129,6 @@ func (m *MetricSet) Close() error {
 	err := m.reader.Close()
 	if err != nil {
 		return errors.Wrap(err, "failed to close pdh query")
-	}
-	return nil
-}
-
-// validateCounterConfig func will check if the instanceLabel has been set, the instance label is mandatory inside the pefrmon metricset
-func validateCounterConfig(counters []CounterConfig) error {
-	for _, counter := range counters {
-		if counter.InstanceLabel == "" {
-			return errors.Errorf("no instance label has been configured for query %s", counter.Query)
-		}
 	}
 	return nil
 }

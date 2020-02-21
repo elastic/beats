@@ -137,7 +137,7 @@ func (re *Reader) RefreshCounterPaths() error {
 }
 
 // Read executes a query and returns those values in an event.
-func (re *Reader) Read(metricset string) ([]mb.Event, error) {
+func (re *Reader) Read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := re.query.CollectData(); err != nil {
@@ -150,8 +150,8 @@ func (re *Reader) Read(metricset string) ([]mb.Event, error) {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event
-	// GroupAllCountersTo config option will only apply to the webserver metricset, where counters for all instances are aggregated
-	if metricsetName != metricset && re.config.GroupAllCountersTo != "" {
+	// GroupAllCountersTo config option where counters for all instances are aggregated and instance count is added in the event under the string value provided by this option.
+	if re.config.GroupAllCountersTo != "" {
 		event := re.groupToEvent(values)
 		events = append(events, event)
 	} else {

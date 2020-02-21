@@ -16955,16 +16955,6 @@ type: keyword
 
 --
 
-*`iis.application_pool.worker_processor_id`*::
-+
---
-worker processor id
-
-
-type: keyword
-
---
-
 *`iis.webserver.*.*`*::
 +
 --

@@ -55,7 +55,7 @@ type WorkerProcess struct {
 }
 
 var appPoolCounters = map[string]string{
-	"worker_process_id":                    "\\Process(w3wp*)\\ID Process",
+	"process.pid":                          "\\Process(w3wp*)\\ID Process",
 	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
 	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
 	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
@@ -215,7 +215,9 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	return filtered, nil
 }
 
-// getw3wpProceses func retrieves the running w3wp process ids. A worker process is a windows process (w3wp.exe) which runs Web applications, and is responsible for handling requests sent to a Web Server for a specific application pool.
+// getw3wpProceses func retrieves the running w3wp process ids.
+// A worker process is a windows process (w3wp.exe) which runs Web applications,
+// and is responsible for handling requests sent to a Web Server for a specific application pool.
 func getw3wpProceses() (map[int]string, error) {
 	processes, err := sysinfo.Processes()
 	if err != nil {

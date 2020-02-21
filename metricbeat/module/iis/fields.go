@@ -32,5 +32,5 @@ func init() {
 // AssetIis returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/iis.
 func AssetIis() string {
-	return "eJy0kktuwzAMRPc6xcDLAMkBtOhVDMVmAjayKUhKA9++UGW7/iNAUS68IAczzyLPeFCnwRwUEDla0iiYQ6GAmkLl2UWWVuNDAUg6NFI/LSnAkyUTSONK0SgF3JhsHfSP8ozWNDQ4p4qdI427l6frOxsBc5OpkXHOcmWSuHQidhRsOaea4/32N1NzHWQssaZo6TsbDEgP6l7i68XsAGABgQSxth9yX+If5EvnpaIQxJe8jPoDRjbHaI6J+QhA10D+i/zldDm98fQZR66fVMVJOzfKPL1ZMTvDsjHOcXvvlcWpeG+tI+bY3fwTjvQfR7W2Xt/S7iXtL/BwfX1m9vsOAAD//5CFBRA="
+	return "eJy0kbGOgzAQRHt/xYgSKfkAF/cryMAm2ovBlu1cxN+ffAYOiEE02YJidzTzzFzwoEGC2QsgcNAkUTD7QgAt+caxDWx6iS8BIOrQmfapSQCONClPEjUFJQRwY9Ktl3/KC3rV0eQcJwyWJO7OPO24yQSsTZZGylrNjYriyhqjZ0HOOc4a73+fTU1zkLHFWqLF7+owIT1oeBnXbm4HABsIRIi1/ZT5otqT+yF3La/liVcnIFN/UxMW67So0vWmjdo5Vp2ylvv7qCzK4twfnTHnbfYlHOgTfb5bv9e4W+J+hYcFjpnJ7zcAAP//navhqA=="
 }

@@ -12,9 +12,9 @@
             "net_clr" : {
                 "total_exceptions_thrown" : 0
             },
-            "worker_process_id" : 11956,
             "name" : "test.local",
             "process" : {
+                "pid" : 11956,
                 "thread_count" : 32,
                 "private_byte" : 3.4684928E7,
                 "handle_count" : 743,

@@ -51,7 +51,7 @@ type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
 
-// counter detail level
+// PerformanceDetailWizard is the counter detail level
 const PerformanceDetailWizard = 400
 
 // PdhCounterInfo struct contains the performance counter details
