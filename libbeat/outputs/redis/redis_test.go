@@ -10,86 +10,92 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type checker func(*testing.T, outputs.Group)
+
+func checks(cs ...checker) checker {
+	return func(t *testing.T, g outputs.Group) {
+		for _, c := range cs {
+			c(t, g)
+		}
+	}
+}
+
+func clientsLen(required int) checker {
+	return func(t *testing.T, group outputs.Group) {
+		assert.Len(t, group.Clients, required)
+	}
+}
+
+func clientPassword(index int, pass string) checker {
+	return func(t *testing.T, group outputs.Group) {
+		redisClient := group.Clients[index].(*backoffClient)
+		assert.Equal(t, redisClient.client.password, pass)
+	}
+}
+
 func TestMakeRedis(t *testing.T) {
-	tests := []struct {
-		Name                 string
-		Config               map[string]interface{}
-		Valid                bool
-		AdditionalValidation func(*testing.T, outputs.Group)
+	tests := map[string]struct {
+		config map[string]interface{}
+		valid  bool
+		checks checker
 	}{
-		{
-			"No host",
-			map[string]interface{}{
+		"no host": {
+			config: map[string]interface{}{
 				"hosts": []string{},
-			}, false,
-			nil,
+			},
 		},
-		{
-			"Invalid scheme",
-			map[string]interface{}{
+		"invald scheme": {
+			config: map[string]interface{}{
 				"hosts": []string{"redisss://localhost:6379"},
-			}, false,
-			nil,
+			},
 		},
-		{
-			"Single host",
-			map[string]interface{}{
+		"Single host": {
+			config: map[string]interface{}{
 				"hosts": []string{"localhost:6379"},
-			}, true,
-			func(t2 *testing.T, groups outputs.Group) {
-				assert.Len(t2, groups.Clients, 1)
-				redisClient := groups.Clients[0].(*backoffClient)
-				assert.Empty(t2, redisClient.client.password)
 			},
+			valid:  true,
+			checks: checks(clientsLen(1), clientPassword(0, "")),
 		},
-		{
-			"Multiple hosts",
-			map[string]interface{}{
+		"Multiple hosts": {
+			config: map[string]interface{}{
 				"hosts": []string{"redis://localhost:6379", "rediss://localhost:6380"},
-			}, true,
-			func(t2 *testing.T, groups outputs.Group) {
-				assert.Len(t2, groups.Clients, 2)
 			},
+			valid:  true,
+			checks: clientsLen(2),
 		},
-		{
-			"Default password",
-			map[string]interface{}{
+		"Default password": {
+			config: map[string]interface{}{
 				"hosts":    []string{"redis://localhost:6379"},
 				"password": "defaultPassword",
-			}, true,
-			func(t2 *testing.T, groups outputs.Group) {
-				assert.Len(t2, groups.Clients, 1)
-				redisClient := groups.Clients[0].(*backoffClient)
-				assert.Equal(t2, "defaultPassword", redisClient.client.password)
 			},
+			valid:  true,
+			checks: checks(clientsLen(1), clientPassword(0, "defaultPassword")),
 		},
-		{
-			"Specific and default password",
-			map[string]interface{}{
+		"Specific and default password": {
+			config: map[string]interface{}{
 				"hosts":    []string{"redis://localhost:6379", "rediss://:mypassword@localhost:6380"},
 				"password": "defaultPassword",
-			}, true,
-			func(t2 *testing.T, groups outputs.Group) {
-				assert.Len(t2, groups.Clients, 2)
-				redisClient := groups.Clients[0].(*backoffClient)
-				assert.Equal(t2, "defaultPassword", redisClient.client.password)
-				redisClient = groups.Clients[1].(*backoffClient)
-				assert.Equal(t2, "mypassword", redisClient.client.password)
 			},
+			valid: true,
+			checks: checks(
+				clientsLen(2),
+				clientPassword(0, "defaultPassword"),
+				clientPassword(1, "mypassword"),
+			),
 		},
 	}
 	beatInfo := beat.Info{Beat: "libbeat", Version: "1.2.3"}
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(test.Config)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := common.NewConfigFrom(test.config)
 			assert.NoError(t, err)
 			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg)
-			assert.Equal(t, err == nil, test.Valid)
-			if err != nil && test.Valid {
+			assert.Equal(t, err == nil, test.valid)
+			if err != nil && test.valid {
 				t.Log(err)
 			}
-			if test.AdditionalValidation != nil {
-				test.AdditionalValidation(t, groups)
+			if test.checks != nil {
+				test.checks(t, groups)
 			}
 		})
 	}
