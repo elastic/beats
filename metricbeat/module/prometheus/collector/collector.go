@@ -54,7 +54,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus     p.Prometheus
 	includeMetrics []*regexp.Regexp
-	ignoreMetrics  []*regexp.Regexp
+	excludeMetrics  []*regexp.Regexp
 }
 
 // New creates a new metricset
@@ -72,13 +72,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 	}
-	ms.ignoreMetrics, err = compilePatternList(config.MetricsFilters.IgnoreMetrics)
+	ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "unable to compile exclude patterns")
 	}
 	ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "unable to compile include patterns")
 	}
 
 	return ms, nil
@@ -199,7 +199,7 @@ func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error){
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}
