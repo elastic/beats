@@ -11,34 +11,10 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:56017",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "redis"
-        }
-    },
-    {
-        "event": {
-            "dataset": "redis.proxy",
-            "duration": 115000,
-            "module": "redis"
-        },
-        "metricset": {
-            "name": "proxy",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
                 "bdb": "1",
                 "cluster": "cluster.local",
                 "endpoint": "1:1",
-                "instance": "127.0.0.1:56017",
+                "instance": "127.0.0.1:58281",
                 "job": "redis",
                 "node": "1",
                 "port": "12000",
@@ -101,6 +77,30 @@
                 "listener_write_res_max": 0,
                 "listener_write_started_res": 0,
                 "listener_write_started_res_max": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "redis"
+        }
+    },
+    {
+        "event": {
+            "dataset": "redis.proxy",
+            "duration": 115000,
+            "module": "redis"
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:58281",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "up": 1
             }
         },
         "service": {
