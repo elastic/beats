@@ -18,8 +18,7 @@ module are `ccr`, `cluster_stats`, `index`, `index_recovery`, `index_summary`,
 [float]
 === Compatibility
 
-The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
-work with all 6.x versions.
+The Elasticsearch module works with Elasticsearch 6.7.0 and later.
 
 
 [float]
