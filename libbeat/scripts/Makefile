@@ -24,6 +24,8 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
+USE_VENDOR?=-mod=vendor
+export USE_VENDOR
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
 MAGE_IMPORT_PATH?=github.com/magefile/mage
 export MAGE_IMPORT_PATH
@@ -164,7 +166,7 @@ endif
 
 .PHONY: fmt
 fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@go install -mod=vendor $(GOIMPORTS_REPO)
+	@go install ${USE_VENDOR} $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name '*.py' -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
@@ -192,9 +194,9 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 prepare-tests: update-yacc-vendor
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go install -mod=vendor ${COVERAGE_TOOL_REPO}
+	go install ${USE_VENDOR} ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
-	go install -mod=vendor ${TESTIFY_TOOL_REPO}
+	go install ${USE_VENDOR} ${TESTIFY_TOOL_REPO}
 	# Avoid running yacc to generate a parser for dependency.
 	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
@@ -226,7 +228,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
 	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
-	  -e GOFLAGS=-mod=vendor \
+	  -e GOFLAGS=${USE_VENDOR} \
 	  beat make integration-tests
 
 # Runs the system tests
@@ -245,7 +247,7 @@ system-tests-environment: prepare-tests build-image
 		-e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} \
 		-e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 		-e PYTHON_EXE=${PYTHON_EXE} \
-		-e GOFLAGS=-mod=vendor \
+		-e GOFLAGS=${USE_VENDOR} \
 		beat make system-tests
 
 .PHONY: fast-system-tests
@@ -458,7 +460,7 @@ help_variables: ## @help Show Makefile customizable variables.
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
-	@go install -mod=vendor github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@go install ${USE_VENDOR} github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
 	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \

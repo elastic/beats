@@ -74,9 +74,9 @@ test-module: python-env update metricbeat.test
 
 .PHONY: assets
 assets:
-	go run -mod=vendor ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
+	go run ${USE_VENDOR} ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
-	go run -mod=vendor ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+	go run ${USE_VENDOR} ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
 
 .PHONY: integration-tests
 integration-tests: ## @testing Run golang integration tests.
