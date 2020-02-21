@@ -1,0 +1,18 @@
+{
+    "source": {
+      "ip": "1.2.3.4"
+    },
+    "user": {
+      "email": "firstname.lastname@domain.net"
+    },
+    "cisco": {
+      "connection_type": "AnyConnect",
+      "dap_records": [
+        "dap_1",
+        "dap_2"
+      ],
+      "asa": {
+        "message_id": "734001"
+      }
+    }
+}
