@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
@@ -42,6 +42,7 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
+	ackChannel   chan int
 }
 
 const (
@@ -66,14 +67,6 @@ func NewInput(
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "reading %s input config", inputName)
 	}
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
@@ -91,12 +84,30 @@ func NewInput(
 	input := &azureInput{
 		config:       config,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
-		outlet:       out,
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
-
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+		ACKEvents: func(privates []interface{}) {
+			for _, priv := range privates {
+				if msg, ok := priv.(*[]byte); ok {
+					input.ackChannel <- 0
+					_= msg
+					//msg.Ack()
+				} else {
+					input.log.Error("Failed ACKing azure-eventhub event")
+				}
+			}
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	input.outlet = out
 	input.log.Infof("Initialized %s input.", inputName)
 	return input, nil
 }
@@ -195,6 +206,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 				"message": msg,
 				"azure":   azure,
 			},
+			Private: event.Data,
 		})
 		if !ok {
 			return ok

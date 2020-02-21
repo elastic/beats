@@ -49,15 +49,17 @@ func (a *azureInput) runWithEPH() error {
 	// register a message handler -- many can be registered
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
+			var onEventErr error
 			// partitionID is not yet mapped in the azure-eventhub sdk
 			ok := a.processEvents(e, "")
 			if !ok {
-				onEventErr := errors.New("OnEvent function returned false. Stopping input worker")
+				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
 				a.log.Debug(onEventErr.Error())
 				a.Stop()
-				return onEventErr
 			}
-			return nil
+			x := <-a.ackChannel
+			_= x
+			return onEventErr
 		})
 	if err != nil {
 		return err
