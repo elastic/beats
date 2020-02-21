@@ -1,0 +1,7 @@
+# Module: crowdstrike
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-crowdstrike.html
+
+- module: crowdstrike
+  # Main logs
+  falcon:
+    enabled: false

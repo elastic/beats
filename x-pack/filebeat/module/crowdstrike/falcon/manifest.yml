@@ -1,0 +1,8 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/crowdstrike/falconhoseclient/output/*
+
+input: config/falcon.yml

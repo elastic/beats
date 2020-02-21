@@ -1,0 +1,9 @@
+- key: crowdstrike
+  title: "Crowdstrike"
+  description: >
+    Crowdstrike Module
+  fields:
+    - name: crowdstrike
+      type: group
+      description: >
+      fields:
