@@ -1,17 +1,16 @@
 :modulename: crowdstrike
 :has-dashboards: true
 
-== crowdstrike module
+== Crowdstrike module
 
-This is the crowdstrike module.
+This is the filebeat module for the Crowdstrike Falcon using the Falcon [SIEM connector](https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem/). By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format. This module collects this data, converts it to ECS, and ingests it to view in the SIEM.
 
 include::../include/what-happens.asciidoc[]
 
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
-
+This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
 
 include::../include/running-modules.asciidoc[]
 
@@ -25,7 +24,15 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`.
+
+["source","yaml",subs="attributes"]
+-----
+var:
+  - name: paths
+    default:
+      - /var/log/crowdstrike/falconhoseclient/output
+-----
 
 :fileset_ex: {fileset}
 
