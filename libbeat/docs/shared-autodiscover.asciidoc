@@ -315,22 +315,28 @@ configs are the same only one will actually run.
 
 This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys] for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and `secret_access_key` variables.
 
-These are the available fields during within config templating. The `elb_listener.*` fields will be available on each emitted event.
+These are the available fields during within config templating. The `aws.elb.*` fields will be available on each emitted event.
 
   * host
   * port
-  * elb_listener.listener_arn
-  * elb_listener.load_balancer_arn
-  * elb_listener.protocol
-  * elb_listener.type
-  * elb_listener.scheme
-  * elb_listener.availability_zones
-  * elb_listener.created
-  * elb_listener.state
-  * elb_listener.ip_address_type
-  * elb_listener.security_groups
-  * elb_listener.vpc_id
-  * elb_listener.ssl_policy
+
+  * cloud.availability_zone
+  * cloud.provider
+  * cloud.region
+
+  * aws.elb.listener_arn
+  * aws.elb.load_balancer_arn
+  * aws.elb.protocol
+  * aws.elb.type
+  * aws.elb.scheme
+  * aws.elb.availability_zones
+  * aws.elb.created
+  * aws.elb.state.code
+  * aws.elb.state.reason
+  * aws.elb.ip_address_type
+  * aws.elb.security_groups
+  * aws.elb.vpc_id
+  * aws.elb.ssl_policy
 
 include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
 
