@@ -70,11 +70,6 @@ type APIConfig struct {
 	// errors performing a request.
 	ErrorRetryInterval time.Duration `config:"error_retry_interval" validate:"positive"`
 
-	// LiveWindowSize defines the window of time [now-window, now) that will be
-	// used to poll for new events. If events are created outside of this window,
-	// they will be lost.
-	LiveWindowSize time.Duration `config:"live_window_size" validate:"positive"`
-
 	// LiveWindowPollInterval determines how often the input should poll for new
 	// data once it has finished scanning for past events and reached the live
 	// window.
@@ -88,6 +83,10 @@ type APIConfig struct {
 	// record is used as the document id for ingestion. This helps avoiding
 	// duplicates.
 	SetIDFromAuditRecord bool `config:"set_id_from_audit_record"`
+
+	// MaxQuerySize is the maximum time window that can be queried. The default
+	// is 24h.
+	MaxQuerySize time.Duration `config:"max_query_size" validate:"positive"`
 }
 
 func defaultConfig() Config {
@@ -122,7 +121,7 @@ func defaultConfig() Config {
 
 			LiveWindowPollInterval: time.Minute,
 
-			LiveWindowSize: timeDay,
+			MaxQuerySize: timeDay,
 
 			// According to the docs this is the max requests that are allowed
 			// per tenant per minute.

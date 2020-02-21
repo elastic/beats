@@ -51,12 +51,12 @@ func (l listBlob) adjustTimes(since time.Time) listBlob {
 	if since.Before(fromLimit) {
 		since = fromLimit
 	}
-	// Max query is 24h worth of events.
-	to := since.Add(timeDay)
+
+	to := since.Add(l.env.Config.MaxQuerySize)
 	// Can't query into the future. Polling for new events every interval.
 	var delay time.Duration
 	if to.After(now) {
-		since = now.Add(-l.env.Config.LiveWindowSize)
+		since = now.Add(-l.env.Config.MaxQuerySize)
 		if since.Before(l.cursor.timestamp) {
 			since = l.cursor.timestamp
 		}
