@@ -67,9 +67,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -98,6 +99,7 @@ metricbeat.modules:
     - state_service
     - state_persistentvolume
     - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -195,6 +197,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
 
+* <<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>>
+
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
@@ -234,6 +238,8 @@ include::kubernetes/state_resourcequota.asciidoc[]
 include::kubernetes/state_service.asciidoc[]
 
 include::kubernetes/state_statefulset.asciidoc[]
+
+include::kubernetes/state_storageclass.asciidoc[]
 
 include::kubernetes/system.asciidoc[]
 

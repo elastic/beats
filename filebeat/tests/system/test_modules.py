@@ -137,7 +137,7 @@ class Test(BaseTest):
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(" ".join(cmd) + "\n")
+        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
         # Use a fixed timezone so results don't vary depending on the environment
         # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
@@ -225,11 +225,15 @@ def clean_keys(obj):
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
     remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
-                        "system.auth", "system.syslog", "cef.log", "activemq.audit"}
+                        "system.auth", "system.syslog", "cef.log", "activemq.audit", "iptables.log", "cisco.asa", "cisco.ios"}
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),
-        ('system.auth', 'timestamp.log')
+        ('system.auth', 'timestamp.log'),
+        ('cisco.asa', 'asa.log'),
+        ('cisco.asa', 'hostnames.log'),
+        ('cisco.asa', 'not-ip.log'),
+        ('cisco.asa', 'sample.log')
     }
 
     # Keep source log filename for exceptions

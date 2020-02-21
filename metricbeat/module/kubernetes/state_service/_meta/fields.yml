@@ -28,10 +28,6 @@
     - name: ingress_hostname
       type: ip
       description: Ingress Hostname
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: Labels for service
     - name: created
       type: date
       description: Service creation date

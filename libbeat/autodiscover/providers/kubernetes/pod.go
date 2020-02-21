@@ -25,34 +25,31 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type pod struct {
-	uuid    uuid.UUID
-	config  *Config
-	metagen kubernetes.MetaGenerator
-	logger  *logp.Logger
-	publish func(bus.Event)
-	watcher kubernetes.Watcher
+	uuid             uuid.UUID
+	config           *Config
+	metagen          metadata.MetaGen
+	logger           *logp.Logger
+	publish          func(bus.Event)
+	watcher          kubernetes.Watcher
+	nodeWatcher      kubernetes.Watcher
+	namespaceWatcher kubernetes.Watcher
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
-	metagen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	logger := logp.NewLogger("autodiscover.pod")
 
 	config := defaultConfig()
-	err = cfg.Unpack(&config)
+	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +57,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		config.Node = kubernetes.DiscoverKubernetesNode(config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 	} else {
 		config.Node = ""
 	}
@@ -71,18 +68,52 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Node,
 		Namespace:   config.Namespace,
-	})
+	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
 	}
 
+	var nodeMeta, namespaceMeta metadata.MetaGen
+	var nodeWatcher, namespaceWatcher kubernetes.Watcher
+	metaConf := config.AddResourceMetadata
+	if metaConf != nil {
+		if metaConf.Node != nil && metaConf.Node.Enabled() {
+			options := kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+				Node:        config.Node,
+			}
+			if config.Namespace != "" {
+				options.Namespace = config.Namespace
+			}
+			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+			}
+
+			nodeMeta = metadata.NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
+		}
+
+		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
+			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			}
+
+			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+		}
+	}
+
 	p := &pod{
-		config:  config,
-		uuid:    uuid,
-		publish: publish,
-		metagen: metagen,
-		logger:  logger,
-		watcher: watcher,
+		config:           config,
+		uuid:             uuid,
+		publish:          publish,
+		metagen:          metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nodeMeta, namespaceMeta),
+		logger:           logger,
+		watcher:          watcher,
+		nodeWatcher:      nodeWatcher,
+		namespaceWatcher: namespaceWatcher,
 	}
 
 	watcher.AddEventHandler(p)
@@ -168,12 +199,33 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 
 // Start starts the eventer
 func (p *pod) Start() error {
+	if p.nodeWatcher != nil {
+		err := p.nodeWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
+	if p.namespaceWatcher != nil {
+		if err := p.namespaceWatcher.Start(); err != nil {
+			return err
+		}
+	}
+
 	return p.watcher.Start()
 }
 
 // Stop stops the eventer
 func (p *pod) Stop() {
 	p.watcher.Stop()
+
+	if p.namespaceWatcher != nil {
+		p.namespaceWatcher.Stop()
+	}
+
+	if p.nodeWatcher != nil {
+		p.nodeWatcher.Stop()
+	}
 }
 
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
@@ -231,7 +283,8 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.Name, c.Image)
+		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name),
+			metadata.WithFields("container.image", c.Image))
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()

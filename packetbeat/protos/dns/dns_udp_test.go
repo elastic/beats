@@ -68,6 +68,7 @@ var (
 		qType:   "A",
 		qName:   "elastic.co",
 		qEtld:   "elastic.co",
+		qTLD:    "co",
 		answers: []string{"54.148.130.30", "54.69.104.66"},
 		request: []byte{
 			0x21, 0x51, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65, 0x6c, 0x61,
@@ -90,6 +91,7 @@ var (
 		qType:   "IXFR",
 		qName:   "etas.com",
 		qEtld:   "etas.com",
+		qTLD:    "com",
 		answers: []string{"training2003p", "training2003p", "training2003p", "training2003p", "1.1.1.100"},
 		request: []byte{
 			0x40, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x04, 0x65, 0x74, 0x61,
@@ -118,15 +120,17 @@ var (
 	}
 
 	githubPtr = dnsTestMessage{
-		id:      344,
-		opcode:  "QUERY",
-		flags:   []string{"rd", "ra"},
-		rcode:   "NOERROR",
-		qClass:  "IN",
-		qType:   "PTR",
-		qName:   "131.252.30.192.in-addr.arpa",
-		qEtld:   "192.in-addr.arpa",
-		answers: []string{"github.com"},
+		id:         344,
+		opcode:     "QUERY",
+		flags:      []string{"rd", "ra"},
+		rcode:      "NOERROR",
+		qClass:     "IN",
+		qType:      "PTR",
+		qName:      "131.252.30.192.in-addr.arpa",
+		qEtld:      "192.in-addr.arpa",
+		qSubdomain: "131.252.30",
+		qTLD:       "in-addr.arpa",
+		answers:    []string{"github.com"},
 		authorities: []string{"a.root-servers.net", "b.root-servers.net", "c.root-servers.net",
 			"d.root-servers.net", "e.root-servers.net", "f.root-servers.net", "g.root-servers.net",
 			"h.root-servers.net", "i.root-servers.net", "j.root-servers.net", "k.root-servers.net",
@@ -169,6 +173,10 @@ var (
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
 			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net",
 		qEtld: "sophosxl.net",
+		qSubdomain: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
+			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
+			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac",
+		qTLD: "net",
 		request: []byte{
 			0x20, 0x2e, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33, 0x3f, 0x31,
 			0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34, 0x71, 0x70,
@@ -206,15 +214,17 @@ var (
 	}
 
 	ednsSecA = dnsTestMessage{
-		id:      20498,
-		opcode:  "QUERY",
-		flags:   []string{"rd", "ad", "ra"},
-		rcode:   "NOERROR",
-		qClass:  "IN",
-		qType:   "A",
-		qName:   "www.ietf.org",
-		qEtld:   "ietf.org",
-		answers: []string{"64.170.98.30", "iDA8bJnrAEz3jgYnyFRm567a76qlv1V0CqxOSd/o9nvnN0GlZLaVoDmuXpaIaoypbGxwzwgK/LY6CV2k6SWKwicBmpENL26hwyjkFzPDW8kX3ibFhtfsOb8pYe7nBj326actp/7iG+DRuDmPnkYBja+wDYk61doTtkqZg57fn3iS97tjNPCC9C9knRAuDYUG+dVxalazSwYrpvY97dUC1H2spD0g4UdDyCbGA46mouZ4GPzNMewgf948qxrnU8pWPk3nQW5TgLVkGoWgco2owfLElBqf6rJ4LOswuhaw8IpTtmw3FsixxTLQvKOE5nftd1nMhQQd9CaHjoKNAUEz5Q=="},
+		id:         20498,
+		opcode:     "QUERY",
+		flags:      []string{"rd", "ad", "ra"},
+		rcode:      "NOERROR",
+		qClass:     "IN",
+		qType:      "A",
+		qName:      "www.ietf.org",
+		qEtld:      "ietf.org",
+		qTLD:       "org",
+		qSubdomain: "www",
+		answers:    []string{"64.170.98.30", "iDA8bJnrAEz3jgYnyFRm567a76qlv1V0CqxOSd/o9nvnN0GlZLaVoDmuXpaIaoypbGxwzwgK/LY6CV2k6SWKwicBmpENL26hwyjkFzPDW8kX3ibFhtfsOb8pYe7nBj326actp/7iG+DRuDmPnkYBja+wDYk61doTtkqZg57fn3iS97tjNPCC9C9knRAuDYUG+dVxalazSwYrpvY97dUC1H2spD0g4UdDyCbGA46mouZ4GPzNMewgf948qxrnU8pWPk3nQW5TgLVkGoWgco2owfLElBqf6rJ4LOswuhaw8IpTtmw3FsixxTLQvKOE5nftd1nMhQQd9CaHjoKNAUEz5Q=="},
 		request: []byte{
 			0x50, 0x12, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x77, 0x77, 0x77,
 			0x04, 0x69, 0x65, 0x74, 0x66, 0x03, 0x6f, 0x72, 0x67, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,

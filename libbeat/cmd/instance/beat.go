@@ -518,7 +518,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			fmt.Println("Index setup finished.")
 		}
 
-		if setup.Dashboard {
+		if setup.Dashboard && settings.HasDashboards {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
 
@@ -889,6 +889,11 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 	}
 
 	if monitoring.IsEnabled(monitoringCfg) {
+		err := monitoring.OverrideWithCloudSettings(monitoringCfg)
+		if err != nil {
+			return nil, err
+		}
+
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			Format:          reporterSettings.Format,

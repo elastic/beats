@@ -31,10 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const eventDebugSelector = "event"
-
-var eventDebugf = logp.MakeDebug(eventDebugSelector)
-
 var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
 
 type Float float64
@@ -46,12 +42,14 @@ type EventConverter interface {
 
 // GenericEventConverter is used to normalize MapStr objects for publishing
 type GenericEventConverter struct {
+	log      *logp.Logger
 	keepNull bool
 }
 
 // NewGenericEventConverter creates an EventConverter with the given configuration options
 func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 	return &GenericEventConverter{
+		log:      logp.NewLogger("event"),
 		keepNull: keepNull,
 	}
 }
@@ -64,7 +62,7 @@ func (e *GenericEventConverter) Convert(m MapStr) MapStr {
 	keys := make([]string, 0, 10)
 	event, errs := e.normalizeMap(m, keys...)
 	if len(errs) > 0 {
-		logp.Warn("Unsuccessful conversion to generic event: %v errors: %v, "+
+		e.log.Warnf("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
 	}
 	return event
@@ -85,8 +83,8 @@ func (e *GenericEventConverter) normalizeMap(m MapStr, keys ...string) (MapStr, 
 
 		// Drop nil values from maps.
 		if !e.keepNull && v == nil {
-			if logp.IsDebug(eventDebugSelector) {
-				eventDebugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
+			if e.log.IsDebug() {
+				e.log.Debugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
 			}
 			continue
 		}

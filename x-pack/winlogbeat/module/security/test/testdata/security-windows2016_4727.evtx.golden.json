@@ -12,12 +12,14 @@
       "domain": "WLBEAT",
       "name": "DnsUpdateProxy"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A security-enabled global group was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x27438\n\nNew Group:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1110\n\tGroup Name:\t\tDnsUpdateProxy\n\tGroup Domain:\t\tWLBEAT\n\nAttributes:\n\tSAM Account Name:\tDnsUpdateProxy\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "WIN-41OB2LO92CR$"
     },
     "user": {
       "domain": "WLBEAT",

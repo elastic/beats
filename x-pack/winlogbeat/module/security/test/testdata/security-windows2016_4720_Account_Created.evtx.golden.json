@@ -14,13 +14,16 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1005\n\tAccount Name:\t\telastictest1\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\telastictest1\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": [
+        "Administrator",
+        "elastictest1"
+      ]
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
-      "name": "elastictest1"
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -34,7 +37,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
+        "NewUacList": [
           "SCRIPT",
           "LOCKOUT"
         ],
@@ -98,13 +101,16 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nNew Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\nAttributes:\n\tSAM Account Name:\taudittest0609\n\tDisplay Name:\t\t\u003cvalue not set\u003e\n\tUser Principal Name:\t-\n\tHome Directory:\t\t\u003cvalue not set\u003e\n\tHome Drive:\t\t\u003cvalue not set\u003e\n\tScript Path:\t\t\u003cvalue not set\u003e\n\tProfile Path:\t\t\u003cvalue not set\u003e\n\tUser Workstations:\t\u003cvalue not set\u003e\n\tPassword Last Set:\t\u003cnever\u003e\n\tAccount Expires:\t\t\u003cnever\u003e\n\tPrimary Group ID:\t513\n\tAllowed To Delegate To:\t-\n\tOld UAC Value:\t\t0x0\n\tNew UAC Value:\t\t0x15\n\tUser Account Control:\t\n\t\tAccount Disabled\n\t\t'Password Not Required' - Enabled\n\t\t'Normal Account' - Enabled\n\tUser Parameters:\t\u003cvalue not set\u003e\n\tSID History:\t\t-\n\tLogon Hours:\t\tAll\n\nAdditional Information:\n\tPrivileges\t\t-",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": [
+        "Administrator",
+        "audittest0609"
+      ]
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
-      "name": "audittest0609"
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -118,7 +124,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
+        "NewUacList": [
           "SCRIPT",
           "LOCKOUT"
         ],

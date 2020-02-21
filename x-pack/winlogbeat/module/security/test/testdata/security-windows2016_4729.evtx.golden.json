@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-10-22T11:33:45.5433159Z",
     "event": {
-      "action": "deleted-group-account-from",
+      "action": "removed-member-from-group",
       "code": 4729,
       "kind": "event",
       "module": "security",
@@ -12,12 +12,14 @@
       "domain": "WLBEAT",
       "name": "test_group2v2"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A member was removed from a security-enabled global group.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nMember:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tCN=Administrator,CN=Users,DC=wlbeat,DC=local\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1112\n\tGroup Name:\t\ttest_group2v2\n\tGroup Domain:\t\tWLBEAT\n\nAdditional Information:\n\tPrivileges:\t\t-",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   traefik:
-    image: docker.elastic.co/observability-ci/beats-integration-traefik:${TRAEFIK_VERSION:-1.6}-1
+    image: docker.elastic.co/integrations-ci/beats-traefik:${TRAEFIK_VERSION:-1.6}-1
     build:
       context: ./_meta
       args:

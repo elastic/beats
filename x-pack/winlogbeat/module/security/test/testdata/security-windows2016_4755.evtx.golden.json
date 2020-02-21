@@ -12,12 +12,14 @@
       "domain": "WLBEAT",
       "name": "Test_group3v2"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
     "log": {
       "level": "information"
     },
-    "message": "A security-enabled universal group was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1113\n\tGroup Name:\t\tTest_group3v2\n\tGroup Domain:\t\tWLBEAT\n\nChanged Attributes:\n\tSAM Account Name:\t-\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

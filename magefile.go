@@ -24,10 +24,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/generator/common/beatgen"
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
+
+	"github.com/elastic/beats/generator/common/beatgen"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/gotool"
@@ -37,7 +38,6 @@ var (
 	// BeatsWithDashboards is a list of Beats to collect dashboards from.
 	BeatsWithDashboards = []string{
 		"heartbeat",
-		"journalbeat",
 		"packetbeat",
 		"winlogbeat",
 		"x-pack/auditbeat",

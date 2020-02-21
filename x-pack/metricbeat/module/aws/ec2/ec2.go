@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
@@ -91,7 +91,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcEC2 := ec2.New(awsConfig)
+
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "ec2", regionName, awsConfig))
+
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -100,7 +103,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
 		namespace := "AWS/EC2"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
@@ -131,7 +136,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// Create Cloudwatch Events for EC2
 			events, err := m.createCloudWatchEvents(metricDataOutput, instancesOutputs, regionName)
-
 			if err != nil {
 				m.Logger().Error(err.Error())
 				report.Error(err)
@@ -201,8 +205,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					}
 				}
 
+				// By default, replace dot "." using under bar "_" for tag keys and values
 				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()

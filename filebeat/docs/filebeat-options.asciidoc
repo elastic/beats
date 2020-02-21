@@ -51,9 +51,11 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-docker>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-syslog>>
+* <<{beatname_lc}-input-mqtt>>
 * <<{beatname_lc}-input-s3>>
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-azure-eventhub>>
 
 
 include::inputs/input-log.asciidoc[]
@@ -74,8 +76,12 @@ include::inputs/input-tcp.asciidoc[]
 
 include::inputs/input-syslog.asciidoc[]
 
+include::inputs/input-mqtt.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]

@@ -1,0 +1,4 @@
+type: http
+url: "/metrics"
+suffix: plain
+remove_fields_from_comparison: ["prometheus.labels.instance"]

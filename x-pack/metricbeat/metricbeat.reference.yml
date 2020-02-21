@@ -73,12 +73,13 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
@@ -131,6 +132,9 @@ metricbeat.modules:
   # Diskio configurations
   #diskio.include_devices: []
 
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
+
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
   metricsets: ['broker', 'queue', 'topic']
@@ -139,36 +143,6 @@ metricbeat.modules:
   path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
   username: admin # default username
   password: admin # default password
-  processors:
-    - script:
-        lang: javascript
-        source: >
-          function process(event) {
-            var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
-            if (broker_memory_broker_pct != null) {
-              event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
-            }
-
-            var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
-            if (broker_memory_temp_pct != null) {
-              event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
-            }
-
-            var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
-            if (broker_memory_store_pct != null) {
-              event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
-            }
-
-            var queue_memory_broker_pct = event.Get("activemq.queue.memory.broker.pct")
-            if (queue_memory_broker_pct != null) {
-              event.Put("activemq.queue.memory.broker.pct", queue_memory_broker_pct / 100.0)
-            }
-
-            var topic_memory_broker_pct = event.Get("activemq.topic.memory.broker.pct")
-            if (topic_memory_broker_pct != null) {
-              event.Put("activemq.topic.memory.broker.pct", topic_memory_broker_pct / 100.0)
-            }
-          }
 
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
@@ -274,6 +248,16 @@ metricbeat.modules:
 - module: azure
   metricsets:
   - compute_vm_scaleset
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - storage
   enabled: true
   period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
@@ -423,6 +407,16 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
+#------------------------ Google Cloud Platform Module ------------------------
+- module: googlecloud
+  metricsets:
+    - compute
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
+
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
   metricsets: ["server"]
@@ -482,6 +476,52 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+#-------------------------------- IBM MQ Module --------------------------------
+- module: ibmmq
+  metricsets: ['qmgr']
+  period: 10s
+  hosts: ['localhost:9157']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
+#-------------------------------- Istio Module --------------------------------
+# Istio mesh. To collect all Mixer-generated metrics
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio galley. To collect all Galley-generated metrics
+- module: istio
+  metricsets: ["galley"]
+  period: 10s
+  # use istio-galley.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio pilot. To collect all Pilot-generated metrics.
+- module: istio
+  metricsets: ["pilot"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio citadel. To collect all Citadel-generated metrics.
+- module: istio
+  metricsets: ["citadel"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -587,9 +627,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -618,6 +659,7 @@ metricbeat.modules:
     - state_service
     - state_persistentvolume
     - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -860,7 +902,7 @@ metricbeat.modules:
   #password: "secret"
 
   # This can be used for service account based authorization:
-  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
@@ -915,12 +957,11 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
-
+  sql_response_format: table
 
 #--------------------------------- Stan Module ---------------------------------
 - module: stan
@@ -1196,8 +1237,7 @@ metricbeat.modules:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1366,9 +1406,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -1391,6 +1431,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1458,9 +1504,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1484,6 +1530,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1631,9 +1683,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -1743,9 +1795,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1941,7 +1993,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1968,7 +2019,7 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'metricbeat-%{[agent.version]}'.
+# 'metricbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
@@ -2012,9 +2063,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -2188,9 +2239,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -2217,6 +2268,14 @@ logging.files:
 
   #metrics.period: 10s
   #state.period: 1m
+
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
