@@ -40,6 +40,35 @@ var ciscoIOS = (function() {
     accessListMessagePatterns.ACCESSLOGDP = accessListMessagePatterns.IPACCESSLOGDP;
     accessListMessagePatterns.ACCESSLOGNP = accessListMessagePatterns.IPACCESSLOGNP;
 
+
+    var ciscoLogPatterns = {
+        "SSH" : {
+            "SSH2_UNEXPECTED_MSG": newDissect("Unexpected message type has arrived. Terminating the connection from %{source.address}"),
+        },
+        "SEC": accessListMessagePatterns,
+        "FMANFP": accessListMessagePatterns,
+        "SEC_LOGIN": {
+            "LOGIN_SUCCESS": newDissect("Login Success [user: %{user.name}] [Source: %{source.address}] [localport: %{source.port}] at %{}"),
+        },
+        "SYS": {
+            "LOGOUT": newDissect("User %{user.name} has exited tty session %{cisco.tty_session_id}(%{source.address})"),
+            "CONFIG_I": newDissect("Configured from %{cisco.comfig_source} by %{user.name} on %{cisco.terminal} (%{source.address})"),
+        },
+        "LINK":  {
+            "UPDOWN": newDissect("Interface %{interface.name}, changed state to %{interface.state}"),
+        },
+        "LINEPROTO": {
+            "UPDOWN": newDissect("Line protocol on Interface %{source.interface.name}, changed state to %{source.interface.state}"),
+        },
+        "CDP": {
+            "NATIVE_VLAN_MISMATCH": newDissect("Native VLAN mismatch discovered on %{source.interface.name} (%{source.interface.vlan}), with %{destination.address} %{destination.interface.name} (%{destination.interface.vlan})."),
+            "DUPLEX_MISMATCH": newDissect("duplex mismatch discovered on %{source.interface.name} (%{source.interface.name}), with %{destination.address} %{destination.interface.name} (%{destination.interface.duplex})."),
+        },
+        "IP": {
+            "DUPADDR": newDissect("Duplicate address %{source.address} on %{source.interface.name}, sourced by %{source.mac}")
+        }
+    }; 
+
     var setLogLevel = function(evt) {
         var severity = evt.Get("event.severity");
 
@@ -109,6 +138,7 @@ var ciscoIOS = (function() {
                 layouts: [
                     'Jan _2 15:04:05.999',
                     'Jan _2 15:04:05.999 MST',
+                    'Jan _2 2020 15:04:05.999 MST',
                 ],
                 ignore_missing: true,
             }).Run(evt);
@@ -137,23 +167,39 @@ var ciscoIOS = (function() {
             ],
         })
         .Add(setLogLevel)
-        // Use a specific dissect pattern based on the event.code.
+        
         .Add(function(evt) {
-            var eventCode = evt.Get("event.code");
-            if (!eventCode) {
+            
+            var facility = evt.Get("cisco.ios.facility");
+            if (!facility) {
                 return;
             }
-
-            var dissect = accessListMessagePatterns[eventCode];
-            if (dissect) {
-                dissect(evt);
-                coerceNumbers(evt);
-                normalizeEventOutcome(evt);
-                setNetworkType(evt);
-                setRelatedIP(evt);
-                evt.Put("event.category", "network_traffic");
-                evt.Put("event.type", "firewall");
+            var facility_patterns = ciscoLogPatterns[facility]
+            // If no patterns for this facility then return
+            if (!facility_patterns) {
                 return;
+            }else{
+                var eventCode = evt.Get("event.code");
+                if (!eventCode) {
+                    return;
+                }
+                // Use a specific dissect pattern based on the event.code.
+                var dissect = facility_patterns[eventCode];
+                if (dissect) {
+                    dissect(evt);
+                    coerceNumbers(evt);
+                    normalizeEventOutcome(evt);
+                    setNetworkType(evt);
+                    setRelatedIP(evt);
+                    evt.AppendTo("tags", "cisco-ios-dissect");
+                    return;
+                }
+    
+                // Add Special Case for Access Logs so they can be treated like firewall rules
+                if (eventCode =~ "ACCESS") {
+                    evt.Put("event.category", "network_traffic");
+                    evt.Put("event.type", "firewall");
+                }
             }
         })
         .CommunityID()
@@ -176,6 +222,9 @@ var ciscoIOS = (function() {
 
     var normalizeEventOutcome = function(evt) {
         var outcome = evt.Get("event.outcome");
+        if (!outcome) {
+            return;
+        }
         switch (outcome) {
             case "denied":
                 evt.Put("event.outcome", "deny");
@@ -200,8 +249,15 @@ var ciscoIOS = (function() {
     };
 
     var setRelatedIP = function(event) {
-        event.AppendTo("related.ip", event.Get("source.ip"));
-        event.AppendTo("related.ip", event.Get("destination.ip"));
+        var src_ip = event.Get("source.ip");
+        if (src_ip) {
+            event.AppendTo("related.ip", src_ip);
+        }
+
+        var dst_ip = event.Get("destination.ip");
+        if (dst_ip) {
+            event.AppendTo("related.ip", dst_ip);
+        }
     };
 
     return {
