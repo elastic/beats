@@ -85,23 +85,42 @@ func TestPublishListTLS(t *testing.T) {
 	testPublishList(t, redisConfig)
 }
 
-func TestPublishListMultipleHosts(t *testing.T) {
-	key := "test_publish_tls"
-	db := 0
-	redisConfig := map[string]interface{}{
-		"hosts":    []string{"rediss://" + getSRedisAddr(), "redis://" + getRedisAddr()},
-		"key":      key,
-		"db":       db,
-		"datatype": "list",
-		"timeout":  "5s",
+func TestWithSchema(t *testing.T) {
+	redisURL := "redis://" + getRedisAddr()
+	sredisURL := "rediss://" + getSRedisAddr()
 
-		"ssl.verification_mode": "full",
-		"ssl.certificate_authorities": []string{
-			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
+	cases := map[string]struct {
+		host string
+	}{
+		"redis ignores ssl settings": {
+			host: redisURL,
+		},
+		"sredis schema sends via tls": {
+			host: sredisURL,
 		},
 	}
 
-	testPublishList(t, redisConfig)
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			key := "test_publish_tls"
+			db := 0
+			redisConfig := map[string]interface{}{
+				"hosts":    []string{test.host},
+				"key":      key,
+				"db":       db,
+				"datatype": "list",
+				"timeout":  "5s",
+
+				"ssl.verification_mode": "full",
+				"ssl.certificate_authorities": []string{
+					"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
+				},
+			}
+
+			testPublishList(t, redisConfig)
+		})
+	}
+
 }
 
 func testPublishList(t *testing.T, cfg map[string]interface{}) {
