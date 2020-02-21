@@ -10,6 +10,8 @@ var ciscoIOS = (function() {
             "tokenizer": pattern,
             "field": "message",
             "target_prefix": "",
+            "ignore_failure" : true,
+            "ignore_missing": true
         }).Run;
     };
 
@@ -20,7 +22,10 @@ var ciscoIOS = (function() {
             "ADJCHANGE": newDissect("neighbor %{destination.address} %{} vpn vrf %{cisco.vrf} topology base removed from session %{}"),
         },
         "BGP" : {
-            "ADJCHANGE": newDissect("neighbor %{destination.address} vpn vrf %{cisco.vrf} %{cisco.bgp.state} %{}"),
+            "ADJCHANGE": [
+                        newDissect("neighbor %{destination.address} vpn vrf %{cisco.vrf} %{cisco.bgp.state} %{}"),
+                        newDissect("neighbor %{destination.address} %{cisco.bgp.state->}"),
+                ],
             "NBR_RESET": newDissect("Neighbor %{destination.address} reset (%{})"),
         },
         //c
@@ -36,7 +41,7 @@ var ciscoIOS = (function() {
         },
         //D
         "DUAL" : {
-            "NBRCHANGE": newDissect("EIGRP-IPv4 %{}: Neighbor %{destination.address} (%{destination.interface.name}) is %{destination.interface.state}: Interface PEER-TERMINATION received"),
+            "NBRCHANGE": newDissect("EIGRP-IPv4 %{}: Neighbor %{destination.address} (%{destination.interface.name}) is %{destination.interface.state}: %{cisco.reason}"),
         },
         //E
         //F
@@ -44,7 +49,7 @@ var ciscoIOS = (function() {
         //G
         //H
         "HSRP" : {
-            "DIFFVIP1": newDissect("%{source.interface.name} Grp %{cisco.hsrp.group} active routers virtual IP address %{cisco.hsrp.vip} is different to the locally configured address %{source.address}1"),
+            "DIFFVIP1": newDissect("%{source.interface.name} Grp %{cisco.hsrp.group} active routers virtual IP address %{cisco.hsrp.vip} is different to the locally configured address %{source.address}"),
             "STATECHANGE": newDissect("%{source.interface.name} Grp %{cisco.hsrp.group} state %{cisco.hsrp.state}"),
         },
         //I
@@ -91,7 +96,11 @@ var ciscoIOS = (function() {
             "SSH2_UNEXPECTED_MSG": newDissect("Unexpected message type has arrived. Terminating the connection from %{source.address}"),
         },
         "SYS": {
-            "CONFIG_I": newDissect("Configured from %{cisco.terminal} by %{user.name} on %{cisco.terminal} (%{source.address})"),
+            "CONFIG_I": [
+                        newDissect("Configured from %{cisco.terminal} by %{user.name} on %{cisco.terminal} (%{source.address})"),
+                        newDissect("Configured from %{cisco.terminal} by %{user.name} on %{cisco.terminal}"),
+                        newDissect("Configured from %{cisco.terminal} by console (%{source.address})"),
+            ],
             "LOGOUT": newDissect("User %{user.name} has exited tty session %{cisco.tty_session_id}(%{source.address})"),
         },
         //T
@@ -101,8 +110,8 @@ var ciscoIOS = (function() {
         //X
         //Y
         //Z
-    }; 
-            
+    };
+
     ciscoLogPatterns.SEC.ACCESSLOGP = ciscoLogPatterns.SEC.IPACCESSLOGP;
     ciscoLogPatterns.SEC.ACCESSLOGSP = ciscoLogPatterns.SEC.IPACCESSLOGSP;
     ciscoLogPatterns.SEC.ACCESSLOGDP = ciscoLogPatterns.SEC.IPACCESSLOGDP;
@@ -207,9 +216,9 @@ var ciscoIOS = (function() {
             ],
         })
         .Add(setLogLevel)
-        
+
         .Add(function(evt) {
-            
+
             var facility = evt.Get("cisco.ios.facility");
             if (!facility) {
                 return;
@@ -223,10 +232,28 @@ var ciscoIOS = (function() {
                 if (!eventCode) {
                     return;
                 }
+
+                //Odd case for IPACCESSLOGP:fman_fp_image needs handling
+                //if (eventCode =~ "\:fman_fp_image") {
+                //    eventCode = eventCode.replace('\:fman_fp_image','')
+                //}
                 // Use a specific dissect pattern based on the event.code.
                 var dissect = facility_patterns[eventCode];
                 if (dissect) {
-                    dissect(evt);
+                    if (Array.isArray(dissect)) {
+                        var pattern_count = dissect.length;
+                        for (var i = 0; i < pattern_count; i++) {
+                                var dissect_fn = dissect[i];
+                                dissect_fn(evt);
+                                var err = evt.Get("error.message");
+                                // It has Worked so Breakout
+                                if (!err) {
+                                  break;
+                                }
+                        }
+                    } else {
+                           dissect(evt);
+                    }
                     coerceNumbers(evt);
                     coerceIPs(evt);
                     normalizeEventOutcome(evt);
@@ -235,7 +262,7 @@ var ciscoIOS = (function() {
                     evt.AppendTo("tags", "cisco-ios-dissect");
                     return;
                 }
-    
+
                 // Add Special Case for Access Logs so they can be treated like firewall rules
                 if (eventCode =~ "ACCESS") {
                     evt.Put("event.category", "network_traffic");
@@ -266,9 +293,9 @@ var ciscoIOS = (function() {
             {from: "source.address", to: "source.ip", type: "ip"},
         ],
         ignore_missing: true,
-        ignore_failure: true
+        fail_on_error: false,
     }).Run;
-    
+
     var normalizeEventOutcome = function(evt) {
         var outcome = evt.Get("event.outcome");
         if (!outcome) {
