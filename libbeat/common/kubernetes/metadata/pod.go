@@ -50,7 +50,7 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 
 	out := p.resource.Generate("pod", obj, opts...)
 	// TODO: remove this call when moving to 8.0
-	out = p.fixLabels(out)
+	out = p.exportPodLabels(out)
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName)
@@ -92,7 +92,7 @@ func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr 
 	return nil
 }
 
-func (p *pod) fixLabels(in common.MapStr) common.MapStr {
+func (p *pod) exportPodLabels(in common.MapStr) common.MapStr {
 	labels, err := in.GetValue("pod.labels")
 	if err != nil {
 		return in
