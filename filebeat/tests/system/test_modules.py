@@ -193,7 +193,6 @@ class Test(BaseTest):
             ev = expected[idx]
             obj = objects[idx]
 
-
             # Flatten objects for easier comparing
             obj = self.flatten_object(obj, {}, "")
             clean_keys(obj)
@@ -202,6 +201,7 @@ class Test(BaseTest):
             d = DeepDiff(ev, obj, ignore_order=True)
 
             assert len(d) == 0, "The following expected object doesn't match:\n Diff: \n {}".format(d, obj)
+
 
 def clean_keys(obj):
     # These keys are host dependent
