@@ -33,7 +33,7 @@ var ciscoIOS = (function() {
         },
         "CRYPTO" : {
             "RECVD_PKT_INV_SPI": newDissect("decaps: rec'd IPSEC packet has invalid spi for destaddr=%{destination.address}, prot=%{cisco.prot}, spi=%{}, srcaddr=%{source.address}, input interface=%{source.interface.name}"),
-        }
+        },
         //D
         "DUAL" : {
             "NBRCHANGE": newDissect("EIGRP-IPv4 %{}: Neighbor %{destination.address} (%{destination.interface.name}) is %{destination.interface.state}: Interface PEER-TERMINATION received"),
@@ -69,24 +69,20 @@ var ciscoIOS = (function() {
         //S
         "SEC": {
             "IPACCESSLOGP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
-            "%{network.transport} %{source.address}(%{source.port}) -> " +
-            "%{destination.address}(%{destination.port}), %{source.packets} packet"),
-
-        "IPACCESSLOGDP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
-            "%{network.transport} %{source.address} -> " +
-            "%{destination.address} (%{icmp.type}/%{icmp.code}), %{source.packets} packet"),
-
-        "IPACCESSLOGRP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
-            "%{network.transport} %{source.address} -> " +
-            "%{destination.address}, %{source.packets} packet"),
-
-        "IPACCESSLOGSP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
-            "%{network.transport} %{source.address} -> " +
-            "%{destination.address} (%{igmp.type}), %{source.packets} packet"),
-
-        "IPACCESSLOGNP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
-            "%{network.iana_number} %{source.address} -> " +
-            "%{destination.address}, %{source.packets} packet"),
+                "%{network.transport} %{source.address}(%{source.port}) -> " +
+                "%{destination.address}(%{destination.port}), %{source.packets} packet"),
+            "IPACCESSLOGDP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
+                "%{network.transport} %{source.address} -> " +
+                "%{destination.address} (%{icmp.type}/%{icmp.code}), %{source.packets} packet"),
+            "IPACCESSLOGRP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
+                "%{network.transport} %{source.address} -> " +
+                "%{destination.address}, %{source.packets} packet"),
+            "IPACCESSLOGSP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
+                "%{network.transport} %{source.address} -> " +
+                "%{destination.address} (%{igmp.type}), %{source.packets} packet"),
+            "IPACCESSLOGNP": newDissect("list %{cisco.ios.access_list} %{event.outcome} " +
+                "%{network.iana_number} %{source.address} -> " +
+                "%{destination.address}, %{source.packets} packet"),
         },
         "SEC_LOGIN": {
             "LOGIN_SUCCESS": newDissect("Login Success [user: %{user.name}] [Source: %{source.address}] [localport: %{source.port}] at %{}"),
