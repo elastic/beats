@@ -203,6 +203,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
 - Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
+- Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 
 *Heartbeat*
 
