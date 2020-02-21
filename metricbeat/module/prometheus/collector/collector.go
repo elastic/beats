@@ -54,7 +54,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus     p.Prometheus
 	includeMetrics []*regexp.Regexp
-	excludeMetrics  []*regexp.Regexp
+	excludeMetrics []*regexp.Regexp
 }
 
 // New creates a new metricset
@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, family := range families {
-		if m.skipFamily(family){
+		if m.skipFamily(family) {
 			continue
 		}
 		promEvents := getPromEventsFromMetricFamily(family)
@@ -178,7 +178,7 @@ func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
 	}
 
 	// if include_metrics are defined, check if this metric should be included
-	if len(m.includeMetrics) > 0  {
+	if len(m.includeMetrics) > 0 {
 		if !matchMetricFamily(*family.Name, m.includeMetrics) {
 			return true
 		}
@@ -192,7 +192,7 @@ func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
 	return false
 }
 
-func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error){
+func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 	var compiledPatterns []*regexp.Regexp
 	compiledPatterns = []*regexp.Regexp{}
 	if patterns != nil {

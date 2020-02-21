@@ -23,13 +23,13 @@ type metricsetConfig struct {
 
 type MetricFilters struct {
 	IncludeMetrics *[]string `config:"include"`
-	ExcludeMetrics  *[]string `config:"exclude"`
+	ExcludeMetrics *[]string `config:"exclude"`
 }
 
 var defaultConfig = metricsetConfig{
 	MetricsFilters: MetricFilters{
 		IncludeMetrics: nil,
-		ExcludeMetrics:  nil},
+		ExcludeMetrics: nil},
 }
 
 func (c *metricsetConfig) Validate() error {

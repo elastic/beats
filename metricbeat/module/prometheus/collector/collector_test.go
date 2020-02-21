@@ -20,9 +20,9 @@
 package collector
 
 import (
-	"fmt"
-	"github.com/elastic/beats/metricbeat/mb"
 	"testing"
+
+	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
@@ -345,7 +345,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			metricsToKeep += 1
 		}
 	}
-	assert.Equal(t, len(testFamilies) - 2, metricsToKeep)
+	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
 	// test with ine include and one exclude
 	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
