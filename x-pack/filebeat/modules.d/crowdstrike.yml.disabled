@@ -4,4 +4,4 @@
 - module: crowdstrike
   # Main logs
   falcon:
-    enabled: false
+    enabled: true
