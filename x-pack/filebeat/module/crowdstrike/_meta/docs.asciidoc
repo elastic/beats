@@ -3,7 +3,7 @@
 
 == Crowdstrike module
 
-This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format. This module collects this data, converts it to ECS, and ingests it to view in the SIEM.
+This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format. 
 
 include::../include/what-happens.asciidoc[]
 
@@ -15,21 +15,26 @@ This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
 include::../include/running-modules.asciidoc[]
 
 [float]
-=== Example dashboard
+=== Dashboards
 
-The best way to view this data is in the SIEM. 
+The best way to view Crowdstrike events and alert data is in the SIEM. 
 
 [role="screenshot"]
 image::./images/siem-alerts-cs.jpg[]
 
+[float]
 For alerts, go to Detections -> External alerts.
 
 [role="screenshot"]
 image::./images/siem-events-cs.jpg[]
 
-For all over event Crowdstrike Falcon event types, go to Host -> Events.
+[float]
+And for all over event Crowdstrike Falcon event types, go to Host -> Events.
 
 include::../include/configuring-intro.asciidoc[]
+
+[float]
+==== `falcon` fileset settings
 
 The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`.
 
@@ -41,21 +46,8 @@ var:
       - /var/log/crowdstrike/falconhoseclient/output
 -----
 
-:fileset_ex: {fileset}
-
-include::../include/config-option-intro.asciidoc[]
-
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
-[float]
-==== `{fileset}` log fileset settings
-
 include::../include/var-paths.asciidoc[]
 
 :has-dashboards!:
-
-:fileset_ex!:
 
 :modulename!:
