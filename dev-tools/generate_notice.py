@@ -22,7 +22,7 @@ def read_file(filename):
 
 def read_go_mod(vendor_dir):
     lines = []
-    with open(os.path.join(vendor_dir, "modules.txt")) as f:
+    with open(os.path.join(vendor_dir, "modules.txt"), encoding="utf_8") as f:
         lines = f.readlines()
 
     deps = []
@@ -419,7 +419,8 @@ def detect_license_summary(content):
         return "EPL-1.0"
     if any(sentence in content[0:1500] for sentence in ISC_LICENSE_TITLE):
         return "ISC"
-
+    if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
+        return "EPL-1.0"
     return "UNKNOWN"
 
 

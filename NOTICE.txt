@@ -1502,6 +1502,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/eclipse/paho.mqtt.golang
+Version: v1.2.1
+Revision: 0d940dd29fd2
 License type (autodetected): EPL-1.0
 ./vendor/github.com/eclipse/paho.mqtt.golang/LICENSE:
 --------------------------------------------------------------------
@@ -2981,6 +2983,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/gorilla/websocket
+Version: v1.4.1
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/gorilla/websocket/LICENSE:
 --------------------------------------------------------------------

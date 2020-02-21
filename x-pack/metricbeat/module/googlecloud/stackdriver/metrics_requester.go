@@ -52,6 +52,8 @@ type stackdriverMetricsRequester struct {
 func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
+	filter := r.getFilterForMetric(m)
+
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
