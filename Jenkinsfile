@@ -180,8 +180,6 @@ pipeline {
                 mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
                 //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
               }
-<<<<<<< HEAD
-=======
             }
           }
         }
@@ -192,7 +190,6 @@ pipeline {
             beforeAgent true
             expression {
               return env.BUILD_AUDITBEAT_XPACK != "false"
->>>>>>> ci: run test on Windows (#15570)
             }
           }
           steps {
