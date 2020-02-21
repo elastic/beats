@@ -1,4 +1,5 @@
 import os
+from parameterized import parameterized
 import redis
 import sys
 import unittest
@@ -15,11 +16,11 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @parameterized.expand([
-        "node",
-        "proxy"
+        ("node", "node"),
+        ("proxy", "listener")
     ])
     @attr('integration')
-    def test_metricset(self, metricset):
+    def test_metricset(self, metricset, metric_name_prefix):
         """
         Test redis enterprise metricset
         """
@@ -33,12 +34,14 @@ class Test(metricbeat.BaseTest):
             "metricsets": [metricset],
             "hosts": ['https://' + self.compose_host(port='8070/tcp')],
             "period": "5s",
-            "ssl.verification_mode": "none"
+            "extras": {
+                "ssl.verification_mode": "none"
+            }
         }])
         proc = self.start_beat(home=self.beat_path)
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=120)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.assert_no_logged_warnings(replace=['SSL/TLS verifications disabled.'])
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -51,7 +54,7 @@ class Test(metricbeat.BaseTest):
 
             # Verify if processors are correctly setup.
             for metric in evt["prometheus"]["metrics"].keys():
-                assert metric.startswith(metricset + "_")
+                assert metric.startswith(metric_name_prefix + "_")
 
     def oss_distribution(self):
         if not 'REDIS_DISTRIBUTION' in self.COMPOSE_ENV:

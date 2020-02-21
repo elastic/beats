@@ -4,7 +4,7 @@
 - module: redis
   metricsets:
     - node
-  #  - proxy
+    - proxy
   period: 1m
 
   # Metrics endpoint

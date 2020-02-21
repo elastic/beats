@@ -18,7 +18,7 @@ processors:
             return;
           }
           Object.keys(metrics).forEach(function(key) {
-            if (!(key.match(/^proxy_.*$/))) {
+            if (!(key.match(/^listener_.*$/))) {
               event.Delete("prometheus.metrics." + key);
             }
           });
