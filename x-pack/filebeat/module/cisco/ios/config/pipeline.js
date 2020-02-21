@@ -228,6 +228,7 @@ var ciscoIOS = (function() {
                 if (dissect) {
                     dissect(evt);
                     coerceNumbers(evt);
+                    coerceIPs(evt);
                     normalizeEventOutcome(evt);
                     setNetworkType(evt);
                     setRelatedIP(evt);
@@ -247,9 +248,7 @@ var ciscoIOS = (function() {
 
     var coerceNumbers = new processor.Convert({
         fields: [
-            {from: "destination.address", to: "destination.ip", type: "ip"},
             {from: "destination.port", type: "long"},
-            {from: "source.address", to: "source.ip", type: "ip"},
             {from: "source.port", type: "long"},
             {from: "source.packets", type: "long"},
             {from: "source.packets", to: "network.packets", type: "long"},
@@ -260,6 +259,16 @@ var ciscoIOS = (function() {
         ignore_missing: true,
     }).Run;
 
+    //address != ip so this is allowed to fail
+    var coerceIPs = new processor.Convert({
+        fields: [
+            {from: "destination.address", to: "destination.ip", type: "ip"},
+            {from: "source.address", to: "source.ip", type: "ip"},
+        ],
+        ignore_missing: true,
+        ignore_failure: true
+    }).Run;
+    
     var normalizeEventOutcome = function(evt) {
         var outcome = evt.Get("event.outcome");
         if (!outcome) {
