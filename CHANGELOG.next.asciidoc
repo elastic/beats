@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
+- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
@@ -243,6 +244,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
+- Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 
 *Packetbeat*
 
