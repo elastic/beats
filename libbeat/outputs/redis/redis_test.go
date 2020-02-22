@@ -13,18 +13,19 @@
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
-// under the License.package redis
+// under the License.
 
 package redis
 
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/stretchr/testify/assert"
 )
 
 type checker func(*testing.T, outputs.Group)
