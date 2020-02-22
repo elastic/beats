@@ -20,11 +20,12 @@ package redis
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/stretchr/testify/assert"
 )
 
 type checker func(*testing.T, outputs.Group)
