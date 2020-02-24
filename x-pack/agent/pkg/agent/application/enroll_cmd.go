@@ -13,13 +13,13 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/x-pack/agent/pkg/kibana"
 )
 
 type store interface {

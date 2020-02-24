@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/kibana"
 	"github.com/elastic/beats/x-pack/agent/pkg/release"
 )
 
