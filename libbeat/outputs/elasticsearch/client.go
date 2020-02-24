@@ -42,7 +42,6 @@ import (
 // Client is an elasticsearch client.
 type Client struct {
 	esclientleg.Connection
-	tlsConfig *tlscommon.TLSConfig
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
@@ -51,10 +50,6 @@ type Client struct {
 
 	// buffered bulk requests
 	bulkRequ *esclientleg.BulkRequest
-
-	// additional configs
-	compressionLevel int
-	proxyURL         *url.URL
 
 	observer outputs.Observer
 
@@ -145,23 +140,13 @@ func NewClient(
 		return nil, err
 	}
 
-	var encoder esclientleg.BodyEncoder
-	compression := s.CompressionLevel
-	if compression == 0 {
-		encoder = esclientleg.NewJSONEncoder(nil, s.EscapeHTML)
-	} else {
-		encoder, err = esclientleg.NewGzipEncoder(compression, nil, s.EscapeHTML)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	conn := esclientleg.NewConnection(esclientleg.ConnectionSettings{
-		URL:      s.URL,
-		Username: s.Username,
-		Password: s.Password,
-		APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
-		Headers:  s.Headers,
+	conn, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+		URL:       s.URL,
+		Username:  s.Username,
+		Password:  s.Password,
+		APIKey:    base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
+		Headers:   s.Headers,
+		TLSConfig: s.TLS,
 		HTTP: &http.Client{
 			Transport: &http.Transport{
 				Dial:            dialer.Dial,
@@ -171,12 +156,16 @@ func NewClient(
 			},
 			Timeout: s.Timeout,
 		},
-		Encoder: encoder,
+		ProxyURL:         s.Proxy,
+		CompressionLevel: s.CompressionLevel,
+		EscapeHTML:       s.EscapeHTML,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	client := &Client{
 		Connection: *conn,
-		tlsConfig:  s.TLS,
 		index:      s.Index,
 		pipeline:   pipeline,
 		params:     params,
@@ -184,9 +173,7 @@ func NewClient(
 
 		bulkRequ: bulkRequ,
 
-		compressionLevel: compression,
-		proxyURL:         s.Proxy,
-		observer:         s.Observer,
+		observer: s.Observer,
 
 		log: logp.NewLogger("elasticsearch"),
 	}
@@ -324,19 +311,19 @@ func (client *Client) Clone() *Client {
 			URL:      client.URL,
 			Index:    client.index,
 			Pipeline: client.pipeline,
-			Proxy:    client.proxyURL,
+			Proxy:    client.ProxyURL,
 			// Without the following nil check on proxyURL, a nil Proxy field will try
 			// reloading proxy settings from the environment instead of leaving them
 			// empty.
-			ProxyDisable:     client.proxyURL == nil,
-			TLS:              client.tlsConfig,
+			ProxyDisable:     client.ProxyURL == nil,
+			TLS:              client.TLSConfig,
 			Username:         client.Username,
 			Password:         client.Password,
 			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
 			Timeout:          client.HTTP.Timeout,
-			CompressionLevel: client.compressionLevel,
+			CompressionLevel: client.CompressionLevel,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
@@ -600,7 +587,7 @@ func (client *Client) Test(d testing.Driver) {
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
 				netDialer := transport.NetDialer(client.timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.tlsConfig, client.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.TLSConfig, client.timeout)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})

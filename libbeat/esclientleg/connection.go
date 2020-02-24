@@ -23,6 +23,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+
+	"github.com/elastic/beats/libbeat/outputs/transport"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -33,6 +36,7 @@ import (
 type Connection struct {
 	ConnectionSettings
 
+	Encoder BodyEncoder
 	version common.Version
 	log     *logp.Logger
 }
@@ -40,22 +44,41 @@ type Connection struct {
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
 	URL      string
+	ProxyURL *url.URL
+
 	Username string
 	Password string
 	APIKey   string
 	Headers  map[string]string
 
-	HTTP              *http.Client
+	TLSConfig *transport.TLSConfig
+
+	HTTP *http.Client
+
 	OnConnectCallback func() error
 
-	Encoder BodyEncoder
+	CompressionLevel int
+	EscapeHTML       bool
 }
 
-func NewConnection(settings ConnectionSettings) *Connection {
+func NewConnection(settings ConnectionSettings) (*Connection, error) {
+	var encoder BodyEncoder
+	var err error
+	compression := settings.CompressionLevel
+	if compression == 0 {
+		encoder = NewJSONEncoder(nil, settings.EscapeHTML)
+	} else {
+		encoder, err = NewGzipEncoder(compression, nil, settings.EscapeHTML)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &Connection{
 		ConnectionSettings: settings,
+		Encoder:            encoder,
 		log:                logp.NewLogger("esclientleg"),
-	}
+	}, nil
 }
 
 // Connect connects the client. It runs a GET request against the root URL of
