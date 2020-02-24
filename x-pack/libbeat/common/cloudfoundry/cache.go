@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 

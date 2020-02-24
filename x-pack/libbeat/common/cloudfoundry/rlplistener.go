@@ -11,6 +11,7 @@ import (
 	loggregator "code.cloudfoundry.org/go-loggregator"
 	"code.cloudfoundry.org/go-loggregator/conversion"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 

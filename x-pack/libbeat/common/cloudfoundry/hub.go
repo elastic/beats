@@ -10,8 +10,9 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-incubator/uaago"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Client interface exposed by Hub.Client.

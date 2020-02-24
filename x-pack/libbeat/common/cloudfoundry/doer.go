@@ -9,8 +9,9 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/uaago"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // authTokenDoer is an HTTP requester that indcludes UAA tokens at the header
