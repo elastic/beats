@@ -45,6 +45,10 @@ var (
 
 	debugf = logp.MakeDebug("cfgfile")
 
+	// configScans measures how many times the config dir was scanned for
+	// changes, configReloads measures how many times there were changes that
+	// triggered an actual reload.
+	configScans   = monitoring.NewInt(nil, "libbeat.config.scans")
 	configReloads = monitoring.NewInt(nil, "libbeat.config.reloads")
 	moduleStarts  = monitoring.NewInt(nil, "libbeat.config.module.starts")
 	moduleStops   = monitoring.NewInt(nil, "libbeat.config.module.stops")
@@ -199,7 +203,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 		case <-time.After(rl.config.Reload.Period):
 			debugf("Scan for new config files")
-			configReloads.Add(1)
+			configScans.Add(1)
 
 			files, updated, err := gw.Scan()
 			if err != nil {
@@ -212,6 +216,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			if !updated && !forceReload {
 				continue
 			}
+			configReloads.Add(1)
 
 			// Load all config objects
 			configs, _ := rl.loadConfigs(files)
