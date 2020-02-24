@@ -40,7 +40,7 @@ func TestPasswords(t *testing.T) {
 	t.Skip("Changing password affects other tests, see https://github.com/elastic/beats/issues/10955")
 
 	service := compose.EnsureUp(t, "redis")
-	host := service.Host()
+	host := service.HostForPort(6379)
 
 	registry := mb.NewRegister()
 	err := registry.AddModule("redis", mb.DefaultModuleFactory)

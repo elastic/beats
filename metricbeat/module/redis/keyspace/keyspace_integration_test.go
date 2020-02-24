@@ -33,7 +33,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t, service.Host())
+	addEntry(t, service.HostForPort(6379))
 
 	// Fetch data
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
@@ -58,7 +58,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t, service.Host())
+	addEntry(t, service.HostForPort(6379))
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
