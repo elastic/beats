@@ -80,6 +80,114 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/go-diodes
+Revision: f77fb823c7ee0156ed4cdadaf4f79ac3fd84613f
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/go-diodes/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Copyright (c) 2017-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This project may include a number of subcomponents with separate
+copyright notices and license terms. Your use of these subcomponents
+is subject to the terms and conditions of each subcomponent's license,
+as noted in the LICENSE file.
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/go-loggregator
+Version: v7.7.0
+Revision: b8d176783c8a6280a34f0e19e0e8f57d722773a1
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/go-loggregator/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+go-loggregator
+
+Copyright (c) 2017-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/gofileutils
+Revision: 4d0c80011a0f37da1711c184028bc40137cd45af
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/gofileutils/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+This project contains software that is Copyright (c) 2014-2015 Pivotal Software, Inc.
+
+This project is licensed to you under the Apache License, Version 2.0 (the "License").
+
+You may not use this project except in compliance with the License.
+
+This project may include a number of subcomponents with separate copyright notices
+and license terms. Your use of these subcomponents is subject to the terms and
+conditions of the subcomponent's license, as noted in the LICENSE file.
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/rfc5424
+Revision: 236a6d29298aea12f69978f33393d12465abc429
+License type (autodetected): BSD-2-Clause
+./vendor/code.cloudfoundry.org/rfc5424/LICENSE:
+--------------------------------------------------------------------
+BSD 2-Clause License
+
+Copyright (c) 2016, Ross Kinder
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: contrib.go.opencensus.io/exporter/ocagent
 Revision: 8110e6c0236bb231b19119275a6be6ec666d05c8
 License type (autodetected): Apache-2.0
@@ -659,6 +767,86 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/cloudfoundry-community/go-cfclient
+Version: master
+Revision: 35bcce23fc5f8b9969723ac38c0de1f82c4d3471
+License type (autodetected): MIT
+./vendor/github.com/cloudfoundry-community/go-cfclient/LICENSE:
+--------------------------------------------------------------------
+The MIT License
+
+Copyright (c) 2017 Long Nguyen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/cloudfoundry-incubator/uaago
+Version: master
+Revision: 8136b7bbe76e26394600a790a95c15eac955f4fc
+License type (autodetected): Apache-2.0
+./vendor/github.com/cloudfoundry-incubator/uaago/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+uaago
+
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------
+Dependency: github.com/cloudfoundry/sonde-go
+Revision: b33733203bb48d7c56de7cb639d77f78b0449d19
+License type (autodetected): Apache-2.0
+./vendor/github.com/cloudfoundry/sonde-go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+sonde-go
+
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+Limitations under the License.
 
 --------------------------------------------------------------------
 Dependency: github.com/containerd/containerd
@@ -4818,6 +5006,46 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/mailru/easyjson
+Revision: 8edcc4e51f39ddbd3505a3386aff3f435a7fd028
+License type (autodetected): MIT
+./vendor/github.com/mailru/easyjson/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2016 Mail.Ru Group
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/Masterminds/semver
+Revision: 910aa146bd66780c2815d652b92a7fc5331e533c
+License type (autodetected): MIT
+./vendor/github.com/Masterminds/semver/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (C) 2014-2019, Matt Butcher and Matt Farina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mattn/go-colorable
