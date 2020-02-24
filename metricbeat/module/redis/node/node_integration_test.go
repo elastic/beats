@@ -22,14 +22,13 @@ package node
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus/collector"
 )
@@ -41,7 +40,7 @@ func init() {
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "redis-enterprise")
+	service := compose.EnsureUp(t, "redis-enterprise", compose.UpWithTimeout(10*time.Minute))
 
 	f := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, errs := f.FetchEvents()

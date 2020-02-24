@@ -4,7 +4,3 @@ FROM redislabs/redis:${REDIS_VERSION}
 # Wait for the health endpoint to have monitors information
 ADD healthcheck.sh /
 HEALTHCHECK --interval=1s --retries=300 CMD /healthcheck.sh
-
-# RUN /opt/redislabs/sbin/supervisord_prestart_script.sh
-# RUN rladmin cluster create name cluster.local username cihan@redislabs.com password redislabs123
-# RUN curl -k -u "cihan@redislabs.com:redislabs123" --request POST --url "https://localhost:9443/v1/bdbs" --header 'content-type: application/json' --data '{"name":"db1","type":"redis","memory_size":102400,"port":12000}'
