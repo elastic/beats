@@ -23,4 +23,4 @@ services:
         REDIS_VERSION: ${REDIS_VERSION:-5.4.10-22}
     privileged: true
     ports:
-      - 127.0.0.1:8070:8070
+      - 8070

@@ -36,7 +36,7 @@ func TestFetch(t *testing.T) {
 
 	addEntry(t, service.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig(service.Host()))
+	ms := mbtest.NewFetcher(t, getConfig(service.HostForPort(6379)))
 	events, err := ms.FetchEvents()
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -51,7 +51,7 @@ func TestData(t *testing.T) {
 
 	addEntry(t, service.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig(service.Host()))
+	ms := mbtest.NewFetcher(t, getConfig(service.HostForPort(6379)))
 	ms.WriteEvents(t, "")
 }
 

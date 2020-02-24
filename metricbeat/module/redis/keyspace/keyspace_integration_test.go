@@ -36,7 +36,7 @@ func TestFetch(t *testing.T) {
 	addEntry(t, service.Host())
 
 	// Fetch data
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
 	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -60,7 +60,7 @@ func TestData(t *testing.T) {
 
 	addEntry(t, service.Host())
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
