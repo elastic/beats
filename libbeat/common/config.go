@@ -116,6 +116,16 @@ func MergeConfigs(cfgs ...*Config) (*Config, error) {
 	return config, nil
 }
 
+func MergeConfigsWithOptions(cfgs []*Config, options ...ucfg.Option) (*Config, error) {
+	config := NewConfig()
+	for _, c := range cfgs {
+		if err := config.MergeWithOpts(c, options...); err != nil {
+			return nil, err
+		}
+	}
+	return config, nil
+}
+
 func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	opts := append(
 		[]ucfg.Option{
@@ -162,6 +172,14 @@ func LoadFiles(paths ...string) (*Config, error) {
 
 func (c *Config) Merge(from interface{}) error {
 	return c.access().Merge(from, configOpts...)
+}
+
+func (c *Config) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
+	o := configOpts
+	if opts != nil {
+		o = append(o, opts...)
+	}
+	return c.access().Merge(from, o...)
 }
 
 func (c *Config) Unpack(to interface{}) error {
