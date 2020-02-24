@@ -30,3 +30,4 @@ websocket-client==0.47.0
 parameterized==0.6.1
 jsondiff==1.1.2
 semver==2.8.1
+deepdiff==3.3.0
