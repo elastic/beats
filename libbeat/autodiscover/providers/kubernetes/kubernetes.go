@@ -143,8 +143,6 @@ func (p *Provider) publish(event bus.Event) {
 		e := p.eventer.GenerateHints(event)
 		if config := p.builders.GetConfig(e); config != nil {
 			event["config"] = config
-		} else {
-
 		}
 	}
 

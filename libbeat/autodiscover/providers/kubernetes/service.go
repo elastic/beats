@@ -124,15 +124,27 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var annotations common.MapStr
 	var kubeMeta common.MapStr
+
+	annotations := make(common.MapStr, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
 		kubeMeta = rawMeta.(common.MapStr)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
+			anns, _ := rawAnn.(common.MapStr)
+			if len(anns) != 0 {
+				annotations = anns.Clone()
+			}
+		}
+
+		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+			nsAnn, _ := rawNsAnn.(common.MapStr)
+			if len(nsAnn) != 0 {
+				annotations.DeepUpdateNoOverwrite(nsAnn)
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -144,14 +156,6 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 
 	hints := builder.GenerateHints(annotations, "", s.config.Prefix)
 	s.logger.Debugf("Generated hints %+v", hints)
-
-	// Fall back to defaults on the namespace if there were no hints on the pods
-	if len(hints) == 0 {
-		if rawAnn, ok := kubeMeta["defaults"]; ok {
-			annotations = rawAnn.(common.MapStr)
-			hints = builder.GenerateHints(annotations, "", s.config.Prefix)
-		}
-	}
 
 	if len(hints) != 0 {
 		e["hints"] = hints
@@ -203,12 +207,12 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	if s.namespaceWatcher != nil {
 		if rawNs, ok, err := s.namespaceWatcher.Store().GetByKey(svc.Namespace); ok && err == nil {
 			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
-				defaults := common.MapStr{}
+				nsAnns := common.MapStr{}
 
 				for k, v := range namespace.GetAnnotations() {
-					safemapstr.Put(defaults, k, v)
+					safemapstr.Put(nsAnns, k, v)
 				}
-				kubemeta["defaults"] = defaults
+				kubemeta["namespace_annotations"] = nsAnns
 			}
 		}
 	}
