@@ -14,13 +14,13 @@ services:
       - 6379
       - 8070
   redis-enterprise:
-    image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-5.4.10-22}-enterprise-1
+    image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-5.4.10-22}-enterprise-2
     build:
       context: ./_meta
       dockerfile: Dockerfile.enterprise
       args:
         REDIS_DISTRIBUTION: enterprise
-        REDIS_VERSION: ${REDIS_VERSION:-:5.4.10-22}
+        REDIS_VERSION: ${REDIS_VERSION:-5.4.10-22}
     privileged: true
     ports:
       - 127.0.0.1:8070:8070
