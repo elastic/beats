@@ -54,6 +54,8 @@ type WorkerProcess struct {
 	InstanceName string
 }
 
+const ecsProcessId = "process.pid"
+
 var appPoolCounters = map[string]string{
 	"process.pid":                          "\\Process(w3wp*)\\ID Process",
 	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
@@ -167,7 +169,11 @@ func (re *Reader) fetch(names []string) ([]mb.Event, error) {
 				if val.Instance == appPool.Name {
 					events[appPool.Name].MetricSetFields.Put(appPool.counters[counterPath], val.Measurement)
 				} else if hasWorkerProcess(val.Instance, workers, appPool.WorkerProcessIds) {
-					events[appPool.Name].MetricSetFields.Put(re.WorkerProcesses[counterPath], val.Measurement)
+					if re.WorkerProcesses[counterPath] == ecsProcessId {
+						events[appPool.Name].RootFields.Put(re.WorkerProcesses[counterPath], val.Measurement)
+					} else {
+						events[appPool.Name].MetricSetFields.Put(re.WorkerProcesses[counterPath], val.Measurement)
+					}
 				}
 			}
 
