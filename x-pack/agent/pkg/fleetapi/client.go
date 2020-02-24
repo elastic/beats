@@ -15,10 +15,10 @@ import (
 	"os"
 
 	"github.com/elastic/beats/agent/kibana"
-	"github.com/elastic/beats/agent/release"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/release"
 )
 
 type clienter interface {

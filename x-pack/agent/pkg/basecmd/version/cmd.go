@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/agent/release"
 	"github.com/elastic/beats/x-pack/agent/pkg/cli"
+	"github.com/elastic/beats/x-pack/agent/pkg/release"
 )
 
 // NewCommandWithArgs returns a new version command.
