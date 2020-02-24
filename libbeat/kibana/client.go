@@ -19,6 +19,7 @@ package kibana
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -157,7 +158,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 func (conn *Connection) Request(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (int, []byte, error) {
 
-	resp, err := conn.Send(method, extraPath, params, headers, body)
+	resp, err := conn.Send(context.TODO(), method, extraPath, params, headers, body)
 	if err != nil {
 		return 0, nil, fmt.Errorf("fail to execute the HTTP %s request: %v", method, err)
 	}
@@ -178,12 +179,12 @@ func (conn *Connection) Request(method, extraPath string,
 }
 
 // Sends an application/json request to Kibana with appropriate kbn headers
-func (conn *Connection) Send(method, extraPath string,
+func (conn *Connection) Send(ctx context.Context, method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 
 	reqURL := addToURL(conn.URL, extraPath, params)
 
-	req, err := http.NewRequest(method, reqURL, body)
+	req, err := http.NewRequestWithContext(ctx, method, reqURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("fail to create the HTTP %s request: %+v", method, err)
 	}
