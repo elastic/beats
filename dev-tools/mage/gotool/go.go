@@ -94,14 +94,20 @@ func ListTestFiles(pkg string) ([]string, error) {
 }
 
 // ListModulePath returns the path to the module in the cache.
-func ListModulePath(pkg string) ([]string, error) {
+func ListModulePath(pkg string) (string, error) {
 	const tmpl = `{{.Dir}}`
-
-	// make sure to look in the module cache
 	env := map[string]string{
+		// make sure to look in the module cache
 		"GOFLAGS": "",
 	}
-	return getLines(callGo(env, "list", "-f", tmpl, pkg))
+	lines, err := getLines(callGo(env, "list", "-m", "-f", tmpl, pkg))
+	if err != nil {
+		return "", err
+	}
+	if n := len(lines); n != 1 {
+		return "", fmt.Errorf("expected 1 line, got %d", n)
+	}
+	return lines[0], nil
 }
 
 // HasTests returns true if the given package contains test files.

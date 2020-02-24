@@ -80,13 +80,10 @@ func Vendor() error {
 		if err != nil {
 			return err
 		}
-		if len(path) != 1 {
-			return fmt.Errorf("unexpected number of paths")
-		}
 		fmt.Println(path)
 
 		for _, f := range p.filesToCopy {
-			from := filepath.Join(path[0], f)
+			from := filepath.Join(path, f)
 			to := filepath.Join(vendorFolder, p.name, f)
 			copyTask := &CopyTask{Source: from, Dest: to, DirMode: os.ModeDir | 0750}
 			err = copyTask.Execute()

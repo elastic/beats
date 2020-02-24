@@ -23,7 +23,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -262,39 +264,26 @@ func ElasticBeatsDir() (string, error) {
 	return elasticBeatsDirValue, elasticBeatsDirErr
 }
 
-// findElasticBeatsDir attempts to find the root of the Elastic Beats directory.
-// It checks to see if the current project is elastic/beats, and then if not
-// checks the vendor directory.
+// findElasticBeatsDir returns the root directory of the Elastic Beats module, using "go list".
 //
-// If your project places the Beats files in a different location (specifically
-// the dev-tools/ contents) then you can use SetElasticBeatsDir().
+// When running within the Elastic Beats repo, this will return the repo root. Otherwise,
+// it will return the root directory of the module from within the module cache or vendor
+// directory.
 func findElasticBeatsDir() (string, error) {
-	repo, err := GetProjectRepoInfo()
-	if err != nil {
-		return "", err
-	}
+	// Find the import path for the package containing this file.
+	type foo struct{}
+	typ := reflect.TypeOf(foo{})
+	magepkgpath := typ.PkgPath()
 
-	if repo.IsElasticBeats() {
-		return repo.RootDir, nil
-	}
-
-	const devToolsImportPath = elasticBeatsImportPath + "/dev-tools/mage"
-
-	// Search in project vendor directories. Order is relevant
-	searchPaths := []string{
-		// beats directory of apm-server
-		filepath.Join(repo.RootDir, "_beats/dev-tools/vendor"),
-		filepath.Join(repo.RootDir, repo.SubDir, "vendor", devToolsImportPath),
-		filepath.Join(repo.RootDir, "vendor", devToolsImportPath),
-	}
-
-	for _, path := range searchPaths {
-		if _, err := os.Stat(path); err == nil {
-			return filepath.Join(path, "../.."), nil
+	// Walk up the import path until we find the elastic/beats module path.
+	pkgpath := magepkgpath
+	for extractCanonicalRootImportPath(pkgpath) != elasticBeatsImportPath {
+		pkgpath = path.Dir(pkgpath)
+		if pkgpath == "." {
+			return "", errors.Errorf("failed to find %q from %q", elasticBeatsImportPath, magepkgpath)
 		}
 	}
-
-	return "", errors.Errorf("failed to find %v in the project's vendor", devToolsImportPath)
+	return gotool.ListModulePath(pkgpath)
 }
 
 var (
@@ -552,7 +541,7 @@ type ProjectRepoInfo struct {
 // IsElasticBeats returns true if the current project is
 // github.com/elastic/beats.
 func (r *ProjectRepoInfo) IsElasticBeats() bool {
-	return strings.HasPrefix(r.RootImportPath, elasticBeatsImportPath)
+	return r.CanonicalRootImportPath == elasticBeatsImportPath
 }
 
 var (
