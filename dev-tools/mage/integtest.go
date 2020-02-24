@@ -182,7 +182,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	if err != nil {
 		return err
 	}
-	magePath := filepath.Join("/go/src", repo.ImportPath, "build/mage-linux-amd64")
+	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
 
 	// Build docker-compose args.
 	args := []string{"-p", dockerComposeProjectName(), "run",
