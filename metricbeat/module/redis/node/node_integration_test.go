@@ -40,7 +40,7 @@ func init() {
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "redis-enterprise", compose.UpWithTimeout(10*time.Minute))
+	service := compose.EnsureUp(t, "redis-enterprise", compose.UpWithTimeout(5*time.Minute))
 
 	f := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, errs := f.FetchEvents()
