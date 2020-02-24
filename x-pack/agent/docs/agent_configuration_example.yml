@@ -458,7 +458,7 @@ datasources:
    title: Suricata's data
    namespace?: "abc"
    package:
-     name: suricate
+     name: suricata
      version: x.x.x
    inputs:
      - type: log
