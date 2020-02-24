@@ -33,8 +33,8 @@ metricbeat.modules:
   hosts: ["localhost:9090"]
   metrics_path: /metrics
   #metrics_filters:
-  #  - include: []
-  #  - exclude: []
+  #  include: []
+  #  exclude: []
   #username: "user"
   #password: "secret"
 

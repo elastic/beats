@@ -18,12 +18,12 @@
 package collector
 
 type metricsetConfig struct {
-	MetricsFilters MetricFilters `config:"metrics_filters"`
+	MetricsFilters MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
 }
 
 type MetricFilters struct {
-	IncludeMetrics *[]string `config:"include"`
-	ExcludeMetrics *[]string `config:"exclude"`
+	IncludeMetrics *[]string `config:"include" yaml:"include,omitempty"`
+	ExcludeMetrics *[]string `config:"exclude" yaml:"exclude,omitempty"`
 }
 
 var defaultConfig = metricsetConfig{
