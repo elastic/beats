@@ -2061,14 +2061,6 @@
 			"versionExact": "master"
 		},
 		{
-			"checksumSHA1": "2+WlMRNm8dhMUr2HC82GuVd5HDU=",
-			"path": "github.com/cloudfoundry-incubator/uaago",
-			"revision": "8136b7bbe76e26394600a790a95c15eac955f4fc",
-			"revisionTime": "2019-03-07T16:43:49Z",
-			"version": "master",
-			"versionExact": "master"
-		},
-		{
 			"checksumSHA1": "6wZB7Zkp33mMdUjWH7O0N5/fk9A=",
 			"path": "github.com/cloudfoundry/sonde-go/events",
 			"revision": "b33733203bb48d7c56de7cb639d77f78b0449d19",

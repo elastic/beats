@@ -5,11 +5,10 @@
 package cloudfoundry
 
 import (
-	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/cloudfoundry-incubator/uaago"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -34,17 +33,22 @@ func NewHub(cfg *Config, userAgent string, log *logp.Logger) *Hub {
 
 // Client returns the cloudfoundry client.
 func (h *Hub) Client() (Client, error) {
+	httpClient, insecure, err := h.httpClient()
+	if err != nil {
+		return nil, err
+	}
+
 	h.log.Debugw(
 		"creating cloudfoundry ",
 		"client_id", h.cfg.ClientID,
 		"client_secret_present", h.cfg.ClientSecret != "",
-		"skip_validation", h.cfg.SkipVerify,
 		"api_address", h.cfg.APIAddress)
 	cf, err := cfclient.NewClient(&cfclient.Config{
 		ClientID:          h.cfg.ClientID,
 		ClientSecret:      h.cfg.ClientSecret,
 		ApiAddress:        h.cfg.APIAddress,
-		SkipSslValidation: h.cfg.SkipVerify,
+		HttpClient:        httpClient,
+		SkipSslValidation: insecure,
 		UserAgent:         h.userAgent,
 	})
 	if err != nil {
@@ -57,32 +61,6 @@ func (h *Hub) Client() (Client, error) {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
 	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.log), nil
-}
-
-// Uaa returns the uaa cloudfoundry client.
-func (h *Hub) Uaa() (*uaago.Client, error) {
-	client, err := h.Client()
-	if err != nil {
-		return nil, err
-	}
-	return h.UaaFromClient(client)
-}
-
-// UaaFromClient returns the uaa cloudfoundry client from the provided client.
-//
-// In the case that the cloudfoundry client was already needed by the code path, call this method
-// as not to create a intermediate client that will not be used.
-func (h *Hub) UaaFromClient(client Client) (*uaago.Client, error) {
-	wrapper, ok := client.(*clientCacheWrap)
-	if !ok {
-		return nil, fmt.Errorf("must pass in a client returned from Hub.Client()")
-	}
-	cfClient, ok := wrapper.client.(*cfclient.Client)
-	if !ok {
-		return nil, fmt.Errorf("client.client is not a cfclient.Client")
-	}
-	h.log.Debugw("creating UAA client", "AuthEndpoint", cfClient.Endpoint.AuthEndpoint)
-	return uaago.NewClient(cfClient.Endpoint.AuthEndpoint)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through
@@ -116,9 +94,21 @@ func (h *Hub) RlpListenerFromClient(client Client, callbacks RlpListenerCallback
 
 // doerFromClient returns an auth token doer using uaa.
 func (h *Hub) doerFromClient(client Client) (*authTokenDoer, error) {
-	uaa, err := h.UaaFromClient(client)
+	httpClient, _, err := h.httpClient()
 	if err != nil {
 		return nil, err
 	}
-	return newAuthTokenDoer(uaa, h.cfg.ClientID, h.cfg.ClientSecret, h.cfg.SkipVerify, h.log), nil
+	return newAuthTokenDoer(h.cfg.ClientID, h.cfg.ClientSecret, httpClient, h.log), nil
+}
+
+// httpClient returns an HTTP client configured with the configuration TLS.
+func (h *Hub) httpClient() (*http.Client, bool, error) {
+	tls, err := h.cfg.TLSConfig()
+	if err != nil {
+		return nil, true, err
+	}
+	httpClient := cfclient.DefaultConfig().HttpClient
+	tp := httpClient.Transport.(*http.Transport)
+	tp.TLSClientConfig = tls
+	return httpClient, tls.InsecureSkipVerify, nil
 }

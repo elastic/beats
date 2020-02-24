@@ -5,7 +5,10 @@
 package cloudfoundry
 
 import (
+	"crypto/tls"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 
 	"github.com/gofrs/uuid"
 )
@@ -15,8 +18,8 @@ type Config struct {
 	ClientID     string `config:"client_id" validate:"required"`
 	ClientSecret string `config:"client_secret" validate:"required"`
 
-	// SkipVerify applies to all endpoints
-	SkipVerify bool `config:"skip_verify"`
+	// TLS configuration for the client
+	TLS *tlscommon.Config `config:"ssl"`
 
 	// Override URLs returned from the CF client
 	APIAddress     string `config:"api_address"`
@@ -42,4 +45,13 @@ func (c *Config) InitDefaults() {
 	}
 	c.ShardID = uuid.String()
 	c.CacheDuration = 120 * time.Second
+}
+
+// TLSConfig returns the TLS configuration.
+func (c *Config) TLSConfig() (*tls.Config, error) {
+	tls, err := tlscommon.LoadTLSConfig(c.TLS)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ToConfig(), nil
 }

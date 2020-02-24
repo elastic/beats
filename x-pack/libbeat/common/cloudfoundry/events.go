@@ -18,6 +18,7 @@ import (
 // EventType defines the different event types that can be raised from RPLClient.
 type EventType uint
 
+// EventTypes from loggregator documented here: https://github.com/cloudfoundry/loggregator-api
 const (
 	// EventTypeHttpAccess is a http access event.
 	EventTypeHttpAccess EventType = iota

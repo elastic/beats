@@ -5,10 +5,13 @@
 package cloudfoundry
 
 import (
-	"crypto/tls"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 
-	"github.com/cloudfoundry-incubator/uaago"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -16,35 +19,25 @@ import (
 
 // authTokenDoer is an HTTP requester that indcludes UAA tokens at the header
 type authTokenDoer struct {
-	uaa          *uaago.Client
 	clientID     string
 	clientSecret string
-	skipVerify   bool
 	httpClient   *http.Client
 	log          *logp.Logger
 }
 
 // NewAuthTokenDoer creates a loggregator HTTP client that uses a new UAA token at each request
-func newAuthTokenDoer(uaa *uaago.Client, clientID, clientSecret string, skipVerify bool, log *logp.Logger) *authTokenDoer {
+func newAuthTokenDoer(clientID, clientSecret string, httpClient *http.Client, log *logp.Logger) *authTokenDoer {
 	return &authTokenDoer{
-		uaa:          uaa,
 		clientID:     clientID,
 		clientSecret: clientSecret,
-		skipVerify:   skipVerify,
-		httpClient: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: skipVerify,
-				},
-			},
-		},
-		log: log.Named("doer"),
+		httpClient:   httpClient,
+		log:          log.Named("doer"),
 	}
 }
 
 // Do executes an HTTP request adding an UAA OAuth token
 func (d *authTokenDoer) Do(r *http.Request) (*http.Response, error) {
-	t, err := d.uaa.GetAuthToken(d.clientID, d.clientSecret, d.skipVerify)
+	t, err := d.getAuthToken(d.clientID, d.clientSecret)
 	if err != nil {
 		// The reason for writing an error here is that pushing the error upstream
 		// is handled by loggregate library, which is beyond our reach.
@@ -53,4 +46,48 @@ func (d *authTokenDoer) Do(r *http.Request) (*http.Response, error) {
 	}
 	r.Header.Set("Authorization", t)
 	return d.httpClient.Do(r)
+}
+
+func (d *authTokenDoer) getAuthToken(username, password string) (string, error) {
+	token, _, err := d.getAuthTokenWithExpiresIn(username, password)
+	return token, err
+}
+
+func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (string, int, error) {
+	data := url.Values{
+		"client_id":  {username},
+		"grant_type": {"client_credentials"},
+	}
+
+	request, err := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", c.uaaUrl), strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", -1, err
+	}
+	request.SetBasicAuth(username, password)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := d.httpClient.Do(request)
+	if err != nil {
+		return "", -1, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", -1, fmt.Errorf("Received a status code %v", resp.Status)
+	}
+	defer resp.Body.Close()
+
+	jsonData := make(map[string]interface{})
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&jsonData)
+
+	expiresIn := 0
+	if value, ok := jsonData["expires_in"]; ok {
+		asFloat, err := strconv.ParseFloat(fmt.Sprintf("%f", value), 64)
+		if err != nil {
+			return "", -1, err
+		}
+		expiresIn = int(asFloat)
+	}
+
+	return fmt.Sprintf("%s %s", jsonData["token_type"], jsonData["access_token"]), expiresIn, err
 }
