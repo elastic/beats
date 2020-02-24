@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type testEventAccumulator struct {
@@ -67,7 +68,7 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher := newMockFetcher(lbls, nil)
 	pBus := bus.New(log, "test")
 
-	cfg := &Config{
+	cfg := &awsauto.Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
 		Period:  time.Nanosecond,
 	}
@@ -109,9 +110,15 @@ func Test_internalBuilder(t *testing.T) {
 		"start":    true,
 		"host":     *lbl.lb.DNSName,
 		"port":     *lbl.listener.Port,
+		"aws": common.MapStr{
+			"elb": lbl.toMap(),
+		},
+		"cloud": lbl.toCloudMap(),
 		"meta": common.MapStr{
-			"elb_listener": lbl.toMap(),
-			"cloud":        lbl.toCloudMap(),
+			"aws": common.MapStr{
+				"elb": lbl.toMap(),
+			},
+			"cloud": lbl.toCloudMap(),
 		},
 	}
 

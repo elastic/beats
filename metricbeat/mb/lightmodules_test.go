@@ -20,6 +20,7 @@
 package mb
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -194,18 +195,22 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
+			expectedQuery:  nil,
 		},
 		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
 			expectedOption: "test",
+			expectedQuery:  nil,
 		},
 		"light module default metricset": {
 			config:         common.MapStr{"module": "service"},
 			expectedOption: "test",
+			expectedQuery:  nil,
 		},
 		"light module override option": {
 			config:         common.MapStr{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
+			expectedQuery:  nil,
 		},
 		"light module with query": {
 			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
@@ -216,6 +221,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config:         common.MapStr{"module": "service", "period": "42s"},
 			expectedOption: "test",
 			expectedPeriod: 42 * time.Second,
+			expectedQuery:  nil,
 		},
 		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
@@ -232,6 +238,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"mixed module with standard and light metricsets": {
 			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
 			expectedOption: "default",
+			expectedQuery:  nil,
 		},
 		"mixed module with unregistered and light metricsets": {
 			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
@@ -279,6 +286,96 @@ func TestNewModuleFromConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
+	const hostEndpoint = "ceph-restful:8003"
+	const sampleHttpsEndpoint = "https://" + hostEndpoint
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption,
+		WithHostParser(func(module Module, host string) (HostData, error) {
+			u, err := url.Parse(host)
+			if err != nil {
+				return HostData{}, err
+			}
+			return HostData{
+				Host: u.Host,
+				URI:  host,
+			}, nil
+		}))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{sampleHttpsEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, hostEndpoint, metricSets[0].Host())
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].HostData().URI)
+}
+
+func TestLightMetricSet_WithoutHostParser(t *testing.T) {
+	const sampleHttpsEndpoint = "https://ceph-restful:8003"
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{sampleHttpsEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].Host())
+	assert.Equal(t, sampleHttpsEndpoint, metricSets[0].HostData().URI)
+}
+
+func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
+	const (
+		postgresHost     = "host1:5432"
+		postgresEndpoint = "postgres://user1:pass@host1:5432?connect_timeout=2"
+		postgresParsed   = "connect_timeout=3 host=host1 password=pass port=5432 user=user1"
+	)
+
+	r := NewRegister()
+	r.MustAddMetricSet("http", "json", newMetricSetWithOption,
+		WithHostParser(func(module Module, host string) (HostData, error) {
+			return HostData{
+				Host: postgresHost,
+				URI:  postgresParsed,
+			}, nil
+		}))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+
+	config, err := common.NewConfigFrom(
+		common.MapStr{
+			"module":     "httpextended",
+			"metricsets": []string{"extends"},
+			"hosts":      []string{postgresEndpoint},
+		})
+	require.NoError(t, err)
+
+	_, metricSets, err := NewModule(config, r)
+	require.NoError(t, err)
+	require.Len(t, metricSets, 1)
+
+	assert.Equal(t, postgresHost, metricSets[0].Host())
+	assert.Equal(t, postgresParsed, metricSets[0].HostData().URI)
 }
 
 func TestNewModulesCallModuleFactory(t *testing.T) {

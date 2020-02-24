@@ -27,7 +27,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 			return nil, err
 		}
 
-		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone)
+		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
 
 		for i := range keyValues {
 			sdCollectorInputData.Timestamp = &keyValues[i].Timestamp

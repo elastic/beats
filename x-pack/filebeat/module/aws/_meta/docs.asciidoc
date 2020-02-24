@@ -28,18 +28,12 @@ Example config:
 - module: aws
   s3access:
     enabled: false
-
-    # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    # var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    # var.credential_profile_name: fb-aws
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
 
   elb:
     enabled: false
@@ -99,6 +93,20 @@ Filename of AWS credential file.
 
 AWS credential profile name.
 
+*`var.visibility_timeout`*::
+
+The duration that the received messages are hidden from ReceiveMessage request.
+Default to be 300 seconds.
+
+*`var.api_timeout`*::
+
+Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
+*`var.endpoint`*::
+
+Custom endpoint used to access AWS APIs.
+
+[float]
 === cloudtrail fileset
 
 CloudTrail monitors events for the account. If user creates a trail, it
@@ -107,6 +115,7 @@ The `cloudtrail` fileset does not read the CloudTrail Digest files
 that are delivered to the S3 bucket when Log File Integrity is turned
 on, it only reads the CloudTrail logs.
 
+[float]
 === elb fileset
 
 Elastic Load Balancing provides access logs that capture detailed information
@@ -125,6 +134,7 @@ This fileset comes with a predefined dashboard:
 [role="screenshot"]
 image::./images/filebeat-aws-elb-overview.png[]
 
+[float]
 === s3access fileset
 
 Server access logging provides detailed records for the requests that are made
@@ -140,6 +150,7 @@ This fileset comes with a predefined dashboard:
 [role="screenshot"]
 image::./images/filebeat-aws-s3access-overview.png[]
 
+[float]
 === vpcflow fileset
 
 VPC Flow Logs is a feature in AWS that enables users to capture information

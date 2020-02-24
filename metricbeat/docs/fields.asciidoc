@@ -3933,6 +3933,116 @@ type: long
 --
 
 [float]
+=== mgr_cluster_disk
+
+see: cluster_disk
+
+
+[float]
+=== mgr_cluster_health
+
+see: cluster_health
+
+
+[float]
+=== mgr_osd_perf
+
+OSD performance metrics of Ceph cluster
+
+
+
+*`ceph.mgr_osd_perf.id`*::
++
+--
+OSD ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ms`*::
++
+--
+Commit latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ms`*::
++
+--
+Apply latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ns`*::
++
+--
+Commit latency in ns
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ns`*::
++
+--
+Apply latency in ns
+
+type: long
+
+--
+
+[float]
+=== mgr_osd_pool_stats
+
+OSD pool stats of Ceph cluster
+
+
+
+*`ceph.mgr_osd_pool_stats.pool_name`*::
++
+--
+Pool name
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_pool_stats.pool_id`*::
++
+--
+Pool ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_pool_stats.client_io_rate`*::
++
+--
+Client I/O rates
+
+type: object
+
+--
+
+[float]
+=== mgr_osd_tree
+
+see: osd_tree
+
+
+[float]
+=== mgr_pool_disk
+
+see: pool_disk
+
+
+[float]
 === monitor_health
 
 monitor_health stats data
@@ -7036,7 +7146,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 
@@ -20992,7 +21102,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
 
 
 type: scaled_float
@@ -22492,6 +22602,58 @@ The desired generation per StatefulSet
 
 
 type: long
+
+--
+
+[float]
+=== storageclass
+
+kubernetes storage class metrics
+
+
+
+*`kubernetes.storageclass.name`*::
++
+--
+Storage class name.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.provisioner`*::
++
+--
+Volume provisioner for the storage class.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.reclaim_policy`*::
++
+--
+Reclaim policy for dynamically created volumes
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.volume_binding_mode`*::
++
+--
+Mode for default provisioning and binding
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.created`*::
++
+--
+Storage class creation date
+
+type: date
 
 --
 

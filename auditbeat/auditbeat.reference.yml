@@ -315,8 +315,7 @@ auditbeat.modules:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1060,7 +1059,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1094,10 +1092,10 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
