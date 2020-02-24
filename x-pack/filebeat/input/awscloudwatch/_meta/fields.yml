@@ -1,0 +1,5 @@
+- key: awscloudwatch
+  title: "awscloudwatch"
+  description: >
+    Fields from awscloudwatch input.
+  release: beta

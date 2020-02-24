@@ -741,6 +741,22 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "lUuymsvXAJlmbU5U6Z2HmLtZJpQ=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "KUuVw2iLik8SzBNsR4CAAq5JgGA=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "6P5rEa7z60Jtq4KsiO6fODPxGbI=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/ec2",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
@@ -5803,18 +5819,18 @@
 			"versionExact": "v0.7.0"
 		},
 		{
-			"path": "google.golang.org/api/internal/gensupport",
-			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
-		},
-		{
 			"checksumSHA1": "I4Oe5Q+AuaxmN3duL38r2evqGKk=",
 			"path": "google.golang.org/api/internal/gensupport",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
 			"revisionTime": "2019-11-15T18:09:15Z",
 			"version": "v0.14.0",
 			"versionExact": "v0.14.0"
+		},
+		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
 		},
 		{
 			"path": "google.golang.org/api/internal/gensupport",
