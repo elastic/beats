@@ -13,6 +13,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 - Variable substitution from environment variables is not longer supported. {pull}15937{15937}
 - Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
+- Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They ca
+n still be used as normal processors in the configuration. {issue}16349[16349] {pull}[]
 
 *Auditbeat*
 

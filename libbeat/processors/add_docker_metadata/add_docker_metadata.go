@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -52,7 +51,6 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsprocessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {
