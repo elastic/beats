@@ -135,7 +135,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
 # Avoid running yacc to generate a parser for dependency.
 .PHONY: update-yacc-vendor
 update-yacc-vendor:
-	@touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
@@ -195,6 +195,8 @@ prepare-tests: update-yacc-vendor
 	go install -mod=vendor ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
 	go install -mod=vendor ${TESTIFY_TOOL_REPO}
+	# Avoid running yacc to generate a parser for dependency.
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
