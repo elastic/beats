@@ -172,6 +172,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in logstash module. {issue}16169[16169] {pull}16668[16668]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
 - Improve ECS categorization field mapping in icinga module. {issue}16164[16164] {pull}16533[16533]
+- Improve ECS categorization field mappings in ibmmq module. {issue}16163[16163] {pull}16532[16532]
 
 *Heartbeat*
 
