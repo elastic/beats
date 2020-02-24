@@ -48,6 +48,13 @@ distributed to the servers in the list. If one server becomes unreachable, the e
 distributed to the reachable servers only. You can define each Redis server by specifying
 `HOST` or `HOST:PORT`. For example: `"192.15.3.2"` or `"test.redis.io:12345"`. If you
 don't specify a port number, the value configured by `port` is used.
+Each Redis server can be defined as a `IP:PORT` pair or as a `URL`. For
+example: `redis://localhost:6379`,or `rediss://localhost:6379`.
+Using URLs one can add a server specific password like as well. For example:
+`redis://:password@localhost:6379`.
+The `redis` scheme will disable the `ssl` settings for the host, while `rediss`
+will enforce TLS. In the later case the output will use the system certificate store if no `ssl`
+settings have been configured.
 
 ===== `index`
 
