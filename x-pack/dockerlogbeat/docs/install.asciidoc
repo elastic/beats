@@ -21,11 +21,11 @@ Make sure your system meets the following prerequisites:
 
 // TODO: Test the following commands when the driver is available on docker hub.
 
-1. Install the plugin. You can install it from the Docker store (recommended),
+1. Install the plugin. You can install it from the Docker hub (recommended),
 or build and install the plugin from source in the
 https://github.com/elastic/beats[beats] GitHub repo.
 +
-*To install from the Docker store:*
+*To install from the Docker hub:*
 +
 ["source","sh",subs="attributes"]
 ----
