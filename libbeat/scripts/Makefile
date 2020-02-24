@@ -135,7 +135,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
 # Avoid running yacc to generate a parser for dependency.
 .PHONY: update-yacc-vendor
 update-yacc-vendor:
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
