@@ -7,6 +7,9 @@
     "service" : {
         "type" : "iis"
     },
+    "process" : {
+        "pid" : 7664
+    },
     "iis" : {
         "application_pool" : {
             "net_clr" : {
@@ -14,7 +17,6 @@
             },
             "name" : "test.local",
             "process" : {
-                "pid" : 11956,
                 "thread_count" : 32,
                 "private_byte" : 3.4684928E7,
                 "handle_count" : 743,

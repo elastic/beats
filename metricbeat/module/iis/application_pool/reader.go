@@ -156,6 +156,7 @@ func (re *Reader) fetch(names []string) ([]mb.Event, error) {
 			MetricSetFields: common.MapStr{
 				"name": appPool.Name,
 			},
+			RootFields: common.MapStr{},
 		}
 		for counterPath, value := range values {
 			for _, val := range value {

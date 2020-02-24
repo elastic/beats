@@ -32,7 +32,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("iis", "application_pool", New, mb.DefaultMetricSet())
+	mb.Registry.MustAddMetricSet("iis", "application_pool", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -63,15 +63,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if err := reader.initCounters(config.Names); err != nil {
-		return nil, err
-	}
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		log:           logp.NewLogger("application pool"),
 		reader:        reader,
-	}, nil
+	}
+	if err := ms.reader.initCounters(config.Names); err != nil {
+		return ms, err
+	}
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
