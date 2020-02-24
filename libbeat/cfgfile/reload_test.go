@@ -28,12 +28,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
-
-type mockRunner struct{}
-type mockRunnerFactory struct{}
 
 func TestReloader(t *testing.T) {
 	// Create random temp directory
@@ -109,15 +105,3 @@ func TestReloader(t *testing.T) {
 				configScans.Get()))
 	}
 }
-
-func (rf *mockRunnerFactory) Create(
-	p beat.Pipeline, config *common.Config, meta *common.MapStrPointer,
-) (Runner, error) {
-	return &mockRunner{}, nil
-}
-
-func (r *mockRunner) String() string {
-	return "mockRunner{}"
-}
-func (r *mockRunner) Start() {}
-func (r *mockRunner) Stop()  {}
