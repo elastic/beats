@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 - Variable substitution from environment variables is not longer supported. {pull}15937{15937}
+- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
 
 *Auditbeat*
 
@@ -90,6 +91,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
 
 *Packetbeat*
 
@@ -125,8 +127,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320] 
+- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
 - Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
+- Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 
 *Heartbeat*
 
@@ -159,12 +162,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
+- Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
 - Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
 - Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
+- Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 
 *Packetbeat*
 
