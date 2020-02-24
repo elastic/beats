@@ -6,11 +6,13 @@
         "field": "message",
         "ignore_missing": true,
         "patterns": [
-            "^(%{DATETIME:greenplum.log.timestamp})?,(\"%{WORD:greenplum.log.user}\")?,(\"%{WORD:greenplum.log.database}\")?,(%{WORD:greenplum.log.process_id})?,(th-%{WORD:greenplum.log.thread_id})?,(\"%{GREEDYDATA:greenplum.log.host}\")?,(\"%{NUMBER:greenplum.log.port}\")?,(%{DATETIME:greenplum.log.session_start})?,(%{NUMBER:greenplum.log.transaction_id})?,(%{WORD:greenplum.log.session_id})?,(cmd%{NUMBER:greenplum.log.command_count})?,(%{WORD:greenplum.log.gp_segment.type}-%{WORD:greenplum.log.gp_segment.id})?,(%{NUMBER:greenplum.log.slice_id})?,(%{WORD:greenplum.log.distributed_transaction_id})?,(%{WORD:greenplum.log.local_transaction_id})?,(%{WORD:greenplum.log.subtransaction_id})?,(\"%{WORD:greenplum.log.level}\")?,(\"%{NUMBER:greenplum.log.state_code}\")?,(\"%{GREEDYDATA:greenplum.log.message}\")?,(%{GREEDYDATA:greenplum.log.detail})?,(%{GREEDYDATA:greenplum.log.hint})?,(%{GREEDYDATA:greenplum.log.query})?,(%{NUMBER:greenplum.log.query_position})?,(%{GREEDYDATA:greenplum.log.context})?,(%{GREEDYDATA:greenplum.log.debug})?,(%{NUMBER:greenplum.log.cursor_position})?,(%{NUMBER:greenplum.log.cursor_position})?,(\"%{GREEDYDATA:greenplum.log.file.name}\")?,(%{NUMBER:greenplum.log.file.line})?,(%{GREEDYDATA:greenplum.log.stack})?"
+            "^(%{DATETIME:greenplum.log.timestamp})?,(\"%{WORD:greenplum.log.user}\")?,(\"%{WORD:greenplum.log.database}\")?,(%{WORD:greenplum.log.process_id})?,((th-|th)%{NUMBER:greenplum.log.thread_id})?,(\"%{GREEDYDATA:greenplum.log.host}\")?,(\"%{NUMBER:greenplum.log.port}\")?,(%{DATETIME:greenplum.log.session_start})?,(%{NUMBER:greenplum.log.transaction_id})?,(%{WORD:greenplum.log.session_id})?,(cmd%{NUMBER:greenplum.log.command_count})?,(%{WORD:greenplum.log.gp_segment.type}-%{WORD:greenplum.log.gp_segment.id}|%{THREE:greenplum.log.gp_segment.type}%{ONE:greenplum.log.gp_segment.id})?,(slice%{NUMBER:greenplum.log.slice_id})?,(%{WORD:greenplum.log.distributed_transaction_id})?,(%{WORD:greenplum.log.local_transaction_id})?,(%{WORD:greenplum.log.subtransaction_id})?,(\"%{WORD:greenplum.log.level}\")?,(\"%{WORD:greenplum.log.state_code}\")?,(\"%{GREEDYDATA:greenplum.log.message}\")?,(\"%{GREEDYDATA:greenplum.log.detail}\")?,(\"%{GREEDYDATA:greenplum.log.hint}\")?,(\"%{GREEDYDATA:greenplum.log.query}\")?,(%{NUMBER:greenplum.log.query_position})?,(\"%{GREEDYDATA:greenplum.log.context}\")?,(\"%{GREEDYDATA:greenplum.log.debug}\")?,(%{NUMBER:greenplum.log.cursor_position})?,(%{WORD:greenplum.log.function})?,(\"%{GREEDYDATA:greenplum.log.file.name}\")?,(%{NUMBER:greenplum.log.file.line})?,(\"%{GREEDYDATA:greenplum.log.stack}\")?$"
         ],
         "pattern_definitions": {
           "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
-          "GREEDYDATA": "(.|\n|\t)*"
+          "GREEDYDATA": "(.|\n|\t)*",
+          "ONE": "[0-9A-Za-z_]{1}",
+          "THREE": "[0-9A-Za-z_]{3}"
         }
       }
     },
@@ -19,8 +21,10 @@
         "field": "greenplum.log.timestamp",
         "target_field": "@timestamp",
         "formats": [
-          "yyyy-MM-dd HH:mm:ss.SSS zz", "yyyy-MM-dd HH:mm:ss zz"
-        ]
+          "yyyy-MM-dd HH:mm:ss.SSS zz", "yyyy-MM-dd HH:mm:ss zz",
+          "yyyy-MM-dd HH:mm:ss.SSSSSS zz", "yyyy-MM-dd HH:mm:ssssss zz"
+        ],
+        "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
       }
     }, {
       "script": {
@@ -32,6 +36,11 @@
     }, {
       "remove": {
         "field": "temp.duration",
+        "ignore_missing": true
+      }
+    }, {
+      "remove": {
+        "field": "message",
         "ignore_missing": true
       }
     }
