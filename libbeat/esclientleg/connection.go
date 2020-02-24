@@ -37,8 +37,13 @@ type Connection struct {
 	ConnectionSettings
 
 	Encoder BodyEncoder
+
+	// buffered bulk requests
+	BulkRequ *BulkRequest
+
 	version common.Version
-	log     *logp.Logger
+
+	log *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -57,6 +62,7 @@ type ConnectionSettings struct {
 
 	OnConnectCallback func() error
 
+	Parameters       map[string]string
 	CompressionLevel int
 	EscapeHTML       bool
 }
@@ -74,9 +80,15 @@ func NewConnection(settings ConnectionSettings) (*Connection, error) {
 		}
 	}
 
+	bulkRequ, err := NewBulkRequest(settings.URL, "", "", settings.Parameters, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Connection{
 		ConnectionSettings: settings,
 		Encoder:            encoder,
+		BulkRequ:           bulkRequ,
 		log:                logp.NewLogger("esclientleg"),
 	}, nil
 }

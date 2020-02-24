@@ -45,11 +45,7 @@ type Client struct {
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
-	params   map[string]string
 	timeout  time.Duration
-
-	// buffered bulk requests
-	bulkRequ *esclientleg.BulkRequest
 
 	observer outputs.Observer
 
@@ -134,12 +130,6 @@ func NewClient(
 		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
 
-	params := s.Parameters
-	bulkRequ, err := esclientleg.NewBulkRequest(s.URL, "", "", params, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	conn, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
 		URL:       s.URL,
 		Username:  s.Username,
@@ -157,6 +147,7 @@ func NewClient(
 			Timeout: s.Timeout,
 		},
 		ProxyURL:         s.Proxy,
+		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
 	})
@@ -168,10 +159,7 @@ func NewClient(
 		Connection: *conn,
 		index:      s.Index,
 		pipeline:   pipeline,
-		params:     params,
 		timeout:    s.Timeout,
-
-		bulkRequ: bulkRequ,
 
 		observer: s.Observer,
 
@@ -379,7 +367,7 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	requ := client.bulkRequ
+	requ := client.BulkRequ
 	requ.Reset(body)
 	status, result, sendErr := client.SendBulkRequest(requ)
 	if sendErr != nil {
