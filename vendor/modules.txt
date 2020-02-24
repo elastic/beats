@@ -266,8 +266,6 @@ github.com/bsm/sarama-cluster
 # github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
 github.com/cavaliercoder/go-rpm
 github.com/cavaliercoder/go-rpm/version
-# github.com/cespare/xxhash v1.1.0
-github.com/cespare/xxhash
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
 # github.com/containerd/containerd v1.3.3
