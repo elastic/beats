@@ -1333,7 +1333,7 @@ type: ip
 *`aws.cloudwatch.program_name`*::
 +
 --
-The internet address of the requester.
+The program name of the log entry.
 
 
 type: keyword
