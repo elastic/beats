@@ -19,11 +19,54 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
+
+func noopWrapper(rt http.RoundTripper) (http.RoundTripper, error) {
+	return rt, nil
+}
+
+func addCatchAll(mux *http.ServeMux, t *testing.T) *http.ServeMux {
+	mux.HandleFunc("/", func(_ http.ResponseWriter, _ *http.Request) {
+		t.Fatal("HTTP catch all handled called")
+	})
+	return mux
+}
 
 // - Prefix.
 func TestHTTPClient(t *testing.T) {
 	ctx := context.Background()
+	l, err := logger.New()
+	require.NoError(t, err)
+
+	t.Run("Guard against double slashes on path", withServer(
+		func(t *testing.T) *http.ServeMux {
+			msg := `{ message: "hello" }`
+			mux := http.NewServeMux()
+			mux.HandleFunc("/nested/echo-hello", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, msg)
+			})
+			return addCatchAll(mux, t)
+		}, func(t *testing.T, host string) {
+			// Add a slashes at the end of the URL, internally we should prevent having double slashes
+			// when adding path to the request.
+			url := "http://" + host + "/"
+
+			c, err := NewConfigFromURL(url)
+			client, err := NewWithConfig(l, c, noopWrapper)
+
+			require.NoError(t, err)
+			resp, err := client.Send(ctx, "GET", "/nested/echo-hello", nil, nil, nil)
+			require.NoError(t, err)
+
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			assert.Equal(t, `{ message: "hello" }`, string(body))
+		},
+	))
+
 	t.Run("Simple call", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
