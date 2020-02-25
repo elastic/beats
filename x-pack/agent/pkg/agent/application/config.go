@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/kibana"
 	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
