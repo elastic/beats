@@ -50,9 +50,8 @@ class Test(metricbeat.BaseTest):
             self.assertIn("metrics", evt["prometheus"].keys(), evt)
             self.assertGreater(len(evt["prometheus"]["metrics"].keys()), 0)
 
-            # Verify if processors are correctly setup.
             for metric in evt["prometheus"]["metrics"].keys():
-                assert metric.startswith(metric_name_prefix + "_")
+                assert metric == "up" or metric.startswith(metric_name_prefix + "_")
 
     def oss_distribution(self):
         if not 'REDIS_DISTRIBUTION' in self.COMPOSE_ENV:
