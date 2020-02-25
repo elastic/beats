@@ -51,15 +51,14 @@ In order to filter out/in metrics one can make use of `metrics_filters.include` 
 -------------------------------------------------------------------------------------
 - module: prometheus
   period: 10s
-  hosts: ["localhost:9092"]
+  hosts: ["localhost:9090"]
   metrics_path: /metrics
   metrics_filters:
     include: ["node_filesystem_*"]
-    exclude: ["node_filesystem_device_*", "node_filesystem_readonly"]
+    exclude: ["node_filesystem_device_*"]
 -------------------------------------------------------------------------------------
 
-The configuration above will include only metrics that match `node_filesystem_*` pattern and do not match `node_filesystem_device_*`
-and are not `node_filesystem_readonly` metric.
+The configuration above will include only metrics that match `node_filesystem_*` pattern and do not match `node_filesystem_device_*`.
 
 
 Keep only specific metrics, anchor the start and the end of the regexp of each metric:
@@ -71,7 +70,7 @@ Keep only specific metrics, anchor the start and the end of the regexp of each m
 -------------------------------------------------------------------------------------
 - module: prometheus
   period: 10s
-  hosts: ["localhost:9092"]
+  hosts: ["localhost:9090"]
   metrics_path: /metrics
   metrics_filters:
     include: ["^node_network_net_dev_group$", "^node_network_up$"]
