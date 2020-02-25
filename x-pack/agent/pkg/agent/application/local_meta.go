@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/release"
 )
 
 func metadata() (map[string]interface{}, error) {
