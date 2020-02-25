@@ -50,6 +50,56 @@ input:
     - instance_label: ''
       measurement_label: network.service_uptime
       query: '\Web Service(_Total)\Service Uptime'
+
+   #added
+    - instance_label: ''
+      measurement_label: network.current_anonymous_users
+      query: 'Web Service(*)Current Anonymous Users'
+    - instance_label: ''
+      measurement_label: network.current_nonanonymous_users
+      query: 'Web Service(*)Current NonAnonymous Users'
+    - instance_label: ''
+      measurement_label: network.total_anonymous_users
+      query: 'Web Service(*)Total Anonymous Users'
+    - instance_label: ''
+      measurement_label: network.anonymous_users_per_sec
+      query: 'Web Service(*)Anonymous Users/sec'
+    - instance_label: ''
+      measurement_label: network.total_nonanonymous_users
+      query: 'Web Service(*)Total NonAnonymous Users'
+    - instance_label: ''
+      measurement_label: network.total_not_found_errors
+      query: 'Web Service(*)Total Not Found Errors'
+    - instance_label: ''
+      measurement_label: network.not_found_errors_per_sec
+      query: 'Web Service(*)Not Found Errors/sec'
+    - instance_label: ''
+      measurement_label: network.total_locked_errors
+      query: 'Web Service(*)Total Locked Errors'
+    - instance_label: ''
+      measurement_label: network.locked_errors_per_sec
+      query: 'Web Service(*)Locked Errors/sec'
+    - instance_label: ''
+      measurement_label: network.total_CGI_requests
+      query: 'Web Service(*)Total CGI Requests'
+
+
+
+
+
+
+      Web Service(*)CGI Requests/sec
+      Web Service(*)Total ISAPI Extension Requests
+      Web Service(*)ISAPI Extension Requests/sec
+      Web Service(*)Total Files Sent
+      Web Service(*)Files Sent/sec
+      Web Service(*)Total Files Received
+      Web Service(*)Files Received/sec
+      Web Service(*)Total Files Transferred
+      Web Service(*)Files/sec
+
+
+
     #cache
     - instance_label: ''
       measurement_label: cache.current_files_cached
