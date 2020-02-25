@@ -122,6 +122,7 @@ func managePropertyName(metric string) string {
 func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) (mb.Event, common.MapStr) {
 	event := mb.Event{
 		ModuleFields: common.MapStr{
+			"timegrain": metric.TimeGrain,
 			"resource": common.MapStr{
 				"name":  metric.Resource.Name,
 				"type":  metric.Resource.Type,
@@ -130,10 +131,8 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 			"subscription_id": metric.Resource.Subscription,
 			"namespace":       metric.Namespace,
 		},
-		MetricSetFields: common.MapStr{
-			"timegrain": metric.TimeGrain,
-		},
-		Timestamp: timestamp,
+		MetricSetFields: common.MapStr{},
+		Timestamp:       timestamp,
 	}
 	if len(metric.Resource.Tags) > 0 {
 		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)

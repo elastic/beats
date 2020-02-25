@@ -14,11 +14,11 @@
         "period" : 300000
     },
     "azure" : {
+        "timegrain" : "PT5M",
         "dimensions" : {
             "databasename" : "testdb"
         },
         "database_account" : {
-            "timegrain" : "PT5M",
             "provisionedthroughput" : {
                 "max" : 400
             }

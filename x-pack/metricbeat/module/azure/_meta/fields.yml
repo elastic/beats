@@ -8,6 +8,10 @@
       type: group
       description: >
       fields:
+        - name: timegrain
+          type: keyword
+          description: >
+            The azure metric timegrain
         - name: resource
           type: group
           description: >

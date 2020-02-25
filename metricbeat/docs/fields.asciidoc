@@ -3097,6 +3097,16 @@ azure module
 
 
 
+*`azure.timegrain`*::
++
+--
+The azure metric timegrain
+
+
+type: keyword
+
+--
+
 [float]
 === resource
 
