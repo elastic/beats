@@ -96,8 +96,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		"address": broker.AdvertisedAddr(),
 	}
 
+	topicPartitionPartitionOffsets := broker.FetchPartitionOffsetsForTopics(topics)
+
 	for _, topic := range topics {
-		debugf("fetch events for topic: ", topic.Name)
 		evtTopic := common.MapStr{
 			"name": topic.Name,
 		}
@@ -109,25 +110,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 
 		for _, partition := range topic.Partitions {
-			// partition offsets can be queried from leader only
-			if broker.ID() != partition.Leader {
-				debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
-				continue
-			}
-
 			// collect offsets for all replicas
-			for _, id := range partition.Replicas {
+			for _, replicaID := range partition.Replicas {
 
 				// Get oldest and newest available offsets
-				offOldest, offNewest, offOK, err := queryOffsetRange(broker, id, topic.Name, partition.ID)
+				partitionOffsets := topicPartitionPartitionOffsets[topic.Name][partition.ID]
 
-				if !offOK {
-					if err == nil {
-						err = errFailQueryOffset
-					}
-
-					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
-						topic.Name, partition.ID, err)
+				if partitionOffsets.Err != nil {
+					msg := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %v",
+						topic.Name, partition.ID, partitionOffsets.Err)
 					m.Logger().Warn(msg)
 					r.Error(msg)
 					continue
@@ -136,9 +127,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				partitionEvent := common.MapStr{
 					"id":             partition.ID,
 					"leader":         partition.Leader,
-					"replica":        id,
-					"is_leader":      partition.Leader == id,
-					"insync_replica": hasID(id, partition.Isr),
+					"replica":        replicaID,
+					"is_leader":      partition.Leader == replicaID,
+					"insync_replica": hasID(replicaID, partition.Isr),
 				}
 
 				if partition.Err != 0 {
@@ -149,7 +140,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 				// Helpful IDs to avoid scripts on queries
 				partitionTopicID := fmt.Sprintf("%d-%s", partition.ID, topic.Name)
-				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, id)
+				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, replicaID)
 
 				// create event
 				event := common.MapStr{
@@ -162,8 +153,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					"broker":    evtBroker,
 					"partition": partitionEvent,
 					"offset": common.MapStr{
-						"newest": offNewest,
-						"oldest": offOldest,
+						"newest": partitionOffsets.Newest,
+						"oldest": partitionOffsets.Oldest,
 					},
 				}
 
