@@ -3,7 +3,6 @@ from parameterized import parameterized
 import redis
 import sys
 import unittest
-from nose.plugins.attrib import attr
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -14,12 +13,11 @@ class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['redis']
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @parameterized.expand([
         ("node", "node"),
         ("proxy", "listener")
     ])
-    @attr('integration')
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset, metric_name_prefix):
         """
         Test redis enterprise metricset
