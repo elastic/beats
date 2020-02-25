@@ -11,12 +11,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/gofrs/uuid"
 )
 
 func TestClientCacheWrap(t *testing.T) {

@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/client-go/tools/cache"
+	"github.com/cloudfoundry-community/go-cfclient"
 
-	cfclient "github.com/cloudfoundry-community/go-cfclient"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -23,26 +22,18 @@ type cfClient interface {
 
 // clientCacheWrap wraps the cloudfoundry client to add a cache in front of GetAppByGuid.
 type clientCacheWrap struct {
-	store  cache.Store
+	cache  *common.Cache
 	client cfClient
 	log    *logp.Logger
-	ttl    time.Duration
 }
 
 // newClientCacheWrap creates a new cache for application data.
 func newClientCacheWrap(client cfClient, ttl time.Duration, log *logp.Logger) *clientCacheWrap {
 	return &clientCacheWrap{
-		store:  cache.NewTTLStore(cacheKeyFunc, ttl),
+		cache:  common.NewCacheWithExpireOnAdd(ttl, 100),
 		client: client,
-		ttl:    ttl,
 		log:    log,
 	}
-}
-
-// appCached wraps an App structure adding a retrieval time
-type appCached struct {
-	app cfclient.App
-	ttl time.Time
 }
 
 // fetchApp uses the cfClient to retrieve an App entity and
@@ -52,36 +43,30 @@ func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	ttl := time.Now().Add(c.ttl)
-	c.store.Add(&appCached{app, ttl})
+	c.cache.Put(app.Guid, &app)
 	return &app, nil
 }
 
 // GetApp returns CF Application info, either from the cache or
 // using the CF client.
 func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
-	cachedApp, ok, _ := c.store.GetByKey(guid)
-	if !ok {
+	cachedApp := c.cache.Get(guid)
+	if cachedApp == nil {
 		return c.fetchAppByGuid(guid)
 	}
-
-	ac, ok := cachedApp.(*appCached)
+	app, ok := cachedApp.(*cfclient.App)
 	if !ok {
 		return nil, fmt.Errorf("error converting cached app")
 	}
-
-	if ac.ttl.Before(time.Now()) {
-		c.log.Debugf("cached data for application %q invalidated, retrieving again", guid)
-		return c.fetchAppByGuid(guid)
-	}
-
-	return &ac.app, nil
+	return app, nil
 }
 
-func cacheKeyFunc(obj interface{}) (string, error) {
-	cachedApp, ok := obj.(*appCached)
-	if !ok {
-		return "", fmt.Errorf("only appCached is allowed in the cache")
-	}
-	return cachedApp.app.Guid, nil
+// StartJanitor starts a goroutine that will periodically clean the applications cache.
+func (c *clientCacheWrap) StartJanitor(interval time.Duration) {
+	c.cache.StartJanitor(interval)
+}
+
+// StopJanitor stops the goroutine that periodically clean the applications cache.
+func (c *clientCacheWrap) StopJanitor() {
+	c.cache.StopJanitor()
 }

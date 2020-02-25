@@ -5,8 +5,10 @@
 package cloudfoundry
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
@@ -16,7 +18,12 @@ import (
 
 // Client interface exposed by Hub.Client.
 type Client interface {
+	// GetAppByGuid returns the application from cloudfoundry.
 	GetAppByGuid(guid string) (*cfclient.App, error)
+	// StartJanitor keeps the cache of applications clean.
+	StartJanitor(interval time.Duration)
+	// StopJanitor stops the running janitor.
+	StopJanitor()
 }
 
 // Hub is central place to get all the required clients to communicate with cloudfoundry.
@@ -98,7 +105,19 @@ func (h *Hub) doerFromClient(client Client) (*authTokenDoer, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newAuthTokenDoer(h.cfg.ClientID, h.cfg.ClientSecret, httpClient, h.log), nil
+	ccw, ok := client.(*clientCacheWrap)
+	if !ok {
+		return nil, fmt.Errorf("must pass client returned from hub.Client")
+	}
+	cfClient, ok := ccw.client.(*cfclient.Client)
+	if !ok {
+		return nil, fmt.Errorf("must pass client returned from hub.Client")
+	}
+	url := cfClient.Endpoint.AuthEndpoint
+	if h.cfg.UaaAddress != "" {
+		url = h.cfg.UaaAddress
+	}
+	return newAuthTokenDoer(url, h.cfg.ClientID, h.cfg.ClientSecret, httpClient, h.log), nil
 }
 
 // httpClient returns an HTTP client configured with the configuration TLS.

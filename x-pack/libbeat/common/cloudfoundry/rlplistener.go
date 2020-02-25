@@ -26,7 +26,6 @@ type RlpListenerCallbacks struct {
 
 // RlpListener is a listener client that connects to the cloudfoundry loggregator.
 type RlpListener struct {
-	stop       chan struct{}
 	cancel     context.CancelFunc
 	wg         sync.WaitGroup
 	rlpAddress string
@@ -44,7 +43,6 @@ func newRlpListener(
 	callbacks RlpListenerCallbacks,
 	log *logp.Logger) *RlpListener {
 	return &RlpListener{
-		stop:       make(chan struct{}),
 		rlpAddress: rlpAddress,
 		doer:       doer,
 		shardID:    shardID,
@@ -54,19 +52,19 @@ func newRlpListener(
 }
 
 // Start receiving events through from loggregator.
-func (c *RlpListener) Start() {
-	c.log.Debugw("Starting RLP listener.", "rlpAddress", c.rlpAddress)
+func (c *RlpListener) Start(ctx context.Context) {
+	c.log.Debugw("starting RLP listener.", "rlpAddress", c.rlpAddress)
 
 	ops := []loggregator.RLPGatewayClientOption{loggregator.WithRLPGatewayHTTPClient(c.doer)}
-	RLPClient := loggregator.NewRLPGatewayClient(c.rlpAddress, ops...)
+	rlpClient := loggregator.NewRLPGatewayClient(c.rlpAddress, ops...)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 	c.cancel = cancel
 	l := &loggregator_v2.EgressBatchRequest{
 		ShardId:   c.shardID,
 		Selectors: c.getSelectors(),
 	}
-	es := RLPClient.Stream(ctx, l)
+	es := rlpClient.Stream(ctx, l)
 
 	go func() {
 		c.wg.Add(1)
@@ -75,9 +73,6 @@ func (c *RlpListener) Start() {
 			select {
 			case <-ctx.Done():
 				c.log.Debug("context done message at loggregator received.")
-				return
-			case <-c.stop:
-				c.log.Debug("received stop channel signal at loggregator receiver.")
 				return
 			default:
 				envelopes := es()
@@ -107,9 +102,8 @@ func (c *RlpListener) Start() {
 
 // Stop receiving events
 func (c *RlpListener) Stop() {
-	c.log.Debugw("Stopping RLP listener.", "rlpAddress", c.rlpAddress)
+	c.log.Debugw("stopping RLP listener.", "rlpAddress", c.rlpAddress)
 
-	close(c.stop)
 	if c.cancel != nil {
 		c.cancel()
 	}

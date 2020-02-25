@@ -19,6 +19,7 @@ import (
 
 // authTokenDoer is an HTTP requester that indcludes UAA tokens at the header
 type authTokenDoer struct {
+	url          string
 	clientID     string
 	clientSecret string
 	httpClient   *http.Client
@@ -26,8 +27,9 @@ type authTokenDoer struct {
 }
 
 // NewAuthTokenDoer creates a loggregator HTTP client that uses a new UAA token at each request
-func newAuthTokenDoer(clientID, clientSecret string, httpClient *http.Client, log *logp.Logger) *authTokenDoer {
+func newAuthTokenDoer(url string, clientID, clientSecret string, httpClient *http.Client, log *logp.Logger) *authTokenDoer {
 	return &authTokenDoer{
+		url:          url,
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		httpClient:   httpClient,
@@ -59,7 +61,7 @@ func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (st
 		"grant_type": {"client_credentials"},
 	}
 
-	request, err := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", c.uaaUrl), strings.NewReader(data.Encode()))
+	request, err := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", d.url), strings.NewReader(data.Encode()))
 	if err != nil {
 		return "", -1, err
 	}
@@ -72,7 +74,7 @@ func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (st
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", -1, fmt.Errorf("Received a status code %v", resp.Status)
+		return "", -1, fmt.Errorf("received a status code %v", resp.Status)
 	}
 	defer resp.Body.Close()
 

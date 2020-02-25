@@ -9,11 +9,11 @@ package cloudfoundry
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestValidation(t *testing.T) {
