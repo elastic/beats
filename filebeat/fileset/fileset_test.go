@@ -222,7 +222,6 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 					t.FailNow()
 				}
 
-				require.True(t, c.HasField("pipeline"))
 				v, err := c.String("pipeline", -1)
 				require.NoError(t, err)
 				require.Equal(t, "foobar", v)
