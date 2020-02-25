@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix loading processors from annotation hints. {pull}16348[16348]
 - Fix k8s pods labels broken schema. {pull}16480[16480]
+- Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 
 *Auditbeat*
