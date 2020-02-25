@@ -11,7 +11,6 @@ var:
   - name: storage_account
   - name: storage_account_key
 
-
 ingest_pipeline:
   - ingest/pipeline.json
   - ../azure-shared-pipeline.json
