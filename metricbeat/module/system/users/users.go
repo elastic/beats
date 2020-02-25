@@ -1,10 +1,13 @@
 package users
 
 import (
+	"net"
+
 	"github.com/coreos/go-systemd/login1"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/godbus/dbus"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +33,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	counter int
-	conn    *login1.Conn
+	conn    *dbus.Conn
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -43,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	conn, err := login1.New()
+	conn, err := initDbusConnection()
 	if err != nil {
 		return nil, errors.Wrap(err, "error connecting to dbus")
 	}
@@ -59,42 +62,62 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	users, err := m.conn.ListUsers()
-	if err != nil {
-		return errors.Wrap(err, "error listing users")
-	}
-	sessions, err := m.conn.ListSessions()
+
+	sessions, err := listSessions(m.conn)
 	if err != nil {
 		return errors.Wrap(err, "error listing sessions")
 	}
 
-	eventMapping(users, sessions, report)
+	eventMapping(m.conn, sessions, report)
 
 	return nil
 }
 
 // eventMapping iterates through the lists of users and sessions, combining the two
-func eventMapping(users []login1.User, sessions []login1.Session, report mb.ReporterV2) error {
-	sessionList := []string{}
-	for _, user := range users {
-		for _, session := range sessions {
-			if session.UID == user.UID {
-				sessionList = append(sessionList, session.ID)
+func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2) error {
+
+	for _, session := range sessions {
+
+		props, err := getSessionProps(conn, session.Path)
+		if err != nil {
+			return errors.Wrap(err, "error getting properties")
+		}
+
+		event := common.MapStr{
+			"id":      session.ID,
+			"seat":    session.Seat,
+			"path":    session.Path,
+			"type":    props.Type,
+			"service": props.Service,
+			"remote":  props.Remote,
+			"state":   props.State,
+			"scope":   props.Scope,
+			"leader":  props.Leader,
+		}
+
+		rootEvents := common.MapStr{
+			"process": common.MapStr{
+				"pid": props.Leader,
+			},
+			"user": common.MapStr{
+				"name": session.User,
+				"id":   session.UID,
+			},
+		}
+
+		if props.Remote {
+			event["remote_host"] = props.RemoteHost
+			if ipAddr := net.ParseIP(props.RemoteHost); ipAddr != nil {
+				rootEvents["source"] = common.MapStr{
+					"ip": ipAddr,
+				}
 			}
 		}
+
 		reported := report.Event(mb.Event{
-			RootFields: common.MapStr{
-				"user": common.MapStr{
-					"name": user.Name,
-					"id":   user.UID,
-				},
-			},
-			MetricSetFields: common.MapStr{
-				"path":     user.Path,
-				"sessions": sessionList,
-			},
-		},
-		)
+			RootFields:      rootEvents,
+			MetricSetFields: event,
+		})
 		//if the channel is closed and metricbeat is shutting down, just return
 		if !reported {
 			break

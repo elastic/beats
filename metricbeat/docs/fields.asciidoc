@@ -35924,24 +35924,104 @@ format: duration
 [float]
 === users
 
-Logged-in user data
+Logged-in user session data
 
 
 
-*`system.users.path`*::
+*`system.users.id`*::
 +
 --
-Dbus object path
+The ID of the session
 
 
 type: keyword
 
 --
 
-*`system.users.sessions`*::
+*`system.users.seat`*::
 +
 --
-sessions associated with the user
+An associated logind seat
+
+
+type: keyword
+
+--
+
+*`system.users.path`*::
++
+--
+The DBus object path of the session
+
+
+type: keyword
+
+--
+
+*`system.users.type`*::
++
+--
+The type of the user session
+
+
+type: keyword
+
+--
+
+*`system.users.service`*::
++
+--
+A session associated with the service
+
+
+type: keyword
+
+--
+
+*`system.users.remote`*::
++
+--
+A bool indicating a remote session
+
+
+type: boolean
+
+--
+
+*`system.users.state`*::
++
+--
+The current state of the session
+
+
+type: keyword
+
+--
+
+*`system.users.scope`*::
++
+--
+The associated systemd scope
+
+
+type: keyword
+
+--
+
+*`system.users.leader`*::
++
+--
+The root PID of the session
+
+
+type: long
+
+--
+
+*`system.users.remote_host`*::
++
+--
+A remote host address for the session
 
 
 type: keyword

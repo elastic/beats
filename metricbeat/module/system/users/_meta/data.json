@@ -1,19 +1,39 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "system.users",
+        "duration": 115000,
+        "module": "system"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"system",
-        "name":"users",
-        "rtt":44269
+    "metricset": {
+        "name": "users",
+        "period": 10000
     },
-    "system":{
-        "users":{
-            "example": "users"
+    "process": {
+        "pid": 10786
+    },
+    "service": {
+        "type": "system"
+    },
+    "source": {
+        "ip": "192.168.1.86"
+    },
+    "system": {
+        "users": {
+            "id": 6,
+            "leader": 10786,
+            "path": "/org/freedesktop/login1/session/_36",
+            "remote": true,
+            "remote_host": "192.168.1.86",
+            "scope": "session-6.scope",
+            "seat": "",
+            "service": "sshd",
+            "state": "active",
+            "type": "tty"
         }
     },
-    "type":"metricsets"
+    "user": {
+        "id": 1000,
+        "name": "alexk"
+    }
 }
