@@ -3194,10 +3194,30 @@ type: object
 
 --
 
-*`azure.container.*.*`*::
+*`azure.container_instance.*.*`*::
 +
 --
-container
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
 
 
 type: object

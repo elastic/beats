@@ -30,9 +30,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-sqs,sqs>>   
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
+.7+| .7+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
-|<<metricbeat-metricset-azure-container,container>> beta[]  
+|<<metricbeat-metricset-azure-container_instance,container_instance>> beta[]  
+|<<metricbeat-metricset-azure-container_registry,container_registry>> beta[]  
+|<<metricbeat-metricset-azure-container_service,container_service>> beta[]  
 |<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
 |<<metricbeat-metricset-azure-storage,storage>> beta[]  
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
