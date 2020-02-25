@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	_ "github.com/mkevac/debugcharts"
 )
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.
@@ -102,6 +103,11 @@ func BeforeRun() {
 
 			// register pprof handler
 			mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+				http.DefaultServeMux.ServeHTTP(w, r)
+			})
+
+			// register debugcharts handler
+			mux.HandleFunc("/debug/charts/", func(w http.ResponseWriter, r *http.Request) {
 				http.DefaultServeMux.ServeHTTP(w, r)
 			})
 

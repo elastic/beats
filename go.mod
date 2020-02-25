@@ -20,7 +20,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.2.0
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
-	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
@@ -114,6 +114,7 @@ require (
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mkevac/debugcharts v0.0.0-20191222103121-ae1c48aa8615 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
