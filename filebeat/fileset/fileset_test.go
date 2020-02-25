@@ -21,6 +21,7 @@ package fileset
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -164,6 +165,30 @@ func TestResolveVariable(t *testing.T) {
 		result, err := resolveVariable(test.Vars, test.Value)
 		assert.NoError(t, err)
 		assert.Equal(t, test.Expected, result)
+	}
+}
+
+func TestGetInputConfig(t *testing.T) {
+	modulesPath, err := filepath.Abs("../module")
+	assert.NoError(t, err)
+	f, err := os.Open(modulesPath)
+	if err != nil {
+		panic(err)
+	}
+	list, err := f.Readdir(-1)
+	f.Close()
+	for _, file := range list {
+		fs, err := New(modulesPath, "", &ModuleConfig{Module: file.Name()}, &FilesetConfig{})
+		if err!= nil {
+			continue
+		}
+		cfg, err := fs.getInputConfig()
+		assert.NoError(t, err)
+		assert.True(t, cfg.HasField("paths"))
+	}
+
+	if err != nil {
+		panic(err)
 	}
 }
 
