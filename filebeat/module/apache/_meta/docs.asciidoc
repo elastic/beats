@@ -8,6 +8,10 @@ https://httpd.apache.org/[Apache HTTP] server.
 
 include::../include/what-happens.asciidoc[]
 
+New to {beatname_uc} modules? Read the
+<<filebeat-modules-quickstart,quick start>> to learn how to set up and run
+modules.
+
 [float]
 === Compatibility
 
@@ -15,16 +19,6 @@ The +{modulename}+ module was tested with logs from versions 2.2.22 and 2.4.23.
 
 On Windows, the module was tested with Apache HTTP Server installed from the Chocolatey
 repository.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-apache.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -80,6 +74,17 @@ Add %v config in httpd.conf in log section
     # By
     LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 -----
+
+ifndef::hide_for_obs[]
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-apache.png[]
+
+endif::[]
 
 :has-dashboards!:
 
