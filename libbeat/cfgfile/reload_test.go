@@ -49,7 +49,7 @@ func TestReloader(t *testing.T) {
 	})
 	// common.Config{}
 	reloader := NewReloader(nil, config)
-	retryCount := 5
+	retryCount := 10
 
 	go reloader.Run(nil)
 	defer reloader.Stop()
