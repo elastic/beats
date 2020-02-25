@@ -27,7 +27,10 @@ The fields added to the event look as follows:
   "pid":   1,
   "ppid":  0,
   "start_time": "2018-08-22T08:44:50.684Z",
-}
+},
+"container": {
+  "id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"
+},
 -------------------------------------------------------------------------------
 
 Optionally, the process environment can be included, too:
@@ -43,13 +46,6 @@ Optionally, the process environment can be included, too:
   ...
 -------------------------------------------------------------------------------
 
-Optionally, the container id can be included, too:
-[source,json]
--------------------------------------------------------------------------------
-  ...
-  "cid": "9317bb0f0c8eef642ded08bf5da182061f7f512a3987b665521a724cc84651ac" 
-  ...
--------------------------------------------------------------------------------
 It has the following settings:
 
 `match_pids`:: List of fields to lookup for a PID. The processor will
@@ -74,6 +70,13 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
-`include_cid`:: (Optional) By default, this value is false, and the `cid` 
-container id field is not outputed. If `restricted_fields` is `true`, `cid` 
-container id can be enriched from cgroup, when running auditbeat on kubernetes.
+`host_path`:: (Optional) By default, the `host_path` field is set to the root
+directory of the host `/`. HostPath is the path where /proc reside. For different 
+runtime configuration of Kubernetes or docker, the host_path can be set to 
+overwrite the default `host_path`
+
+`cgroup_prefixes`:: (Optional) By default, the `cgroup_prefixes` field is set to
+`/kubepods` and `/docker`. CgroupPrefix is the prefix where the container id is 
+inside cgroup. or different runtime configuration of Kubernetes or docker, the 
+cgroup_prefixes can be set to overwrite the default `cgroup_prefixes`
+

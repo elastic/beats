@@ -30,13 +30,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/gosigar/cgroup"
 )
 
 const (
 	processorName   = "add_process_metadata"
 	cacheExpiration = time.Second * 30
-	hostPath        = "/"
-	cgroupPrefix    = "/kubepods"
 )
 
 var (
@@ -49,7 +48,9 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
 
-	gCidProvider = newCidProvider(hostPath, cgroupPrefix)
+	processCgroupPaths = cgroup.ProcessCgroupPaths
+
+	// wantContainerID = false
 
 	instanceID atomic.Uint32
 )
@@ -87,10 +88,10 @@ func init() {
 
 // New constructs a new add_process_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache, gCidProvider)
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, cidProvider cidProvider) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -105,7 +106,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	p := addProcessMetadata{
 		config:      config,
 		provider:    provider,
-		cidProvider: cidProvider,
+		cidProvider: newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths),
 		log:         log,
 	}
 	if p.mappings, err = config.getMappings(); err != nil {
@@ -166,6 +167,14 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	}
 	meta := metaPtr.fields
 
+	cid, err := p.cidProvider.GetCid(pid)
+	if err != nil {
+		return nil, err
+	}
+	if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+		return nil, err
+	}
+
 	result = event.Clone()
 	for dest, sourceIf := range p.mappings {
 		source, castOk := sourceIf.(string)
@@ -184,17 +193,6 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 			return nil, err
 		}
 		if _, err = result.Put(dest, value); err != nil {
-			return nil, err
-		}
-	}
-
-	// enrich with the container id, if include_cid is set to true
-	if p.config.IncludeCid {
-		cid, err := p.cidProvider.GetCid(pid)
-		if err != nil {
-			return nil, err
-		}
-		if _, err = result.Put("cid", cid); err != nil {
 			return nil, err
 		}
 	}

@@ -21,17 +21,17 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-
-	"github.com/elastic/gosigar/cgroup"
 )
 
 type gosigarCidProvider struct {
-	hostPath     string
-	cgroupPrefix string
+	hostPath           string
+	cgroupPrefixes     []string
+	processCgroupPaths func(string, int) (map[string]string, error)
 }
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
-	cgroups, err := cgroup.ProcessCgroupPaths(p.hostPath, pid)
+	cgroups, err := p.processCgroupPaths(p.hostPath, pid)
+
 	if err != nil {
 		return "", fmt.Errorf("failed to read cgroups for pid=%v", pid)
 	}
@@ -39,10 +39,12 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath string, cgroupPrefix string) gosigarCidProvider {
+func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error)) gosigarCidProvider {
+
 	return gosigarCidProvider{
-		hostPath:     hostPath,
-		cgroupPrefix: cgroupPrefix,
+		hostPath:           hostPath,
+		cgroupPrefixes:     cgroupPrefixes,
+		processCgroupPaths: processCgroupPaths,
 	}
 }
 
@@ -54,8 +56,10 @@ func newCidProvider(hostPath string, cgroupPrefix string) gosigarCidProvider {
 // /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
 func (p gosigarCidProvider) getCid(cgroups map[string]string) string {
 	for _, path := range cgroups {
-		if strings.HasPrefix(path, p.cgroupPrefix) {
-			return filepath.Base(path)
+		for _, prefix := range p.cgroupPrefixes {
+			if strings.HasPrefix(path, prefix) {
+				return filepath.Base(path)
+			}
 		}
 	}
 	return ""
