@@ -146,8 +146,12 @@ func getDefaultMetricsets() (map[string][]string, error) {
 		return masterMap, nil
 	}
 
+	cmd := []string{"run"}
+	if mage.UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", "run", "-mod", "vendor", dir)()
+		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
 		if err != nil {
 			return nil, errors.Wrap(err, "Error running subcommand to get metricsets")
 		}
