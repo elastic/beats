@@ -1,0 +1,42 @@
+[[log-driver-troubleshooting]]
+[role="xpack"]
+== Troubleshooting
+
+experimental[]
+
+You can set the debug level to capture debugging output about the {log-driver}.
+To set the debug level:
+
+1. Disable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin disable elastic/{log-driver-alias}:{version}
+----
+
+2. Set the debug level:
++
+["source","sh",subs="attributes"]
+----
+docker plugin set elastic/{log-driver-alias}:{version} LOG_DRIVER_LEVEL=debug
+----
++
+Where valid settings for `LOG_DRIVER_LEVEL` are `debug`, `info`, `warning`, or
+`error`.
+
+3. Enable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin enable elastic/{log-driver-alias}:{version}
+----
+
+To view the logs:
+
+On Linux, the {log-driver} logs are written to the same location as other
+docker logs, typically the system journal. 
+
+On MacOS, locating the logs is more complicated. For more information, see
+the
+https://github.com/elastic/beats/tree/{branch}/x-pack/dockerlogbeat#debugging-on-macos[Debugging
+on MacOS] section in the readme file.

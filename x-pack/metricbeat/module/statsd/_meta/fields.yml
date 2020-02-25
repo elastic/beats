@@ -2,7 +2,7 @@
   title: "Statsd"
   description: >
     Statsd module
-  release: beta
+  release: ga
   fields:
     - name: statsd
       type: group

@@ -167,7 +167,7 @@ func reifyInto(opts *options, to reflect.Value, from *Config) Error {
 
 	switch k {
 	case reflect.Map:
-		return reifyMap(opts, to, from)
+		return reifyMap(opts, to, from, nil)
 	case reflect.Struct:
 		return reifyStruct(opts, to, from)
 	case reflect.Slice, reflect.Array:
@@ -183,7 +183,7 @@ func reifyInto(opts *options, to reflect.Value, from *Config) Error {
 	return raiseInvalidTopLevelType(to.Interface(), opts.meta)
 }
 
-func reifyMap(opts *options, to reflect.Value, from *Config) Error {
+func reifyMap(opts *options, to reflect.Value, from *Config, validators []validatorTag) Error {
 	parentFields := opts.activeFields
 	defer func() { opts.activeFields = parentFields }()
 
@@ -198,7 +198,7 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 
 	fields := from.fields.dict()
 	if len(fields) == 0 {
-		if err := tryRecursiveValidate(to, opts, nil); err != nil {
+		if err := tryRecursiveValidate(to, opts, validators); err != nil {
 			return raiseValidation(from.ctx, from.metadata, "", err)
 		}
 		return nil
@@ -224,6 +224,9 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 		to.SetMapIndex(key, v)
 	}
 
+	if err := runValidators(to.Interface(), validators); err != nil {
+		return raiseValidation(from.ctx, from.metadata, "", err)
+	}
 	if err := tryValidate(to); err != nil {
 		return raiseValidation(from.ctx, from.metadata, "", err)
 	}
@@ -321,7 +324,7 @@ func reifyGetField(
 		}
 
 		// Primitive types return early when it doesn't implement the Initializer interface.
-		if fieldType.Kind() != reflect.Map && fieldType.Kind() != reflect.Struct && !hasInitDefaults(fieldType) {
+		if fieldType.Kind() != reflect.Struct && !hasInitDefaults(fieldType) {
 			if err := tryRecursiveValidate(to, opts.opts, opts.validators); err != nil {
 				return raiseValidation(cfg.ctx, cfg.metadata, name, err)
 			}
@@ -479,7 +482,7 @@ func reifyMergeValue(
 		if err != nil {
 			return reflect.Value{}, raiseExpectedObject(opts.opts, val)
 		}
-		return old, reifyMap(opts.opts, old, sub)
+		return old, reifyMap(opts.opts, old, sub, opts.validators)
 
 	case reflect.Struct:
 		sub, err := val.toConfig(opts.opts)

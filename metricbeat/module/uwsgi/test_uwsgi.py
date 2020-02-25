@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from nose.plugins.attrib import attr
+from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -11,8 +12,9 @@ import metricbeat
 logger = logging.getLogger(__name__)
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
-    COMPOSE_SERVICES = ['uwsgi_tcp']
+    COMPOSE_SERVICES = ['uwsgi_http', 'uwsgi_tcp']
 
     def common_checks(self, output):
         # Ensure no errors or warnings exist in the log.
@@ -24,7 +26,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             top_level_fields = metricbeat.COMMON_FIELDS + ["uwsgi"]
-            self.assertItemsEqual(self.de_dot(top_level_fields), evt.keys())
+            self.assertCountEqual(self.de_dot(top_level_fields), evt.keys())
 
             self.assert_fields_are_documented(evt)
 
@@ -52,16 +54,17 @@ class Test(metricbeat.BaseTest):
         assert "requests" in cores[0]
         assert "static" in cores[0]["requests"]
 
+    @parameterized.expand(["http", "tcp"])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_status(self):
+    def test_status(self, proto):
         """
         uWSGI module outputs an event.
         """
         self.render_config_template(modules=[{
             "name": "uwsgi",
             "metricsets": ["status"],
-            "hosts": [self.get_host()],
+            "hosts": [self.get_host(proto)],
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -71,12 +74,5 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.common_checks(output)
 
-    def get_host(self):
-        return "tcp://" + self.compose_host()
-
-
-class TestHTTP(Test):
-    COMPOSE_SERVICES = ['uwsgi_http']
-
-    def get_host(self):
-        return "http://" + self.compose_host()
+    def get_host(self, proto):
+        return proto + "://" + self.compose_host(service="uwsgi_"+proto)
