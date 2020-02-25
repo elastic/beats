@@ -25,8 +25,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/libbeat/outputs/transport"
-
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -56,7 +55,7 @@ type ConnectionSettings struct {
 	APIKey   string
 	Headers  map[string]string
 
-	TLSConfig *transport.TLSConfig
+	TLSConfig *tlscommon.TLSConfig
 
 	HTTP *http.Client
 
