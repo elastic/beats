@@ -257,7 +257,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	assert.Equal(t, ok, true)
 	assert.Equal(t, len(labelMap), 2)
 
-	rawAnnotations, _ := indexers[0].Data.GetValue("pod.annotations")
+	rawAnnotations, _ := indexers[0].Data.GetValue("annotations")
 	assert.Nil(t, rawAnnotations)
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -284,7 +284,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	ok, _ = labelMap.HasKey("foo")
 	assert.Equal(t, ok, true)
 
-	rawAnnotations, _ = indexers[0].Data.GetValue("pod.annotations")
+	rawAnnotations, _ = indexers[0].Data.GetValue("annotations")
 	assert.NotNil(t, rawAnnotations)
 	annotationsMap, ok := rawAnnotations.(common.MapStr)
 

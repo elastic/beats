@@ -105,6 +105,48 @@
 			"revisionTime": "2019-08-13T14:39:03Z"
 		},
 		{
+			"checksumSHA1": "wei6nnaRVIBVKgG02Y2ZKZFImOs=",
+			"path": "code.cloudfoundry.org/go-diodes",
+			"revision": "f77fb823c7ee0156ed4cdadaf4f79ac3fd84613f",
+			"revisionTime": "2019-08-08T08:06:32Z"
+		},
+		{
+			"checksumSHA1": "/ThvU1ey59Se2KtvnxDH8pTv0tE=",
+			"path": "code.cloudfoundry.org/go-loggregator",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "gqL4M5ckqhtX9MaUh+VdHq+KEUs=",
+			"path": "code.cloudfoundry.org/go-loggregator/conversion",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "Y1hEVVknRkkXXUYd84nEBGBz5a8=",
+			"path": "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "g0lkFgCOhEZmlwxJF7aKD58pz2g=",
+			"path": "code.cloudfoundry.org/gofileutils/fileutils",
+			"revision": "4d0c80011a0f37da1711c184028bc40137cd45af",
+			"revisionTime": "2017-01-11T11:52:28Z"
+		},
+		{
+			"checksumSHA1": "3h5TYyUNNdIhRM2j8cTr/yuPVWs=",
+			"path": "code.cloudfoundry.org/rfc5424",
+			"revision": "236a6d29298aea12f69978f33393d12465abc429",
+			"revisionTime": "2018-09-05T21:01:52Z"
+		},
+		{
 			"checksumSHA1": "6uv2eI5FyjWtTg5AsZ++csclSqc=",
 			"path": "contrib.go.opencensus.io/exporter/ocagent",
 			"revision": "8110e6c0236bb231b19119275a6be6ec666d05c8",
@@ -358,6 +400,12 @@
 			"path": "github.com/Azure/go-autorest/tracing",
 			"revision": "ba1147dc57f993013ef255c128ca1cac8a557409",
 			"revisionTime": "2019-08-01T15:21:39Z"
+		},
+		{
+			"checksumSHA1": "Mr55Nhc1CQ49Fi97aHLYgvXmPc8=",
+			"path": "github.com/Masterminds/semver",
+			"revision": "910aa146bd66780c2815d652b92a7fc5331e533c",
+			"revisionTime": "2019-12-13T17:28:11Z"
 		},
 		{
 			"checksumSHA1": "9vIkKNaaSRELM/2nCkWOAdHD21M=",
@@ -2003,6 +2051,20 @@
 			"path": "github.com/cloudflare/cfssl/signer/local",
 			"revision": "b1ec8c586c2aa3ec3eaf4a622933f169cfa5648b",
 			"revisionTime": "2019-08-08T01:16:37Z"
+		},
+		{
+			"checksumSHA1": "Cq0mCokJQIOkHz7SFCKSstUZxnw=",
+			"path": "github.com/cloudfoundry-community/go-cfclient",
+			"revision": "35bcce23fc5f8b9969723ac38c0de1f82c4d3471",
+			"revisionTime": "2019-08-08T21:40:49Z",
+			"version": "master",
+			"versionExact": "master"
+		},
+		{
+			"checksumSHA1": "6wZB7Zkp33mMdUjWH7O0N5/fk9A=",
+			"path": "github.com/cloudfoundry/sonde-go/events",
+			"revision": "b33733203bb48d7c56de7cb639d77f78b0449d19",
+			"revisionTime": "2017-12-06T17:18:20Z"
 		},
 		{
 			"checksumSHA1": "ru5eKWdLzXfpNRL+Mi1bxbmY8DU=",
@@ -4107,6 +4169,30 @@
 			"version": "v1.8.0"
 		},
 		{
+			"checksumSHA1": "UaztUU8ZfWj6YG13dBLR2FHIZxg=",
+			"path": "github.com/mailru/easyjson",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "T8soMJArSZrYnhmdpAnq1bVxQ6Q=",
+			"path": "github.com/mailru/easyjson/buffer",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "8Qyp0ekkp7JuahJZnnzuTXESyFU=",
+			"path": "github.com/mailru/easyjson/jlexer",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "C72An0967WekWiUIFS+fAvoJpcY=",
+			"path": "github.com/mailru/easyjson/jwriter",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
 			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
 			"path": "github.com/mattn/go-colorable",
 			"revision": "941b50ebc6efddf4c41c8e4537a5f68a4e686b24",
@@ -5292,6 +5378,12 @@
 			"path": "golang.org/x/oauth2",
 			"revision": "0f29369cfe4552d0e4bcddc57cc75f4d7e672a33",
 			"revisionTime": "2019-05-07T23:52:07Z"
+		},
+		{
+			"checksumSHA1": "Fie9WZxLdPy9f7Kk4qXqH4CV30A=",
+			"path": "golang.org/x/oauth2/clientcredentials",
+			"revision": "bf48bf16ab8d622ce64ec6ce98d2c98f916b6303",
+			"revisionTime": "2020-01-07T16:11:21Z"
 		},
 		{
 			"checksumSHA1": "w5SmJwdVFlGE1KO4/AQjY+jvdsI=",
