@@ -34,6 +34,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/elastic/go-ucfg"
+
 	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
@@ -355,7 +357,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
-		cfg, err = common.MergeConfigs(cfg, overrides)
+		cfg, err = common.MergeConfigsWithOptions([]*common.Config{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
 		if err != nil {
 			return nil, fmt.Errorf("Error applying config overrides: %v", err)
 		}

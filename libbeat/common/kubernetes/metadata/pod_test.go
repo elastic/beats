@@ -67,9 +67,9 @@ func TestPod_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 				"namespace": "default",
 				"node": common.MapStr{
@@ -110,9 +110,6 @@ func TestPod_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -120,6 +117,9 @@ func TestPod_Generate(t *testing.T) {
 				},
 				"node": common.MapStr{
 					"name": "testnode",
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -168,13 +168,13 @@ func TestPod_GenerateFromName(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"node": common.MapStr{
 					"name": "testnode",
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -211,9 +211,6 @@ func TestPod_GenerateFromName(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -221,6 +218,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 				},
 				"node": common.MapStr{
 					"name": "testnode",
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -304,9 +304,6 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace":     "default",
 				"namespace_uid": uid,
@@ -319,6 +316,9 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					"labels": common.MapStr{
 						"nodekey": "nodevalue",
 					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
