@@ -74,10 +74,8 @@ type MemberDescription struct {
 }
 
 type PartitionOffsets struct {
-	Err error
-
-	Newest int64
-	Oldest int64
+	Err    error
+	Offset int64
 }
 
 const noID = -1
@@ -297,37 +295,39 @@ func (b *Broker) FetchPartitionOffsetFromTheLeader(topic string, partitionID int
 	return offset, nil
 }
 
-// FetchPartitionOffsetsForTopics fetches Newest and Oldest of all partitions from its leaders.
-func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata) map[string]map[int32]*PartitionOffsets {
+// FetchPartitionOffsetsForTopics fetches offsets of all partitions from its leaders.
+func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata, time int64) map[string]map[int32]*PartitionOffsets {
 	leaderTopicPartition := map[int32]map[string]int32{}
+	leaderBrokers := map[int32]*sarama.Broker{}
 
 	for _, topic := range topics {
 		for _, partition := range topic.Partitions {
-			if _, ok := leaderTopicPartition[partition.Leader]; !ok {
-				leaderTopicPartition[partition.Leader] = map[string]int32{}
+			broker, err := b.client.Leader(topic.Name, partition.ID)
+			if err != nil {
+				log.Errorf("connecting to leader broker failed (topicName: %s, partitionID: %d): %v",
+					topic.Name, partition.ID, err)
+				continue
 			}
-			leaderTopicPartition[partition.Leader][topic.Name] = partition.ID
+
+			if _, ok := leaderTopicPartition[broker.ID()]; !ok {
+				leaderTopicPartition[broker.ID()] = map[string]int32{}
+			}
+			leaderTopicPartition[broker.ID()][topic.Name] = partition.ID
+			leaderBrokers[broker.ID()] = broker
 		}
 	}
 
 	topicPartitionPartitionOffsets := map[string]map[int32]*PartitionOffsets{}
 
-	for _, broker := range b.client.Brokers() {
-		topicPartition, ok := leaderTopicPartition[broker.ID()]
-		if !ok {
-			log.Debugf("no partition offsets to be fetched by leader (ID: %d)", broker.ID())
-			continue
-		}
-
+	for leader, topicPartition := range leaderTopicPartition {
 		req := new(sarama.OffsetRequest)
-		for topic, partition := range topicPartition {
-			req.AddBlock(topic, partition, sarama.OffsetNewest, 1)
-			req.AddBlock(topic, partition, sarama.OffsetOldest, 1)
+		for topic, partition := range leaderTopicPartition[leader] {
+			req.AddBlock(topic, partition, time, 1)
 		}
 
-		resp, err := broker.GetAvailableOffsets(req)
+		resp, err := leaderBrokers[leader].GetAvailableOffsets(req)
 		if err != nil {
-			log.Errorf("get available offsets failed by leader (ID: %d): %v", broker.ID(), err)
+			log.Errorf("get available offsets failed by leader (ID: %d): %v", leader, err)
 			continue
 		}
 
@@ -337,20 +337,20 @@ func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata) 
 			}
 
 			if err != nil {
-				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Newest: -1, Oldest: -1}
+				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
 				continue
 			}
 
 			block := resp.GetBlock(topic, partition)
-			if len(block.Offsets) != 2 {
+			if len(block.Offsets) == 0 {
 				err = fmt.Errorf("block offsets is invalid (topicName: %s, partitionID: %d, leaderID: %d): %v",
-					topic, partition, broker.ID(), block.Err)
-				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Newest: -1, Oldest: -1}
+					topic, partition, leader, block.Err)
+				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
 				continue
 			}
 
 			topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{
-				Newest: block.Offsets[0], Oldest: block.Offsets[1],
+				Offset: block.Offsets[0],
 			}
 		}
 	}

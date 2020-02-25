@@ -96,7 +96,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		"address": broker.AdvertisedAddr(),
 	}
 
-	topicPartitionPartitionOffsets := broker.FetchPartitionOffsetsForTopics(topics)
+	topicPartitionPartitionOldestOffsets := broker.FetchPartitionOffsetsForTopics(topics, sarama.OffsetOldest)
+	topicPartitionPartitionNewestOffsets := broker.FetchPartitionOffsetsForTopics(topics, sarama.OffsetNewest)
 
 	for _, topic := range topics {
 		evtTopic := common.MapStr{
@@ -112,13 +113,29 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, partition := range topic.Partitions {
 			// collect offsets for all replicas
 			for _, replicaID := range partition.Replicas {
+				oldestPartitionOffsets := topicPartitionPartitionOldestOffsets[topic.Name][partition.ID]
+				if oldestPartitionOffsets == nil {
+					msg := fmt.Errorf("no oldest partition offsets defined (%v:%v)", topic.Name, partition.ID)
+					m.Logger().Warn(msg)
+					r.Error(msg)
+					continue
+				} else if oldestPartitionOffsets.Err != nil {
+					msg := fmt.Errorf("failed to query kafka partition (%v:%v) oldest offsets: %v",
+						topic.Name, partition.ID, oldestPartitionOffsets.Err)
+					m.Logger().Warn(msg)
+					r.Error(msg)
+					continue
+				}
 
-				// Get oldest and newest available offsets
-				partitionOffsets := topicPartitionPartitionOffsets[topic.Name][partition.ID]
-
-				if partitionOffsets.Err != nil {
-					msg := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %v",
-						topic.Name, partition.ID, partitionOffsets.Err)
+				newestPartitionOffsets := topicPartitionPartitionNewestOffsets[topic.Name][partition.ID]
+				if newestPartitionOffsets == nil {
+					msg := fmt.Errorf("no newest partition offsets defined (%v:%v)", topic.Name, partition.ID)
+					m.Logger().Warn(msg)
+					r.Error(msg)
+					continue
+				} else if newestPartitionOffsets.Err != nil {
+					msg := fmt.Errorf("failed to query kafka partition (%v:%v) newest offsets: %v",
+						topic.Name, partition.ID, newestPartitionOffsets.Err)
 					m.Logger().Warn(msg)
 					r.Error(msg)
 					continue
@@ -153,8 +170,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					"broker":    evtBroker,
 					"partition": partitionEvent,
 					"offset": common.MapStr{
-						"newest": partitionOffsets.Newest,
-						"oldest": partitionOffsets.Oldest,
+						"newest": newestPartitionOffsets.Offset,
+						"oldest": oldestPartitionOffsets.Offset,
 					},
 				}
 
