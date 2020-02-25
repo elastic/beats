@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix loading processors from annotation hints. {pull}16348[16348]
+- Fix k8s pods labels broken schema. {pull}16480[16480]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 
 *Auditbeat*
