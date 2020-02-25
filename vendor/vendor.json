@@ -2069,14 +2069,6 @@
 			"versionExact": "v20"
 		},
 		{
-			"checksumSHA1": "H9YEySbt+BMCmgVYnOLTyihKsME=",
-			"path": "github.com/coreos/go-systemd/login1",
-			"revision": "e64a0ec8b42a61e2a9801dc1d0abe539dea79197",
-			"revisionTime": "2019-06-20T07:13:33Z",
-			"version": "v20",
-			"versionExact": "v20"
-		},
-		{
 			"checksumSHA1": "kDSYVipifs9K6CgxXLIfHrGh8wA=",
 			"path": "github.com/coreos/go-systemd/sdjournal",
 			"revision": "e64a0ec8b42a61e2a9801dc1d0abe539dea79197",
@@ -5817,18 +5809,18 @@
 			"versionExact": "v0.7.0"
 		},
 		{
-			"path": "google.golang.org/api/internal/gensupport",
-			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
-		},
-		{
 			"checksumSHA1": "I4Oe5Q+AuaxmN3duL38r2evqGKk=",
 			"path": "google.golang.org/api/internal/gensupport",
 			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
 			"revisionTime": "2019-11-15T18:09:15Z",
 			"version": "v0.14.0",
 			"versionExact": "v0.14.0"
+		},
+		{
+			"path": "google.golang.org/api/internal/gensupport",
+			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
+			"version": "v0.7.0",
+			"versionExact": "v0.7.0"
 		},
 		{
 			"checksumSHA1": "nN+zggDyWr8HPYzwltMkzJJr1Jc=",
