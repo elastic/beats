@@ -2,17 +2,21 @@
 4d63.com/embedfiles
 # 4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
 4d63.com/tz
-# cloud.google.com/go v0.49.0
+# cloud.google.com/go v0.51.0
 cloud.google.com/go
 cloud.google.com/go/civil
 cloud.google.com/go/compute/metadata
 cloud.google.com/go/functions/metadata
 cloud.google.com/go/iam
 cloud.google.com/go/internal
+cloud.google.com/go/internal/fields
 cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/monitoring/apiv3
+# cloud.google.com/go/datastore v1.0.0
+cloud.google.com/go/datastore
+cloud.google.com/go/datastore/internal/gaepb
 # cloud.google.com/go/pubsub v1.0.1
 cloud.google.com/go/pubsub
 cloud.google.com/go/pubsub/apiv1
@@ -261,6 +265,8 @@ github.com/awslabs/goformation/v4/intrinsics
 github.com/beorn7/perks/quantile
 # github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 github.com/blakesmith/ar
+# github.com/bradleyfalzon/ghinstallation v1.1.0
+github.com/bradleyfalzon/ghinstallation
 # github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
 github.com/bsm/sarama-cluster
 # github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
@@ -485,6 +491,8 @@ github.com/gofrs/uuid
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
+# github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7
+github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go
@@ -504,12 +512,18 @@ github.com/golang/protobuf/ptypes/wrappers
 github.com/golang/snappy
 # github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
 github.com/google/flatbuffers/go
-# github.com/google/go-cmp v0.3.1
+# github.com/google/go-cmp v0.4.0
 github.com/google/go-cmp/cmp
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
+# github.com/google/go-github/v28 v28.1.1
+github.com/google/go-github/v28/github
+# github.com/google/go-github/v29 v29.0.2
+github.com/google/go-github/v29/github
+# github.com/google/go-querystring v1.0.0
+github.com/google/go-querystring/query
 # github.com/google/gofuzz v1.0.0
 github.com/google/gofuzz
 # github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
@@ -530,9 +544,13 @@ github.com/gorhill/cronexpr
 github.com/gorilla/websocket
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
+# github.com/hashicorp/go-version v1.0.0
+github.com/hashicorp/go-version
 # github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
+# github.com/haya14busa/go-actions-toolkit v0.0.0-20200105081403-ca0307860f01
+github.com/haya14busa/go-actions-toolkit/core
 # github.com/imdario/mergo v0.3.6
 github.com/imdario/mergo
 # github.com/inconshreveable/mousetrap v1.0.0
@@ -554,7 +572,7 @@ github.com/joeshaw/multierror
 github.com/jpillora/backoff
 # github.com/json-iterator/go v1.1.7
 github.com/json-iterator/go
-# github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024
+# github.com/jstemmer/go-junit-report v0.9.1
 github.com/jstemmer/go-junit-report
 github.com/jstemmer/go-junit-report/formatter
 github.com/jstemmer/go-junit-report/parser
@@ -586,14 +604,20 @@ github.com/mattn/go-colorable
 github.com/mattn/go-ieproxy
 # github.com/mattn/go-isatty v0.0.2
 github.com/mattn/go-isatty
+# github.com/mattn/go-shellwords v1.0.7
+github.com/mattn/go-shellwords
 # github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/miekg/dns v1.1.15
 github.com/miekg/dns
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
+# github.com/mitchellh/gox v1.0.1
+github.com/mitchellh/gox
 # github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 github.com/mitchellh/hashstructure
+# github.com/mitchellh/iochan v1.0.0
+github.com/mitchellh/iochan
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
@@ -635,6 +659,24 @@ github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
 # github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 github.com/rcrowley/go-metrics
+# github.com/reviewdog/errorformat v0.0.0-20200109134752-8983be9bc7dd
+github.com/reviewdog/errorformat
+github.com/reviewdog/errorformat/fmts
+# github.com/reviewdog/reviewdog v0.9.17
+github.com/reviewdog/reviewdog
+github.com/reviewdog/reviewdog/cienv
+github.com/reviewdog/reviewdog/cmd/reviewdog
+github.com/reviewdog/reviewdog/commands
+github.com/reviewdog/reviewdog/diff
+github.com/reviewdog/reviewdog/doghouse
+github.com/reviewdog/reviewdog/doghouse/client
+github.com/reviewdog/reviewdog/doghouse/server
+github.com/reviewdog/reviewdog/doghouse/server/storage
+github.com/reviewdog/reviewdog/project
+github.com/reviewdog/reviewdog/service/github
+github.com/reviewdog/reviewdog/service/github/githubutils
+github.com/reviewdog/reviewdog/service/gitlab
+github.com/reviewdog/reviewdog/service/serviceutil
 # github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e
 github.com/samuel/go-parser/parser
 # github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
@@ -695,12 +737,14 @@ github.com/vmware/govmomi/vim25/progress
 github.com/vmware/govmomi/vim25/soap
 github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
+# github.com/xanzy/go-gitlab v0.22.3
+github.com/xanzy/go-gitlab
 # github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7
 github.com/yuin/gopher-lua
 github.com/yuin/gopher-lua/ast
 github.com/yuin/gopher-lua/parse
 github.com/yuin/gopher-lua/pm
-# go.opencensus.io v0.22.0
+# go.opencensus.io v0.22.2
 go.opencensus.io
 go.opencensus.io/internal
 go.opencensus.io/internal/tagencoding
@@ -747,10 +791,10 @@ golang.org/x/crypto/pkcs12
 golang.org/x/crypto/pkcs12/internal/rc2
 golang.org/x/crypto/sha3
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136
+# golang.org/x/exp v0.0.0-20191227195350-da58074b4299
 golang.org/x/exp/apidiff
 golang.org/x/exp/cmd/apidiff
-# golang.org/x/lint v0.0.0-20190930215403-16217165b5de
+# golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 golang.org/x/lint
 golang.org/x/lint/golint
 # golang.org/x/net v0.0.0-20200202094626-16171245cfb2
@@ -774,7 +818,7 @@ golang.org/x/net/proxy
 golang.org/x/net/publicsuffix
 golang.org/x/net/trace
 golang.org/x/net/websocket
-# golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+# golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 golang.org/x/oauth2
 golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
@@ -818,7 +862,7 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 golang.org/x/time/rate
-# golang.org/x/tools v0.0.0-20191115202509-3a792d9c32b2
+# golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer
 golang.org/x/tools/go/analysis
@@ -838,11 +882,10 @@ golang.org/x/tools/internal/gopathwalk
 golang.org/x/tools/internal/imports
 golang.org/x/tools/internal/module
 golang.org/x/tools/internal/semver
-golang.org/x/tools/internal/span
 # golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# google.golang.org/api v0.14.0
+# google.golang.org/api v0.15.0
 google.golang.org/api/cloudfunctions/v1
 google.golang.org/api/compute/v1
 google.golang.org/api/googleapi
@@ -872,13 +915,14 @@ google.golang.org/appengine/internal/socket
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/socket
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20191115221424-83cc0476cb11
+# google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/distribution
 google.golang.org/genproto/googleapis/api/label
 google.golang.org/genproto/googleapis/api/metric
 google.golang.org/genproto/googleapis/api/monitoredres
+google.golang.org/genproto/googleapis/datastore/v1
 google.golang.org/genproto/googleapis/iam/v1
 google.golang.org/genproto/googleapis/monitoring/v3
 google.golang.org/genproto/googleapis/pubsub/v1
@@ -886,6 +930,7 @@ google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/googleapis/type/calendarperiod
 google.golang.org/genproto/googleapis/type/expr
+google.golang.org/genproto/googleapis/type/latlng
 google.golang.org/genproto/protobuf/field_mask
 # google.golang.org/grpc v1.27.1
 google.golang.org/grpc
@@ -981,7 +1026,7 @@ gopkg.in/mgo.v2/bson
 gopkg.in/mgo.v2/internal/json
 gopkg.in/mgo.v2/internal/sasl
 gopkg.in/mgo.v2/internal/scram
-# gopkg.in/yaml.v2 v2.2.4
+# gopkg.in/yaml.v2 v2.2.7
 gopkg.in/yaml.v2
 # honnef.co/go/tools v0.0.1-2019.2.3
 honnef.co/go/tools/arg

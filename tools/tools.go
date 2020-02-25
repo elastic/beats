@@ -29,5 +29,9 @@ import (
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"
 
+	_ "github.com/mitchellh/gox"
+	_ "github.com/reviewdog/reviewdog/cmd/reviewdog"
+	_ "golang.org/x/lint/golint"
+
 	_ "github.com/elastic/go-licenser"
 )

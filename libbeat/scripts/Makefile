@@ -73,7 +73,7 @@ GOLINT=golint
 GOLINT_REPO?=golang.org/x/lint/golint
 REVIEWDOG?=reviewdog -conf ${ES_BEATS}/reviewdog.yml
 REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
+REVIEWDOG_REPO?=github.com/reviewdog/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
@@ -141,7 +141,7 @@ update-yacc-vendor:
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
 ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
-	go get github.com/mitchellh/gox
+	go install -mod=vendor github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 endif
@@ -170,7 +170,7 @@ fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on th
 
 .PHONY: lint
 lint:
-	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	@go install -mod=vendor $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 .PHONY: clean
