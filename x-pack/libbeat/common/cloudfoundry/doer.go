@@ -81,6 +81,9 @@ func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (st
 	jsonData := make(map[string]interface{})
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&jsonData)
+	if err != nil {
+		return "", -1, err
+	}
 
 	expiresIn := 0
 	if value, ok := jsonData["expires_in"]; ok {
@@ -91,5 +94,5 @@ func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (st
 		expiresIn = int(asFloat)
 	}
 
-	return fmt.Sprintf("%s %s", jsonData["token_type"], jsonData["access_token"]), expiresIn, err
+	return fmt.Sprintf("%s %s", jsonData["token_type"], jsonData["access_token"]), expiresIn, nil
 }
