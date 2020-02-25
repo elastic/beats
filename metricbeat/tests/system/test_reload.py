@@ -76,7 +76,7 @@ class Test(metricbeat.BaseTest):
         # Ensure the module was successfully loaded
         self.wait_until(
             lambda: self.log_contains(reload_line(1)),
-            max_timeout=10)
+            max_timeout=15)
 
         # Remove config again
         os.remove(config_path)
