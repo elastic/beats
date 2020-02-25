@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 
 *Heartbeat*
@@ -137,6 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
+- Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
 
 *Heartbeat*
 
