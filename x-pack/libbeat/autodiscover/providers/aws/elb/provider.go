@@ -131,9 +131,15 @@ func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 		"id":       arn,
 		"host":     lblMap["host"],
 		"port":     lblMap["port"],
+		"aws": common.MapStr{
+			"elb": lbl.toMap(),
+		},
+		"cloud": lbl.toCloudMap(),
 		"meta": common.MapStr{
-			"elb_listener": lbl.toMap(),
-			"cloud":        lbl.toCloudMap(),
+			"aws": common.MapStr{
+				"elb": lbl.toMap(),
+			},
+			"cloud": lbl.toCloudMap(),
 		},
 	}
 
