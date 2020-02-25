@@ -19,8 +19,6 @@ package keystore
 
 import (
 	"errors"
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
@@ -50,7 +48,6 @@ type Keystore interface {
 }
 
 type WritableKeystore interface {
-	Keystore
 	// Store add keys to the keystore, wont be persisted until we save.
 	Store(key string, secret []byte) error
 
@@ -65,7 +62,6 @@ type WritableKeystore interface {
 }
 
 type ListingKeystore interface {
-	WritableKeystore
 	// List returns the list of keys in the keystore, return an empty list if none is found.
 	List() ([]string, error)
 }
@@ -74,38 +70,6 @@ type ListingKeystore interface {
 type Packager interface {
 	Package() ([]byte, error)
 	ConfiguredPath() string
-}
-
-// Factory Create the right keystore with the configured options.
-func Factory(cfg *common.Config, defaultPath string) (ListingKeystore, error) {
-	config := defaultConfig
-
-	if cfg == nil {
-		cfg = common.NewConfig()
-	}
-	err := cfg.Unpack(&config)
-
-	if err != nil {
-		return nil, fmt.Errorf("could not read keystore configuration, err: %v", err)
-	}
-
-	if config.Path == "" {
-		config.Path = defaultPath
-	}
-
-	keystore, err := NewFileKeystore(config.Path)
-	return keystore, err
-}
-
-// ResolverFromConfig create a resolver from a configuration.
-func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
-	keystore, err := Factory(cfg, dataPath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return ResolverWrap(keystore), nil
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.

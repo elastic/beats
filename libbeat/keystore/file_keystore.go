@@ -53,6 +53,9 @@ var version = []byte("v1")
 
 // FileKeystore Allows to store key / secrets pair securely into an encrypted local file.
 type FileKeystore struct {
+	Keystore
+	WritableKeystore
+	ListingKeystore
 	sync.RWMutex
 	Path     string
 	secrets  map[string]serializableSecureString
@@ -66,16 +69,37 @@ type serializableSecureString struct {
 	Value []byte `json:"value"`
 }
 
+// Factory Create the right keystore with the configured options.
+func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
+	config := defaultConfig
+
+	if cfg == nil {
+		cfg = common.NewConfig()
+	}
+	err := cfg.Unpack(&config)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not read keystore configuration, err: %v", err)
+	}
+
+	if config.Path == "" {
+		config.Path = defaultPath
+	}
+
+	keystore, err := NewFileKeystore(config.Path)
+	return keystore, err
+}
+
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their
 // own password on the keystore, the default password will be an empty string. When the keystore
 // is initialized the secrets are automatically loaded into memory.
-func NewFileKeystore(keystoreFile string) (ListingKeystore, error) {
+func NewFileKeystore(keystoreFile string) (Keystore, error) {
 	return NewFileKeystoreWithPassword(keystoreFile, NewSecureString([]byte("")))
 }
 
 // NewFileKeystoreWithPassword return a new File based keystore or an error, allow to define what
 // password to use to create the keystore.
-func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (ListingKeystore, error) {
+func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (Keystore, error) {
 	keystore := FileKeystore{
 		Path:     keystoreFile,
 		dirty:    false,
