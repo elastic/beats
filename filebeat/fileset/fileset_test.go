@@ -179,7 +179,7 @@ func TestGetInputConfig(t *testing.T) {
 	f.Close()
 	for _, file := range list {
 		fs, err := New(modulesPath, "", &ModuleConfig{Module: file.Name()}, &FilesetConfig{})
-		if err!= nil {
+		if err != nil {
 			continue
 		}
 		cfg, err := fs.getInputConfig()
