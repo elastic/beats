@@ -21,7 +21,6 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -100,7 +99,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, family := range families {
-		if m.skipFamily(family) {
+		if family == nil {
+			continue
+		}
+		if m.skipFamily(*family.Name) {
 			continue
 		}
 		promEvents := getPromEventsFromMetricFamily(family)
@@ -148,6 +150,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 }
 
 func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
+	metricName := "up"
+	if m.skipFamily(metricName) {
+		return
+	}
 	upPromEvent := PromEvent{
 		labels: common.MapStr{
 			"instance": m.Host(),
@@ -163,7 +169,7 @@ func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 
 }
 
-func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+func (m *MetricSet) skipFamily(family string) bool {
 	// example:
 	//	include_metrics:
 	//		- node_*
@@ -173,19 +179,15 @@ func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
 	// This would mean that we want to keep only the metrics that start with node_ prefix but
 	// are not related to disk so we exclude node_disk_* metrics from them.
 
-	if family == nil {
-		return true
-	}
-
 	// if include_metrics are defined, check if this metric should be included
 	if len(m.includeMetrics) > 0 {
-		if !matchMetricFamily(*family.Name, m.includeMetrics) {
+		if !matchMetricFamily(family, m.includeMetrics) {
 			return true
 		}
 	}
 	// now exclude the metric if it matches any of the given patterns
 	if len(m.excludeMetrics) > 0 {
-		if matchMetricFamily(*family.Name, m.excludeMetrics) {
+		if matchMetricFamily(family, m.excludeMetrics) {
 			return true
 		}
 	}
