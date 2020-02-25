@@ -65,6 +65,7 @@ type diskPerformance struct {
 	QueryTime           int64
 	StorageDeviceNumber uint32
 	StorageManagerName  [8]uint16
+	ReservedAlignment   uint32
 }
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.
