@@ -75,7 +75,6 @@ Add %v config in httpd.conf in log section
     LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 -----
 
-ifndef::hide_for_obs[]
 [float]
 === Example dashboard
 
@@ -83,8 +82,6 @@ This module comes with a sample dashboard. For example:
 
 [role="screenshot"]
 image::./images/kibana-apache.png[]
-
-endif::[]
 
 :has-dashboards!:
 
