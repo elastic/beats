@@ -29,7 +29,6 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/script"
 	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
-	_ "github.com/elastic/beats/winlogbeat/processors/translate_sid"
 )
 
 // Name of this beat

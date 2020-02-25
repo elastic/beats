@@ -5,7 +5,8 @@ beta[]
 
 The `translate_sid` processor translates a Windows security identifier (SID)
 into an account name. It retrieves the name of the account associated with the
-SID, the first domain on which the SID is found, and the type of account.
+SID, the first domain on which the SID is found, and the type of account. This
+is only available on Windows.
 
 Every account on a network is issued a unique SID when the account is first
 created. Internal processes in Windows refer to an account's SID rather than
