@@ -8,9 +8,7 @@ https://httpd.apache.org/[Apache HTTP] server.
 
 include::../include/what-happens.asciidoc[]
 
-New to {beatname_uc} modules? Read the
-<<filebeat-modules-quickstart,quick start>> to learn how to set up and run
-modules.
+include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
