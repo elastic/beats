@@ -18,6 +18,7 @@
 package add_kubernetes_metadata
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -101,4 +102,59 @@ func TestFieldFormatMatcher(t *testing.T) {
 
 	out = matcher.MetadataIndex(event)
 	assert.Equal(t, "foo/bar", out)
+}
+
+func TestPidMatcher(t *testing.T) {
+
+	testCfg := map[string]interface{}{}
+
+	cfg, err := common.NewConfigFrom(testCfg)
+	assert.Nil(t, err)
+
+	matcher, err := NewPidMatcher(*cfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	input := common.MapStr{
+		"process": common.MapStr{
+			"pid":  123,
+			"ppid": 321,
+		},
+	}
+
+	readCgroupFile = func(pid int) ([]byte, error) {
+		return nil, fmt.Errorf("file not found")
+	}
+
+	// test matcher when cgroup file not found
+	out := matcher.MetadataIndex(input)
+	assert.Equal(t, out, "")
+
+	readCgroupFile = func(pid int) ([]byte, error) {
+		return []byte("12:fr:/ku/bu/po/c025a1a09bdf3ec56c0f8d8fb33c41ef55a4c7cec82da5c1496eeded7ecece9d"), nil
+	}
+
+	// test match based on default regex with matching input
+	out = matcher.MetadataIndex(input)
+	assert.Equal(t, out, "c025a1a09bdf3ec56c0f8d8fb33c41ef55a4c7cec82da5c1496eeded7ecece9d")
+
+	nonMatchInput := common.MapStr{
+		"not": "match",
+	}
+
+	// test with not matching input
+	out = matcher.MetadataIndex(nonMatchInput)
+	assert.Equal(t, out, "")
+
+	testCfg["matcher_regex"] = "(.*)"
+	cfg, err = common.NewConfigFrom(testCfg)
+	assert.Nil(t, err)
+
+	matcher, err = NewPidMatcher(*cfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	// test matching with regex from config
+	out = matcher.MetadataIndex(input)
+	assert.Equal(t, out, "12:fr:/ku/bu/po/c025a1a09bdf3ec56c0f8d8fb33c41ef55a4c7cec82da5c1496eeded7ecece9d")
 }

@@ -56,13 +56,14 @@ func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
 	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
-	// Register default indexers
+	// Register default indexers and matchers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
+	Indexing.AddMatcher(PidMatcherName, NewPidMatcher)
 }
 
 func isKubernetesAvailable(client k8sclient.Interface) (bool, error) {

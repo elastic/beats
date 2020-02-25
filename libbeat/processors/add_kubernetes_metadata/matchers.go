@@ -19,7 +19,10 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"io/ioutil"
+	"regexp"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -32,6 +35,7 @@ import (
 const (
 	FieldMatcherName       = "fields"
 	FieldFormatMatcherName = "field_format"
+	PidMatcherName         = "pid"
 )
 
 // Matcher takes a new event and returns the index
@@ -172,4 +176,95 @@ func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
 	}
 
 	return string(bytes)
+}
+
+// PidMatcher implements matcher that matches container id based on pid from cgroup file
+type PidMatcher struct {
+	matchRegex  string
+	pidCidCache *common.Cache
+}
+
+// NewPidMatcher initializes and returns a PidMatcher
+func NewPidMatcher(cfg common.Config) (Matcher, error) {
+	config := struct {
+		RegexField string `config:"matcher_regex"`
+	}{}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, fmt.Errorf("fail to unpack the `matcher_regex` configuration: %s", err)
+	}
+
+	if len(config.RegexField) == 0 {
+		// no matcher regex from conf, use default one
+		config.RegexField = "^\\d+:\\w+:\\/.+\\/.+\\/.+\\/([0-9a-f]{64})"
+	}
+
+	cache := common.NewCache(time.Minute, 1000)
+	cache.StartJanitor(time.Minute)
+
+	return &PidMatcher{matchRegex: config.RegexField, pidCidCache: cache}, nil
+}
+
+// MetadataIndex returns index for matching metadata indexed based on container id
+func (p *PidMatcher) MetadataIndex(event common.MapStr) string {
+	val, err := event.GetValue("process.pid")
+	if err == nil {
+		pid, ok := val.(int)
+		if ok {
+			// find the container uuid by the pid
+			cid, err := p.getContainerIDFromCgroup(pid)
+			if err == nil {
+				return cid
+			}
+			// no cgroup file with that pid, maybe process already exited
+			// trying with parent process instead
+			val, err := event.GetValue("process.ppid")
+			if err == nil {
+				ppid, ok := val.(int)
+				if ok {
+					//find the container uuid from the ppid
+					cid, err := p.getContainerIDFromCgroup(ppid)
+					if err == nil {
+						return cid
+					}
+				}
+
+			}
+		}
+	}
+	return ""
+}
+
+// For easy stubbing file read in unit tests
+var readCgroupFile = func(pid int) ([]byte, error) {
+	return ioutil.ReadFile(fmt.Sprintf("/proc/%d/cgroup", pid))
+}
+
+func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
+	// check from from cache
+	cid := p.pidCidCache.Get(pid)
+	if cid != nil {
+		return cid.(string), nil
+	}
+
+	// not found in cache, try to read form cgroup file
+	data, err := readCgroupFile(pid)
+	if err != nil {
+		// no cgroup file with given pid
+		return "", err
+	}
+
+	// parse uuid from file contents
+	re := regexp.MustCompile(p.matchRegex)
+	rs := re.FindStringSubmatch(string(data))
+	if rs != nil {
+		// add pid and cid to cache
+		cid := rs[1]
+		p.pidCidCache.Put(pid, cid)
+		return cid, nil
+	}
+
+	// no regex match, probably not a container process
+	return "", nil
 }
