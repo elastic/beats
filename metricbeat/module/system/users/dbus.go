@@ -26,6 +26,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	loginObj    = "org.freedesktop.login1"
+	getAll      = "org.freedesktop.DBus.Properties.GetAll"
+	sessionList = "org.freedesktop.login1.Manager.ListSessions"
+)
+
 // sessionInfo contains useful properties for a session
 type sessionInfo struct {
 	Remote     bool
@@ -71,15 +77,19 @@ func initDbusConnection() (*dbus.Conn, error) {
 
 // getSessionProps returns info on a given session pointed to by path
 func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error) {
-	busObj := conn.Object("org.freedesktop.login1", path)
+	busObj := conn.Object(loginObj, path)
 
 	var props map[string]dbus.Variant
 
-	err := busObj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "").Store(&props)
+	err := busObj.Call(getAll, 0, "").Store(&props)
 	if err != nil {
 		return sessionInfo{}, errors.Wrap(err, "error calling DBus")
 	}
 
+	return formatSessonProps(props)
+}
+
+func formatSessonProps(props map[string]dbus.Variant) (sessionInfo, error) {
 	if len(props) < 8 {
 		return sessionInfo{}, fmt.Errorf("wrong number of fields in  info: %v", props)
 	}
@@ -91,7 +101,7 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 
 	remoteHost, ok := props["RemoteHost"].Value().(string)
 	if !ok {
-		return sessionInfo{}, fmt.Errorf("failed to cast remote to string")
+		return sessionInfo{}, fmt.Errorf("failed to cast remote host to string")
 	}
 
 	userName, ok := props["Name"].Value().(string)
@@ -121,7 +131,7 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 
 	leader, ok := props["Leader"].Value().(uint32)
 	if !ok {
-		return sessionInfo{}, fmt.Errorf("failed to cast type to uint32")
+		return sessionInfo{}, fmt.Errorf("failed to cast leader to uint32")
 	}
 
 	session := sessionInfo{
@@ -140,13 +150,16 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 
 // listSessions lists all sessions known to dbus
 func listSessions(conn *dbus.Conn) ([]loginSession, error) {
-	busObj := conn.Object("org.freedesktop.login1", dbus.ObjectPath("/org/freedesktop/login1"))
+	busObj := conn.Object(loginObj, dbus.ObjectPath("/org/freedesktop/login1"))
 	var props [][]dbus.Variant
 
-	if err := busObj.Call("org.freedesktop.login1.Manager.ListSessions", 0).Store(&props); err != nil {
+	if err := busObj.Call(sessionList, 0).Store(&props); err != nil {
 		return nil, errors.Wrap(err, "error calling dbus")
 	}
+	return formatSessionList(props)
+}
 
+func formatSessionList(props [][]dbus.Variant) ([]loginSession, error) {
 	sessionList := make([]loginSession, len(props))
 	for iter, session := range props {
 		if len(session) < 5 {
@@ -178,11 +191,13 @@ func listSessions(conn *dbus.Conn) ([]loginSession, error) {
 		if !ok {
 			return nil, fmt.Errorf("failed to cast session path to ObjectPath")
 		}
-		newSession := loginSession{ID: id,
+		newSession := loginSession{
+			ID:   id,
 			UID:  uid,
 			User: user,
 			Seat: seat,
-			Path: path}
+			Path: path,
+		}
 		sessionList[iter] = newSession
 	}
 

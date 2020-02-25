@@ -20,36 +20,55 @@ package users
 import (
 	"testing"
 
+	"github.com/godbus/dbus"
 	"github.com/stretchr/testify/assert"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2Error(f)
+func TestFormatSession(t *testing.T) {
 
-	if !assert.Empty(t, errs) {
-		t.FailNow()
+	testIn := map[string]dbus.Variant{
+		"Remote":     dbus.MakeVariant(true),
+		"RemoteHost": dbus.MakeVariant("192.168.1.1"),
+		"Name":       dbus.MakeVariant("user"),
+		"Scope":      dbus.MakeVariant("user-6.scope"),
+		"Service":    dbus.MakeVariant("sshd.service"),
+		"State":      dbus.MakeVariant("active"),
+		"Type":       dbus.MakeVariant("remote"),
+		"Leader":     dbus.MakeVariant(uint32(17459)),
 	}
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
+
+	goodOut := sessionInfo{
+		Remote:     true,
+		RemoteHost: "192.168.1.1",
+		Name:       "user",
+		Scope:      "user-6.scope",
+		Service:    "sshd.service",
+		State:      "active",
+		Type:       "remote",
+		Leader:     17459,
 	}
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("system", "users").Fields.StringToPrint())
+
+	output, err := formatSessonProps(testIn)
+	assert.NoError(t, err)
+	assert.Equal(t, goodOut, output)
 }
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
+func TestFormatSessionList(t *testing.T) {
+	testIn := [][]dbus.Variant{
+		{dbus.MakeVariant("6"), dbus.MakeVariant(uint32(1000)), dbus.MakeVariant("user"), dbus.MakeVariant(""), dbus.MakeVariant(dbus.ObjectPath("/path/to/object"))},
 	}
-}
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"users"},
+	goodOut := []loginSession{{
+		ID:   uint64(6),
+		UID:  uint32(1000),
+		User: "user",
+		Seat: "",
+		Path: dbus.ObjectPath("/path/to/object"),
+	},
 	}
+
+	output, err := formatSessionList(testIn)
+	assert.NoError(t, err)
+	assert.Equal(t, goodOut, output)
+
 }
