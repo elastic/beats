@@ -11,5 +11,5 @@ var:
   - name: input
     default: syslog
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
