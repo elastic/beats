@@ -452,6 +452,23 @@ datasources:
             period: 10s
 
 #################################################################################################
+### Suricata
+#
+ - id?: suricata-x1
+   title: Suricata's data
+   namespace?: "abc"
+   package:
+     name: suricata
+     version: x.x.x
+   inputs:
+     - type: log
+       streams:
+         -  id?: {id}
+            type: "typeX"
+            dataset: suricata.logs
+            path: /var/log/surcata/eve.json
+
+#################################################################################################
 ### suggestion 1
  - id?: myendpoint-x1
    title: Endpoint configuration
