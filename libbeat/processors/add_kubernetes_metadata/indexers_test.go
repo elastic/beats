@@ -66,9 +66,9 @@ func TestPodIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"labels": common.MapStr{
-				"labelkey": "labelvalue",
-			},
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
@@ -117,13 +117,13 @@ func TestPodUIDIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"labels": common.MapStr{
-				"labelkey": "labelvalue",
-			},
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
 			"name": "testnode",
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 	}
 
@@ -173,13 +173,13 @@ func TestContainerIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"labels": common.MapStr{
-				"labelkey": "labelvalue",
-			},
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
 			"name": "testnode",
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 	}
 	container1 := "docker://abcde"
@@ -250,7 +250,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ := indexers[0].Data.GetValue("pod.labels")
+	rawLabels, _ := indexers[0].Data.GetValue("labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(common.MapStr)
@@ -274,7 +274,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	indexers = podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ = indexers[0].Data.GetValue("pod.labels")
+	rawLabels, _ = indexers[0].Data.GetValue("labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok = rawLabels.(common.MapStr)
@@ -331,7 +331,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 
-	rawLabels, _ := indexers[0].Data.GetValue("pod.labels")
+	rawLabels, _ := indexers[0].Data.GetValue("labels")
 	assert.NotNil(t, rawLabels)
 
 	labelMap, ok := rawLabels.(common.MapStr)
@@ -392,13 +392,13 @@ func TestIpPortIndexer(t *testing.T) {
 		"pod": common.MapStr{
 			"name": "testpod",
 			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-			"labels": common.MapStr{
-				"labelkey": "labelvalue",
-			},
 		},
 		"namespace": "testns",
 		"node": common.MapStr{
 			"name": "testnode",
+		},
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
 		},
 	}
 
