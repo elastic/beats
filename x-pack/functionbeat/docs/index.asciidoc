@@ -22,7 +22,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_file_output:
 :no_console_output:
 :no_codec:
-:has_xpack:
+:requires_xpack:
 :serverless:
 :mac_os:
 :win_os:
