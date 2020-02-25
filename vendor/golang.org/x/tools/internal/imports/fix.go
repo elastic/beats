@@ -302,7 +302,7 @@ func (p *pass) importIdentifier(imp *ImportInfo) string {
 	if known != nil && known.name != "" {
 		return known.name
 	}
-	return importPathToAssumedName(imp.ImportPath)
+	return ImportPathToAssumedName(imp.ImportPath)
 }
 
 // load reads in everything necessary to run a pass, and reports whether the
@@ -435,7 +435,7 @@ func (p *pass) importSpecName(imp *ImportInfo) string {
 	}
 
 	ident := p.importIdentifier(imp)
-	if ident == importPathToAssumedName(imp.ImportPath) {
+	if ident == ImportPathToAssumedName(imp.ImportPath) {
 		return "" // ident not needed since the assumed and real names are the same.
 	}
 	return ident
@@ -644,7 +644,7 @@ func getCandidatePkgs(pkgName, filename string, env *ProcessEnv) ([]*pkg, error)
 }
 
 func candidateImportName(pkg *pkg) string {
-	if importPathToAssumedName(pkg.importPathShort) != pkg.packageName {
+	if ImportPathToAssumedName(pkg.importPathShort) != pkg.packageName {
 		return pkg.packageName
 	}
 	return ""
@@ -784,12 +784,20 @@ func (e *ProcessEnv) buildContext() *build.Context {
 	ctx.GOROOT = e.GOROOT
 	ctx.GOPATH = e.GOPATH
 
-	// As of Go 1.14, build.Context has a WorkingDir field
+	// As of Go 1.14, build.Context has a Dir field
 	// (see golang.org/issue/34860).
 	// Populate it only if present.
-	if wd := reflect.ValueOf(&ctx).Elem().FieldByName("WorkingDir"); wd.IsValid() && wd.Kind() == reflect.String {
-		wd.SetString(e.WorkingDir)
+	rc := reflect.ValueOf(&ctx).Elem()
+	dir := rc.FieldByName("Dir")
+	if !dir.IsValid() {
+		// Working drafts of Go 1.14 named the field "WorkingDir" instead.
+		// TODO(bcmills): Remove this case after the Go 1.14 beta has been released.
+		dir = rc.FieldByName("WorkingDir")
 	}
+	if dir.IsValid() && dir.Kind() == reflect.String {
+		dir.SetString(e.WorkingDir)
+	}
+
 	return &ctx
 }
 
@@ -884,7 +892,7 @@ func (r *goPackagesResolver) loadPackageNames(importPaths []string, srcDir strin
 		if _, ok := names[path]; ok {
 			continue
 		}
-		names[path] = importPathToAssumedName(path)
+		names[path] = ImportPathToAssumedName(path)
 	}
 	return names, nil
 
@@ -1006,7 +1014,7 @@ func notIdentifier(ch rune) bool {
 		ch >= utf8.RuneSelf && (unicode.IsLetter(ch) || unicode.IsDigit(ch)))
 }
 
-// importPathToAssumedName returns the assumed package name of an import path.
+// ImportPathToAssumedName returns the assumed package name of an import path.
 // It does this using only string parsing of the import path.
 // It picks the last element of the path that does not look like a major
 // version, and then picks the valid identifier off the start of that element.
@@ -1014,7 +1022,7 @@ func notIdentifier(ch rune) bool {
 // clarity.
 // This function could be moved to a standard package and exported if we want
 // for use in other tools.
-func importPathToAssumedName(importPath string) string {
+func ImportPathToAssumedName(importPath string) string {
 	base := path.Base(importPath)
 	if strings.HasPrefix(base, "v") {
 		if _, err := strconv.Atoi(base[1:]); err == nil {
