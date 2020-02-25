@@ -845,6 +845,19 @@ metricbeat.modules:
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
 
+#----------------------------- Openmetrics Module -----------------------------
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+  metrics_filters:
+    include: []
+    exclude: []
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
   metricsets: ["tablespace", "performance"]

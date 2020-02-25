@@ -1,0 +1,14 @@
+# Module: openmetrics
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-openmetrics.html
+
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+  metrics_filters:
+    include: []
+    exclude: []
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
