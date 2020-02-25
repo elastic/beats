@@ -39,8 +39,3 @@ func Fields() error {
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
-
-// Config generates example and reference configuration for libbeat.
-func Config() error {
-	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
-}
