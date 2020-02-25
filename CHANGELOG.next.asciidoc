@@ -48,7 +48,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
-- Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 
 *Heartbeat*
 
