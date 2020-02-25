@@ -18,6 +18,7 @@
 package index
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -32,6 +33,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+)
+
+var (
+	errParse = errors.New("failure parsing Indices Stats Elasticsearch API response")
 )
 
 var (
@@ -106,8 +111,41 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
 	}
 
+	dec := json.NewDecoder(bytes.NewReader(content))
+
+	// read opening `{`
+	if _, err = dec.Token(); err != nil {
+		return errors.Wrap(err, errParse.Error())
+	}
+
+	// read "indices"
+	if _, err = dec.Token(); err != nil {
+		return errors.Wrap(err, errParse.Error())
+	}
+
+	// read nested opening `{`
+	if _, err = dec.Token(); err != nil {
+		return errors.Wrap(err, errParse.Error())
+	}
+
 	var errs multierror.Errors
-	for name, index := range indicesStruct.Indices {
+	for dec.More() {
+		// Read index name
+		tok, err := dec.Token()
+		if err != nil {
+			return errors.Wrap(err, errParse.Error())
+		}
+
+		name, ok := tok.(string)
+		if !ok {
+			return errParse
+		}
+
+		var index map[string]interface{}
+		if err = dec.Decode(&index); err != nil {
+			return errors.Wrap(err, errParse.Error())
+		}
+
 		event := mb.Event{}
 		indexStats, err := xpackSchema.Apply(index)
 		if err != nil {
@@ -134,7 +172,21 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		r.Event(event)
 	}
 
-	return errs.Err()
+	if errs != nil {
+		return errs.Err()
+	}
+
+	// read nested closing `}`
+	if _, err = dec.Token(); err != nil {
+		return errors.Wrap(err, errParse.Error())
+	}
+
+	// read closing `}`
+	if _, err = dec.Token(); err != nil {
+		return errors.Wrap(err, errParse.Error())
+	}
+
+	return nil
 }
 
 func parseAPIResponse(content []byte, indicesStruct *IndicesStruct) error {
