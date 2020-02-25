@@ -1,0 +1,16 @@
+default: true
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.ContainerRegistry/registries"
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.ContainerRegistry/registries"
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.ContainerRegistry/registries"
+    - resource_id: ""
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.ContainerRegistry/registries"

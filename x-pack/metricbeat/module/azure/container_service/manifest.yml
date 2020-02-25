@@ -1,0 +1,16 @@
+default: true
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.ContainerService/managedClusters"
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.ContainerService/managedClusters"
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.ContainerService/managedClusters"
+    - resource_id: ""
+      metrics:
+      - name: "*"
+        namespace: "Microsoft.ContainerService/managedClusters"
