@@ -101,15 +101,18 @@ function FirewallProcessor(keep_original_message, debug) {
     builder.Add("categorizeEvent", new processor.AddFields({
         target: "event",
         fields: {
-            category: "firewall-rule",
-            type: "firewall"
+            kind: "event",
+            category: "network",
+            type: "connection",
+            action: "firewall-rule"
         },
     }));
 
     builder.Add("saveMetadata", new processor.Convert({
         fields: [
             {from: "json.logName", to: "log.logger"},
-            {from: "json.resource.labels.subnetwork_name", to: "network.name"}
+            {from: "json.resource.labels.subnetwork_name", to: "network.name"},
+            {from: "json.insertId", to: "event.id"}
         ],
         ignore_missing: true
     }));
@@ -125,15 +128,12 @@ function FirewallProcessor(keep_original_message, debug) {
         mode: "rename"
     }));
 
-    builder.Add("addOutcome", makeMapper({
-        from: "json.disposition",
-        to: "event.outcome",
-        mappings: {
-            ALLOWED: "allow",
-            DENIED: "deny"
-        },
-        default: "unknown"
-    }));
+    builder.Add("addType", function(evt) {
+        var disp = evt.Get("json.disposition");
+        if (disp != null) {
+            evt.AppendTo("event.type", disp.toLowerCase());
+        }
+    });
 
     builder.Add("addDirection", makeMapper({
         from: "json.rule_details.direction",
@@ -228,7 +228,7 @@ function FirewallProcessor(keep_original_message, debug) {
             {from: "json.dest_vpc", to: "googlecloud.destination.vpc"},
             {from: "json.src_instance", to: "googlecloud.source.instance"},
             {from: "json.src_vpc", to: "googlecloud.source.vpc"},
-
+            {from: "json.rule_details.reference", to: "rule.name"},
             {from: "json", to: "googlecloud.firewall"},
         ],
         mode: "rename",
