@@ -1,0 +1,3 @@
+name: openmetrics
+metricsets:
+- collector

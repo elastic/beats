@@ -1,0 +1,10 @@
+- key: openmetrics
+  title: 'Openmetrics'
+  release: beta
+  description: >
+    Openmetrics module
+  settings: ["http"]
+  fields:
+    - name: openmetrics
+      type: group
+      fields:
