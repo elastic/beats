@@ -4,26 +4,5 @@ input:
   metricset: collector
   defaults:
     metrics_path: /
-
-# The custom processor is responsible for filtering Prometheus metrics
-# not stricly related to the redis node.
-processors:
-  - script:
-      lang: javascript
-      source: >
-        function process(event) {
-          var metrics = event.Get("prometheus.metrics");
-          if (metrics == null) {
-            event.Cancel();
-            return;
-          }
-          Object.keys(metrics).forEach(function(key) {
-            if (!(key.match(/^listener_.*$/))) {
-              event.Delete("prometheus.metrics." + key);
-            }
-          });
-          metrics = event.Get("prometheus.metrics");
-          if (Object.keys(metrics).length == 0) {
-            event.Cancel();
-          }
-        }
+    metrics_filters:
+      include: ["listener_*"]
