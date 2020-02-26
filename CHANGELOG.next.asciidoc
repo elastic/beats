@@ -39,29 +39,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fix k8s pods labels broken schema. {pull}16480[16480]
-- Fix k8s pods annotations broken schema. {pull}16554[16554]
 
 *Auditbeat*
 
 
 *Filebeat*
-- Fix a connection error in httpjson input. {pull}16123[16123]
-- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
-- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
-- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 
 *Heartbeat*
 
-- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
 
 *Metricbeat*
 
-- Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
-- Change sqs metricset to use average as statistic method. {pull}16438[16438]
 
 *Packetbeat*
 
@@ -71,7 +62,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
@@ -84,7 +74,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
 
 *Heartbeat*
 
