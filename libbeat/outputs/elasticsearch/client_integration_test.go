@@ -38,9 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/internal"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 func TestClientPublishEvent(t *testing.T) {
@@ -281,20 +279,6 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	client.Connect()
 
 	return client, client
-}
-
-// getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t internal.TestLogger) *Client {
-	client, err := NewClient(ClientSettings{
-		URL:              internal.GetURL(),
-		Index:            outil.MakeSelector(),
-		Username:         internal.GetUser(),
-		Password:         internal.GetPass(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	eslegtest.InitConnection(t, client, err)
-	return client
 }
 
 func randomClient(grp outputs.Group) outputs.NetworkClient {
