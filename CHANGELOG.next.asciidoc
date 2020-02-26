@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
 - Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
 - Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
