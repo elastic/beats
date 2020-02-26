@@ -132,7 +132,17 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 		Timeout:   cfg.Timeout,
 	}
 
-	p := strings.Join([]string{cfg.Path, cfg.SpaceID}, "/")
+	// Normalize the URL with the path any spaces configured.
+	var p string
+	if len(cfg.SpaceID) > 0 {
+		p = strings.Join([]string{cfg.Path, cfg.SpaceID}, "/")
+	} else {
+		p = cfg.Path
+	}
+
+	if !strings.HasSuffix(p, "/") {
+		p = p + "/"
+	}
 
 	kibanaURL, err := common.MakeURL(string(cfg.Protocol), p, cfg.Host, kibanaPort)
 	if err != nil {
