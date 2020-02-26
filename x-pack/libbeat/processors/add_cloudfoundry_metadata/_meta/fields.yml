@@ -1,0 +1,30 @@
+- key: cloudfoundry
+  title: Cloud Foundry
+  description: >
+    Cloud Foundry information collected from Cloud Foundry.
+  short_config: false
+  anchor: cloudfoundry-processor
+  fields:
+    - name: docker
+      type: group
+      fields:
+        - name: container.id
+          type: alias
+          path: container.id
+          migration: true
+
+        - name: container.image
+          type: alias
+          path: container.image.name
+          migration: true
+
+        - name: container.name
+          type: alias
+          path: container.name
+          migration: true
+
+        - name: container.labels
+          type: object
+          object_type: keyword
+          description: >
+            Image labels.
