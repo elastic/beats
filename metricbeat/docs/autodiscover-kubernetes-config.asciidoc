@@ -16,4 +16,4 @@ metricbeat.autodiscover:
               hosts: "${data.host}:${data.port}"
 -------------------------------------------------------------------------------------
 
-This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.
+This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io/scrape: "true"`.
