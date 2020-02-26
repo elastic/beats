@@ -1825,6 +1825,9 @@ setup.kibana:
   # Optional HTTP path
   #path: ""
 
+  # Optional Space ID.
+  #space.id: ""
+
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
