@@ -50,7 +50,7 @@ const (
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
-	processors.RegisterPlugin(processorName, New)
+	processors.RegisterStatefulPlugin(processorName, New)
 }
 
 type addDockerMetadata struct {

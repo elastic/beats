@@ -51,6 +51,16 @@ func NewList(log *logp.Logger) *Processors {
 
 // New creates a list of processors from a list of free user configurations.
 func New(config PluginConfig) (*Processors, error) {
+	return newFromRegistry(registry, config)
+}
+
+// NewStateful creates a list of processors from a list of free user configurations.
+// These processors may need to be closed once they are not used anymore.
+func NewStateful(config PluginConfig) (*Processors, error) {
+	return newFromRegistry(statefulRegistry, config)
+}
+
+func newFromRegistry(registry *Namespace, config PluginConfig) (*Processors, error) {
 	procs := NewList(nil)
 
 	for _, procConfig := range config {
@@ -84,7 +94,7 @@ func New(config PluginConfig) (*Processors, error) {
 				validActions = append(validActions, k)
 
 			}
-			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
+			return nil, errors.Errorf("the processor action %s is not available in this context. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
 		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)

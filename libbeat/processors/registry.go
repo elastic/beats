@@ -50,11 +50,28 @@ func init() {
 type Constructor func(config *common.Config) (Processor, error)
 
 var registry = NewNamespace()
+var statefulRegistry = NewNamespace()
 
+// RegisterPlugin register a stateless processor
 func RegisterPlugin(name string, constructor Constructor) {
 	logp.L().Named(logName).Debugf("Register plugin %s", name)
 
 	err := registry.Register(name, constructor)
+	if err != nil {
+		panic(err)
+	}
+
+	err = statefulRegistry.Register(name, constructor)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// RegisterPlugin register processor that needs to be closed
+func RegisterStatefulPlugin(name string, constructor Constructor) {
+	logp.L().Named(logName).Debugf("Register plugin %s", name)
+
+	err := statefulRegistry.Register(name, constructor)
 	if err != nil {
 		panic(err)
 	}
