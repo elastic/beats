@@ -830,8 +830,6 @@ func (e *Event) unpack(data string) error {
 		(p)--
 		cs = 28
 		goto _again
-
-		goto _again
 	f17:
 //line cef.rl:87
 
@@ -839,8 +837,6 @@ func (e *Event) unpack(data string) error {
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 24
-		goto _again
-
 		goto _again
 	f2:
 //line cef.rl:37
