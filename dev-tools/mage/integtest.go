@@ -193,7 +193,9 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// compose.EnsureUp needs to know the environment type.
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
-		"-e", "GOFLAGS=-mod=vendor",
+	}
+	if UseVendor {
+		args = append(args, "--env", "GOFLAGS=-mod=vendor")
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {

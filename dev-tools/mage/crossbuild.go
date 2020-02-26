@@ -247,9 +247,12 @@ func (b GolangCrossBuilder) Build() error {
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
+	if UseVendor {
+		args = append(args, "--env", "GOFLAGS=-mod=vendor")
+	}
+
 	args = append(args,
 		"--rm",
-		"--env", "GOFLAGS=-mod=vendor",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"-v", repoInfo.RootDir+":"+mountPoint,
