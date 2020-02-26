@@ -21,7 +21,7 @@ input:
       query: '\Web Service(*)\Bytes Received/sec'
     - instance_label: 'name'
       measurement_label: current_connections
-      query: 'Web Service(*)\Current Connections'
+      query: '\Web Service(*)\Current Connections'
     - instance_label: 'name'
       measurement_label: maximum_connections
       query: '\Web Service(*)\Maximum Connections'
@@ -55,37 +55,6 @@ input:
     - instance_label: 'name'
       measurement_label: put_requests_per_sec
       query: '\Web Service(*)\PUT Requests/sec'
-    - instance_label: 'name'
-      measurement_label: total_head_requests
-      query: '\Web Service(*)\Total Head Requests'
-    - instance_label: 'name'
-      measurement_label: head_requests_per_sec
-      query: '\Web Service(*)\Head Requests/sec'
-    - instance_label: 'name'
-      measurement_label: options_requests_per_sec
-      query: '\Web Service(*)\Options Requests/sec'
-    - instance_label: 'name'
-      measurement_label: total_options_requests
-      query: '\Web Service(*)\Total Options Requests'
-    - instance_label: 'name'
-      measurement_label: other_request_methods_per_sec
-      query: '\Web Service(*)\Other Request Methods/sec'
-    - instance_label: 'name'
-      measurement_label: total_other_request_methods
-      query: '\Web Service(*)\Total Other Request Methods'
-    - instance_label: 'name'
-      measurement_label: total_trace_requests
-      query: '\Web Service(*)\Total Trace Requests'
-    - instance_label: 'name'
-      measurement_label: trace_requests_per_sec
-      query: '\Web Service(*)\Trace Requests/sec'
-    - instance_label: 'name'
-      measurement_label: total_unlock_requests
-      query: '\Web Service(*)\Total Unlock Requests'
-    - instance_label: 'name'
-      measurement_label: unlock_requests_per_sec
-      query: '\Web Service(*)\Unlock Requests/sec'
-
 
 processors:
 - drop_event.when.equals:

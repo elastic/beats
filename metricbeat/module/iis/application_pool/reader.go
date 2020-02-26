@@ -72,11 +72,6 @@ var appPoolCounters = map[string]string{
 	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
 	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
 	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
-	"net_clr.GC_time_perc":                 "\\.NET CLR Memory(w3wp)\\% Time in GC",
-	"net_clr.bytes_all_heaps":              "\\.NET CLR Memory(w3wp)\\# Bytes in all Heaps",
-	"net_clr.GC_total_commited_bytes":      "\\.NET CLR Memory(w3wp)\\# Total Committed Bytes",
-	"net_clr.process_id":                   "\\.NET CLR Memory(w3wp)\\Process ID",
-	"net_clr.last_time_RT_checks_perc":     "\\.NET CLR Security(w3wp)\\% Time in RT checks",
 }
 
 // newReader creates a new instance of Reader.
@@ -109,7 +104,8 @@ func (re *Reader) initCounters(filtered []string) error {
 	for key, value := range appPoolCounters {
 		counters, err := re.Query.ExpandWildCardPath(value)
 		if err != nil {
-			return errors.Wrapf(err, `failed to expand counter path (query="%v")`, value)
+			re.log.Error(err, `failed to expand counter path (query="%v")`, value)
+			continue
 		}
 		for _, count := range counters {
 			if err = re.Query.AddCounter(count, "", "float", true); err != nil {

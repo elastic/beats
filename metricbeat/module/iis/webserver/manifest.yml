@@ -22,7 +22,7 @@ input:
       query: '\Web Service(_Total)\Bytes Received/sec'
     - instance_label: ''
       measurement_label: network.current_connections
-      query: 'Web Service(_Total)\Current Connections'
+      query: '\Web Service(_Total)\Current Connections'
     - instance_label: ''
       measurement_label: network.maximum_connections
       query: '\Web Service(_Total)\Maximum Connections'
@@ -50,55 +50,45 @@ input:
     - instance_label: ''
       measurement_label: network.service_uptime
       query: '\Web Service(_Total)\Service Uptime'
-
-   #added
     - instance_label: ''
       measurement_label: network.current_anonymous_users
-      query: 'Web Service(*)Current Anonymous Users'
+      query: '\Web Service(_Total)\Current Anonymous Users'
     - instance_label: ''
       measurement_label: network.current_nonanonymous_users
-      query: 'Web Service(*)Current NonAnonymous Users'
+      query: '\Web Service(_Total)\Current NonAnonymous Users'
     - instance_label: ''
       measurement_label: network.total_anonymous_users
-      query: 'Web Service(*)Total Anonymous Users'
+      query: '\Web Service(_Total)\Total Anonymous Users'
     - instance_label: ''
       measurement_label: network.anonymous_users_per_sec
-      query: 'Web Service(*)Anonymous Users/sec'
+      query: '\Web Service(_Total)\Anonymous Users/sec'
     - instance_label: ''
       measurement_label: network.total_nonanonymous_users
-      query: 'Web Service(*)Total NonAnonymous Users'
+      query: '\Web Service(_Total)\Total NonAnonymous Users'
+
+    #asp.net
     - instance_label: ''
-      measurement_label: network.total_not_found_errors
-      query: 'Web Service(*)Total Not Found Errors'
+      measurement_label: asp_net_application.errors_per_sec
+      query: '\ASP.NET Applications(__Total__)\Errors Total/Sec'
     - instance_label: ''
-      measurement_label: network.not_found_errors_per_sec
-      query: 'Web Service(*)Not Found Errors/sec'
+      measurement_label: asp_net_application.pipeline_instance_count
+      query: '\ASP.NET Applications(__Total__)\Pipeline Instance Count'
     - instance_label: ''
-      measurement_label: network.total_locked_errors
-      query: 'Web Service(*)Total Locked Errors'
+      measurement_label: asp_net_application.requests_executing
+      query: '\ASP.NET Applications(__Total__)\Requests Executing'
     - instance_label: ''
-      measurement_label: network.locked_errors_per_sec
-      query: 'Web Service(*)Locked Errors/sec'
+      measurement_label: asp_net_application.requests_in_application_queue
+      query: '\ASP.NET Applications(__Total__)\Requests in Application Queue'
+      format: 'large'
     - instance_label: ''
-      measurement_label: network.total_CGI_requests
-      query: 'Web Service(*)Total CGI Requests'
-
-
-
-
-
-
-      Web Service(*)CGI Requests/sec
-      Web Service(*)Total ISAPI Extension Requests
-      Web Service(*)ISAPI Extension Requests/sec
-      Web Service(*)Total Files Sent
-      Web Service(*)Files Sent/sec
-      Web Service(*)Total Files Received
-      Web Service(*)Files Received/sec
-      Web Service(*)Total Files Transferred
-      Web Service(*)Files/sec
-
-
+      measurement_label: asp_net_application.requests_per_sec
+      query: '\ASP.NET Applications(__Total__)\Requests/Sec'
+    - instance_label: ''
+      measurement_label: asp_net.application_restarts
+      query: '\ASP.NET\Application Restarts'
+    - instance_label: ''
+      measurement_label: asp_net.request_wait_time
+      query: '\ASP.NET\Request Wait Time'
 
     #cache
     - instance_label: ''

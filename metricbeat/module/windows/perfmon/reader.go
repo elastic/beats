@@ -229,13 +229,19 @@ func (re *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event 
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
 				continue
 			}
-
+			var counterVal float64
+			switch val.Measurement.(type) {
+			case int64:
+				counterVal = float64(val.Measurement.(int64))
+			default:
+				counterVal = val.Measurement.(float64)
+			}
 			if _, ok := measurements[re.measurement[counterPath]]; !ok {
-				measurements[re.measurement[counterPath]] = val.Measurement.(float64)
+				measurements[re.measurement[counterPath]] = counterVal
 				measurements[re.measurement[counterPath]+instanceCountLabel] = 1
 			} else {
 				measurements[re.measurement[counterPath]+instanceCountLabel] = measurements[re.measurement[counterPath]+instanceCountLabel] + 1
-				measurements[re.measurement[counterPath]] = measurements[re.measurement[counterPath]] + val.Measurement.(float64)
+				measurements[re.measurement[counterPath]] = measurements[re.measurement[counterPath]] + counterVal
 			}
 		}
 	}
