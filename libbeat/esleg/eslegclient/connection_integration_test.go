@@ -103,8 +103,8 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	require.NoError(t, err)
 
 	var proxy string
-	if config.HasField("proxy") {
-		proxy, err = config.String("proxy", -1)
+	if config.HasField("proxy_url") {
+		proxy, err = config.String("proxy_url", -1)
 		require.NoError(t, err)
 	}
 
