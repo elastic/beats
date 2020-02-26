@@ -38,7 +38,6 @@ import (
 	"github.com/elastic/beats/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
 )
 
 func TestConnect(t *testing.T) {
@@ -118,11 +117,11 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 }
 
 // getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t internal.TestLogger) *Client {
+func getTestingElasticsearch(t eslegtest.TestLogger) *Client {
 	conn, err := NewConnection(ConnectionSettings{
-		URL:              internal.GetURL(),
-		Username:         internal.GetUser(),
-		Password:         internal.GetUser(),
+		URL:              eslegtest.GetURL(),
+		Username:         eslegtest.GetUser(),
+		Password:         eslegtest.GetPass(),
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	}, nil)
