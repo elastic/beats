@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to ECS 1.4.0. {pull}14844[14844]
 - The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 - Variable substitution from environment variables is not longer supported. {pull}15937{15937}
+- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
 
 *Auditbeat*
 
@@ -75,6 +76,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
+- Fix loading processors from annotation hints. {pull}16348[16348]
+- Fix k8s pods labels broken schema. {pull}16480[16480]
+- Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 
 *Auditbeat*
 
@@ -93,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 - Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
@@ -100,11 +105,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 
 *Heartbeat*
 
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
+- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
@@ -129,6 +136,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
 - Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
+- Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
 
 *Packetbeat*
 
@@ -163,7 +172,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
+- Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
+- Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
 
 *Auditbeat*
 
@@ -195,7 +206,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
 - Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320] 
+- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
+- Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
+- Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
+- Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
+- Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 
 *Heartbeat*
 
@@ -232,6 +247,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add collecting AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
+- Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
+- Add support for Dropwizard metrics 4.1. {pull}16332[16332]
+- Add support for NATS 2.1. {pull}16317[16317]
+- Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
+- Add filtering option for prometheus collector. {pull}16420[16420]
+- Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
+- Add Load Balancing metricset to GCP {pull}15559[15559]
+- Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 
 *Packetbeat*
 

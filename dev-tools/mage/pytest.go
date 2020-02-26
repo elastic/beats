@@ -37,7 +37,7 @@ import (
 // platforms. So do verify the version with python.exe --version.
 //
 // Setting up a python virtual environment on a network drive does not work
-// well. So if this applies to your development environment set PYTHON_EXE
+// well. So if this applies to your development environment set PYTHON_ENV
 // to point to somewhere on C:\.
 
 const (

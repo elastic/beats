@@ -9,6 +9,23 @@ processors:
       patterns:
         - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{WORD:activemq.user}%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}"
       ignore_missing: true
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      if: "ctx?.activemq?.user != null"
+      field: user.name
+      value: "{{activemq.user}}"
+  - script:
+      if: "ctx?.log?.level != null"
+      lang: painless
+      source: >-
+        def err_levels = ["FATAL", "ERROR", "WARN"];
+        if (err_levels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
 on_failure:
   - set:
       field: error.message
