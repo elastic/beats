@@ -99,11 +99,14 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	password, err := config.String("password", -1)
 	require.NoError(t, err)
 
-	proxy, err := config.String("proxy", -1)
-	require.NoError(t, err)
-
 	timeout, err := config.Int("timeout", -1)
 	require.NoError(t, err)
+
+	var proxy string
+	if config.HasField("proxy") {
+		proxy, err = config.String("proxy", -1)
+		require.NoError(t, err)
+	}
 
 	s := ConnectionSettings{
 		URL:      hosts,
