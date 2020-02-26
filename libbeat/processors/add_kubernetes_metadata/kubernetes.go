@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -54,7 +53,6 @@ type kubernetesAnnotator struct {
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
-	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
 	// Register default indexers and matchers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
