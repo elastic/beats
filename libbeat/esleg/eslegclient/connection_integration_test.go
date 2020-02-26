@@ -33,11 +33,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/esleg/eslegtest"
-	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func TestConnect(t *testing.T) {
@@ -62,69 +61,82 @@ func TestConnectWithProxy(t *testing.T) {
 	defer proxy.Close()
 
 	// Use connectTestEs instead of getTestingElasticsearch to make use of makeES
-	_, client := connectTestEs(t, map[string]interface{}{
+	client, err := connectTestEs(t, map[string]interface{}{
 		"hosts":   "http://" + wrongPort.Addr().String(),
 		"timeout": 5, // seconds
 	})
+	require.NoError(t, err)
 	assert.Error(t, client.Connect(), "it should fail without proxy")
 
-	_, client = connectTestEs(t, map[string]interface{}{
+	client, err = connectTestEs(t, map[string]interface{}{
 		"hosts":     "http://" + wrongPort.Addr().String(),
 		"proxy_url": proxy.URL,
 		"timeout":   5, // seconds
 	})
+	require.NoError(t, err)
 	assert.NoError(t, client.Connect())
 }
 
-func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
+func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            eslegtest.GetEsHost(),
-		"username":         eslegtest.GetUser(),
-		"password":         eslegtest.GetPass(),
-		"template.enabled": false,
+		"username": eslegtest.GetUser(),
+		"password": eslegtest.GetPass(),
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	tmp, err := common.NewConfigFrom(cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	err = config.Merge(tmp)
-	if err != nil {
-		t.Fatal(err)
+	require.NoError(t, err)
+
+	hosts, err := config.String("hosts", -1)
+	require.NoError(t, err)
+
+	username, err := config.String("username", -1)
+	require.NoError(t, err)
+
+	password, err := config.String("password", -1)
+	require.NoError(t, err)
+
+	proxy, err := config.String("proxy", -1)
+	require.NoError(t, err)
+
+	timeout, err := config.Int("timeout", -1)
+	require.NoError(t, err)
+
+	s := ConnectionSettings{
+		URL:      hosts,
+		Username: username,
+		Password: password,
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(timeout * time.Second).Dial,
+			},
+			Timeout: timeout * time.Second,
+		}, CompressionLevel: 3,
 	}
 
-	info := beat.Info{Beat: "libbeat"}
-	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
-	output, err := makeES(im, info, outputs.NewNilObserver(), config)
-	if err != nil {
-		t.Fatal(err)
+	if proxy != "" {
+		s.Proxy = proxy
 	}
 
-	type clientWrap interface {
-		outputs.NetworkClient
-		Client() outputs.NetworkClient
-	}
-	client := randomClient(output).(clientWrap).Client().(*Client)
-
-	// Load version number
-	client.Connect()
-
-	return client, client
+	return NewConnection(s)
 }
 
 // getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t eslegtest.TestLogger) *Client {
+func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 	conn, err := NewConnection(ConnectionSettings{
-		URL:              eslegtest.GetURL(),
-		Username:         eslegtest.GetUser(),
-		Password:         eslegtest.GetPass(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
+		URL:      eslegtest.GetURL(),
+		Username: eslegtest.GetUser(),
+		Password: eslegtest.GetPass(),
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(60 * time.Second).Dial,
+			},
+			Timeout: 60 * time.Second,
+		}, CompressionLevel: 3,
+	})
 	eslegtest.InitConnection(t, conn, err)
 	return conn
 }

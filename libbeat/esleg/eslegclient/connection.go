@@ -47,8 +47,9 @@ type Connection struct {
 
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
-	URL      string
-	ProxyURL *url.URL
+	URL          string
+	Proxy        *url.URL
+	ProxyDisable bool
 
 	Username string
 	Password string
@@ -82,6 +83,20 @@ func NewConnection(settings ConnectionSettings) (*Connection, error) {
 	bulkRequ, err := NewBulkRequest(settings.URL, "", "", settings.Parameters, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	var proxy func(*http.Request) (*url.URL, error)
+	if !settings.ProxyDisable {
+		proxy = http.ProxyFromEnvironment
+		if settings.Proxy != nil {
+			proxy = http.ProxyURL(settings.Proxy)
+		}
+	}
+
+	if settings.HTTP != nil {
+		if t, ok := settings.HTTP.Transport.(*http.Transport); ok {
+			t.Proxy = proxy
+		}
 	}
 
 	return &Connection{

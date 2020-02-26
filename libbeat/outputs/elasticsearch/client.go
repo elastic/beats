@@ -146,7 +146,7 @@ func NewClient(
 			},
 			Timeout: s.Timeout,
 		},
-		ProxyURL:         s.Proxy,
+		Proxy:            s.Proxy,
 		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
@@ -299,11 +299,11 @@ func (client *Client) Clone() *Client {
 			URL:      client.URL,
 			Index:    client.index,
 			Pipeline: client.pipeline,
-			Proxy:    client.ProxyURL,
+			Proxy:    client.Proxy,
 			// Without the following nil check on proxyURL, a nil Proxy field will try
 			// reloading proxy settings from the environment instead of leaving them
 			// empty.
-			ProxyDisable:     client.ProxyURL == nil,
+			ProxyDisable:     client.Proxy == nil,
 			TLS:              client.TLSConfig,
 			Username:         client.Username,
 			Password:         client.Password,
