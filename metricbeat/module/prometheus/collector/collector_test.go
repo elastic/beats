@@ -319,7 +319,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	ms.excludeMetrics, _ = compilePatternList(&[]string{})
 	metricsToKeep := 0
 	for _, testFamily := range testFamilies {
-		if !ms.skipFamily(*testFamily.Name) {
+		if !ms.skipFamily(testFamily) {
 			metricsToKeep += 1
 		}
 	}
@@ -330,7 +330,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	ms.excludeMetrics, _ = compilePatternList(&[]string{})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
-		if !ms.skipFamily(*testFamily.Name) {
+		if !ms.skipFamily(testFamily) {
 			metricsToKeep += 1
 		}
 	}
@@ -341,7 +341,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
-		if !ms.skipFamily(*testFamily.Name) {
+		if !ms.skipFamily(testFamily) {
 			metricsToKeep += 1
 		}
 	}
@@ -352,7 +352,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
-		if !ms.skipFamily(*testFamily.Name) {
+		if !ms.skipFamily(testFamily) {
 			metricsToKeep += 1
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
+	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -99,10 +100,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, family := range families {
-		if family == nil {
-			continue
-		}
-		if m.skipFamily(*family.Name) {
+		if m.skipFamily(family) {
 			continue
 		}
 		promEvents := getPromEventsFromMetricFamily(family)
@@ -151,7 +149,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 	metricName := "up"
-	if m.skipFamily(metricName) {
+	if m.skipFamilyName(metricName) {
 		return
 	}
 	upPromEvent := PromEvent{
@@ -169,7 +167,14 @@ func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
 
 }
 
-func (m *MetricSet) skipFamily(family string) bool {
+func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+	if family == nil {
+		return false
+	}
+	return m.skipFamilyName(*family.Name)
+}
+
+func (m *MetricSet) skipFamilyName(family string) bool {
 	// example:
 	//	include_metrics:
 	//		- node_*
