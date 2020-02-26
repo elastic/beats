@@ -34,12 +34,12 @@ const cef_en_main_cef_extensions int = 24
 //line cef.rl:16
 
 // unpack unpacks a CEF message.
-func (e *Event) unpack(data []byte) error {
+func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark := 0
 
 	// Extension key.
-	var extKey []byte
+	var extKey string
 
 	// Extension value start and end indices.
 	extValueStart, extValueEnd := 0, 0
@@ -48,7 +48,7 @@ func (e *Event) unpack(data []byte) error {
 	// recover from (though the parsing might not be "correct").
 	var recoveredErrs []error
 
-	e.init()
+	e.init(data)
 
 //line parser.go:55
 	{
@@ -760,43 +760,43 @@ func (e *Event) unpack(data []byte) error {
 	f1:
 //line cef.rl:40
 
-		e.Version, _ = strconv.Atoi(string(data[mark:p]))
+		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
 	f3:
 //line cef.rl:43
 
-		e.DeviceVendor = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f5:
 //line cef.rl:46
 
-		e.DeviceProduct = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f7:
 //line cef.rl:49
 
-		e.DeviceVersion = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f9:
 //line cef.rl:52
 
-		e.DeviceEventClassID = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f11:
 //line cef.rl:55
 
-		e.Name = string(replaceHeaderEscapes(data[mark:p]))
+		e.Name = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f13:
 //line cef.rl:58
 
-		e.Severity = string(data[mark:p])
+		e.Severity = data[mark:p]
 
 		goto _again
 	f14:
@@ -805,7 +805,7 @@ func (e *Event) unpack(data []byte) error {
 		// A new extension key marks the end of the last extension value.
 		if len(extKey) > 0 && extValueStart <= mark-1 {
 			e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:mark-1]))
-			extKey, extValueStart, extValueEnd = nil, 0, 0
+			extKey, extValueStart, extValueEnd = "", 0, 0
 		}
 		extKey = data[mark:p]
 
@@ -829,15 +829,17 @@ func (e *Event) unpack(data []byte) error {
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
 		(p)--
 		cs = 28
+		goto _again
 
 		goto _again
 	f17:
 //line cef.rl:87
 
-		extKey, extValueStart, extValueEnd = nil, 0, 0
+		extKey, extValueStart, extValueEnd = "", 0, 0
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 24
+		goto _again
 
 		goto _again
 	f2:
@@ -847,7 +849,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:43
 
-		e.DeviceVendor = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f4:
@@ -857,7 +859,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:46
 
-		e.DeviceProduct = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f6:
@@ -867,7 +869,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:49
 
-		e.DeviceVersion = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f8:
@@ -877,7 +879,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:52
 
-		e.DeviceEventClassID = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f10:
@@ -887,7 +889,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:55
 
-		e.Name = string(replaceHeaderEscapes(data[mark:p]))
+		e.Name = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f12:
@@ -897,7 +899,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:58
 
-		e.Severity = string(data[mark:p])
+		e.Severity = data[mark:p]
 
 		goto _again
 	f23:
@@ -950,7 +952,7 @@ func (e *Event) unpack(data []byte) error {
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
 					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = nil, 0, 0
+					extKey, extValueStart, extValueEnd = "", 0, 0
 				}
 
 			case 16:
@@ -972,7 +974,7 @@ func (e *Event) unpack(data []byte) error {
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
 					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = nil, 0, 0
+					extKey, extValueStart, extValueEnd = "", 0, 0
 				}
 
 //line parser.go:847
