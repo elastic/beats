@@ -426,17 +426,6 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
-	// Check content-type
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrap(err, "gzip.NewReader failed")
-			p.logger.Error(err)
-			return err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
-	}
 
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
@@ -448,6 +437,18 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			return err
 		}
 		return nil
+	}
+
+	// Check content-type
+	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrap(err, "gzip.NewReader failed")
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
 	}
 
 	// handle s3 objects that are not json content-type
