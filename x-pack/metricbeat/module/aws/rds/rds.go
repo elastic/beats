@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
@@ -49,6 +51,7 @@ type DBDetails struct {
 	dbAvailabilityZone string
 	dbIdentifier       string
 	dbStatus           string
+	tags               []aws.Tag
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -172,6 +175,20 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 			dbDetails.dbAvailabilityZone = *dbInstance.AvailabilityZone
 		}
 
+		// Get tags for each RDS instance
+		listTagsInput := rds.ListTagsForResourceInput{
+			ResourceName: dbInstance.DBInstanceArn,
+		}
+		reqListTags := svc.ListTagsForResourceRequest(&listTagsInput)
+		outputListTags, err := reqListTags.Send(context.TODO())
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "Error ListTagsForResourceRequest")
+		}
+
+		for _, tag := range outputListTags.TagList {
+			dbDetails.tags = append(dbDetails.tags, aws.Tag{Key: *tag.Key, Value: *tag.Value})
+		}
+
 		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
 	}
 	return dbInstanceIDs, dbDetailsMap, nil
@@ -268,6 +285,11 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 								events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
+
+								// By default, replace dot "." using under bar "_" for tag keys and values
+								for _, tag := range dbInstanceMap[dbIdentifier].tags {
+									events[dbIdentifier].MetricSetFields.Put("db_instance.tags."+common.DeDot(tag.Key), common.DeDot(tag.Value))
+								}
 							}
 						}
 						metricSetFieldResults[dimValues][labels[i]] = fmt.Sprint(labels[(i + 1)])
