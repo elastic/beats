@@ -1,5 +1,8 @@
 [[add-cloudfoundry-metadata]]
+[role="xpack"]
 === Add Cloud Foundry metadata
+
+experimental[]
 
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
 from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
