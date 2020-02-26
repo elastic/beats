@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
@@ -73,6 +75,20 @@ func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstance
 	}
 }
 
+func (m *MockRDSClient) ListTagsForResourceRequest(input *rds.ListTagsForResourceInput) rds.ListTagsForResourceRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return rds.ListTagsForResourceRequest{
+		Request: &awssdk.Request{
+			Data: &rds.ListTagsForResourceOutput{
+				TagList: []rds.Tag{
+					{Key: awssdk.String("dept"), Value: awssdk.String("engr")},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
 func TestConstructLabel(t *testing.T) {
 	cases := []struct {
 		dimensions    []cloudwatch.Dimension
@@ -126,6 +142,7 @@ func TestGetDBInstancesPerRegion(t *testing.T) {
 		dbAvailabilityZone: availabilityZone,
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
+		tags:               []aws.Tag{{Key: "dept", Value: "engr"}},
 	}
 	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
 }
