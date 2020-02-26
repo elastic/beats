@@ -1,5 +1,3 @@
-//begin inner exclude for redis
-ifndef::no-output-redis[]
 [[redis-output]]
 === Configure the Redis output
 
@@ -252,6 +250,3 @@ client. You can change this behavior by setting the
 
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
-
-//end inner exclude for redis
-endif::[]
