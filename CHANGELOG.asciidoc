@@ -25,9 +25,6 @@ https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
 
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
-*Journalbeat*
-
-
 *Metricbeat*
 
 - Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
