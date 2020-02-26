@@ -98,6 +98,9 @@ endif::[]
 ifndef::no_truncate_fields_processor[]
 * <<truncate-fields, `truncate_fields`>>
 endif::[]
+ifdef::no_translate_sid_processor[]
+* <<processor-translate-sid, `translate_sid`>>
+endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
@@ -196,6 +199,9 @@ include::{libbeat-processors-dir}/timestamp/docs/timestamp.asciidoc[]
 endif::[]
 ifndef::no_truncate_fields_processor[]
 include::{libbeat-processors-dir}/actions/docs/truncate_fields.asciidoc[]
+endif::[]
+ifdef::no_translate_sid_processor[]
+include::{libbeat-processors-dir}/translate_sid/docs/translate_sid.asciidoc[]
 endif::[]
 
 //# end::processors-include[]
