@@ -9,10 +9,10 @@ quickly, see {stack-gs}/get-started-elastic-stack.html[Getting started with the
 [TIP]
 ==============
 You can skip having to install {es} and {kib} by using our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
-Elastic Cloud. The {es} Service is available on both AWS and GCP.
-https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {es}
-Service for free].
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}. The {ess} is available on AWS, GCP, and Azure.
+{ess-trial}[Try out the {ess}
+for free].
 ==============
 
 After installing the {stack}, see the {beats} getting started guides: 
