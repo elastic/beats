@@ -18,6 +18,8 @@ from network interfaces in AWS VPC. ELB access logs captures detailed informatio
 about requests sent to the load balancer. CloudTrail logs contain events
 that represent actions taken by a user, role or AWS service.
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Module configuration
 
