@@ -132,6 +132,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	es := &esConnection{}
 	es.t = t
+	es.Connection = client
 	es.index = index
 	return es
 }
