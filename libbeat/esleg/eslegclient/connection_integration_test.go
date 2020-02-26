@@ -114,9 +114,9 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 		Password: password,
 		HTTP: &http.Client{
 			Transport: &http.Transport{
-				Dial: transport.NetDialer(timeout * time.Second).Dial,
+				Dial: transport.NetDialer(time.Duration(timeout) * time.Second).Dial,
 			},
-			Timeout: timeout * time.Second,
+			Timeout: time.Duration(timeout) * time.Second,
 		}, CompressionLevel: 3,
 	}
 
