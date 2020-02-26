@@ -23,7 +23,7 @@ PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
 # remove this and treat all sub-projects the same.
-PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG)
+PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
 
 #
 # Includes
