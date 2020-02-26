@@ -23,12 +23,13 @@ import (
 	"context"
 	"io/ioutil"
 	"math/rand"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/libbeat/esclientleg/eslegtest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,42 +43,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
-
-func TestClientConnect(t *testing.T) {
-	client := getTestingElasticsearch(t)
-	err := client.Connect()
-	assert.NoError(t, err)
-}
-
-func TestClientConnectWithProxy(t *testing.T) {
-	wrongPort, err := net.Listen("tcp", "localhost:0")
-	require.NoError(t, err)
-	go func() {
-		c, err := wrongPort.Accept()
-		if err == nil {
-			// Provoke an early-EOF error on client
-			c.Close()
-		}
-	}()
-	defer wrongPort.Close()
-
-	proxy := startTestProxy(t, internal.GetURL())
-	defer proxy.Close()
-
-	// Use connectTestEs instead of getTestingElasticsearch to make use of makeES
-	_, client := connectTestEs(t, map[string]interface{}{
-		"hosts":   "http://" + wrongPort.Addr().String(),
-		"timeout": 5, // seconds
-	})
-	assert.Error(t, client.Connect(), "it should fail without proxy")
-
-	_, client = connectTestEs(t, map[string]interface{}{
-		"hosts":     "http://" + wrongPort.Addr().String(),
-		"proxy_url": proxy.URL,
-		"timeout":   5, // seconds
-	})
-	assert.NoError(t, client.Connect())
-}
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
@@ -281,9 +246,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            internal.GetEsHost(),
-		"username":         internal.GetUser(),
-		"password":         internal.GetPass(),
+		"hosts":            eslegtest.GetEsHost(),
+		"username":         eslegtest.GetUser(),
+		"password":         eslegtest.GetPass(),
 		"template.enabled": false,
 	})
 	if err != nil {
@@ -329,7 +294,7 @@ func getTestingElasticsearch(t internal.TestLogger) *Client {
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	}, nil)
-	internal.InitClient(t, client, err)
+	eslegtest.InitConnection(t, client, err)
 	return client
 }
 

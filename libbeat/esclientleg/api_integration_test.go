@@ -29,15 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
-)
-
-const (
-	// ElasticsearchDefaultHost is the default host for elasticsearch.
-	ElasticsearchDefaultHost = "localhost"
-	// ElasticsearchDefaultPort is the default port for elasticsearch.
-	ElasticsearchDefaultPort = "9200"
->>>>>>> Moving API integration tests
 )
 
 func TestIndex(t *testing.T) {
@@ -172,71 +163,4 @@ func TestIngest(t *testing.T) {
 	}
 
 	assert.Equal(t, "test", doc.Field)
-}
-
-// FIXME: Below code is repeated in outputs/elasticsearch/internal/testing.go
-
-// TestLogger is used to report fatal errors to the testing framework.
-type TestLogger interface {
-	Fatal(args ...interface{})
-}
-
-// Connectable defines the minimum interface required to initialize a connected
-// client.
-type Connectable interface {
-	Connect() error
-}
-
-// getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t TestLogger) *Connection {
-	conn, err := NewConnection(ConnectionSettings{
-		URL: getURL(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(0).Dial,
-			},
-			Timeout: 0,
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-		panic(err) // panic in case TestLogger did not stop test
-	}
-
-	conn.Encoder = NewJSONEncoder(nil, false)
-
-	err = conn.Connect()
-	if err != nil {
-		t.Fatal(err)
-		panic(err) // panic in case TestLogger did not stop test
-	}
-
-	return conn
-}
-
-func getURL() string {
-	return fmt.Sprintf("http://%v:%v", getEsHost(), getEsPort())
-}
-
-func getEsHost() string {
-	return getEnv("ES_HOST", ElasticsearchDefaultHost)
-}
-
-func getEsPort() string {
-	return getEnv("ES_PORT", ElasticsearchDefaultPort)
-}
-
-func getUser() string {
-	return getEnv("ES_USER", "")
-}
-
-func getPass() string {
-	return getEnv("ES_PASS", "")
-}
-
-func getEnv(name, def string) string {
-	if v := os.Getenv(name); len(v) > 0 {
-		return v
-	}
-	return def
 }

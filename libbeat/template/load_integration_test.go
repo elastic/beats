@@ -34,8 +34,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esclientleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -60,7 +60,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	client := estest.GetTestingElasticsearch(t)
+	client := eslegtest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
