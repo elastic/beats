@@ -86,6 +86,13 @@ the cases where Kibana listens behind an HTTP reverse proxy that exports the API
 under a custom prefix.
 
 [float]
+[[kibana-space-id-option]]
+==== `setup.kibana.space.id`
+
+The Kibana Space ID to use. If specified, {beatname_uc} will load Kibana assets
+into this Kibana Space. Omit this option to use the Default Kibana Space.
+
+[float]
 ==== `setup.kibana.ssl.enabled`
 
 Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
