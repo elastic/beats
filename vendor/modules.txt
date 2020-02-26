@@ -466,7 +466,7 @@ github.com/elastic/go-txfile/internal/vfs/osfs/osfstest
 github.com/elastic/go-txfile/pq
 github.com/elastic/go-txfile/txerr
 github.com/elastic/go-txfile/txfiletest
-# github.com/elastic/go-ucfg v0.8.2
+# github.com/elastic/go-ucfg v0.8.3
 github.com/elastic/go-ucfg
 github.com/elastic/go-ucfg/cfgutil
 github.com/elastic/go-ucfg/flag
