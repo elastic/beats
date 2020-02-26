@@ -92,6 +92,12 @@ Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
 If you configure {beatname_uc} to connect over HTTPS, this setting defaults to
 `true` and {beatname_uc} uses the default SSL settings.
 
+[float]
+==== `setup.kibana.space.id`
+
+Define which Kibana Space the dashboards should be loaded into. If you don't
+specify a value for this setting, {beatname_uc} uses Default Kibana Space.
+
 Example configuration:
 
 [source,yaml]
