@@ -34,8 +34,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/esclientleg/eslegtest"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -290,7 +290,7 @@ func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	require.NoError(t, setup.loadFromFile([]string{"testdata", "fields.yml"}))
 	require.True(t, setup.loader.templateExists(setup.config.Name))
-	esClient := setup.client.(*elasticsearch.Client)
+	esClient := setup.client.(*esclientleg.Connection)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
