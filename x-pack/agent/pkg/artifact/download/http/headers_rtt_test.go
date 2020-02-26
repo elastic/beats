@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/release"
 )
 
 func TestAddingHeaders(t *testing.T) {

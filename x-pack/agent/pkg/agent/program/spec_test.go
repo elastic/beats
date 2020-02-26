@@ -6,6 +6,8 @@ package program
 
 import (
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -100,9 +102,14 @@ when: 1 == 1
 }
 
 func TestExport(t *testing.T) {
+	dir, err := ioutil.TempDir("", "test_export")
+	require.NoError(t, err)
+	defer os.RemoveAll(dir)
+
 	for _, spec := range Supported {
 		b, err := yaml.Marshal(spec)
 		require.NoError(t, err)
-		ioutil.WriteFile("../../../spec/"+strings.ToLower(spec.Name)+".yml", b, 0666)
+		err = ioutil.WriteFile(filepath.Join(dir, strings.ToLower(spec.Name)+".yml"), b, 0666)
+		require.NoError(t, err)
 	}
 }
