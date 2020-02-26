@@ -215,8 +215,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
 		err = config.Sasl.configureSarama(k)
-		fmt.Println("-------------------")
-		fmt.Println(k.Net.SASL)
+
 		if err != nil {
 			return nil, err
 		}
