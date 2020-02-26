@@ -121,7 +121,9 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	}
 
 	if proxy != "" {
-		s.Proxy = proxy
+		p, err := url.Parse(proxy)
+		require.NoError(t, err)
+		s.Proxy = p
 	}
 
 	return NewConnection(s)
