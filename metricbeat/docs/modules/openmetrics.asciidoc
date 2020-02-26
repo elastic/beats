@@ -8,7 +8,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This module periodically fetches metrics from endpoints following Openmetrics format.
+This module periodically fetches metrics from endpoints following https://openmetrics.io/[Openmetrics] format.
 
 [float]
 === Filtering metrics
@@ -46,13 +46,13 @@ metricbeat.modules:
   metricsets: ['collector']
   period: 10s
   hosts: ['localhost:9090']
-  metrics_filters:
-    include: []
-    exclude: []
 
   # This module uses the Prometheus collector metricset, all
   # the options for this metricset are also available here.
   metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
 ----
 
 It also supports the options described in <<module-http-config-options>>.

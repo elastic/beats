@@ -1,4 +1,4 @@
-This module periodically fetches metrics from endpoints following Openmetrics format.
+This module periodically fetches metrics from endpoints following https://openmetrics.io/[Openmetrics] format.
 
 [float]
 === Filtering metrics

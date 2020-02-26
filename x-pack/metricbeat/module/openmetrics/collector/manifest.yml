@@ -4,10 +4,7 @@ input:
   metricset: collector
   defaults:
     metrics_path: /metrics
-    metrics_filters:
-      include: []
-      exclude: []
-
-# The custom processor is responsible for filtering Prometheus metrics
-# not stricly related to the IBM MQ domain, e.g. system load, process,
-# metrics HTTP server.
+    # Set these to override openmetrics.yml configuration settings
+    #metrics_filters:
+    #  include: []
+    #  exclude: []
