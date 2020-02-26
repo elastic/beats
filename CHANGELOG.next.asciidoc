@@ -178,6 +178,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
+- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 
 *Auditbeat*
 
