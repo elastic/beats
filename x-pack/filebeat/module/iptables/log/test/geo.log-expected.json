@@ -3,10 +3,15 @@
         "destination.ip": "10.4.0.5",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "deny",
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -30,6 +35,10 @@
         "network.community_id": "1:RGJPRWtru8Lg2itNyFREDvoRkNA=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "158.109.0.1",
+            "10.4.0.5"
+        ],
         "service.type": "iptables",
         "source.as.number": 13041,
         "source.as.organization.name": "Consorci de Serveis Universitaris de Catalunya",

@@ -3,10 +3,15 @@
         "destination.ip": "255.55.174.225",
         "destination.mac": "90:10:92:6e:ea:a7",
         "destination.port": 48689,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -25,6 +30,10 @@
         "network.community_id": "1:3qoibVBmc9hsnHpP4Ms5HO6ls7Q=",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.48.137",
+            "255.55.174.225"
+        ],
         "service.type": "iptables",
         "source.ip": "192.168.48.137",
         "source.mac": "90:10:73:ba:d6:77",
@@ -37,10 +46,15 @@
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -62,6 +76,10 @@
         "network.community_id": "1:7bPQdYPL4yePwQJZt0I1dvVXLHc=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.134.158",
+            "192.0.2.25"
+        ],
         "service.type": "iptables",
         "source.ip": "192.168.134.158",
         "source.mac": "90:10:24:67:f4:89",
@@ -74,10 +92,15 @@
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "deny",
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -101,6 +124,10 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
@@ -113,10 +140,15 @@
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -138,6 +170,10 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
@@ -150,10 +186,15 @@
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.category": "network",
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -175,6 +216,10 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
