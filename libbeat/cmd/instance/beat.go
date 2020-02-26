@@ -33,6 +33,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 
 	"github.com/gofrs/uuid"
@@ -799,7 +800,7 @@ func (b *Beat) registerESIndexManagement() error {
 }
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
-	return func(esClient *elasticsearch.Client) error {
+	return func(esClient *esclientleg.Connection) error {
 		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
@@ -845,7 +846,7 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
-	callback := func(esClient *elasticsearch.Client) error {
+	callback := func(esClient *esclientleg.Connection) error {
 		var response struct {
 			ClusterUUID string `json:"cluster_uuid"`
 		}

@@ -18,6 +18,7 @@
 package fileset
 
 import (
+	"github.com/elastic/beats/libbeat/esclientleg"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -134,7 +135,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *elasticsearch.Client) error {
+		callback := func(esClient *esclientleg.Connection) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)

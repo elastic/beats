@@ -171,7 +171,7 @@ func NewClient(
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(client)
+			err := callback(conn)
 			if err != nil {
 				return err
 			}
@@ -182,7 +182,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(client)
+				err := callback(conn)
 				if err != nil {
 					return err
 				}

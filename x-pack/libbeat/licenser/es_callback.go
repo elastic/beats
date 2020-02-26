@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/esclientleg"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -21,7 +23,7 @@ const licenseDebugK = "license"
 func Enforce(name string, checks ...CheckFunc) {
 	name = strings.Title(name)
 
-	cb := func(client *elasticsearch.Client) error {
+	cb := func(client *esclientleg.Connection) error {
 		// Logger created earlier than this place are at risk of discarding any log statement.
 		log := logp.NewLogger(licenseDebugK)
 

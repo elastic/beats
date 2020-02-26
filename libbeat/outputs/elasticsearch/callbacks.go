@@ -20,11 +20,13 @@ package elasticsearch
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/esclientleg"
+
 	"github.com/gofrs/uuid"
 )
 
 // ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
-type ConnectCallback func(client *Client) error
+type ConnectCallback func(*esclientleg.Connection) error
 
 // Callbacks must not depend on the result of a previous one,
 // because the ordering is not fixed.
