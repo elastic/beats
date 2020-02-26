@@ -3100,7 +3100,7 @@ azure module
 *`azure.timegrain`*::
 +
 --
-The azure metric timegrain
+The Azure metric timegrain
 
 
 type: keyword
