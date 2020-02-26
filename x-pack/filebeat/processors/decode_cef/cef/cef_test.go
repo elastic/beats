@@ -191,7 +191,7 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Nil(t, e.Extensions)
+		assert.Empty(t, e.Extensions)
 
 		// Pipes in extensions should not be escaped.
 		assert.Error(t, err)
@@ -241,7 +241,7 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Nil(t, e.Extensions)
+		assert.Empty(t, e.Extensions)
 
 		// moo contains unescaped equals signs.
 		assert.Error(t, err)
