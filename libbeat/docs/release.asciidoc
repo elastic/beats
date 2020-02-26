@@ -8,6 +8,7 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+* <<release-notes-6.8.7>>
 * <<release-notes-6.8.6>>
 * <<release-notes-6.8.5>>
 * <<release-notes-6.8.4>>

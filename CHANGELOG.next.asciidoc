@@ -46,8 +46,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
-- Make `kibana` module more resilient to Kibana unavailability. {issue}15258[15258] {pull}15270[15270]
 
 *Packetbeat*
 
