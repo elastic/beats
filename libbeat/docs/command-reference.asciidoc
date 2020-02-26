@@ -100,7 +100,9 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
+ifndef::serverless[]
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
+endif::[]
 ifeval::["{beatname_lc}"=="functionbeat"]
 |<<package-command,`package`>> |{package-command-short-desc}.
 |<<remove-command,`remove`>> |{remove-command-short-desc}.
@@ -320,6 +322,7 @@ Specifies the name of the command to show help for.
 {beatname_lc} help export
 -----
 
+ifndef::serverless[]
 [[keystore-command]]
 ==== `keystore` command
 
@@ -375,6 +378,8 @@ Shows help for the `keystore` command.
 
 See <<keystore>> for more examples.
 
+endif::[]
+
 ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
@@ -394,7 +399,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 Shows help for the `package` command.
 
 *`-o, --output`*::
-Specifies the full path to the zip file that will contain the package.
+Specifies the full path pattern to use when creating the packages. 
 
 {global-flags}
 
@@ -402,7 +407,7 @@ Specifies the full path to the zip file that will contain the package.
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} package /path/to/file.zip
+{beatname_lc} package --output /path/to/folder/package-{{.Provider}}.zip
 -----
 
 [[remove-command]]

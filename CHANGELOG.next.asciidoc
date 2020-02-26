@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
 
 
 *Auditbeat*
@@ -40,23 +39,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fix missing output in dockerlogbeat {pull}15719[15719]
-- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
-- Do not load dashboards where not available. {pull}15802[15802]
+- Fix k8s pods labels broken schema. {pull}16480[16480]
+- Fix k8s pods annotations broken schema. {pull}16554[16554]
 
 *Auditbeat*
 
-- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
-
-- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
-- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
-- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
+- Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 
 *Heartbeat*
 
-- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
+- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
@@ -66,6 +63,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
 - Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
 - Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 
 *Packetbeat*
@@ -76,19 +75,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
 *Affecting all Beats*
 
-- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 
 
 *Auditbeat*
 
 
 *Filebeat*
-- Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
+
+- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
 
 *Heartbeat*
 
@@ -97,7 +97,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Add STAN dashboard {pull}15654[15654]
 
 *Packetbeat*
 

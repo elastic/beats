@@ -20,6 +20,12 @@ output.elasticsearch:
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
+Notes about the previous example and client based PKI authentication:
+
+- The `ssl.certificate` and `ssl.key` settings are ONLY needed if {es} is configured to require client based PKI authentication (with `xpack.security.http.ssl.client_authentication: required` or `xpack.security.http.ssl.client_authentication: optional`).
+- The `ssl.certificate_authorities` setting needs to include the CA used to sign the remote server certificate, not the client cert.
+- If client PKI is used, the remote server ({es}) should include the CA used for signing the client cert in the `xpack.security.http.ssl.certificate_authorities: []` list.
+
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 ["source","yaml",subs="attributes,callouts"]

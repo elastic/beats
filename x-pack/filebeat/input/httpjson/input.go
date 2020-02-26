@@ -150,31 +150,36 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
+func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *requestInfo) error {
 	for {
+		req, err := in.createHTTPRequest(ctx, ri)
+		if err != nil {
+			return errors.Wrapf(err, "failed to create http request")
+		}
 		msg, err := client.Do(req)
 		if err != nil {
-			return errors.New("failed to do http request. Stopping input worker - ")
-		}
-		if msg.StatusCode != http.StatusOK {
-			return errors.Errorf("return HTTP status is %s - ", msg.Status)
+			return errors.Wrapf(err, "failed to execute http client.Do")
 		}
 		responseData, err := ioutil.ReadAll(msg.Body)
-		defer msg.Body.Close()
+		msg.Body.Close()
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to read http.response.body")
+		}
+		if msg.StatusCode != http.StatusOK {
+			in.log.Debugw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
+			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
 		var m, v interface{}
 		err = json.Unmarshal(responseData, &m)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to unmarshal http.response.body")
 		}
 		switch mmap := m.(type) {
 		case map[string]interface{}:
 			if in.config.JSONObjects == "" {
 				ok := in.outlet.OnEvent(makeEvent(string(responseData)))
 				if !ok {
-					return errors.New("function OnEvent returned false - ")
+					return errors.New("function OnEvent returned false")
 				}
 			} else {
 				v, err = common.MapStr(mmap).GetValue(in.config.JSONObjects)
@@ -188,11 +193,11 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 						case map[string]interface{}:
 							d, err := json.Marshal(tv)
 							if err != nil {
-								return errors.New("failed to process http response data - ")
+								return errors.Wrapf(err, "failed to marshal json_objects_array")
 							}
 							ok := in.outlet.OnEvent(makeEvent(string(d)))
 							if !ok {
-								return errors.New("OnEvent returned false - ")
+								return errors.New("function OnEvent returned false")
 							}
 						default:
 							return errors.New("invalid json_objects_array configuration")
@@ -218,21 +223,18 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					case string:
 						ri.URL = v.(string)
 					default:
-						return errors.New("pagination ID is not string, which is required for URL - ")
+						return errors.New("pagination ID is not of string type")
 					}
 				}
 				if in.config.Pagination.ExtraBodyContent != nil {
 					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
 				}
-				req, err = in.createHTTPRequest(ctx, ri)
-				if err != nil {
-					return err
-				}
 				continue
 			}
 			return nil
 		default:
-			return errors.New("response is not valid JSON - ")
+			in.log.Debugw("http.response.body is not valid JSON", string(responseData))
+			return errors.New("http.response.body is not valid JSON")
 		}
 	}
 }
@@ -274,11 +276,7 @@ func (in *httpjsonInput) run() error {
 	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
 		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))
 	}
-	req, err := in.createHTTPRequest(ctx, ri)
-	if err != nil {
-		return err
-	}
-	err = in.processHTTPRequest(ctx, client, req, ri)
+	err = in.processHTTPRequest(ctx, client, ri)
 	if err == nil && in.Interval > 0 {
 		ticker := time.NewTicker(in.Interval)
 		defer ticker.Stop()
@@ -288,7 +286,8 @@ func (in *httpjsonInput) run() error {
 				in.log.Info("Context done.")
 				return nil
 			case <-ticker.C:
-				err = in.processHTTPRequest(ctx, client, req, ri)
+				in.log.Info("Process another repeated request.")
+				err = in.processHTTPRequest(ctx, client, ri)
 				if err != nil {
 					return err
 				}
