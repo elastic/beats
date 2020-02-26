@@ -89,8 +89,8 @@ under a custom prefix.
 [[kibana-space-id-option]]
 ==== `setup.kibana.space.id`
 
-The Kibana Space ID to use. If specified, {beatname_uc} will load Kibana assets
-into this Kibana Space. Omit this option to use the Default Kibana Space.
+The Kibana space ID to use. If specified, {beatname_uc} loads Kibana assets
+into this Kibana space. Omit this option to use the default space.
 
 [float]
 ==== `setup.kibana.ssl.enabled`
@@ -111,4 +111,3 @@ setup.kibana.ssl.key: "/etc/pki/client/cert.key
 ----
 
 See <<configuration-ssl>> for more information.
-
