@@ -9,22 +9,10 @@ import (
 	"github.com/mailru/easyjson/buffer"
 )
 
-// Flags describe various encoding options. The behavior may be actually implemented in the encoder, but
-// Flags field in Writer is used to set and pass them around.
-type Flags int
-
-const (
-	NilMapAsEmpty   Flags = 1 << iota // Encode nil map as '{}' rather than 'null'.
-	NilSliceAsEmpty                   // Encode nil slice as '[]' rather than 'null'.
-)
-
 // Writer is a JSON writer.
 type Writer struct {
-	Flags Flags
-
-	Error        error
-	Buffer       buffer.Buffer
-	NoEscapeHTML bool
+	Error  error
+	Buffer buffer.Buffer
 }
 
 // Size returns the size of the data that was written out.
@@ -37,24 +25,13 @@ func (w *Writer) DumpTo(out io.Writer) (written int, err error) {
 	return w.Buffer.DumpTo(out)
 }
 
-// BuildBytes returns writer data as a single byte slice. You can optionally provide one byte slice
-// as argument that it will try to reuse.
-func (w *Writer) BuildBytes(reuse ...[]byte) ([]byte, error) {
+// BuildBytes returns writer data as a single byte slice.
+func (w *Writer) BuildBytes() ([]byte, error) {
 	if w.Error != nil {
 		return nil, w.Error
 	}
 
-	return w.Buffer.BuildBytes(reuse...), nil
-}
-
-// ReadCloser returns an io.ReadCloser that can be used to read the data.
-// ReadCloser also resets the buffer.
-func (w *Writer) ReadCloser() (io.ReadCloser, error) {
-	if w.Error != nil {
-		return nil, w.Error
-	}
-
-	return w.Buffer.ReadCloser(), nil
+	return w.Buffer.BuildBytes(), nil
 }
 
 // RawByte appends raw binary data to the buffer.
@@ -67,7 +44,7 @@ func (w *Writer) RawString(s string) {
 	w.Buffer.AppendString(s)
 }
 
-// Raw appends raw binary data to the buffer or sets the error if it is given. Useful for
+// RawByte appends raw binary data to the buffer or sets the error if it is given. Useful for
 // calling with results of MarshalJSON-like functions.
 func (w *Writer) Raw(data []byte, err error) {
 	switch {
@@ -80,32 +57,6 @@ func (w *Writer) Raw(data []byte, err error) {
 	default:
 		w.RawString("null")
 	}
-}
-
-// RawText encloses raw binary data in quotes and appends in to the buffer.
-// Useful for calling with results of MarshalText-like functions.
-func (w *Writer) RawText(data []byte, err error) {
-	switch {
-	case w.Error != nil:
-		return
-	case err != nil:
-		w.Error = err
-	case len(data) > 0:
-		w.String(string(data))
-	default:
-		w.RawString("null")
-	}
-}
-
-// Base64Bytes appends data to the buffer after base64 encoding it
-func (w *Writer) Base64Bytes(data []byte) {
-	if data == nil {
-		w.Buffer.AppendString("null")
-		return
-	}
-	w.Buffer.AppendByte('"')
-	w.base64(data)
-	w.Buffer.AppendByte('"')
 }
 
 func (w *Writer) Uint8(n uint8) {
@@ -193,13 +144,6 @@ func (w *Writer) Uint64Str(n uint64) {
 	w.Buffer.Buf = append(w.Buffer.Buf, '"')
 }
 
-func (w *Writer) UintptrStr(n uintptr) {
-	w.Buffer.EnsureSpace(20)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
-	w.Buffer.Buf = strconv.AppendUint(w.Buffer.Buf, uint64(n), 10)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
-}
-
 func (w *Writer) Int8Str(n int8) {
 	w.Buffer.EnsureSpace(4)
 	w.Buffer.Buf = append(w.Buffer.Buf, '"')
@@ -240,23 +184,9 @@ func (w *Writer) Float32(n float32) {
 	w.Buffer.Buf = strconv.AppendFloat(w.Buffer.Buf, float64(n), 'g', -1, 32)
 }
 
-func (w *Writer) Float32Str(n float32) {
-	w.Buffer.EnsureSpace(20)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
-	w.Buffer.Buf = strconv.AppendFloat(w.Buffer.Buf, float64(n), 'g', -1, 32)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
-}
-
 func (w *Writer) Float64(n float64) {
 	w.Buffer.EnsureSpace(20)
 	w.Buffer.Buf = strconv.AppendFloat(w.Buffer.Buf, n, 'g', -1, 64)
-}
-
-func (w *Writer) Float64Str(n float64) {
-	w.Buffer.EnsureSpace(20)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
-	w.Buffer.Buf = strconv.AppendFloat(w.Buffer.Buf, float64(n), 'g', -1, 64)
-	w.Buffer.Buf = append(w.Buffer.Buf, '"')
 }
 
 func (w *Writer) Bool(v bool) {
@@ -270,25 +200,6 @@ func (w *Writer) Bool(v bool) {
 
 const chars = "0123456789abcdef"
 
-func getTable(falseValues ...int) [128]bool {
-	table := [128]bool{}
-
-	for i := 0; i < 128; i++ {
-		table[i] = true
-	}
-
-	for _, v := range falseValues {
-		table[v] = false
-	}
-
-	return table
-}
-
-var (
-	htmlEscapeTable   = getTable(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, '"', '&', '<', '>', '\\')
-	htmlNoEscapeTable = getTable(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, '"', '\\')
-)
-
 func (w *Writer) String(s string) {
 	w.Buffer.AppendByte('"')
 
@@ -297,41 +208,40 @@ func (w *Writer) String(s string) {
 
 	p := 0 // last non-escape symbol
 
-	var escapeTable [128]bool
-	if w.NoEscapeHTML {
-		escapeTable = htmlNoEscapeTable
-	} else {
-		escapeTable = htmlEscapeTable
-	}
-
 	for i := 0; i < len(s); {
-		c := s[i]
-
-		if c < utf8.RuneSelf {
-			if escapeTable[c] {
-				// single-width character, no escaping is required
-				i++
-				continue
-			}
-
-			w.Buffer.AppendString(s[p:i])
+		// single-with character
+		if c := s[i]; c < utf8.RuneSelf {
+			var escape byte
 			switch c {
 			case '\t':
-				w.Buffer.AppendString(`\t`)
+				escape = 't'
 			case '\r':
-				w.Buffer.AppendString(`\r`)
+				escape = 'r'
 			case '\n':
-				w.Buffer.AppendString(`\n`)
+				escape = 'n'
 			case '\\':
-				w.Buffer.AppendString(`\\`)
+				escape = '\\'
 			case '"':
-				w.Buffer.AppendString(`\"`)
+				escape = '"'
+			case '<', '>':
+				// do nothing
 			default:
+				if c >= 0x20 {
+					// no escaping is required
+					i++
+					continue
+				}
+			}
+			if escape != 0 {
+				w.Buffer.AppendString(s[p:i])
+				w.Buffer.AppendByte('\\')
+				w.Buffer.AppendByte(escape)
+			} else {
+				w.Buffer.AppendString(s[p:i])
 				w.Buffer.AppendString(`\u00`)
 				w.Buffer.AppendByte(chars[c>>4])
 				w.Buffer.AppendByte(chars[c&0xf])
 			}
-
 			i++
 			p = i
 			continue
@@ -360,48 +270,4 @@ func (w *Writer) String(s string) {
 	}
 	w.Buffer.AppendString(s[p:])
 	w.Buffer.AppendByte('"')
-}
-
-const encode = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-const padChar = '='
-
-func (w *Writer) base64(in []byte) {
-
-	if len(in) == 0 {
-		return
-	}
-
-	w.Buffer.EnsureSpace(((len(in)-1)/3 + 1) * 4)
-
-	si := 0
-	n := (len(in) / 3) * 3
-
-	for si < n {
-		// Convert 3x 8bit source bytes into 4 bytes
-		val := uint(in[si+0])<<16 | uint(in[si+1])<<8 | uint(in[si+2])
-
-		w.Buffer.Buf = append(w.Buffer.Buf, encode[val>>18&0x3F], encode[val>>12&0x3F], encode[val>>6&0x3F], encode[val&0x3F])
-
-		si += 3
-	}
-
-	remain := len(in) - si
-	if remain == 0 {
-		return
-	}
-
-	// Add the remaining small block
-	val := uint(in[si+0]) << 16
-	if remain == 2 {
-		val |= uint(in[si+1]) << 8
-	}
-
-	w.Buffer.Buf = append(w.Buffer.Buf, encode[val>>18&0x3F], encode[val>>12&0x3F])
-
-	switch remain {
-	case 2:
-		w.Buffer.Buf = append(w.Buffer.Buf, encode[val>>6&0x3F], byte(padChar))
-	case 1:
-		w.Buffer.Buf = append(w.Buffer.Buf, byte(padChar), byte(padChar))
-	}
 }

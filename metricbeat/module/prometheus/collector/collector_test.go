@@ -22,7 +22,7 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"

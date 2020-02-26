@@ -134,6 +134,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: code.cloudfoundry.org/go-diodes
+Revision: f77fb823c7ee
 License type (autodetected): Apache-2.0
 ./vendor/code.cloudfoundry.org/go-diodes/LICENSE:
 --------------------------------------------------------------------
@@ -161,6 +162,7 @@ as noted in the LICENSE file.
 
 --------------------------------------------------------------------
 Dependency: code.cloudfoundry.org/go-loggregator
+Version: v7.4.0
 License type (autodetected): Apache-2.0
 ./vendor/code.cloudfoundry.org/go-loggregator/LICENSE:
 --------------------------------------------------------------------
@@ -186,6 +188,7 @@ limitations under the License.
 
 --------------------------------------------------------------------
 Dependency: code.cloudfoundry.org/gofileutils
+Revision: 4d0c80011a0f
 License type (autodetected): Apache-2.0
 ./vendor/code.cloudfoundry.org/gofileutils/LICENSE:
 --------------------------------------------------------------------
@@ -206,6 +209,7 @@ conditions of the subcomponent's license, as noted in the LICENSE file.
 
 --------------------------------------------------------------------
 Dependency: code.cloudfoundry.org/rfc5424
+Revision: 236a6d29298a
 License type (autodetected): BSD-2-Clause
 ./vendor/code.cloudfoundry.org/rfc5424/LICENSE:
 --------------------------------------------------------------------
@@ -282,6 +286,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/akavel/rsrc
+Version: v0.8.0
 License type (autodetected): MIT
 ./vendor/github.com/akavel/rsrc/LICENSE.txt:
 --------------------------------------------------------------------
@@ -929,6 +934,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/cloudfoundry-community/go-cfclient
+Revision: 35bcce23fc5f
 License type (autodetected): MIT
 ./vendor/github.com/cloudfoundry-community/go-cfclient/LICENSE:
 --------------------------------------------------------------------
@@ -956,6 +962,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/cloudfoundry/sonde-go
+Revision: b33733203bb4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/cloudfoundry/sonde-go/LICENSE:
 --------------------------------------------------------------------
@@ -4823,6 +4830,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/josephspurrier/goversioninfo
+Revision: 63e6d1acd3dd
 License type (autodetected): MIT
 ./vendor/github.com/josephspurrier/goversioninfo/LICENSE:
 --------------------------------------------------------------------
@@ -5071,6 +5079,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/mailru/easyjson
+Revision: d5b7844b561a
 License type (autodetected): MIT
 ./vendor/github.com/mailru/easyjson/LICENSE:
 --------------------------------------------------------------------
@@ -5084,10 +5093,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------
 Dependency: github.com/Masterminds/semver
+Version: v1.4.2
 License type (autodetected): MIT
 ./vendor/github.com/Masterminds/semver/LICENSE.txt:
 --------------------------------------------------------------------
-Copyright (C) 2014-2019, Matt Butcher and Matt Farina
+The Masterminds
+Copyright (C) 2014-2015, Matt Butcher and Matt Farina
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
