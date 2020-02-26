@@ -39,12 +39,3 @@ x-pack/dockerlogbeat/temproot.tar
 *.test
 *.prof
 *.pyc
-
-# agent
-agent/core/plugin/operation/tests/scripts/configurable/1.0/configurable
-x-pack/agent/build/
-x-pack/agent/agent.dev.yml
-x-pack/agent/pkg/agent/operation/tests/scripts/short--1.0.yml
-x-pack/agent/pkg/agent/operation/tests/scripts/configurable-1.0-darwin-x86/configurable
-x-pack/agent/pkg/agent/operation/tests/scripts/configurablebyfile-1.0-darwin-x86/configurablebyfile
-x-pack/agent/pkg/agent/application/fleet.yml
