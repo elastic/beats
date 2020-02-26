@@ -5,26 +5,35 @@
   short_config: false
   anchor: cloudfoundry-processor
   fields:
-    - name: docker
+    - name: cf
       type: group
       fields:
-        - name: container.id
-          type: alias
-          path: container.id
-          migration: true
-
-        - name: container.image
-          type: alias
-          path: container.image.name
-          migration: true
-
-        - name: container.name
-          type: alias
-          path: container.name
-          migration: true
-
-        - name: container.labels
-          type: object
-          object_type: keyword
+        - name: app.id
+          type: keyword
           description: >
-            Image labels.
+            Cloud Foundry application ID
+
+        - name: app.name
+          type: keyword
+          description: >
+            Cloud Foundry application name
+
+        - name: space.id
+          type: keyword
+          description: >
+            Cloud Foundry space name
+
+        - name: space.name
+          type: keyword
+          description: >
+            Cloud Foundry space name
+
+        - name: org.id
+          type: keyword
+          description: >
+            Cloud Foundry organization ID
+
+        - name: org.name
+          type: keyword
+          description: >
+            Cloud Foundry organization name

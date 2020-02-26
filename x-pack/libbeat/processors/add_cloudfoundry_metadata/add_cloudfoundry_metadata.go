@@ -7,6 +7,8 @@
 package add_cloudfoundry_metadata
 
 import (
+	"time"
+
 	"github.com/elastic/beats/x-pack/libbeat/common/cloudfoundry"
 
 	"github.com/pkg/errors"
@@ -36,20 +38,20 @@ const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return buildCloudFoundryMetadataProcessor(logp.NewLogger(selector), cfg)
-}
-
-func buildCloudFoundryMetadataProcessor(log *logp.Logger, cfg *common.Config) (processors.Processor, error) {
 	var config cloudfoundry.Config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
+	log := logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.Client()
 	if err != nil {
 		log.Debugf("%s: failed to created cloudfoundry client: %+v", processorName, err)
 	}
+
+	// Janitor run every 5 minutes to clean up the client cache.
+	client.StartJanitor(5 * time.Minute)
 
 	return &addCloudFoundryMetadata{
 		log:    log,
