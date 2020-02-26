@@ -16,6 +16,158 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  # agent specific
+  # Deb/RPM spec for community beats.
+  - &deb_rpm_agent_spec
+    <<: *common
+    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/files/linux/systemd-daemon-reload.sh'
+    files:
+      /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+      /usr/share/{{.BeatName}}/LICENSE.txt:
+        source: '{{ repo.RootDir }}/LICENSE.txt'
+        mode: 0644
+      /usr/share/{{.BeatName}}/README.md:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+        mode: 0644
+      /usr/share/{{.BeatName}}/.build_hash.txt:
+        content: >
+          {{ commit }}
+        mode: 0644
+      /etc/{{.BeatName}}/agent.reference.yml:
+        source: 'agent.reference.yml'
+        mode: 0644
+      /etc/{{.BeatName}}/agent.yml:
+        source: 'agent.yml'
+        mode: 0600
+        config: true
+      /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
+        source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
+        mode: 0755
+      /usr/bin/{{.BeatName}}:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl'
+        mode: 0755
+      /lib/systemd/system/{{.BeatServiceName}}.service:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
+        mode: 0644
+      /etc/init.d/{{.BeatServiceName}}:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
+        mode: 0755
+      /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+
+
+  # MacOS pkg spec for community beats.
+  - &macos_agent_pkg_spec
+    <<: *common
+    extra_vars:
+      # OS X 10.8 Mountain Lion is the oldest supported by Go 1.10.
+      # https://golang.org/doc/go1.10#ports
+      min_supported_osx_version: 10.8
+      identifier: 'co.{{.BeatVendor | tolower}}.beats.{{.BeatName}}'
+      install_path: /Library/Application Support
+    pre_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/preinstall.tmpl'
+    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/postinstall.tmpl'
+    files:
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
+        source: '{{ repo.RootDir }}/LICENSE.txt'
+        mode: 0644
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/README.md:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+        mode: 0644
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/.build_hash.txt:
+        content: >
+          {{ commit }}
+        mode: 0644
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/{{.identifier}}.plist:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/launchd-daemon.plist.tmpl'
+        mode: 0644
+      /etc/{{.BeatName}}/agent.reference.yml:
+        source: 'agent.reference.yml'
+        mode: 0644
+      /etc/{{.BeatName}}/agent.yml:
+        source: 'agent.yml'
+        mode: 0600
+        config: true
+      /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+
+  - &agent_binary_files
+    '{{.BeatName}}{{.BinaryExt}}':
+      source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
+    LICENSE.txt:
+      source: '{{ repo.RootDir }}/LICENSE.txt'
+      mode: 0644
+    README.md:
+      template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+      mode: 0644
+    .build_hash.txt:
+      content: >
+        {{ commit }}
+      mode: 0644
+    'agent.reference.yml':
+      source: 'agent.reference.yml'
+      mode: 0644
+    'agent.yml':
+      source: 'agent.yml'
+      mode: 0600
+      config: true
+
+  # Binary package spec (tar.gz for linux/darwin) for community beats.
+  - &agent_binary_spec
+    <<: *common
+    files:
+      <<: *agent_binary_files
+      'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+
+  # Binary package spec (zip for windows) for community beats.
+  - &agent_windows_binary_spec
+    <<: *common
+    files:
+      <<: *agent_binary_files
+      install-service-{{.BeatName}}.ps1:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service.ps1.tmpl'
+        mode: 0755
+      uninstall-service-{{.BeatName}}.ps1:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
+        mode: 0755
+      'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+      'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+
+  - &agent_docker_spec
+    <<: *agent_binary_spec
+    extra_vars:
+      from: 'centos:7'
+      user: '{{ .BeatName }}'
+      linux_capabilities: ''
+    files:
+      'agent.yml':
+        source: 'agent.docker.yml'
+        mode: 0600
+        config: true
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -338,6 +490,29 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  elastic_beat_xpack_reduced:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: windows
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: darwin
+      types: [tgz]
+      spec:
+        <<: *binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *binary_spec
+        <<: *elastic_license_for_binaries
+
   # Elastic Beat with Elastic License and binary taken from the x-pack dir.
   elastic_beat_xpack_separate_binaries:
     ###
@@ -398,3 +573,65 @@ specs:
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+  # Elastic Beat with Elastic License and binary taken from the x-pack dir.
+  elastic_beat_agent_binaries:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: windows
+      types: [zip]
+      spec:
+        <<: *agent_windows_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: darwin
+      types: [tgz]
+      spec:
+        <<: *agent_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: darwin
+      types: [dmg]
+      spec:
+        <<: *macos_agent_pkg_spec
+        <<: *elastic_license_for_macos_pkg
+        files:
+          /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            mode: 0755
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *agent_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      types: [deb, rpm]
+      spec:
+        <<: *deb_rpm_agent_spec
+        <<: *elastic_license_for_deb_rpm
+        files:
+          /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
