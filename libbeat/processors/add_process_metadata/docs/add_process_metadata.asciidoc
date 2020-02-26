@@ -71,12 +71,11 @@ output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
 `host_path`:: (Optional) By default, the `host_path` field is set to the root
-directory of the host `/`. HostPath is the path where /proc reside. For different 
-runtime configuration of Kubernetes or docker, the host_path can be set to 
-overwrite the default `host_path`
+directory of the host `/`. This is the path where `/proc` is mounted. For different 
+runtime configuration of Kubernetes or Docker the `host_path` can be set to 
+overwrite the default.
 
 `cgroup_prefixes`:: (Optional) By default, the `cgroup_prefixes` field is set to
-`/kubepods` and `/docker`. CgroupPrefix is the prefix where the container id is 
-inside cgroup. or different runtime configuration of Kubernetes or docker, the 
-cgroup_prefixes can be set to overwrite the default `cgroup_prefixes`
-
+`/kubepods` and `/docker`. This is the prefix where the container ID is inside 
+cgroup. For different runtime configuration of Kubernetes or Docker the 
+`cgroup_prefixes` can be set to overwrite the defaults.
