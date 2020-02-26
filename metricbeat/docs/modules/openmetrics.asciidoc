@@ -53,6 +53,7 @@ metricbeat.modules:
     exclude: []
 ----
 
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 It also supports the options described in <<module-http-config-options>>.
 
 [float]

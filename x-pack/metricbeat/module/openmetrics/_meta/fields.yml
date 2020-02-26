@@ -3,8 +3,10 @@
   release: beta
   description: >
     Openmetrics module
-  settings: ["http"]
+  settings: ["http", "ssl"]
   fields:
     - name: openmetrics
       type: group
+      description: >
+        `openmetrics` contains metrics from endpoints that are following Openmetrics format.
       fields:

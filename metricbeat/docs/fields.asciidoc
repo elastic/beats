@@ -28769,6 +28769,12 @@ Openmetrics module
 
 
 
+[float]
+=== openmetrics
+
+`openmetrics` contains metrics from endpoints that are following Openmetrics format.
+
+
 
 [[exported-fields-oracle]]
 == Oracle fields
