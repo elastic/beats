@@ -11,16 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestNoClient(t *testing.T) {
