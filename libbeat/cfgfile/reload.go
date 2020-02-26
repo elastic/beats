@@ -227,7 +227,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			// Force reload on the next iteration if and only if this one failed.
 			// (Any errors are already logged by list.Reload, so we don't need to
 			// propagate the details further.)
-			forceReload = err != nil
+			//forceReload = err != nil
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
