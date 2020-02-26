@@ -279,7 +279,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 					for i := 1; i < len(labels); i += 2 {
 						if labels[i] == "DBInstanceIdentifier" {
 							dbIdentifier := labels[i+1]
-							if _, found := events[dbIdentifier]; !found {
+							if _, found := events[dbIdentifier]; found {
 								events[dbIdentifier].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbIdentifier].dbAvailabilityZone)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbIdentifier].dbArn)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)

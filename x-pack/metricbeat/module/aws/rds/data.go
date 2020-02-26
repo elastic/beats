@@ -71,11 +71,11 @@ var (
 		},
 		"login_failures": c.Float("LoginFailures"),
 
-		//"db_instance.identifier":            c.Str("DBInstanceIdentifier"),
-		//"db_instance.db_cluster_identifier": c.Str("DBClusterIdentifier"),
-		//"db_instance.class":                 c.Str("DatabaseClass"),
-		//"db_instance.role":                  c.Str("Role"),
-		//"db_instance.engine_name":           c.Str("EngineName"),
+		"db_instance.identifier":            c.Str("DBInstanceIdentifier"),
+		"db_instance.db_cluster_identifier": c.Str("DBClusterIdentifier"),
+		"db_instance.class":                 c.Str("DatabaseClass"),
+		"db_instance.role":                  c.Str("Role"),
+		"db_instance.engine_name":           c.Str("EngineName"),
 
 		"aurora_bin_log_replica_lag": c.Float("AuroraBinlogReplicaLag"),
 
