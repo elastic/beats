@@ -19,12 +19,7 @@ package eslegtest
 
 import (
 	"fmt"
-	"net/http"
 	"os"
-
-	"github.com/elastic/beats/libbeat/esleg/eslegclient"
-
-	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 const (
@@ -57,33 +52,6 @@ func InitConnection(t TestLogger, conn Connectable, err error) {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
 	}
-}
-
-// GetTestingElasticsearch creates a test connection.
-func GetTestingElasticsearch(t TestLogger) *eslegclient.Connection {
-	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: GetURL(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(0).Dial,
-			},
-			Timeout: 0,
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-		panic(err) // panic in case TestLogger did not stop test
-	}
-
-	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
-
-	err = conn.Connect()
-	if err != nil {
-		t.Fatal(err)
-		panic(err) // panic in case TestLogger did not stop test
-	}
-
-	return conn
 }
 
 // GetURL return the Elasticsearch testing URL.

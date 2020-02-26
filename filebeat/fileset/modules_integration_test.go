@@ -21,6 +21,7 @@ package fileset
 
 import (
 	"encoding/json"
+	"net/http"
 	"path/filepath"
 	"testing"
 
@@ -28,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -39,7 +40,7 @@ func makeTestInfo(version string) beat.Info {
 }
 
 func TestLoadPipeline(t *testing.T) {
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -90,7 +91,7 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 }
 
 func TestSetupNginx(t *testing.T) {
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -122,7 +123,7 @@ func TestSetupNginx(t *testing.T) {
 }
 
 func TestAvailableProcessors(t *testing.T) {
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -158,7 +159,7 @@ func hasIngestPipelineProcessor(client *eslegclient.Connection) bool {
 }
 
 func TestLoadMultiplePipelines(t *testing.T) {
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -203,7 +204,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 }
 
 func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -244,4 +245,30 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	assert.Equal(t, 404, status)
 	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-plain_logs_bad", "", nil, nil)
 	assert.Equal(t, 404, status)
+}
+
+func getTestingElasticsearch(t TestLogger) *eslegclient.Connection {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL: GetURL(),
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(0).Dial,
+			},
+			Timeout: 0,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
 }

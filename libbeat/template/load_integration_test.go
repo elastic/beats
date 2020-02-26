@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -32,6 +33,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -60,7 +62,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	client := eslegtest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -349,4 +351,30 @@ func path(t *testing.T, fileElems []string) string {
 	fieldsPath, err := filepath.Abs(filepath.Join(fileElems...))
 	require.NoError(t, err)
 	return fieldsPath
+}
+
+func getTestingElasticsearch(t TestLogger) *eslegclient.Connection {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL: eslegtest.GetURL(),
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(0).Dial,
+			},
+			Timeout: 0,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
 }
