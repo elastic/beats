@@ -127,7 +127,18 @@ func (h *Hub) httpClient() (*http.Client, bool, error) {
 		return nil, true, err
 	}
 	httpClient := cfclient.DefaultConfig().HttpClient
-	tp := httpClient.Transport.(*http.Transport)
+	tp := defaultTransport()
 	tp.TLSClientConfig = tls
+	httpClient.Transport = tp
 	return httpClient, tls.InsecureSkipVerify, nil
+}
+
+// defaultTransport returns a new http.Transport for http.Client
+func defaultTransport() *http.Transport {
+	defaultTransport := http.DefaultTransport.(*http.Transport)
+	return &http.Transport{
+		Proxy:                 defaultTransport.Proxy,
+		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
+		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
+	}
 }
