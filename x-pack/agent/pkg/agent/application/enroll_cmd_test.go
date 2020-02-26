@@ -160,6 +160,66 @@ func TestEnroll(t *testing.T) {
 		},
 	))
 
+	t.Run("successfully enroll when a slash is defined at the end of host", withServer(
+		func(t *testing.T) *http.ServeMux {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`
+{
+    "action": "created",
+    "success": true,
+    "item": {
+        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
+        "active": true,
+        "policy_id": "69f3f5a0-ec52-11e9-93c4-d72ab8a69391",
+        "type": "PERMANENT",
+        "enrolled_at": "2019-10-11T18:26:37.158Z",
+        "user_provided_metadata": {
+						"custom": "customize"
+				},
+        "local_metadata": {
+            "platform": "linux",
+            "version": "8.0.0"
+        },
+        "actions": [],
+        "access_api_key": "my-access-api-key"
+    }
+}`))
+			})
+			return mux
+		}, func(t *testing.T, host string) {
+			url := "http://" + host + "/"
+			store := &mockStore{}
+			cmd, err := NewEnrollCmdWithStore(
+				log,
+				&EnrollCmdOption{
+					ID:                   "my-id",
+					URL:                  url,
+					CAs:                  []string{},
+					EnrollAPIKey:         "my-enrollment-api-key",
+					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
+				},
+				"",
+				store,
+			)
+			require.NoError(t, err)
+
+			err = cmd.Execute()
+			require.NoError(t, err)
+
+			require.True(t, store.Called)
+
+			config, err := readConfig(store.Content)
+
+			require.NoError(t, err)
+			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
+			require.Equal(t, host, config.API.Kibana.Host)
+			require.Equal(t, "", config.API.Kibana.Username)
+			require.Equal(t, "", config.API.Kibana.Password)
+		},
+	))
+
 	t.Run("successfully enroll without TLS and save access api key in the store", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
