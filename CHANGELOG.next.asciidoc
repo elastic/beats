@@ -69,6 +69,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Limit some of the error messages to the logs only {issue}14317[14317] {pull}14327[14327]
 - Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
+- Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
+- Change lookup_fields from metricset.host to service.address {pull}15883[15883]
+- Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Fixed issue `logstash-xpack` module suddenly ceasing to monitor Logstash. {issue}15974[15974] {pull}16044[16044]
+- Fix skipping protocol scheme by light modules. {pull}16205[pull]
+- Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
+- Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 
 *Packetbeat*
 
