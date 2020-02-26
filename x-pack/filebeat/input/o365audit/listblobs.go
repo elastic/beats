@@ -191,7 +191,7 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		}
 	case 408, 503:
 		// Known errors when the backend is down.
-		//Repeat the request without reporting an error.
+		// Repeat the request without reporting an error.
 		return []poll.Action{
 			poll.Fetch(l),
 		}
@@ -223,9 +223,9 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		// retention_time(7d)+1h in the past.
 		// On the other hand, requests can be days into the future without error.
 
-		// First check if this is caused by a request close to  that's been
-		// queued for hours because of server being down. Repeat the request
-		// with updated times.
+		// First check if this is caused by a request close to the max retention
+		// period that's been queued for hours because of server being down.
+		// Repeat the request with updated times.
 		now := l.env.Clock()
 		delta := now.Sub(l.startTime)
 		if delta > (l.env.Config.MaxRetention + 30*time.Minute) {
@@ -253,15 +253,16 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		return []poll.Action{
 			poll.Fetch(l.adjustTimes(l.startTime)),
 		}
-	case "AF429":
-		// Too many requests.
-	case "AF50000":
-		// ...
-	// Invalid nextPage Input: {0}.
-	case "AF20031":
-		// Can be ignored.
 
-	//
+	// Too many requests.
+	case "AF429":
+
+	// Internal server error. Retry the request.
+	case "AF50000":
+
+	// Invalid nextPage Input: {0}. Can be ignored.
+	case "AF20031":
+
 	// AF50005-AF50006: An internal error occurred. Retry the request.
 	case "AF50005", "AF50006":
 		return append(actions, poll.Fetch(l))

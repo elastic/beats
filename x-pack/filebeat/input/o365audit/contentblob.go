@@ -28,7 +28,7 @@ type contentBlob struct {
 	skipLines int
 }
 
-// String return a printable representation of this transaction.
+// String returns a printable representation of this transaction.
 func (c contentBlob) String() string {
 	return fmt.Sprintf("content blob url:%s id:%s", c.url, c.id)
 }

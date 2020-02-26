@@ -20,7 +20,7 @@ type TokenProvider interface {
 	Renew() error
 }
 
-// servicePrincipalToken extends *adal.ServicePrincipalToken with the
+// servicePrincipalToken extends adal.ServicePrincipalToken with the
 // the TokenProvider interface.
 type servicePrincipalToken adal.ServicePrincipalToken
 

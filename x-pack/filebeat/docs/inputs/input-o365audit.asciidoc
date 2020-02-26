@@ -15,7 +15,6 @@ Use the `o365audit` input to retrieve audit messages from Office 365
 and Azure AD activity logs. These are the same logs that are available under
 _Audit_ _log_ _search_ in the _Security_ _and_ _Compliance_ center.
 
-
 A single input instance can be used to fetch events for multiple tenants as long
 as a single application is configured to access all tenants. Certificate-based
 authentication is recommended in this scenario.
@@ -100,7 +99,7 @@ Path to the certificate's private key file for certificate-based authentication.
 [float]
 ===== `key_passphrase`
 
-Passphrase used to unlock the private key.
+Passphrase used to decrypt the private key.
 
 [float]
 ===== `api.authentication_endpoint`
@@ -126,9 +125,10 @@ The interval to wait before polling the API server for new events. Default `3m`.
 
 ===== `api.max_requests_per_minute`
 
-The maximum number of requests to perform every minute, for each tenant. The
-current limit is `2000` requests per minute per tenant.
+The maximum number of requests to perform per minute, for each tenant. The
+default is `2000`, as this is the server-side limit per tenant.
 
 ===== `api.max_query_size`
 
-The maximum time window that API allows in a single query. This is `24h`.
+The maximum time window that API allows in a single query. Defaults to `24h`
+to match Microsoft's documented limit.
