@@ -180,7 +180,7 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 }
 
 func newRawESClient(t *testing.T) ilm.ESClient {
-	client, err := esleg.NewConnection(eslegclient.ConnectionSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      getURL(),
 		Username: getUser(),
 		Password: getPass(),
@@ -188,11 +188,10 @@ func newRawESClient(t *testing.T) ilm.ESClient {
 			Transport: &http.Transport{
 				Dial: transport.NetDialer(60 * time.Second).Dial,
 			},
-			Timeout: 0,
+			Timeout: 60 * time.Second,
 		},
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}, nil)
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

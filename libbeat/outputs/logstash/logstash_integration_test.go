@@ -102,7 +102,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := esleg.NewConnection(eslegclient.ConnectionSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      host,
 		Username: username,
 		Password: password,
@@ -132,7 +132,6 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	es := &esConnection{}
 	es.t = t
-	es.Client = client
 	es.index = index
 	return es
 }
