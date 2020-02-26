@@ -63,6 +63,26 @@ func init() {
 	}
 }
 
+// An adapter so that logp.Logger can be used as a log.Logger.
+type logDebugWrapper struct {
+	sync.Mutex
+	Logger *logp.Logger
+	buf    []byte
+}
+
+// Write writes messages to the log.
+func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
+	w.Lock()
+	defer w.Unlock()
+	n = len(p)
+	w.buf = append(w.buf, p...)
+	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
+		w.Logger.Debug(string(w.buf[:endl]))
+		w.buf = w.buf[endl+1:]
+	}
+	return n, nil
+}
+
 // NewInput creates a new Netflow input
 func NewInput(
 	cfg *common.Config,
@@ -72,7 +92,6 @@ func NewInput(
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
@@ -99,7 +118,9 @@ func NewInput(
 	decoder, err := decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(config.Protocols...).
 		WithExpiration(config.ExpirationTimeout).
-		WithCustomFields(customFields...))
+		WithLogOutput(&logDebugWrapper{Logger: logger}).
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(config.DetectSequenceReset))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}

@@ -23,11 +23,9 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -55,6 +53,9 @@ type Watcher interface {
 
 	// AddEventHandler add event handlers for corresponding event type watched
 	AddEventHandler(ResourceEventHandler)
+
+	// Store returns the store object for the watcher
+	Store() cache.Store
 }
 
 // WatchOptions controls watch behaviors
@@ -83,101 +84,17 @@ type watcher struct {
 	logger   *logp.Logger
 }
 
-func tweakOptions(options *metav1.ListOptions, opt WatchOptions) {
-	if opt.Node != "" {
-		options.FieldSelector = "spec.nodeName=" + opt.Node
-	}
-}
-
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
-func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions) (Watcher, error) {
-	var informer cache.SharedInformer
+func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
 	var queue workqueue.RateLimitingInterface
-	var objType string
 
-	var listwatch *cache.ListWatch
-	switch resource.(type) {
-	case *Pod:
-		p := client.CoreV1().Pods(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				tweakOptions(&options, opts)
-				return p.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				tweakOptions(&options, opts)
-				return p.Watch(options)
-			},
-		}
-
-		objType = "pod"
-	case *Event:
-		e := client.CoreV1().Events(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return e.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return e.Watch(options)
-			},
-		}
-
-		objType = "event"
-	case *Node:
-		n := client.CoreV1().Nodes()
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return n.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return n.Watch(options)
-			},
-		}
-
-		objType = "node"
-	case *Deployment:
-		d := client.AppsV1().Deployments(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return d.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return d.Watch(options)
-			},
-		}
-
-		objType = "deployment"
-	case *ReplicaSet:
-		rs := client.AppsV1().ReplicaSets(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return rs.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return rs.Watch(options)
-			},
-		}
-
-		objType = "replicaset"
-	case *StatefulSet:
-		ss := client.AppsV1().ReplicaSets(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return ss.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return ss.Watch(options)
-			},
-		}
-
-		objType = "statefulset"
-	default:
-		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
+	informer, objType, err := NewInformer(client, resource, opts, indexers)
+	if err != nil {
+		return nil, err
 	}
 
-	informer = cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout)
 	store = informer.GetStore()
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -190,6 +107,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		ctx:      ctx,
 		stop:     cancel,
 		logger:   logp.NewLogger("kubernetes"),
+		handler:  NoOpEventHandlerFuncs{},
 	}
 
 	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -213,21 +131,14 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	return w, nil
 }
 
-// enqueue takes the most recent object that was received, figures out the namespace/name of the object
-// and adds it to the work queue for processing.
-func (w *watcher) enqueue(obj interface{}, state string) {
-	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-	if err != nil {
-		return
-	}
-
-	w.queue.Add(&item{key, state})
-}
-
 // AddEventHandler adds a resource handler to process each request that is coming into the watcher
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
+}
+
+// Store returns the store object for the resource that is being watched
+func (w *watcher) Store() cache.Store {
+	return w.store
 }
 
 // Start watching pods
@@ -249,6 +160,23 @@ func (w *watcher) Start() error {
 	}, time.Second*1, w.ctx.Done())
 
 	return nil
+}
+
+func (w *watcher) Stop() {
+	w.queue.ShutDown()
+	w.stop()
+}
+
+// enqueue takes the most recent object that was received, figures out the namespace/name of the object
+// and adds it to the work queue for processing.
+func (w *watcher) enqueue(obj interface{}, state string) {
+	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+	if err != nil {
+		return
+	}
+
+	w.queue.Add(&item{key, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -297,9 +225,4 @@ func (w *watcher) process(ctx context.Context) bool {
 	}
 
 	return true
-}
-
-func (w *watcher) Stop() {
-	w.queue.ShutDown()
-	w.stop()
 }

@@ -80,7 +80,10 @@ func create(
 	// Determine whether we're using a proxy or not and then use that to figure out how to
 	// run the job
 	var makeJob func(string) (jobs.Job, error)
-	if config.ProxyURL != "" {
+	// In the event that a ProxyURL is present, or redirect support is enabled
+	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
+	// separate DNS rtt data.
+	if config.ProxyURL != "" || config.MaxRedirects > 0 {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
 			return nil, 0, err
@@ -135,6 +138,7 @@ func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport,
 		Proxy:             proxy,
 		Dial:              dialer.Dial,
 		DialTLS:           tlsDialer.Dial,
+		TLSClientConfig:   tls.ToConfig(),
 		DisableKeepAlives: true,
 	}, nil
 }

@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	xpackmb "github.com/elastic/beats/x-pack/metricbeat/mb"
 
 	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/prometheus"
@@ -25,7 +24,7 @@ import (
 func init() {
 	// To be moved to some kind of helper
 	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(xpackmb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
 }
 
 func TestFetch(t *testing.T) {

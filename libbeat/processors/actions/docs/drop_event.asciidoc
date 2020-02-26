@@ -1,0 +1,16 @@
+[[drop-event]]
+=== Drop events
+
+The `drop_event` processor drops the entire event if the associated condition
+is fulfilled. The condition is mandatory, because without one, all the events
+are dropped.
+
+[source,yaml]
+------
+processors:
+ - drop_event:
+     when:
+        condition
+------
+
+See <<conditions>> for a list of supported conditions.

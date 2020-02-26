@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2019 Elasticsearch BV
+Copyright 2014-2020 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -11,7 +11,7 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------
 Dependency: 4d63.com/tz
-Revision: bd6cee76f7319745d44ff235e42124b3891e293d
+Revision: 6d37baae851b6f07225308b199322f70907aa3dd
 License type (autodetected): MIT
 ./vendor/4d63.com/tz/LICENSE:
 --------------------------------------------------------------------
@@ -75,6 +75,123 @@ Version: v0.40.0
 Revision: 457ea5c15ccf3b87db582c450e80101989da35f7
 License type (autodetected): Apache-2.0
 ./vendor/cloud.google.com/go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/go-diodes
+Revision: f77fb823c7ee0156ed4cdadaf4f79ac3fd84613f
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/go-diodes/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Copyright (c) 2017-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This project may include a number of subcomponents with separate
+copyright notices and license terms. Your use of these subcomponents
+is subject to the terms and conditions of each subcomponent's license,
+as noted in the LICENSE file.
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/go-loggregator
+Version: v7.7.0
+Revision: b8d176783c8a6280a34f0e19e0e8f57d722773a1
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/go-loggregator/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+go-loggregator
+
+Copyright (c) 2017-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/gofileutils
+Revision: 4d0c80011a0f37da1711c184028bc40137cd45af
+License type (autodetected): Apache-2.0
+./vendor/code.cloudfoundry.org/gofileutils/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+This project contains software that is Copyright (c) 2014-2015 Pivotal Software, Inc.
+
+This project is licensed to you under the Apache License, Version 2.0 (the "License").
+
+You may not use this project except in compliance with the License.
+
+This project may include a number of subcomponents with separate copyright notices
+and license terms. Your use of these subcomponents is subject to the terms and
+conditions of the subcomponent's license, as noted in the LICENSE file.
+
+--------------------------------------------------------------------
+Dependency: code.cloudfoundry.org/rfc5424
+Revision: 236a6d29298aea12f69978f33393d12465abc429
+License type (autodetected): BSD-2-Clause
+./vendor/code.cloudfoundry.org/rfc5424/LICENSE:
+--------------------------------------------------------------------
+BSD 2-Clause License
+
+Copyright (c) 2016, Ross Kinder
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: contrib.go.opencensus.io/exporter/ocagent
+Revision: 8110e6c0236bb231b19119275a6be6ec666d05c8
+License type (autodetected): Apache-2.0
+./vendor/contrib.go.opencensus.io/exporter/ocagent/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -230,15 +347,216 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/awslabs/goformation
-Revision: c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3
+Version: v4.1.0
+Revision: 18ccd0e58e5df10d9f82f875d54b087d3058cfc1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/awslabs/goformation/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/awslabs/goformation/v4
+Version: v4.1.0
+Revision: 18ccd0e58e5df10d9f82f875d54b087d3058cfc1
+License type (autodetected): Apache-2.0
+./vendor/github.com/awslabs/goformation/v4/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
 -------NOTICE-----
 GoFormation
 Copyright 2011-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-amqp-common-go/v3
+Version: v3.0.0
+Revision: af261efd31b6641d91d5c53cc4f9bc1e438f4e5a
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-amqp-common-go/v3/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-event-hubs-go/v3
+Version: v3.0.0
+Revision: 7a1b2e2089e284bcec716b3bdc64ee2e5e626871
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-event-hubs-go/v3/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-pipeline-go
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-pipeline-go/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-sdk-for-go
+Revision: 0820c0553d6c410603056869f7b0e52d61ce5bee
+License type (autodetected): Apache-2.0
+./vendor/github.com/Azure/azure-sdk-for-go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Microsoft Azure-SDK-for-Go
+Copyright 2014-2017 Microsoft
+
+This product includes software developed at
+the Microsoft Corporation (https://www.microsoft.com).
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/azure-storage-blob-go
+License type (autodetected): MIT
+./vendor/github.com/Azure/azure-storage-blob-go/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+--------------------------------------------------------------------
+Dependency: github.com/Azure/go-amqp
+Revision: 35df54553cf7e6d1b8526b67fb5dd2e1ff0b0ff2
+License type (autodetected): MIT
+./vendor/github.com/Azure/go-amqp/LICENSE:
+--------------------------------------------------------------------
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/go-ansiterm
+Revision: d6e3b3328b783f23731bc4d058875b0371ff8109
+License type (autodetected): MIT
+./vendor/github.com/Azure/go-ansiterm/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2015 Microsoft Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/go-autorest
+Revision: ba1147dc57f993013ef255c128ca1cac8a557409
+License type (autodetected): Apache-2.0
+./vendor/github.com/Azure/go-autorest/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/beorn7/perks
@@ -268,6 +586,33 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/blakesmith/ar
+Revision: 8bd4349a67f2533b078dbc524689d15dba0f4659
+License type (autodetected): MIT
+./vendor/github.com/blakesmith/ar/COPYING:
+--------------------------------------------------------------------
+Copyright (c) 2013 Blake Smith <blakesmith0@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/bsm/sarama-cluster
 Revision: 7e67d87a6b3f83fe08c096fd084691bd9dca112f
 License type (autodetected): MIT
@@ -295,6 +640,102 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/cavaliercoder/badio
+Revision: ce5280129e9e9d80def35bfe203b845a4eebc9db
+License type (autodetected): MIT
+./vendor/github.com/cavaliercoder/badio/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2015 Ryan Armstrong
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/cavaliercoder/go-rpm
+Revision: 7a9c54e3d83e935c2f070a97273c99be6a3ac2e9
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/cavaliercoder/go-rpm/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2017 Ryan Armstrong. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/census-instrumentation/opencensus-proto
+Revision: 26aa36c099c2041b432cf3cc8a26c5fb858d218b
+License type (autodetected): Apache-2.0
+./vendor/github.com/census-instrumentation/opencensus-proto/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/cespare/xxhash
+Revision: 2372543dd2bbab7a55ce14c54eb357abe23a42f5
+License type (autodetected): MIT
+./vendor/github.com/cespare/xxhash/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016 Caleb Spare
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/cloudflare/cfssl
@@ -328,10 +769,99 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/cloudfoundry-community/go-cfclient
+Version: master
+Revision: 35bcce23fc5f8b9969723ac38c0de1f82c4d3471
+License type (autodetected): MIT
+./vendor/github.com/cloudfoundry-community/go-cfclient/LICENSE:
+--------------------------------------------------------------------
+The MIT License
+
+Copyright (c) 2017 Long Nguyen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/cloudfoundry/sonde-go
+Revision: b33733203bb48d7c56de7cb639d77f78b0449d19
+License type (autodetected): Apache-2.0
+./vendor/github.com/cloudfoundry/sonde-go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+sonde-go
+
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+Limitations under the License.
+
+--------------------------------------------------------------------
+Dependency: github.com/containerd/containerd
+Revision: 36cf5b690dcc00ff0f34ff7799209050c3d0c59a
+License type (autodetected): Apache-2.0
+./vendor/github.com/containerd/containerd/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
 Dependency: github.com/containerd/continuity
-Revision: 75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec
+Revision: 26c1120b8d4107d2471b93ad78ef7ce1fc84c4c4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/containerd/continuity/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/containerd/fifo
+Revision: bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13
+License type (autodetected): Apache-2.0
+./vendor/github.com/containerd/fifo/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -380,8 +910,8 @@ This product includes software developed at CoreOS, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v18
-Revision: 9002847aa1425fb6ac49077c0a630b3b67e0fbfd
+Version: v20
+Revision: e64a0ec8b42a61e2a9801dc1d0abe539dea79197
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -410,40 +940,6 @@ This product includes software developed at CoreOS, Inc.
 (http://www.coreos.com/).
 
 --------------------------------------------------------------------
-Dependency: github.com/DataDog/zstd
-Revision: 2bf71ec4836011b92dc78df3b9ace6b40e65f7df
-License type (autodetected): BSD-3-Clause
-./vendor/github.com/DataDog/zstd/LICENSE:
---------------------------------------------------------------------
-Simplified BSD License
-
-Copyright (c) 2016, Datadog <info@datadoghq.com>
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
-    * Neither the name of the copyright holder nor the names of its contributors
-      may be used to endorse or promote products derived from this software
-      without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
 Dependency: github.com/davecgh/go-spew
 Version: v1.1.0
 Revision: 346938d642f2ec3594ed81d874461961cd0faa76
@@ -470,7 +966,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 Dependency: github.com/davecgh/go-xdr
 Revision: e6a2ba005892b6a5b27cb5352f64c2e96942dd28
 License type (autodetected): MIT
-./metricbeat/module/kvm/vendor/github.com/davecgh/go-xdr/LICENSE:
+./vendor/github.com/davecgh/go-xdr/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012-2014 Dave Collins <dave@davec.name>
 
@@ -520,10 +1016,62 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/devigned/tab
+Revision: 0c15cf42f9a213a393bbc9ddbd13c231c7a36af0
+License type (autodetected): MIT
+./vendor/github.com/devigned/tab/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2019 David Justice
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/dgrijalva/jwt-go
+Revision: 5e25c22bd5d6de03265bbe5462dcd162f85046f6
+License type (autodetected): MIT
+./vendor/github.com/dgrijalva/jwt-go/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012 Dave Grijalva
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/digitalocean/go-libvirt
-Revision: 59d541f19311883ad82708651353009fb207d8a9
+Revision: 6075ea3c39a182efd22179110e92d4e8a8892d00
 License type (autodetected): Apache-2.0
-./metricbeat/module/kvm/vendor/github.com/digitalocean/go-libvirt/LICENSE.md:
+./vendor/github.com/digitalocean/go-libvirt/LICENSE.md:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/dimchansky/utfbom
+Revision: d2133a1ce379ef6fa992b0514a77146c60db9d1c
+License type (autodetected): Apache-2.0
+./vendor/github.com/dimchansky/utfbom/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -558,7 +1106,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/distribution
-Revision: 1e2f10eb65743fed02f573d31a4587de09afb20e
+Revision: aeaeb844071362767ad497eb0911fcf60e47fa11
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/distribution/LICENSE:
 --------------------------------------------------------------------
@@ -567,8 +1115,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/docker
-Version: v19.03.2
-Revision: ed20165a37b40ff1cfbe55e218344c5e89f30ee2
+Version: v19.03.5
+Revision: ea84732a77251e0d7af278e2b7df1d6a59fca46b
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/docker/LICENSE:
 --------------------------------------------------------------------
@@ -580,7 +1128,7 @@ Copyright 2012-2017 Docker, Inc.
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
 
-This product contains software (https://github.com/kr/pty) developed
+This product contains software (https://github.com/creack/pty) developed
 by Keith Rarick, licensed under the MIT License.
 
 The following is courtesy of our legal counsel:
@@ -627,6 +1175,35 @@ Docker
 Copyright 2012-2015 Docker, Inc.
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
+Dependency: github.com/docker/go-plugins-helpers
+Revision: 1e6269c305b8c75cfda1c8aa91349c38d7335814
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/go-plugins-helpers/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+This product contains software (https://github.com/kr/pty) developed
+by Keith Rarick, licensed under the MIT License.
 
 The following is courtesy of our legal counsel:
 
@@ -840,9 +1417,102 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/eclipse/paho.mqtt.golang
+Revision: 0d940dd29fd24f905cd16b28b1209b4977b97e1a
+License type (autodetected): EPL-1.0
+./vendor/github.com/eclipse/paho.mqtt.golang/LICENSE:
+--------------------------------------------------------------------
+Eclipse Public License - v 1.0
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
+
+1. DEFINITIONS
+
+"Contribution" means:
+
+a) in the case of the initial Contributor, the initial code and documentation distributed under this Agreement, and
+
+b) in the case of each subsequent Contributor:
+
+i) changes to the Program, and
+
+ii) additions to the Program;
+
+where such changes and/or additions to the Program originate from and are distributed by that particular Contributor. A Contribution 'originates' from a Contributor if it was added to the Program by such Contributor itself or anyone acting on such Contributor's behalf. Contributions do not include additions to the Program which: (i) are separate modules of software distributed in conjunction with the Program under their own license agreement, and (ii) are not derivative works of the Program.
+
+"Contributor" means any person or entity that distributes the Program.
+
+"Licensed Patents" mean patent claims licensable by a Contributor which are necessarily infringed by the use or sale of its Contribution alone or when combined with the Program.
+
+"Program" means the Contributions distributed in accordance with this Agreement.
+
+"Recipient" means anyone who receives the Program under this Agreement, including all Contributors.
+
+2. GRANT OF RIGHTS
+
+a) Subject to the terms of this Agreement, each Contributor hereby grants Recipient a non-exclusive, worldwide, royalty-free copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, distribute and sublicense the Contribution of such Contributor, if any, and such derivative works, in source code and object code form.
+
+b) Subject to the terms of this Agreement, each Contributor hereby grants Recipient a non-exclusive, worldwide, royalty-free patent license under Licensed Patents to make, use, sell, offer to sell, import and otherwise transfer the Contribution of such Contributor, if any, in source code and object code form. This patent license shall apply to the combination of the Contribution and the Program if, at the time the Contribution is added by the Contributor, such addition of the Contribution causes such combination to be covered by the Licensed Patents. The patent license shall not apply to any other combinations which include the Contribution. No hardware per se is licensed hereunder.
+
+c) Recipient understands that although each Contributor grants the licenses to its Contributions set forth herein, no assurances are provided by any Contributor that the Program does not infringe the patent or other intellectual property rights of any other entity. Each Contributor disclaims any liability to Recipient for claims brought by any other entity based on infringement of intellectual property rights or otherwise. As a condition to exercising the rights and licenses granted hereunder, each Recipient hereby assumes sole responsibility to secure any other intellectual property rights needed, if any. For example, if a third party patent license is required to allow Recipient to distribute the Program, it is Recipient's responsibility to acquire that license before distributing the Program.
+
+d) Each Contributor represents that to its knowledge it has sufficient copyright rights in its Contribution, if any, to grant the copyright license set forth in this Agreement.
+
+3. REQUIREMENTS
+
+A Contributor may choose to distribute the Program in object code form under its own license agreement, provided that:
+
+a) it complies with the terms and conditions of this Agreement; and
+
+b) its license agreement:
+
+i) effectively disclaims on behalf of all Contributors all warranties and conditions, express and implied, including warranties or conditions of title and non-infringement, and implied warranties or conditions of merchantability and fitness for a particular purpose;
+
+ii) effectively excludes on behalf of all Contributors all liability for damages, including direct, indirect, special, incidental and consequential damages, such as lost profits;
+
+iii) states that any provisions which differ from this Agreement are offered by that Contributor alone and not by any other party; and
+
+iv) states that source code for the Program is available from such Contributor, and informs licensees how to obtain it in a reasonable manner on or through a medium customarily used for software exchange.
+
+When the Program is made available in source code form:
+
+a) it must be made available under this Agreement; and
+
+b) a copy of this Agreement must be included with each copy of the Program.
+
+Contributors may not remove or alter any copyright notices contained within the Program.
+
+Each Contributor must identify itself as the originator of its Contribution, if any, in a manner that reasonably allows subsequent Recipients to identify the originator of the Contribution.
+
+4. COMMERCIAL DISTRIBUTION
+
+Commercial distributors of software may accept certain responsibilities with respect to end users, business partners and the like. While this license is intended to facilitate the commercial use of the Program, the Contributor who includes the Program in a commercial product offering should do so in a manner which does not create potential liability for other Contributors. Therefore, if a Contributor includes the Program in a commercial product offering, such Contributor ("Commercial Contributor") hereby agrees to defend and indemnify every other Contributor ("Indemnified Contributor") against any losses, damages and costs (collectively "Losses") arising from claims, lawsuits and other legal actions brought by a third party against the Indemnified Contributor to the extent caused by the acts or omissions of such Commercial Contributor in connection with its distribution of the Program in a commercial product offering. The obligations in this section do not apply to any claims or Losses relating to any actual or alleged intellectual property infringement. In order to qualify, an Indemnified Contributor must: a) promptly notify the Commercial Contributor in writing of such claim, and b) allow the Commercial Contributor to control, and cooperate with the Commercial Contributor in, the defense and any related settlement negotiations. The Indemnified Contributor may participate in any such claim at its own expense.
+
+For example, a Contributor might include the Program in a commercial product offering, Product X. That Contributor is then a Commercial Contributor. If that Commercial Contributor then makes performance claims, or offers warranties related to Product X, those performance claims and warranties are such Commercial Contributor's responsibility alone. Under this section, the Commercial Contributor would have to defend claims against the other Contributors related to those performance claims and warranties, and if a court requires any other Contributor to pay any damages as a result, the Commercial Contributor must pay those damages.
+
+5. NO WARRANTY
+
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is solely responsible for determining the appropriateness of using and distributing the Program and assumes all risks associated with its exercise of rights under this Agreement , including but not limited to the risks and costs of program errors, compliance with applicable laws, damage to or loss of data, programs or equipment, and unavailability or interruption of operations.
+
+6. DISCLAIMER OF LIABILITY
+
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR ANY CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7. GENERAL
+
+If any provision of this Agreement is invalid or unenforceable under applicable law, it shall not affect the validity or enforceability of the remainder of the terms of this Agreement, and without further action by the parties hereto, such provision shall be reformed to the minimum extent necessary to make such provision valid and enforceable.
+
+If Recipient institutes patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Program itself (excluding combinations of the Program with other software or hardware) infringes such Recipient's patent(s), then such Recipient's rights granted under Section 2(b) shall terminate as of the date such litigation is filed.
+
+All Recipient's rights under this Agreement shall terminate if it fails to comply with any of the material terms or conditions of this Agreement and does not cure such failure in a reasonable period of time after becoming aware of such noncompliance. If all Recipient's rights under this Agreement terminate, Recipient agrees to cease use and distribution of the Program as soon as reasonably practicable. However, Recipient's obligations under this Agreement and any licenses granted by Recipient relating to the Program shall continue and survive.
+
+Everyone is permitted to copy and distribute copies of this Agreement, but in order to avoid inconsistency the Agreement is copyrighted and may only be modified in the following manner. The Agreement Steward reserves the right to publish new versions (including revisions) of this Agreement from time to time. No one other than the Agreement Steward has the right to modify this Agreement. The Eclipse Foundation is the initial Agreement Steward. The Eclipse Foundation may assign the responsibility to serve as the Agreement Steward to a suitable separate entity. Each new version of the Agreement will be given a distinguishing version number. The Program (including Contributions) may always be distributed subject to the version of the Agreement under which it was received. In addition, after a new version of the Agreement is published, Contributor may elect to distribute the Program (including its Contributions) under the new version. Except as expressly stated in Sections 2(a) and 2(b) above, Recipient receives no rights or licenses to the intellectual property of any Contributor under this Agreement, whether expressly, by implication, estoppel or otherwise. All rights in the Program not expressly granted under this Agreement are reserved.
+
+This Agreement is governed by the laws of the State of New York and the intellectual property laws of the United States of America. No party to this Agreement will bring a legal action under this Agreement more than one year after the cause of action arose. Each party waives its rights to a jury trial in any resulting litigation.
+--------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: v1.1.0
-Revision: cc1d96bf3f70a8e6af1e436a0283ef22b6af3dd2
+Version: v1.4.0
+Revision: cc4b36eebec29975f57cd0475c3987c9bde5c15a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -858,6 +1528,22 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/elastic/go-licenser
+Version: 0.2.0
+Revision: 2b2abd4ee9b58025ebd0630d7621cfd7619f58ac
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-licenser/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Elastic go-licenser
+Copyright 2018 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-lookslike
@@ -880,7 +1566,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-perf
-Revision: 9bc9b58a3de9e63a1a8e27241ae3c61d3449782b
+Revision: 9c656876f595360525261b7db5bbbcd3c40b7dbb
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/elastic/go-perf/LICENSE:
 --------------------------------------------------------------------
@@ -934,18 +1620,24 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Version: v1.1.0
-Revision: 51d9d1362d77a4792dfb39a7a19f056cdf1b9840
+Version: v1.3.0
+Revision: b719bc42e40963c707571af208683a049e61f07f
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
+-------NOTICE.txt-----
+Elastic go-sysinfo
+Copyright 2017-2020 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.6
-Revision: fa3d87c14381c01aaa1c7901877fb5e483294964
+Version: v0.0.7
+Revision: 4acb7500cf41aea9d6362378aee5ebacac831ea4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -954,8 +1646,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.7.0
-Revision: 0539807037ce820e147797f051ff32b05f4f9288
+Version: v0.8.3
+Revision: f3ae3b220df32cfcae011ec6bbf87a711e6bf06b
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -1164,17 +1856,31 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/go-ole/go-ole
-Revision: de8695c8edbf8236f30d6e1376e20b198a028d42
+Revision: 14974a1cf6477f616180232977d8ab4791ea8820
 License type (autodetected): MIT
 ./vendor/github.com/go-ole/go-ole/LICENSE:
 --------------------------------------------------------------------
-Copyright © 2013-2018 Yasuhiro Matsumoto, http://mattn.kaoriya.net <mattn.jp@gmail.com>
+The MIT License (MIT)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Copyright © 2013-2017 Yasuhiro Matsumoto, <mattn.jp@gmail.com>
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the “Software”), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/go-sourcemap/sourcemap
@@ -1213,7 +1919,7 @@ Dependency: github.com/go-sql-driver/mysql
 Version: v1.4.1
 Revision: 72cd26f257d44c1114970e19afddcd812016007e
 License type (autodetected): MPL-2.0
-./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
+./vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License Version 2.0
 ==================================
@@ -1617,6 +2323,305 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/godbus/dbus
+Revision: 37bf87eef99d69c4f1d3528bd66e3a87dc201472
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/godbus/dbus/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/godror/godror
+Version: v0.10.4
+Revision: 0123d49bd73e1bed106ac8b6af67f943fbbf06e2
+License type (autodetected): Apache-2.0
+./vendor/github.com/godror/godror/LICENSE.md:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/godror/godror/odpi
+License type (autodetected): UPL-1.0
+./vendor/github.com/godror/godror/odpi/LICENSE.md:
+--------------------------------------------------------------------
+Copyright (c) 2016, 2018 Oracle and/or its affiliates.  All rights reserved.
+
+This program is free software: you can modify it and/or redistribute it under
+the terms of:
+
+(i)  the Universal Permissive License v 1.0 or at your option, any
+     later version (<http://oss.oracle.com/licenses/upl>); and/or
+
+(ii) the Apache License v 2.0. (<http://www.apache.org/licenses/LICENSE-2.0>)
+
+
+The Universal Permissive License (UPL), Version 1.0
+===================================================
+
+Subject to the condition set forth below, permission is hereby granted to any
+person obtaining a copy of this software, associated documentation and/or data
+(collectively the "Software"), free of charge and under any and all copyright
+rights in the Software, and any and all patent rights owned or freely
+licensable by each licensor hereunder covering either (i) the unmodified
+Software as contributed to or provided by such licensor, or (ii) the Larger
+Works (as defined below), to deal in both
+
+(a) the Software, and
+
+(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+    one is included with the Software (each a "Larger Work" to which the
+    Software is contributed by such licensors),
+
+without restriction, including without limitation the rights to copy, create
+derivative works of, display, perform, and distribute the Software and make,
+use, sell, offer for sale, import, export, have made, and have sold the
+Software and the Larger Work(s), and to sublicense the foregoing rights on
+either these or other terms.
+
+This license is subject to the following condition:
+
+The above copyright notice and either this complete permission notice or at a
+minimum a reference to the UPL must be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Apache License
+==============
+
+Version 2.0, January 2004
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1.  **Definitions**.
+
+    "License" shall mean the terms and conditions for use, reproduction, and
+    distribution as defined by Sections 1 through 9 of this document.
+
+    "Licensor" shall mean the copyright owner or entity authorized by the
+    copyright owner that is granting the License.
+
+    "Legal Entity" shall mean the union of the acting entity and all other
+    entities that control, are controlled by, or are under common control with
+    that entity.  For the purposes of this definition, "control" means (i) the
+    power, direct or indirect, to cause the direction or management of such
+    entity, whether by contract or otherwise, or (ii) ownership of fifty
+    percent (50%) or more of the outstanding shares, or (iii) beneficial
+    ownership of such entity.
+
+    "You" (or "Your") shall mean an individual or Legal Entity exercising
+    permissions granted by this License.
+
+    "Source" form shall mean the preferred form for making modifications,
+    including but not limited to software source code, documentation source,
+    and configuration files.
+
+    "Object" form shall mean any form resulting from mechanical transformation
+    or translation of a Source form, including but not limited to compiled
+    object code, generated documentation, and conversions to other media types.
+
+    "Work" shall mean the work of authorship, whether in Source or Object form,
+    made available under the License, as indicated by a copyright notice that
+    is included in or attached to the work (an example is provided in the
+    Appendix below).
+
+    "Derivative Works" shall mean any work, whether in Source or Object form,
+    that is based on (or derived from) the Work and for which the editorial
+    revisions, annotations, elaborations, or other modifications represent, as
+    a whole, an original work of authorship. For the purposes of this License,
+    Derivative Works shall not include works that remain separable from, or
+    merely link (or bind by name) to the interfaces of, the Work and Derivative
+    Works thereof.
+
+    "Contribution" shall mean any work of authorship, including the original
+    version of the Work and any modifications or additions to that Work or
+    Derivative Works thereof, that is intentionally submitted to Licensor for
+    inclusion in the Work by the copyright owner or by an individual or Legal
+    Entity authorized to submit on behalf of the copyright owner. For the
+    purposes of this definition, "submitted" means any form of electronic,
+    verbal, or written communication sent to the Licensor or its
+    representatives, including but not limited to communication on electronic
+    mailing lists, source code control systems, and issue tracking systems that
+    are managed by, or on behalf of, the Licensor for the purpose of discussing
+    and improving the Work, but excluding communication that is conspicuously
+    marked or otherwise designated in writing by the copyright owner as "Not a
+    Contribution."
+
+    "Contributor" shall mean Licensor and any individual or Legal Entity on
+    behalf of whom a Contribution has been received by Licensor and
+    subsequently incorporated within the Work.
+
+2.  **Grant of Copyright License.** Subject to the terms and conditions of this
+    License, each Contributor hereby grants to You a perpetual, worldwide,
+    non-exclusive, no-charge, royalty-free, irrevocable copyright license to
+    reproduce, prepare Derivative Works of, publicly display, publicly perform,
+    sublicense, and distribute the Work and such Derivative Works in Source or
+    Object form.
+
+3.  **Grant of Patent License.** Subject to the terms and conditions of this
+    License, each Contributor hereby grants to You a perpetual, worldwide,
+    non-exclusive, no-charge, royalty-free, irrevocable (except as stated in
+    this section) patent license to make, have made, use, offer to sell, sell,
+    import, and otherwise transfer the Work, where such license applies only to
+    those patent claims licensable by such Contributor that are necessarily
+    infringed by their Contribution(s) alone or by combination of their
+    Contribution(s) with the Work to which such Contribution(s) was submitted.
+    If You institute patent litigation against any entity (including a
+    cross-claim or counterclaim in a lawsuit) alleging that the Work or a
+    Contribution incorporated within the Work constitutes direct or
+    contributory patent infringement, then any patent licenses granted to You
+    under this License for that Work shall terminate as of the date such
+    litigation is filed.
+
+4.  **Redistribution.** You may reproduce and distribute copies of the Work or
+    Derivative Works thereof in any medium, with or without modifications, and
+    in Source or Object form, provided that You meet the following conditions:
+
+    1.  You must give any other recipients of the Work or Derivative Works a
+        copy of this License; and
+
+    2.  You must cause any modified files to carry prominent notices stating
+        that You changed the files; and
+
+    3.  You must retain, in the Source form of any Derivative Works that You
+        distribute, all copyright, patent, trademark, and attribution notices
+        from the Source form of the Work, excluding those notices that do not
+        pertain to any part of the Derivative Works; and
+
+    4.  If the Work includes a "NOTICE" text file as part of its distribution,
+        then any Derivative Works that You distribute must include a readable
+        copy of the attribution notices contained within such NOTICE file,
+        excluding those notices that do not pertain to any part of the
+        Derivative Works, in at least one of the following places: within a
+        NOTICE text file distributed as part of the Derivative Works; within
+        the Source form or documentation, if provided along with the Derivative
+        Works; or, within a display generated by the Derivative Works, if and
+        wherever such third-party notices normally appear. The contents of the
+        NOTICE file are for informational purposes only and do not modify the
+        License. You may add Your own attribution notices within Derivative
+        Works that You distribute, alongside or as an addendum to the NOTICE
+        text from the Work, provided that such additional attribution notices
+        cannot be construed as modifying the License.
+
+        You may add Your own copyright statement to Your modifications and may
+        provide additional or different license terms and conditions for use,
+        reproduction, or distribution of Your modifications, or for any such
+        Derivative Works as a whole, provided Your use, reproduction, and
+        distribution of the Work otherwise complies with the conditions stated
+        in this License.
+
+5.  **Submission of Contributions.** Unless You explicitly state otherwise, any
+    Contribution intentionally submitted for inclusion in the Work by You to
+    the Licensor shall be under the terms and conditions of this License,
+    without any additional terms or conditions. Notwithstanding the above,
+    nothing herein shall supersede or modify the terms of any separate license
+    agreement you may have executed with Licensor regarding such Contributions.
+
+6.  **Trademarks.** This License does not grant permission to use the trade
+    names, trademarks, service marks, or product names of the Licensor, except
+    as required for reasonable and customary use in describing the origin of
+    the Work and reproducing the content of the NOTICE file.
+
+7.  **Disclaimer of Warranty.** Unless required by applicable law or agreed to
+    in writing, Licensor provides the Work (and each Contributor provides its
+    Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied, including, without limitation, any
+    warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or
+    FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+    determining the appropriateness of using or redistributing the Work and
+    assume any risks associated with Your exercise of permissions under this
+    License.
+
+8.  **Limitation of Liability.** In no event and under no legal theory, whether
+    in tort (including negligence), contract, or otherwise, unless required by
+    applicable law (such as deliberate and grossly negligent acts) or agreed to
+    in writing, shall any Contributor be liable to You for damages, including
+    any direct, indirect, special, incidental, or consequential damages of any
+    character arising as a result of this License or out of the use or
+    inability to use the Work (including but not limited to damages for loss of
+    goodwill, work stoppage, computer failure or malfunction, or any and all
+    other commercial damages or losses), even if such Contributor has been
+    advised of the possibility of such damages.
+
+9.  **Accepting Warranty or Additional Liability.** While redistributing the
+    Work or Derivative Works thereof, You may choose to offer, and charge a fee
+    for, acceptance of support, warranty, indemnity, or other liability
+    obligations and/or rights consistent with this License. However, in
+    accepting such obligations, You may act only on Your own behalf and on Your
+    sole responsibility, not on behalf of any other Contributor, and only if
+    You agree to indemnify, defend, and hold each Contributor harmless for any
+    liability incurred by, or claims asserted against, such Contributor by
+    reason of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+--------------------------------------------------------------------
+Dependency: github.com/gofrs/flock
+Revision: 5135e617513b1e6e205a3a89b042249dee6730c8
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/gofrs/flock/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2015, Tim Heckman
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of linode-netint nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/gofrs/uuid
 Version: 3.1.1
 Revision: 47cd1dca1a6e7f807d5a492bd7e7f41d0855b5a1
@@ -1646,56 +2651,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gogo/protobuf
-Revision: 4c00d2f19fb91be5fecd8681fa83450a2a979e69
+Version: v1.3.1
+Revision: 5628607bb4c51c3157aacc3a50f0ab707582b805
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/gogo/protobuf/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013, The GoGo Authors. All rights reserved.
 
 Protocol Buffers for Go with Gadgets
-
-Go support for Protocol Buffers - Google's data interchange format
-
-Copyright 2010 The Go Authors.  All rights reserved.
-https://github.com/golang/protobuf
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-    * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------
-Dependency: github.com/gogo/protobuf
-Revision: 636bf0302bc95575d69441b25a2603156ffdddf1
-License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/github.com/gogo/protobuf/LICENSE:
---------------------------------------------------------------------
-Protocol Buffers for Go with Gadgets
-
-Copyright (c) 2013, The GoGo Authors. All rights reserved.
-http://github.com/gogo/protobuf
 
 Go support for Protocol Buffers - Google's data interchange format
 
@@ -1740,50 +2703,11 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Version: v1.3.1
-Revision: b5d812f8a3706043e23a9cd5babf2e5423744d30
+Revision: 6c65a5562fc06764971b7c5d05c76c75e84bdbf7
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
 Copyright 2010 The Go Authors.  All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-    * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------
-Dependency: github.com/golang/protobuf
-Revision: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
-License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
---------------------------------------------------------------------
-Go support for Protocol Buffers - Google's data interchange format
-
-Copyright 2010 The Go Authors.  All rights reserved.
-https://github.com/golang/protobuf
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -1908,10 +2832,45 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
-Dependency: github.com/google/uuid
-Revision: 281f560d28af7174109514e936f94c2ab2cb2823
+Dependency: github.com/google/gopacket
+Revision: 0ad7f2610e344e58c1c95e2adda5c3258da8e97b
 License type (autodetected): BSD-3-Clause
-./metricbeat/module/vsphere/vendor/github.com/google/uuid/LICENSE:
+./vendor/github.com/google/gopacket/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012 Google, Inc. All rights reserved.
+Copyright (c) 2009-2011 Andreas Krennmair. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Andreas Krennmair, Google, nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/google/uuid
+Revision: c2e93f3ae59f2904160ceaab466009f965df46d6
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/google/uuid/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009,2014 Google Inc. All rights reserved.
 
@@ -1995,6 +2954,35 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/gorilla/websocket
+Revision: c3e18be99d19e6b3e8f1559eea2c161a665c4b6b
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/gorilla/websocket/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013 The Gorilla WebSocket Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+  Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/grpc-ecosystem/go-grpc-prometheus
 Revision: ae0d8660c5f2108ca70a3776dbe0fb53cf79f1da
 License type (autodetected): Apache-2.0
@@ -2002,6 +2990,40 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/grpc-ecosystem/grpc-gateway
+Revision: d63917fcb0d53f39184485b9b6a0893af18a5668
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/grpc-ecosystem/grpc-gateway/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2015, Gengo, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the name of Gengo, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/hashicorp/go-immutable-radix
@@ -3616,6 +4638,36 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/jmoiron/sqlx
+Revision: d7d95172beb5a538ff08c50a6e98aee6e7c41f40
+License type (autodetected): MIT
+./vendor/github.com/jmoiron/sqlx/LICENSE:
+--------------------------------------------------------------------
+ Copyright (c) 2013, Jason Moiron
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/joeshaw/multierror
 Revision: 69b34d4ec901851247ae7e77d33909caf9df99ed
 License type (autodetected): MIT
@@ -3642,6 +4694,34 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/jpillora/backoff
+Revision: d80867952dff4e2fbfb4280ded4ff94d67790457
+License type (autodetected): MIT
+./vendor/github.com/jpillora/backoff/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2017 Jaime Pillora
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/json-iterator/go
@@ -3705,6 +4785,7 @@ License type (autodetected): BSD-3-Clause
 ./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2019 Klaus Post. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -3731,6 +4812,69 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/klauspost/compress/snappy
+Revision: c099ac9f21ddbdc8fda7992ce71fae347bf1df88
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/klauspost/compress/snappy/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/klauspost/compress/zstd/internal/xxhash
+Revision: c099ac9f21ddbdc8fda7992ce71fae347bf1df88
+License type (autodetected): MIT
+./vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016 Caleb Spare
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/cpuid
@@ -3813,20 +4957,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/kubernetes/apimachinery
-Version: kubernetes-1.11.1
-Revision: 103fd098999dc9c0c88536f5c9ad2e5da39373ae
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/kubernetes/apimachinery/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/lib/pq
 Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
-./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
+./vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------
 Copyright (c) 2011-2013, 'pq' Contributors
 Portions Copyright (C) 2011 Blake Mizerany
@@ -3839,13 +4973,53 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------
 Dependency: github.com/magefile/mage
-Version: v1.8.0
-Revision: aedfce64c122eef47009b7f80c9771044753215d
+Version: v1.9.0
+Revision: 1c36bf78a98209d91af71354deb001cca75e11fc
 License type (autodetected): Apache-2.0
 ./vendor/github.com/magefile/mage/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/mailru/easyjson
+Revision: 8edcc4e51f39ddbd3505a3386aff3f435a7fd028
+License type (autodetected): MIT
+./vendor/github.com/mailru/easyjson/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2016 Mail.Ru Group
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/Masterminds/semver
+Revision: 910aa146bd66780c2815d652b92a7fc5331e533c
+License type (autodetected): MIT
+./vendor/github.com/Masterminds/semver/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (C) 2014-2019, Matt Butcher and Matt Farina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mattn/go-colorable
@@ -3856,6 +5030,36 @@ License type (autodetected): MIT
 The MIT License (MIT)
 
 Copyright (c) 2016 Yasuhiro Matsumoto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/mattn/go-ieproxy
+Revision: 7c0f6868bffe087073376feaab3ace57f2ef90b2
+License type (autodetected): MIT
+./vendor/github.com/mattn/go-ieproxy/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2014 mattn
+Copyright (c) 2017 oliverpool
+Copyright (c) 2019 Adele Reed
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3903,19 +5107,9 @@ Apache License 2.0
 Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
 --------------------------------------------------------------------
-Dependency: github.com/matttproud/golang_protobuf_extensions
-Revision: c12348ce28de40eed0136aa2b644d0ee0650e56c
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/matttproud/golang_protobuf_extensions/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
-
---------------------------------------------------------------------
 Dependency: github.com/Microsoft/go-winio
-Revision: f533f7a102197536779ea3a8cb881d639e21ec5a
+Version: v0.4.14
+Revision: 6c72808b55902eae4c5943626030429ff20f3b63
 License type (autodetected): MIT
 ./vendor/github.com/Microsoft/go-winio/LICENSE:
 --------------------------------------------------------------------
@@ -4010,6 +5204,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
+Dependency: github.com/mitchellh/go-homedir
+Revision: af06845cf3004701891bf4fdb884bfe4920b3727
+License type (autodetected): MIT
+./vendor/github.com/mitchellh/go-homedir/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2013 Mitchell Hashimoto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/mitchellh/hashstructure
 Revision: ab25296c0f51f1022f01cd99dfb45f1775de8799
 License type (autodetected): MIT
@@ -4039,7 +5261,8 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mitchellh/mapstructure
-Revision: 740c764bc6149d3f1806231418adb9f52c11bcbf
+Version: v1.1.2
+Revision: 3536a929edddb9a5b34bd6861dc4a9647cb459fe
 License type (autodetected): MIT
 ./vendor/github.com/mitchellh/mapstructure/LICENSE:
 --------------------------------------------------------------------
@@ -4084,26 +5307,45 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
-Dependency: github.com/OneOfOne/xxhash
-Revision: 74ace4fe5525ef62ce28d5093d6b0faaa6a575f3
-License type (autodetected): Apache-2.0
-./vendor/github.com/OneOfOne/xxhash/LICENSE:
+Dependency: github.com/morikuni/aec
+Revision: 39771216ff4c63d11f5e604076f9c45e8be1067b
+License type (autodetected): MIT
+./vendor/github.com/morikuni/aec/LICENSE:
 --------------------------------------------------------------------
-Apache License 2.0
+The MIT License (MIT)
 
+Copyright (c) 2016 Taihei Morikuni
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
-Revision: eaa60544f31ccf3b0653b1a118b76d33418ff41b
+Revision: ac19fd6e7483ff933754af248d80be865e543d22
 License type (autodetected): Apache-2.0
-./vendor/github.com/opencontainers/go-digest/LICENSE.code:
+./vendor/github.com/opencontainers/go-digest/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/image-spec
-Revision: 4038d4391fe912af1031db5a1f511cf07c07cbc8
+Revision: 775207bd45b6cb8153ce218cc59351799217451f
 License type (autodetected): Apache-2.0
 ./vendor/github.com/opencontainers/image-spec/LICENSE:
 --------------------------------------------------------------------
@@ -4112,7 +5354,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/runc
-Revision: 653207bc29a6d2d62b5d4f55b596467cb715a128
+Version: v1.0.0-rc9
+Revision: d736ef14f0288d6993a1845745d6756cfc9ddd5a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/opencontainers/runc/LICENSE:
 --------------------------------------------------------------------
@@ -4287,7 +5530,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/client_golang
-Revision: 35ef65db672a76effef5f0808decd0484a636f3f
+Revision: 20428fa0bffcb4ee7a7941545ae0df9acdc9d8a7
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/client_golang/LICENSE:
 --------------------------------------------------------------------
@@ -4333,21 +5576,6 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-Dependency: github.com/prometheus/client_model
-Revision: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/prometheus/client_model/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Data model artifacts for Prometheus.
-Copyright 2012-2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
---------------------------------------------------------------------
 Dependency: github.com/prometheus/common
 Revision: 637d7c34db122e2d1a25d061423098663758d2d3
 License type (autodetected): Apache-2.0
@@ -4363,23 +5591,8 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-Dependency: github.com/prometheus/common
-Revision: 89604d197083d4781071d3c65855d24ecfb0a563
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/prometheus/common/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Common libraries shared by Prometheus Go components.
-Copyright 2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
---------------------------------------------------------------------
 Dependency: github.com/prometheus/procfs
-Revision: 54d17b57dd7d4a3aa092476596b3f8a933bde349
+Revision: 42f6e295b56f795825f88add3c95f83aedb744a4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/procfs/LICENSE:
 --------------------------------------------------------------------
@@ -4602,8 +5815,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.11
-Revision: 0f70a4a06f7a1039305ec9b3ba9c2800f8929fba
+Version: v2.19.11
+Revision: fc7e5e7af6052e36e83e5539148015ed2c09d8f9
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
@@ -4669,9 +5882,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
+Dependency: github.com/shirou/w32
+Revision: bb4de0191aa41b5507caa14b0650cdbddcd9280b
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/shirou/w32/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2010-2012 The w32 Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The names of the authors may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.23.1
-Revision: 46c83074a05474240f9620fb7c70fb0d80ca401a
+Version: v1.24.1-elastic
+Revision: 355d120d09706d85bc6d2a84287be7fbd13ef453
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -4855,38 +6098,37 @@ OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/theckman/go-flock
-Version: v0.4.0
-Revision: b139a2487364247d91814e4a7c7b8fdc69e342b2
-License type (autodetected): BSD-3-Clause
-./vendor/github.com/theckman/go-flock/LICENSE:
+Dependency: github.com/tsg/go-daemon
+Revision: c6e0d1a849861166320520e9bae9bbda5f2ecb03
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/tsg/go-daemon/LICENSE:
 --------------------------------------------------------------------
-Copyright (c) 2015, Tim Heckman
-All rights reserved.
+Copyright (c) 2013-2014 Alexandre Fiori. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+modification, are permitted provided that the following conditions are
+met:
 
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * The names of authors or contributors may NOT be used to endorse or
+promote products derived from this software without specific prior
+written permission.
 
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-* Neither the name of linode-netint nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
@@ -4934,6 +6176,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/urso/magetools
+Revision: 61080ed7b22b35d276d023e17437c85d8a5ade51
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/magetools/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/urso/qcgen
 Revision: 0b059e7db4f40a062ca3d975b7500c6a0a968d87
 License type (autodetected): Apache-2.0
@@ -4946,7 +6197,7 @@ Apache License 2.0
 Dependency: github.com/vmware/govmomi
 Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): Apache-2.0
-./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/LICENSE.txt:
+./vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4955,7 +6206,7 @@ Apache License 2.0
 Dependency: github.com/vmware/govmomi/vim25/xml
 Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): BSD-3-Clause
-./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
+./vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -5059,15 +6310,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/zmap/zcrypto
-Revision: 9051775e6a2e3a89ec27977077b09f4496febecf
-License type (autodetected): Apache-2.0
-./vendor/github.com/zmap/zcrypto/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/zmap/zlint
 Revision: 5dcecad773158b82b5e52064ee2782d1b8a79314
 License type (autodetected): Apache-2.0
@@ -5167,7 +6409,8 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: 85e1b3f9139abd58575d728a509643924e3b2ebf
+Version: release-branch.go1.13
+Revision: 60c769a6c58655dab1b9adac0d58967dd517cfba
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -5201,8 +6444,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/net
-Version: release-branch.go1.9
-Revision: 44b7c21cbf19450f38b337eb6b6fe4f6496fb5b3
+Version: release-branch.go1.13
+Revision: 13f9640d40b9cc418fb53703dfbd177679788ceb
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
@@ -5304,7 +6547,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: d989b31c87461dc8ab2f1cac6792814e27fadea9
+Version: release-branch.go1.13
+Revision: fde4db37ae7ad8191b03d30d27f258b5291ae4e3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -5338,7 +6582,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
-Revision: 4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1
+Version: release-branch.go1.13
+Revision: 342b2e1fbaa52c93f31447ad2c6abc048c63e475
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
@@ -5372,7 +6617,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/time
-Revision: 26559e0f760e39c24d730d3224364aef164ee23f
+Version: release-branch.go1.13
+Revision: 555d28b269f0569763d25dbe1a237ae74c6bcc82
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/time/LICENSE:
 --------------------------------------------------------------------
@@ -5406,12 +6652,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Version: release-branch.go1.10
-Revision: 156d532d4f67148ceab07c3b59ed7fa13bdbf00c
+Version: release-branch.go1.13
+Revision: 65e3620a7ae7ac25e8494a60f0e5ef4e4fba03b3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: golang.org/x/xerrors
+Revision: 9bdfabe68543c54f90421aeb9a60ef8061b5b544
+License type (autodetected): BSD-3-Clause
+./vendor/golang.org/x/xerrors/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2019 The Go Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -5475,284 +6755,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: google.golang.org/appengine
-Version: v1.6.1
-Revision: b2f4a3cf3c67576a2ee09e1fe62656a5086ce880
-License type (autodetected): Apache-2.0
-./vendor/google.golang.org/appengine/LICENSE:
+Dependency: google.golang.org/api/googleapi/internal/uritemplates
+Version: v0.7.0
+Revision: 02490b97dff7cfde1995bd77de808fd27053bc87
+License type (autodetected): MIT
+./vendor/google.golang.org/api/googleapi/internal/uritemplates/LICENSE:
 --------------------------------------------------------------------
-Apache License 2.0
+Copyright (c) 2013 Joshua Tacoma
 
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
---------------------------------------------------------------------
-Dependency: google.golang.org/appengine
-Revision: e9657d882bb81064595ca3b56cbe2546bbabf7b1
-License type (autodetected): Apache-2.0
-./metricbeat/module/mysql/vendor/google.golang.org/appengine/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: google.golang.org/genproto
-Revision: a7e196e89fd3a3c4d103ca540bd5dac3a736e375
-License type (autodetected): Apache-2.0
-./vendor/google.golang.org/genproto/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: google.golang.org/grpc
-Version: v1.21.1
-Revision: 501c41df7f472c740d0674ff27122f3f48c80ce7
-License type (autodetected): Apache-2.0
-./vendor/google.golang.org/grpc/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: gopkg.in/goracle.v2
-Revision: 3222d7159b45fce95150f06a57e1bcc2868108d3
-License type (autodetected): Apache-2.0
-./vendor/gopkg.in/goracle.v2/LICENSE.md:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: gopkg.in/goracle.v2/odpi
-License type (autodetected): UPL-1.0
-./vendor/gopkg.in/goracle.v2/odpi/LICENSE.md:
---------------------------------------------------------------------
-Copyright (c) 2016, 2018 Oracle and/or its affiliates.  All rights reserved.
-
-This program is free software: you can modify it and/or redistribute it under
-the terms of:
-
-(i)  the Universal Permissive License v 1.0 or at your option, any
-     later version (<http://oss.oracle.com/licenses/upl>); and/or
-
-(ii) the Apache License v 2.0. (<http://www.apache.org/licenses/LICENSE-2.0>)
-
-
-The Universal Permissive License (UPL), Version 1.0
-===================================================
-
-Subject to the condition set forth below, permission is hereby granted to any
-person obtaining a copy of this software, associated documentation and/or data
-(collectively the "Software"), free of charge and under any and all copyright
-rights in the Software, and any and all patent rights owned or freely
-licensable by each licensor hereunder covering either (i) the unmodified
-Software as contributed to or provided by such licensor, or (ii) the Larger
-Works (as defined below), to deal in both
-
-(a) the Software, and
-
-(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
-    one is included with the Software (each a "Larger Work" to which the
-    Software is contributed by such licensors),
-
-without restriction, including without limitation the rights to copy, create
-derivative works of, display, perform, and distribute the Software and make,
-use, sell, offer for sale, import, export, have made, and have sold the
-Software and the Larger Work(s), and to sublicense the foregoing rights on
-either these or other terms.
-
-This license is subject to the following condition:
-
-The above copyright notice and either this complete permission notice or at a
-minimum a reference to the UPL must be included in all copies or substantial
-portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
-Apache License
-==============
-
-Version 2.0, January 2004
-
-TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-
-1.  **Definitions**.
-
-    "License" shall mean the terms and conditions for use, reproduction, and
-    distribution as defined by Sections 1 through 9 of this document.
-
-    "Licensor" shall mean the copyright owner or entity authorized by the
-    copyright owner that is granting the License.
-
-    "Legal Entity" shall mean the union of the acting entity and all other
-    entities that control, are controlled by, or are under common control with
-    that entity.  For the purposes of this definition, "control" means (i) the
-    power, direct or indirect, to cause the direction or management of such
-    entity, whether by contract or otherwise, or (ii) ownership of fifty
-    percent (50%) or more of the outstanding shares, or (iii) beneficial
-    ownership of such entity.
-
-    "You" (or "Your") shall mean an individual or Legal Entity exercising
-    permissions granted by this License.
-
-    "Source" form shall mean the preferred form for making modifications,
-    including but not limited to software source code, documentation source,
-    and configuration files.
-
-    "Object" form shall mean any form resulting from mechanical transformation
-    or translation of a Source form, including but not limited to compiled
-    object code, generated documentation, and conversions to other media types.
-
-    "Work" shall mean the work of authorship, whether in Source or Object form,
-    made available under the License, as indicated by a copyright notice that
-    is included in or attached to the work (an example is provided in the
-    Appendix below).
-
-    "Derivative Works" shall mean any work, whether in Source or Object form,
-    that is based on (or derived from) the Work and for which the editorial
-    revisions, annotations, elaborations, or other modifications represent, as
-    a whole, an original work of authorship. For the purposes of this License,
-    Derivative Works shall not include works that remain separable from, or
-    merely link (or bind by name) to the interfaces of, the Work and Derivative
-    Works thereof.
-
-    "Contribution" shall mean any work of authorship, including the original
-    version of the Work and any modifications or additions to that Work or
-    Derivative Works thereof, that is intentionally submitted to Licensor for
-    inclusion in the Work by the copyright owner or by an individual or Legal
-    Entity authorized to submit on behalf of the copyright owner. For the
-    purposes of this definition, "submitted" means any form of electronic,
-    verbal, or written communication sent to the Licensor or its
-    representatives, including but not limited to communication on electronic
-    mailing lists, source code control systems, and issue tracking systems that
-    are managed by, or on behalf of, the Licensor for the purpose of discussing
-    and improving the Work, but excluding communication that is conspicuously
-    marked or otherwise designated in writing by the copyright owner as "Not a
-    Contribution."
-
-    "Contributor" shall mean Licensor and any individual or Legal Entity on
-    behalf of whom a Contribution has been received by Licensor and
-    subsequently incorporated within the Work.
-
-2.  **Grant of Copyright License.** Subject to the terms and conditions of this
-    License, each Contributor hereby grants to You a perpetual, worldwide,
-    non-exclusive, no-charge, royalty-free, irrevocable copyright license to
-    reproduce, prepare Derivative Works of, publicly display, publicly perform,
-    sublicense, and distribute the Work and such Derivative Works in Source or
-    Object form.
-
-3.  **Grant of Patent License.** Subject to the terms and conditions of this
-    License, each Contributor hereby grants to You a perpetual, worldwide,
-    non-exclusive, no-charge, royalty-free, irrevocable (except as stated in
-    this section) patent license to make, have made, use, offer to sell, sell,
-    import, and otherwise transfer the Work, where such license applies only to
-    those patent claims licensable by such Contributor that are necessarily
-    infringed by their Contribution(s) alone or by combination of their
-    Contribution(s) with the Work to which such Contribution(s) was submitted.
-    If You institute patent litigation against any entity (including a
-    cross-claim or counterclaim in a lawsuit) alleging that the Work or a
-    Contribution incorporated within the Work constitutes direct or
-    contributory patent infringement, then any patent licenses granted to You
-    under this License for that Work shall terminate as of the date such
-    litigation is filed.
-
-4.  **Redistribution.** You may reproduce and distribute copies of the Work or
-    Derivative Works thereof in any medium, with or without modifications, and
-    in Source or Object form, provided that You meet the following conditions:
-
-    1.  You must give any other recipients of the Work or Derivative Works a
-        copy of this License; and
-
-    2.  You must cause any modified files to carry prominent notices stating
-        that You changed the files; and
-
-    3.  You must retain, in the Source form of any Derivative Works that You
-        distribute, all copyright, patent, trademark, and attribution notices
-        from the Source form of the Work, excluding those notices that do not
-        pertain to any part of the Derivative Works; and
-
-    4.  If the Work includes a "NOTICE" text file as part of its distribution,
-        then any Derivative Works that You distribute must include a readable
-        copy of the attribution notices contained within such NOTICE file,
-        excluding those notices that do not pertain to any part of the
-        Derivative Works, in at least one of the following places: within a
-        NOTICE text file distributed as part of the Derivative Works; within
-        the Source form or documentation, if provided along with the Derivative
-        Works; or, within a display generated by the Derivative Works, if and
-        wherever such third-party notices normally appear. The contents of the
-        NOTICE file are for informational purposes only and do not modify the
-        License. You may add Your own attribution notices within Derivative
-        Works that You distribute, alongside or as an addendum to the NOTICE
-        text from the Work, provided that such additional attribution notices
-        cannot be construed as modifying the License.
-
-        You may add Your own copyright statement to Your modifications and may
-        provide additional or different license terms and conditions for use,
-        reproduction, or distribution of Your modifications, or for any such
-        Derivative Works as a whole, provided Your use, reproduction, and
-        distribution of the Work otherwise complies with the conditions stated
-        in this License.
-
-5.  **Submission of Contributions.** Unless You explicitly state otherwise, any
-    Contribution intentionally submitted for inclusion in the Work by You to
-    the Licensor shall be under the terms and conditions of this License,
-    without any additional terms or conditions. Notwithstanding the above,
-    nothing herein shall supersede or modify the terms of any separate license
-    agreement you may have executed with Licensor regarding such Contributions.
-
-6.  **Trademarks.** This License does not grant permission to use the trade
-    names, trademarks, service marks, or product names of the Licensor, except
-    as required for reasonable and customary use in describing the origin of
-    the Work and reproducing the content of the NOTICE file.
-
-7.  **Disclaimer of Warranty.** Unless required by applicable law or agreed to
-    in writing, Licensor provides the Work (and each Contributor provides its
-    Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied, including, without limitation, any
-    warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or
-    FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
-    determining the appropriateness of using or redistributing the Work and
-    assume any risks associated with Your exercise of permissions under this
-    License.
-
-8.  **Limitation of Liability.** In no event and under no legal theory, whether
-    in tort (including negligence), contract, or otherwise, unless required by
-    applicable law (such as deliberate and grossly negligent acts) or agreed to
-    in writing, shall any Contributor be liable to You for damages, including
-    any direct, indirect, special, incidental, or consequential damages of any
-    character arising as a result of this License or out of the use or
-    inability to use the Work (including but not limited to damages for loss of
-    goodwill, work stoppage, computer failure or malfunction, or any and all
-    other commercial damages or losses), even if such Contributor has been
-    advised of the possibility of such damages.
-
-9.  **Accepting Warranty or Additional Liability.** While redistributing the
-    Work or Derivative Works thereof, You may choose to offer, and charge a fee
-    for, acceptance of support, warranty, indemnity, or other liability
-    obligations and/or rights consistent with this License. However, in
-    accepting such obligations, You may act only on Your own behalf and on Your
-    sole responsibility, not on behalf of any other Contributor, and only if
-    You agree to indemnify, defend, and hold each Contributor harmless for any
-    liability incurred by, or claims asserted against, such Contributor by
-    reason of your accepting any such warranty or additional liability.
-
-END OF TERMS AND CONDITIONS
-
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: gopkg.in/inf.v0
-Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+Dependency: google.golang.org/api/internal/third_party/uritemplates
+Version: v0.14.0
+Revision: 8a410c21381766a810817fd6200fce8838ecb277
 License type (autodetected): BSD-3-Clause
-./vendor/gopkg.in/inf.v0/LICENSE:
+./vendor/google.golang.org/api/internal/third_party/uritemplates/LICENSE:
 --------------------------------------------------------------------
-Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
-Authors. All rights reserved.
+Copyright (c) 2013 Joshua Tacoma. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -5781,10 +6816,67 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: google.golang.org/appengine
+Version: v1.6.1
+Revision: b2f4a3cf3c67576a2ee09e1fe62656a5086ce880
+License type (autodetected): Apache-2.0
+./vendor/google.golang.org/appengine/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/genproto
+Revision: 83cc0476cb11ea0da33dacd4c6354ab192de6fe6
+License type (autodetected): Apache-2.0
+./vendor/google.golang.org/genproto/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/grpc
+Version: v1.25.1
+Revision: 1a3960e4bd028ac0cec0a2afd27d7d8e67c11514
+License type (autodetected): Apache-2.0
+./vendor/google.golang.org/grpc/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/hjson/hjson-go.v3
+Revision: 8f44e1182a33737b57cb6855fe656ece998e9b3c
+License type (autodetected): MIT
+./vendor/gopkg.in/hjson/hjson-go.v3/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2016, 2017 Christian Zangl
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
-Revision: d2d2541c53f18d2a059457998ce2876cc8e67cbf
+Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/gopkg.in/inf.v0/LICENSE:
+./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 Authors. All rights reserved.
@@ -6120,6 +7212,34 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: pack.ag/amqp
+Revision: ddf76e6b06138e7e73606c99f40d6f21a02c0be5
+License type (autodetected): MIT
+./vendor/pack.ag/amqp/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (C) 2017 Kale Blankenship
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: sigs.k8s.io/yaml

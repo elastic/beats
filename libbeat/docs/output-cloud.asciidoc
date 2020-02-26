@@ -1,0 +1,50 @@
+[[configure-cloud-id]]
+=== Configure the output for the {ecloud}
+
+[subs="attributes"]
+++++
+<titleabbrev>{ecloud}</titleabbrev>
+++++
+
+ifdef::apm-server[]
+NOTE: This page refers to using a separate instance of APM Server with an existing
+https://www.elastic.co/cloud/elasticsearch-service[{ess} deployment].
+If you want to use APM on {ecloud}, see the cloud docs:
+{cloud}/ec-create-deployment.html[Create your deployment] or
+{cloud}/ec-manage-apm-settings.html[Add APM user settings].
+endif::apm-server[]
+
+{beatname_uc} comes with two settings that simplify the output configuration
+when used together with https://cloud.elastic.co/[{ecloud}]. When defined,
+these setting overwrite settings from other parts in the configuration.
+
+Example:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
+cloud.auth: "elastic:{pwd}"
+------------------------------------------------------------------------------
+
+These settings can be also specified at the command line, like this:
+
+
+["source","sh",subs="attributes"]
+------------------------------------------------------------------------------
+{beatname_lc} -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
+------------------------------------------------------------------------------
+
+
+==== `cloud.id`
+
+The Cloud ID, which can be found in the {ecloud} web console, is used by
+{beatname_uc} to resolve the {es} and {kib} URLs. This setting
+overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings.
+
+==== `cloud.auth`
+
+When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` and
+`output.elasticsearch.password` settings. Because the Kibana settings inherit
+the username and password from the {es} output, this can also be used
+to set the `setup.kibana.username` and `setup.kibana.password` options.
+

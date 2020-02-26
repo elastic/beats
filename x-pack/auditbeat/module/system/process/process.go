@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
@@ -98,7 +98,7 @@ type Process struct {
 
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(strconv.Itoa(p.Info.PID))
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()

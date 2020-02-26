@@ -21,6 +21,7 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/ecs/code/go/ecs"
@@ -95,6 +96,8 @@ func synthesizeFullURL(u *ecs.Url, port int64) string {
 	host := u.Domain
 	if port != 80 {
 		host = net.JoinHostPort(u.Domain, strconv.Itoa(int(u.Port)))
+	} else if strings.IndexByte(u.Domain, ':') != -1 {
+		host = "[" + u.Domain + "]"
 	}
 
 	urlBuilder := url.URL{

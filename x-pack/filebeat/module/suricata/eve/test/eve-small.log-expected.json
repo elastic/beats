@@ -116,7 +116,7 @@
         "user_agent.os.full": "Mac OS X 10.13.5",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.13.5",
-        "user_agent.version": "67.0.3396"
+        "user_agent.version": "67.0.3396.99"
     },
     {
         "@timestamp": "2018-07-05T19:44:33.222Z",
@@ -168,7 +168,7 @@
         "user_agent.os.full": "Mac OS X 10.13.5",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.13.5",
-        "user_agent.version": "67.0.3396"
+        "user_agent.version": "67.0.3396.99"
     },
     {
         "@timestamp": "2018-07-05T19:51:20.213Z",

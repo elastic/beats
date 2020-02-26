@@ -39,7 +39,7 @@
                 How long the exporter process has been running, in milliseconds.
 
             - name: version
-              type: long
+              type: integer
               description: >
                 NetFlow version used.
 
@@ -194,7 +194,7 @@
           type: long
 
         - name: class_id
-          type: short
+          type: long
 
         - name: minimum_ttl
           type: short
@@ -628,16 +628,16 @@
         - name: ip_total_length
           type: long
 
-        - name: post_nast_ource_ipv4_address
+        - name: post_nat_source_ipv4_address
           type: ip
 
-        - name: post_nadt_estination_ipv4_address
+        - name: post_nat_destination_ipv4_address
           type: ip
 
-        - name: post_napst_ource_transport_port
+        - name: post_napt_source_transport_port
           type: integer
 
-        - name: post_napdt_estination_transport_port
+        - name: post_napt_destination_transport_port
           type: integer
 
         - name: nat_originating_address_realm
@@ -796,10 +796,10 @@
         - name: connection_transaction_id
           type: long
 
-        - name: post_nast_ource_ipv6_address
+        - name: post_nat_source_ipv6_address
           type: ip
 
-        - name: post_nadt_estination_ipv6_address
+        - name: post_nat_destination_ipv6_address
           type: ip
 
         - name: nat_pool_id
@@ -925,10 +925,10 @@
         - name: digest_hash_value
           type: long
 
-        - name: hash_ipp_ayload_offset
+        - name: hash_ip_payload_offset
           type: long
 
-        - name: hash_ipp_ayload_size
+        - name: hash_ip_payload_size
           type: long
 
         - name: hash_output_range_min
@@ -952,10 +952,10 @@
         - name: selector_name
           type: keyword
 
-        - name: upper_cli_imit
+        - name: upper_ci_limit
           type: double
 
-        - name: lower_cli_imit
+        - name: lower_ci_limit
           type: double
 
         - name: confidence_level
@@ -1078,10 +1078,10 @@
         - name: original_flows_completed
           type: long
 
-        - name: distinct_count_of_sourc_eipa_ddress
+        - name: distinct_count_of_source_ip_address
           type: long
 
-        - name: distinct_count_of_destinatio_nipa_ddress
+        - name: distinct_count_of_destination_ip_address
           type: long
 
         - name: distinct_count_of_source_ipv4_address
@@ -1126,10 +1126,10 @@
         - name: flow_selected_flow_delta_count
           type: long
 
-        - name: selector_itd_otal_flows_observed
+        - name: selector_id_total_flows_observed
           type: long
 
-        - name: selector_itd_otal_flows_selected
+        - name: selector_id_total_flows_selected
           type: long
 
         - name: sampling_flow_interval
@@ -1252,7 +1252,7 @@
         - name: mib_object_value_bits
           type: short
 
-        - name: mib_object_valuei_pa_ddress
+        - name: mib_object_value_ip_address
           type: ip
 
         - name: mib_object_value_counter
@@ -1348,7 +1348,7 @@
         - name: max_session_entries
           type: long
 
-        - name: max_bieb_ntries
+        - name: max_bib_entries
           type: long
 
         - name: max_entries_per_user

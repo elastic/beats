@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  jolokia:
+    image: docker.elastic.co/integrations-ci/beats-jolokia:${JOLOKIA_VERSION:-1.5.0}-1
+    build:
+      context: ./_meta
+      args:
+        JOLOKIA_VERSION: ${JOLOKIA_VERSION:-1.5.0}
+    ports:
+      - 8778

@@ -14,47 +14,57 @@ import (
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
 )
 
-type SessionKey string
-
-func MakeSessionKey(addr net.Addr) SessionKey {
-	return SessionKey(addr.String())
+// SessionKey is the key used to lookup sessions: exporter address + port
+// + source ID.
+type SessionKey struct {
+	Addr     string
+	SourceID uint32
 }
 
-type TemplateKey struct {
-	SourceID   uint32
-	TemplateID uint16
+// MakeSessionKey returns a session key.
+func MakeSessionKey(addr net.Addr, sourceID uint32) SessionKey {
+	return SessionKey{addr.String(), sourceID}
 }
 
+// TemplateKey is the type of key used to lookup templates.
+type TemplateKey uint16
+
+// TemplateWrapper wraps a template with an expiration flag.
 type TemplateWrapper struct {
 	Template *template.Template
 	Delete   atomic.Bool
 }
 
+// SessionState holds the state for a single session (observation domain).
 type SessionState struct {
 	mutex        sync.RWMutex
 	Templates    map[TemplateKey]*TemplateWrapper
 	lastSequence uint32
+	logger       *log.Logger
 	Delete       atomic.Bool
 }
 
-func NewSession() *SessionState {
+// NewSession creates a new session.
+func NewSession(logger *log.Logger) *SessionState {
 	return &SessionState{
+		logger:    logger,
 		Templates: make(map[TemplateKey]*TemplateWrapper),
 	}
 }
 
-func (s *SessionState) AddTemplate(sourceId uint32, t *template.Template) {
-	key := TemplateKey{sourceId, t.ID}
+// AddTemplate adds the passed template.
+func (s *SessionState) AddTemplate(t *template.Template) {
+	s.logger.Printf("state %p addTemplate %d %p", s, t.ID, t)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	s.Templates[key] = &TemplateWrapper{Template: t}
+	s.Templates[TemplateKey(t.ID)] = &TemplateWrapper{Template: t}
 }
 
-func (s *SessionState) GetTemplate(sourceId uint32, id uint16) (template *template.Template) {
-	key := TemplateKey{sourceId, id}
+// GetTemplate returns a template by ID.
+func (s *SessionState) GetTemplate(id uint16) (template *template.Template) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	wrapper, found := s.Templates[key]
+	wrapper, found := s.Templates[TemplateKey(id)]
 	if found {
 		template = wrapper.Template
 		wrapper.Delete.Store(false)
@@ -62,6 +72,8 @@ func (s *SessionState) GetTemplate(sourceId uint32, id uint16) (template *templa
 	return template
 }
 
+// ExpireTemplates will remove those templates that have not been used
+// since the last call to ExpireTemplates.
 func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	var toDelete []TemplateKey
 	s.mutex.RLock()
@@ -77,6 +89,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 		total = len(s.Templates)
 		for _, id := range toDelete {
 			if template, found := s.Templates[id]; found && template.Delete.Load() {
+				s.logger.Printf("expired template %v", id)
 				delete(s.Templates, id)
 				removed++
 			}
@@ -86,27 +99,40 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	return total - removed, removed
 }
 
-func (s *SessionState) CheckReset(seqNum uint32) (reset bool) {
+// CheckReset returns if the session must be reset after the receipt of the
+// given sequence number.
+func (s *SessionState) CheckReset(seqNum uint32) (prev uint32, reset bool) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if reset = seqNum < s.lastSequence && seqNum-s.lastSequence > MaxSequenceDifference; reset {
+	prev = s.lastSequence
+	if reset = !isValidSequence(prev, seqNum); reset {
 		s.Templates = make(map[TemplateKey]*TemplateWrapper)
 	}
 	s.lastSequence = seqNum
 	return
 }
 
+func isValidSequence(current, next uint32) bool {
+	return next-current < MaxSequenceDifference || current-next < MaxSequenceDifference
+}
+
+// SessionMap manages all the sessions for a collector.
 type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
+	logger   *log.Logger
 }
 
-func NewSessionMap() SessionMap {
+// NewSessionMap returns a new SessionMap.
+func NewSessionMap(logger *log.Logger) SessionMap {
 	return SessionMap{
+		logger:   logger,
 		Sessions: make(map[SessionKey]*SessionState),
 	}
 }
 
+// GetOrCreate looks up the given session key and returns an existing session
+// or creates a new one.
 func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 	m.mutex.RLock()
 	session, found := m.Sessions[key]
@@ -117,7 +143,7 @@ func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 	if !found {
 		m.mutex.Lock()
 		if session, found = m.Sessions[key]; !found {
-			session = NewSession()
+			session = NewSession(m.logger)
 			m.Sessions[key] = session
 		}
 		m.mutex.Unlock()
@@ -152,7 +178,9 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 	return total - removedSession, removedSession, aliveTemplates, removedTemplates
 }
 
-func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}, logger *log.Logger) {
+// CleanupLoop will expire the sessions that have been inactive for the given
+// interval.
+func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 	t := time.NewTicker(interval)
 	defer t.Stop()
 	for {
@@ -162,9 +190,8 @@ func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}, l
 
 		case <-t.C:
 			aliveS, removedS, aliveT, removedT := m.cleanup()
-			m.cleanup()
 			if removedS > 0 || removedT > 0 {
-				logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
+				m.logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
 			}
 		}
 	}

@@ -1,0 +1,15 @@
+{
+    "cluster_id": "nats-smp",
+    "server_id": "drE5wVcRP3jvBrUbu2i48E",
+    "version": "0.11.2",
+    "go": "go1.11.1",
+    "state": "STANDALONE",
+    "now": "2019-07-26T21:04:58.54617639Z",
+    "start_time": "2019-07-23T18:14:58.113267661Z",
+    "uptime": "3d2h50m0s",
+    "clients": 52,
+    "subscriptions": 109,
+    "channels": 55,
+    "total_msgs": 101,
+    "total_bytes": 27473416
+  }

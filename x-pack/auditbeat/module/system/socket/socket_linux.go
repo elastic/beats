@@ -7,6 +7,7 @@
 package socket
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strconv"
@@ -28,6 +29,10 @@ import (
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/providers/linux"
+
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
+	// Register dns capture implementations
+	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns/afpacket"
 )
 
 const (
@@ -59,6 +64,7 @@ type MetricSet struct {
 	log          *logp.Logger
 	detailLog    *logp.Logger
 	installer    helper.ProbeInstaller
+	sniffer      dns.Sniffer
 	perfChannel  *tracing.PerfChannel
 	mountedFS    *mountPoint
 	isDebug      bool
@@ -84,15 +90,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %s config", fullName)
 	}
+	logger := logp.NewLogger(metricsetName)
+	sniffer, err := dns.NewSniffer(base, logger)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create DNS sniffer")
+	}
 
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		templateVars:    make(common.MapStr),
 		config:          config,
-		log:             logp.NewLogger(metricsetName),
+		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),
 		detailLog:       logp.NewLogger(detailSelector),
-		isDetailed:      logp.IsDebug(detailSelector),
+		isDetailed:      logp.HasSelector(detailSelector),
+		sniffer:         sniffer,
 	}
 
 	// Setup the metricset before Run() so that startup can be halted in case of
@@ -108,6 +120,25 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	defer m.log.Infof("%s terminated.", fullName)
 	defer m.Cleanup()
 
+	st := NewState(r,
+		m.log,
+		m.config.FlowInactiveTimeout,
+		m.config.FlowTerminationTimeout,
+		m.config.ClockMaxDrift)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if err := m.sniffer.Monitor(ctx, func(tr dns.Transaction) {
+		if err := st.OnDNSTransaction(tr); err != nil {
+			m.log.Errorf("Unable to store DNS transaction %+v: %v", tr, err)
+		}
+	}); err != nil {
+		err = errors.Wrap(err, "unable to start DNS sniffer")
+		r.Error(err)
+		m.log.Error(err)
+		return
+	}
+
 	if err := m.perfChannel.Run(); err != nil {
 		err = errors.Wrap(err, "unable to start perf channel")
 		r.Error(err)
@@ -116,11 +147,6 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	}
 	// Launch the clock-synchronization ticker.
 	go m.clockSyncLoop(m.config.ClockSyncPeriod, r.Done())
-	st := NewState(r,
-		m.log,
-		m.config.FlowInactiveTimeout,
-		m.config.FlowTerminationTimeout,
-		m.config.ClockMaxDrift)
 
 	if procs, err := sysinfo.Processes(); err != nil {
 		m.log.Error("Failed to bootstrap process table using /proc", err)
@@ -173,8 +199,11 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			if m.isDetailed {
 				m.detailLog.Debug(v.String())
 			}
-			if err := v.Update(st); err != nil {
-				m.log.Infof("error processing event '%s': %v", v.String(), err)
+			if err := v.Update(st); err != nil && m.isDetailed {
+				// These errors are seldom interesting, as the flow state engine
+				// doesn't have many error conditions and all benign enough to
+				// not be worth logging them by default.
+				m.detailLog.Warnf("Issue while processing event '%s': %v", v.String(), err)
 			}
 			atomic.AddUint64(&eventCount, 1)
 
@@ -239,7 +268,8 @@ func (m *MetricSet) Setup() (err error) {
 
 	hasIPv6, err := detectIPv6()
 	if err != nil {
-		return errors.Wrap(err, "error detecting IPv6 support")
+		m.log.Debugf("Error detecting IPv6 support: %v", err)
+		hasIPv6 = false
 	}
 	m.log.Debugf("IPv6 supported: %v", hasIPv6)
 	if m.config.EnableIPv6 != nil {
@@ -329,7 +359,7 @@ func (m *MetricSet) Setup() (err error) {
 		return errors.Wrap(err, "unable to guess one or more required parameters")
 	}
 
-	if m.isDetailed {
+	if m.isDebug {
 		names := make([]string, 0, len(m.templateVars))
 		for name := range m.templateVars {
 			names = append(names, name)
@@ -337,7 +367,7 @@ func (m *MetricSet) Setup() (err error) {
 		sort.Strings(names)
 		m.log.Debugf("%d template variables in use:", len(m.templateVars))
 		for _, key := range names {
-			m.detailLog.Debugf("  %s = %v", key, m.templateVars[key])
+			m.log.Debugf("  %s = %v", key, m.templateVars[key])
 		}
 	}
 
@@ -459,6 +489,13 @@ func (m *mountPoint) String() string {
 }
 
 func detectIPv6() (bool, error) {
+	// Check that AF_INET6 is available.
+	// This fails when the kernel is booted with ipv6.disable=1
+	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, 0)
+	if err != nil {
+		return false, nil
+	}
+	unix.Close(fd)
 	loopback, err := helper.NewIPv6Loopback()
 	if err != nil {
 		return false, err

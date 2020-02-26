@@ -57,6 +57,30 @@
               type: integer
               description: >
                 Number of TCP connections in _time_wait_ state
+            - name: syn_sent
+              type: integer
+              description: >
+                Number of TCP connections in _syn_sent_ state
+            - name: syn_recv
+              type: integer
+              description: >
+                Number of TCP connections in _syn_recv_ state
+            - name: fin_wait1
+              type: integer
+              description: >
+                Number of TCP connections in _fin_wait1_ state
+            - name: fin_wait2
+              type: integer
+              description: >
+                Number of TCP connections in _fin_wait2_ state
+            - name: last_ack
+              type: integer
+              description: >
+                Number of TCP connections in _last_ack_ state
+            - name: closing
+              type: integer
+              description: >
+                Number of TCP connections in _closing_ state
     - name: udp
       type: group
       description: >

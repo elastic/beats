@@ -1,0 +1,81 @@
+{
+  "description": "Pipeline for normalizing Zeek kerberos.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.kerberos.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.kerberos.ts"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "client.address",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "server.address",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.zeek.kerberos.valid.days = Math.round( (ctx.zeek.kerberos.valid.until - ctx.zeek.kerberos.valid.from) / 86400 )",
+        "if": "ctx.zeek.kerberos.valid?.from != null && ctx.zeek.kerberos.valid?.until != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.kerberos.valid.until",
+        "target_field": "zeek.kerberos.valid.until",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.kerberos.valid?.until != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.kerberos.valid.from",
+        "target_field": "zeek.kerberos.valid.from",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.kerberos.valid?.from != null"
+      }
+    }
+  ],
+  "on_failure": [{
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

@@ -64,7 +64,7 @@ If this option is set to true, the custom
 <<{beatname_lc}-input-{type}-fields,fields>> are stored as top-level fields in
 the output document instead of being grouped under a `fields` sub-dictionary. If
 the custom field names conflict with other field names added by {beatname_uc},
-then the custom fields overwrite the other fields. 
+then the custom fields overwrite the other fields.
 
 [float]
 ===== `processors`
@@ -84,3 +84,20 @@ this option usually results in simpler configuration files. If the pipeline is
 configured both in the input and output, the option from the
 input is used.
 
+[float]
+===== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
+===== `index`
+
+If present, this formatted string overrides the index for events from this input
+(for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"filebeat-myindex-2019.11.01"`.

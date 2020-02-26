@@ -1,3 +1,4 @@
+[[prometheus-module]]
 This module periodically scrapes metrics from
 https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
 

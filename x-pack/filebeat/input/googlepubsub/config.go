@@ -4,7 +4,9 @@
 
 package googlepubsub
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 type config struct {
 	// Google Cloud project name.

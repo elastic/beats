@@ -88,6 +88,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("e"))
+	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))

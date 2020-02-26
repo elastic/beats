@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -32,7 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -133,11 +131,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		moduleRegistry: moduleRegistry,
 	}
 
-	// register `setup` callback for ML jobs
-	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
-		return fb.loadModulesML(b, kibanaConfig)
-	}
-
 	err = fb.setupPipelineLoaderCallback(b)
 	if err != nil {
 		return nil, err
@@ -197,92 +190,6 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	return err
 }
 
-func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
-	var errs multierror.Errors
-
-	logp.Debug("machine-learning", "Setting up ML jobs for modules")
-
-	if b.Config.Output.Name() != "elasticsearch" {
-		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
-			" modules because the Elasticsearch output is not configured/enabled.")
-		return nil
-	}
-
-	esConfig := b.Config.Output.Config()
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
-	if err != nil {
-		return errors.Errorf("Error creating Elasticsearch client: %v", err)
-	}
-
-	if kibanaConfig == nil {
-		kibanaConfig = common.NewConfig()
-	}
-
-	if esConfig.Enabled() {
-		username, _ := esConfig.String("username", -1)
-		password, _ := esConfig.String("password", -1)
-
-		if !kibanaConfig.HasField("username") && username != "" {
-			kibanaConfig.SetString("username", -1, username)
-		}
-		if !kibanaConfig.HasField("password") && password != "" {
-			kibanaConfig.SetString("password", -1, password)
-		}
-	}
-
-	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
-	if err != nil {
-		return errors.Errorf("Error creating Kibana client: %v", err)
-	}
-
-	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient); err != nil {
-		errs = append(errs, err)
-	}
-
-	// Add dynamic modules.d
-	if fb.config.ConfigModules.Enabled() {
-		config := cfgfile.DefaultDynamicConfig
-		fb.config.ConfigModules.Unpack(&config)
-
-		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
-		if err != nil {
-			return errors.Wrap(err, "initialization error")
-		}
-
-		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
-			if err != nil {
-				errs = append(errs, errors.Wrap(err, "error loading config file"))
-				continue
-			}
-			set, err := fileset.NewModuleRegistry(confs, "", false)
-			if err != nil {
-				errs = append(errs, err)
-				continue
-			}
-
-			if err := setupMLBasedOnVersion(set, esClient, kibanaClient); err != nil {
-				errs = append(errs, err)
-			}
-
-		}
-	}
-
-	return errs.Err()
-}
-
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client) error {
-	if isElasticsearchLoads(kibanaClient.GetVersion()) {
-		return reg.LoadML(esClient)
-	}
-	return reg.SetupML(esClient, kibanaClient)
-}
-
-func isElasticsearchLoads(kibanaVersion common.Version) bool {
-	return kibanaVersion.Major < 6 ||
-		(kibanaVersion.Major == 6 && kibanaVersion.Minor < 1)
-}
-
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
@@ -326,7 +233,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
-		channel.NewOutletFactory(outDone, wgEvents).Create,
+		channel.NewOutletFactory(outDone, wgEvents, b.Info).Create,
 		config.Inputs,
 		b.Info.Version,
 		fb.done,

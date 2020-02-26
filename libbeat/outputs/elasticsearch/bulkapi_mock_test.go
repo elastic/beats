@@ -20,7 +20,6 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -34,7 +33,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", ID: "1", Version: 1, Created: true})
+	expectedResp := []byte(`{"took":7,"errors":false,"items":[]}`)
 
 	ops := []map[string]interface{}{
 		{
@@ -61,12 +60,9 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Bulk(index, "type1", params, body)
+	_, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
-	}
-	if !resp.Created {
-		t.Errorf("Bulk() fails: %s", resp)
 	}
 }
 

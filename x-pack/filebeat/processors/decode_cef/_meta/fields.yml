@@ -49,15 +49,679 @@
             Short description of the event.
 
         - name: extensions
-          type: object
-          object_type: keyword
+          type: group
           description: >
             Collection of key-value pairs carried in the CEF extension field.
+          default_field: false
+          fields:
+            - name: agentAddress
+              type: ip
+              description: The IP address of the ArcSight connector that processed the event.
 
-    - name: observer.product
-      type: keyword
-      description:
-        Product name.
+            - name: agentDnsDomain
+              type: keyword
+              description: The DNS domain name of the ArcSight connector that processed the event.
+
+            - name: agentHostName
+              type: keyword
+              description: The hostname of the ArcSight connector that processed the event.
+
+            - name: agentId
+              type: keyword
+              description: The agent ID of the ArcSight connector that processed the event.
+
+            - name: agentMacAddress
+              type: keyword
+              description: The MAC address of the ArcSight connector that processed the event.
+
+            - name: agentNtDomain
+              type: keyword
+              description:
+
+            - name: agentReceiptTime
+              type: date
+              description: The time at which information about the event was received by the ArcSight connector.
+
+            - name: agentTimeZone
+              type: keyword
+              description: The agent time zone of the ArcSight connector that processed the event.
+
+            - name: agentTranslatedAddress
+              type: ip
+              description:
+
+            - name: agentTranslatedZoneExternalID
+              type: keyword
+              description:
+
+            - name: agentTranslatedZoneURI
+              type: keyword
+              description:
+
+            - name: agentType
+              type: keyword
+              description: The agent type of the ArcSight connector that processed the event
+
+            - name: agentVersion
+              type: keyword
+              description: The version of the ArcSight connector that processed the event.
+
+            - name: agentZoneExternalID
+              type: keyword
+              description:
+
+            - name: agentZoneURI
+              type: keyword
+              description:
+
+            - name: applicationProtocol
+              type: keyword
+              description: Application level protocol, example values are HTTP, HTTPS, SSHv2, Telnet, POP, IMPA, IMAPS, and so on.
+
+            - name: baseEventCount
+              type: long
+              description: A count associated with this event. How many times was this same event observed? Count can be omitted if it is 1.
+
+            - name: bytesIn
+              type: long
+              description: Number of bytes transferred inbound, relative to the source to destination relationship, meaning that data was flowing from source to destination.
+
+            - name: bytesOut
+              type: long
+              description: Number of bytes transferred outbound relative to the source to destination relationship. For example, the byte number of data flowing from the destination to the source.
+
+            - name: customerExternalID
+              type: keyword
+              description:
+
+            - name: customerURI
+              type: keyword
+              description:
+
+            - name: destinationAddress
+              type: ip
+              description: Identifies the destination address that the event refers to in an IP network. The format is an IPv4 address.
+
+            - name: destinationDnsDomain
+              type: keyword
+              description: The DNS domain part of the complete fully qualified domain name (FQDN).
+
+            - name: destinationGeoLatitude
+              type: double
+              description: The latitudinal value from which the destination's IP address belongs.
+
+            - name: destinationGeoLongitude
+              type: double
+              description: The longitudinal value from which the destination's IP address belongs.
+
+            - name: destinationHostName
+              type: keyword
+              description: Identifies the destination that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the destination node, when a node is available.
+
+            - name: destinationMacAddress
+              type: keyword
+              description: Six colon-seperated hexadecimal numbers.
+
+            - name: destinationNtDomain
+              type: keyword
+              description: The Windows domain name of the destination address.
+
+            - name: destinationPort
+              type: long
+              description: The valid port numbers are between 0 and 65535.
+
+            - name: destinationProcessId
+              type: long
+              description: Provides the ID of the destination process associated with the event. For example, if an event contains process ID 105, "105" is the process ID.
+
+            - name: destinationProcessName
+              type: keyword
+              description: The name of the event's destination process.
+
+            - name: destinationServiceName
+              type: keyword
+              description: The service targeted by this event.
+
+            - name: destinationTranslatedAddress
+              type: ip
+              description: Identifies the translated destination that the event refers to in an IP network.
+
+            - name: destinationTranslatedPort
+              type: long
+              description: Port after it was translated; for example, a firewall. Valid port numbers are 0 to 65535.
+
+            - name: destinationTranslatedZoneExternalID
+              type: keyword
+              description:
+
+            - name: destinationTranslatedZoneURI
+              type: keyword
+              description: The URI for the Translated Zone that the destination asset has been assigned to in ArcSight.
+
+            - name: destinationUserId
+              type: keyword
+              description: Identifies the destination user by ID. For example, in UNIX, the root user is generally associated with user ID 0.
+
+            - name: destinationUserName
+              type: keyword
+              description: Identifies the destination user by name. This is the user associated with the event's destination. Email addresses are often mapped into the UserName fields. The recipient is a candidate to put into this field.
+
+            - name: destinationUserPrivileges
+              type: keyword
+              description: The typical values are "Administrator", "User", and "Guest". This identifies the destination user's privileges. In UNIX, for example, activity executed on the root user would be identified with destinationUser Privileges of "Administrator".
+
+            - name: destinationZoneExternalID
+              type: keyword
+              description:
+
+            - name: destinationZoneURI
+              type: keyword
+              description: The URI for the Zone that the destination asset has been assigned to in ArcSight.
+
+            - name: deviceAction
+              type: keyword
+              description: Action taken by the device.
+
+            - name: deviceAddress
+              type: ip
+              description: Identifies the device address that an event refers to in an IP network.
+
+            - name: deviceCustomFloatingPoint1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomFloatingPoint3Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomFloatingPoint4Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomDate1
+              type: date
+              description: One of two timestamp fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomDate1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomDate2
+              type: date
+              description: One of two timestamp fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomDate2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomFloatingPoint1
+              type: double
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomFloatingPoint2
+              type: double
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomFloatingPoint2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomFloatingPoint3
+              type: double
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomFloatingPoint4
+              type: double
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomIPv6Address4
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address4Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomIPv6Address1
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address3
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address3Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomNumber1
+              type: long
+              description: One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomNumber1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: DeviceCustomNumber2
+              type: long
+              description: One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomNumber2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomNumber3
+              type: long
+              description: One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomNumber3Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString1
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString2
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString3
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString3Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString4
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString4Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString5
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString5Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomString6
+              type: keyword
+              description: One of six strings available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceCustomString6Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceDirection
+              type: long
+              description: Any information about what direction the observed communication has taken. The following values are supported - "0" for inbound or "1" for outbound.
+
+            - name: deviceDnsDomain
+              type: keyword
+              description: The DNS domain part of the complete fully qualified domain name (FQDN).
+
+            - name: deviceEventCategory
+              type: keyword
+              description: Represents the category assigned by the originating device. Devices often use their own categorization schema to classify event. Example "/Monitor/Disk/Read".
+
+            - name: deviceExternalId
+              type: keyword
+              description: A name that uniquely identifies the device generating this event.
+
+            - name: deviceFacility
+              type: keyword
+              description: The facility generating this event. For example, Syslog has an explicit facility associated with every event.
+
+            - name: deviceHostName
+              type: keyword
+              description: The format should be a fully qualified domain name (FQDN) associated with the device node, when a node is available.
+
+            - name: deviceInboundInterface
+              type: keyword
+              description: Interface on which the packet or data entered the device.
+
+            - name: deviceMacAddress
+              type: keyword
+              description: Six colon-separated hexadecimal numbers.
+
+            - name: deviceNtDomain
+              type: keyword
+              description: The Windows domain name of the device address.
+
+            - name: deviceOutboundInterface
+              type: keyword
+              description: Interface on which the packet or data left the device.
+
+            - name: devicePayloadId
+              type: keyword
+              description: Unique identifier for the payload associated with the event.
+
+            - name: deviceProcessId
+              type: long
+              description: Provides the ID of the process on the device generating the event.
+
+            - name: deviceProcessName
+              type: keyword
+              description: Process name associated with the event. An example might be the process generating the syslog entry in UNIX.
+
+            - name: deviceReceiptTime
+              type: date
+              description: The time at which the event related to the activity was received. The format is MMM dd yyyy HH:mm:ss or milliseconds since epoch (Jan 1st 1970)
+
+            - name: deviceTimeZone
+              type: keyword
+              description: The timezone for the device generating the event.
+
+            - name: deviceTranslatedAddress
+              type: ip
+              description: Identifies the translated device address that the event refers to in an IP network.
+
+            - name: deviceTranslatedZoneExternalID
+              type: keyword
+              description:
+
+            - name: deviceTranslatedZoneURI
+              type: keyword
+              description: The URI for the Translated Zone that the device asset has been assigned to in ArcSight.
+
+            - name: deviceZoneExternalID
+              type: keyword
+              description:
+
+            - name: deviceZoneURI
+              type: keyword
+              description: Thee URI for the Zone that the device asset has been assigned to in ArcSight.
+
+            - name: endTime
+              type: date
+              description: The time at which the activity related to the event ended. The format is MMM dd yyyy HH:mm:ss or milliseconds since epoch (Jan 1st1970). An example would be reporting the end of a session.
+
+            - name: eventId
+              type: long
+              description: This is a unique ID that ArcSight assigns to each event.
+
+            - name: eventOutcome
+              type: keyword
+              description: Displays the outcome, usually as 'success' or 'failure'.
+
+            - name: externalId
+              type: keyword
+              description: The ID used by an originating device. They are usually increasing numbers, associated with events.
+
+            - name: fileCreateTime
+              type: date
+              description: Time when the file was created.
+
+            - name: fileHash
+              type: keyword
+              description: Hash of a file.
+
+            - name: fileId
+              type: keyword
+              description: An ID associated with a file could be the inode.
+
+            - name: fileModificationTime
+              type: date
+              description: Time when the file was last modified.
+
+            - name: filename
+              type: keyword
+              description: Name of the file only (without its path).
+
+            - name: filePath
+              type: keyword
+              description: Full path to the file, including file name itself.
+
+            - name: filePermission
+              type: keyword
+              description: Permissions of the file.
+
+            - name: fileSize
+              type: long
+              description: Size of the file.
+
+            - name: fileType
+              type: keyword
+              description: Type of file (pipe, socket, etc.)
+
+            - name: flexDate1
+              type: date
+              description: A timestamp field available to map a timestamp that does not apply to any other defined timestamp field in this dictionary. Use all flex fields sparingly and seek a more specific, dictionary supplied field when possible. These fields are typically reserved for customer use and should not be set by vendors unless necessary.
+
+            - name: flexDate1Label
+              type: keyword
+              description: The label field is a string and describes the purpose of the flex field.
+
+            - name: flexString1
+              type: keyword
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible. These fields are typically reserved for customer use and should not be set by vendors unless necessary.
+
+            - name: flexString2
+              type: keyword
+              description: One of four floating point fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible. These fields are typically reserved for customer use and should not be set by vendors unless necessary.
+
+            - name: flexString1Label
+              type: keyword
+              description: The label field is a string and describes the purpose of the flex field.
+
+            - name: flexString2Label
+              type: keyword
+              description: The label field is a string and describes the purpose of the flex field.
+
+            - name: message
+              type: keyword
+              description: An arbitrary message giving more details about the event. Multi-line entries can be produced by using \n as the new line separator.
+
+            - name: oldFileCreateTime
+              type: date
+              description: Time when old file was created.
+
+            - name: oldFileHash
+              type: keyword
+              description: Hash of the old file.
+
+            - name: oldFileId
+              type: keyword
+              description: An ID associated with the old file could be the inode.
+
+            - name: oldFileModificationTime
+              type: date
+              description: Time when old file was last modified.
+
+            - name: oldFileName
+              type: keyword
+              description: Name of the old file.
+
+            - name: oldFilePath
+              type: keyword
+              description: Full path to the old file, including the file name itself.
+
+            - name: oldFilePermission
+              type: keyword
+              description: Permissions of the old file.
+
+            - name: oldFileSize
+              type: long
+              description: Size of the old file.
+
+            - name: oldFileType
+              type: keyword
+              description: Type of the old file (pipe, socket, etc.)
+
+            - name: rawEvent
+              type: keyword
+              description:
+
+            - name: Reason
+              type: keyword
+              description: The reason an audit event was generated. For example "bad password" or "unknown user". This could also be an error or return code. Example "0x1234".
+
+            - name: requestClientApplication
+              type: keyword
+              description: The User-Agent associated with the request.
+
+            - name: requestContext
+              type: keyword
+              description: Description of the content from which the request originated (for example, HTTP Referrer)
+
+            - name: requestCookies
+              type: keyword
+              description: Cookies associated with the request.
+
+            - name: requestMethod
+              type: keyword
+              description: The HTTP method used to access a URL.
+
+            - name: requestUrl
+              type: keyword
+              description: In the case of an HTTP request, this field contains the URL accessed. The URL should contain the protocol as well.
+
+            - name: sourceAddress
+              type: ip
+              description: Identifies the source that an event refers to in an IP network.
+
+            - name: sourceDnsDomain
+              type: keyword
+              description: The DNS domain part of the complete fully qualified domain name (FQDN).
+
+            - name: sourceGeoLatitude
+              type: double
+              description:
+
+            - name: sourceGeoLongitude
+              type: double
+              description:
+
+            - name: sourceHostName
+              type: keyword
+              description: >
+                Identifies the source that an event refers to in an IP network.
+                The format should be a fully qualified domain name (FQDN) associated with the source node, when a
+                mode is available. Examples: 'host' or 'host.domain.com'.
+
+            - name: sourceMacAddress
+              type: keyword
+              example: "00:0d:60:af:1b:61"
+              description: Six colon-separated hexadecimal numbers.
+
+            - name: sourceNtDomain
+              type: keyword
+              description: The Windows domain name for the source address.
+
+            - name: sourcePort
+              type: long
+              description: The valid port numbers are 0 to 65535.
+
+            - name: sourceProcessId
+              type: long
+              description: The ID of the source process associated with the event.
+
+            - name: sourceProcessName
+              type: keyword
+              description: The name of the event's source process.
+
+            - name: sourceServiceName
+              type: keyword
+              description: The service that is responsible for generating this event.
+
+            - name: sourceTranslatedAddress
+              type: ip
+              description: Identifies the translated source that the event refers to in an IP network.
+
+            - name: sourceTranslatedPort
+              type: long
+              description: A port number after being translated by, for example, a firewall. Valid port numbers are 0 to 65535.
+
+            - name: sourceTranslatedZoneExternalID
+              type: keyword
+              description:
+
+            - name: sourceTranslatedZoneURI
+              type: keyword
+              description: The URI for the Translated Zone that the destination asset has been assigned to in ArcSight.
+
+            - name: sourceUserId
+              type: keyword
+              description: Identifies the source user by ID. This is the user associated with the source of the event. For example, in UNIX, the root user is generally associated with user ID 0.
+
+            - name: sourceUserName
+              type: keyword
+              description: Identifies the source user by name. Email addresses are also mapped into the UserName fields. The sender is a candidate to put into this field.
+
+            - name: sourceUserPrivileges
+              type: keyword
+              description: The typical values are "Administrator", "User", and "Guest". It identifies the source user's privileges. In UNIX, for example, activity executed by the root user would be identified with "Administrator".
+
+            - name: sourceZoneExternalID
+              type: keyword
+              description:
+
+            - name: sourceZoneURI
+              type: keyword
+              description: The URI for the Zone that the source asset has been assigned to in ArcSight.
+
+            - name: startTime
+              type: date
+              description: The time when the activity the event referred to started. The format is MMM dd yyyy HH:mm:ss or milliseconds since epoch (Jan 1st 1970)
+
+            - name: transportProtocol
+              type: keyword
+              description: Identifies the Layer-4 protocol used. The possible values are protocols such as TCP or UDP.
+
+            - name: type
+              type: long
+              description: 0 means base event, 1 means aggregated, 2 means correlation, and 3 means action. This field can be omitted for base events (type 0).
+
+            # ArcSight fields.
+            - name: categoryDeviceType
+              type: keyword
+              description: Device type. Examples - Proxy, IDS, Web Server
+
+            - name: categoryObject
+              type: keyword
+              description: Object that the event is about. For example it can be an operating sytem, database, file, etc.
+
+            - name: categoryBehavior
+              type: keyword
+              description: Action or a behavior associated with an event. It's what is being done to the object.
+
+            - name: categoryTechnique
+              type: keyword
+              description: Technique being used (e.g. /DoS).
+
+            - name: categoryDeviceGroup
+              type: keyword
+              description: General device group like Firewall.
+
+            - name: categorySignificance
+              type: keyword
+              description: Characterization of the importance of the event.
+
+            - name: categoryOutcome
+              type: keyword
+              description: Outcome of the event (e.g. sucess, failure, or attempt).
+
+            - name: managerReceiptTime
+              type: date
+              description: When the Arcsight ESM received the event.
 
     - name: source.service.name
       type: keyword

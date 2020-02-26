@@ -50,6 +50,7 @@ var (
 			"select": c.Float("SelectLatency"),
 			"update": c.Float("UpdateLatency"),
 			"write":  c.Float("WriteLatency"),
+			"delete": c.Float("DeleteLatency"),
 		},
 		"replica_lag.sec": c.Float("ReplicaLag"),
 		"disk_usage": s.Object{
@@ -69,5 +70,40 @@ var (
 			"blocked": c.Float("BlockedTransactions"),
 		},
 		"login_failures": c.Float("LoginFailures"),
+
+		"db_instance.identifier":            c.Str("DBInstanceIdentifier"),
+		"db_instance.db_cluster_identifier": c.Str("DBClusterIdentifier"),
+		"db_instance.class":                 c.Str("DatabaseClass"),
+		"db_instance.role":                  c.Str("Role"),
+		"db_instance.engine_name":           c.Str("EngineName"),
+
+		"aurora_bin_log_replica_lag": c.Float("AuroraBinlogReplicaLag"),
+
+		"aurora_global_db.replicated_write_io.bytes": c.Float("AuroraGlobalDBReplicatedWriteIO"),
+		"aurora_global_db.data_transfer.bytes":       c.Float("AuroraGlobalDBDataTransferBytes"),
+		"aurora_global_db.replication_lag.ms":        c.Float("AuroraGlobalDBReplicationLag"),
+
+		"aurora_replica.lag.ms":     c.Float("AuroraReplicaLag"),
+		"aurora_replica.lag_max.ms": c.Float("AuroraReplicaLagMaximum"),
+		"aurora_replica.lag_min.ms": c.Float("AuroraReplicaLagMinimum"),
+
+		"backtrack_change_records.creation_rate": c.Float("BacktrackChangeRecordsCreationRate"),
+		"backtrack_change_records.stored":        c.Float("BacktrackChangeRecordsStored"),
+
+		"backtrack_window.actual": c.Float("BacktrackWindowActual"),
+		"backtrack_window.alert":  c.Float("BacktrackWindowAlert"),
+
+		"storage_used.backup_retention_period.bytes": c.Float("BackupRetentionPeriodStorageUsed"),
+		"storage_used.snapshot.bytes":                c.Float("SnapshotStorageUsed"),
+
+		"cache_hit_ratio.buffer":     c.Float("BufferCacheHitRatio"),
+		"cache_hit_ratio.result_set": c.Float("ResultSetCacheHitRatio"),
+
+		"engine_uptime.sec":                        c.Float("EngineUptime"),
+		"volume.read.iops":                         c.Float("VolumeReadIOPs"),
+		"volume.write.iops":                        c.Float("VolumeWriteIOPs"),
+		"rds_to_aurora_postgresql_replica_lag.sec": c.Float("RDSToAuroraPostgreSQLReplicaLag"),
+		"backup_storage_billed_total.bytes":        c.Float("TotalBackupStorageBilled"),
+		"aurora_volume_left_total.bytes":           c.Float("AuroraVolumeBytesLeftTotal"),
 	}
 )

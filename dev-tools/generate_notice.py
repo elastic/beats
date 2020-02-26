@@ -1,5 +1,4 @@
-from __future__ import print_function
-
+#!/usr/bin/env python3
 import glob
 import os
 import datetime
@@ -17,13 +16,8 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    try:
-        with open(filename, 'r') as f:
-            return f.read()
-    except UnicodeDecodeError:
-        # try latin-1
-        with open(filename, 'r', encoding="ISO-8859-1") as f:
-            return f.read()
+    with open(filename, 'r', encoding='utf_8') as f:
+        return f.read()
 
 
 def get_library_path(license):
@@ -39,7 +33,7 @@ def get_library_path(license):
 
 def read_versions(vendor):
     libs = []
-    with open(os.path.join(vendor, "vendor.json")) as f:
+    with open(os.path.join(vendor, "vendor.json"), encoding='utf_8') as f:
         govendor = json.load(f)
         for package in govendor["package"]:
             libs.append(package)
@@ -117,6 +111,8 @@ def has_license(folder):
         * The parent folder contains a LICENSE
         * The folder only contains subdirectories AND all these
           subdirectories contain a LICENSE
+        * The folder only contains subdirectories AND all these
+          subdirectories contain  subdirectories which contain a LICENSE (ex Azure folder)
     """
 
     if len(get_licenses(folder)) > 0:
@@ -127,8 +123,14 @@ def has_license(folder):
     for subdir in os.listdir(folder):
         if not os.path.isdir(os.path.join(folder, subdir)):
             return False, folder
-        if len(get_licenses(os.path.join(folder, subdir))) == 0:
-            return False, os.path.join(folder, subdir)
+        if len(get_licenses(os.path.join(folder, subdir))) > 0:
+            continue
+        for dir in os.listdir(os.path.join(folder, subdir)):
+            if not os.path.isdir(os.path.join(folder, subdir, dir)):
+                return False, subdir
+            if len(get_licenses(os.path.join(folder, subdir, dir))) == 0:
+                return False, os.path.join(folder, subdir, dir)
+
     return True, ""
 
 
@@ -216,11 +218,11 @@ def get_url(repo):
 def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=None):
     dependencies = gather_dependencies(vendor_dirs, overrides=overrides)
     if not csvfile:
-        with open(filename, "w+") as f:
+        with open(filename, "w+", encoding='utf_8') as f:
             write_notice_file(f, beat, copyright, dependencies)
             print("Available at {}".format(filename))
     else:
-        with open(csvfile, "wb") as f:
+        with open(csvfile, "w") as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
             print("Available at {}".format(csvfile))
@@ -301,6 +303,10 @@ CC_SA_4_LICENSE_TITLE = [
     "Creative Commons Attribution-ShareAlike 4.0 International"
 ]
 
+ECLIPSE_PUBLIC_LICENSE_TITLES = [
+    "Eclipse Public License - v 1.0"
+]
+
 LGPL_3_LICENSE_TITLE = [
     "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
 ]
@@ -320,7 +326,7 @@ def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     # replace smart quotes with less intelligent ones
-    content = content.replace(b'\xe2\x80\x9c', '"').replace(b'\xe2\x80\x9d', '"')
+    content = content.replace(bytes(b'\xe2\x80\x9c').decode(), '"').replace(bytes(b'\xe2\x80\x9d').decode(), '"')
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
@@ -340,16 +346,18 @@ def detect_license_summary(content):
         return "LGPL-3.0"
     if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
         return "UPL-1.0"
-
+    if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
+        return "EPL-1.0"
     return "UNKNOWN"
 
 
 ACCEPTED_LICENSES = [
     "Apache-2.0",
-    "MIT",
     "BSD-4-Clause",
     "BSD-3-Clause",
     "BSD-2-Clause",
+    "EPL-1.0",
+    "MIT",
     "MPL-2.0",
     "UPL-1.0",
 ]

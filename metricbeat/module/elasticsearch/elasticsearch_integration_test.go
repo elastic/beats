@@ -30,7 +30,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/enrich"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
@@ -51,6 +52,7 @@ import (
 var metricSets = []string{
 	"ccr",
 	"cluster_stats",
+	"enrich",
 	"index",
 	"index_recovery",
 	"index_summary",
@@ -60,37 +62,36 @@ var metricSets = []string{
 	"shard",
 }
 
+var xpackMetricSets = []string{
+	"ccr",
+	"enrich",
+	"cluster_stats",
+	"index",
+	"index_recovery",
+	"index_summary",
+	"ml_job",
+	"node_stats",
+	"shard",
+}
+
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
-
 	host := service.Host()
-	err := createIndex(host)
-	assert.NoError(t, err)
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
-	err = enableTrialLicense(host, version)
-	assert.NoError(t, err)
-
-	err = createMLJob(host, version)
-	assert.NoError(t, err)
-
-	err = createCCRStats(host)
-	assert.NoError(t, err)
+	setupTest(t, host, version)
 
 	for _, metricSet := range metricSets {
-		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
+			checkSkip(t, metricSet, version)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
-			}
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
+
 			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
 		})
@@ -99,21 +100,86 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
-
 	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
-	}
+	require.NoError(t, err)
 
 	for _, metricSet := range metricSets {
-		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
+			checkSkip(t, metricSet, version)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-			if err != nil {
-				t.Fatal("write", err)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestXPackEnabled(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+	host := service.Host()
+
+	version, err := getElasticsearchVersion(host)
+	require.NoError(t, err)
+
+	setupTest(t, host, version)
+
+	metricSetToTypesMap := map[string][]string{
+		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
+		"cluster_stats":  []string{"cluster_stats"},
+		"enrich":         []string{"enrich_coordinator_stats"},
+		"index_recovery": []string{"index_recovery"},
+		"index_summary":  []string{"indices_stats"},
+		"ml_job":         []string{"job_stats"},
+		"node_stats":     []string{"node_stats"},
+	}
+
+	config := getXPackConfig(host)
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		t.Run(metricSet.Name(), func(t *testing.T) {
+			checkSkip(t, metricSet.Name(), version)
+			events, errs := mbtest.ReportingFetchV2Error(metricSet)
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
+
+			// Special case: the `index` metricset generates as many events
+			// as there are distinct indices in Elasticsearch
+			if metricSet.Name() == "index" {
+				numIndices, err := countIndices(host)
+				require.NoError(t, err)
+				require.Len(t, events, numIndices)
+
+				for _, event := range events {
+					require.Equal(t, "index_stats", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+				}
+
+				return
+			}
+
+			// Special case: the `shard` metricset generates as many events
+			// as there are distinct shards in Elasticsearch
+			if metricSet.Name() == "shard" {
+				numShards, err := countShards(host)
+				require.NoError(t, err)
+				require.Len(t, events, numShards)
+
+				for _, event := range events {
+					require.Equal(t, "shards", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+				}
+
+				return
+			}
+
+			types := metricSetToTypesMap[metricSet.Name()]
+			require.Len(t, events, len(types))
+
+			for i, event := range events {
+				require.Equal(t, types[i], event.RootFields["type"])
+				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
 			}
 		})
 	}
@@ -127,6 +193,32 @@ func getConfig(metricset string, host string) map[string]interface{} {
 		"hosts":                      []string{host},
 		"index_recovery.active_only": false,
 	}
+}
+
+func getXPackConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":        elasticsearch.ModuleName,
+		"metricsets":    xpackMetricSets,
+		"hosts":         []string{host},
+		"xpack.enabled": true,
+	}
+}
+
+func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
+	err := createIndex(esHost)
+	require.NoError(t, err)
+
+	err = enableTrialLicense(esHost, esVersion)
+	require.NoError(t, err)
+
+	err = createMLJob(esHost, esVersion)
+	require.NoError(t, err)
+
+	err = createCCRStats(esHost)
+	require.NoError(t, err)
+
+	err = createEnrichStats(esHost)
+	require.NoError(t, err)
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
@@ -367,15 +459,128 @@ func checkExists(url string) bool {
 	return false
 }
 
-func checkSkip(t *testing.T, metricset string, version *common.Version) {
-	if metricset != "ccr" {
-		return
+func createEnrichStats(host string) error {
+	err := createEnrichSourceIndex(host)
+	if err != nil {
+		return errors.Wrap(err, "error creating enrich source index")
 	}
 
-	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
+	err = createEnrichPolicy(host)
+	if err != nil {
+		return errors.Wrap(err, "error creating enrich policy")
+	}
 
-	if !isCCRStatsAPIAvailable {
-		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion.String())
+	err = executeEnrichPolicy(host)
+	if err != nil {
+		return errors.Wrap(err, "error executing enrich policy")
+	}
+
+	err = createEnrichIngestPipeline(host)
+	if err != nil {
+		return errors.Wrap(err, "error creating ingest pipeline with enrich processor")
+	}
+
+	err = ingestAndEnrichDoc(host)
+	if err != nil {
+		return errors.Wrap(err, "error ingesting doc for enrichment")
+	}
+
+	return nil
+}
+
+func createEnrichSourceIndex(host string) error {
+	sourceDoc, err := ioutil.ReadFile("enrich/_meta/test/source_doc.json")
+	if err != nil {
+		return err
+	}
+
+	docURL := "/users/_doc/1?refresh=wait_for"
+	_, _, err = httpPutJSON(host, docURL, sourceDoc)
+	return err
+}
+
+func createEnrichPolicy(host string) error {
+	policy, err := ioutil.ReadFile("enrich/_meta/test/policy.json")
+	if err != nil {
+		return err
+	}
+
+	policyURL := "/_enrich/policy/users-policy"
+	_, _, err = httpPutJSON(host, policyURL, policy)
+	return err
+}
+
+func executeEnrichPolicy(host string) error {
+	executeURL := "/_enrich/policy/users-policy/_execute"
+	_, _, err := httpPostJSON(host, executeURL, nil)
+	return err
+}
+
+func createEnrichIngestPipeline(host string) error {
+	pipeline, err := ioutil.ReadFile("enrich/_meta/test/ingest_pipeline.json")
+	if err != nil {
+		return err
+	}
+
+	pipelineURL := "/_ingest/pipeline/user_lookup"
+	_, _, err = httpPutJSON(host, pipelineURL, pipeline)
+	return err
+}
+
+func ingestAndEnrichDoc(host string) error {
+	targetDoc, err := ioutil.ReadFile("enrich/_meta/test/target_doc.json")
+	if err != nil {
+		return err
+	}
+
+	docURL := "/my_index/_doc/my_id?pipeline=user_lookup"
+	_, _, err = httpPutJSON(host, docURL, targetDoc)
+	return err
+}
+
+func countIndices(elasticsearchHostPort string) (int, error) {
+	return countCatItems(elasticsearchHostPort, "indices")
+
+}
+
+func countShards(elasticsearchHostPort string) (int, error) {
+	return countCatItems(elasticsearchHostPort, "shards")
+}
+
+func countCatItems(elasticsearchHostPort, catObject string) (int, error) {
+	resp, err := http.Get("http://" + elasticsearchHostPort + "/_cat/" + catObject + "?format=json")
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+
+	var data []common.MapStr
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return 0, err
+	}
+
+	return len(data), nil
+}
+
+func checkSkip(t *testing.T, metricset string, version *common.Version) {
+	checkSkipFeature := func(name string, availableVersion *common.Version) {
+		isAPIAvailable := elastic.IsFeatureAvailable(version, availableVersion)
+		if !isAPIAvailable {
+			t.Skipf("elasticsearch %s stats API is not available until %s", name, availableVersion)
+		}
+	}
+
+	switch metricset {
+	case "ccr":
+		checkSkipFeature("CCR", elasticsearch.CCRStatsAPIAvailableVersion)
+	case "enrich":
+		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
 	}
 }
 
@@ -406,7 +611,15 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, err
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
-	req, err := http.NewRequest("PUT", "http://"+host+path, bytes.NewReader(body))
+	return httpSendJSON(host, path, "PUT", body)
+}
+
+func httpPostJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
+	return httpSendJSON(host, path, "POST", body)
+}
+
+func httpSendJSON(host, path, method string, body []byte) ([]byte, *http.Response, error) {
+	req, err := http.NewRequest(method, "http://"+host+path, bytes.NewReader(body))
 	if err != nil {
 		return nil, nil, err
 	}

@@ -92,7 +92,8 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	host := getElasticsearchHost()
 	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
-	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(indexFmt, ""))
+	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "")
+	indexSel := outil.MakeSelector(indexFmtExpr)
 	index, _ = indexSel.Select(&beat.Event{
 		Timestamp: ts,
 	})
@@ -194,6 +195,8 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	es := &testOutputer{}
 	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
 	es.esConnection = connection
+	es.Connect()
+
 	return es
 }
 

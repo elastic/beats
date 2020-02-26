@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "stan.subscriptions",
+        "duration": 115000,
+        "module": "stan"
+    },
+    "metricset": {
+        "name": "subscriptions",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:32770",
+        "type": "stan"
+    },
+    "stan": {
+        "cluster": {
+            "id": "test-cluster"
+        },
+        "server": {
+            "id": "mNKuLCRmOZD79arLFAXiaJ"
+        },
+        "subscriptions": {
+            "channel": "bar",
+            "id": "benchmark-sub-2",
+            "last_sent": 7195645,
+            "offline": false,
+            "pending": 1024,
+            "stalled": true
+        }
+    }
+}

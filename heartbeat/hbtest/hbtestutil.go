@@ -30,6 +30,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtestllext"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
@@ -73,6 +75,23 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	)
 }
 
+// RedirectHandler redirects the paths at the keys in the redirectingPaths map to the locations in their values.
+// For paths not in the redirectingPaths map it returns a 200 response with the given body.
+func RedirectHandler(redirectingPaths map[string]string, body string) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			url, _ := url.Parse(r.RequestURI)
+			redirectTarget, isRedirect := redirectingPaths[url.Path]
+			if isRedirect {
+				w.Header().Add("Location", redirectTarget)
+				w.WriteHeader(302)
+			} else {
+				w.WriteHeader(200)
+				io.WriteString(w, body)
+			}
+		})
+}
+
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
 	u, err := url.Parse(server.URL)
@@ -107,17 +126,21 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	} else {
 		ipCheck = isdef.Optional(isdef.IsEqual(ip))
 	}
-	return lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"ip":          ipCheck,
-			"duration.us": isdef.IsDuration,
-			"status":      status,
-			"id":          isdef.IsNonEmptyString,
-			"name":        isdef.IsString,
-			"type":        typ,
-			"check_group": isdef.IsString,
-		},
-	})
+
+	return lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
+				"ip":          ipCheck,
+				"status":      status,
+				"duration.us": isdef.IsDuration,
+				"id":          isdef.IsNonEmptyString,
+				"name":        isdef.IsString,
+				"type":        typ,
+				"check_group": isdef.IsString,
+			},
+		}),
+		hbtestllext.MonitorTimespanValidator,
+	)
 }
 
 // SummaryChecks validates the "summary" field and its subfields.

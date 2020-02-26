@@ -3,7 +3,7 @@
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 

@@ -10,11 +10,11 @@
 //// This content must be embedded underneath a level 3 heading.
 //////////////////////////////////////////////////////////////////////////
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
-endif::only-elasticsearch[]
+endif::[]
 
 In Elasticsearch, {ref}/indices-templates.html[index
 templates] are used to define settings and mappings that determine how fields
@@ -107,13 +107,14 @@ See <<configuration-template>> for the full list of configuration options.
 ==== Load the template manually
 
 To load the template manually, run the <<setup-command,`setup`>> command. A
-connection to Elasticsearch is required. 
-ifndef::only-elasticsearch[]
-If another output is enabled, you need
-to temporarily disable that output and enable Elasticsearch by using the
-`-E` option. The examples here assume that Logstash output is enabled. You can
-omit the `-E` flags if Elasticsearch output is already enabled.
-endif::only-elasticsearch[]
+connection to Elasticsearch is required.  If another output is enabled, you need
+to temporarily disable that output and enable Elasticsearch by using the `-E`
+option.
+ifndef::no-output-logstash[]
+The examples here assume that Logstash output is enabled.
+endif::[]
+You can omit the `-E` flags if Elasticsearch output is already enabled.
+
 
 If you are connecting to a secured Elasticsearch cluster, make sure you've
 configured credentials as described in <<{beatname_lc}-configuration>>.
@@ -129,13 +130,13 @@ ifdef::win_only[]
 To load the template:
 endif::win_only[]
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 :disable_logstash: {sp}-E output.logstash.enabled=false
-endif::only-elasticsearch[]
+endif::[]
 
-ifdef::only-elasticsearch[]
+ifdef::no-output-logstash[]
 :disable_logstash:
-endif::only-elasticsearch[]
+endif::[]
 
 ifdef::requires-sudo[]
 include::./shared-note-sudo.asciidoc[]
@@ -303,7 +304,7 @@ endif::win_only[]
 
 ["source","sh",subs="attributes"]
 ----
-PS > .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
+PS > .{backslash}{beatname_lc}.exe export template --es.version {version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
 ----
 endif::win_os[]
 
@@ -314,7 +315,7 @@ ifdef::deb_os,rpm_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::deb_os,rpm_os[]
 
@@ -323,7 +324,7 @@ ifdef::mac_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::mac_os[]
 
@@ -332,7 +333,7 @@ ifdef::linux_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::linux_os[]
 
@@ -343,6 +344,6 @@ endif::win_only[]
 
 ["source","sh",subs="attributes"]
 ----
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{stack-version}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{version}
 ----
 endif::win_os[]

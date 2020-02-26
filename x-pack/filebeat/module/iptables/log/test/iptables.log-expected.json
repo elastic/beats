@@ -1,12 +1,11 @@
 [
     {
-        "@timestamp": "2019-01-08T03:37:09.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -35,13 +34,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:37:57.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 1433,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -69,13 +67,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:38:45.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -104,13 +101,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:39:25.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 80,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -139,13 +135,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:40:21.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -174,13 +169,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:40:25.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -208,13 +202,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:41:17.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -243,13 +236,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:41:23.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -278,13 +270,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:43:18.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 139,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -312,13 +303,12 @@
         ]
     },
     {
-        "@timestamp": "2019-01-08T03:43:42.000Z",
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 8088,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,

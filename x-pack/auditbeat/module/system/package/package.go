@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -111,7 +111,7 @@ type Package struct {
 
 // Hash creates a hash for Package.
 func (pkg Package) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(pkg.Name)
 	h.WriteString(pkg.Version)
 	h.WriteString(pkg.Release)

@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -37,35 +39,34 @@ var (
 
 // Reader will contain the config options
 type Reader struct {
-	query             Query             // PDH Query
-	instanceLabel     map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement       map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed          bool              // Indicates if the query has been executed.
-	log               *logp.Logger      //
-	groupMeasurements bool              // Indicates if measurements with the same instance label should be sent in the same event
+	query         pdh.Query         // PDH Query
+	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
+	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
+	executed      bool              // Indicates if the query has been executed.
+	log           *logp.Logger      //
+	config        Config            // Metricset configuration
 }
 
 // NewReader creates a new instance of Reader.
 func NewReader(config Config) (*Reader, error) {
-	var query Query
+	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
-
 	r := &Reader{
-		query:             query,
-		instanceLabel:     map[string]string{},
-		measurement:       map[string]string{},
-		log:               logp.NewLogger("perfmon"),
-		groupMeasurements: config.GroupMeasurements,
+		query:         query,
+		instanceLabel: map[string]string{},
+		measurement:   map[string]string{},
+		log:           logp.NewLogger("perfmon"),
+		config:        config,
 	}
 	for _, counter := range config.CounterConfig {
-		childQueries, err := query.ExpandWildCardPath(counter.Query)
+		childQueries, err := query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
+					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					r.log.Infow("Ignoring non existent counter", "error", err,
 						logp.Namespace("perfmon"), "query", counter.Query)
 					continue
@@ -77,15 +78,18 @@ func NewReader(config Config) (*Reader, error) {
 		}
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
 		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
-			query.Close()
+			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
+			if config.IgnoreNECounters {
+				r.log.Infow("Ignoring non existent counter", "initial query", counter.Query,
+					logp.Namespace("perfmon"), "expanded query", childQueries)
+				continue
+			}
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
 		}
 		for _, v := range childQueries {
-			if err := query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
-				query.Close()
+			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
-
 			r.instanceLabel[v] = counter.InstanceLabel
 			r.measurement[v] = counter.MeasurementLabel
 		}
@@ -94,8 +98,48 @@ func NewReader(config Config) (*Reader, error) {
 	return r, nil
 }
 
+// RefreshCounterPaths will recheck for any new instances and add them to the counter list
+func (r *Reader) RefreshCounterPaths() error {
+	var newCounters []string
+	for _, counter := range r.config.CounterConfig {
+		childQueries, err := r.query.GetCounterPaths(counter.Query)
+		if err != nil {
+			if r.config.IgnoreNECounters {
+				switch err {
+				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
+					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
+					r.log.Infow("Ignoring non existent counter", "error", err,
+						logp.Namespace("perfmon"), "query", counter.Query)
+					continue
+				}
+			} else {
+				return errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+			}
+		}
+		newCounters = append(newCounters, childQueries...)
+		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
+		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
+			for _, v := range childQueries {
+				if err := r.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
+					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
+				}
+				r.instanceLabel[v] = counter.InstanceLabel
+				r.measurement[v] = counter.MeasurementLabel
+			}
+		}
+	}
+	err := r.query.RemoveUnusedCounters(newCounters)
+	if err != nil {
+		return errors.Wrap(err, "failed removing unused counter values")
+	}
+
+	return nil
+}
+
 // Read executes a query and returns those values in an event.
 func (r *Reader) Read() ([]mb.Event, error) {
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := r.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}
@@ -119,7 +163,7 @@ func (r *Reader) Read() ([]mb.Event, error) {
 			}
 
 			var eventKey string
-			if r.groupMeasurements && val.Err == nil {
+			if r.config.GroupMeasurements && val.Err == nil {
 				// Send measurements with the same instance label as part of the same event
 				eventKey = val.Instance
 			} else {

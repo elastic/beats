@@ -486,6 +486,184 @@ func TestMergeFields(t *testing.T) {
 	}
 }
 
+func TestMergeFieldsDeep(t *testing.T) {
+	type io struct {
+		UnderRoot bool
+		Event     MapStr
+		Fields    MapStr
+		Output    MapStr
+		Err       string
+	}
+	tests := []io{
+		// underRoot = true, merges
+		{
+			UnderRoot: true,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"b": 2,
+			},
+			Output: MapStr{
+				"a": "1",
+				"b": 2,
+			},
+		},
+
+		// underRoot = true, overwrites existing
+		{
+			UnderRoot: true,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"a": 2,
+			},
+			Output: MapStr{
+				"a": 2,
+			},
+		},
+
+		// underRoot = false, adds new 'fields' when it doesn't exist
+		{
+			UnderRoot: false,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"a": 2,
+			},
+			Output: MapStr{
+				"a": "1",
+				"fields": MapStr{
+					"a": 2,
+				},
+			},
+		},
+
+		// underRoot = false, merge with existing 'fields' and overwrites existing keys
+		{
+			UnderRoot: false,
+			Event: MapStr{
+				"fields": MapStr{
+					"a": "1",
+					"b": 2,
+				},
+			},
+			Fields: MapStr{
+				"a": 3,
+				"c": 4,
+			},
+			Output: MapStr{
+				"fields": MapStr{
+					"a": 3,
+					"b": 2,
+					"c": 4,
+				},
+			},
+		},
+
+		// underRoot = false, error when 'fields' is wrong type
+		{
+			UnderRoot: false,
+			Event: MapStr{
+				"fields": "not a MapStr",
+			},
+			Fields: MapStr{
+				"a": 3,
+			},
+			Output: MapStr{
+				"fields": "not a MapStr",
+			},
+			Err: "expected map",
+		},
+
+		// underRoot = true, merges recursively
+		{
+			UnderRoot: true,
+			Event: MapStr{
+				"my": MapStr{
+					"field1": "field1",
+				},
+			},
+			Fields: MapStr{
+				"my": MapStr{
+					"field2": "field2",
+					"field3": "field3",
+				},
+			},
+			Output: MapStr{
+				"my": MapStr{
+					"field1": "field1",
+					"field2": "field2",
+					"field3": "field3",
+				},
+			},
+		},
+
+		// underRoot = true, merges recursively and overrides
+		{
+			UnderRoot: true,
+			Event: MapStr{
+				"my": MapStr{
+					"field1": "field1",
+					"field2": "field2",
+				},
+			},
+			Fields: MapStr{
+				"my": MapStr{
+					"field2": "fieldTWO",
+					"field3": "field3",
+				},
+			},
+			Output: MapStr{
+				"my": MapStr{
+					"field1": "field1",
+					"field2": "fieldTWO",
+					"field3": "field3",
+				},
+			},
+		},
+
+		// underRoot = false, merges recursively under existing 'fields'
+		{
+			UnderRoot: false,
+			Event: MapStr{
+				"fields": MapStr{
+					"my": MapStr{
+						"field1": "field1",
+					},
+				},
+			},
+			Fields: MapStr{
+				"my": MapStr{
+					"field2": "field2",
+					"field3": "field3",
+				},
+			},
+			Output: MapStr{
+				"fields": MapStr{
+					"my": MapStr{
+						"field1": "field1",
+						"field2": "field2",
+						"field3": "field3",
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		err := MergeFieldsDeep(test.Event, test.Fields, test.UnderRoot)
+		assert.Equal(t, test.Output, test.Event)
+		if test.Err != "" {
+			assert.Contains(t, err.Error(), test.Err)
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}
+
 func TestAddTag(t *testing.T) {
 	type io struct {
 		Event  MapStr
@@ -823,4 +1001,27 @@ func BenchmarkWalkMap(b *testing.B) {
 			m.Put("hello.world.test", 17)
 		}
 	})
+}
+
+func TestFormat(t *testing.T) {
+	input := MapStr{
+		"foo":      "bar",
+		"password": "SUPER_SECURE",
+	}
+
+	tests := map[string]string{
+		"%v":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%s":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+	}
+
+	for verb, expected := range tests {
+		t.Run(verb, func(t *testing.T) {
+			actual := fmt.Sprintf(verb, input)
+			assert.Equal(t, expected, actual)
+		})
+	}
 }

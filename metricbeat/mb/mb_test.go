@@ -75,15 +75,18 @@ func (m *testPushMetricSet) Run(r PushReporter) {}
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
-		in  interface{}
-		out ModuleConfig
-		err string
+		name string
+		in   interface{}
+		out  ModuleConfig
+		err  string
 	}{
 		{
-			in:  map[string]interface{}{},
-			err: "missing required field accessing 'module'",
+			name: "string value is not set on required field",
+			in:   map[string]interface{}{},
+			err:  "string value is not set accessing 'module'",
 		},
 		{
+			name: "valid config",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -94,9 +97,11 @@ func TestModuleConfig(t *testing.T) {
 				Enabled:    true,
 				Period:     time.Second * 10,
 				Timeout:    0,
+				Query:      nil,
 			},
 		},
 		{
+			name: "missing period",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -105,6 +110,7 @@ func TestModuleConfig(t *testing.T) {
 			err: "negative value accessing 'period'",
 		},
 		{
+			name: "negative timeout",
 			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
@@ -115,27 +121,29 @@ func TestModuleConfig(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		c, err := common.NewConfigFrom(test.in)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		unpackedConfig := DefaultModuleConfig()
-		err = c.Unpack(&unpackedConfig)
-		if err != nil && test.err == "" {
-			t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
-			continue
-		}
-		if test.err != "" {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.in)
 			if err != nil {
-				assert.Contains(t, err.Error(), test.err, "testcase %d", i)
-			} else {
-				t.Errorf("expected error '%v' in testcase %d", test.err, i)
+				t.Fatal(err)
 			}
-			continue
-		}
 
-		assert.Equal(t, test.out, unpackedConfig)
+			unpackedConfig := DefaultModuleConfig()
+			err = c.Unpack(&unpackedConfig)
+			if err != nil && test.err == "" {
+				t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
+				return
+			}
+			if test.err != "" {
+				if err != nil {
+					assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+				} else {
+					t.Errorf("expected error '%v' in testcase %d", test.err, i)
+				}
+				return
+			}
+
+			assert.Equal(t, test.out, unpackedConfig)
+		})
 	}
 }
 

@@ -42,6 +42,7 @@ https://github.com/radoondas/earthquakebeat[earthquakebeat]:: Pulls data from ht
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
 https://github.com/berfinsari/envoyproxybeat[envoyproxybeat]:: Reads stats from the Envoy Proxy and indexes them into Elasticsearch.
 https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
+https://gitlab.com/hatricker/etherbeat[etherbeat]:: Reads blocks from Ethereum compatible blockchain and indexes them into Elasticsearch.
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
@@ -81,6 +82,7 @@ https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
 https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.
 https://github.com/eBay/nvidiagpubeat[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
+https://github.com/counteractive/o365beat[o365beat]:: Ships Office 365 logs from the O365 Management Activities API
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
 https://github.com/radoondas/owmbeat[owmbeat]:: Open Weather Map beat to pull weather data from all around the world and store and visualize them in Elastic Stack
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package

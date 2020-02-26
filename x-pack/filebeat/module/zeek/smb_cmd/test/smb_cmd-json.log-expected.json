@@ -1,0 +1,37 @@
+[
+    {
+        "@timestamp": "2013-02-26T22:05:32.020Z",
+        "destination.address": "172.16.128.202",
+        "destination.ip": "172.16.128.202",
+        "destination.port": 445,
+        "event.dataset": "zeek.smb_cmd",
+        "event.id": "CbT8mpAXseu6Pt4R7",
+        "event.module": "zeek",
+        "fileset.name": "smb_cmd",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:SJNAD5vtzZuhQjGtfaI8svTnyuw=",
+        "network.protocol": "smb",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "172.16.133.6",
+        "source.ip": "172.16.133.6",
+        "source.port": 1728,
+        "tags": [
+            "zeek.smb_cmd"
+        ],
+        "zeek.session_id": "CbT8mpAXseu6Pt4R7",
+        "zeek.smb_cmd.argument": "\\browser",
+        "zeek.smb_cmd.command": "NT_CREATE_ANDX",
+        "zeek.smb_cmd.file.action": "SMB::FILE_OPEN",
+        "zeek.smb_cmd.file.host.rx": "172.16.128.202",
+        "zeek.smb_cmd.file.host.tx": "172.16.133.6",
+        "zeek.smb_cmd.file.name": "\\browser",
+        "zeek.smb_cmd.file.uid": "CbT8mpAXseu6Pt4R7",
+        "zeek.smb_cmd.rtt": 0.091141,
+        "zeek.smb_cmd.status": "SUCCESS",
+        "zeek.smb_cmd.tree": "\\\\JSRVR20\\IPC$",
+        "zeek.smb_cmd.tree_service": "IPC",
+        "zeek.smb_cmd.version": "SMB1"
+    }
+]

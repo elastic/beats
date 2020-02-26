@@ -25,7 +25,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -38,17 +38,13 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host())
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
@@ -57,10 +53,8 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
+	require.Empty(t, errs)
+	require.NotEmpty(t, events)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("kibana", "stats").Fields.StringToPrint())
@@ -69,17 +63,13 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host())
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
@@ -87,9 +77,7 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err = mbtest.WriteEventsReporterV2Error(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	require.NoError(t, err)
 }
 
 func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {

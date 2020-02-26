@@ -26,6 +26,10 @@
       migration: true
       description: >
         Node name.
+    - name: state
+      type: keyword
+      description: >
+        Connection state.
     - name: channels
       type: long
       description: >

@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:modulename: file_integrity
+
 [id="{beatname_lc}-module-file_integrity"]
 == File Integrity Module
 
@@ -66,6 +68,10 @@ Linux.
   recursive: false
 ----
 
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
+
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 
@@ -122,6 +128,8 @@ of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
 
+include::{docdir}/auditbeat-options.asciidoc[]
+
 
 [float]
 === Example configuration
@@ -142,4 +150,7 @@ auditbeat.modules:
   - /etc
 
 ----
+
+
+:modulename!:
 

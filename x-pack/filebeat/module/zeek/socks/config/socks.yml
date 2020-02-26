@@ -1,0 +1,54 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: socks
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.socks"
+
+        - from: "zeek.socks.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.socks.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.socks.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.socks.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.socks.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.socks.request.name"
+          to: "zeek.socks.request.host"
+
+        - from: "zeek.socks.request_p"
+          to: "zeek.socks.request.port"
+
+        - from: "zeek.socks.bound_p"
+          to: "zeek.socks.bound.port"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

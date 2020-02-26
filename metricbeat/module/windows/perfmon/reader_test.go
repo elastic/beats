@@ -25,6 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var validQuery = `\Processor Information(_Total)\% Processor Time`
+
 // TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
 func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
@@ -51,9 +53,9 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
-	assert.NotNil(t, reader.query.handle)
-	assert.NotNil(t, reader.query.counters)
-	assert.NotZero(t, len(reader.query.counters))
+	assert.NotNil(t, reader.query.Handle)
+	assert.NotNil(t, reader.query.Counters)
+	assert.NotZero(t, len(reader.query.Counters))
 	defer reader.Close()
 }
 

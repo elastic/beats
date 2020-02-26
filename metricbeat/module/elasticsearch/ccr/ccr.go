@@ -82,7 +82,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
 			m.lastCCRLicenseMessageTimestamp = time.Now()
-			m.Logger().Warn(ccrUnavailableMessage)
+			m.Logger().Debug(ccrUnavailableMessage)
 		}
 		return nil
 	}

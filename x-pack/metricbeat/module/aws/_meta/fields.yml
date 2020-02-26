@@ -4,6 +4,10 @@
     `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
   release: ga
   fields:
+    - name: cloud.account.name
+      type: keyword
+      description: >
+        The cloud account name or alias used to identify different entities in a multi-tenant environment.
     - name: aws
       type: group
       description: >
@@ -18,3 +22,15 @@
           type: keyword
           description: >
             Name of a S3 bucket.
+        - name: dimensions.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Metric dimensions.
+        - name: '*.metrics.*.*'
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Metrics that returned from Cloudwatch API query.

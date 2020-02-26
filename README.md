@@ -1,6 +1,7 @@
 [![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 # Beats - The Lightweight Shippers of the Elastic Stack
 
@@ -85,3 +86,18 @@ your dev environment to build Beats from the source.
 ## Snapshots
 
 For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/elastic+beats+master+multijob-package-linux/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+
+## CI
+
+It is possible to trigger some jobs by putting a comment on a GitHub PR.
+(This service is only available for users affiliated with Elastic and not for open-source contributors.)
+
+* [beats][]
+  * `jenkins run the tests please`
+  * `jenkins run tests`
+* [apm-beats-update][]
+  * `/run apm-beats-update`
+
+
+[beats]: https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/
+[apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/

@@ -22,8 +22,8 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 52.4908,
-        "source.geo.location.lon": 13.3275,
+        "source.geo.location.lat": 52.4473,
+        "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
@@ -33,8 +33,10 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
-        "user_agent.os.name": "Windows 7",
-        "user_agent.version": "57.0"
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
+        "user_agent.version": "57.0."
     },
     {
         "@timestamp": "2018-01-01T09:10:11.000Z",
@@ -64,8 +66,10 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
-        "user_agent.os.name": "Windows 7",
-        "user_agent.version": "57.0"
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
+        "user_agent.version": "57.0."
     },
     {
         "@timestamp": "2018-01-01T10:11:12.000Z",
@@ -97,8 +101,8 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 52.4908,
-        "source.geo.location.lon": 13.3275,
+        "source.geo.location.lat": 52.4473,
+        "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
@@ -111,7 +115,7 @@
         "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.0",
-        "user_agent.version": "70.0.3538"
+        "user_agent.version": "70.0.3538.102"
     },
     {
         "@timestamp": "2018-12-31T12:52:33.000Z",
@@ -138,7 +142,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     },
     {
@@ -166,7 +172,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     }
 ]

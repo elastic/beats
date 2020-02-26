@@ -8,10 +8,14 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/googlepubsub"
+	_ "github.com/elastic/beats/x-pack/filebeat/input/httpjson"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/s3"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/activemq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/aws"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/azure"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cef"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cisco"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/coredns"
@@ -19,6 +23,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/googlecloud"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/ibmmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/iptables"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/misp"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/panw"

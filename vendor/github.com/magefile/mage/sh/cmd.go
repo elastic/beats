@@ -76,7 +76,7 @@ func Output(cmd string, args ...string) (string, error) {
 	return strings.TrimSuffix(buf.String(), "\n"), err
 }
 
-// OutputWith is like RunWith, ubt returns what is written to stdout.
+// OutputWith is like RunWith, but returns what is written to stdout.
 func OutputWith(env map[string]string, cmd string, args ...string) (string, error) {
 	buf := &bytes.Buffer{}
 	_, err := Exec(env, buf, os.Stderr, cmd, args...)

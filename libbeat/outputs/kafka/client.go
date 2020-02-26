@@ -79,7 +79,7 @@ func newKafkaClient(
 		hosts:    hosts,
 		topic:    topic,
 		key:      key,
-		index:    index,
+		index:    strings.ToLower(index),
 		codec:    writer,
 		config:   *cfg,
 	}
@@ -162,19 +162,27 @@ func (c *client) String() string {
 func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	event := &data.Content
 	msg := &message{partition: -1, data: *data}
-	if event.Meta != nil {
-		if value, ok := event.Meta["partition"]; ok {
-			if partition, ok := value.(int32); ok {
-				msg.partition = partition
-			}
-		}
 
-		if value, ok := event.Meta["topic"]; ok {
-			if topic, ok := value.(string); ok {
-				msg.topic = topic
-			}
+	value, err := data.Cache.GetValue("partition")
+	if err == nil {
+		if logp.IsDebug(debugSelector) {
+			debugf("got event.Meta[\"partition\"] = %v", value)
+		}
+		if partition, ok := value.(int32); ok {
+			msg.partition = partition
 		}
 	}
+
+	value, err = data.Cache.GetValue("topic")
+	if err == nil {
+		if logp.IsDebug(debugSelector) {
+			debugf("got event.Meta[\"topic\"] = %v", value)
+		}
+		if topic, ok := value.(string); ok {
+			msg.topic = topic
+		}
+	}
+
 	if msg.topic == "" {
 		topic, err := c.topic.Select(event)
 		if err != nil {
@@ -184,15 +192,16 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
-		if event.Meta == nil {
-			event.Meta = map[string]interface{}{}
+		if _, err := data.Cache.Put("topic", topic); err != nil {
+			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %v", err)
 		}
-		event.Meta["topic"] = topic
 	}
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
-		logp.Debug("kafka", "Failed event: %v", event)
+		if logp.IsDebug(debugSelector) {
+			debugf("failed event: %v", event)
+		}
 		return nil, err
 	}
 
@@ -242,11 +251,13 @@ func (r *msgRef) fail(msg *message, err error) {
 	switch err {
 	case sarama.ErrInvalidMessage:
 		logp.Err("Kafka (topic=%v): dropping invalid message", msg.topic)
+		r.client.observer.Dropped(1)
 
 	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
 		logp.Err("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
+		r.client.observer.Dropped(1)
 
 	default:
 		r.failed = append(r.failed, msg.data)

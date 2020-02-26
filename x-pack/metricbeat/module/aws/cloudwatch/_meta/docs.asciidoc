@@ -10,11 +10,15 @@ ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
 === Metricset-specific configuration notes
-* *namespace*: The namespace to filter against. For example, AWS/EC2, AWS/S3.
+* *namespace*: The namespace used by ListMetrics API to filter against.
+For example, AWS/EC2, AWS/S3. If wildcard * is given for namespace, metrics
+from all namespaces will be collected automatically.
 * *name*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
 * *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
 * *tags.resource_type_filter*: The constraints on the resources that you want returned.
@@ -26,12 +30,14 @@ only EC2 instances.
 By default, statistic includes Average, Sum, Count, Maximum and Minimum.
 
 [float]
-=== Configuration example
+=== Configuration examples
 To be more focused on `cloudwatch` metricset use cases, the examples below do
 not include configurations on AWS credentials.
 Please see <<aws-credentials-config,AWS credentials options>> for more details on setting AWS credentials
 in configurations in order for this metricset to make proper AWS API calls.
 
+[float]
+==== Example 1
 [source,yaml]
 ----
 - module: aws
@@ -63,6 +69,27 @@ this configuration format can be used. `namespace` and `metricname` need to be
 specified and `dimensions` can be used to filter cloudwatch metrics. Please see
 https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/list-metrics.html[AWS List Metrics]
 for more details.
+
+[float]
+==== Example 2
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: "*"
+----
+With this config, metrics from all namespaces will be collected from Cloudwatch.
+The limitation here is the collection period for all namespaces are all set to
+be the same, which in this case is 300 second. This will cause extra costs for
+API calls or data loss.
+For example, metrics from namespace AWS/Usage are sent to Cloudwatch every 1
+minute. With the collection period equals to 300 seconds, data points in between
+will get lost. Metrics from namespace AWS/Billing are sent to Cloudwatch every
+several hours. By querying from AWS/Billing namespace every 300 seconds,
+additional costs will occur.
 
 [float]
 === More examples
@@ -111,7 +138,7 @@ metric(average) from EC2 instance i-456.
   metrics:
     - namespace: AWS/EC2
       name: ["CPUUtilization"]
-      tags.resource_type_filter: ec2:intance
+      tags.resource_type_filter: ec2:instance
       dimensions:
         - name: InstanceId
           value: i-123

@@ -19,8 +19,8 @@ Another approach (the one described here) is to define processors.
 [[using-processors]]
 === Processors
 
-include::{libbeat-dir}/docs/processors.asciidoc[]
+include::{libbeat-dir}/processors.asciidoc[]
 
 :processor-scope: function
-include::{libbeat-dir}/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]
 :processor-scope!:

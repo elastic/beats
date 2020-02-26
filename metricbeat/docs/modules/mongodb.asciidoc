@@ -55,6 +55,33 @@ The default metricsets are `collstats`, `dbstats` and `status`.
 The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
 work with all versions >= 2.8.
 
+[float]
+=== MongoDB Privileges
+
+In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges].
+
+We recommend using the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role] to cover all the necessary privileges.
+
+You can use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
+
+["source","js",subs="attributes"]
+----
+db.createUser(
+    {
+        user: "beats",
+        pwd: "pass",
+        roles: ["clusterMonitor"]
+    }
+)
+----
+
+You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
+
+["source","js",subs="attributes"]
+----
+db.grantRolesToUser("user", ["clusterMonitor"])
+----
+
 
 [float]
 === Example configuration

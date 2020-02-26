@@ -75,7 +75,7 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 		return err
 	}
 
-	python, err := LookVirtualenvPath(ve, "python")
+	python, err := LookVirtualenvPath(ve, pythonExe)
 	if err != nil {
 		return err
 	}
@@ -124,6 +124,8 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 	htmlDir := CWD("build/html_docs", params.name)
 	buildDocsScript := filepath.Join(cloneDir, "build_docs")
 	args := []string{
+		"--asciidoctor",
+		"--respect_edit_url_overrides",
 		"--chunk=1",
 		"--doc", params.indexFile,
 		"--out", htmlDir,

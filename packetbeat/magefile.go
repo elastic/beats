@@ -36,6 +36,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
 )
 
 func init() {
@@ -150,7 +152,10 @@ func Config() error {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"protos/*"}, nil)
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"protos/*"}
+	options.ModuleDirs = nil
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
@@ -185,11 +190,6 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 
 // UnitTest executes the unit tests.

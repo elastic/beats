@@ -1,14 +1,15 @@
 [role="xpack"]
 [[monitoring-metricbeat-collection]]
-== Collect {beatname_uc} monitoring data with {metricbeat}
+== Use {metricbeat} to send monitoring data
 [subs="attributes"]
 ++++
 <titleabbrev>{metricbeat} collection</titleabbrev>
 ++++
 
 In 7.3 and later, you can use {metricbeat} to collect data about {beatname_uc} 
-and ship it to the monitoring cluster, rather than routing it through the 
-production cluster as described in <<monitoring-internal-collection>>.
+and ship it to the monitoring cluster. The benefit of using {metricbeat} instead
+of internal collection is that the monitoring agent remains active even if the
+{beatname_uc} instance dies.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 Because you'll be using {metricbeat} to _monitor_ {beatname_uc}, you'll need to
@@ -25,8 +26,10 @@ concurrently. If you don't want to run two instances concurrently, use
 {metricbeat}.
 endif::[]
 
-To learn about monitoring in general, see 
-{stack-ov}/xpack-monitoring.html[Monitoring the {stack}].
+//Commenting out this link temporarily until the general monitoring docs can be
+//updated. 
+//To learn about monitoring in general, see 
+//{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster].
 
 //NOTE: The tagged regions are re-used in the Stack Overview.
 
@@ -174,10 +177,10 @@ it via HTTPS. For example, use a `hosts` setting like `https://localhost:5066`.
 If the Elastic {security-features} are enabled, you must also provide a user 
 ID and password so that {metricbeat} can collect metrics successfully: 
 
-.. Create a user on the production cluster that has the 
-`remote_monitoring_collector` {stack-ov}/built-in-roles.html[built-in role]. 
-Alternatively, use the `remote_monitoring_user` 
-{stack-ov}/built-in-users.html[built-in user].
+.. Create a user on the {es} cluster that has the 
+`remote_monitoring_collector` {ref}/built-in-roles.html[built-in role]. 
+Alternatively, if it's available in your environment, use the
+`remote_monitoring_user` {ref}/built-in-users.html[built-in user].
 
 .. Add the `username` and `password` settings to the beat module configuration 
 file.
@@ -220,11 +223,13 @@ output.elasticsearch:
   
   # Optional protocol and basic auth credentials.
   #protocol: "https"
+  #api_key:  "id:api_key" <2>
   #username: "elastic"
   #password: "changeme"
 ----------------------------------
 <1> In this example, the data is stored on a monitoring cluster with nodes 
 `es-mon-1` and `es-mon-2`.
+<2> Specify one of `api_key` or `username`/`password`.
 
 If you configured the monitoring cluster to use encrypted communications, you
 must access it via HTTPS. For example, use a `hosts` setting like
@@ -238,9 +243,9 @@ must provide a valid user ID and password so that {metricbeat} can send metrics
 successfully: 
 
 .. Create a user on the monitoring cluster that has the 
-`remote_monitoring_agent` {stack-ov}/built-in-roles.html[built-in role]. 
-Alternatively, use the `remote_monitoring_user` 
-{stack-ov}/built-in-users.html[built-in user]. 
+`remote_monitoring_agent` {ref}/built-in-roles.html[built-in role]. 
+Alternatively, if it's available in your environment, use the
+`remote_monitoring_user` {ref}/built-in-users.html[built-in user]. 
 +
 TIP: If you're using index lifecycle management, the remote monitoring user
 requires additional privileges to create and read indices. For more

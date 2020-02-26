@@ -71,12 +71,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 702,
           "ip": "20.20.20.20",
           "locality": "public",
+          "packets": 9,
           "port": 137
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

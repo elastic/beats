@@ -8,38 +8,20 @@ package socket
 
 import (
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"net"
 	"testing"
 	"time"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
-
-type testReporter struct {
-	received []mb.Event
-	errors   []error
-}
-
-func (t *testReporter) Event(event mb.Event) bool {
-	t.received = append(t.received, event)
-	return true
-}
-
-func (t *testReporter) Error(err error) bool {
-	t.errors = append(t.errors, err)
-	return true
-}
-
-func (t *testReporter) Done() <-chan struct{} {
-	// Unused
-	return nil
-}
 
 type logWrapper testing.T
 
@@ -108,7 +90,9 @@ func TestTCPConnWithProcess(t *testing.T) {
 		},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	feedEvents(evs, st, t)
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
 	st.ExpireOlder()
 	flows, err := getFlows(st.DoneFlows(), all)
 	if err != nil {
@@ -143,12 +127,143 @@ func TestTCPConnWithProcess(t *testing.T) {
 	}
 }
 
+func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
+	flow := flows[0]
+	t.Log("read flow", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           localIP,
+		"source.port":         localPort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(151),
+		"client.ip":           localIP,
+		"client.port":         localPort,
+		"destination.ip":      remoteIP,
+		"destination.port":    remotePort,
+		"destination.packets": uint64(0),
+		"destination.bytes":   uint64(0),
+		"server.ip":           remoteIP,
+		"server.port":         remotePort,
+		"network.direction":   "outbound",
+		"network.transport":   "udp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "exfil-udp",
+		"user.id":             "501",
+	} {
+		assertValue(t, flow, expected, field)
+	}
+}
+
+func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	var packet [256]byte
+	var ipHdr, udpHdr uint16 = 2, 64
+	packet[ipHdr] = 0x45
+	tracing.MachineEndian.PutUint32(packet[ipHdr+12:], rAddr)
+	tracing.MachineEndian.PutUint16(packet[udpHdr:], rPort)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpQueueRcvSkb{
+			Meta:   meta(1234, 1235, 5),
+			Sock:   sock,
+			Size:   123,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			IPHdr:  ipHdr,
+			UDPHdr: udpHdr,
+			Packet: packet,
+		},
+		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
+	flow := flows[0]
+	t.Log("read flow", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           remoteIP,
+		"source.port":         remotePort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(151),
+		"client.ip":           remoteIP,
+		"client.port":         remotePort,
+		"destination.ip":      localIP,
+		"destination.port":    localPort,
+		"destination.packets": uint64(0),
+		"destination.bytes":   uint64(0),
+		"server.ip":           localIP,
+		"server.port":         localPort,
+		"network.direction":   "inbound",
+		"network.transport":   "udp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "exfil-udp",
+		"user.id":             "501",
+	} {
+		assertValue(t, flow, expected, field)
+	}
+}
+
 func assertValue(t *testing.T, ev beat.Event, expected interface{}, field string) bool {
 	value, err := ev.GetValue(field)
-	if err != nil {
-		t.Fatal(err, "field", field)
-	}
-	return assert.Equal(t, expected, value)
+	return assert.Nil(t, err, field) && assert.Equal(t, expected, value, field)
 }
 
 func be16(val uint16) uint16 {
@@ -177,16 +292,33 @@ func ipv4(ip string) uint32 {
 	return tracing.MachineEndian.Uint32(netIP)
 }
 
-func feedEvents(evs []event, st *state, t *testing.T) {
+func ipv6(ip string) (hi uint64, lo uint64) {
+	netIP := net.ParseIP(ip).To16()
+	if netIP == nil {
+		panic("bad ip")
+	}
+	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
+}
+
+func feedEvents(evs []event, st *state, t *testing.T) error {
 	for idx, ev := range evs {
 		t.Logf("Delivering event %d: %s", idx, ev.String())
 		// TODO: err
-		ev.Update(st)
+		if err := ev.Update(st); err != nil {
+			return errors.Wrapf(err, "error feeding event '%s'", ev.String())
+		}
 	}
+	return nil
 }
 
 func all(*flow) bool {
 	return true
+}
+
+type noDNSResolution struct{}
+
+func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
+	return "", false
 }
 
 func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
@@ -261,4 +393,191 @@ func copyCString(dst []byte, src []byte) {
 	} else {
 		dst[len(dst)-1] = 0
 	}
+}
+
+type dnsTestCase struct {
+	found      bool
+	proc       *process
+	ip, domain string
+}
+
+type dnsTestCases []dnsTestCase
+
+func (c dnsTestCases) Run(t *testing.T) {
+	for idx, test := range c {
+		msg := fmt.Sprintf("test entry #%d : %+v", idx, test)
+		domain, found := test.proc.ResolveIP(net.ParseIP(test.ip))
+		assert.Equal(t, test.found, found, msg)
+		assert.Equal(t, test.domain, domain, msg)
+	}
+}
+
+func TestDNSTracker(t *testing.T) {
+	const infiniteExpiration = time.Hour * 3
+	local1 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55555}
+	local2 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55556}
+	trV4 := dns.Transaction{
+		TXID:      1234,
+		Client:    local1,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.net",
+		Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+	}
+	trV6 := dns.Transaction{
+		TXID:      1235,
+		Client:    local2,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.com",
+		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
+	}
+	t.Run("transaction before register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("transaction after register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("unknown local endpoint", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("expiration", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		tracker := newDNSTracker(10 * time.Millisecond)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		time.Sleep(time.Millisecond * 50)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{false, proc1, "192.0.2.12", ""},
+			{false, proc1, "192.0.2.13", ""},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+		}.Run(t)
+	})
+	t.Run("same IP different domains", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		trV4alt := dns.Transaction{
+			TXID:      1234,
+			Client:    local2,
+			Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+			Domain:    "example.com",
+			Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+		}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV4alt)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc2)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc2, "192.0.2.12", "example.com"},
+		}.Run(t)
+	})
+}
+
+func TestUDPSendMsgAltLogic(t *testing.T) {
+	const expectedIPv4 = "6 probe=0 pid=1234 tid=1235 udp_sendmsg(sock=0x0, size=0, 10.11.12.13:1010 -> 10.20.30.40:1234)"
+	const expectedIPv6 = "6 probe=0 pid=1234 tid=1235 udpv6_sendmsg(sock=0x0, size=0, [fddd::bebe]:1010 -> [fddd::cafe]:1234)"
+	t.Run("ipv4 non-connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("10.20.30.40"),
+			RPort:    be16(1234),
+			AltRAddr: ipv4("192.168.255.255"),
+			AltRPort: be16(555),
+			SIPtr:    0x7fffffff,
+			SIAF:     unix.AF_INET,
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv4 connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("192.168.255.255"),
+			RPort:    be16(555),
+			AltRAddr: ipv4("10.20.30.40"),
+			AltRPort: be16(1234),
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv6 non-connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(1234),
+			AltRPort: be16(555),
+			SI6Ptr:   0x7fffffff,
+			SI6AF:    unix.AF_INET6,
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::cafe")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::bad:bad")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
+	t.Run("ipv6 connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(555),
+			AltRPort: be16(1234),
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::bad:bad")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
 }

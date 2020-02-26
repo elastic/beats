@@ -1,15 +1,15 @@
-from __future__ import absolute_import
 import os
 import sys
 import tarfile
 import time
-import StringIO
+import io
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 if INTEGRATION_TESTS:
     from compose.cli.command import get_project
+    from compose.config.environment import Environment
     from compose.service import BuildAction
     from compose.service import ConvergenceStrategy
 
@@ -22,14 +22,17 @@ class ComposeMixin(object):
     # List of required services to run INTEGRATION_TESTS
     COMPOSE_SERVICES = []
 
-    # docker-compose.yml dir path
-    COMPOSE_PROJECT_DIR = '.'
+    # Additional environment variables for docker compose
+    COMPOSE_ENV = {}
 
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
 
     # add advertised host environment file
     COMPOSE_ADVERTISED_HOST = False
+
+    # port to advertise when COMPOSE_ADVERTISED_HOST is set to true
+    COMPOSE_ADVERTISED_PORT = None
 
     @classmethod
     def compose_up(cls):
@@ -51,10 +54,12 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
+        project.pull(
+            ignore_pull_failures=True,
+            service_names=cls.COMPOSE_SERVICES)
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
-            do_build=BuildAction.force,
             timeout=30)
 
         # Wait for them to be healthy
@@ -101,16 +106,16 @@ class ComposeMixin(object):
         sends the proper address to use to the container by adding a
         environment file with the SERVICE_HOST variable set to this value.
         """
-        host = cls.compose_host(service=service)
+        host = cls.compose_host(service=service, port=cls.COMPOSE_ADVERTISED_PORT)
 
         content = "SERVICE_HOST=%s" % host
         info = tarfile.TarInfo(name="/run/compose_env")
-        info.mode = 0100644
+        info.mode = 0o100644
         info.size = len(content)
 
-        data = StringIO.StringIO()
+        data = io.BytesIO()
         tar = tarfile.TarFile(fileobj=data, mode='w')
-        tar.addfile(info, StringIO.StringIO(content))
+        tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
         tar.close()
 
         containers = project.containers(service_names=[service])
@@ -126,7 +131,11 @@ class ComposeMixin(object):
             return
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
-            cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+            # Use down on per-module scenarios to release network pools too
+            if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
+                cls.compose_project().down(remove_image_type=None, include_volumes=True)
+            else:
+                cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -140,7 +149,7 @@ class ComposeMixin(object):
         run from another container in the same network. It also works when
         running from the host network if the docker daemon runs natively.
         """
-        networks = info['NetworkSettings']['Networks'].values()
+        networks = list(info['NetworkSettings']['Networks'].values())
         port = port.split("/")[0]
         for network in networks:
             ip = network['IPAddress']
@@ -174,7 +183,7 @@ class ComposeMixin(object):
         if len(portsConfig) == 0:
             raise Exception("No exposed ports for service %s" % service)
         if port is None:
-            port = portsConfig.keys()[0]
+            port = list(portsConfig.keys())[0]
 
         # We can use _exposed_host for all platforms when we can use host network
         # in the metricbeat container
@@ -183,5 +192,42 @@ class ComposeMixin(object):
         return cls._exposed_host(info, port)
 
     @classmethod
+    def compose_project_name(cls):
+        basename = os.path.basename(cls.find_compose_path())
+
+        def positivehash(x):
+            return hash(x) % ((sys.maxsize+1) * 2)
+
+        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
+
+    @classmethod
     def compose_project(cls):
-        return get_project(cls.COMPOSE_PROJECT_DIR, project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))
+        env = Environment(os.environ.copy())
+        env.update(cls.COMPOSE_ENV)
+        return get_project(cls.find_compose_path(),
+                           project_name=cls.compose_project_name(),
+                           environment=env)
+
+    @classmethod
+    def find_compose_path(cls):
+        class_dir = os.path.abspath(os.path.dirname(sys.modules[cls.__module__].__file__))
+        while True:
+            if os.path.exists(os.path.join(class_dir, "docker-compose.yml")):
+                return class_dir
+            class_dir, current = os.path.split(class_dir)
+            if current == '':  # We have reached root
+                raise Exception("failed to find a docker-compose.yml file")
+
+    @classmethod
+    def get_service_log(cls, service):
+        container = cls.compose_project().containers(service_names=[service])[0]
+        return container.logs()
+
+    @classmethod
+    def service_log_contains(cls, service, msg):
+        log = cls.get_service_log(service)
+        counter = 0
+        for line in log.splitlines():
+            if line.find(msg.encode("utf-8")) >= 0:
+                counter += 1
+        return counter > 0
