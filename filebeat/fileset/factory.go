@@ -18,12 +18,12 @@
 package fileset
 
 import (
-	"github.com/elastic/beats/libbeat/esclientleg"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
