@@ -87,14 +87,6 @@ func NewClient(
 	s ClientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
-	var proxy func(*http.Request) (*url.URL, error)
-	if !s.ProxyDisable {
-		proxy = http.ProxyFromEnvironment
-		if s.Proxy != nil {
-			proxy = http.ProxyURL(s.Proxy)
-		}
-	}
-
 	pipeline := s.Pipeline
 	if pipeline != nil && pipeline.IsEmpty() {
 		pipeline = nil
@@ -142,11 +134,11 @@ func NewClient(
 				Dial:            dialer.Dial,
 				DialTLS:         tlsDialer.Dial,
 				TLSClientConfig: s.TLS.ToConfig(),
-				Proxy:           proxy,
 			},
 			Timeout: s.Timeout,
 		},
 		Proxy:            s.Proxy,
+		ProxyDisable:     s.ProxyDisable,
 		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
