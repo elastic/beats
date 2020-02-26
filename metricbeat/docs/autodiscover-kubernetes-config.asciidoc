@@ -9,7 +9,7 @@ metricbeat.autodiscover:
       templates:
         - condition:
             contains:
-              kubernetes.annotations.prometheus.io.scrape: "true"
+              kubernetes.annotations.prometheus.io/scrape: "true"
           config:
             - module: prometheus
               metricsets: ["collector"]
