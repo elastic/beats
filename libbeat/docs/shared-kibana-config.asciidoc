@@ -89,8 +89,9 @@ under a custom prefix.
 [[kibana-space-id-option]]
 ==== `setup.kibana.space.id`
 
-The Kibana space ID to use. If specified, {beatname_uc} loads Kibana assets
-into this Kibana space. Omit this option to use the default space.
+The {kibana-ref}/xpack-spaces.html[Kibana space] ID to use. If specified,
+{beatname_uc} loads Kibana assets into this Kibana space. Omit this option to
+use the default space.
 
 [float]
 ==== `setup.kibana.ssl.enabled`
