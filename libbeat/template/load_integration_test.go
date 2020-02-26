@@ -353,7 +353,7 @@ func path(t *testing.T, fileElems []string) string {
 	return fieldsPath
 }
 
-func getTestingElasticsearch(t TestLogger) *eslegclient.Connection {
+func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: eslegtest.GetURL(),
 		HTTP: &http.Client{

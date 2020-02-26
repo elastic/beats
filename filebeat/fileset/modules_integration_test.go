@@ -25,6 +25,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/esleg/eslegtest"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -247,7 +249,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	assert.Equal(t, 404, status)
 }
 
-func getTestingElasticsearch(t TestLogger) *eslegclient.Connection {
+func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: GetURL(),
 		HTTP: &http.Client{
