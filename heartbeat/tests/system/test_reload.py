@@ -69,6 +69,8 @@ class Test(BaseTest):
         """
         self.setup_dynamic()
 
+        # Wait until the beat is running and has performed its first load of
+        # the config directory.
         self.wait_until(lambda: self.log_contains(
             "Starting reload procedure, current runners: 0"))
 
@@ -77,9 +79,10 @@ class Test(BaseTest):
             self.write_dyn_config(
                 "test.yml", self.http_cfg("myid", "http://localhost:{}".format(server.server_port)))
 
+            # The beat should recognize there is a new runner to start.
             self.wait_until(lambda: self.log_contains(
-                "Starting reload procedure, current runners: 1"),
-                max_timeout=15)
+                "Start list: 1, Stop list: 0"),
+                max_timeout=10)
 
             self.wait_until(lambda: self.output_lines() > 0)
 
