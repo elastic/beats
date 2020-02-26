@@ -43,16 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
-- Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
-- Add new dashboard for CouchDB database {pull}13198[13198]
-- Add new dashboard for Ceph cluster stats {pull}13216[13216]
-- Add new dashboard for Aerospike database stats {pull}13217[13217]
-- Add new dashboard for Couchbase cluster stats {pull}13212[13212]
-- Add new dashboard for Prometheus server stats {pull}13126[13126]
 - Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
-- Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
-- system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Update cloudwatch metricset mapping for both metrics and dimensions. {pull}15245[15245]
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
