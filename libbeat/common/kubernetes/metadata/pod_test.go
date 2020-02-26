@@ -53,7 +53,9 @@ func TestPod_Generate(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"app": "production",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Pod",
@@ -67,9 +69,12 @@ func TestPod_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
 				},
 				"namespace": "default",
 				"node": common.MapStr{
@@ -87,7 +92,9 @@ func TestPod_Generate(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"app": "production",
+					},
 					OwnerReferences: []metav1.OwnerReference{
 						{
 							APIVersion: "apps",
@@ -110,9 +117,6 @@ func TestPod_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -121,12 +125,22 @@ func TestPod_Generate(t *testing.T) {
 				"node": common.MapStr{
 					"name": "testnode",
 				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
+				},
 			},
 		},
 	}
 
-	cfg := common.NewConfig()
-	metagen := NewPodMetadataGenerator(cfg, nil, nil, nil)
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"include_annotations": []string{"app"},
+	})
+	assert.Nil(t, err)
+
+	metagen := NewPodMetadataGenerator(config, nil, nil, nil)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -154,7 +168,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"app": "production",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Pod",
@@ -168,13 +184,16 @@ func TestPod_GenerateFromName(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"node": common.MapStr{
 					"name": "testnode",
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
 				},
 			},
 		},
@@ -188,7 +207,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"app": "production",
+					},
 					OwnerReferences: []metav1.OwnerReference{
 						{
 							APIVersion: "apps",
@@ -211,9 +232,6 @@ func TestPod_GenerateFromName(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -222,15 +240,24 @@ func TestPod_GenerateFromName(t *testing.T) {
 				"node": common.MapStr{
 					"name": "testnode",
 				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
+				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		config, err := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"app"},
+		})
+		assert.Nil(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
-		metagen := NewPodMetadataGenerator(cfg, pods, nil, nil)
+		metagen := NewPodMetadataGenerator(config, pods, nil, nil)
 
 		accessor, err := meta.Accessor(test.input)
 		require.Nil(t, err)
@@ -262,7 +289,9 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"app": "production",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Pod",
@@ -304,9 +333,6 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
 				},
 				"namespace":     "default",
 				"namespace_uid": uid,
@@ -320,24 +346,33 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 						"nodekey": "nodevalue",
 					},
 				},
+				"labels": common.MapStr{
+					"foo": "bar",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
+				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		config, err := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"app"},
+		})
+		assert.Nil(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.node)
-		nodeMeta := NewNodeMetadataGenerator(cfg, nodes)
+		nodeMeta := NewNodeMetadataGenerator(config, nodes)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)
-		nsMeta := NewNamespaceMetadataGenerator(cfg, namespaces)
+		nsMeta := NewNamespaceMetadataGenerator(config, namespaces)
 
-		metagen := NewPodMetadataGenerator(cfg, pods, nodeMeta, nsMeta)
+		metagen := NewPodMetadataGenerator(config, pods, nodeMeta, nsMeta)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})
