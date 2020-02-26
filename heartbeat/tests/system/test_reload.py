@@ -78,7 +78,8 @@ class Test(BaseTest):
                 "test.yml", self.http_cfg("myid", "http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.log_contains(
-                "Starting reload procedure, current runners: 1"))
+                "Starting reload procedure, current runners: 1"),
+                max_timeout=15)
 
             self.wait_until(lambda: self.output_lines() > 0)
 
