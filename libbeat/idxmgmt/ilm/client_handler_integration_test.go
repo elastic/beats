@@ -22,6 +22,7 @@ package ilm_test
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -31,9 +32,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -179,11 +180,16 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 }
 
 func newRawESClient(t *testing.T) ilm.ESClient {
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-		URL:              getURL(),
-		Index:            outil.MakeSelector(),
-		Username:         getUser(),
-		Password:         getUser(),
+	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+		URL:      getURL(),
+		Username: getUser(),
+		Password: getPass(),
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(60 * time.Second).Dial,
+			},
+			Timeout: 0,
+		},
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	}, nil)

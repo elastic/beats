@@ -7,14 +7,17 @@
 package licenser
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/esclientleg"
+
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 const (
@@ -22,16 +25,20 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *elasticsearch.Client {
+func getTestClient() *esclientleg.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
 		URL:              host,
-		Index:            outil.MakeSelector(),
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}, nil)
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(60 * time.Second).Dial,
+			},
+			Timeout: 60 * time.Second,
+		},
+	})
 
 	if err != nil {
 		panic(err)

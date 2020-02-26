@@ -14,18 +14,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/stretchr/testify/assert"
 )
 
-func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *elasticsearch.Client) {
+func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *esclientleg.Connection) {
 	mux := http.NewServeMux()
 	mux.Handle("/_license/", http.HandlerFunc(handler))
 
 	server := httptest.NewServer(mux)
 
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{URL: server.URL}, nil)
+	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+		URL: server.URL,
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial: transport.NetDialer(90 * time.Second).Dial,
+			},
+			Timeout: 90 * time.Second,
+		},
+	})
 	if err != nil {
 		t.Fatalf("could not create the elasticsearch client, error: %s", err)
 	}
