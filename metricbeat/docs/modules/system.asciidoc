@@ -242,6 +242,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-diskio,diskio>>
 
+* <<metricbeat-metricset-system-domain,domain>>
+
 * <<metricbeat-metricset-system-entropy,entropy>>
 
 * <<metricbeat-metricset-system-filesystem,filesystem>>
@@ -285,6 +287,8 @@ include::system/core.asciidoc[]
 include::system/cpu.asciidoc[]
 
 include::system/diskio.asciidoc[]
+
+include::system/domain.asciidoc[]
 
 include::system/entropy.asciidoc[]
 

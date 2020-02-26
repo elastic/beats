@@ -8,6 +8,7 @@
     - process
     - process_summary
     - socket_summary
+    - domain
     #- software
     #- hardware
     #- users

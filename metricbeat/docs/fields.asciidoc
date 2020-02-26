@@ -31560,6 +31560,23 @@ type: float
 --
 
 [float]
+=== domain
+
+domain
+
+
+
+*`system.domain.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
 === entropy
 
 Available system entropy

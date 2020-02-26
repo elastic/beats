@@ -1,0 +1,10 @@
+- name: domain
+  type: group
+  release: beta
+  description: >
+    domain
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
