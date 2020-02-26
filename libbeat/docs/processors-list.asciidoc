@@ -21,7 +21,7 @@ ifndef::no_add_kubernetes_metadata_processor[]
 * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
 endif::[]
 ifndef::no_add_cloudfoundry_metadata_processor[]
-* <<add-kubernetes-metadata,`add_cloudfoundry_metadata`>>
+* <<add-cloudfoundry-metadata,`add_cloudfoundry_metadata`>>
 endif::[]
 ifndef::no_add_labels_processor[]
 * <<add-labels, `add_labels`>>
