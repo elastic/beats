@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix loading processors from annotation hints. {pull}16348[16348]
+- Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
 - Fix k8s pods labels broken schema. {pull}16480[16480]
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
@@ -120,6 +121,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
+- Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 
