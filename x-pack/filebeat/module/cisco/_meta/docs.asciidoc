@@ -29,15 +29,7 @@ Check the <<dynamic-script-compilations>> section for more information.
 
 include::../include/what-happens.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard for ASA:
-
-[role="screenshot"]
-image::./images/kibana-cisco-asa.png[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -299,5 +291,13 @@ on your cluster:
 
 - {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
   Increase to at least `200` if using both filesets or other script-heavy modules.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for ASA:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
 
 :modulename!:
