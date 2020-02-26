@@ -37,6 +37,7 @@ type Software struct {
 	Version      string
 	MajorVersion uint64
 	MinorVersion uint64
+	Date         string
 }
 
 type MetricSet struct {
@@ -80,6 +81,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			"version":      soft.Version,
 			"majorVersion": soft.MajorVersion,
 			"minorVersion": soft.MinorVersion,
+			"InstallDate":  soft.Date,
 		}
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
@@ -138,6 +140,17 @@ func readRegistry(path string) []Software {
 		// from each key get values of display name and display version
 		displayName, _, err := k.GetStringValue("DisplayName")
 		displayVersion, _, err := k.GetStringValue("DisplayVersion")
+		installDate, _, err := k.GetStringValue("InstallDate")
+
+		// get install year,month,day
+		dateString := ""
+
+		if len(installDate) == 8 {
+			fulldate := []string{installDate[:4], installDate[4:6], installDate[6:8]}
+			dateString = strings.Join(fulldate, "/")
+		} else {
+			dateString = "Unknown"
+		}
 
 		// split display version into array by dot
 		versionSplitted := strings.Split(displayVersion, ".")
@@ -149,9 +162,7 @@ func readRegistry(path string) []Software {
 			majorVersionInt, _ := strconv.ParseUint(majorVersion, 10, 64)
 			minorVersionInt, _ := strconv.ParseUint(minorVersion, 10, 64)
 			// creating the instance of software object
-			newData := Software{Name: displayName, Version: displayVersion,
-				MajorVersion: majorVersionInt, MinorVersion: minorVersionInt}
-
+			newData := Software{Name: displayName, Version: displayVersion, MajorVersion: majorVersionInt, MinorVersion: minorVersionInt, Date: dateString}
 			if displayName != "" {
 				if displayVersion != "" {
 					data = append(data, newData)
