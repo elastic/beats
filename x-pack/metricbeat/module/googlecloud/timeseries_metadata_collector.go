@@ -16,11 +16,12 @@ import (
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors
-func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string) *MetadataCollectorInputData {
+func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string, region string) *MetadataCollectorInputData {
 	return &MetadataCollectorInputData{
 		TimeSeries: ts,
 		ProjectID:  projectID,
 		Zone:       zone,
+		Region:     region,
 	}
 }
 
@@ -52,12 +53,15 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	ecs := common.MapStr{
 		ECSCloud: common.MapStr{
-			ECSCloudAvailabilityZone: availabilityZone,
 			ECSCloudAccount: common.MapStr{
 				ECSCloudAccountID: accountID,
 			},
 			ECSCloudProvider: "googlecloud",
 		},
+	}
+
+	if availabilityZone != "" {
+		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
 	}
 
 	//Remove keys from resource that refers to ECS fields
