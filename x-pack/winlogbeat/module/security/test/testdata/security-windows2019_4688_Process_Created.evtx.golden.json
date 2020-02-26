@@ -16,7 +16,6 @@
     "log": {
       "level": "information"
     },
-    "message": "A new process has been created.\n\nCreator Subject:\n\tSecurity ID:\t\tS-1-5-21-1610636575-2290000098-1654242922-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT\n\tLogon ID:\t\t0x274A2\n\nTarget Subject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nProcess Information:\n\tNew Process ID:\t\t0x11cc\n\tNew Process Name:\tC:\\Windows\\System32\\wevtutil.exe\n\tToken Elevation Type:\t%%1937\n\tMandatory Label:\t\tS-1-16-12288\n\tCreator Process ID:\t0x122c\n\tCreator Process Name:\tC:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tProcess Command Line:\t\"C:\\Windows\\system32\\wevtutil.exe\" cl Security\n\nToken Elevation Type indicates the type of token that was assigned to the new process in accordance with User Account Control policy.\n\nType 1 is a full token with no privileges removed or groups disabled.  A full token is only used if User Account Control is disabled or if the user is the built-in Administrator account or a service account.\n\nType 2 is an elevated token with no privileges removed or groups disabled.  An elevated token is used when User Account Control is enabled and the user chooses to start the program using Run as administrator.  An elevated token is also used when an application is configured to always require administrative privilege or to always require maximum privilege, and the user is a member of the Administrators group.\n\nType 3 is a limited token with administrative privileges removed and administrative groups disabled.  The limited token is used when User Account Control is enabled, the application does not require administrative privilege, and the user does not choose to start the program using Run as administrator.",
     "process": {
       "args": [
         "C:\\Windows\\system32\\wevtutil.exe",
@@ -31,6 +30,12 @@
         "name": "powershell.exe"
       },
       "pid": 4556
+    },
+    "related": {
+      "user": [
+        "vagrant",
+        "-"
+      ]
     },
     "user": {
       "domain": "VAGRANT",

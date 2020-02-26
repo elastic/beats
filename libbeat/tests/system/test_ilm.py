@@ -16,15 +16,18 @@ class TestRunILM(BaseTest):
     def setUp(self):
         super(TestRunILM, self).setUp()
 
-        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.alias_name = self.index_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.custom_alias = self.beat_name + "_foo"
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -158,20 +161,23 @@ class TestCommandSetupILMPolicy(BaseTest):
     def setUp(self):
         super(TestCommandSetupILMPolicy, self).setUp()
 
-        self.setupCmd = "--ilm-policy"
+        self.setupCmd = "--index-management"
 
-        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.alias_name = self.index_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.custom_alias = self.beat_name + "_foo"
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -188,12 +194,12 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         self.render_config()
 
+        # NOTE: --template is deprecated for 8.0.0./
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd, "--template"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -211,7 +217,6 @@ class TestCommandSetupILMPolicy(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -262,7 +267,6 @@ class TestCommandSetupILMPolicy(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
-        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
 
@@ -277,7 +281,7 @@ class TestCommandExportILMPolicy(BaseTest):
         self.config = "libbeat.yml"
         self.output = os.path.join(self.working_dir, self.config)
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
-        self.policy_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
         self.cmd = "ilm-policy"
 
     def assert_log_contains_policy(self):

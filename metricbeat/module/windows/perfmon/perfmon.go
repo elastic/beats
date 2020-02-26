@@ -89,6 +89,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches events and reports them upstream
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
+	if len(m.reader.query.Counters) == 0 {
+		return errors.New("no counters to read")
+	}
+
 	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).

@@ -253,8 +253,7 @@ setup.template.settings:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -423,9 +422,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -448,6 +447,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -515,9 +520,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -541,6 +546,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -688,9 +699,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -727,6 +738,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -800,9 +813,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -998,7 +1011,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1025,17 +1037,17 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'journalbeat-%{[agent.version]}'.
+# 'journalbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
@@ -1069,9 +1081,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1245,9 +1257,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1274,6 +1286,14 @@ logging.files:
 
   #metrics.period: 10s
   #state.period: 1m
+
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

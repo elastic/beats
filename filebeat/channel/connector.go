@@ -18,12 +18,11 @@
 package channel
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
 )
 
 // ConnectorFunc is an adapter for using ordinary functions as Connector.
@@ -32,14 +31,6 @@ type ConnectorFunc func(*common.Config, beat.ClientConfig) (Outleter, error)
 type pipelineConnector struct {
 	parent   *OutletFactory
 	pipeline beat.Pipeline
-}
-
-// addFormattedIndex is a Processor to set an event's "raw_index" metadata field
-// with a given TimestampFormatString. The elasticsearch output interprets
-// that field as specifying the (raw string) index the event should be sent to;
-// in other outputs it is just included in the metadata.
-type addFormattedIndex struct {
-	formatString *fmtstr.TimestampFormatString
 }
 
 // Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.
@@ -132,13 +123,13 @@ func processorsForConfig(
 		if err != nil {
 			return nil, err
 		}
-		indexProcessor := &addFormattedIndex{timestampFormat}
-		procs.List = append(procs.List, indexProcessor)
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
 	}
 
 	// 2. ClientConfig processors
 	if lst := clientCfg.Processing.Processor; lst != nil {
-		procs.List = append(procs.List, lst)
+		procs.AddProcessor(lst)
 	}
 
 	// 3. User processors
@@ -146,34 +137,7 @@ func processorsForConfig(
 	if err != nil {
 		return nil, err
 	}
-	// Subtlety: it is important here that we append the individual elements of
-	// userProcessors, rather than userProcessors itself, even though
-	// userProcessors implements the processors.Processor interface. This is
-	// because the contents of what we return are later pulled out into a
-	// processing.group rather than a processors.Processors, and the two have
-	// different error semantics: processors.Processors aborts processing on
-	// any error, whereas processing.group only aborts on fatal errors. The
-	// latter is the most common behavior, and the one we are preserving here for
-	// backwards compatibility.
-	// We are unhappy about this and have plans to fix this inconsistency at a
-	// higher level, but for now we need to respect the existing semantics.
-	procs.List = append(procs.List, userProcessors.List...)
+	procs.AddProcessors(*userProcessors)
+
 	return procs, nil
-}
-
-func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
-	index, err := p.formatString.Run(event.Timestamp)
-	if err != nil {
-		return nil, err
-	}
-
-	if event.Meta == nil {
-		event.Meta = common.MapStr{}
-	}
-	event.Meta["raw_index"] = index
-	return event, nil
-}
-
-func (p *addFormattedIndex) String() string {
-	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }

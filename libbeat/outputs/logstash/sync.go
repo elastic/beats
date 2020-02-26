@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/go-lumber/client/v2"
+	v2 "github.com/elastic/go-lumber/client/v2"
 )
 
 type syncClient struct {

@@ -10,6 +10,7 @@ interval: {{ .interval }}
 json_objects_array: {{ .json_objects_array }}
 pagination: {{ .pagination }}
 url: {{ .url }}
+ssl: {{ .ssl }}
 
 {{ else if eq .input "file" }}
 

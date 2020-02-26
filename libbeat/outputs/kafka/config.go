@@ -79,6 +79,9 @@ type metaRetryConfig struct {
 }
 
 var compressionModes = map[string]sarama.CompressionCodec{
+	// As of sarama 1.24.1, zstd support is broken
+	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
+	// addressed before we add support here.
 	"none":   sarama.CompressionNone,
 	"no":     sarama.CompressionNone,
 	"off":    sarama.CompressionNone,

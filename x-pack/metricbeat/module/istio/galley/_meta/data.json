@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "istio.galley",
+        "duration": 115000,
+        "module": "istio"
+    },
+    "istio": {
+        "galley": {
+            "collection": "istio/networking/v1alpha3/envoyfilters",
+            "runtime": {
+                "state_type_instances": 1
+            }
+        }
+    },
+    "metricset": {
+        "name": "galley",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "istio"
+    }
+}

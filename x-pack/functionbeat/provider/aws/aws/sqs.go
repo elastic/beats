@@ -10,14 +10,17 @@ import (
 	"sort"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/cloudformation"
+	lambdarunner "github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -65,8 +68,10 @@ func SQSDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (s *SQS) Run(_ context.Context, client core.Client) error {
-	lambda.Start(s.createHandler(client))
+func (s *SQS) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
+	lambdarunner.Start(s.createHandler(client))
 	return nil
 }
 
@@ -75,6 +80,7 @@ func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) er
 		s.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.SQS(request)
+
 		if err := client.PublishAll(events); err != nil {
 			s.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
@@ -99,7 +105,7 @@ func (s *SQS) Template() *cloudformation.Template {
 
 	for _, trigger := range s.config.Triggers {
 		resourceName := prefix("SQS") + NormalizeResourceName(trigger.EventSourceArn)
-		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
+		template.Resources[resourceName] = &lambda.EventSourceMapping{
 			BatchSize:      batchSize,
 			EventSourceArn: trigger.EventSourceArn,
 			FunctionName:   cloudformation.GetAtt(prefix(""), "Arn"),
@@ -109,7 +115,7 @@ func (s *SQS) Template() *cloudformation.Template {
 }
 
 // Policies returns a slice of policies to add to the lambda role.
-func (s *SQS) Policies() []cloudformation.AWSIAMRole_Policy {
+func (s *SQS) Policies() []iam.Role_Policy {
 	resources := make([]string, len(s.config.Triggers))
 	for idx, trigger := range s.config.Triggers {
 		resources[idx] = trigger.EventSourceArn
@@ -129,8 +135,8 @@ func (s *SQS) Policies() []cloudformation.AWSIAMRole_Policy {
 	// - sqs:DeleteMessage
 	// - sqs:GetQueueAttributes
 	// - sqs:ReceiveMessage
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
+	policies := []iam.Role_Policy{
+		iam.Role_Policy{
 			PolicyName: cloudformation.Join("-", []string{"fnb", "sqs", s.config.Name}),
 			PolicyDocument: map[string]interface{}{
 				"Statement": []map[string]interface{}{

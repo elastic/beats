@@ -215,6 +215,18 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `index`
+
+If present, this formatted string overrides the index for events from this
+module (for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"metricbeat-myindex-2019.12.13"`.
+
+[float]
 ==== `keep_null`
 
 If this option is set to true, fields with `null` values will be published in
@@ -289,7 +301,7 @@ as the first segment in the HTTP URI path.
 [float]
 ==== `query`
 
-An optional value to pass common query params in YAML. Instead of setting the query params 
+An optional value to pass common query params in YAML. Instead of setting the query params
 within hosts values using the syntax `?key=value&key2&value2`, you can set it here like this:
 
 [source,yaml]

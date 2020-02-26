@@ -9,11 +9,12 @@ package cloudwatch
 import (
 	"testing"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 var (
@@ -652,44 +653,63 @@ func TestReadCloudwatchConfig(t *testing.T) {
 func TestGenerateFieldName(t *testing.T) {
 	cases := []struct {
 		title             string
+		metricsetName     string
 		label             []string
 		expectedFieldName string
 	}{
 		{
 			"test Average",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.avg",
+			"aws.ec2.metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.max",
+			"aws.ec2.metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.min",
+			"aws.ec2.metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.sum",
+			"aws.ec2.metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.count",
+			"aws.ec2.metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.p10",
+			"aws.ec2.metrics.CPUUtilization.p10",
+		},
+		{
+			"test other metricset",
+			"ec2",
+			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			"aws.ec2.metrics.CPUUtilization.p10",
+		},
+		{
+			"test metric name with dot",
+			"cloudwatch",
+			[]string{"DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
+			"aws.firehose.metrics.DeliveryToS3_Records.avg",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			fieldName := generateFieldName(c.label)
+			fieldName := generateFieldName(c.label[namespaceIdx], c.label)
 			assert.Equal(t, c.expectedFieldName, fieldName)
 		})
 	}
@@ -981,6 +1001,77 @@ func TestFilterListMetricsOutput(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			output := filterListMetricsOutput(c.listMetricsOutput, c.namespaceDetails)
 			assert.Equal(t, c.filteredMetricWithStatsTotal, output)
+		})
+	}
+}
+
+func TestCheckStatistics(t *testing.T) {
+	m := MetricSet{}
+	cases := []struct {
+		title           string
+		statisticMethod string
+		expectedOutput  error
+	}{
+		{
+			"test average",
+			"Average",
+			nil,
+		},
+		{
+			"test sum",
+			"Sum",
+			nil,
+		},
+		{
+			"test max",
+			"Maximum",
+			nil,
+		},
+		{
+			"test min",
+			"Minimum",
+			nil,
+		},
+		{
+			"test count",
+			"SampleCount",
+			nil,
+		},
+		{
+			"test pN",
+			"p10",
+			nil,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			m.CloudwatchConfigs = []Config{{Statistic: []string{c.statisticMethod}}}
+			output := m.checkStatistics()
+			assert.Equal(t, c.expectedOutput, output)
+		})
+	}
+
+	casesFailed := []struct {
+		title            string
+		statisticMethods []string
+		expectedOutput   error
+	}{
+		{
+			"wrong statistic method",
+			[]string{"test"},
+			errors.New("statistic method specified is not valid: test"),
+		},
+		{
+			"one correct and one wrong statistic method",
+			[]string{"Sum", "test"},
+			errors.New("statistic method specified is not valid: test"),
+		},
+	}
+	for _, c := range casesFailed {
+		t.Run(c.title, func(t *testing.T) {
+			m.CloudwatchConfigs = []Config{{Statistic: c.statisticMethods}}
+			output := m.checkStatistics()
+			assert.Error(t, output)
 		})
 	}
 }

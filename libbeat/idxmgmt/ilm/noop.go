@@ -34,8 +34,9 @@ func NewNoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 func (*noopSupport) Mode() Mode                      { return ModeDisabled }
 func (*noopSupport) Alias() Alias                    { return Alias{} }
 func (*noopSupport) Policy() Policy                  { return Policy{} }
+func (*noopSupport) Overwrite() bool                 { return false }
 func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
-func (*noopManager) Enabled() (bool, error)            { return false, nil }
+func (*noopManager) CheckEnabled() (bool, error)       { return false, nil }
 func (*noopManager) EnsureAlias() error                { return errOf(ErrOpNotAvailable) }
 func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, errOf(ErrOpNotAvailable) }

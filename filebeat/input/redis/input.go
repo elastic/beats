@@ -85,6 +85,10 @@ func (p *Input) LoadStates(states []file.State) error {
 }
 
 // Run runs the input
+// Note: Filebeat is required to call the redis input's Run() method multiple times. It is expected to be called
+// once initially when the input starts up and then again periodically, where the period is determined
+// by the value of the `scan_frequency` setting.
+// Also see https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-redis.html#redis-scan_frequency.
 func (p *Input) Run() {
 	logp.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
 

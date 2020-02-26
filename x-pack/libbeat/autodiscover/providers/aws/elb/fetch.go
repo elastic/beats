@@ -15,8 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const logSelector = "autodiscover-elb-fetch"
-
 // fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.
 type fetcher interface {
 	fetch(ctx context.Context) ([]*lbListener, error)
@@ -64,7 +62,7 @@ type apiFetcher struct {
 	client elasticloadbalancingv2iface.ClientAPI
 }
 
-func newAPIFetcher(ctx context.Context, clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
+func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{client}
@@ -89,6 +87,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 		taskPool:  sync.Pool{},
 		context:   ctx,
 		cancel:    cancel,
+		logger:    logp.NewLogger("autodiscover-elb-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -112,6 +111,7 @@ type fetchRequest struct {
 	pendingTasks sync.WaitGroup
 	context      context.Context
 	cancel       func()
+	logger       *logp.Logger
 }
 
 func (p *fetchRequest) fetch() ([]*lbListener, error) {
@@ -138,14 +138,14 @@ func (p *fetchRequest) fetchAllPages() {
 	for {
 		select {
 		case <-p.context.Done():
-			logp.Debug(logSelector, "done fetching ELB pages, context cancelled")
+			p.logger.Debug("done fetching ELB pages, context cancelled")
 			return
 		default:
 			if !p.fetchNextPage() {
-				logp.Debug(logSelector, "fetched all ELB pages")
+				p.logger.Debug("fetched all ELB pages")
 				return
 			}
-			logp.Debug(logSelector, "fetched ELB page")
+			p.logger.Debug("fetched ELB page")
 		}
 	}
 }

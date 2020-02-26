@@ -1,0 +1,35 @@
+- name: stats
+  type: group
+  description: >
+    Contains only high-level stan / nats streaming server related metrics
+  release: beta
+  fields:
+    - name: state
+      type: keyword
+      description: >
+        The cluster / streaming configuration state (STANDALONE, CLUSTERED)
+    - name: role
+      type: keyword
+      description: >
+        If clustered, role of this node in the cluster (Leader, Follower, Candidate)
+    - name: clients
+      type: integer
+      description: >
+        The number of STAN clients
+    - name: subscriptions
+      type: integer
+      description: >
+        The number of STAN streaming subscriptions
+    - name: channels
+      type: integer
+      description: >
+        The number of STAN channels
+    - name: messages
+      type: long
+      description: >
+        Number of messages across all STAN queues
+    - name: bytes
+      type: long
+      description: >
+        Number of bytes consumed across all STAN queues
+    

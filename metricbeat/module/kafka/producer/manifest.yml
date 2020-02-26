@@ -33,7 +33,14 @@ input:
             field: response_rate
           - attr: io-wait-time-ns-avg
             field: io_wait
-      - mbean: 'kafka.producer:client-id=console-producer,node-id=*,type=producer-node-metrics'
+      - mbean: 'kafka.producer:client-id=*,node-id=*,type=producer-node-metrics'
         attributes:
           - attr: outgoing-byte-total
-            field: bytes_out
+            field: out.bytes_per_sec
+      - mbean: 'kafka\.producer:type=ProducerTopicMetrics,name=MessagesPerSec,clientId=.*'
+        attributes:
+          - attr: Count
+            field: message_rate
+
+
+

@@ -14,6 +14,8 @@ processors:
 
 The `dissect` processor has the following configuration settings:
 
+`tokenizer`:: The field used to define the *dissection* pattern.
+
 `field`:: (Optional) The event field to tokenize. Default is `message`.
 
 `target_prefix`:: (Optional) The name of the field where the values will be extracted. When an empty
