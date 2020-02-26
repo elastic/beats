@@ -110,6 +110,10 @@ github.com/aerospike/aerospike-client-go/types/atomic
 github.com/aerospike/aerospike-client-go/types/particle_type
 github.com/aerospike/aerospike-client-go/types/rand
 github.com/aerospike/aerospike-client-go/utils/buffer
+# github.com/akavel/rsrc v0.8.0
+github.com/akavel/rsrc/binutil
+github.com/akavel/rsrc/coff
+github.com/akavel/rsrc/ico
 # github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 github.com/andrewkroh/sys/windows/svc/eventlog
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
@@ -595,6 +599,8 @@ github.com/jmoiron/sqlx
 github.com/jmoiron/sqlx/reflectx
 # github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 github.com/joeshaw/multierror
+# github.com/josephspurrier/goversioninfo v0.0.0-20200309025242-14b0ab84c6ca
+github.com/josephspurrier/goversioninfo
 # github.com/jpillora/backoff v1.0.0
 github.com/jpillora/backoff
 # github.com/json-iterator/go v1.1.7
