@@ -17,7 +17,8 @@ In order to filter out/in metrics one can make use of `metrics_filters.include` 
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-- module: prometheus
+- module: openmetrics
+  metricsets: ['collector']
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics
