@@ -16,7 +16,7 @@
 // under the License.
 
 // Need for unit and integration tests
-package esclientleg
+package eslegclient
 
 import (
 	"encoding/json"

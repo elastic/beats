@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -41,7 +41,7 @@ import (
 
 // Client is an elasticsearch client.
 type Client struct {
-	esclientleg.Connection
+	eslegclient.Connection
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
@@ -130,7 +130,7 @@ func NewClient(
 		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
 
-	conn, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       s.URL,
 		Username:  s.Username,
 		Password:  s.Password,
@@ -404,7 +404,7 @@ func (client *Client) publishEvents(
 
 	if failed > 0 {
 		if sendErr == nil {
-			sendErr = esclientleg.ErrTempBulkFailure
+			sendErr = eslegclient.ErrTempBulkFailure
 		}
 		return failedEvents, sendErr
 	}
@@ -416,7 +416,7 @@ func (client *Client) publishEvents(
 func bulkEncodePublishRequest(
 	log *logp.Logger,
 	version common.Version,
-	body esclientleg.BulkWriter,
+	body eslegclient.BulkWriter,
 	index outputs.IndexSelector,
 	pipeline *outil.Selector,
 	eventType string,
@@ -472,7 +472,7 @@ func createEventBulkMeta(
 		}
 	}
 
-	meta := esclientleg.BulkMeta{
+	meta := eslegclient.BulkMeta{
 		Index:    index,
 		DocType:  eventType,
 		Pipeline: pipeline,
@@ -480,9 +480,9 @@ func createEventBulkMeta(
 	}
 
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		return esclientleg.BulkCreateAction{Create: meta}, nil
+		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
-	return esclientleg.BulkIndexAction{Index: meta}, nil
+	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
@@ -510,8 +510,8 @@ func bulkCollectPublishFails(
 	result esclientleg.BulkResult,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
-	reader := esclientleg.NewJSONReader(result)
-	if err := esclientleg.BulkReadToItems(reader); err != nil {
+	reader := eslegclient.NewJSONReader(result)
+	if err := eslegclient.BulkReadToItems(reader); err != nil {
 		log.Errorf("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
@@ -520,7 +520,7 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := esclientleg.BulkReadItemStatus(log, reader)
+		status, msg, err := eslegclient.BulkReadItemStatus(log, reader)
 		if err != nil {
 			log.Error(err)
 			return nil, bulkResultStats{}

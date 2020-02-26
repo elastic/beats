@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -97,11 +98,7 @@ func (c *publishClient) Connect() error {
 		return errNoMonitoring
 	}
 
-<<<<<<< HEAD
 	c.log.Debug("XPack monitoring is enabled")
-=======
-	c.log.Debug(("XPack monitoring is enabled"))
->>>>>>> Reducing global logging usage
 
 	return nil
 }
@@ -119,11 +116,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
-<<<<<<< HEAD
 			c.log.Errorf("Type not available in monitoring reported. Please report this error: %+v", err)
-=======
-			c.log.Errorf("Type not available in monitoring reported. Please report this error: %s", err)
->>>>>>> Reducing global logging usage
 			continue
 		}
 
@@ -261,8 +254,8 @@ func getMonitoringIndexName() string {
 }
 
 func logBulkFailures(log *logp.Logger, result esclientleg.BulkResult, events []report.Event) {
-	reader := esclientleg.NewJSONReader(result)
-	err := esclientleg.BulkReadToItems(reader)
+	reader := eslegclient.NewJSONReader(result)
+	err := eslegclient.BulkReadToItems(reader)
 	if err != nil {
 		log.Errorf("failed to parse monitoring bulk items: %+v", err)
 		return

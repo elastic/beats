@@ -32,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -180,7 +180,7 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 }
 
 func newRawESClient(t *testing.T) ilm.ESClient {
-	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+	client, err := esleg.NewConnection(eslegclient.ConnectionSettings{
 		URL:      getURL(),
 		Username: getUser(),
 		Password: getPass(),

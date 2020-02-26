@@ -27,8 +27,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
-	"github.com/elastic/beats/v7/libbeat/esclientleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -77,7 +77,7 @@ func TestLoadPipeline(t *testing.T) {
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
 
-func checkUploadedPipeline(t *testing.T, client *esclientleg.Connection, expectedDescription string) {
+func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expectedDescription string) {
 	status, response, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, status)
@@ -147,12 +147,12 @@ func TestAvailableProcessors(t *testing.T) {
 	assert.Contains(t, err.Error(), "ingest-hello")
 }
 
-func hasIngest(client *esclientleg.Connection) bool {
+func hasIngest(client *esleg.Connection) bool {
 	v := client.GetVersion()
 	return v.Major >= 5
 }
 
-func hasIngestPipelineProcessor(client *esclientleg.Connection) bool {
+func hasIngestPipelineProcessor(client *eslegclient.Connection) bool {
 	v := client.GetVersion()
 	return v.Major > 6 || (v.Major == 6 && v.Minor >= 5)
 }

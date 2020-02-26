@@ -30,10 +30,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -51,7 +51,7 @@ const (
 )
 
 type esConnection struct {
-	*esclientleg.Connection
+	*eslegclient.Connection
 	t     *testing.T
 	index string
 }
@@ -102,7 +102,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+	client, err := esleg.NewConnection(eslegclient.ConnectionSettings{
 		URL:      host,
 		Username: username,
 		Password: password,

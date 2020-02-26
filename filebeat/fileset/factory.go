@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -135,7 +135,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *esclientleg.Connection) error {
+		callback := func(esClient *eslegclient.Connection) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)

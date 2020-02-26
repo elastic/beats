@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package esclientleg
+package eslegclient
 
 import (
 	"testing"

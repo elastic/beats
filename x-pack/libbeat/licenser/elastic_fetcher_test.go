@@ -14,19 +14,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *esclientleg.Connection) {
+func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *eslegclient.Connection) {
 	mux := http.NewServeMux()
 	mux.Handle("/_license/", http.HandlerFunc(handler))
 
 	server := httptest.NewServer(mux)
 
-	client, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: server.URL,
 		HTTP: &http.Client{
 			Transport: &http.Transport{

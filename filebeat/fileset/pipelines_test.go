@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 
 	"github.com/stretchr/testify/assert"
@@ -89,7 +89,7 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			}))
 			defer testESServer.Close()
 
-			testESClient, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 				URL: testESServer.URL,
 				HTTP: &http.Client{
 					Transport: &http.Transport{

@@ -22,7 +22,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/elastic/beats/libbeat/esclientleg"
+	"github.com/elastic/beats/libbeat/esleg"
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -60,8 +61,8 @@ func InitConnection(t TestLogger, conn Connectable, err error) {
 }
 
 // GetTestingElasticsearch creates a test connection.
-func GetTestingElasticsearch(t TestLogger) *esclientleg.Connection {
-	conn, err := esclientleg.NewConnection(esclientleg.ConnectionSettings{
+func GetTestingElasticsearch(t TestLogger) *eslegclient.Connection {
+	conn, err := esleg.NewConnection(eslegclient.ConnectionSettings{
 		URL: GetURL(),
 		HTTP: &http.Client{
 			Transport: &http.Transport{
@@ -75,7 +76,7 @@ func GetTestingElasticsearch(t TestLogger) *esclientleg.Connection {
 		panic(err) // panic in case TestLogger did not stop test
 	}
 
-	conn.Encoder = esclientleg.NewJSONEncoder(nil, false)
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
 	err = conn.Connect()
 	if err != nil {

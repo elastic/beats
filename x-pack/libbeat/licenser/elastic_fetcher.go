@@ -14,7 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -146,7 +146,7 @@ func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 // esClientMux is taking care of round robin request over an array of elasticsearch client, note that
 // calling request is not threadsafe.
 type esClientMux struct {
-	clients []esclientleg.Connection
+	clients []eslegclient.Connection
 	idx     int
 }
 
@@ -177,12 +177,12 @@ func (mux *esClientMux) Request(
 
 // newESClientMux takes a list of clients and randomize where we start and the list of  host we are
 // querying.
-func newESClientMux(clients []esclientleg.Connection) *esClientMux {
+func newESClientMux(clients []eslegclient.Connection) *esClientMux {
 	// randomize where we start
 	idx := rand.Intn(len(clients))
 
 	// randomize the list of round robin hosts.
-	tmp := make([]esclientleg.Connection, len(clients))
+	tmp := make([]eslegclient.Connection, len(clients))
 	copy(tmp, clients)
 	rand.Shuffle(len(tmp), func(i, j int) {
 		tmp[i], tmp[j] = tmp[j], tmp[i]

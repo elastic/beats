@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/esclientleg"
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -291,11 +291,11 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 			// check meta-data for each event
 			for i := 0; i < len(recorder.data); i += 2 {
-				var meta esclientleg.BulkMeta
+				var meta eslegclient.BulkMeta
 				switch v := recorder.data[i].(type) {
-				case esclientleg.BulkCreateAction:
+				case eslegclient.BulkCreateAction:
 					meta = v.Create
-				case esclientleg.BulkIndexAction:
+				case eslegclient.BulkIndexAction:
 					meta = v.Index
 				default:
 					panic("unknown type")

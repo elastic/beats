@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -182,7 +182,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
-	callback := func(esClient *esclientleg.Connection) error {
+	callback := func(esClient *eslegclient.Connection) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	_, err := elasticsearch.RegisterConnectCallback(callback)
