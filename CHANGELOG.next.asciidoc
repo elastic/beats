@@ -44,6 +44,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+- Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
+- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
+- Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 
 *Heartbeat*
 
@@ -53,6 +59,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add dedot for tags in ec2 metricset and cloudwatch metricset. {issue}15843[15843] {pull}15844[15844]
+- Use RFC3339 format for timestamps collected using the SQL module. {pull}15847[15847]
+- Add dedot for cloudwatch metric name. {issue}15916[15916] {pull}15917[15917]
+- Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
+- Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 
 *Packetbeat*
 
