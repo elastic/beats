@@ -182,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
 - Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
 - Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
+- Add database_account azure metricset. {issue}15758[15758]
 - Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]

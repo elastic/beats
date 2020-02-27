@@ -1,0 +1,3 @@
+name: azure
+metricsets:
+  - database_account
