@@ -46,6 +46,7 @@ func init() {
 	mb.Registry.MustAddMetricSet("prometheus", "collector", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
+		mb.WithNamespace("prometheus"),
 	)
 }
 
@@ -87,13 +88,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
-
 	eventList := map[string]common.MapStr{}
 	if err != nil {
 		m.addUpEvent(eventList, 0)
 		for _, evt := range eventList {
 			reporter.Event(mb.Event{
-				RootFields: common.MapStr{"prometheus": evt},
+				MetricSetFields: evt,
 			})
 		}
 		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
@@ -137,7 +137,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// Converts hash list to slice
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
-			RootFields: common.MapStr{"prometheus": e},
+			MetricSetFields: e,
 		})
 		if !isOpen {
 			break

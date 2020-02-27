@@ -1,7 +1,7 @@
 [
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -9,10 +9,10 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
+        "openmetrics": {
             "labels": {
-                "device": "br-10229e3512d9",
-                "instance": "127.0.0.1:51027",
+                "device": "br-33d819d5f834",
+                "instance": "127.0.0.1:51093",
                 "job": "openmetrics"
             },
             "metrics": {
@@ -26,7 +26,7 @@
     },
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -34,59 +34,9 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
+        "openmetrics": {
             "labels": {
-                "device": "br-38feb0aad6ab",
-                "instance": "127.0.0.1:51027",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-425cb4c454a6",
-                "instance": "127.0.0.1:51027",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:51027",
+                "instance": "127.0.0.1:51093",
                 "job": "prometheus"
             },
             "metrics": {
@@ -100,7 +50,7 @@
     },
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -108,10 +58,35 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
+        "openmetrics": {
+            "labels": {
+                "device": "br-425cb4c454a6",
+                "instance": "127.0.0.1:51093",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "node_network_carrier": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
             "labels": {
                 "device": "br-0cb306323b90",
-                "instance": "127.0.0.1:51027",
+                "instance": "127.0.0.1:51093",
                 "job": "openmetrics"
             },
             "metrics": {
@@ -125,7 +100,7 @@
     },
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -133,60 +108,10 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
-            "labels": {
-                "device": "br-210476dc4ef8",
-                "instance": "127.0.0.1:51027",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-33d819d5f834",
-                "instance": "127.0.0.1:51027",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
+        "openmetrics": {
             "labels": {
                 "device": "br-38425a39f36b",
-                "instance": "127.0.0.1:51027",
+                "instance": "127.0.0.1:51093",
                 "job": "openmetrics"
             },
             "metrics": {
@@ -200,7 +125,7 @@
     },
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -208,10 +133,10 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
+        "openmetrics": {
             "labels": {
-                "device": "br-4e623477470e",
-                "instance": "127.0.0.1:51027",
+                "device": "br-210476dc4ef8",
+                "instance": "127.0.0.1:51093",
                 "job": "openmetrics"
             },
             "metrics": {
@@ -225,7 +150,7 @@
     },
     {
         "event": {
-            "dataset": "openmetrics.collector",
+            "dataset": "openmetrics",
             "duration": 115000,
             "module": "openmetrics"
         },
@@ -233,10 +158,85 @@
             "name": "collector",
             "period": 10000
         },
-        "prometheus": {
+        "openmetrics": {
             "labels": {
                 "device": "br-3a285aa5e58c",
-                "instance": "127.0.0.1:51027",
+                "instance": "127.0.0.1:51093",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "node_network_carrier": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "device": "br-10229e3512d9",
+                "instance": "127.0.0.1:51093",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "node_network_carrier": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "device": "br-4e623477470e",
+                "instance": "127.0.0.1:51093",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "node_network_carrier": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "device": "br-38feb0aad6ab",
+                "instance": "127.0.0.1:51093",
                 "job": "openmetrics"
             },
             "metrics": {

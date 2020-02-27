@@ -28776,6 +28776,26 @@ Openmetrics module
 
 
 
+*`openmetrics.labels.*`*::
++
+--
+Prometheus metric labels
+
+
+type: object
+
+--
+
+*`openmetrics.metrics.*`*::
++
+--
+Prometheus metric
+
+
+type: object
+
+--
+
 [[exported-fields-oracle]]
 == Oracle fields
 

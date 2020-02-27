@@ -1,7 +1,7 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "openmetrics.collector",
+        "dataset": "openmetrics",
         "duration": 115000,
         "module": "openmetrics"
     },
@@ -9,9 +9,9 @@
         "name": "collector",
         "period": 10000
     },
-    "prometheus": {
+    "openmetrics": {
         "labels": {
-            "device": "br-10229e3512d9",
+            "device": "br-33d819d5f834",
             "job": "openmetrics"
         },
         "metrics": {
