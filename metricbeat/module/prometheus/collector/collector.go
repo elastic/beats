@@ -58,7 +58,7 @@ type MetricSet struct {
 	namespace      string
 }
 
-// MetricSetBuilder returns a builder function for a new Prometheus metricset using the given mapping
+// MetricSetBuilder returns a builder function for a new Prometheus metricset using the given namespace
 func MetricSetBuilder(namespace string) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config := defaultConfig
