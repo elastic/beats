@@ -3204,6 +3204,36 @@ type: object
 
 --
 
+*`azure.container_instance.*.*`*::
++
+--
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
+
+
+type: object
+
+--
+
 *`azure.database_account.*.*`*::
 +
 --
