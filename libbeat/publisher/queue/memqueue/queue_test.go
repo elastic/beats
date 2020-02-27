@@ -74,7 +74,7 @@ func TestProducerCancelRemovesEvents(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
-		return NewBroker(nil, Settings{
+		return NewQueue(nil, Settings{
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,
