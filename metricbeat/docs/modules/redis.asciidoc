@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-redis]]
+[role="xpack"]
 == Redis module
 
 This module periodically fetches metrics from http://redis.io/[Redis] servers.

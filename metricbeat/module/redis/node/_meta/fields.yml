@@ -1,4 +1,0 @@
-- name: node
-  type: group
-  release: beta
-  fields:

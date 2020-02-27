@@ -1,1 +1,0 @@
-This is the `proxy` metricset of the redis module. The metricset is compatible with Redis Enterprise Software.

@@ -32,7 +32,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -53,7 +53,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(6379)))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
