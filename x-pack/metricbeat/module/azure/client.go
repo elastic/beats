@@ -114,11 +114,11 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			client.Log.Error(err)
 			report.Error(err)
 		} else {
-			if metric.TimeGrain == "" {
-				metric.TimeGrain = timegrain
-			}
 			for i, currentMetric := range client.Resources.Metrics {
 				if matchMetrics(currentMetric, metric) {
+					if metric.TimeGrain == "" {
+						metric.TimeGrain = timegrain
+					}
 					current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
 					client.Resources.Metrics[i].Values = current
 					resultedMetrics = append(resultedMetrics, client.Resources.Metrics[i])

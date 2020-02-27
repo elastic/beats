@@ -8,9 +8,23 @@ input:
     - resource_group: ""
       resource_type: "Microsoft.ContainerService/managedClusters"
       metrics:
-      - name: "*"
+      - name: ["kube_node_status_condition"]
         namespace: "Microsoft.ContainerService/managedClusters"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "status"
+          value: "*"
+      - name: ["kube_node_status_allocatable_cpu_cores", "kube_node_status_allocatable_memory_bytes", "kube_pod_status_ready", "kube_pod_status_phase"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        timegrain: "PT5M"
     - resource_id: ""
       metrics:
-      - name: "*"
+      - name: ["kube_node_status_condition"]
         namespace: "Microsoft.ContainerService/managedClusters"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "status"
+          value: "*"
+      - name: ["kube_node_status_allocatable_cpu_cores", "kube_node_status_allocatable_memory_bytes", "kube_pod_status_ready", "kube_pod_status_phase"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        timegrain: "PT5M"

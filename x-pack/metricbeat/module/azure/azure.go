@@ -106,14 +106,16 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
 		var resources []ResourceConfig
 		for _, resource := range config.Resources {
-			if len(resource.Group) != 0 || len(resource.ID) != 0 {
+			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.ID) {
 				resources = append(resources, resource)
 			}
 		}
+		// check if this is a light metricset or not and no resources have been configured
 		if len(resources) == 0 && len(config.Resources) != 0 {
-			res := config.Resources[0]
-			res.Query = fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType)
-			resources = append(resources, res)
+			resources = append(resources, ResourceConfig{
+				Query:   fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType),
+				Metrics: config.Resources[0].Metrics,
+			})
 		}
 		config.Resources = resources
 	}
@@ -151,4 +153,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}
 	return nil
+}
+
+// hasConfigOptions func will check if any resource id or resource group options have been entered in the light metricsets
+func hasConfigOptions(config []string) bool {
+	if config == nil {
+		return false
+	}
+	for _, group := range config {
+		if group == "" {
+			return false
+		}
+	}
+	return true
 }

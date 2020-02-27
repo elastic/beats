@@ -7,10 +7,22 @@ input:
     resources:
     - resource_group: ""
       resource_type: "Microsoft.ContainerInstance/containerGroups"
+      timegrain: "PT5M"
       metrics:
-      - name: "*"
+      - name: ["CpuUsage", "MemoryUsage"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        dimensions:
+        - name: "containerName"
+          value: "*"
+      - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
     - resource_id: ""
+      timegrain: "PT5M"
       metrics:
-      - name: "*"
+      - name: ["CpuUsage", "MemoryUsage"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        dimensions:
+        - name: "containerName"
+          value: "*"
+      - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
