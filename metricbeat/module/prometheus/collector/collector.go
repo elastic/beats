@@ -43,10 +43,9 @@ var (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("prometheus", "collector", New,
+	mb.Registry.MustAddMetricSet("prometheus", "collector", MetricSetBuilder("prometheus"),
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
-		mb.WithNamespace("prometheus"),
 	)
 }
 
@@ -56,33 +55,37 @@ type MetricSet struct {
 	prometheus     p.Prometheus
 	includeMetrics []*regexp.Regexp
 	excludeMetrics []*regexp.Regexp
+	namespace      string
 }
 
-// New creates a new metricset
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := defaultConfig
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-	prometheus, err := p.NewPrometheusClient(base)
-	if err != nil {
-		return nil, err
-	}
+// MetricSetBuilder returns a builder function for a new Prometheus metricset using the given mapping
+func MetricSetBuilder(namespace string) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		config := defaultConfig
+		if err := base.Module().UnpackConfig(&config); err != nil {
+			return nil, err
+		}
+		prometheus, err := p.NewPrometheusClient(base)
+		if err != nil {
+			return nil, err
+		}
 
-	ms := &MetricSet{
-		BaseMetricSet: base,
-		prometheus:    prometheus,
-	}
-	ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
-	if err != nil {
-		return nil, errors.Wrapf(err, "unable to compile exclude patterns")
-	}
-	ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
-	if err != nil {
-		return nil, errors.Wrapf(err, "unable to compile include patterns")
-	}
+		ms := &MetricSet{
+			BaseMetricSet: base,
+			prometheus:    prometheus,
+			namespace:     namespace,
+		}
+		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+		}
+		ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to compile include patterns")
+		}
 
-	return ms, nil
+		return ms, nil
+	}
 }
 
 // Fetch fetches data and reports it
@@ -93,7 +96,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.addUpEvent(eventList, 0)
 		for _, evt := range eventList {
 			reporter.Event(mb.Event{
-				MetricSetFields: evt,
+				RootFields: common.MapStr{m.namespace: evt},
 			})
 		}
 		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
@@ -137,7 +140,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// Converts hash list to slice
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
-			MetricSetFields: e,
+			RootFields: common.MapStr{m.namespace: e},
 		})
 		if !isOpen {
 			break

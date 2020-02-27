@@ -1,7 +1,7 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "openmetrics",
+        "dataset": "openmetrics.collector",
         "duration": 115000,
         "module": "openmetrics"
     },
@@ -11,7 +11,7 @@
     },
     "openmetrics": {
         "labels": {
-            "device": "br-0cb306323b90",
+            "device": "br-10229e3512d9",
             "job": "openmetrics"
         },
         "metrics": {
