@@ -46,8 +46,6 @@ var:
       - /var/log/crowdstrike/falconhoseclient/output
 -----
 
-include::../include/var-paths.asciidoc[]
-
 :has-dashboards!:
 
 :modulename!:

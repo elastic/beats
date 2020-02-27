@@ -88,7 +88,7 @@ var crowdstrikeFalcon = (function() {
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
                 evt.Put("message", evt.Get("crowdstrike.event.ServiceName"))
                 evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
-                evt.Put("change")
+                evt.Put("event.type", "change")
  
                 break;
  
