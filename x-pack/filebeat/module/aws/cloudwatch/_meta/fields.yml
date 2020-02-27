@@ -5,11 +5,3 @@
   description: >
     Fields for AWS CloudWatch logs.
   fields:
-    - name: ip
-      type: ip
-      description: >
-        The internet address of the requester.
-    - name: program_name
-      type: keyword
-      description: >
-        The program name of the log entry.

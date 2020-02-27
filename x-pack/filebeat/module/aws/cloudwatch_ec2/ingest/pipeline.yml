@@ -1,11 +1,11 @@
-description: "Pipeline for CloudWatch logs"
+description: "Pipeline for EC2 logs in CloudWatch"
 
 processors:
   - grok:
       field: message
       patterns:
         - >-
-          %{TIMESTAMP_ISO8601:_tmp.timestamp} %{GREEDYDATA:message}
+          %{TIMESTAMP_ISO8601:_tmp.timestamp} %{MONTH:_tmp.month} %{MONTHDAY:_tmp.day} %{TIME:_tmp.time} %{IPORHOST:aws.cloudwatch_ec2.ip_address} %{NOTSPACE:aws.cloudwatch_ec2.program_name}: %{GREEDYDATA:message}
 
   - date:
       field: "_tmp_.timestamp"

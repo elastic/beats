@@ -1,0 +1,15 @@
+- name: cloudwatch_ec2
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Fields for AWS EC2 logs in CloudWatch.
+  fields:
+    - name: ip_address
+      type: keyword
+      description: >
+        The internet address of the requester.
+    - name: program_name
+      type: keyword
+      description: >
+        The program name of the log entry.
