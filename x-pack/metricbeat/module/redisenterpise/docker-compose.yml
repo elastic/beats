@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  redisenterprise:
+    image: docker.elastic.co/integrations-ci/beats-redisenterprise:${REDIS_VERSION:-5.4.10-22}-3
+    build:
+      context: ./_meta
+      args:
+        REDIS_VERSION: ${REDIS_VERSION:-5.4.10-22}
+    privileged: true
+    ports:
+      - 8070

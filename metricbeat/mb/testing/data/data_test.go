@@ -25,13 +25,10 @@ import (
 	"testing"
 
 	_ "github.com/elastic/beats/metricbeat/include"
-	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestAll(t *testing.T) {
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(getModulesPath()))
-
 	configFiles, _ := filepath.Glob(getModulesPath() + "/*/*/_meta/testdata/config.yml")
 
 	for _, f := range configFiles {

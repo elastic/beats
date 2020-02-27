@@ -1,0 +1,11 @@
+- key: redisenterprise
+  title: "Redis"
+  description: >
+    Redis metrics collected from Redis Enterprise Server.
+  release: ga
+  fields:
+    - name: redisenterprise
+      type: group
+      description: >
+        `redisenterprise` contains the information and statistics from Redis Enterprise Server.
+      fields:
