@@ -28,5 +28,5 @@ func init() {
 func TestEventMapping(t *testing.T) {
 	logp.TestingSetup()
 
-	mbtest.TestDataFiles(t, "redis", "node")
+	mbtest.TestDataFiles(t, "redisenterprise", "node")
 }
