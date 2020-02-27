@@ -19,5 +19,5 @@ func init() {
 // AssetRedisenterprise returns asset data.
 // This is the base64 encoded gzipped contents of module/redisenterprise.
 func AssetRedisenterprise() string {
-	return "eJykj0FOxDAUQ/c9hTX74QBZsOMCcIEJiQtfpEn0/wfR26OMRlWFiliMl7ZsPZ/xwTVAmcVYndpVjBPg4oUBp+eRnCYg05JKd2k14HECgGuGha6SDKmVwuTMmLUtt/Bp28QL9Yv6MAHKwmgMeIsTMAtLtnBdPKPGhUc8Q772UdL22W/OAdTQ5Vf/gtSqR6kGfyekzk2XOFqINcM8upiPE/+hD+2B99C1ZW7mEe3Q9v2VHnf+X6Nd2/d69+pPAAAA//9a0ZKZ"
+	return "eJykjztOBDEQRHOforT5cgAHZFwALrDGroUWHtvqbhBze2Q+q9VoEAEv7E/p1REvXCOURYzNqUPFGAAXr4w43M8N7i6rQwAKLasMl94ibgMAfJ0tdJVsyL1WZmfBWfuCbQYeqG/UmwAoK5Mx4pGeAnAW1mLxM/OIlhbuyU18HYx40v46vic7WpPT5v+E3JsnaQZ/JqSduy5pfiG1AvPkYj5r/CU/uRa+lm698DLcs51s2//wW+jQ/r7+O/UjAAD//wOWl64="
 }
