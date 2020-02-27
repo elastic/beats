@@ -5,7 +5,7 @@
   short_config: false
   anchor: cloudfoundry-processor
   fields:
-    - name: cf
+    - name: cloudfoundry
       type: group
       fields:
         - name: app.id
