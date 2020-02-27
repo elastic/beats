@@ -11,7 +11,7 @@ import (
 // Fuzz is the entry point that go-fuzz uses to fuzz the parser.
 func Fuzz(data []byte) int {
 	var e cef2.Event
-	if err := e.Unpack(data); err != nil {
+	if err := e.Unpack(string(data)); err != nil {
 		return 1
 	}
 	return 0
