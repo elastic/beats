@@ -19,9 +19,10 @@ const ModuleName = "cloudfoundry"
 type Module struct {
 	mb.BaseModule
 
+	log *logp.Logger
+
 	hub          *cfcommon.Hub
 	listener     *cfcommon.RlpListener
-	listenerOn   bool
 	listenerLock sync.Mutex
 
 	counterReporter   mb.PushReporterV2
@@ -40,15 +41,21 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 	if err := base.UnpackConfig(&cfg); err != nil {
 		return nil, err
 	}
-	hub := cfcommon.NewHub(&cfg, "metricbeat", logp.NewLogger("cloudfoundry"))
-	listener, err := hub.RlpListener(cfcommon.RlpListenerCallbacks{})
+
+	log := logp.NewLogger("cloudfoundry")
+	hub := cfcommon.NewHub(&cfg, "metricbeat", log)
+
+	// early check that listener can be created
+	_, err := hub.RlpListener(cfcommon.RlpListenerCallbacks{})
 	if err != nil {
 		return nil, err
+
 	}
+
 	return &Module{
 		BaseModule: base,
+		log:        log,
 		hub:        hub,
-		listener:   listener,
 	}, nil
 }
 
@@ -89,9 +96,9 @@ func (m *Module) RunContainerReporter(reporter mb.PushReporterV2) {
 }
 
 func (m *Module) runReporters(counterReporter, valueReporter, containerReporter mb.PushReporterV2) {
-	if m.listenerOn {
+	if m.listener != nil {
 		m.listener.Stop()
-		m.listenerOn = false
+		m.listener = nil
 	}
 	m.counterReporter = counterReporter
 	m.valueReporter = valueReporter
@@ -127,7 +134,12 @@ func (m *Module) runReporters(counterReporter, valueReporter, containerReporter 
 		}
 	}
 	if start {
-		m.listener.Start(context.Background())
-		m.listenerOn = true
+		l, err := m.hub.RlpListener(callbacks)
+		if err != nil {
+			m.log.Errorf("failed to create RlpListener: %v", err)
+			return
+		}
+		l.Start(context.Background())
+		m.listener = l
 	}
 }
