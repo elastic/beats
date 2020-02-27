@@ -17,8 +17,8 @@ func getNamespace(provider string) string {
 
 // Feature creates a new Provider feature to be added to the global registry.
 // The namespace will be 'functionbeat.provider' in the registry.
-func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
-	return feature.New(namespace, name, factory, description)
+func Feature(name string, factory Factory, details feature.Details) *feature.Feature {
+	return feature.New(namespace, name, factory, details)
 }
 
 // FunctionFeature Feature creates a new function feature to be added to the global registry
@@ -26,9 +26,9 @@ func Feature(name string, factory Factory, description feature.Describer) *featu
 func FunctionFeature(
 	provider, name string,
 	factory FunctionFactory,
-	description feature.Describer,
+	details feature.Details,
 ) *feature.Feature {
-	return feature.New(getNamespace(provider), name, factory, description)
+	return feature.New(getNamespace(provider), name, factory, details)
 }
 
 // Builder is used to have a fluent interface to build a set of function for a specific provider, it
@@ -41,8 +41,8 @@ type Builder struct {
 
 // MustCreate creates a new provider builder, it is used to define a provider and the function
 // it supports.
-func MustCreate(name string, factory Factory, description feature.Describer) *Builder {
-	return &Builder{name: name, bundle: feature.NewBundle(Feature(name, factory, description))}
+func MustCreate(name string, factory Factory, details feature.Details) *Builder {
+	return &Builder{name: name, bundle: feature.NewBundle(Feature(name, factory, details))}
 }
 
 // Bundle transforms the provider and the functions into a bundle feature.
@@ -54,8 +54,8 @@ func (b *Builder) Bundle() *feature.Bundle {
 func (b *Builder) MustAddFunction(
 	name string,
 	factory FunctionFactory,
-	description feature.Describer,
+	details feature.Details,
 ) *Builder {
-	b.bundle = feature.MustBundle(b.bundle, FunctionFeature(b.name, name, factory, description))
+	b.bundle = feature.MustBundle(b.bundle, FunctionFeature(b.name, name, factory, details))
 	return b
 }
