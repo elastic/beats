@@ -28,6 +28,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
 - Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
+- Python 3 is required now to run python tests and tools. {pull}14798[14798]
+- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
 
 ==== Bugfixes
 
