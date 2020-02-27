@@ -9,12 +9,11 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/openmetrics"
 )
 
-func TestEventMapping(t *testing.T) {
-	logp.TestingSetup()
-
+func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
