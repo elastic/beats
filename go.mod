@@ -130,6 +130,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
+	github.com/u-root/u-root v6.0.0+incompatible // indirect
 	github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
@@ -168,5 +169,6 @@ replace (
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
+	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200221232812-81b9770086ea // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 )

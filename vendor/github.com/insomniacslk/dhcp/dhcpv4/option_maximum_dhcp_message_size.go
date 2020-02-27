@@ -1,57 +1,50 @@
 package dhcpv4
 
 import (
-	"encoding/binary"
 	"fmt"
+
+	"github.com/u-root/u-root/pkg/uio"
 )
 
-// This option implements the Maximum DHCP Message size option
-// https://tools.ietf.org/html/rfc2132
-
-// OptMaximumDHCPMessageSize represents the DHCP message type option.
-type OptMaximumDHCPMessageSize struct {
-	Size uint16
-}
-
-// ParseOptMaximumDHCPMessageSize constructs an OptMaximumDHCPMessageSize struct from a sequence of
-// bytes and returns it, or an error.
-func ParseOptMaximumDHCPMessageSize(data []byte) (*OptMaximumDHCPMessageSize, error) {
-	// Should at least have code, length, and message type.
-	if len(data) < 4 {
-		return nil, ErrShortByteStream
-	}
-	code := OptionCode(data[0])
-	if code != OptionMaximumDHCPMessageSize {
-		return nil, fmt.Errorf("expected option %v, got %v instead", OptionMaximumDHCPMessageSize, code)
-	}
-	length := int(data[1])
-	if length != 2 {
-		return nil, fmt.Errorf("expected length 2, got %v instead", length)
-	}
-	msgSize := binary.BigEndian.Uint16(data[2:4])
-	return &OptMaximumDHCPMessageSize{Size: msgSize}, nil
-}
-
-// Code returns the option code.
-func (o *OptMaximumDHCPMessageSize) Code() OptionCode {
-	return OptionMaximumDHCPMessageSize
-}
+// Uint16 implements encoding and decoding functions for a uint16 as used in
+// RFC 2132, Section 9.10.
+type Uint16 uint16
 
 // ToBytes returns a serialized stream of bytes for this option.
-func (o *OptMaximumDHCPMessageSize) ToBytes() []byte {
-	serializedSize := make([]byte, 2)
-	binary.BigEndian.PutUint16(serializedSize, o.Size)
-	serializedOpt := []byte{byte(o.Code()), byte(o.Length())}
-	return append(serializedOpt, serializedSize...)
+func (o Uint16) ToBytes() []byte {
+	buf := uio.NewBigEndianBuffer(nil)
+	buf.Write16(uint16(o))
+	return buf.Data()
 }
 
 // String returns a human-readable string for this option.
-func (o *OptMaximumDHCPMessageSize) String() string {
-	return fmt.Sprintf("Maximum DHCP Message Size -> %v", o.Size)
+func (o Uint16) String() string {
+	return fmt.Sprintf("%d", uint16(o))
 }
 
-// Length returns the length of the data portion (excluding option code and byte
-// for length, if any).
-func (o *OptMaximumDHCPMessageSize) Length() int {
-	return 2
+// FromBytes decodes data into o as per RFC 2132, Section 9.10.
+func (o *Uint16) FromBytes(data []byte) error {
+	buf := uio.NewBigEndianBuffer(data)
+	*o = Uint16(buf.Read16())
+	return buf.FinError()
+}
+
+// GetUint16 parses a uint16 from code in o.
+func GetUint16(code OptionCode, o Options) (uint16, error) {
+	v := o.Get(code)
+	if v == nil {
+		return 0, fmt.Errorf("option not present")
+	}
+	var u Uint16
+	if err := u.FromBytes(v); err != nil {
+		return 0, err
+	}
+	return uint16(u), nil
+}
+
+// OptMaxMessageSize returns a new DHCP Maximum Message Size option.
+//
+// The Maximum DHCP Message Size option is described by RFC 2132, Section 9.10.
+func OptMaxMessageSize(size uint16) Option {
+	return Option{Code: OptionMaximumDHCPMessageSize, Value: Uint16(size)}
 }

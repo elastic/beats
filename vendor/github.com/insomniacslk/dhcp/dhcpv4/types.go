@@ -1,13 +1,33 @@
 package dhcpv4
 
+import (
+	"fmt"
+
+	"github.com/u-root/u-root/pkg/uio"
+)
+
 // values from http://www.networksorcery.com/enp/protocol/dhcp.htm and
 // http://www.networksorcery.com/enp/protocol/bootp/options.htm
+
+// TransactionID represents a 4-byte DHCP transaction ID as defined in RFC 951,
+// Section 3.
+//
+// The TransactionID is used to match DHCP replies to their original request.
+type TransactionID [4]byte
+
+// String prints a hex transaction ID.
+func (xid TransactionID) String() string {
+	return fmt.Sprintf("0x%x", xid[:])
+}
 
 // MessageType represents the possible DHCP message types - DISCOVER, OFFER, etc
 type MessageType byte
 
 // DHCP message types
 const (
+	// MessageTypeNone is not a real message type, it is used by certain
+	// functions to signal that no explicit message type is requested
+	MessageTypeNone     MessageType = 0
 	MessageTypeDiscover MessageType = 1
 	MessageTypeOffer    MessageType = 2
 	MessageTypeRequest  MessageType = 3
@@ -18,8 +38,29 @@ const (
 	MessageTypeInform   MessageType = 8
 )
 
-// MessageTypeToString maps DHCP message types to human-readable strings.
-var MessageTypeToString = map[MessageType]string{
+// ToBytes returns the serialized version of this option described by RFC 2132,
+// Section 9.6.
+func (m MessageType) ToBytes() []byte {
+	return []byte{byte(m)}
+}
+
+// String prints a human-readable message type name.
+func (m MessageType) String() string {
+	if s, ok := messageTypeToString[m]; ok {
+		return s
+	}
+	return fmt.Sprintf("unknown (%d)", byte(m))
+}
+
+// FromBytes reads a message type from data as described by RFC 2132, Section
+// 9.6.
+func (m *MessageType) FromBytes(data []byte) error {
+	buf := uio.NewBigEndianBuffer(data)
+	*m = MessageType(buf.Read8())
+	return buf.FinError()
+}
+
+var messageTypeToString = map[MessageType]string{
 	MessageTypeDiscover: "DISCOVER",
 	MessageTypeOffer:    "OFFER",
 	MessageTypeRequest:  "REQUEST",
@@ -39,178 +80,225 @@ const (
 	OpcodeBootReply   OpcodeType = 2
 )
 
-// OpcodeToString maps an OpcodeType to its mnemonic name
-var OpcodeToString = map[OpcodeType]string{
+func (o OpcodeType) String() string {
+	if s, ok := opcodeToString[o]; ok {
+		return s
+	}
+	return fmt.Sprintf("unknown (%d)", uint8(o))
+}
+
+var opcodeToString = map[OpcodeType]string{
 	OpcodeBootRequest: "BootRequest",
 	OpcodeBootReply:   "BootReply",
 }
 
+// OptionCode is a single byte representing the code for a given Option.
+//
+// OptionCode is an interface purely to support different stringers on options
+// with the same Code value, as vendor-specific options use option codes that
+// have the same value, but mean a different thing.
+type OptionCode interface {
+	// Code is the 1 byte option code for the wire.
+	Code() uint8
+
+	// String returns the option's name.
+	String() string
+}
+
+// optionCode is a DHCP option code.
+type optionCode uint8
+
+// Code implements OptionCode.Code.
+func (o optionCode) Code() uint8 {
+	return uint8(o)
+}
+
+// String returns an option name.
+func (o optionCode) String() string {
+	if s, ok := optionCodeToString[o]; ok {
+		return s
+	}
+	return fmt.Sprintf("unknown (%d)", uint8(o))
+}
+
+// GenericOptionCode is an unnamed option code.
+type GenericOptionCode uint8
+
+// Code implements OptionCode.Code.
+func (o GenericOptionCode) Code() uint8 {
+	return uint8(o)
+}
+
+// String returns the option's name.
+func (o GenericOptionCode) String() string {
+	return fmt.Sprintf("unknown (%d)", uint8(o))
+}
+
 // DHCPv4 Options
 const (
-	OptionPad                                        OptionCode = 0
-	OptionSubnetMask                                 OptionCode = 1
-	OptionTimeOffset                                 OptionCode = 2
-	OptionRouter                                     OptionCode = 3
-	OptionTimeServer                                 OptionCode = 4
-	OptionNameServer                                 OptionCode = 5
-	OptionDomainNameServer                           OptionCode = 6
-	OptionLogServer                                  OptionCode = 7
-	OptionQuoteServer                                OptionCode = 8
-	OptionLPRServer                                  OptionCode = 9
-	OptionImpressServer                              OptionCode = 10
-	OptionResourceLocationServer                     OptionCode = 11
-	OptionHostName                                   OptionCode = 12
-	OptionBootFileSize                               OptionCode = 13
-	OptionMeritDumpFile                              OptionCode = 14
-	OptionDomainName                                 OptionCode = 15
-	OptionSwapServer                                 OptionCode = 16
-	OptionRootPath                                   OptionCode = 17
-	OptionExtensionsPath                             OptionCode = 18
-	OptionIPForwarding                               OptionCode = 19
-	OptionNonLocalSourceRouting                      OptionCode = 20
-	OptionPolicyFilter                               OptionCode = 21
-	OptionMaximumDatagramAssemblySize                OptionCode = 22
-	OptionDefaultIPTTL                               OptionCode = 23
-	OptionPathMTUAgingTimeout                        OptionCode = 24
-	OptionPathMTUPlateauTable                        OptionCode = 25
-	OptionInterfaceMTU                               OptionCode = 26
-	OptionAllSubnetsAreLocal                         OptionCode = 27
-	OptionBroadcastAddress                           OptionCode = 28
-	OptionPerformMaskDiscovery                       OptionCode = 29
-	OptionMaskSupplier                               OptionCode = 30
-	OptionPerformRouterDiscovery                     OptionCode = 31
-	OptionRouterSolicitationAddress                  OptionCode = 32
-	OptionStaticRoutingTable                         OptionCode = 33
-	OptionTrailerEncapsulation                       OptionCode = 34
-	OptionArpCacheTimeout                            OptionCode = 35
-	OptionEthernetEncapsulation                      OptionCode = 36
-	OptionDefaulTCPTTL                               OptionCode = 37
-	OptionTCPKeepaliveInterval                       OptionCode = 38
-	OptionTCPKeepaliveGarbage                        OptionCode = 39
-	OptionNetworkInformationServiceDomain            OptionCode = 40
-	OptionNetworkInformationServers                  OptionCode = 41
-	OptionNTPServers                                 OptionCode = 42
-	OptionVendorSpecificInformation                  OptionCode = 43
-	OptionNetBIOSOverTCPIPNameServer                 OptionCode = 44
-	OptionNetBIOSOverTCPIPDatagramDistributionServer OptionCode = 45
-	OptionNetBIOSOverTCPIPNodeType                   OptionCode = 46
-	OptionNetBIOSOverTCPIPScope                      OptionCode = 47
-	OptionXWindowSystemFontServer                    OptionCode = 48
-	OptionXWindowSystemDisplayManger                 OptionCode = 49
-	OptionRequestedIPAddress                         OptionCode = 50
-	OptionIPAddressLeaseTime                         OptionCode = 51
-	OptionOptionOverload                             OptionCode = 52
-	OptionDHCPMessageType                            OptionCode = 53
-	OptionServerIdentifier                           OptionCode = 54
-	OptionParameterRequestList                       OptionCode = 55
-	OptionMessage                                    OptionCode = 56
-	OptionMaximumDHCPMessageSize                     OptionCode = 57
-	OptionRenewTimeValue                             OptionCode = 58
-	OptionRebindingTimeValue                         OptionCode = 59
-	OptionClassIdentifier                            OptionCode = 60
-	OptionClientIdentifier                           OptionCode = 61
-	OptionNetWareIPDomainName                        OptionCode = 62
-	OptionNetWareIPInformation                       OptionCode = 63
-	OptionNetworkInformationServicePlusDomain        OptionCode = 64
-	OptionNetworkInformationServicePlusServers       OptionCode = 65
-	OptionTFTPServerName                             OptionCode = 66
-	OptionBootfileName                               OptionCode = 67
-	OptionMobileIPHomeAgent                          OptionCode = 68
-	OptionSimpleMailTransportProtocolServer          OptionCode = 69
-	OptionPostOfficeProtocolServer                   OptionCode = 70
-	OptionNetworkNewsTransportProtocolServer         OptionCode = 71
-	OptionDefaultWorldWideWebServer                  OptionCode = 72
-	OptionDefaultFingerServer                        OptionCode = 73
-	OptionDefaultInternetRelayChatServer             OptionCode = 74
-	OptionStreetTalkServer                           OptionCode = 75
-	OptionStreetTalkDirectoryAssistanceServer        OptionCode = 76
-	OptionUserClassInformation                       OptionCode = 77
-	OptionSLPDirectoryAgent                          OptionCode = 78
-	OptionSLPServiceScope                            OptionCode = 79
-	OptionRapidCommit                                OptionCode = 80
-	OptionFQDN                                       OptionCode = 81
-	OptionRelayAgentInformation                      OptionCode = 82
-	OptionInternetStorageNameService                 OptionCode = 83
+	OptionPad                                        optionCode = 0
+	OptionSubnetMask                                 optionCode = 1
+	OptionTimeOffset                                 optionCode = 2
+	OptionRouter                                     optionCode = 3
+	OptionTimeServer                                 optionCode = 4
+	OptionNameServer                                 optionCode = 5
+	OptionDomainNameServer                           optionCode = 6
+	OptionLogServer                                  optionCode = 7
+	OptionQuoteServer                                optionCode = 8
+	OptionLPRServer                                  optionCode = 9
+	OptionImpressServer                              optionCode = 10
+	OptionResourceLocationServer                     optionCode = 11
+	OptionHostName                                   optionCode = 12
+	OptionBootFileSize                               optionCode = 13
+	OptionMeritDumpFile                              optionCode = 14
+	OptionDomainName                                 optionCode = 15
+	OptionSwapServer                                 optionCode = 16
+	OptionRootPath                                   optionCode = 17
+	OptionExtensionsPath                             optionCode = 18
+	OptionIPForwarding                               optionCode = 19
+	OptionNonLocalSourceRouting                      optionCode = 20
+	OptionPolicyFilter                               optionCode = 21
+	OptionMaximumDatagramAssemblySize                optionCode = 22
+	OptionDefaultIPTTL                               optionCode = 23
+	OptionPathMTUAgingTimeout                        optionCode = 24
+	OptionPathMTUPlateauTable                        optionCode = 25
+	OptionInterfaceMTU                               optionCode = 26
+	OptionAllSubnetsAreLocal                         optionCode = 27
+	OptionBroadcastAddress                           optionCode = 28
+	OptionPerformMaskDiscovery                       optionCode = 29
+	OptionMaskSupplier                               optionCode = 30
+	OptionPerformRouterDiscovery                     optionCode = 31
+	OptionRouterSolicitationAddress                  optionCode = 32
+	OptionStaticRoutingTable                         optionCode = 33
+	OptionTrailerEncapsulation                       optionCode = 34
+	OptionArpCacheTimeout                            optionCode = 35
+	OptionEthernetEncapsulation                      optionCode = 36
+	OptionDefaulTCPTTL                               optionCode = 37
+	OptionTCPKeepaliveInterval                       optionCode = 38
+	OptionTCPKeepaliveGarbage                        optionCode = 39
+	OptionNetworkInformationServiceDomain            optionCode = 40
+	OptionNetworkInformationServers                  optionCode = 41
+	OptionNTPServers                                 optionCode = 42
+	OptionVendorSpecificInformation                  optionCode = 43
+	OptionNetBIOSOverTCPIPNameServer                 optionCode = 44
+	OptionNetBIOSOverTCPIPDatagramDistributionServer optionCode = 45
+	OptionNetBIOSOverTCPIPNodeType                   optionCode = 46
+	OptionNetBIOSOverTCPIPScope                      optionCode = 47
+	OptionXWindowSystemFontServer                    optionCode = 48
+	OptionXWindowSystemDisplayManger                 optionCode = 49
+	OptionRequestedIPAddress                         optionCode = 50
+	OptionIPAddressLeaseTime                         optionCode = 51
+	OptionOptionOverload                             optionCode = 52
+	OptionDHCPMessageType                            optionCode = 53
+	OptionServerIdentifier                           optionCode = 54
+	OptionParameterRequestList                       optionCode = 55
+	OptionMessage                                    optionCode = 56
+	OptionMaximumDHCPMessageSize                     optionCode = 57
+	OptionRenewTimeValue                             optionCode = 58
+	OptionRebindingTimeValue                         optionCode = 59
+	OptionClassIdentifier                            optionCode = 60
+	OptionClientIdentifier                           optionCode = 61
+	OptionNetWareIPDomainName                        optionCode = 62
+	OptionNetWareIPInformation                       optionCode = 63
+	OptionNetworkInformationServicePlusDomain        optionCode = 64
+	OptionNetworkInformationServicePlusServers       optionCode = 65
+	OptionTFTPServerName                             optionCode = 66
+	OptionBootfileName                               optionCode = 67
+	OptionMobileIPHomeAgent                          optionCode = 68
+	OptionSimpleMailTransportProtocolServer          optionCode = 69
+	OptionPostOfficeProtocolServer                   optionCode = 70
+	OptionNetworkNewsTransportProtocolServer         optionCode = 71
+	OptionDefaultWorldWideWebServer                  optionCode = 72
+	OptionDefaultFingerServer                        optionCode = 73
+	OptionDefaultInternetRelayChatServer             optionCode = 74
+	OptionStreetTalkServer                           optionCode = 75
+	OptionStreetTalkDirectoryAssistanceServer        optionCode = 76
+	OptionUserClassInformation                       optionCode = 77
+	OptionSLPDirectoryAgent                          optionCode = 78
+	OptionSLPServiceScope                            optionCode = 79
+	OptionRapidCommit                                optionCode = 80
+	OptionFQDN                                       optionCode = 81
+	OptionRelayAgentInformation                      optionCode = 82
+	OptionInternetStorageNameService                 optionCode = 83
 	// Option 84 returned in RFC 3679
-	OptionNDSServers                       OptionCode = 85
-	OptionNDSTreeName                      OptionCode = 86
-	OptionNDSContext                       OptionCode = 87
-	OptionBCMCSControllerDomainNameList    OptionCode = 88
-	OptionBCMCSControllerIPv4AddressList   OptionCode = 89
-	OptionAuthentication                   OptionCode = 90
-	OptionClientLastTransactionTime        OptionCode = 91
-	OptionAssociatedIP                     OptionCode = 92
-	OptionClientSystemArchitectureType     OptionCode = 93
-	OptionClientNetworkInterfaceIdentifier OptionCode = 94
-	OptionLDAP                             OptionCode = 95
+	OptionNDSServers                       optionCode = 85
+	OptionNDSTreeName                      optionCode = 86
+	OptionNDSContext                       optionCode = 87
+	OptionBCMCSControllerDomainNameList    optionCode = 88
+	OptionBCMCSControllerIPv4AddressList   optionCode = 89
+	OptionAuthentication                   optionCode = 90
+	OptionClientLastTransactionTime        optionCode = 91
+	OptionAssociatedIP                     optionCode = 92
+	OptionClientSystemArchitectureType     optionCode = 93
+	OptionClientNetworkInterfaceIdentifier optionCode = 94
+	OptionLDAP                             optionCode = 95
 	// Option 96 returned in RFC 3679
-	OptionClientMachineIdentifier     OptionCode = 97
-	OptionOpenGroupUserAuthentication OptionCode = 98
-	OptionGeoConfCivic                OptionCode = 99
-	OptionIEEE10031TZString           OptionCode = 100
-	OptionReferenceToTZDatabase       OptionCode = 101
+	OptionClientMachineIdentifier     optionCode = 97
+	OptionOpenGroupUserAuthentication optionCode = 98
+	OptionGeoConfCivic                optionCode = 99
+	OptionIEEE10031TZString           optionCode = 100
+	OptionReferenceToTZDatabase       optionCode = 101
 	// Options 102-111 returned in RFC 3679
-	OptionNetInfoParentServerAddress OptionCode = 112
-	OptionNetInfoParentServerTag     OptionCode = 113
-	OptionURL                        OptionCode = 114
+	OptionNetInfoParentServerAddress optionCode = 112
+	OptionNetInfoParentServerTag     optionCode = 113
+	OptionURL                        optionCode = 114
 	// Option 115 returned in RFC 3679
-	OptionAutoConfigure                   OptionCode = 116
-	OptionNameServiceSearch               OptionCode = 117
-	OptionSubnetSelection                 OptionCode = 118
-	OptionDNSDomainSearchList             OptionCode = 119
-	OptionSIPServersDHCPOption            OptionCode = 120
-	OptionClasslessStaticRouteOption      OptionCode = 121
-	OptionCCC                             OptionCode = 122
-	OptionGeoConf                         OptionCode = 123
-	OptionVendorIdentifyingVendorClass    OptionCode = 124
-	OptionVendorIdentifyingVendorSpecific OptionCode = 125
+	OptionAutoConfigure                   optionCode = 116
+	OptionNameServiceSearch               optionCode = 117
+	OptionSubnetSelection                 optionCode = 118
+	OptionDNSDomainSearchList             optionCode = 119
+	OptionSIPServers                      optionCode = 120
+	OptionClasslessStaticRoute            optionCode = 121
+	OptionCCC                             optionCode = 122
+	OptionGeoConf                         optionCode = 123
+	OptionVendorIdentifyingVendorClass    optionCode = 124
+	OptionVendorIdentifyingVendorSpecific optionCode = 125
 	// Options 126-127 returned in RFC 3679
-	OptionTFTPServerIPAddress                   OptionCode = 128
-	OptionCallServerIPAddress                   OptionCode = 129
-	OptionDiscriminationString                  OptionCode = 130
-	OptionRemoteStatisticsServerIPAddress       OptionCode = 131
-	Option8021PVLANID                           OptionCode = 132
-	Option8021QL2Priority                       OptionCode = 133
-	OptionDiffservCodePoint                     OptionCode = 134
-	OptionHTTPProxyForPhoneSpecificApplications OptionCode = 135
-	OptionPANAAuthenticationAgent               OptionCode = 136
-	OptionLoSTServer                            OptionCode = 137
-	OptionCAPWAPAccessControllerAddresses       OptionCode = 138
-	OptionOPTIONIPv4AddressMoS                  OptionCode = 139
-	OptionOPTIONIPv4FQDNMoS                     OptionCode = 140
-	OptionSIPUAConfigurationServiceDomains      OptionCode = 141
-	OptionOPTIONIPv4AddressANDSF                OptionCode = 142
-	OptionOPTIONIPv6AddressANDSF                OptionCode = 143
+	OptionTFTPServerIPAddress                   optionCode = 128
+	OptionCallServerIPAddress                   optionCode = 129
+	OptionDiscriminationString                  optionCode = 130
+	OptionRemoteStatisticsServerIPAddress       optionCode = 131
+	Option8021PVLANID                           optionCode = 132
+	Option8021QL2Priority                       optionCode = 133
+	OptionDiffservCodePoint                     optionCode = 134
+	OptionHTTPProxyForPhoneSpecificApplications optionCode = 135
+	OptionPANAAuthenticationAgent               optionCode = 136
+	OptionLoSTServer                            optionCode = 137
+	OptionCAPWAPAccessControllerAddresses       optionCode = 138
+	OptionOPTIONIPv4AddressMoS                  optionCode = 139
+	OptionOPTIONIPv4FQDNMoS                     optionCode = 140
+	OptionSIPUAConfigurationServiceDomains      optionCode = 141
+	OptionOPTIONIPv4AddressANDSF                optionCode = 142
+	OptionOPTIONIPv6AddressANDSF                optionCode = 143
 	// Options 144-149 returned in RFC 3679
-	OptionTFTPServerAddress OptionCode = 150
-	OptionStatusCode        OptionCode = 151
-	OptionBaseTime          OptionCode = 152
-	OptionStartTimeOfState  OptionCode = 153
-	OptionQueryStartTime    OptionCode = 154
-	OptionQueryEndTime      OptionCode = 155
-	OptionDHCPState         OptionCode = 156
-	OptionDataSource        OptionCode = 157
+	OptionTFTPServerAddress optionCode = 150
+	OptionStatusCode        optionCode = 151
+	OptionBaseTime          optionCode = 152
+	OptionStartTimeOfState  optionCode = 153
+	OptionQueryStartTime    optionCode = 154
+	OptionQueryEndTime      optionCode = 155
+	OptionDHCPState         optionCode = 156
+	OptionDataSource        optionCode = 157
 	// Options 158-174 returned in RFC 3679
-	OptionEtherboot                        OptionCode = 175
-	OptionIPTelephone                      OptionCode = 176
-	OptionEtherbootPacketCableAndCableHome OptionCode = 177
+	OptionEtherboot                        optionCode = 175
+	OptionIPTelephone                      optionCode = 176
+	OptionEtherbootPacketCableAndCableHome optionCode = 177
 	// Options 178-207 returned in RFC 3679
-	OptionPXELinuxMagicString  OptionCode = 208
-	OptionPXELinuxConfigFile   OptionCode = 209
-	OptionPXELinuxPathPrefix   OptionCode = 210
-	OptionPXELinuxRebootTime   OptionCode = 211
-	OptionOPTION6RD            OptionCode = 212
-	OptionOPTIONv4AccessDomain OptionCode = 213
+	OptionPXELinuxMagicString  optionCode = 208
+	OptionPXELinuxConfigFile   optionCode = 209
+	OptionPXELinuxPathPrefix   optionCode = 210
+	OptionPXELinuxRebootTime   optionCode = 211
+	OptionOPTION6RD            optionCode = 212
+	OptionOPTIONv4AccessDomain optionCode = 213
 	// Options 214-219 returned in RFC 3679
-	OptionSubnetAllocation        OptionCode = 220
-	OptionVirtualSubnetAllocation OptionCode = 221
+	OptionSubnetAllocation        optionCode = 220
+	OptionVirtualSubnetAllocation optionCode = 221
 	// Options 222-223 returned in RFC 3679
 	// Options 224-254 are reserved for private use
-	OptionEnd OptionCode = 255
+	OptionEnd optionCode = 255
 )
 
-// OptionCodeToString maps an OptionCode to its mnemonic name
-var OptionCodeToString = map[OptionCode]string{
+var optionCodeToString = map[OptionCode]string{
 	OptionPad:                                        "Pad",
 	OptionSubnetMask:                                 "Subnet Mask",
 	OptionTimeOffset:                                 "Time Offset",
@@ -322,8 +410,8 @@ var OptionCodeToString = map[OptionCode]string{
 	OptionNameServiceSearch:               "Name Service Search",
 	OptionSubnetSelection:                 "Subnet Selection",
 	OptionDNSDomainSearchList:             "DNS Domain Search List",
-	OptionSIPServersDHCPOption:            "SIP Servers DHCP Option",
-	OptionClasslessStaticRouteOption:      "Classless Static Route Option",
+	OptionSIPServers:                      "SIP Servers",
+	OptionClasslessStaticRoute:            "Classless Static Route",
 	OptionCCC:                             "CCC, CableLabs Client Configuration",
 	OptionGeoConf:                         "GeoConf",
 	OptionVendorIdentifyingVendorClass:    "Vendor-Identifying Vendor Class",

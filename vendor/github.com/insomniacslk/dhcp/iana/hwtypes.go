@@ -1,80 +1,91 @@
 package iana
 
-type HwTypeType uint8
+// HWType is a hardware type as per RFC 2132 and defined by the IANA.
+type HWType uint16
 
+// See IANA for values.
 const (
-	_ HwTypeType = iota // skip 0
-	HwTypeEthernet
-	HwTypeExperimentalEthernet
-	HwTypeAmateurRadioAX25
-	HwTypeProteonTokenRing
-	HwTypeChaos
-	HwTypeIEEE802
-	HwTypeARCNET
-	HwTypeHyperchannel
-	HwTypeLanstar
-	HwTypeAutonet
-	HwTypeLocalTalk
-	HwTypeLocalNet
-	HwTypeUltraLink
-	HwTypeSMDS
-	HwTypeFrameRelay
-	HwTypeATM
-	HwTypeHDLC
-	HwTypeFibreChannel
-	HwTypeATM2
-	HwTypeSerialLine
-	HwTypeATM3
-	HwTypeMILSTD188220
-	HwTypeMetricom
-	HwTypeIEEE1394
-	HwTypeMAPOS
-	HwTypeTwinaxial
-	HwTypeEUI64
-	HwTypeHIPARP
-	HwTypeISO7816
-	HwTypeARPSec
-	HwTypeIPsec
-	HwTypeInfiniband
-	HwTypeCAI
-	HwTypeWiegandInterface
-	HwTypePureIP
+	_ HWType = iota // skip 0
+	HWTypeEthernet
+	HWTypeExperimentalEthernet
+	HWTypeAmateurRadioAX25
+	HWTypeProteonTokenRing
+	HWTypeChaos
+	HWTypeIEEE802
+	HWTypeARCNET
+	HWTypeHyperchannel
+	HWTypeLanstar
+	HWTypeAutonet
+	HWTypeLocalTalk
+	HWTypeLocalNet
+	HWTypeUltraLink
+	HWTypeSMDS
+	HWTypeFrameRelay
+	HWTypeATM
+	HWTypeHDLC
+	HWTypeFibreChannel
+	HWTypeATM2
+	HWTypeSerialLine
+	HWTypeATM3
+	HWTypeMILSTD188220
+	HWTypeMetricom
+	HWTypeIEEE1394
+	HWTypeMAPOS
+	HWTypeTwinaxial
+	HWTypeEUI64
+	HWTypeHIPARP
+	HWTypeISO7816
+	HWTypeARPSec
+	HWTypeIPsec
+	HWTypeInfiniband
+	HWTypeCAI
+	HWTypeWiegandInterface
+	HWTypePureIP
 )
 
-var HwTypeToString = map[HwTypeType]string{
-	HwTypeEthernet:             "Ethernet",
-	HwTypeExperimentalEthernet: "Experimental Ethernet",
-	HwTypeAmateurRadioAX25:     "Amateur Radio AX.25",
-	HwTypeProteonTokenRing:     "Proteon ProNET Token Ring",
-	HwTypeChaos:                "Chaos",
-	HwTypeIEEE802:              "IEEE 802",
-	HwTypeARCNET:               "ARCNET",
-	HwTypeHyperchannel:         "Hyperchannel",
-	HwTypeLanstar:              "Lanstar",
-	HwTypeAutonet:              "Autonet Short Address",
-	HwTypeLocalTalk:            "LocalTalk",
-	HwTypeLocalNet:             "LocalNet",
-	HwTypeUltraLink:            "Ultra link",
-	HwTypeSMDS:                 "SMDS",
-	HwTypeFrameRelay:           "Frame Relay",
-	HwTypeATM:                  "ATM",
-	HwTypeHDLC:                 "HDLC",
-	HwTypeFibreChannel:         "Fibre Channel",
-	HwTypeATM2:                 "ATM 2",
-	HwTypeSerialLine:           "Serial Line",
-	HwTypeATM3:                 "ATM 3",
-	HwTypeMILSTD188220:         "MIL-STD-188-220",
-	HwTypeMetricom:             "Metricom",
-	HwTypeIEEE1394:             "IEEE 1394.1995",
-	HwTypeMAPOS:                "MAPOS",
-	HwTypeTwinaxial:            "Twinaxial",
-	HwTypeEUI64:                "EUI-64",
-	HwTypeHIPARP:               "HIPARP",
-	HwTypeISO7816:              "IP and ARP over ISO 7816-3",
-	HwTypeARPSec:               "ARPSec",
-	HwTypeIPsec:                "IPsec tunnel",
-	HwTypeInfiniband:           "Infiniband",
-	HwTypeCAI:                  "CAI, TIA-102 Project 125 Common Air Interface",
-	HwTypeWiegandInterface:     "Wiegand Interface",
-	HwTypePureIP:               "Pure IP",
+var hwTypeToString = map[HWType]string{
+	HWTypeEthernet:             "Ethernet",
+	HWTypeExperimentalEthernet: "Experimental Ethernet",
+	HWTypeAmateurRadioAX25:     "Amateur Radio AX.25",
+	HWTypeProteonTokenRing:     "Proteon ProNET Token Ring",
+	HWTypeChaos:                "Chaos",
+	HWTypeIEEE802:              "IEEE 802",
+	HWTypeARCNET:               "ARCNET",
+	HWTypeHyperchannel:         "Hyperchannel",
+	HWTypeLanstar:              "Lanstar",
+	HWTypeAutonet:              "Autonet Short Address",
+	HWTypeLocalTalk:            "LocalTalk",
+	HWTypeLocalNet:             "LocalNet",
+	HWTypeUltraLink:            "Ultra link",
+	HWTypeSMDS:                 "SMDS",
+	HWTypeFrameRelay:           "Frame Relay",
+	HWTypeATM:                  "ATM",
+	HWTypeHDLC:                 "HDLC",
+	HWTypeFibreChannel:         "Fibre Channel",
+	HWTypeATM2:                 "ATM 2",
+	HWTypeSerialLine:           "Serial Line",
+	HWTypeATM3:                 "ATM 3",
+	HWTypeMILSTD188220:         "MIL-STD-188-220",
+	HWTypeMetricom:             "Metricom",
+	HWTypeIEEE1394:             "IEEE 1394.1995",
+	HWTypeMAPOS:                "MAPOS",
+	HWTypeTwinaxial:            "Twinaxial",
+	HWTypeEUI64:                "EUI-64",
+	HWTypeHIPARP:               "HIPARP",
+	HWTypeISO7816:              "IP and ARP over ISO 7816-3",
+	HWTypeARPSec:               "ARPSec",
+	HWTypeIPsec:                "IPsec tunnel",
+	HWTypeInfiniband:           "Infiniband",
+	HWTypeCAI:                  "CAI, TIA-102 Project 125 Common Air Interface",
+	HWTypeWiegandInterface:     "Wiegand Interface",
+	HWTypePureIP:               "Pure IP",
+}
+
+// String implements fmt.Stringer.
+func (h HWType) String() string {
+	hwtype := hwTypeToString[h]
+	if hwtype == "" {
+		hwtype = "unknown"
+	}
+	return hwtype
 }

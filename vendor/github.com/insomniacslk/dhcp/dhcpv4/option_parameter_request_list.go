@@ -1,69 +1,72 @@
 package dhcpv4
 
 import (
-	"fmt"
+	"sort"
 	"strings"
+
+	"github.com/u-root/u-root/pkg/uio"
 )
 
-// This option implements the parameter request list option
-// https://tools.ietf.org/html/rfc2132
+// OptionCodeList is a list of DHCP option codes.
+type OptionCodeList []OptionCode
 
-// OptParameterRequestList represents the parameter request list option.
-type OptParameterRequestList struct {
-	RequestedOpts []OptionCode
-}
-
-// ParseOptParameterRequestList returns a new OptParameterRequestList from a
-// byte stream, or error if any.
-func ParseOptParameterRequestList(data []byte) (*OptParameterRequestList, error) {
-	// Should at least have code + length byte.
-	if len(data) < 2 {
-		return nil, ErrShortByteStream
-	}
-	code := OptionCode(data[0])
-	if code != OptionParameterRequestList {
-		return nil, fmt.Errorf("expected code %v, got %v", OptionParameterRequestList, code)
-	}
-	length := int(data[1])
-	if len(data) < length+2 {
-		return nil, ErrShortByteStream
-	}
-	var requestedOpts []OptionCode
-	for _, opt := range data[2 : length+2] {
-		requestedOpts = append(requestedOpts, OptionCode(opt))
-	}
-	return &OptParameterRequestList{RequestedOpts: requestedOpts}, nil
-}
-
-// Code returns the option code.
-func (o *OptParameterRequestList) Code() OptionCode {
-	return OptionParameterRequestList
-}
-
-// ToBytes returns a serialized stream of bytes for this option.
-func (o *OptParameterRequestList) ToBytes() []byte {
-	ret := []byte{byte(o.Code()), byte(o.Length())}
-	for _, req := range o.RequestedOpts {
-		ret = append(ret, byte(req))
-	}
-	return ret
-}
-
-// String returns a human-readable string for this option.
-func (o *OptParameterRequestList) String() string {
-	var optNames []string
-	for _, ro := range o.RequestedOpts {
-		if name, ok := OptionCodeToString[ro]; ok {
-			optNames = append(optNames, name)
-		} else {
-			optNames = append(optNames, fmt.Sprintf("Unknown (%v)", ro))
+// Has returns whether c is in the list.
+func (ol OptionCodeList) Has(c OptionCode) bool {
+	for _, code := range ol {
+		if code == c {
+			return true
 		}
 	}
-	return fmt.Sprintf("Parameter Request List -> [%v]", strings.Join(optNames, ", "))
+	return false
 }
 
-// Length returns the length of the data portion (excluding option code and byte
-// for length, if any).
-func (o *OptParameterRequestList) Length() int {
-	return len(o.RequestedOpts)
+// Add adds option codes in cs to ol.
+func (ol *OptionCodeList) Add(cs ...OptionCode) {
+	for _, c := range cs {
+		if !ol.Has(c) {
+			*ol = append(*ol, c)
+		}
+	}
+}
+
+func (ol OptionCodeList) sort() {
+	sort.Slice(ol, func(i, j int) bool { return ol[i].Code() < ol[j].Code() })
+}
+
+// String returns a human-readable string for the option names.
+func (ol OptionCodeList) String() string {
+	var names []string
+	ol.sort()
+	for _, code := range ol {
+		names = append(names, code.String())
+	}
+	return strings.Join(names, ", ")
+}
+
+// ToBytes returns a serialized stream of bytes for this option as defined by
+// RFC 2132, Section 9.8.
+func (ol OptionCodeList) ToBytes() []byte {
+	buf := uio.NewBigEndianBuffer(nil)
+	for _, req := range ol {
+		buf.Write8(req.Code())
+	}
+	return buf.Data()
+}
+
+// FromBytes parses a byte stream for this option as described by RFC 2132,
+// Section 9.8.
+func (ol *OptionCodeList) FromBytes(data []byte) error {
+	buf := uio.NewBigEndianBuffer(data)
+	*ol = make(OptionCodeList, 0, buf.Len())
+	for buf.Has(1) {
+		*ol = append(*ol, optionCode(buf.Read8()))
+	}
+	return buf.FinError()
+}
+
+// OptParameterRequestList returns a new DHCPv4 Parameter Request List.
+//
+// The parameter request list option is described by RFC 2132, Section 9.8.
+func OptParameterRequestList(codes ...OptionCode) Option {
+	return Option{Code: OptionParameterRequestList, Value: OptionCodeList(codes)}
 }
