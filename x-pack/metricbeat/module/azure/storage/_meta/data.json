@@ -15,6 +15,7 @@
             "period" : 300000
         },
         "azure" : {
+            "timegrain" : "PT5M",
             "namespace" : "Microsoft.Storage/storageAccounts/blobServices",
             "dimensions" : {
                 "apiname" : "DeleteBlob"

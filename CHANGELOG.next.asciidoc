@@ -59,7 +59,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix loading processors from annotation hints. {pull}16348[16348]
+- Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
 - Fix k8s pods labels broken schema. {pull}16480[16480]
+- Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 
 *Auditbeat*
@@ -76,6 +78,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
+- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 
 *Heartbeat*
@@ -96,6 +101,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
+- Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 
 *Packetbeat*
 
@@ -106,6 +112,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
@@ -114,7 +121,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
+- Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
+- Windows .exe files now have embedded file version info. {issue}15232[15232]t
+- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 
 *Auditbeat*
 
@@ -136,6 +146,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
+- Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
+- Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
 
 *Heartbeat*
 
@@ -170,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
 - Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
 - Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
+- Add database_account azure metricset. {issue}15758[15758]
 - Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
