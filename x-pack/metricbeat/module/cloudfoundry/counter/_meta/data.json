@@ -1,0 +1,21 @@
+{
+    "@timestamp": "2020-02-26T08:05:34.853Z",
+    "cloudfoundry": {
+        "counter": {
+            "name": "",
+            "delta": 0,
+            "total": 0
+        }
+    },
+    "event": {
+        "dataset": "cloudfoundry.counter",
+        "duration": 115000,
+        "module": "cloudfoundry"
+    },
+    "metricset": {
+        "name": "counter"
+    },
+    "service": {
+        "type": "cloudfoundry"
+    }
+}
