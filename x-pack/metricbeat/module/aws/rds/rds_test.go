@@ -11,14 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 // MockRDSClient struct is used for unit tests.
@@ -129,7 +128,8 @@ func TestConstructLabel(t *testing.T) {
 
 func TestGetDBInstancesPerRegion(t *testing.T) {
 	mockSvc := &MockRDSClient{}
-	dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(mockSvc)
+	m := MetricSet{}
+	dbInstanceIDs, dbDetailsMap, err := m.getDBInstancesPerRegion(mockSvc)
 	if err != nil {
 		t.FailNow()
 	}

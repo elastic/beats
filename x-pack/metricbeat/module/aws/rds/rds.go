@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.Endpoint, "rds", regionName, awsConfig))
 
 		// Get DBInstance IDs per region
-		dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
+		dbInstanceIDs, dbDetailsMap, err := m.getDBInstancesPerRegion(svc)
 		if err != nil {
 			err = errors.Wrap(err, "getDBInstancesPerRegion failed, skipping region "+regionName)
 			m.Logger().Errorf(err.Error())
@@ -152,7 +152,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDetails, error) {
+func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDetails, error) {
 	describeInstanceInput := &rds.DescribeDBInstancesInput{}
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
 	output, err := req.Send(context.TODO())
@@ -182,7 +182,9 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 		reqListTags := svc.ListTagsForResourceRequest(&listTagsInput)
 		outputListTags, err := reqListTags.Send(context.TODO())
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "Error ListTagsForResourceRequest")
+			m.Logger().Warn("ListTagsForResourceRequest failed, rds:ListTagsForResource permission is required for getting tags.")
+			dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
+			return dbInstanceIDs, dbDetailsMap, nil
 		}
 
 		for _, tag := range outputListTags.TagList {
