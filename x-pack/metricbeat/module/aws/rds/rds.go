@@ -186,7 +186,12 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 		}
 
 		for _, tag := range outputListTags.TagList {
-			dbDetails.tags = append(dbDetails.tags, aws.Tag{Key: *tag.Key, Value: *tag.Value})
+			// By default, replace dot "." using under bar "_" for tag keys and values
+			dbDetails.tags = append(dbDetails.tags,
+				aws.Tag{
+					Key:   common.DeDot(*tag.Key),
+					Value: common.DeDot(*tag.Value),
+				})
 		}
 
 		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
@@ -286,9 +291,8 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 								events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
 
-								// By default, replace dot "." using under bar "_" for tag keys and values
 								for _, tag := range dbInstanceMap[dbIdentifier].tags {
-									events[dbIdentifier].MetricSetFields.Put("db_instance.tags."+common.DeDot(tag.Key), common.DeDot(tag.Value))
+									events[dbIdentifier].MetricSetFields.Put("db_instance.tags."+tag.Key, tag.Value)
 								}
 							}
 						}

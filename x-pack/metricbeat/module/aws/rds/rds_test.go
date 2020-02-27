@@ -81,7 +81,8 @@ func (m *MockRDSClient) ListTagsForResourceRequest(input *rds.ListTagsForResourc
 		Request: &awssdk.Request{
 			Data: &rds.ListTagsForResourceOutput{
 				TagList: []rds.Tag{
-					{Key: awssdk.String("dept"), Value: awssdk.String("engr")},
+					{Key: awssdk.String("dept.name"), Value: awssdk.String("eng.software")},
+					{Key: awssdk.String("created-by"), Value: awssdk.String("foo")},
 				},
 			},
 			HTTPRequest: httpReq,
@@ -142,7 +143,10 @@ func TestGetDBInstancesPerRegion(t *testing.T) {
 		dbAvailabilityZone: availabilityZone,
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
-		tags:               []aws.Tag{{Key: "dept", Value: "engr"}},
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
 	}
 	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
 }
