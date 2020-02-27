@@ -7,6 +7,7 @@ services:
       context: ./_meta
       args:
         REDIS_VERSION: ${REDIS_VERSION:-5.4.10-22}
-    privileged: true
+    cap_add:
+      - SYS_RESOURCE
     ports:
       - 8070
