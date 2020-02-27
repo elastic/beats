@@ -37,9 +37,9 @@ func (client *MockService) GetMetricNamespaces(resourceID string) (insights.Metr
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client *MockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+func (client *MockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
 	args := client.Called(resourceID, namespace)
-	return args.Get(0).([]insights.Metric), args.Error(1)
+	return args.Get(0).([]insights.Metric), args.String(1), args.Error(2)
 }
 
 // MockReporterV2 mock implementation for testing purposes
