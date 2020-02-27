@@ -183,7 +183,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
-- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 
 *Auditbeat*
 
@@ -220,8 +220,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
-- Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
-- Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 
 *Heartbeat*
