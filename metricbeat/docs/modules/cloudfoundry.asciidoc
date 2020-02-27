@@ -1,3 +1,13 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-cloudfoundry]]
+[role="xpack"]
+== cloudfoundry module
+
+experimental[]
+
 This is the cloudfoundry module.
 
 The Cloud Foundry module connects to Cloud Foundry loggregator to gather container, counter, and value metrics into a common data platform where it can be used for analysis, visualization, and alerting.
@@ -97,3 +107,66 @@ from the RLP Gateway. Default: "(generated UUID)".
 === `ssl`
 
 This specifies SSL/TLS common config. Default: not used.
+
+
+[float]
+=== Example configuration
+
+The cloudfoundry module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: cloudfoundry
+  metricsets:
+    - container
+    - counter
+    - value
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+
+- module: cloudfoundry
+  metricsets:
+    - counter
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+
+- module: cloudfoundry
+  metricsets:
+    - counter
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+
+- module: cloudfoundry
+  metricsets:
+    - value
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-cloudfoundry-container,container>>
+
+* <<metricbeat-metricset-cloudfoundry-counter,counter>>
+
+* <<metricbeat-metricset-cloudfoundry-value,value>>
+
+include::cloudfoundry/container.asciidoc[]
+
+include::cloudfoundry/counter.asciidoc[]
+
+include::cloudfoundry/value.asciidoc[]
+
