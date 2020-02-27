@@ -30,7 +30,7 @@ import (
 // Feature exposes a memory queue.
 var Feature = queue.Feature("mem",
 	create,
-	feature.NewDetails(
+	feature.MakeDetails(
 		"Memory queue",
 		"Buffer events in memory before sending to the output.",
 		feature.Stable),

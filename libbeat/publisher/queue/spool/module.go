@@ -29,7 +29,7 @@ import (
 
 // Feature exposes a spooling to disk queue.
 var Feature = queue.Feature("spool", create,
-	feature.NewDetails(
+	feature.MakeDetails(
 		"Memory queue",
 		"Buffer events in memory before sending to the output.",
 		feature.Beta),
