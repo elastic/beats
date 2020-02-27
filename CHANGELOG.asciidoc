@@ -3,6 +3,37 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.6.1]]
+=== Beats version 7.6.1
+https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix k8s pods labels broken schema. {pull}16480[16480]
+- Fix k8s pods annotations broken schema. {pull}16554[16554]
+
+*Filebeat*
+
+- Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
+- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
+
+*Heartbeat*
+
+- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
+
+*Metricbeat*
+
+- Avoid parsing errors returned from prometheus endpoints. {pull}15712[15712]
+- Change sqs metricset to use average as statistic method. {pull}16438[16438]
+
+*Functionbeat*
+
+- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
+
 [[release-notes-7.6.0]]
 === Beats version 7.6.0
 https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]

@@ -39,8 +39,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fix k8s pods labels broken schema. {pull}16480[16480]
-- Fix k8s pods annotations broken schema. {pull}16554[16554]
 
 *Auditbeat*
 
@@ -55,7 +53,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
@@ -77,7 +74,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
@@ -90,7 +86,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
 
 *Heartbeat*
 
