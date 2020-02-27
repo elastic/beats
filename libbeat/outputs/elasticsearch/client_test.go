@@ -207,8 +207,14 @@ func TestClientWithHeaders(t *testing.T) {
 		// Request.Host field and removed from the Header map.
 		assert.Equal(t, "myhost.local", r.Host)
 
-		bulkResponse := `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
-		fmt.Fprintln(w, bulkResponse)
+		var response string
+		if r.URL.Path == "/" {
+			response = `{ "version": { "number": "7.6.0" } }`
+		} else {
+			response = `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+
+		}
+		fmt.Fprintln(w, response)
 		requestCount++
 	}))
 	defer ts.Close()
@@ -237,7 +243,7 @@ func TestClientWithHeaders(t *testing.T) {
 	batch := outest.NewBatch(event, event, event)
 	err = client.Publish(batch)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, requestCount)
+	assert.Equal(t, 3, requestCount)
 }
 
 type testBulkRecorder struct {
