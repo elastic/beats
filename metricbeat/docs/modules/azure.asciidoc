@@ -152,27 +152,7 @@ metricbeat.modules:
 
 - module: azure
   metricsets:
-  - container_instance
-  enabled: true
-  period: 300s
-  client_id: '${AZURE_CLIENT_ID:""}'
-  client_secret: '${AZURE_CLIENT_SECRET:""}'
-  tenant_id: '${AZURE_TENANT_ID:""}'
-  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-
-- module: azure
-  metricsets:
-  - container_service
-  enabled: true
-  period: 300s
-  client_id: '${AZURE_CLIENT_ID:""}'
-  client_secret: '${AZURE_CLIENT_SECRET:""}'
-  tenant_id: '${AZURE_TENANT_ID:""}'
-  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-
-- module: azure
-  metricsets:
-  - container_registry
+  - database_account
   enabled: true
   period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
@@ -191,11 +171,7 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>
 
-* <<metricbeat-metricset-azure-container_instance,container_instance>>
-
-* <<metricbeat-metricset-azure-container_registry,container_registry>>
-
-* <<metricbeat-metricset-azure-container_service,container_service>>
+* <<metricbeat-metricset-azure-database_account,database_account>>
 
 * <<metricbeat-metricset-azure-monitor,monitor>>
 
@@ -205,11 +181,7 @@ include::azure/compute_vm.asciidoc[]
 
 include::azure/compute_vm_scaleset.asciidoc[]
 
-include::azure/container_instance.asciidoc[]
-
-include::azure/container_registry.asciidoc[]
-
-include::azure/container_service.asciidoc[]
+include::azure/database_account.asciidoc[]
 
 include::azure/monitor.asciidoc[]
 

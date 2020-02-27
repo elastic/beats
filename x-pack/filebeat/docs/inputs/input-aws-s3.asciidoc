@@ -59,7 +59,11 @@ If the fileset using this input expects to receive multiple messages bundled
 under a specific field then the config option expand_event_list_from_field value
 can be assigned the name of the field. This setting will be able to split the
 messages under the group value into separate events. For example, CloudTrail logs
-are in JSON format and events are found under the JSON object "Records":
+are in JSON format and events are found under the JSON object "Records".
+
+Note: When `expand_event_list_from_field` parameter is given in the config, s3
+input will assume the logs are in JSON format and decode them as JSON. Content
+type will not be checked.
 
 [float]
 ==== `api_timeout`

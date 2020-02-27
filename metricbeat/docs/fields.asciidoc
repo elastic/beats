@@ -3097,6 +3097,16 @@ azure module
 
 
 
+*`azure.timegrain`*::
++
+--
+The Azure metric timegrain
+
+
+type: keyword
+
+--
+
 [float]
 === resource
 
@@ -3194,30 +3204,10 @@ type: object
 
 --
 
-*`azure.container_instance.*.*`*::
+*`azure.database_account.*.*`*::
 +
 --
-container instance
-
-
-type: object
-
---
-
-*`azure.container_registry.*.*`*::
-+
---
-container registry
-
-
-type: object
-
---
-
-*`azure.container_service.*.*`*::
-+
---
-container service
+database account
 
 
 type: object
