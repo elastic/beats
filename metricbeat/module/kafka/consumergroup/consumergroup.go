@@ -49,7 +49,7 @@ type groupAssignment struct {
 	clientHost string
 }
 
-var debugf = logp.MakeDebug("kafka")
+var log = logp.NewLogger("kafka")
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {

@@ -53,7 +53,7 @@ func fetchGroupInfo(
 		return nil
 	}
 
-	debugf("known consumer groups: ", groups)
+	log.Debugf("known consumer groups: ", groups)
 
 	assignments, err := fetchGroupAssignments(b, groups)
 	if err != nil {

@@ -78,6 +78,10 @@ type PartitionOffsets struct {
 	Offset int64
 }
 
+type brokerTopicPartitionsMap map[int32]map[string]int32
+
+type brokersMap map[int32]*sarama.Broker
+
 const noID = -1
 
 // NewBroker creates a new unconnected kafka Broker connection instance.
@@ -146,7 +150,7 @@ func (b *Broker) Connect() error {
 		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
 	}
 
-	debugf("found matching broker %v with id %v", other.Addr(), other.ID())
+	log.Debugf("found matching broker %v with id %v", other.Addr(), other.ID())
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
 
@@ -297,8 +301,16 @@ func (b *Broker) FetchPartitionOffsetFromTheLeader(topic string, partitionID int
 
 // FetchPartitionOffsetsForTopics fetches offsets of all partitions from its leaders.
 func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata, time int64) map[string]map[int32]*PartitionOffsets {
-	leaderTopicPartition := map[int32]map[string]int32{}
-	leaderBrokers := map[int32]*sarama.Broker{}
+	leaderTopicPartition, leaderBrokers := b.groupBrokersPerTopicPartitions(topics)
+	defer b.closeLeaders(leaderBrokers)
+
+	topicPartitionPartitionOffsets := b.fetchGroupedPartitionOffsetsPerBroker(leaderTopicPartition, leaderBrokers, time)
+	return topicPartitionPartitionOffsets
+}
+
+func (b *Broker) groupBrokersPerTopicPartitions(topics []*sarama.TopicMetadata) (brokerTopicPartitionsMap, brokersMap) {
+	leaderTopicPartition := brokerTopicPartitionsMap{}
+	leaderBrokers := brokersMap{}
 
 	for _, topic := range topics {
 		for _, partition := range topic.Partitions {
@@ -316,7 +328,11 @@ func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata, 
 			leaderBrokers[broker.ID()] = broker
 		}
 	}
+	return leaderTopicPartition, leaderBrokers
+}
 
+func (b *Broker) fetchGroupedPartitionOffsetsPerBroker(leaderTopicPartition brokerTopicPartitionsMap,
+	leaderBrokers brokersMap, time int64) map[string]map[int32]*PartitionOffsets {
 	topicPartitionPartitionOffsets := map[string]map[int32]*PartitionOffsets{}
 
 	for leader, topicPartition := range leaderTopicPartition {
@@ -342,19 +358,25 @@ func (b *Broker) FetchPartitionOffsetsForTopics(topics []*sarama.TopicMetadata, 
 			}
 
 			block := resp.GetBlock(topic, partition)
-			if len(block.Offsets) == 0 {
+			if len(block.Offsets) == 0 || block.Err != 0 {
 				err = fmt.Errorf("block offsets is invalid (topicName: %s, partitionID: %d, leaderID: %d): %v",
-					topic, partition, leader, block.Err)
+					topic, partition, leader, block.Err.Error())
 				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
 				continue
 			}
-
-			topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{
-				Offset: block.Offsets[0],
-			}
+			topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Offset: block.Offsets[0]}
 		}
 	}
 	return topicPartitionPartitionOffsets
+}
+
+func (b *Broker) closeLeaders(leaderBrokers brokersMap) {
+	for id, broker := range leaderBrokers {
+		err := broker.Close()
+		if err != nil {
+			log.Debugf("closing broker (ID: %d) failed: ", id, err)
+		}
+	}
 }
 
 // ID returns the broker ID or -1 if the broker id is unknown.
@@ -485,7 +507,7 @@ func (m *brokerFinder) findBroker(addr string, brokers []*sarama.Broker) *sarama
 }
 
 func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
-	debugf("Try to match broker to: %v", addr)
+	log.Debugf("Try to match broker to: %v", addr)
 
 	// get connection 'port'
 	host, port, err := net.SplitHostPort(addr)
@@ -504,14 +526,14 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	if err != nil || len(localIPs) == 0 {
 		return -1, false
 	}
-	debugf("local machine ips: %v", localIPs)
+	log.Debugf("local machine ips: %v", localIPs)
 
 	// try to find broker by comparing the fqdn for each known ip to list of
 	// brokers
 	localHosts := m.lookupHosts(localIPs)
-	debugf("local machine addresses: %v", localHosts)
+	log.Debugf("local machine addresses: %v", localHosts)
 	for _, host := range localHosts {
-		debugf("try to match with fqdn: %v (%v)", host, port)
+		log.Debugf("try to match with fqdn: %v (%v)", host, port)
 		if i, found := indexOf(net.JoinHostPort(host, port), brokers); found {
 			return i, true
 		}
@@ -533,7 +555,7 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	// try to find broker id by comparing the machines local hostname to
 	// broker hostnames in metadata
 	if host, err := m.Net.Hostname(); err == nil {
-		debugf("try to match with hostname only: %v (%v)", host, port)
+		log.Debugf("try to match with hostname only: %v (%v)", host, port)
 
 		tmp := net.JoinHostPort(strings.ToLower(host), port)
 		if i, found := indexOf(tmp, brokers); found {
@@ -542,9 +564,9 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	}
 
 	// lookup ips for all brokers
-	debugf("match by ips")
+	log.Debugf("match by ips")
 	for i, b := range brokers {
-		debugf("test broker address: %v", b)
+		log.Debugf("test broker address: %v", b)
 		bh, bp, err := net.SplitHostPort(b)
 		if err != nil {
 			continue
@@ -557,12 +579,12 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 
 		// lookup all ips for brokers host:
 		ips, err := m.Net.LookupIP(bh)
-		debugf("broker %v ips: %v, %v", bh, ips, err)
+		log.Debugf("broker %v ips: %v, %v", bh, ips, err)
 		if err != nil {
 			continue
 		}
 
-		debugf("broker (%v) ips: %v", bh, ips)
+		log.Debugf("broker (%v) ips: %v", bh, ips)
 
 		// check if ip is known
 		if anyIPsMatch(ips, localIPs) {
@@ -582,7 +604,7 @@ func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 		}
 
 		hosts, err := m.Net.LookupAddr(string(txt))
-		debugf("lookup %v => %v, %v", string(txt), hosts, err)
+		log.Debugf("lookup %v => %v, %v", string(txt), hosts, err)
 		if err != nil {
 			continue
 		}

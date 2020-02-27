@@ -48,7 +48,7 @@ type MetricSet struct {
 
 var errFailQueryOffset = errors.New("operation failed")
 
-var debugf = logp.MakeDebug("kafka")
+var log = logp.NewLogger("kafka")
 
 // New creates a new instance of the partition MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -87,7 +87,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error getting topic metadata")
 	}
 	if len(topics) == 0 {
-		debugf("no topic could be read, check ACLs")
+		log.Debugf("no topic could be read, check ACLs")
 		return nil
 	}
 
@@ -113,31 +113,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, partition := range topic.Partitions {
 			// collect offsets for all replicas
 			for _, replicaID := range partition.Replicas {
-				oldestPartitionOffsets := topicPartitionPartitionOldestOffsets[topic.Name][partition.ID]
-				if oldestPartitionOffsets == nil {
-					msg := fmt.Errorf("no oldest partition offsets defined (%v:%v)", topic.Name, partition.ID)
-					m.Logger().Warn(msg)
-					r.Error(msg)
-					continue
-				} else if oldestPartitionOffsets.Err != nil {
-					msg := fmt.Errorf("failed to query kafka partition (%v:%v) oldest offsets: %v",
-						topic.Name, partition.ID, oldestPartitionOffsets.Err)
-					m.Logger().Warn(msg)
-					r.Error(msg)
+				oldestPartitionOffsets, err := m.selectPartitionOffsets(topicPartitionPartitionOldestOffsets, topic, partition)
+				if err != nil {
+					m.reportPartitionOffsetsError(r, err)
 					continue
 				}
-
-				newestPartitionOffsets := topicPartitionPartitionNewestOffsets[topic.Name][partition.ID]
-				if newestPartitionOffsets == nil {
-					msg := fmt.Errorf("no newest partition offsets defined (%v:%v)", topic.Name, partition.ID)
-					m.Logger().Warn(msg)
-					r.Error(msg)
-					continue
-				} else if newestPartitionOffsets.Err != nil {
-					msg := fmt.Errorf("failed to query kafka partition (%v:%v) newest offsets: %v",
-						topic.Name, partition.ID, newestPartitionOffsets.Err)
-					m.Logger().Warn(msg)
-					r.Error(msg)
+				newestPartitionOffsets, err := m.selectPartitionOffsets(topicPartitionPartitionNewestOffsets, topic, partition)
+				if err != nil {
+					m.reportPartitionOffsetsError(r, err)
 					continue
 				}
 
@@ -192,27 +175,23 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-// queryOffsetRange queries the broker for the oldest and the newest offsets in
-// a kafka topics partition for a given replica.
-func queryOffsetRange(
-	b *kafka.Broker,
-	replicaID int32,
-	topic string,
-	partition int32,
-) (int64, int64, bool, error) {
-	oldest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetOldest)
-	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get oldest offset")
+func (m *MetricSet) selectPartitionOffsets(topicPartitionPartitionOffsets map[string]map[int32]*kafka.PartitionOffsets,
+	topic *sarama.TopicMetadata, partition *sarama.PartitionMetadata) (*kafka.PartitionOffsets, error) {
+	offsets := topicPartitionPartitionOffsets[topic.Name][partition.ID]
+	if offsets == nil {
+		err := fmt.Errorf("no partition offsets defined (%v:%v)", topic.Name, partition.ID)
+		return nil, err
+	} else if offsets.Err != nil {
+		err := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %v",
+			topic.Name, partition.ID, offsets.Err)
+		return nil, err
 	}
+	return offsets, nil
+}
 
-	newest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetNewest)
-	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get newest offset")
-	}
-
-	okOld := oldest != -1
-	okNew := newest != -1
-	return oldest, newest, okOld && okNew, nil
+func (m *MetricSet) reportPartitionOffsetsError(r mb.ReporterV2, err error) {
+	m.Logger().Warn(err)
+	r.Error(err)
 }
 
 func hasID(id int32, lst []int32) bool {
