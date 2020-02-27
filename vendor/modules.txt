@@ -623,7 +623,7 @@ github.com/magefile/mage/mg
 github.com/magefile/mage/parse
 github.com/magefile/mage/sh
 github.com/magefile/mage/target
-# github.com/mailru/easyjson v0.0.0-20160728113105-d5b7844b561a
+# github.com/mailru/easyjson v0.7.1
 github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer

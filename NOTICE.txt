@@ -5079,7 +5079,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/mailru/easyjson
-Revision: d5b7844b561a
+Version: v0.7.1
 License type (autodetected): MIT
 ./vendor/github.com/mailru/easyjson/LICENSE:
 --------------------------------------------------------------------
