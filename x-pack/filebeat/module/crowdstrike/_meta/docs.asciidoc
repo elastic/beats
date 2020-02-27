@@ -1,3 +1,5 @@
+[role="xpack"]
+
 :modulename: crowdstrike
 :has-dashboards: true
 
@@ -33,6 +35,10 @@ And for all over event Crowdstrike Falcon event types, go to Host -> Events.
 
 include::../include/configuring-intro.asciidoc[]
 
+:fileset_ex: falcon
+
+include::../include/config-option-intro.asciidoc[]
+
 [float]
 ==== `falcon` fileset settings
 
@@ -44,7 +50,8 @@ var:
   - name: paths
     default:
       - /var/log/crowdstrike/falconhoseclient/output
------
+
+include::../include/var-paths.asciidoc[]
 
 :has-dashboards!:
 
