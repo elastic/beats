@@ -107,13 +107,16 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
-		resp, err := client.AzureMonitorService.GetMetricValues(metric.Resource.SubID, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
+		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(metric.Resource.SubID, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
 			metric.Aggregations, filter)
 		if err != nil {
 			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.SubID, metric.Namespace)
 			client.Log.Error(err)
 			report.Error(err)
 		} else {
+			if metric.TimeGrain == "" {
+				metric.TimeGrain = timegrain
+			}
 			for i, currentMetric := range client.Resources.Metrics {
 				if matchMetrics(currentMetric, metric) {
 					current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))

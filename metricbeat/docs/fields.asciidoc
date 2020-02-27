@@ -3097,6 +3097,16 @@ azure module
 
 
 
+*`azure.timegrain`*::
++
+--
+The Azure metric timegrain
+
+
+type: keyword
+
+--
+
 [float]
 === resource
 
@@ -3188,6 +3198,16 @@ type: object
 +
 --
 compute_vm_scaleset
+
+
+type: object
+
+--
+
+*`azure.database_account.*.*`*::
++
+--
+database account
 
 
 type: object
