@@ -63,8 +63,8 @@ func NewSQS(provider provider.Provider, cfg *common.Config) (provider.Function, 
 }
 
 // SQSDetails returns the details of the feature.
-func SQSDetails() *feature.Details {
-	return feature.NewDetails("SQS trigger", "receive events from a SQS queue", feature.Stable)
+func SQSDetails() feature.Details {
+	return feature.MakeDetails("SQS trigger", "receive events from a SQS queue", feature.Stable)
 }
 
 // Run starts the lambda function and wait for web triggers.
