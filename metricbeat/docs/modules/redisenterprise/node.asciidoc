@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-redisenterprise-node]]
-=== Redis node metricset
+=== Redis Enterprise node metricset
 
 beta[]
 

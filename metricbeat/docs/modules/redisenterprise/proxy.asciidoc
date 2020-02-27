@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-redisenterprise-proxy]]
-=== Redis proxy metricset
+=== Redis Enterprise proxy metricset
 
 beta[]
 

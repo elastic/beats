@@ -4,7 +4,9 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-redisenterprise]]
 [role="xpack"]
-== Redis module
+== Redis Enterprise module
+
+beta[]
 
 This module periodically fetches metrics from https://redislabs.com/redis-enterprise/[Redis Enterprise Software].
 
@@ -29,7 +31,7 @@ The metricsets `node` and `proxy` are compatible with Redis Enterprise Software 
 [float]
 === Example configuration
 
-The Redis module supports the standard configuration options that are described
+The Redis Enterprise module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

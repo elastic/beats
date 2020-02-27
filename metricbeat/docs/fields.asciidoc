@@ -32474,7 +32474,7 @@ type: long
 --
 
 [[exported-fields-redisenterprise]]
-== Redis fields
+== Redis Enterprise fields
 
 Redis metrics collected from Redis Enterprise Server.
 
