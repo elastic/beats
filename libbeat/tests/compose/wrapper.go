@@ -391,7 +391,7 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 	}
 
 	if !found {
-		return "", errors.Wrap(err, "container not found")
+		return "", errors.Errorf("container not found for service '%s'", serviceName)
 	}
 
 	inspect, err := d.client.ContainerInspect(ctx, c.ID)

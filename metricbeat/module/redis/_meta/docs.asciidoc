@@ -26,5 +26,5 @@ redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
 [float]
 === Compatibility
 
-The redis metricsets `info`, `key` and `keyspace` are compatible with the open source distribution of Redis. They were
-tested with Redis 3.2.12, 4.0.11 and 5.0-rc4, and are expected to work with all versions >= 3.0.
+The redis metricsets `info`, `key` and `keyspace` are compatible with all distributions of Redis (OSS and enterprise).
+They were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4, and are expected to work with all versions >= 3.0.
