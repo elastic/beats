@@ -39,7 +39,7 @@ func UseCommunityBeatPackaging() {
 	MustUsePackaging("community_beat", packageSpecFile)
 }
 
-// UseElasticBeatAgentPackaging configures the package target to build packages for
+// UseElasticAgentPackaging configures the package target to build packages for
 // an Elastic Agent.
 func UseElasticAgentPackaging() {
 	// Prepare binaries so they can be packed into agent
