@@ -1,33 +1,59 @@
-- module: cloudfoundry
+- module: azure
   metricsets:
-    - container
-    - counter
-    - value
+  - monitor
   enabled: true
-  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-#
-#- module: cloudfoundry
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 600s
+  resources:
+#  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+#    metrics:
+#    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+#      namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+#- module: azure
 #  metricsets:
-#    - counter
+#  - compute_vm
 #  enabled: true
-#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-#
-#- module: cloudfoundry
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
+
+#- module: azure
 #  metricsets:
-#    - counter
+#  - compute_vm_scaleset
 #  enabled: true
-#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-#
-#- module: cloudfoundry
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
+
+#- module: azure
 #  metricsets:
-#    - value
+#  - storage
 #  enabled: true
-#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
+
+#- module: azure
+#  metricsets:
+#  - database_account
+#  enabled: true
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
