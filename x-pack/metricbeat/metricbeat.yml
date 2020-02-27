@@ -2,13 +2,12 @@ metricbeat.modules:
   - &cloudfoundry
     module: cloudfoundry
     api_address: https://api.dev.cfdev.sh
-    skip_verify: true
     client_id: firehose-to-filebeat
     client_secret: verysecret
     ssl:
       verification_mode: none
     metricsets:
-      - counter
+      - value
 
 #processors:
 #  - add_cloudfoundry_metadata:

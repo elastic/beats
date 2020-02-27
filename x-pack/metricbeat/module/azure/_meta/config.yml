@@ -1,59 +1,33 @@
-- module: azure
+- module: cloudfoundry
   metricsets:
-  - monitor
+    - container
+    - counter
+    - value
   enabled: true
-  period: 300s
-  client_id: '${AZURE_CLIENT_ID:""}'
-  client_secret: '${AZURE_CLIENT_SECRET:""}'
-  tenant_id: '${AZURE_TENANT_ID:""}'
-  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  refresh_list_interval: 600s
-  resources:
-#  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
-#    metrics:
-#    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
-#      namespace: "Microsoft.DocumentDb/databaseAccounts"
-
-#- module: azure
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+#
+#- module: cloudfoundry
 #  metricsets:
-#  - compute_vm
+#    - counter
 #  enabled: true
-#  period: 300s
-#  client_id: '${AZURE_CLIENT_ID:""}'
-#  client_secret: '${AZURE_CLIENT_SECRET:""}'
-#  tenant_id: '${AZURE_TENANT_ID:""}'
-#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-#  refresh_list_interval: 600s
-
-#- module: azure
+#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+#
+#- module: cloudfoundry
 #  metricsets:
-#  - compute_vm_scaleset
+#    - counter
 #  enabled: true
-#  period: 300s
-#  client_id: '${AZURE_CLIENT_ID:""}'
-#  client_secret: '${AZURE_CLIENT_SECRET:""}'
-#  tenant_id: '${AZURE_TENANT_ID:""}'
-#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-#  refresh_list_interval: 600s
-
-#- module: azure
+#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+#
+#- module: cloudfoundry
 #  metricsets:
-#  - storage
+#    - value
 #  enabled: true
-#  period: 300s
-#  client_id: '${AZURE_CLIENT_ID:""}'
-#  client_secret: '${AZURE_CLIENT_SECRET:""}'
-#  tenant_id: '${AZURE_TENANT_ID:""}'
-#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-#  refresh_list_interval: 600s
-
-#- module: azure
-#  metricsets:
-#  - database_account
-#  enabled: true
-#  period: 300s
-#  client_id: '${AZURE_CLIENT_ID:""}'
-#  client_secret: '${AZURE_CLIENT_SECRET:""}'
-#  tenant_id: '${AZURE_TENANT_ID:""}'
-#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-#  refresh_list_interval: 600s
+#  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+#  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+#  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
