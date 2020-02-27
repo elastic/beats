@@ -23,7 +23,7 @@ package memqueue
 // broker event loop.
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
-	broker *Broker
+	broker *broker
 	sig    chan batchAckMsg
 	lst    chanList
 
@@ -36,7 +36,7 @@ type ackLoop struct {
 	processACK func(chanList, int)
 }
 
-func newACKLoop(b *Broker, processACK func(chanList, int)) *ackLoop {
+func newACKLoop(b *broker, processACK func(chanList, int)) *ackLoop {
 	l := &ackLoop{broker: b}
 	l.processACK = processACK
 	return l
