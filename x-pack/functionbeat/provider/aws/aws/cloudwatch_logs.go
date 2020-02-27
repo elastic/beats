@@ -101,8 +101,8 @@ func NewCloudwatchLogs(provider provider.Provider, cfg *common.Config) (provider
 }
 
 // CloudwatchLogsDetails returns the details of the feature.
-func CloudwatchLogsDetails() *feature.Details {
-	return feature.NewDetails("Cloudwatch Logs trigger", "receive events from cloudwatch logs.", feature.Stable)
+func CloudwatchLogsDetails() feature.Details {
+	return feature.MakeDetails("Cloudwatch Logs trigger", "receive events from cloudwatch logs.", feature.Stable)
 }
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.

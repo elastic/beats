@@ -65,8 +65,8 @@ func defaultCloudwatchKinesisConfig() *CloudwatchKinesisConfig {
 }
 
 // CloudwatchKinesisDetails returns the details of the feature.
-func CloudwatchKinesisDetails() *feature.Details {
-	return feature.NewDetails("Cloudwatch logs via Kinesis trigger", "receive Cloudwatch logs from a Kinesis stream", feature.Experimental)
+func CloudwatchKinesisDetails() feature.Details {
+	return feature.MakeDetails("Cloudwatch logs via Kinesis trigger", "receive Cloudwatch logs from a Kinesis stream", feature.Experimental)
 }
 
 // Run starts the lambda function and wait for web triggers.
