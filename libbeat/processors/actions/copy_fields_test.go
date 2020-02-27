@@ -18,8 +18,9 @@
 package actions
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 
