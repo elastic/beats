@@ -6,3 +6,4 @@ input:
     metrics_path: /
     metrics_filters:
       include: ["listener_*"]
+      exclude: ["up"]
