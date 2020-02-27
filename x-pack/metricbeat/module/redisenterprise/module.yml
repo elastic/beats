@@ -1,4 +1,4 @@
-name: redis
+name: redisenterprise
 metricsets:
   - node
   - proxy
