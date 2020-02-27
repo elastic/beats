@@ -147,18 +147,7 @@ func NewClient(
 		return nil, err
 	}
 
-	client := &Client{
-		Connection: *conn,
-		index:      s.Index,
-		pipeline:   pipeline,
-		timeout:    s.Timeout,
-
-		observer: s.Observer,
-
-		log: logp.NewLogger("elasticsearch"),
-	}
-
-	client.Connection.OnConnectCallback = func() error {
+	conn.OnConnectCallback = func() error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
@@ -181,6 +170,17 @@ func NewClient(
 			}
 		}
 		return nil
+	}
+
+	client := &Client{
+		Connection: *conn,
+		index:      s.Index,
+		pipeline:   pipeline,
+		timeout:    s.Timeout,
+
+		observer: s.Observer,
+
+		log: logp.NewLogger("elasticsearch"),
 	}
 
 	return client, nil

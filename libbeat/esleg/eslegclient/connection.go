@@ -111,21 +111,12 @@ func NewConnection(settings ConnectionSettings) (*Connection, error) {
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (conn *Connection) Connect() error {
-	versionString, err := conn.Ping()
-	if err != nil {
+	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
-	if version, err := common.NewVersion(versionString); err != nil {
-		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
-		conn.version = common.Version{}
-	} else {
-		conn.version = *version
-	}
-
 	if conn.OnConnectCallback != nil {
-		err = conn.OnConnectCallback()
-		if err != nil {
+		if err := conn.OnConnectCallback(); err != nil {
 			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
 		}
 	}
@@ -215,9 +206,28 @@ func (conn *Connection) execRequest(
 }
 
 // GetVersion returns the elasticsearch version the client is connected to.
-// The version is read and updated on 'Connect'.
 func (conn *Connection) GetVersion() common.Version {
+	if !conn.version.IsValid() {
+		conn.getVersion()
+	}
+
 	return conn.version
+}
+
+func (conn *Connection) getVersion() error {
+	versionString, err := conn.Ping()
+	if err != nil {
+		return err
+	}
+
+	if version, err := common.NewVersion(versionString); err != nil {
+		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
+		conn.version = common.Version{}
+	} else {
+		conn.version = *version
+	}
+
+	return nil
 }
 
 // LoadJSON creates a PUT request based on a JSON document.
