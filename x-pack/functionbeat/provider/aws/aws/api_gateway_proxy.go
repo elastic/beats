@@ -40,8 +40,8 @@ func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (prov
 }
 
 // APIGatewayProxyDetails returns the details of the feature.
-func APIGatewayProxyDetails() *feature.Details {
-	return feature.NewDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
+func APIGatewayProxyDetails() feature.Details {
+	return feature.MakeDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
 }
 
 // Run starts the lambda function and wait for web triggers.
