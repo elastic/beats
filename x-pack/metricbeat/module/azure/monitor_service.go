@@ -90,8 +90,9 @@ func (service *MonitorService) GetMetricDefinitions(resourceID string, namespace
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details
-func (service *MonitorService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+func (service *MonitorService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
 	var tg *string
+	var interval string
 	if timegrain != "" {
 		tg = &timegrain
 	}
@@ -110,10 +111,11 @@ func (service *MonitorService) GetMetricValues(resourceID string, namespace stri
 			service.log.Warnf("Charges amounted to %v are being applied while retrieving the metric values from the resource %s ", *resp.Cost, resourceID)
 		}
 		if err != nil {
-			return metrics, err
+			return metrics, "", err
 		}
+		interval = *resp.Interval
 		metrics = append(metrics, *resp.Value...)
 
 	}
-	return metrics, nil
+	return metrics, interval, nil
 }
