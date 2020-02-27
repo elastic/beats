@@ -3084,6 +3084,12 @@ type: keyword
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
 
+[float]
+=== vpc
+
+`vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
+
+
 [[exported-fields-azure]]
 == azure fields
 
