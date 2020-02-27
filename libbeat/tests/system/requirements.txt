@@ -31,3 +31,4 @@ parameterized==0.7.0
 jsondiff==1.1.2
 semver==2.8.1
 stomp.py==4.1.22
+deepdiff==4.2.0

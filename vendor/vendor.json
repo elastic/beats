@@ -105,6 +105,48 @@
 			"revisionTime": "2019-08-13T14:39:03Z"
 		},
 		{
+			"checksumSHA1": "wei6nnaRVIBVKgG02Y2ZKZFImOs=",
+			"path": "code.cloudfoundry.org/go-diodes",
+			"revision": "f77fb823c7ee0156ed4cdadaf4f79ac3fd84613f",
+			"revisionTime": "2019-08-08T08:06:32Z"
+		},
+		{
+			"checksumSHA1": "/ThvU1ey59Se2KtvnxDH8pTv0tE=",
+			"path": "code.cloudfoundry.org/go-loggregator",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "gqL4M5ckqhtX9MaUh+VdHq+KEUs=",
+			"path": "code.cloudfoundry.org/go-loggregator/conversion",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "Y1hEVVknRkkXXUYd84nEBGBz5a8=",
+			"path": "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
+			"revision": "b8d176783c8a6280a34f0e19e0e8f57d722773a1",
+			"revisionTime": "2019-07-25T20:30:07Z",
+			"version": "v7.7.0",
+			"versionExact": "v7.7.0"
+		},
+		{
+			"checksumSHA1": "g0lkFgCOhEZmlwxJF7aKD58pz2g=",
+			"path": "code.cloudfoundry.org/gofileutils/fileutils",
+			"revision": "4d0c80011a0f37da1711c184028bc40137cd45af",
+			"revisionTime": "2017-01-11T11:52:28Z"
+		},
+		{
+			"checksumSHA1": "3h5TYyUNNdIhRM2j8cTr/yuPVWs=",
+			"path": "code.cloudfoundry.org/rfc5424",
+			"revision": "236a6d29298aea12f69978f33393d12465abc429",
+			"revisionTime": "2018-09-05T21:01:52Z"
+		},
+		{
 			"checksumSHA1": "6uv2eI5FyjWtTg5AsZ++csclSqc=",
 			"path": "contrib.go.opencensus.io/exporter/ocagent",
 			"revision": "8110e6c0236bb231b19119275a6be6ec666d05c8",
@@ -360,6 +402,12 @@
 			"revisionTime": "2019-08-01T15:21:39Z"
 		},
 		{
+			"checksumSHA1": "Mr55Nhc1CQ49Fi97aHLYgvXmPc8=",
+			"path": "github.com/Masterminds/semver",
+			"revision": "910aa146bd66780c2815d652b92a7fc5331e533c",
+			"revisionTime": "2019-12-13T17:28:11Z"
+		},
+		{
 			"checksumSHA1": "9vIkKNaaSRELM/2nCkWOAdHD21M=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
@@ -454,6 +502,24 @@
 			"path": "github.com/aerospike/aerospike-client-go/utils/buffer",
 			"revision": "0f3b54da6bdc2c31c505f9afbc5f434dd2089658",
 			"revisionTime": "2017-06-12T17:41:08Z"
+		},
+		{
+			"checksumSHA1": "Y71DWZxVHxm5RKQDF2807roHrv4=",
+			"path": "github.com/akavel/rsrc/binutil",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
+		},
+		{
+			"checksumSHA1": "dY6sByHSXr76sRhg42HvGqYhU5I=",
+			"path": "github.com/akavel/rsrc/coff",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
+		},
+		{
+			"checksumSHA1": "8FHKm/Sc+zlYExn/UkdoG0Mk2cw=",
+			"path": "github.com/akavel/rsrc/ico",
+			"revision": "b9f6b78f792dc3dddaf295854d968f5b6fdcdba1",
+			"revisionTime": "2019-03-03T07:55:59Z"
 		},
 		{
 			"checksumSHA1": "QZeGe47LzTo4drKys2X2DNGtPFA=",
@@ -2005,6 +2071,20 @@
 			"revisionTime": "2019-08-08T01:16:37Z"
 		},
 		{
+			"checksumSHA1": "Cq0mCokJQIOkHz7SFCKSstUZxnw=",
+			"path": "github.com/cloudfoundry-community/go-cfclient",
+			"revision": "35bcce23fc5f8b9969723ac38c0de1f82c4d3471",
+			"revisionTime": "2019-08-08T21:40:49Z",
+			"version": "master",
+			"versionExact": "master"
+		},
+		{
+			"checksumSHA1": "6wZB7Zkp33mMdUjWH7O0N5/fk9A=",
+			"path": "github.com/cloudfoundry/sonde-go/events",
+			"revision": "b33733203bb48d7c56de7cb639d77f78b0449d19",
+			"revisionTime": "2017-12-06T17:18:20Z"
+		},
+		{
 			"checksumSHA1": "ru5eKWdLzXfpNRL+Mi1bxbmY8DU=",
 			"path": "github.com/containerd/containerd/errdefs",
 			"revision": "36cf5b690dcc00ff0f34ff7799209050c3d0c59a",
@@ -3304,76 +3384,76 @@
 			"versionExact": "v0.0.7"
 		},
 		{
-			"checksumSHA1": "VPcK6uPDligSrbdi1yVeGivPvno=",
+			"checksumSHA1": "6EwlkLbm/yUYgLddYEiQRZioMNM=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "B58nBBiUIstpkXfr9yaYN9GzdLE=",
 			"path": "github.com/elastic/go-ucfg/diff",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "E6k6DWkpI+LOKDIFRqRmNH9GORc=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "NhiQQjYMs/ViCbmEq9tll2uCaYo=",
 			"path": "github.com/elastic/go-ucfg/hjson",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
 			"revision": "0539807037ce820e147797f051ff32b05f4f9288",
 			"revisionTime": "2019-01-28T11:18:48Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "cfMNsyQm0gZOV0hRJrBSdKDQSBo=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "ZISq+zzSb0OLzvwLlf1ObdgnFmM=",
 			"path": "github.com/elastic/go-ucfg/parse",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "cnJVnptTvXNLzxVhd266k19/pQg=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "ab69586e10820006b250d04c98cc3b848e227808",
-			"revisionTime": "2020-02-07T21:56:35Z",
-			"version": "v0.8.2",
-			"versionExact": "v0.8.2"
+			"revision": "f3ae3b220df32cfcae011ec6bbf87a711e6bf06b",
+			"revisionTime": "2020-02-20T11:45:39Z",
+			"version": "v0.8.3",
+			"versionExact": "v0.8.3"
 		},
 		{
 			"checksumSHA1": "iI1JCWsrAPpoKcEo/i6G3lRLIVs=",
@@ -3962,6 +4042,12 @@
 			"revisionTime": "2014-01-24T17:37:10Z"
 		},
 		{
+			"checksumSHA1": "6oDcHNyION8grmQpUBnUnk+G6YA=",
+			"path": "github.com/josephspurrier/goversioninfo",
+			"revision": "63e6d1acd3dd857ec6b8c54fbf52e10ce24a8786",
+			"revisionTime": "2019-02-09T21:06:21Z"
+		},
+		{
 			"checksumSHA1": "eH5fWNpm9ZUA195fLBNe7gyUU9k=",
 			"path": "github.com/jpillora/backoff",
 			"revision": "d80867952dff4e2fbfb4280ded4ff94d67790457",
@@ -4129,6 +4215,30 @@
 			"path": "github.com/magefile/mage^",
 			"revision": "v1.8.0",
 			"version": "v1.8.0"
+		},
+		{
+			"checksumSHA1": "UaztUU8ZfWj6YG13dBLR2FHIZxg=",
+			"path": "github.com/mailru/easyjson",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "T8soMJArSZrYnhmdpAnq1bVxQ6Q=",
+			"path": "github.com/mailru/easyjson/buffer",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "8Qyp0ekkp7JuahJZnnzuTXESyFU=",
+			"path": "github.com/mailru/easyjson/jlexer",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
+		},
+		{
+			"checksumSHA1": "C72An0967WekWiUIFS+fAvoJpcY=",
+			"path": "github.com/mailru/easyjson/jwriter",
+			"revision": "8edcc4e51f39ddbd3505a3386aff3f435a7fd028",
+			"revisionTime": "2020-02-18T08:42:23Z"
 		},
 		{
 			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
@@ -5324,6 +5434,12 @@
 			"path": "golang.org/x/oauth2",
 			"revision": "0f29369cfe4552d0e4bcddc57cc75f4d7e672a33",
 			"revisionTime": "2019-05-07T23:52:07Z"
+		},
+		{
+			"checksumSHA1": "Fie9WZxLdPy9f7Kk4qXqH4CV30A=",
+			"path": "golang.org/x/oauth2/clientcredentials",
+			"revision": "bf48bf16ab8d622ce64ec6ce98d2c98f916b6303",
+			"revisionTime": "2020-01-07T16:11:21Z"
 		},
 		{
 			"checksumSHA1": "w5SmJwdVFlGE1KO4/AQjY+jvdsI=",

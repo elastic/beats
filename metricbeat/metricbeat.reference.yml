@@ -699,6 +699,9 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
   #username: "user"
   #password: "secret"
 
@@ -1489,6 +1492,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -1734,7 +1739,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -1820,6 +1824,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true

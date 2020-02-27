@@ -67,7 +67,7 @@ type TLSConfig struct {
 
 	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
 	// the server certificate.
-	CASha256 pins
+	CASha256 []string
 }
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
