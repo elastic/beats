@@ -19,6 +19,7 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -32,10 +33,19 @@ type gosigarCidProvider struct {
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	cgroups, err := p.processCgroupPaths(p.hostPath, pid)
 
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// do no thing
+	case *os.PathError:
+		// os.PathError happens when the process don't exist, or not running in linux system
+		return "", nil
+	default:
+		// should never happen
 		return "", fmt.Errorf("failed to read cgroups for pid=%v", pid)
 	}
+
 	cid := p.getCid(cgroups)
+
 	return cid, nil
 }
 

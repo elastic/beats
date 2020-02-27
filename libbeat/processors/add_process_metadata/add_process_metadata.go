@@ -206,11 +206,22 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 				return nil, errors.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
-		value, err := meta.GetValue(source)
+
+		ok, err := meta.HasKey(source)
 		if err != nil {
-			// Should never happen
 			return nil, err
 		}
+
+		var value interface{}
+
+		if ok {
+			value, err = meta.GetValue(source)
+			if err != nil {
+				// Should never happen
+				return nil, err
+			}
+		}
+
 		if _, err = result.Put(dest, value); err != nil {
 			return nil, err
 		}
