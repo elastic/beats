@@ -6,8 +6,9 @@ experimental[]
 
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
 from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
-only if the event contains a reference to a Cloud Foundry application and the configured
-Cloud Foundry client is able to retrieve information for the application.
+only if the event contains a reference to a Cloud Foundry application (using field
+`cloudfoundry.app.id`) and the configured Cloud Foundry client is able to retrieve
+information for the application.
 
 Each event is annotated with:
 

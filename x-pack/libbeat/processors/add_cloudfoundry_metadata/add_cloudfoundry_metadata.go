@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -26,7 +25,6 @@ const (
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsprocessor.RegisterPlugin("AddCloudFoundryMetadata", New)
 }
 
 type addCloudFoundryMetadata struct {
@@ -63,7 +61,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if d.client == nil {
 		return event, nil
 	}
-	valI, err := event.GetValue("cf.app.id")
+	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
 		// doesn't have the required cf.app.id value to add more information
 		return event, nil
@@ -79,7 +77,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 	event.Fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			"app": common.MapStr{
 				"name": app.Name,
 			},

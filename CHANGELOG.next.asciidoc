@@ -63,7 +63,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods labels broken schema. {pull}16480[16480]
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
-- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
 
 *Auditbeat*
 
@@ -83,7 +82,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
 - Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
-- Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 
 *Heartbeat*
 
@@ -127,6 +125,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
 - Windows .exe files now have embedded file version info. {issue}15232[15232]t
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
 
 *Auditbeat*
 
@@ -150,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
 - Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
+- Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 
 *Heartbeat*
 

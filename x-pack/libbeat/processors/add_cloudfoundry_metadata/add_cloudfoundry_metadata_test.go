@@ -36,7 +36,7 @@ func TestNoCFApp(t *testing.T) {
 
 	evt := beat.Event{
 		Fields: common.MapStr{
-			"cf": common.MapStr{
+			"cloudfoundry": common.MapStr{
 				"app": common.MapStr{},
 			},
 		},
@@ -53,7 +53,7 @@ func TestCFAppIdInvalid(t *testing.T) {
 
 	evt := beat.Event{
 		Fields: common.MapStr{
-			"cf": common.MapStr{
+			"cloudfoundry": common.MapStr{
 				"app": common.MapStr{
 					"id": 1,
 				},
@@ -73,7 +73,7 @@ func TestCFAppNotFound(t *testing.T) {
 
 	evt := beat.Event{
 		Fields: common.MapStr{
-			"cf": common.MapStr{
+			"cloudfoundry": common.MapStr{
 				"app": common.MapStr{
 					"id": mustCreateFakeGuid(),
 				},
@@ -114,7 +114,7 @@ func TestCFAppUpdated(t *testing.T) {
 
 	evt := beat.Event{
 		Fields: common.MapStr{
-			"cf": common.MapStr{
+			"cloudfoundry": common.MapStr{
 				"app": common.MapStr{
 					"id": guid,
 				},
@@ -123,7 +123,7 @@ func TestCFAppUpdated(t *testing.T) {
 	}
 	expected := beat.Event{
 		Fields: common.MapStr{
-			"cf": common.MapStr{
+			"cloudfoundry": common.MapStr{
 				"app": common.MapStr{
 					"id":   guid,
 					"name": app.Name,
