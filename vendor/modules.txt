@@ -578,11 +578,9 @@ github.com/haya14busa/go-actions-toolkit/core
 github.com/imdario/mergo
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
-# github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2 => github.com/elastic/dhcp v0.0.0-20200221232812-81b9770086ea
+# github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2 => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3
 github.com/insomniacslk/dhcp/dhcpv4
 github.com/insomniacslk/dhcp/iana
-github.com/insomniacslk/dhcp/interfaces
-github.com/insomniacslk/dhcp/rfc1035label
 # github.com/jcmturner/gofork v1.0.0
 github.com/jcmturner/gofork/encoding/asn1
 github.com/jcmturner/gofork/x/crypto/pbkdf2
@@ -740,10 +738,6 @@ github.com/tsg/gopacket
 github.com/tsg/gopacket/afpacket
 github.com/tsg/gopacket/layers
 github.com/tsg/gopacket/pcap
-# github.com/u-root/u-root v6.0.0+incompatible
-github.com/u-root/u-root/pkg/rand
-github.com/u-root/u-root/pkg/ubinary
-github.com/u-root/u-root/pkg/uio
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
 # github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b
