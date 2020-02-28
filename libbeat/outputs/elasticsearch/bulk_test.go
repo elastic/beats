@@ -15,12 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eslegclient
+package elasticsearch
 
 import (
 	"testing"
-
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -126,8 +124,4 @@ func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
 	code, msg, err := BulkReadItemStatus(reader, testLogger())
 	return code, string(msg), err
-}
-
-func testLogger() *logp.Logger {
-	return logp.NewLogger("test_esclientleg")
 }

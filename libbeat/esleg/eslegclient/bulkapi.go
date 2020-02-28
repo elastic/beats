@@ -31,16 +31,7 @@ import (
 )
 
 var (
-	errExpectedItemsArray    = errors.New("expected items array")
-	errExpectedItemObject    = errors.New("expected item response object")
-	errExpectedStatusCode    = errors.New("expected item status code")
-	errUnexpectedEmptyObject = errors.New("empty object")
-	errExpectedObjectEnd     = errors.New("expected end of object")
-	ErrTempBulkFailure       = errors.New("temporary bulk send failure")
-
-	nameItems  = []byte("items")
-	nameStatus = []byte("status")
-	nameError  = []byte("error")
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
 )
 
 type BulkIndexAction struct {
@@ -215,124 +206,6 @@ func (r *bulkRequest) reset(body BodyEncoder) {
 func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, error) {
 	status, resp, err := conn.execHTTPRequest(requ.requ)
 	return status, BulkResult(resp), err
-}
-
-// BulkReadToItems reads the bulk response up to (but not including) items
-func BulkReadToItems(reader *JSONReader) error {
-	if err := reader.ExpectDict(); err != nil {
-		return errExpectedObject
-	}
-
-	// find 'items' field in response
-	for {
-		kind, name, err := reader.nextFieldName()
-		if err != nil {
-			return err
-		}
-
-		if kind == dictEnd {
-			return errExpectedItemsArray
-		}
-
-		// found items array -> continue
-		if bytes.Equal(name, nameItems) {
-			break
-		}
-
-		reader.ignoreNext()
-	}
-
-	// check items field is an array
-	if err := reader.ExpectArray(); err != nil {
-		return errExpectedItemsArray
-	}
-
-	return nil
-}
-
-// BulkReadItemStatus reads the status and error fields from the bulk item
-func BulkReadItemStatus(reader *JSONReader, logger *logp.Logger) (int, []byte, error) {
-	// skip outer dictionary
-	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
-	}
-
-	// find first field in outer dictionary (e.g. 'create')
-	kind, _, err := reader.nextFieldName()
-	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
-	}
-	if kind == dictEnd {
-		err = errUnexpectedEmptyObject
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
-	}
-
-	// parse actual item response code and error message
-	status, msg, err := itemStatusInner(reader, logger)
-	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
-	}
-
-	// close dictionary. Expect outer dictionary to have only one element
-	kind, _, err = reader.step()
-	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
-	}
-	if kind != dictEnd {
-		err = errExpectedObjectEnd
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
-	}
-
-	return status, msg, nil
-}
-
-func itemStatusInner(reader *JSONReader, logger *logp.Logger) (int, []byte, error) {
-	if err := reader.ExpectDict(); err != nil {
-		return 0, nil, errExpectedItemObject
-	}
-
-	status := -1
-	var msg []byte
-	for {
-		kind, name, err := reader.nextFieldName()
-		if err != nil {
-			logger.Errorf("Failed to parse bulk response item: %s", err)
-		}
-		if kind == dictEnd {
-			break
-		}
-
-		switch {
-		case bytes.Equal(name, nameStatus): // name == "status"
-			status, err = reader.nextInt()
-			if err != nil {
-				logger.Errorf("Failed to parse bulk response item: %s", err)
-				return 0, nil, err
-			}
-
-		case bytes.Equal(name, nameError): // name == "error"
-			msg, err = reader.ignoreNext() // collect raw string for "error" field
-			if err != nil {
-				return 0, nil, err
-			}
-
-		default: // ignore unknown fields
-			_, err = reader.ignoreNext()
-			if err != nil {
-				return 0, nil, err
-			}
-		}
-	}
-
-	if status < 0 {
-		return 0, nil, errExpectedStatusCode
-	}
-	return status, msg, nil
 }
 
 func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {

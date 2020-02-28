@@ -26,11 +26,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esclientleg"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -38,8 +37,7 @@ import (
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
-	log    *logp.Logger
-	es     *esout.Client
+	es     *elasticsearch.Client
 	params map[string]string
 	format report.Format
 
@@ -47,12 +45,11 @@ type publishClient struct {
 }
 
 func newPublishClient(
-	es *esout.Client,
+	es *elasticsearch.Client,
 	params map[string]string,
 	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
-		log:    logp.NewLogger(selector),
 		es:     es,
 		params: params,
 		format: format,
@@ -253,16 +250,17 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result esclientleg.BulkResult, events []report.Event) {
-	reader := eslegclient.NewJSONReader(result)
-	err := eslegclient.BulkReadToItems(reader)
+// TODO: reimplement without using streaming JSON reader, since monitoring bulk results only contain single items
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+	reader := elasticsearch.NewJSONReader(result)
+	err := elasticsearch.BulkReadToItems(reader)
 	if err != nil {
 		log.Errorf("failed to parse monitoring bulk items: %+v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := esclientleg.BulkReadItemStatus(log, reader)
+		status, msg, err := elasticsearch.BulkReadItemStatus(log, reader)
 		if err != nil {
 			log.Errorf("failed to parse monitoring bulk item status: %+v", err)
 			return
