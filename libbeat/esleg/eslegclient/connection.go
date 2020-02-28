@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Connection manages the connection for a given client.
@@ -277,6 +278,37 @@ func (conn *Connection) Ping() (string, error) {
 // Close closes a connection.
 func (conn *Connection) Close() error {
 	return nil
+}
+
+func (conn *Connection) Test(d testing.Driver) {
+	d.Run("elasticsearch: "+conn.URL, func(d testing.Driver) {
+		u, err := url.Parse(conn.URL)
+		d.Fatal("parse url", err)
+
+		address := u.Host
+
+		d.Run("connection", func(d testing.Driver) {
+			netDialer := transport.TestNetDialer(d, conn.timeout)
+			_, err = netDialer.Dial("tcp", address)
+			d.Fatal("dial up", err)
+		})
+
+		if u.Scheme != "https" {
+			d.Warn("TLS", "secure connection disabled")
+		} else {
+			d.Run("TLS", func(d testing.Driver) {
+				netDialer := transport.NetDialer(conn.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.TLS, conn.timeout)
+				_, err = tlsDialer.Dial("tcp", address)
+				d.Fatal("dial up", err)
+			})
+		}
+
+		err = conn.Connect()
+		d.Fatal("talk to server", err)
+		version := conn.GetVersion()
+		d.Info("version", version.String())
+	})
 }
 
 // Request sends a request via the connection.

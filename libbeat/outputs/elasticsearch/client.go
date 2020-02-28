@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
@@ -35,7 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -44,7 +42,6 @@ type Client struct {
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
-	timeout  time.Duration
 
 	observer outputs.Observer
 
@@ -93,6 +90,7 @@ func NewClient(
 		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
+		Timeout:          s.Timeout,
 	})
 	if err != nil {
 		return nil, err
@@ -127,7 +125,6 @@ func NewClient(
 		Connection: *conn,
 		index:      s.Index,
 		pipeline:   pipeline,
-		timeout:    s.Timeout,
 
 		observer: s.Observer,
 
@@ -410,37 +407,6 @@ func bulkCollectPublishFails(
 	}
 
 	return failed, stats
-}
-
-func (client *Client) Test(d testing.Driver) {
-	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
-		u, err := url.Parse(client.URL)
-		d.Fatal("parse url", err)
-
-		address := u.Host
-
-		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, client.timeout)
-			_, err = netDialer.Dial("tcp", address)
-			d.Fatal("dial up", err)
-		})
-
-		if u.Scheme != "https" {
-			d.Warn("TLS", "secure connection disabled")
-		} else {
-			d.Run("TLS", func(d testing.Driver) {
-				netDialer := transport.NetDialer(client.timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.TLS, client.timeout)
-				_, err = tlsDialer.Dial("tcp", address)
-				d.Fatal("dial up", err)
-			})
-		}
-
-		err = client.Connect()
-		d.Fatal("talk to server", err)
-		version := client.GetVersion()
-		d.Info("version", version.String())
-	})
 }
 
 func (client *Client) String() string {
