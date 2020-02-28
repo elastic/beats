@@ -32,8 +32,8 @@ import (
 	"github.com/elastic/go-txfile/pq"
 )
 
-// Spool implements an on-disk queue.Queue.
-type Spool struct {
+// diskSpool implements an on-disk queue.Queue.
+type diskSpool struct {
 	// producer/input support
 	inCtx    *spoolCtx
 	inBroker *inBroker
@@ -76,8 +76,8 @@ type Settings struct {
 const minInFlushTimeout = 100 * time.Millisecond
 const minOutFlushTimeout = 0 * time.Millisecond
 
-// NewSpool creates and initializes a new file based queue.
-func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
+// newDiskSpool creates and initializes a new file based queue.
+func newDiskSpool(logger logger, path string, settings Settings) (*diskSpool, error) {
 	mode := settings.Mode
 	if mode == 0 {
 		mode = os.ModePerm
@@ -115,7 +115,7 @@ func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
 		return nil, err
 	}
 
-	spool := &Spool{
+	spool := &diskSpool{
 		inCtx:  inCtx,
 		outCtx: outCtx,
 	}
@@ -158,7 +158,7 @@ func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
 }
 
 // Close shuts down the queue and closes the used file.
-func (s *Spool) Close() error {
+func (s *diskSpool) Close() error {
 	// stop all workers (waits for all workers to be finished)
 	s.outCtx.Close()
 	s.inCtx.Close()
@@ -173,17 +173,17 @@ func (s *Spool) Close() error {
 }
 
 // BufferConfig returns the queue initial buffer settings.
-func (s *Spool) BufferConfig() queue.BufferConfig {
+func (s *diskSpool) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{Events: -1}
 }
 
 // Producer creates a new queue producer for publishing events.
-func (s *Spool) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (s *diskSpool) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return s.inBroker.Producer(cfg)
 }
 
 // Consumer creates a new queue consumer for consuming and acking events.
-func (s *Spool) Consumer() queue.Consumer {
+func (s *diskSpool) Consumer() queue.Consumer {
 	return s.outBroker.Consumer()
 }
 
@@ -191,7 +191,7 @@ func (s *Spool) Consumer() queue.Consumer {
 // Flush events are forwarded to all workers.
 // The onFlush callback is directly called by the queue writer (same go-routine)
 // on Write or Flush operations.
-func (s *Spool) onFlush(n uint) {
+func (s *diskSpool) onFlush(n uint) {
 	s.inBroker.onFlush(n)
 	s.outBroker.onFlush(n)
 }
@@ -199,7 +199,7 @@ func (s *Spool) onFlush(n uint) {
 // onACK is run whenever the queue signals events being acked and removed from
 // the queue.
 // ACK events are forwarded to all workers.
-func (s *Spool) onACK(events, pages uint) {
+func (s *diskSpool) onACK(events, pages uint) {
 	s.inBroker.onACK(events, pages)
 }
 
