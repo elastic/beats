@@ -18,14 +18,15 @@
 package remote_write
 
 import (
-	"github.com/gogo/protobuf/proto"
-	"github.com/golang/snappy"
-	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/prompb"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"strconv"
+
+	"github.com/gogo/protobuf/proto"
+	"github.com/golang/snappy"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/prompb"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"

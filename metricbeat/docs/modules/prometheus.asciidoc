@@ -30,7 +30,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: prometheus
   period: 10s
-  metricsets: ["collector", "remote_write"]
+  metricsets: ["collector"]
   hosts: ["localhost:9090"]
   metrics_path: /metrics
   #metrics_filters:
@@ -43,6 +43,15 @@ metricbeat.modules:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -55,5 +64,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-prometheus-collector,collector>>
 
+* <<metricbeat-metricset-prometheus-remote_write,remote_write>>
+
 include::prometheus/collector.asciidoc[]
+
+include::prometheus/remote_write.asciidoc[]
 

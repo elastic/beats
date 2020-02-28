@@ -47,6 +47,9 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 	for _, metric := range metrics {
 		labels := common.MapStr{}
 
+		if metric == nil {
+			continue
+		}
 		// TODO this may be nil?
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
