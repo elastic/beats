@@ -127,30 +127,6 @@ metricbeat.modules:
   api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-
-- module: cloudfoundry
-  metricsets:
-    - counter
-  enabled: true
-  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-
-- module: cloudfoundry
-  metricsets:
-    - counter
-  enabled: true
-  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
-
-- module: cloudfoundry
-  metricsets:
-    - value
-  enabled: true
-  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
-  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
-  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
 ----
 
 [float]
