@@ -1,6 +1,7 @@
 {
     "@timestamp" : "2019-09-20T11:13:00.000Z",
     "azure" : {
+        "timegrain" : "PT5M",
         "resource" : {
             "name" : "winvmss",
             "type" : "Microsoft.Compute/virtualMachineScaleSets",
