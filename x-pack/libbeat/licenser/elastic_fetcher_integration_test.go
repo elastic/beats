@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common/cli"
@@ -23,9 +25,9 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *esleg.Connection {
+func getTestClient() *eslegclient.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
-	client, err := esleg.NewConnection(esleg.ConnectionSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",

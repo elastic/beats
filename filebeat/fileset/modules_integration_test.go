@@ -150,7 +150,7 @@ func TestAvailableProcessors(t *testing.T) {
 	assert.Contains(t, err.Error(), "ingest-hello")
 }
 
-func hasIngest(client *esleg.Connection) bool {
+func hasIngest(client *eslegclient.Connection) bool {
 	v := client.GetVersion()
 	return v.Major >= 5
 }
@@ -251,7 +251,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: GetURL(),
+		URL: eslegtest.GetURL(),
 		HTTP: &http.Client{
 			Transport: &http.Transport{
 				Dial: transport.NetDialer(0).Dial,
