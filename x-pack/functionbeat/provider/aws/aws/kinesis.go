@@ -128,8 +128,8 @@ func NewKinesis(provider provider.Provider, cfg *common.Config) (provider.Functi
 }
 
 // KinesisDetails returns the details of the feature.
-func KinesisDetails() *feature.Details {
-	return feature.NewDetails("Kinesis trigger", "receive events from a Kinesis stream", feature.Stable)
+func KinesisDetails() feature.Details {
+	return feature.MakeDetails("Kinesis trigger", "receive events from a Kinesis stream", feature.Stable)
 }
 
 // Run starts the lambda function and wait for web triggers.

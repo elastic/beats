@@ -9,6 +9,7 @@ package include
 import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/x-pack/filebeat/input/azureeventhub"
+	_ "github.com/elastic/beats/x-pack/filebeat/input/cloudfoundry"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/googlepubsub"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/httpjson"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/netflow"
