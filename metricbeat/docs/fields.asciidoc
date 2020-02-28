@@ -42,6 +42,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-ibmmq>>
+* <<exported-fields-iis>>
 * <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
@@ -66,6 +67,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-redisenterprise>>
 * <<exported-fields-sql>>
 * <<exported-fields-stan>>
 * <<exported-fields-statsd>>
@@ -3085,6 +3087,12 @@ type: keyword
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
 
+[float]
+=== vpc
+
+`vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
+
+
 [[exported-fields-azure]]
 == azure fields
 
@@ -3097,6 +3105,16 @@ azure module
 
 
 
+
+*`azure.timegrain`*::
++
+--
+The Azure metric timegrain
+
+
+type: keyword
+
+--
 
 [float]
 === resource
@@ -3189,6 +3207,16 @@ type: object
 +
 --
 compute_vm_scaleset
+
+
+type: object
+
+--
+
+*`azure.database_account.*.*`*::
++
+--
+database account
 
 
 type: object
@@ -16924,6 +16952,63 @@ IBM MQ module
 
 
 
+
+[[exported-fields-iis]]
+== iis fields
+
+iis module
+
+
+
+[float]
+=== iis
+
+
+
+
+[float]
+=== application_pool
+
+application_pool
+
+
+
+*`iis.application_pool.name`*::
++
+--
+application pool name
+
+
+type: keyword
+
+--
+
+*`iis.webserver.*.*`*::
++
+--
+webserver
+
+
+type: object
+
+--
+
+[float]
+=== website
+
+website
+
+
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
 
 [[exported-fields-istio]]
 == istio fields
@@ -32506,6 +32591,20 @@ type: long
 type: long
 
 --
+
+[[exported-fields-redisenterprise]]
+== Redis Enterprise fields
+
+Redis metrics collected from Redis Enterprise Server.
+
+
+
+[float]
+=== redisenterprise
+
+`redisenterprise` contains the information and statistics from Redis Enterprise Server.
+
+
 
 [[exported-fields-sql]]
 == sql fields

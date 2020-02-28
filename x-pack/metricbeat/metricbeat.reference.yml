@@ -265,6 +265,17 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+- module: azure
+  metricsets:
+  - database_account
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -486,6 +497,18 @@ metricbeat.modules:
   # This module uses the Prometheus collector metricset, all
   # the options for this metricset are also available here.
   metrics_path: /metrics
+
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
 
 #-------------------------------- Istio Module --------------------------------
 # Istio mesh. To collect all Mixer-generated metrics
@@ -967,6 +990,16 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#--------------------------- Redis Enterprise Module ---------------------------
+- module: redisenterprise
+  metricsets:
+    - node
+    - proxy
+  period: 1m
+
+  # Metrics endpoint
+  hosts: ["https://127.0.0.1:8070/"]
 
 #--------------------------------- Sql Module ---------------------------------
 - module: sql
@@ -2070,6 +2103,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
