@@ -20,7 +20,6 @@ package eslegclient
 
 import (
 	"encoding/json"
-	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -174,13 +173,8 @@ func TestReadSearchResult_invalid(t *testing.T) {
 
 func newTestConnection(url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
-		URL: url,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(0).Dial,
-			},
-			Timeout: 0,
-		},
+		URL:     url,
+		Timeout: 0,
 	})
 	conn.Encoder = NewJSONEncoder(nil, false)
 	return conn

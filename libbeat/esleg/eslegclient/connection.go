@@ -288,7 +288,7 @@ func (conn *Connection) Test(d testing.Driver) {
 		address := u.Host
 
 		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, conn.timeout)
+			netDialer := transport.TestNetDialer(d, conn.Timeout)
 			_, err = netDialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
@@ -297,8 +297,8 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				netDialer := transport.NetDialer(conn.timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.TLS, conn.timeout)
+				netDialer := transport.NetDialer(conn.Timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, conn.TLS, conn.Timeout)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})

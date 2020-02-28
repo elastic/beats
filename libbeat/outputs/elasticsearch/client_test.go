@@ -220,12 +220,14 @@ func TestClientWithHeaders(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
-		URL:   ts.URL,
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers: map[string]string{
-			"host":   "myhost.local",
-			"X-Test": "testing value",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL: ts.URL,
+			Headers: map[string]string{
+				"host":   "myhost.local",
+				"X-Test": "testing value",
+			},
 		},
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
 	}, nil)
 	assert.NoError(t, err)
 
@@ -341,8 +343,10 @@ func TestClientWithAPIKey(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
-		URL:    ts.URL,
-		APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL:    ts.URL,
+			APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+		},
 	}, nil)
 	assert.NoError(t, err)
 

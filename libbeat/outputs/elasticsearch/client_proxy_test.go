@@ -30,6 +30,8 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/esleg/eslegclient"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -184,10 +186,12 @@ func doClientPing(t *testing.T) {
 	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
 	clientSettings := ClientSettings{
-		URL:          serverURL,
-		Index:        outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers:      map[string]string{headerTestField: headerTestValue},
-		ProxyDisable: proxyDisable != "",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL:          serverURL,
+			Headers:      map[string]string{headerTestField: headerTestValue},
+			ProxyDisable: proxyDisable != "",
+		},
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
