@@ -89,6 +89,7 @@ check: python-env
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
+	go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
