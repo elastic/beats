@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"github.com/elastic/beats/libbeat/logp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,6 +28,7 @@ import (
 )
 
 func TestTruncateFields(t *testing.T) {
+	log := logp.NewLogger("truncate_fields_test")
 	var tests = map[string]struct {
 		MaxBytes     int
 		MaxChars     int
@@ -158,6 +160,7 @@ func TestTruncateFields(t *testing.T) {
 					FailOnError: true,
 				},
 				truncate: test.TruncateFunc,
+				logger:   log,
 			}
 
 			event := &beat.Event{
