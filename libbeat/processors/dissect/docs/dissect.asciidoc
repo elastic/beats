@@ -1,7 +1,11 @@
 [[dissect]]
 === Dissect strings
 
-The dissect processor tokenizes incoming strings using defined patterns.
+++++
+<titleabbrev>dissect</titleabbrev>
+++++
+
+The `dissect` processor tokenizes incoming strings using defined patterns.
 
 [source,yaml]
 -------
