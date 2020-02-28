@@ -6,10 +6,10 @@ The dissect processor tokenizes incoming strings using defined patterns.
 [source,yaml]
 -------
 processors:
-- dissect:
-    tokenizer: "%{key1} %{key2}"
-    field: "message"
-    target_prefix: "dissect"
+  - dissect:
+      tokenizer: "%{key1} %{key2}"
+      field: "message"
+      target_prefix: "dissect"
 -------
 
 The `dissect` processor has the following configuration settings:
@@ -30,3 +30,46 @@ NOTE: A key can contain any characters except reserved suffix or prefix modifier
 and `?`.
 
 See <<conditions>> for a list of supported conditions.
+
+[[dissect-example]]
+==== Dissect example
+
+For this example, imagine that an application generates the following messages:
+
+[source,sh]
+----
+"App01 - WebServer is starting"
+"App01 - WebServer is up and running"
+"App01 - WebServer is scaling 2 pods"
+"App02 - Database is will be restarted in 5 minutes"
+"App02 - Database is up and running"
+"App02 - Database is refreshing tables"
+----
+
+Use the `dissect` processor to split each message into two fields, for example,
+`service.name` and `service.status`:
+
+[source,yaml]
+----
+processors:
+  - dissect:
+      tokenizer: '"%{service.name} - %{service.status}"'
+      field: "message"
+      target_prefix: ""
+----
+
+This configuration produces fields like:
+
+[source,json]
+----
+"service": {
+  "name": "App01",
+  "status": "WebServer is up and running"
+},
+----
+
+`service.name` is an ECS {ref}/keyword.html[keyword field], which means that you
+can use it in {es} for filtering, sorting, and aggregations. 
+
+When possible, use ECS-compatible field names. For more information, see the
+{ecs-ref}/index.html[Elastic Common Schema] documentation.
