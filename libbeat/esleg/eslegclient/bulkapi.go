@@ -58,9 +58,6 @@ type BulkMeta struct {
 	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
 
-// MetaBuilder creates meta data for bulk requests
-type MetaBuilder func(interface{}) interface{}
-
 type BulkRequest struct {
 	requ *http.Request
 }
@@ -80,7 +77,7 @@ func (conn *Connection) Bulk(
 
 	enc := conn.Encoder
 	enc.Reset()
-	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
+	if err := bulkEncode(conn.log, enc, body); err != nil {
 		return nil, err
 	}
 
@@ -109,7 +106,7 @@ func (conn *Connection) SendMonitoringBulk(
 
 	enc := conn.Encoder
 	enc.Reset()
-	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
+	if err := bulkEncode(conn.log, enc, body); err != nil {
 		return nil, err
 	}
 
@@ -339,20 +336,11 @@ func itemStatusInner(reader *JSONReader, logger *logp.Logger) (int, []byte, erro
 	return status, msg, nil
 }
 
-func bulkEncode(log *logp.Logger, out BulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
-	if metaBuilder == nil {
-		for _, obj := range body {
-			if err := out.AddRaw(obj); err != nil {
-				log.Debugf("Failed to encode message: %+v", err)
-				return err
-			}
-		}
-	} else {
-		for _, obj := range body {
-			meta := metaBuilder(obj)
-			if err := out.Add(meta, obj); err != nil {
-				log.Debugf("Failed to encode event (dropping event): %+v", err)
-			}
+func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
+	for _, obj := range body {
+		if err := out.AddRaw(obj); err != nil {
+			log.Debugf("Failed to encode message: %s", err)
+			return err
 		}
 	}
 	return nil
