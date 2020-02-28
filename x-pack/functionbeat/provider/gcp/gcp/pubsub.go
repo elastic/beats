@@ -98,8 +98,8 @@ func (p *PubSub) getEventDataFromContext(ctx context.Context) (PubSubEvent, erro
 }
 
 // PubSubDetails returns the details of the feature.
-func PubSubDetails() *feature.Details {
-	return feature.NewDetails("Google Pub/Sub trigger", "receive messages from Google Pub/Sub.", feature.Stable)
+func PubSubDetails() feature.Details {
+	return feature.MakeDetails("Google Pub/Sub trigger", "receive messages from Google Pub/Sub.", feature.Stable)
 }
 
 // Name returns the name of the function.

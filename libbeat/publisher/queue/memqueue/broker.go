@@ -30,13 +30,13 @@ import (
 // Feature exposes a memory queue.
 var Feature = queue.Feature("mem",
 	create,
-	feature.NewDetails(
+	feature.MakeDetails(
 		"Memory queue",
 		"Buffer events in memory before sending to the output.",
 		feature.Stable),
 )
 
-type Broker struct {
+type broker struct {
 	done chan struct{}
 
 	logger logger
@@ -97,7 +97,7 @@ func create(eventer queue.Eventer, logger *logp.Logger, cfg *common.Config) (que
 		logger = logp.L()
 	}
 
-	return NewBroker(logger, Settings{
+	return NewQueue(logger, Settings{
 		Eventer:        eventer,
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
@@ -105,13 +105,13 @@ func create(eventer queue.Eventer, logger *logp.Logger, cfg *common.Config) (que
 	}), nil
 }
 
-// NewBroker creates a new broker based in-memory queue holding up to sz number of events.
+// NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
-func NewBroker(
+func NewQueue(
 	logger logger,
 	settings Settings,
-) *Broker {
+) queue.Queue {
 	// define internal channel size for producer/client requests
 	// to the broker
 	chanSize := 20
@@ -137,7 +137,7 @@ func NewBroker(
 		logger = logp.NewLogger("memqueue")
 	}
 
-	b := &Broker{
+	b := &broker{
 		done:   make(chan struct{}),
 		logger: logger,
 
@@ -182,7 +182,7 @@ func NewBroker(
 	return b
 }
 
-func (b *Broker) Close() error {
+func (b *broker) Close() error {
 	close(b.done)
 	if b.waitOnClose {
 		b.wg.Wait()
@@ -190,17 +190,17 @@ func (b *Broker) Close() error {
 	return nil
 }
 
-func (b *Broker) BufferConfig() queue.BufferConfig {
+func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
 		Events: b.bufSize,
 	}
 }
 
-func (b *Broker) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *Broker) Consumer() queue.Consumer {
+func (b *broker) Consumer() queue.Consumer {
 	return newConsumer(b)
 }
 

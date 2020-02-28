@@ -14,7 +14,7 @@ import (
 var bundle = provider.MustCreate(
 	"aws",
 	provider.NewDefaultProvider("aws", provider.NewNullCli, provider.NewNullTemplateBuilder),
-	feature.NewDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
+	feature.MakeDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
 ).MustAddFunction("cloudwatch_logs",
 	aws.NewCloudwatchLogs,
 	aws.CloudwatchLogsDetails(),
