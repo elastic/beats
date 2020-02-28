@@ -11,20 +11,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 var (
-	metricsetName    = "rds"
-	dbInstanceArnIdx = 0
-	metricNameIdx    = 1
+	metricsetName = "rds"
+	metricNameIdx = 0
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -83,9 +82,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svc := rds.New(awsConfig)
-		// Get DBInstance ARNs per region
-		dbInstanceARNs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
+
+		svc := rds.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "rds", regionName, awsConfig))
+
+		// Get DBInstance IDs per region
+		dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
 		if err != nil {
 			err = errors.Wrap(err, "getDBInstancesPerRegion failed, skipping region "+regionName)
 			m.Logger().Errorf(err.Error())
@@ -93,11 +95,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		if len(dbInstanceARNs) == 0 {
+		if len(dbInstanceIDs) == 0 {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
 		namespace := "AWS/RDS"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
@@ -111,11 +115,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Get MetricDataQuery for all dbInstances per region
-		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
-		for _, dbInstanceARN := range dbInstanceARNs {
-			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, dbInstanceARN, m.Period)...)
-		}
-
+		metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
 		var metricDataOutput []cloudwatch.MetricDataResult
 		if len(metricDataQueriesTotal) != 0 {
 			// Use metricDataQueries to make GetMetricData API calls
@@ -157,10 +157,10 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 		return nil, nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
 	}
 
-	var dbInstanceARNs []string
+	var dbInstanceIDs []string
 	dbDetailsMap := map[string]DBDetails{}
 	for _, dbInstance := range output.DBInstances {
-		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
+		dbInstanceIDs = append(dbInstanceIDs, *dbInstance.DBInstanceIdentifier)
 		dbDetails := DBDetails{
 			dbArn:        *dbInstance.DBInstanceArn,
 			dbClass:      *dbInstance.DBInstanceClass,
@@ -172,16 +172,16 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 			dbDetails.dbAvailabilityZone = *dbInstance.AvailabilityZone
 		}
 
-		dbDetailsMap[*dbInstance.DBInstanceArn] = dbDetails
+		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
 	}
-	return dbInstanceARNs, dbDetailsMap, nil
+	return dbInstanceIDs, dbDetailsMap, nil
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn string, period time.Duration) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i, dbInstanceArn, period)
+		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -190,7 +190,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN string, period time.Duration) cloudwatch.MetricDataQuery {
+func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) cloudwatch.MetricDataQuery {
 	statistic := "Average"
 	periodInSeconds := int64(period.Seconds())
 	id := metricsetName + strconv.Itoa(index)
@@ -205,15 +205,15 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN st
 		},
 	}
 
-	label := constructLabel(metricDims, dbInstanceARN, *metric.MetricName)
+	label := constructLabel(metricDims, *metric.MetricName)
 	metricDataQuery.Label = &label
 	return metricDataQuery
 }
 
-func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN string, metricName string) string {
-	// label = dbInstanceARN + metricName + dimensionKey1 + dimensionValue1
+func constructLabel(metricDimensions []cloudwatch.Dimension, metricName string) string {
+	// label = metricName + dimensionKey1 + dimensionValue1
 	// + dimensionKey2 + dimensionValue2 + ...
-	label := dbInstanceARN + " " + metricName
+	label := metricName
 	if len(metricDimensions) != 0 {
 		for _, dim := range metricDimensions {
 			label += " "
@@ -228,11 +228,6 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
-	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = aws.InitEvent(regionName, accountName, accountID)
-		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
-	}
-
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
 	if !timestamp.IsZero() {
@@ -243,29 +238,52 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
 				labels := strings.Split(*output.Label, " ")
-				dbInstanceArn := labels[dbInstanceArnIdx]
-				events[dbInstanceArn].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbInstanceArn].dbAvailabilityZone)
-				events[dbInstanceArn].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbInstanceArn].dbArn)
-				events[dbInstanceArn].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbInstanceArn].dbClass)
-				events[dbInstanceArn].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbInstanceArn].dbIdentifier)
-				events[dbInstanceArn].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbInstanceArn].dbStatus)
-				if len(output.Values) > timestampIdx && len(labels) > 1 {
-					metricSetFieldResults[dbInstanceArn][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
-					for i := 1; i <= (len(labels)-2)/2; i++ {
-						metricSetFieldResults[dbInstanceArn][labels[i*2]] = labels[(i*2 + 1)]
+				// Collect dimension values from the labels and initialize events and metricSetFieldResults with dimValues
+				var dimValues string
+				for i := 1; i < len(labels); i += 2 {
+					dimValues = dimValues + labels[i+1]
+				}
+
+				if _, ok := events[dimValues]; !ok {
+					events[dimValues] = aws.InitEvent(regionName, accountName, accountID)
+				}
+
+				if _, ok := metricSetFieldResults[dimValues]; !ok {
+					metricSetFieldResults[dimValues] = map[string]interface{}{}
+				}
+
+				if len(output.Values) > timestampIdx && len(labels) > 0 {
+					if labels[metricNameIdx] == "CPUUtilization" {
+						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx] / 100)
+					} else {
+						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+					}
+
+					for i := 1; i < len(labels); i += 2 {
+						if labels[i] == "DBInstanceIdentifier" {
+							dbIdentifier := labels[i+1]
+							if _, found := events[dbIdentifier]; !found {
+								events[dbIdentifier].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbIdentifier].dbAvailabilityZone)
+								events[dbIdentifier].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbIdentifier].dbArn)
+								events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)
+								events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
+								events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
+							}
+						}
+						metricSetFieldResults[dimValues][labels[i]] = fmt.Sprint(labels[(i + 1)])
 					}
 				}
 			}
 		}
 	}
 
-	for dbInstanceArn, metricSetFieldsPerInstance := range metricSetFieldResults {
+	for dimValues, metricSetFieldsPerInstance := range metricSetFieldResults {
 		resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
 		if err != nil {
-			return events, errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS RDS metricbeat module for dbInstance "+dbInstanceArn)
+			return events, errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS RDS metricbeat module")
 		}
 
-		events[dbInstanceArn].MetricSetFields.Update(resultMetricsetFields)
+		events[dimValues].MetricSetFields.Update(resultMetricsetFields)
 	}
 
 	return events, nil

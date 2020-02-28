@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus/collector"

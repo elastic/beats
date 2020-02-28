@@ -244,7 +244,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         output_path = os.path.join(self.working_dir, output)
         with open(output_path, "wb") as f:
             os.chmod(output_path, 0o600)
-            f.write(output_str.encode('utf8'))
+            f.write(output_str.encode('utf_8'))
 
     # Returns output as JSON object with flattened fields (. notation)
     def read_output(self,
@@ -256,7 +256,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
             for line in f:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
@@ -280,7 +280,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
             for line in f:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
@@ -359,7 +359,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + ".log"
 
-        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
 
         return data
@@ -371,7 +371,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + ".log"
 
-        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.readlines()
 
         return data
@@ -409,7 +409,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             logfile = self.beat_name + ".log"
 
         try:
-            with open(os.path.join(self.working_dir, logfile), "r") as f:
+            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
                     if is_regexp:
                         if msg.search(line) is not None:
@@ -434,7 +434,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             logfile = self.beat_name + ".log"
 
         try:
-            with open(os.path.join(self.working_dir, logfile), "r") as f:
+            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
                     res = pattern.search(line)
                     if res is not None:
@@ -454,7 +454,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
                 return sum([1 for line in f])
         except IOError:
             return 0
@@ -469,7 +469,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
                 return len([1 for line in f]) == lines
         except IOError:
             return False
@@ -578,7 +578,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             content += f.read()
 
-            hash = hashlib.md5(content).hexdigest()
+            hash = hashlib.md5(content.encode("utf-8")).hexdigest()
             doc = ""
             if hash in yaml_cache:
                 doc = yaml_cache[hash]
@@ -629,7 +629,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
                 return pred(len([1 for line in f]))
         except IOError:
             return False
@@ -642,6 +642,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
         return "http://{host}:{port}".format(
             host=os.getenv("ES_HOST", "localhost"),
             port=os.getenv("ES_PORT", "9200"),
+        )
+
+    def get_elasticsearch_url_ssl(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "https://{host}:{port}".format(
+            host=os.getenv("ES_HOST_SSL", "localhost"),
+            port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
     def get_kibana_url(self):
@@ -683,7 +693,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
-            if not(is_documented(key, expected_fields) or metaKey):
+            # Range keys as used in 'date_range' etc will not have docs of course
+            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+            if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
             if is_documented(key, aliases):
                 raise Exception("Key '{}' found in event is documented as an alias!".format(key))

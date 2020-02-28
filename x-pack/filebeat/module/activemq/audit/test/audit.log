@@ -1,0 +1,4 @@
+INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,213 | qtp443290224-47
+INFO  | admin called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,229 | qtp443290224-45
+WARN  | admin requested /admin/createDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='4eb0bc3e-9d7a-4256-844c-24f40fda98f1' ] from 127.0.0.1 | qtp12205619-39
+INFO  | guest requested /admin/purgeDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='eff6a932-1b58-45da-a64a-1b30b246cfc9' ] from 127.0.0.1 | qtp12205619-36

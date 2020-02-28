@@ -4,44 +4,48 @@
     azure module
   release: beta
   fields:
-  - name: azure
-    type: group
-    description: >
-    fields:
-      - name: namespace
-        type: keyword
-        description: >
-          The namespace selected
-      - name: subscription_id
-        type: keyword
-        description: >
-          The subscription ID
-      - name: dimensions.*
-        type: object
-        object_type: keyword
-        object_type_mapping_type: "*"
-        description: >
-          Azure metric dimensions.
-      - name: resource
-        type: group
-        description: >
-          The resource specified
-        fields:
-        - name: name
+    - name: azure
+      type: group
+      description: >
+      fields:
+        - name: timegrain
           type: keyword
           description: >
-            The name of the resource
-        - name: type
+            The Azure metric timegrain
+        - name: resource
+          type: group
+          description: >
+            The resource specified
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The name of the resource
+            - name: type
+              type: keyword
+              description: >
+                The type of the resource
+            - name: group
+              type: keyword
+              description: >
+                The resource group
+            - name: tags.*
+              type: object
+              object_type: keyword
+              object_type_mapping_type: "*"
+              description: >
+                Azure resource tags.
+        - name: namespace
           type: keyword
           description: >
-            The type of the resource
-        - name: group
+            The namespace selected
+        - name: subscription_id
           type: keyword
           description: >
-            The resource group
-        - name: tags.*
+            The subscription ID
+        - name: dimensions.*
           type: object
           object_type: keyword
           object_type_mapping_type: "*"
           description: >
-            Azure resource tags.
+            Azure metric dimensions.

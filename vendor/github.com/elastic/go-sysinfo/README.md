@@ -37,6 +37,7 @@ that are implemented.
 | `Memory()`       | x      | x     | x       |
 | `CPUTimer`       | x      | x     | x       |
 | `VMStat`         |        | x     |         |
+| `NetworkCounters`|        | x     |         |
 
 | `Process` Features     | Darwin | Linux | Windows |
 |------------------------|--------|-------|---------|

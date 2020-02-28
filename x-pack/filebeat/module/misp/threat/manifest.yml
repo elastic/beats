@@ -30,6 +30,9 @@ var:
       }
   - name: url
     default: ""
+  - name: ssl
+    default: |-
+      {}
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.json

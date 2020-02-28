@@ -5,6 +5,7 @@ ARG ACTIVEMQ_VERSION
 ENV ACTIVEMQ_HOME /opt/activemq
 ENV ACTIVEMQ apache-activemq-$ACTIVEMQ_VERSION
 ENV ACTIVEMQ_STOMP=61613 ACTIVEMQ_REST=8161
+ENV ACTIVEMQ_OPTS="-Dorg.apache.activemq.audit=true"
 
 RUN set -x && \
     mkdir -p /opt && \

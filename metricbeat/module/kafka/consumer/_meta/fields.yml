@@ -15,6 +15,18 @@
     - name: records_consumed
       description: The average number of records consumed per second for a specific topic
       type: float
-    - name: bytes_in
+    - name: in.bytes_per_sec
       description: The rate of bytes coming in to the consumer
+      type: float
+    - name: max_lag
+      description: The maximum consumer lag
+      type: float
+    - name: zookeeper_commits
+      description: The rate of offset commits to ZooKeeper
+      type: float
+    - name: kafka_commits
+      description: The rate of offset commits to Kafka
+      type: float
+    - name: messages_in
+      description: The rate of consumer message consumption
       type: float

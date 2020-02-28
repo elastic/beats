@@ -34,7 +34,7 @@ heartbeat.monitors:
 - type: http
   schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
-  check.response.status: 200
+  check.response.status: [200]
 heartbeat.scheduler:
   limit: 10
 ----------------------------------------------------------------------
@@ -69,7 +69,7 @@ monitor definitions only, e.g. what is normally under the `heartbeat.monitors` s
 - type: http
   schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
-  check.response.status: 200
+  check.response.status: [200]
 ----------------------------------------------------------------------
 
 [float]
@@ -87,11 +87,11 @@ options that are specific to that monitor type.
 The type of monitor to run. One of:
 
 * `icmp`: Uses an ICMP (v4 and v6) Echo Request to ping the configured hosts.
-Requires root access. See <<monitor-icmp-options>>.
+Requires special permissions or root access. See <<monitor-icmp-options>>.
 * `tcp`: Connects via TCP and optionally verifies the endpoint by sending and/or
 receiving a custom payload. See <<monitor-tcp-options>>.
 * `http`: Connects via HTTP and optionally verifies that the host returns the
-expected response. See <<monitor-http-options>>.
+expected response. See <<monitor-http-options>>. Will use `Elastic-Heartbeat` as the user agent product.
 
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
@@ -138,6 +138,13 @@ started.
 
 The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
 but adds the `@every` keyword.
+
+For stats on the execution of scheduled tasks you can enable the HTTP stats server with `http.enabled: true` in heartbeat.yml, then run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each time a monitor is scheduled is considered to be a single job, while portions of the work a job does, like DNS lookups and executing network requests are defined as tasks. The stats provided are:
+
+* **jobs.active:** The number of actively running jobs/monitors.
+* **jobs.missed_deadline:** The number of jobs that executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
+* **tasks.active:** The number of tasks currently running.
+* **tasks.waiting:** If the global `schedule.limit` option is set, this number will reflect the number of tasks that are ready to execute, but have not been started in order to prevent exceeding `schedule.limit`.
 
 [float]
 [[monitor-ipv4]]
@@ -224,7 +231,15 @@ the output document. By default, `keep_null` is set to `false`.
 
 These options configure {beatname_uc} to use ICMP (v4 and v6) Echo Requests to check
 the configured hosts. These options are valid when the <<monitor-type,`type`>> is
-`icmp`.
+`icmp`. Please note that on most platforms you must execute Heartbeat with elevated permissions
+to perform ICMP pings.
+
+On Linux, regular users may perform pings if the right file capabilities are set. Run
+`sudo setcap cap_net_raw+eip /path/to/heartbeat` to  grant {beatname_uc} ping capabilities on Linux.
+Alternatively, one may grant ping permissions to the user {beatname_uc} runs as. To grant ping permissions
+in this way, run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
+
+Other platforms may require {beatname_uc} to run as root or administrator to execute pings.
 
 [float]
 [[monitor-icmp-hosts]]
@@ -414,7 +429,7 @@ The username for authenticating with the server. The credentials are passed
 with the request. This setting is optional.
 
 You need to specify credentials when your `check.response` settings require it.
-For example, you can check for a 403 response (`check.response.status: 403`)
+For example, you can check for a 403 response (`check.response.status: [403]`)
 without setting credentials.
 
 [float]
@@ -474,7 +489,7 @@ Example configuration:
   schedule: '@every 5s'
   hosts: ["http://myhost:80"]
   check.request.method: HEAD
-  check.response.status: 200
+  check.response.status: [200]
 -------------------------------------------------------------------------------
 
 
@@ -502,7 +517,7 @@ to the endpoint `/demo/add`
     # urlencode the body:
     body: "name=first&email=someemail%40someemailprovider.com"
   check.response:
-    status: 200
+    status: [200]
     body:
       - Saved
       - saved
@@ -510,14 +525,14 @@ to the endpoint `/demo/add`
 
 Under `check.response`, specify these options:
 
-*`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
+*`status`*:: A list of expected status codes. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match. HTTP response
 bodies of up to 100MiB are supported.
 
 Example configuration:
 This monitor examines the
-response body for the strings `saved` or `Saved`
+response body for the strings `saved` or `Saved` and expects 200 or 201 status codes
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -531,7 +546,7 @@ response body for the strings `saved` or `Saved`
     # urlencode the body:
     body: "name=first&email=someemail%40someemailprovider.com"
   check.response:
-    status: 200
+    status: [200, 201]
     body:
       - Saved
       - saved
@@ -553,7 +568,7 @@ contains JSON:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     json:
       - description: check status
         condition:
@@ -574,7 +589,7 @@ patterns:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     body:
       - hello
       - world
@@ -593,7 +608,7 @@ regex:
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
-    status: 200
+    status: [200]
     body: '(?s)first.*second.*third'
 -------------------------------------------------------------------------------
 
@@ -690,5 +705,3 @@ the following JSON objects in `dynamic.json`:
 restarts it with a schedule of 15 seconds between checks.
 <2> {beatname_uc} starts a new monitor that uses a TLS-based connection with a
 custom CA certificate.
-
-

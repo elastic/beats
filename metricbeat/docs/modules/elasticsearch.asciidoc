@@ -12,14 +12,13 @@ monitoring of Elasticsearch across multiple versions. The default metricsets in
 this module are `node` and `node_stats`.
 * The Elasticsearch X-Pack module enables you to monitor more Elasticsearch
 metrics with our {stack} {monitor-features}. The default metricsets in this
-module are `ccr`, `cluster_stats`, `index`, `index_recovery`, `index_summary`,
-`ml_job`, `node_stats`, and `shard`.
+module are `ccr`, `cluster_stats`, `enrich`, ``index`, `index_recovery`,
+`index_summary`, `ml_job`, `node_stats`, and `shard`.
 
 [float]
 === Compatibility
 
-The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
-work with all 6.x versions.
+The Elasticsearch module works with Elasticsearch 6.7.0 and later.
 
 
 [float]

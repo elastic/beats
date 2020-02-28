@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/journalbeat/config"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -47,6 +48,8 @@ type Config struct {
 	common.EventMetadata `config:",inline"`
 	// Processors to run on events.
 	Processors processors.PluginConfig `config:"processors"`
+	// ES output index pattern
+	Index fmtstr.EventFormatString `config:"index"`
 }
 
 var (

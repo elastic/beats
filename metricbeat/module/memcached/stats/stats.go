@@ -20,15 +20,20 @@ package stats
 import (
 	"bufio"
 	"net"
+	"net/url"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
+
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("memcached", "stats", New,
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -47,7 +52,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
+	network, address, err := m.getNetworkAndAddress()
+	if err != nil {
+		return errors.Wrap(err, "error in fetch")
+	}
+
+	conn, err := net.DialTimeout(network, address, m.Module().Config().Timeout)
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")
 	}
@@ -80,4 +90,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	reporter.Event(mb.Event{MetricSetFields: event})
 
 	return nil
+}
+
+func (m *MetricSet) getNetworkAndAddress() (network string, address string, err error) {
+	hostData := m.HostData()
+	u, err := url.Parse(hostData.URI)
+	if err != nil {
+		err = errors.Wrap(err, "invalid URL")
+		return
+	}
+	network = u.Scheme
+	address = u.Host
+	return
 }

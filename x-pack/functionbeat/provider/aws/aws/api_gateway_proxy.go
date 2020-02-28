@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -39,12 +40,14 @@ func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (prov
 }
 
 // APIGatewayProxyDetails returns the details of the feature.
-func APIGatewayProxyDetails() *feature.Details {
-	return feature.NewDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
+func APIGatewayProxyDetails() feature.Details {
+	return feature.MakeDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
+func (a *APIGatewayProxy) Run(_ context.Context, client core.Client, telemetry telemetry.T) error {
+	telemetry.AddTriggeredFunction()
+
 	lambda.Start(a.createHandler(client))
 	return nil
 }
@@ -55,6 +58,7 @@ func (a *APIGatewayProxy) createHandler(
 	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 		a.log.Debugf("The handler receives a new event from the gateway (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)
+
 		if err := client.Publish(event); err != nil {
 			a.log.Errorf("could not publish event to the pipeline, error: %+v", err)
 			return buildResponse(

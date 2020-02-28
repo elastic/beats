@@ -139,11 +139,11 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 	cases := map[string]struct {
-		calls []onCall
-		cfg   map[string]interface{}
-		b     bool
-		fail  error
-		err   bool
+		calls   []onCall
+		cfg     map[string]interface{}
+		enabled bool
+		fail    error
+		err     bool
 	}{
 		"disabled via config": {
 			cfg: map[string]interface{}{"enabled": false},
@@ -157,14 +157,14 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			calls: []onCall{
 				onCheckILMEnabled(ModeAuto).Return(true, nil),
 			},
-			b: true,
+			enabled: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
 				onCheckILMEnabled(ModeEnabled).Return(true, nil),
 			},
-			cfg: map[string]interface{}{"enabled": true},
-			b:   true,
+			cfg:     map[string]interface{}{"enabled": true},
+			enabled: true,
 		},
 		"fail enabled": {
 			calls: []onCall{
@@ -191,7 +191,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
-			b, err := m.Enabled()
+			enabled, err := m.CheckEnabled()
 
 			if test.fail == nil && !test.err {
 				require.NoError(t, err)
@@ -203,7 +203,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 				assert.Equal(t, test.fail, ErrReason(err))
 			}
 
-			assert.Equal(t, test.b, b)
+			assert.Equal(t, test.enabled, enabled)
 			h.AssertExpectations(t)
 		})
 	}
@@ -264,7 +264,7 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
-		Name: "test-9.9.9",
+		Name: "test",
 		Body: DefaultPolicy,
 	}
 
@@ -305,11 +305,6 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{"name": "test"}
-			}
-
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
 			created, err := m.EnsurePolicy(test.overwrite)

@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -34,7 +36,7 @@ func TestMonitor(t *testing.T) {
 	reg := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1)
+	sched := scheduler.New(1, monitoring.NewRegistry())
 	err := sched.Start()
 	require.NoError(t, err)
 	defer sched.Stop()
@@ -82,7 +84,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	reg := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1)
+	sched := scheduler.New(1, monitoring.NewRegistry())
 	err := sched.Start()
 	require.NoError(t, err)
 	defer sched.Stop()
@@ -111,7 +113,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	reg := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1)
+	sched := scheduler.New(1, monitoring.NewRegistry())
 	err := sched.Start()
 	require.NoError(t, err)
 	defer sched.Stop()

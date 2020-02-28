@@ -2,8 +2,17 @@
     {
         "destination.ip": "1.2.3.4",
         "destination.port": 5000,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "haproxy.log",
+        "event.kind": "event",
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "log",
         "haproxy.frontend_name": "main",
         "haproxy.mode": "HTTP",
@@ -12,6 +21,10 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 24551,
+        "related.ip": [
+            "1.2.3.4",
+            "1.2.3.4"
+        ],
         "service.type": "haproxy",
         "source.address": "1.2.3.4",
         "source.geo.city_name": "Moscow",

@@ -13,6 +13,7 @@ include::{libbeat-dir}/shared-configuring.asciidoc[]
 The following topics describe how to configure {beatname_uc}:
 
 * <<configuration-{beatname_lc}-options>>
+* <<configuration-{beatname_lc}-gcp-options>>
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
@@ -31,7 +32,9 @@ The following topics describe how to configure {beatname_uc}:
 
 --
 
-include::./config-options.asciidoc[]
+include::./config-options-aws.asciidoc[]
+
+include::./config-options-gcp.asciidoc[]
 
 include::./general-options.asciidoc[]
 
@@ -41,20 +44,7 @@ include::{libbeat-dir}/queueconfig.asciidoc[]
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/outputconfig.asciidoc[tag=shared-outputconfig]
-
-* <<elasticsearch-output>>
-* <<logstash-output>>
-* <<configure-cloud-id>>
-
-[role="xpack"]
-include::{libbeat-dir}/outputs/output-elasticsearch.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/outputs/output-logstash.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/outputs/output-cloud.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/shared-ilm.asciidoc[]

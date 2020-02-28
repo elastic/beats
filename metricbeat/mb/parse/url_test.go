@@ -97,7 +97,7 @@ func TestParseURL(t *testing.T) {
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, transport.Path)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe", hostData.URI)
 			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
@@ -112,7 +112,7 @@ func TestParseURL(t *testing.T) {
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, transport.Path)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe/apath", hostData.URI)
 			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)

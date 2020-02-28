@@ -42,6 +42,9 @@
     - name: io_wait
       description: The producer I/O wait time
       type: float
-    - name: bytes_out
+    - name: out.bytes_per_sec
       description: The rate of bytes going out for the producer
+      type: float
+    - name: message_rate
+      description: The producer message rate
       type: float

@@ -1,15 +1,18 @@
-FROM golang:1.13.4
+FROM golang:1.13.8
 
 RUN \
     apt-get update \
       && apt-get install -y --no-install-recommends \
          netcat \
-         python-pip \
          rsync \
-         virtualenv \
+         python3 \
+         python3-pip \
+         python3-venv \
          libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
-RUN pip install --upgrade setuptools
-RUN pip install --upgrade docker-compose==1.23.2
+ENV PYTHON_ENV=/tmp/python-env
+
+RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade setuptools
+RUN pip3 install --upgrade docker-compose==1.23.2

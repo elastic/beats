@@ -21,6 +21,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -338,6 +339,28 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 	return containers, nil
 }
 
+// KillOld is a workaround for issues in CI with heavy load caused by having too many
+// running containers.
+// It kills all containers not related to services in `except`.
+func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
+	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return errors.Wrap(err, "listing containers to be killed")
+	}
+	for _, container := range list {
+		container := wrapperContainer{info: container}
+		serviceName, ok := container.info.Labels[labelComposeService]
+		if !ok || contains(except, serviceName) {
+			continue
+		}
+
+		if container.Running() && container.Old() {
+			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+		}
+	}
+	return nil
+}
+
 func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 	var stdout bytes.Buffer
 	cmd := d.cmd(ctx, "config", "--services")
@@ -347,6 +370,43 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 		return nil, errors.Wrap(err, "failed to get list of service names")
 	}
 	return strings.Fields(stdout.String()), nil
+}
+
+// Inspect a container.
+func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
+	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return "", errors.Wrap(err, "listing containers to be inspected")
+	}
+
+	var found bool
+	var c types.Container
+	for _, container := range list {
+		aServiceName, ok := container.Labels[labelComposeService]
+		if ok && serviceName == aServiceName {
+			c = container
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return "", errors.Errorf("container not found for service '%s'", serviceName)
+	}
+
+	inspect, err := d.client.ContainerInspect(ctx, c.ID)
+	if err != nil {
+		return "", errors.Wrap(err, "container failed inspection")
+	} else if inspect.State == nil {
+		return "empty container state", nil
+	}
+
+	state, err := json.Marshal(inspect.State)
+	if err != nil {
+		return "", errors.Wrap(err, "container inspection failed")
+	}
+
+	return string(state), nil
 }
 
 func makeFilter(project, service string, projectFilter Filter) filters.Args {

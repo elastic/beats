@@ -4,7 +4,12 @@
 
 package cef
 
-import "bytes"
+import (
+	"strings"
+
+	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+)
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G1 cef.rl -o parser.go
@@ -14,6 +19,13 @@ import "bytes"
 // Chrome / Firefox.
 //go:generate ragel -V -p cef.rl -o cef.dot
 //go:generate dot -T svg cef.dot -o cef.svg
+
+// Field is CEF extension field value.
+type Field struct {
+	String    string      // Raw value.
+	Type      DataType    // Data type from CEF guide.
+	Interface interface{} // Converted value.
+}
 
 // Event is a single CEF message.
 type Event struct {
@@ -44,10 +56,10 @@ type Event struct {
 	// predefined set. The standard allows for including additional keys as
 	// outlined in "ArcSight Extension Directory". An event can contain any
 	// number of key-value pairs in any order.
-	Extensions map[string]string `json:"extensions,omitempty"`
+	Extensions map[string]*Field `json:"extensions,omitempty"`
 }
 
-func (e *Event) init() {
+func (e *Event) init(data string) {
 	e.Version = -1
 	e.DeviceVendor = ""
 	e.DeviceProduct = ""
@@ -56,13 +68,25 @@ func (e *Event) init() {
 	e.Name = ""
 	e.Severity = ""
 	e.Extensions = nil
+
+	// Estimate length of the extensions. But limit the allocation because
+	// it's based on user input. This doesn't account for escaped equals.
+	if n := strings.Count(data, "="); n > 0 {
+		const maxLen = 50
+		if n <= maxLen {
+			e.Extensions = make(map[string]*Field, n)
+		} else {
+			e.Extensions = make(map[string]*Field, maxLen)
+		}
+	}
 }
 
-func (e *Event) pushExtension(key []byte, value []byte) {
+func (e *Event) pushExtension(key, value string) {
 	if e.Extensions == nil {
-		e.Extensions = map[string]string{}
+		e.Extensions = map[string]*Field{}
 	}
-	e.Extensions[string(key)] = string(value)
+	field := &Field{String: value}
+	e.Extensions[key] = field
 }
 
 // Unpack unpacks a common event format (CEF) message. The data is expected to
@@ -87,52 +111,70 @@ func (e *Event) pushExtension(key []byte, value []byte) {
 // and may contain alphanumeric, underscore (_), period (.), comma (,), and
 // brackets ([) (]). This is less strict than the CEF specification, but aligns
 // the key names used in practice.
-func (e *Event) Unpack(data []byte, opts ...Option) error {
+func (e *Event) Unpack(data string, opts ...Option) error {
 	var settings Settings
 	for _, opt := range opts {
 		opt.Apply(&settings)
 	}
 
-	err := e.unpack(data)
+	var errs []error
+	var err error
+	if err = e.unpack(data); err != nil {
+		errs = append(errs, err)
+	}
 
-	if settings.fullExtensionNames {
-		for key, v := range e.Extensions {
-			fullName, found := fullNameMapping[key]
-			if !found || key == fullName {
-				continue
-			}
+	for key, field := range e.Extensions {
+		mapping, found := extensionMapping[key]
+		if !found {
+			continue
+		}
 
-			e.Extensions[fullName] = v
+		// Mark the data type and do the actual conversion.
+		field.Type = mapping.Type
+		field.Interface, err = ToType(field.String, mapping.Type)
+		if err != nil {
+			// Drop the key because the field value is invalid.
+			delete(e.Extensions, key)
+			errs = append(errs, errors.Wrapf(err, "error in field '%v'", key))
+			continue
+		}
+
+		// Rename extension.
+		if settings.fullExtensionNames && key != mapping.Target {
+			e.Extensions[mapping.Target] = field
 			delete(e.Extensions, key)
 		}
 	}
 
-	return err
+	return multierr.Combine(errs...)
 }
 
-var (
-	backslash        = []byte(`\`)
-	escapedBackslash = []byte(`\\`)
+const (
+	backslash        = `\`
+	escapedBackslash = `\\`
 
-	pipe        = []byte(`|`)
-	escapedPipe = []byte(`\|`)
+	pipe        = `|`
+	escapedPipe = `\|`
 
-	equalsSign        = []byte(`=`)
-	escapedEqualsSign = []byte(`\=`)
+	equalsSign        = `=`
+	escapedEqualsSign = `\=`
 )
 
-func replaceHeaderEscapes(b []byte) []byte {
-	if bytes.IndexByte(b, '\\') != -1 {
-		b = bytes.ReplaceAll(b, escapedBackslash, backslash)
-		b = bytes.ReplaceAll(b, escapedPipe, pipe)
+var (
+	headerEscapes    = strings.NewReplacer(escapedBackslash, backslash, escapedPipe, pipe)
+	extensionEscapes = strings.NewReplacer(escapedBackslash, backslash, escapedEqualsSign, equalsSign)
+)
+
+func replaceHeaderEscapes(b string) string {
+	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedPipe) != -1 {
+		return headerEscapes.Replace(b)
 	}
 	return b
 }
 
-func replaceExtensionEscapes(b []byte) []byte {
-	if bytes.IndexByte(b, '\\') != -1 {
-		b = bytes.ReplaceAll(b, escapedBackslash, backslash)
-		b = bytes.ReplaceAll(b, escapedEqualsSign, equalsSign)
+func replaceExtensionEscapes(b string) string {
+	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedEqualsSign) != -1 {
+		return extensionEscapes.Replace(b)
 	}
 	return b
 }
