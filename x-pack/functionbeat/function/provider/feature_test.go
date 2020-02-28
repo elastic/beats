@@ -26,12 +26,12 @@ func TestBuilder(t *testing.T) {
 	b := MustCreate(
 		provider,
 		providerFactory,
-		feature.NewDetails("myprovider", "myprovider", feature.Experimental),
+		feature.MakeDetails("myprovider", "myprovider", feature.Experimental),
 	).MustAddFunction(
 		"f1",
 		fnFactory1,
-		feature.NewDetails("fn1 description", "fn1", feature.Experimental),
-	).MustAddFunction("f2", fnFactory2, feature.NewDetails(
+		feature.MakeDetails("fn1 description", "fn1", feature.Experimental),
+	).MustAddFunction("f2", fnFactory2, feature.MakeDetails(
 		"fn1 description",
 		"fn1",
 		feature.Experimental,

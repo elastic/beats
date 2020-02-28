@@ -409,7 +409,15 @@
     description: >
       The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning. 
     example: >
-      [source.ip = '198.51.100.1/32']
+      [destination:ip = '91.219.29.188/32']
+
+  - name: attack_pattern_kql
+    level: core
+    type: keyword
+    description: >
+      The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
+    example: >
+      destination.ip: "91.219.29.188/32"
 
   - name: negate
     level: core

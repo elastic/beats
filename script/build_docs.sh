@@ -38,5 +38,5 @@ do
     params="$params --resource=${resource_dir}"
   fi
 
-  $docs_dir/build_docs --asciidoctor --respect_edit_url_overrides $params --doc "$index" --out "$dest_dir"
+  $docs_dir/build_docs --direct_html --respect_edit_url_overrides $params --doc "$index" --out "$dest_dir"
 done

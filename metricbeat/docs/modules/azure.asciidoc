@@ -37,6 +37,10 @@ The virtual machine scale sets dashboard is similar to the VM dashboard and show
 
 image::./images/metricbeat-azure-vmss-overview.png[]
 
+The Azure storage dashboards dashboards show all relevant metrics for the blob, file, table and queue storage services:
+
+image::./images/metricbeat-azure-storage-overview.png[]
+
 [float]
 === Module-specific configuration notes
 
@@ -77,6 +81,11 @@ so the `period` for `compute_vm` metricset  should be `300s` or multiples of `30
 === `compute_vm_scaleset`
 This metricset will collect metrics from the virtual machine scalesets, these metrics will have a timegrain every 5 minutes,
 so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `storage`
+This metricset will collect metrics from the storage accounts, these metrics will have a timegrain every 5 minutes,
+so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
 
 
 [float]
@@ -130,6 +139,27 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - database_account
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
 ----
 
 [float]
@@ -141,11 +171,19 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>
 
+* <<metricbeat-metricset-azure-database_account,database_account>>
+
 * <<metricbeat-metricset-azure-monitor,monitor>>
+
+* <<metricbeat-metricset-azure-storage,storage>>
 
 include::azure/compute_vm.asciidoc[]
 
 include::azure/compute_vm_scaleset.asciidoc[]
 
+include::azure/database_account.asciidoc[]
+
 include::azure/monitor.asciidoc[]
+
+include::azure/storage.asciidoc[]
 

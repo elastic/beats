@@ -52,7 +52,7 @@ type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManage
 
 // Register a config manager
 func Register(name string, fn FactoryFunc, stability feature.Stability) {
-	f := feature.New(Namespace, name, fn, feature.NewDetails(name, "", stability))
+	f := feature.New(Namespace, name, fn, feature.MakeDetails(name, "", stability))
 	feature.MustRegister(f)
 }
 

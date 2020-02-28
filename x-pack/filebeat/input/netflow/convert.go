@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -245,22 +245,10 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		ecsNetwork["transport"] = IPProtocol(proto).String()
 		ecsNetwork["iana_number"] = proto
 	}
-	countBytes, hasBytes := getKeyUint64(flow.Fields, "octetDeltaCount")
-	if !hasBytes {
-		countBytes, hasBytes = getKeyUint64(flow.Fields, "octetTotalCount")
-	}
-	countPkts, hasPkts := getKeyUint64(flow.Fields, "packetDeltaCount")
-	if !hasPkts {
-		countPkts, hasPkts = getKeyUint64(flow.Fields, "packetTotalCount")
-	}
-	revBytes, hasRevBytes := getKeyUint64(flow.Fields, "reverseOctetDeltaCount")
-	if !hasRevBytes {
-		revBytes, hasRevBytes = getKeyUint64(flow.Fields, "reverseOctetTotalCount")
-	}
-	revPkts, hasRevPkts := getKeyUint64(flow.Fields, "reversePacketDeltaCount")
-	if !hasRevPkts {
-		revPkts, hasRevPkts = getKeyUint64(flow.Fields, "reversePacketTotalCount")
-	}
+	countBytes, hasBytes := getKeyUint64Alternatives(flow.Fields, "octetDeltaCount", "octetTotalCount", "initiatorOctets")
+	countPkts, hasPkts := getKeyUint64Alternatives(flow.Fields, "packetDeltaCount", "packetTotalCount", "initiatorPackets")
+	revBytes, hasRevBytes := getKeyUint64Alternatives(flow.Fields, "reverseOctetDeltaCount", "reverseOctetTotalCount", "responderOctets")
+	revPkts, hasRevPkts := getKeyUint64Alternatives(flow.Fields, "reversePacketDeltaCount", "reversePacketTotalCount", "responderPackets")
 
 	if hasRevBytes {
 		ecsDest["bytes"] = revBytes
@@ -334,6 +322,18 @@ func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
 		return
 	}
 	value, found = iface.(uint64)
+	return
+}
+
+func getKeyUint64Alternatives(dict record.Map, keys ...string) (value uint64, found bool) {
+	var iface interface{}
+	for _, key := range keys {
+		if iface, found = dict[key]; found {
+			if value, found = iface.(uint64); found {
+				return
+			}
+		}
+	}
 	return
 }
 
@@ -442,7 +442,7 @@ func (p IPProtocol) String() string {
 }
 
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
-	h := xxhash.New64()
+	h := xxhash.New()
 	// Both flows will have the same ID.
 	if srcPort >= dstPort {
 		h.Write(srcIP)

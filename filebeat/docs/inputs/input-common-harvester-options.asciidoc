@@ -193,7 +193,7 @@ occur.
 
 *`document_id`*:: Option configuration setting that specifies the JSON key to
 set the document id. If configured, the field will be removed from the original
-json document and stored in `@metadata.id`
+json document and stored in `@metadata._id`
 
 *`ignore_decoding_error`*:: An optional configuration setting that specifies if
 JSON decoding errors should be logged or not. If set to true, errors will not

@@ -2,6 +2,13 @@
   "description": "Pipeline for parsing azure signin logs.",
   "processors": [
       {
+          "rename" : {
+              "field" : "azure",
+              "target_field" : "azure-eventhub",
+              "ignore_missing": true
+          }
+      },
+      {
           "json" : {
               "field" : "message",
               "target_field" : "azure.signinlogs"
@@ -20,6 +27,12 @@
               "formats": [
                   "ISO8601"
               ]
+          }
+      },
+      {
+          "remove": {
+              "field": ["message", "azure.signinlogs.time"],
+              "ignore_missing": true
           }
       },
       {
@@ -96,6 +109,13 @@
       },
       {
           "rename": {
+              "field": "azure.signinlogs.resultDescription",
+              "target_field": "azure.signinlogs.result_description",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
               "field": "azure.signinlogs.operationVersion",
               "target_field": "azure.signinlogs.operation_version",
               "ignore_missing": true
@@ -111,7 +131,7 @@
       {
           "rename": {
               "field": "azure.signinlogs.correlationId",
-              "target_field": "azure.signinlogs.correlation_id",
+              "target_field": "azure.correlation_id",
               "ignore_missing": true
           }
       },
@@ -133,6 +153,27 @@
           "rename": {
               "field": "azure.signinlogs.properties.appliedConditionalAccessPolicies",
               "target_field": "azure.signinlogs.properties.applied_conditional_access_policies",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.authenticationDetails",
+              "target_field": "azure.signinlogs.properties.authentication_details",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.authenticationRequirementPolicies",
+              "target_field": "azure.signinlogs.properties.authentication_requirement_policies",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.authenticationProcessingDetails",
+              "target_field": "azure.signinlogs.properties.authentication_processing_details",
               "ignore_missing": true
           }
       },
@@ -320,8 +361,15 @@
       },
       {
           "rename": {
+              "field": "azure.signinlogs.properties.status.failureReason",
+              "target_field": "message",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
               "field": "azure.signinlogs.properties.status.additionalDetails",
-              "target_field": "azure.signinlogs.properties.status.additional_details",
+              "target_field": "message",
               "ignore_missing": true
           }
       },
@@ -362,7 +410,7 @@
       },
       {
           "remove": {
-              "field": ["message", "azure.signinlogs.time","azure.signinlogs.properties.location"],
+              "field": ["azure.signinlogs.properties.location"],
               "ignore_missing": true
           }
       },

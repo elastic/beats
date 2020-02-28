@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/mapping"
 )
@@ -145,7 +144,6 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	var err error
 	if len(t.config.AppendFields) > 0 {
-		cfgwarn.Experimental("append_fields is used.")
 		fields, err = mapping.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
@@ -312,8 +310,9 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	}
 
 	// number_of_routing shards is only supported for ES version >= 6.1
+	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) {
+	if !ver.LessThan(version61) && ver.Major < 7 {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 

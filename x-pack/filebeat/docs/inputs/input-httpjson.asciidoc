@@ -1,0 +1,136 @@
+[role="xpack"]
+
+:type: httpjson
+
+[id="{beatname_lc}-input-{type}"]
+=== HTTP JSON input
+
+++++
+<titleabbrev>HTTP JSON</titleabbrev>
+++++
+
+beta[]
+
+Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
+
+For example, this input is used to retrieve MISP threat indicators in the filebeat 
+x-pack misp module.
+
+This input supports timed retrieval at a configurable interval and pagination.
+
+Example configurations:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  api_key: <YOUR API KEY>
+  interval: 12h
+  url: <URL to access>
+----
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  http_method: POST
+  json_objects_array: hits.hits
+  pagination: |-
+  {
+    "enabled": true,
+    "extra_body_content": {
+      "scroll": "5m"
+    },
+    "id_field": "_scroll_id",
+    "req_field": "scroll_id",
+    "url": "http://localhost:9200/_search/scroll"
+   }
+   url: http://localhost:9200/filebeat-test/_search?scroll=5m
+----
+
+
+==== Configuration options
+
+The `httpjson` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `api_key`
+
+API key to access the HTTP API. Optional. Default: "", which means no API key is used.
+
+[float]
+==== `http_client_timeout`
+
+Time duration before declaring that the HTTP client connection has timed out. Default: 60s.
+
+[float]
+==== `http_headers`
+
+Extra HTTP header options can be set by specifying this JSON object. Default: not used.
+
+[float]
+==== `http_method`
+
+This option specifies which HTTP method to use, GET or POST. Default: GET. 
+
+[float]
+==== `http_request_body`
+
+Any additional data that needs to be set in the HTTP request can be specified in
+this JSON blob. Default: not used.
+
+[float]
+==== `interval`
+
+Time duration between repeated data retrievals. Default: 0s, meaning no repeated data retrieval.
+
+[float]
+==== `json_objects_array`
+
+If the HTTP API returns data in a JSON array, then this option can be set to decode these records 
+from the array. Default: not used.
+
+[float]
+==== `pagination.enabled`
+
+This option specifies whether pagination is enabled. Default: false.
+
+[float]
+==== `pagination.extra_body_content`
+
+Any additional data that needs to be set in the HTTP pagination request can be specified in
+this JSON blob. Default: not used.
+
+[float]
+==== `pagination.id_field`
+
+This specifies which field to use as the pagination id, to retrieve the id from the pagination 
+result JSON document.  Required when pagination is enabled.
+
+[float]
+==== `pagination.req_field`
+
+This specifies which field to use as the pagination request id, to send to the HTTP API. 
+Required when pagination is enabled. 
+
+[float]
+==== `pagination.url`
+
+This specifies the URL for sending pagination request. Required if the pagination URL is different 
+than the HTTP API URL.
+
+[float]
+==== `ssl`
+
+This specifies SSL/TLS common config. Default: not used.
+
+[float]
+==== `url`
+
+The URL of the HTTP API. Required.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

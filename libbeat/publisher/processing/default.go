@@ -295,7 +295,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || cfg.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
-		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy))
+		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy, true))
 	}
 
 	if cfg.DynamicFields != nil {
@@ -310,7 +310,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(actions.NewAddFields(meta, needsCopy))
+		processors.add(actions.NewAddFields(meta, needsCopy, false))
 	}
 
 	// setup 8: pipeline processors list

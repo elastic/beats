@@ -122,6 +122,6 @@ reached EOF or not. Note that this option can lead to data loss if the file is
 deleted before {beatname_uc} reaches the end of the file.
 
 
-include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
+include::{libbeat-dir}/faq-limit-bandwidth.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]

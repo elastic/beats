@@ -41,7 +41,7 @@ type Config struct {
 // Validate validates the cpu config.
 func (c Config) Validate() error {
 	if c.CPUTicks != nil {
-		cfgwarn.Deprecate("6.1", "cpu_ticks is deprecated. Add 'ticks' to the cpu.metrics list.")
+		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Add 'ticks' to the cpu.metrics list.")
 	}
 
 	if len(c.Metrics) == 0 {
@@ -62,5 +62,5 @@ func (c Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	Metrics: []string{percentages},
+	Metrics: []string{percentages, normalizedPercentages},
 }

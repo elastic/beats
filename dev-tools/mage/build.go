@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/josephspurrier/goversioninfo"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 )
@@ -32,15 +33,16 @@ import (
 // BuildArgs are the arguments used for the "build" target and they define how
 // "go build" is invoked.
 type BuildArgs struct {
-	Name       string // Name of binary. (On Windows '.exe' is appended.)
-	InputFiles []string
-	OutputDir  string
-	CGO        bool
-	Static     bool
-	Env        map[string]string
-	LDFlags    []string
-	Vars       map[string]string // Vars that are passed as -X key=value with the ldflags.
-	ExtraFlags []string
+	Name        string // Name of binary. (On Windows '.exe' is appended.)
+	InputFiles  []string
+	OutputDir   string
+	CGO         bool
+	Static      bool
+	Env         map[string]string
+	LDFlags     []string
+	Vars        map[string]string // Vars that are passed as -X key=value with the ldflags.
+	ExtraFlags  []string
+	WinMetadata bool // Add resource metadata to Windows binaries (like add the version number to the .exe properties).
 }
 
 // DefaultBuildArgs returns the default BuildArgs for use in builds.
@@ -55,6 +57,7 @@ func DefaultBuildArgs() BuildArgs {
 			"github.com/elastic/beats/libbeat/version.buildTime": "{{ date }}",
 			"github.com/elastic/beats/libbeat/version.commit":    "{{ commit }}",
 		},
+		WinMetadata: true,
 	}
 
 	if versionQualified {
@@ -88,6 +91,12 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 	if bp, found := BuildPlatforms.Get(Platform.Name); found {
 		args.CGO = bp.Flags.SupportsCGO()
 	}
+
+	// Enable DEP (data execution protection) for Windows binaries.
+	if Platform.GOOS == "windows" {
+		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat")
+	}
+
 	return args
 }
 
@@ -151,6 +160,64 @@ func Build(params BuildArgs) error {
 		args = append(args, params.InputFiles...)
 	}
 
+	if GOOS == "windows" && params.WinMetadata {
+		log.Println("Generating a .syso containing Windows file metadata.")
+		syso, err := MakeWindowsSysoFile()
+		if err != nil {
+			return errors.Wrap(err, "failed generating Windows .syso metadata file")
+		}
+		defer os.Remove(syso)
+	}
+
 	log.Println("Adding build environment vars:", env)
 	return sh.RunWith(env, "go", args...)
+}
+
+// MakeWindowsSysoFile generates a .syso file containing metadata about the
+// executable file like vendor, version, copyright. The linker automatically
+// discovers the .syso file and incorporates it into the Windows exe. This
+// allows users to view metadata about the exe in the Details tab of the file
+// properties viewer.
+func MakeWindowsSysoFile() (string, error) {
+	version, err := BeatQualifiedVersion()
+	if err != nil {
+		return "", err
+	}
+
+	commit, err := CommitHash()
+	if err != nil {
+		return "", err
+	}
+
+	major, minor, patch, err := ParseVersion(version)
+	if err != nil {
+		return "", err
+	}
+	fileVersion := goversioninfo.FileVersion{Major: major, Minor: minor, Patch: patch}
+
+	vi := &goversioninfo.VersionInfo{
+		FixedFileInfo: goversioninfo.FixedFileInfo{
+			FileVersion:    fileVersion,
+			ProductVersion: fileVersion,
+			FileType:       "01", // Application
+		},
+		StringFileInfo: goversioninfo.StringFileInfo{
+			CompanyName:      BeatVendor,
+			ProductName:      strings.Title(BeatName),
+			ProductVersion:   version,
+			FileVersion:      version,
+			FileDescription:  BeatDescription,
+			OriginalFilename: BeatName + ".exe",
+			LegalCopyright:   "Copyright " + BeatVendor + ", License " + BeatLicense,
+			Comments:         "commit=" + commit,
+		},
+	}
+
+	vi.Build()
+	vi.Walk()
+	sysoFile := BeatName + "_windows_" + GOARCH + ".syso"
+	if err = vi.WriteSyso(sysoFile, GOARCH); err != nil {
+		return "", errors.Wrap(err, "failed to generate syso file with Windows metadata")
+	}
+	return sysoFile, nil
 }

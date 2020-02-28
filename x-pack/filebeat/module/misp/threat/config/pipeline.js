@@ -34,6 +34,7 @@ var threat = (function () {
     var setAttackPattern = function (evt) {
         var indicator_type = evt.Get("json.type");
         var attackPattern;
+        var attackPatternKQL;
         var arr;
         var ip;
         var filename;
@@ -48,36 +49,35 @@ var threat = (function () {
                 } else {
                     asn = v;
                 }
-                attackPattern = '[' + 'as.number = ' + '\'' + asn + '\'' + ']';
-                evt.Put("as.number", asn);
+                attackPattern = '[' + 'source:as:number = ' + '\'' + asn + '\'' + ' OR destination:as:number = ' + '\'' + asn + '\'' + ']';
+                attackPatternKQL = 'source.as.number: ' + asn + ' OR destination.as.number: ' + asn;
                 break;
             case 'btc':
-                attackPattern = '[' + 'bitcoin.address = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'bitcoin:address = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'bitcoin.address: ' + '"' + v + '"'; 
                 break;
             case "domain":
-                attackPattern = '[' + 'dns.question.name = ' + '\'' + v + '\'' + ' OR url.domain = ' + '\'' + v + '\'' + ']';
-                evt.Put("dns.question.name", v);
-                evt.Put("url.domain", v);
+                attackPattern = '[' + 'dns:question:name = ' + '\'' + v + '\'' + ' OR url:domain = ' + '\'' + v + '\'' + ' OR source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'dns.question.name: ' + '"' + v + '"' + ' OR url.domain: ' + '"' + v + '"' + ' OR source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"'; 
                 break;
             case "domain|ip":
                 arr = v.split("|");
                 if (arr.length == 2) {
                     var domain = arr[0];
                     ip = arr[1].split("/")[0];
-                    attackPattern = '[' + '(' + 'dns.question.name = ' + '\'' + domain + '\'' + ' OR url.domain = ' + '\'' + domain + '\'' + ')' +
-                        ' AND ' + '(' + 'source.ip = ' + '\'' + ip + '\'' + ' OR destination.ip = ' + '\'' + ip + '\'' + ')' + ']';
-                    evt.Put("dns.question.name", domain);
-                    evt.Put("url.domain", domain);
-                    evt.Put("source.ip", ip);
-                    evt.Put("destination.ip", ip);
+                    attackPattern = '[' + '(' + 'dns:question:name = ' + '\'' + domain + '\'' + ' OR url:domain = ' + '\'' + domain + '\'' + ')' +
+                        ' AND ' + '(' + 'source:ip = ' + '\'' + ip + '\'' + ' OR destination:ip = ' + '\'' + ip + '\'' + ')' + ']';
+                    attackPatternKQL = '(' + 'dns.question.name :' + '"' + domain + '"' + ' OR url.domain: ' + '"' + domain + '"' + ')' + ' AND ' + '(' + 'source.ip: ' + '"' + ip + '"' + ' OR destination.ip: ' + '"' + ip + '"' + ')';
                 }
                 break;
             case 'email-src':
-                attackPattern = '[' + 'user.email = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'user:email = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'user.email: ' + '"' + v + '"';
                 evt.Put("user.email", v);
                 break;
             case "filename":
-                attackPattern = '[' + 'file.path = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'file:path = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'file.path: ' + '"' + v + '"';
                 evt.Put("file.path", v);
                 break;
             case "filename|md5":
@@ -85,7 +85,8 @@ var threat = (function () {
                 if (arr.length == 2) {
                     filename = arr[0];
                     var md5 = arr[1];
-                    attackPattern = '[' + 'file.hash.md5 = ' + '\'' + md5 + '\'' + ' AND file.path = ' + '\'' + filename + '\'' + ']';
+                    attackPattern = '[' + 'file:hash:md5 = ' + '\'' + md5 + '\'' + ' AND file:path = ' + '\'' + filename + '\'' + ']';
+                    attackPatternKQL = 'file.hash.md5: ' + '"' + md5 + '"' + ' AND file.path: ' + '"' + filename + '"';
                     evt.Put("file.hash.md5", md5);
                     evt.Put("file.path", filename);
                 }
@@ -95,7 +96,8 @@ var threat = (function () {
                 if (arr.length == 2) {
                     filename = arr[0];
                     var sha1 = arr[1];
-                    attackPattern = '[' + 'file.hash.sha1 = ' + '\'' + sha1 + '\'' + ' AND file.path = ' + '\'' + filename + '\'' + ']';
+                    attackPattern = '[' + 'file:hash:sha1 = ' + '\'' + sha1 + '\'' + ' AND file:path = ' + '\'' + filename + '\'' + ']';
+                    attackPatternKQL = 'file.hash.sha1: ' + '"' + sha1 + '"' + ' AND file.path: ' + '"' + filename + '"';
                     evt.Put("file.hash.sha1", sha1);
                     evt.Put("file.path", filename);
                 }
@@ -105,71 +107,85 @@ var threat = (function () {
                 if (arr.length == 2) {
                     filename = arr[0];
                     var sha256 = arr[1];
-                    attackPattern = '[' + 'file.hash.sha256 = ' + '\'' + sha256 + '\'' + ' AND file.path = ' + '\'' + filename + '\'' + ']';
+                    attackPattern = '[' + 'file:hash:sha256 = ' + '\'' + sha256 + '\'' + ' AND file:path = ' + '\'' + filename + '\'' + ']';
+                    attackPatternKQL = 'file.hash.sha256: ' + '"' + sha256 + '"' + ' AND file.path: ' + '"' + filename + '"';
                     evt.Put("file.hash.sha256", sha256);
                     evt.Put("file.path", filename);
                 }
                 break;
             case 'github-username':
-                attackPattern = '[' + 'github.username = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'user:name = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'user.name: ' + '"' + v + '"';
                 break;
             case "hostname":
-                attackPattern = '[' + 'source.domain = ' + '\'' + v + '\'' + ' OR destination.domain = ' + '\'' + v + '\'' + ']';
-                evt.Put("source.domain", v);
-                evt.Put("destination.domain", v);
+                attackPattern = '[' + 'source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"';
                 break;
             case "ip-dst":
                 ip = v.split("/")[0];
-                attackPattern = '[destination.ip = ' + '\'' + ip + '\'' + ']';
+                attackPattern = '[destination:ip = ' + '\'' + ip + '\'' + ']';
+                attackPatternKQL = 'destination.ip: ' + '"' + ip + '"';
                 evt.Put("destination.ip", ip);
                 break;
             case "ip-dst|port":
                 arr = v.split("|");
                 if (arr.length == 2) {
-                  attackPattern = '[destination.ip = ' + '\'' + arr[0] + '\'' + ' AND destination.port = ' + '\'' + arr[1] + '\'' + ']';
+                  attackPattern = '[destination:ip = ' + '\'' + arr[0] + '\'' + ' AND destination:port = ' + '\'' + arr[1] + '\'' + ']';
+                  attackPatternKQL = 'destination.ip: ' + '"' + arr[0] + '"' + ' AND destination.port: ' + arr[1];
                   evt.Put("destination.ip", arr[0]);
+                  evt.Put("destination.port", arr[1]);
                 }
                 break;
             case "ip-src":
                 ip = v.split("/")[0];
-                attackPattern = '[' + 'source.ip = ' + '\'' + ip + '\'' + ']';
+                attackPattern = '[' + 'source:ip = ' + '\'' + ip + '\'' + ']';
+                attackPatternKQL = 'source.ip: ' + '"' + ip + '"';
                 evt.Put("source.ip", ip);
                 break;
             case "link":
-                attackPattern = '[' + 'url.full = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'url:full = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'url.full: ' + '"' + v + '"';
                 evt.Put("url.full", v);
                 break;
             case "md5":
-                attackPattern = '[' + 'file.hash.md5 = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'file:hash:md5 = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'file.hash.md5: ' + '"' + v + '"';
                 evt.Put("file.hash.md5", v);
                 break;
             case 'regkey':
                 attackPattern = '[' + 'regkey = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'regkey: ' + '"' + v + '"';
                 break;
             case "sha1":
-                attackPattern = '[' + 'file.hash.sha1 = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'file:hash:sha1 = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'file.hash.sha1: ' + '"' + v + '"';
                 evt.Put("file.hash.sha1", v);
                 break;
             case "sha256":
-                attackPattern = '[' + 'file.hash.sha256 = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'file:hash:sha256 = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'file.hash.sha256: ' + '"' + v + '"';
                 evt.Put("file.hash.sha256", v);
                 break;            
             case "sha512":
-                attackPattern = '[' + 'file.hash.sha512 = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'file:hash:sha512 = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'file.hash.sha512: ' + '"' + v + '"';
                 evt.Put("file.hash.sha512", v);
                 break;
             case "url":
-                attackPattern = '[' + 'url.full = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'url:full = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'url.full: ' + '"' + v + '"';
                 evt.Put("url.full", v);
                 break;
             case 'yara':
-                attackPattern = '[' + 'yara.rule = ' + '\'' + v + '\'' + ']';
+                attackPattern = '[' + 'yara:rule = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'yara.rule: ' + '"' + v + '"';
                 break; 
         }
-        if (attackPattern == undefined) {
+        if (attackPattern == undefined || attackPatternKQL == undefined) {
             evt.Put("error.message", 'Unsupported type: ' + indicator_type);
         }
         evt.Put("misp.threat_indicator.attack_pattern", attackPattern);
+        evt.Put("misp.threat_indicator.attack_pattern_kql", attackPatternKQL);
     };
 
     var pipeline = new processor.Chain()

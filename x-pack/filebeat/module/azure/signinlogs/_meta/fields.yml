@@ -19,6 +19,10 @@
       type: keyword
       description: >
         Result signature
+    - name: result_description
+      type: keyword
+      description: >
+        Result description
     - name: identity
       type: keyword
       description: >
@@ -33,7 +37,7 @@
           description: >
             ID
         - name: created_at
-          type: keyword
+          type: date
           description: >
             Created date time
         - name: user_display_name
@@ -121,10 +125,6 @@
               type: keyword
               description: >
                 Error code
-            - name: additional_details
-              type: keyword
-              description: >
-                Additional details
         - name: device_detail
           type: group
           description: >

@@ -147,16 +147,21 @@ func TestInput(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	for _, m := range messages {
+	for range messages {
 		select {
 		case event := <-events:
-			text, err := event.Fields.GetValue("message")
+			v, err := event.Fields.GetValue("message")
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, text, m.message)
+			text, ok := v.(string)
+			if !ok {
+				t.Fatal("could not get message text from event")
+			}
+			msg := findMessage(t, text, messages)
+			assert.Equal(t, text, msg.message)
 
-			checkMatchingHeaders(t, event, m.headers)
+			checkMatchingHeaders(t, event, msg.headers)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
@@ -249,6 +254,19 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+}
+
+func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
+	var msg *testMessage
+	for _, m := range msgs {
+		if text == m.message {
+			msg = &m
+			break
+		}
+	}
+
+	assert.NotNil(t, msg)
+	return msg
 }
 
 func checkMatchingHeaders(

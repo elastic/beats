@@ -25,11 +25,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/generator/common/beatgen/setup"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen/setup"
 )
 
 // ConfigItem represents a value that must be configured for the custom beat
@@ -129,8 +130,7 @@ func VendorUpdate() error {
 	}
 
 	devtools.SetElasticBeatsDir(getAbsoluteBeatsPath())
-	mg.SerialDeps(setup.CopyVendor, setup.LinkImportsHelper)
-	return nil
+	return setup.CopyVendor()
 }
 
 // returns a "compleated" config object with everything we need

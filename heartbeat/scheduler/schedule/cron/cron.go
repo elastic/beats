@@ -50,3 +50,8 @@ func (s *Schedule) Unpack(str string) error {
 	}
 	return err
 }
+
+// RunOnInit returns false for interval schedulers.
+func (s *Schedule) RunOnInit() bool {
+	return false
+}

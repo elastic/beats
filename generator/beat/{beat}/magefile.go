@@ -22,6 +22,7 @@ func init() {
 
 	devtools.BeatDescription = "One sentence description of the Beat."
 	devtools.BeatVendor = "{full_name}"
+	devtools.BeatProjectType = devtools.CommunityProject
 }
 
 // VendorUpdate updates elastic/beats in the vendor dir
@@ -87,4 +88,15 @@ func Build() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return build.CrossBuild()
+}
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return build.BuildGoDaemon()
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return build.GolangCrossBuild()
 }

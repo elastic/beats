@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 type mockProvider struct {
@@ -48,8 +49,8 @@ type mockFunction struct {
 	name string
 }
 
-func (mf *mockFunction) Run(ctx context.Context, client core.Client) error { return nil }
-func (mf *mockFunction) Name() string                                      { return mf.name }
+func (mf *mockFunction) Run(ctx context.Context, client core.Client, t telemetry.T) error { return nil }
+func (mf *mockFunction) Name() string                                                     { return mf.name }
 
 func testProviderLookup(t *testing.T) {
 	name := "myprovider"
@@ -62,7 +63,7 @@ func testProviderLookup(t *testing.T) {
 	f := Feature(
 		name,
 		providerFn,
-		feature.NewDetails(name, "provider for testing", feature.Experimental),
+		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	t.Run("adding and retrieving a provider", withRegistry(func(
@@ -114,7 +115,7 @@ func testFunctionLookup(t *testing.T) {
 	f := Feature(
 		name,
 		providerFn,
-		feature.NewDetails(name, "provider for testing", feature.Experimental),
+		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	fnName := "myfunc"
@@ -123,7 +124,7 @@ func testFunctionLookup(t *testing.T) {
 		return myfunction, nil
 	}
 
-	fnFeature := FunctionFeature(name, fnName, functionFn, feature.NewDetails(
+	fnFeature := FunctionFeature(name, fnName, functionFn, feature.MakeDetails(
 		name,
 		"provider for testing",
 		feature.Experimental,
@@ -251,14 +252,14 @@ func TestFindFunctionByName(t *testing.T) {
 		providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
 			return myprovider, nil
 		}
-		f := Feature(name, providerFn, feature.NewDetails(name, "provider for testing", feature.Experimental))
+		f := Feature(name, providerFn, feature.MakeDetails(name, "provider for testing", feature.Experimental))
 
 		myfunction := &mockFunction{name}
 		functionFn := func(provider Provider, config *common.Config) (Function, error) {
 			return myfunction, nil
 		}
 
-		fnFeature := FunctionFeature(name, fnName, functionFn, feature.NewDetails(
+		fnFeature := FunctionFeature(name, fnName, functionFn, feature.MakeDetails(
 			name,
 			"provider for testing",
 			feature.Experimental,

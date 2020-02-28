@@ -140,5 +140,28 @@
         "log.offset": 4766,
         "message": "[2018-07-04T21:51:30,411][INFO ][index.indexing.slowlog.index] [v_VJhjV] [metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg] took[1.7ms], took_millis[1], type[doc], id[s01HZ2QBk9jw4gtgaFtn], routing[], source[",
         "service.type": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-11-14T21:18:40.269-02:00",
+        "elasticsearch.index.name": "exp_v3_1_current",
+        "elasticsearch.node.name": "exp-data-elasticsearc-2",
+        "elasticsearch.shard.id": "3",
+        "elasticsearch.slowlog.logger": "index.search.slowlog.query",
+        "elasticsearch.slowlog.search_type": "QUERY_THEN_FETCH",
+        "elasticsearch.slowlog.source_query": "{\"size\":1000,\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"diagnosis.dx_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"diagnosis\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}},{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"procedure.px_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"procedure\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}}],\"must_not\":[{\"exists\":{\"field\":\"primary_px_key\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"version\":true,\"sort\":[{\"_doc\":{\"order\":\"asc\"}}]}",
+        "elasticsearch.slowlog.stats": "",
+        "elasticsearch.slowlog.took": "516.4ms",
+        "elasticsearch.slowlog.total_shards": 10,
+        "elasticsearch.slowlog.types": "encounter",
+        "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 516000000,
+        "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.level": "TRACE",
+        "log.offset": 5638,
+        "message": "[2019-11-14T21:18:40,269][TRACE][index.search.slowlog.query] [exp-data-elasticsearc-2] [exp_v3_1_current][3] took[516.4ms], took_millis[516], types[encounter], stats[], search_type[QUERY_THEN_FETCH], total_shards[10], source[{\"size\":1000,\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"diagnosis.dx_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"diagnosis\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}},{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"procedure.px_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"procedure\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}}],\"must_not\":[{\"exists\":{\"field\":\"primary_px_key\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"version\":true,\"sort\":[{\"_doc\":{\"order\":\"asc\"}}]}]",
+        "service.type": "elasticsearch"
     }
 ]

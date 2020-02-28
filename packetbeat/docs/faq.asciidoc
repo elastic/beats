@@ -57,8 +57,8 @@ response messages are not sent.
 
 include::./faq-mysql-ssl.asciidoc[]
 
-include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
+include::{libbeat-dir}/faq-limit-bandwidth.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]
 
-include::{libbeat-dir}/docs/faq-refresh-index.asciidoc[]
+include::{libbeat-dir}/faq-refresh-index.asciidoc[]

@@ -218,7 +218,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 }
 
 func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
-	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), false, loadILM)
+	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.support.ilm.Overwrite(), loadILM)
 
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
@@ -236,10 +236,12 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 
 	var warn string
 	if !ilmComponent.load {
-		warn += "ILM policy and write alias loading not enabled. "
+		warn += "ILM policy and write alias loading not enabled.\n"
+	} else if !ilmComponent.overwrite {
+		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite:true` for enabling.\n"
 	}
 	if !templateComponent.load {
-		warn += "Template loading not enabled."
+		warn += "Template loading not enabled.\n"
 	}
 	return warn == "", warn
 }
@@ -256,7 +258,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("Auto ILM enable success.")
 	}
 
-	ilmComponent := newFeature(componentILM, withILM, false, loadILM)
+	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
 
@@ -312,7 +314,7 @@ func (m *indexManager) setupWithILM() (bool, error) {
 	var err error
 	withILM := m.support.st.withILM.Load()
 	if !withILM {
-		withILM, err = m.ilm.Enabled()
+		withILM, err = m.ilm.CheckEnabled()
 		if err != nil {
 			return false, err
 		}

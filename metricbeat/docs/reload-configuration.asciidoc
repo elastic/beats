@@ -38,7 +38,7 @@ definitions. For example:
 ------------------------------------------------------------------------------
 
 
-include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
 
 === Live reloading
 
@@ -80,4 +80,4 @@ set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
-include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]

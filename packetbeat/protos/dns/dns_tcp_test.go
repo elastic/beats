@@ -58,6 +58,7 @@ var (
 		qType:       "A",
 		qName:       "elastic.co",
 		qEtld:       "elastic.co",
+		qTLD:        "co",
 		answers:     []string{"54.201.204.244", "54.200.185.88"},
 		authorities: []string{"NS-835.AWSDNS-40.NET", "NS-1183.AWSDNS-19.ORG", "NS-2007.AWSDNS-58.CO.UK", "NS-66.AWSDNS-08.COM"},
 		request: []byte{
@@ -89,6 +90,7 @@ var (
 		qType:   "AXFR",
 		qName:   "etas.com",
 		qEtld:   "etas.com",
+		qTLD:    "com",
 		answers: []string{"training2003p", "training2003p", "1.1.1.1", "training2003p"},
 		request: []byte{
 			0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x65,
@@ -120,6 +122,8 @@ var (
 		qType:       "PTR",
 		qName:       "131.252.30.192.in-addr.arpa",
 		qEtld:       "192.in-addr.arpa",
+		qSubdomain:  "131.252.30",
+		qTLD:        "in-addr.arpa",
 		answers:     []string{"github.com"},
 		authorities: []string{"ns1.p16.dynect.net", "ns3.p16.dynect.net", "ns4.p16.dynect.net", "ns2.p16.dynect.net"},
 		request: []byte{
@@ -152,6 +156,10 @@ var (
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
 			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net",
 		qEtld: "sophosxl.net",
+		qSubdomain: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
+			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
+			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac",
+		qTLD: "net",
 		request: []byte{
 			0x00, 0xed, 0x88, 0xc1, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33,
 			0x3f, 0x31, 0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34,

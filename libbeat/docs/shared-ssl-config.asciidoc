@@ -129,9 +129,10 @@ The passphrase used to decrypt an encrypted key stored in the configured `key` f
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
+`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
+`TLSv1.3`.
 
-The default value is `[TLSv1.1, TLSv1.2]`.
+The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 
 [float]
 ==== `verification_mode`
@@ -149,7 +150,8 @@ The default is `full`.
 
 The list of cipher suites to use. The first entry has the highest priority.
 If this option is omitted, the Go crypto library's default
-suites are used (recommended).
+suites are used (recommended). Note that TLS 1.3 cipher suites are not
+individually configurable in Go, so they are not included in this list.
 
 The following cipher suites are available:
 
@@ -226,6 +228,20 @@ are `never`, `once`, and `freely`. The default value is never.
 * `never` - Disables renegotiation.
 * `once` - Allows a remote server to request renegotiation once per connection.
 * `freely` - Allows a remote server to repeatedly request renegotiation.
+
+
+[float]
+==== `ca_sha256`
+
+This configure a certificate pin can that ca be used to ensure that a specific certificate is used
+to as part of the verified chain.
+
+The pin is a base64 encoded string of the SHA-256 of the certificate.
+
+NOTE: This check is not a replacement for the normal SSL validation but it add additional validation.
+If this option is used with  `verification_mode` set to `none`, the check will always fail because
+it will not receive any verified chains.
+
 
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]

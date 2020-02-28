@@ -104,6 +104,12 @@ func Update() error {
 	return update.Update()
 }
 
+// Imports generates an include/list.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return devtools.GenerateModuleIncludeListGo()
+}
+
 // Test runs all available tests
 func Test() {
 	mg.Deps(unittest.GoUnitTest)
@@ -117,4 +123,15 @@ func Build() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return build.CrossBuild()
+}
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return build.BuildGoDaemon()
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return build.GolangCrossBuild()
 }

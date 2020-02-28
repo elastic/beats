@@ -65,6 +65,13 @@ func DialContext(npipe string) func(context.Context, string, string) (net.Conn, 
 	}
 }
 
+// Dial create a Dial to be use with an http.Client to connect to a pipe.
+func Dial(npipe string) func(string, string) (net.Conn, error) {
+	return func(_, _ string) (net.Conn, error) {
+		return winio.DialPipe(npipe, nil)
+	}
+}
+
 // DefaultSD returns a default SecurityDescriptor which is the minimal required permissions to be
 // able to write to the named pipe. The security descriptor is returned in SDDL format.
 //

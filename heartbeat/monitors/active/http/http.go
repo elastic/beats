@@ -138,6 +138,7 @@ func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport,
 		Proxy:             proxy,
 		Dial:              dialer.Dial,
 		DialTLS:           tlsDialer.Dial,
+		TLSClientConfig:   tls.ToConfig(),
 		DisableKeepAlives: true,
 	}, nil
 }

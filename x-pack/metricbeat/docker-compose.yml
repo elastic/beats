@@ -1,8 +1,10 @@
 version: '2.3'
+
 services:
   beat:
     build: ../../metricbeat
     environment:
+      - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
     volumes:
@@ -11,60 +13,22 @@ services:
     network_mode: host
     command: make
 
-  # Modules
-  appsearch:
-    build:
-      context: ./module/appsearch/_meta
-    depends_on:
-      - elasticsearch
-    environment:
-      - "elasticsearch.host=http://elasticsearch:9200"
-      - "allow_es_settings_modification=true"
-    ports:
-      - 3002
-    command: --process app-server
-
-  cockroachdb:
-    image: docker.elastic.co/observability-ci/beats-integration-cockroachdb:${COCKROACHDB_VERSION:-19.1.1}-1
-    build:
-      context: ./module/cockroachdb/_meta
-      args:
-        COCKROACHDB_VERSION: ${COCKROACHDB_VERSION:-19.1.1}
-    ports:
-      - 8080
-
-  coredns:
-    image: docker.elastic.co/observability-ci/beats-integration-coredns:${COREDNS_VERSION:-1.5.0}-1
-    build:
-      context: ./module/coredns/_meta
-      args:
-        COREDNS_VERSION: ${COREDNS_VERSION:-1.5.0}
-    ports:
-      - 9153
-
+  # Used by base tests
   elasticsearch:
     extends:
       file: ../../metricbeat/docker-compose.yml
       service: elasticsearch
 
+  # Used by base tests
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.5.2}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-7.4.0}
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.5.2}
     depends_on:
       - elasticsearch
     ports:
       - 5601
-
-  mssql:
-    image: docker.elastic.co/observability-ci/beats-integration-mssql:${MSSQL_VERSION:-2017-GA}-1
-    build:
-      context: ./module/mssql/_meta
-      args:
-        MSSQL_VERSION: ${MSSQL_VERSION:-2017-GA}
-    ports:
-      - 1433

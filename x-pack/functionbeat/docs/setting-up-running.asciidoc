@@ -17,8 +17,6 @@ This section includes additional information on how to set up and run
 
 * <<directory-layout>>
 
-* <<keystore>>
-
 * <<iam-permissions>>
 
 * <<deploy-to-cloud-provider>>
@@ -31,16 +29,13 @@ This section includes additional information on how to set up and run
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-directory-layout.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/docs/keystore.asciidoc[]
+include::{libbeat-dir}/shared-directory-layout.asciidoc[]
 
 include::iam-permissions.asciidoc[]
 
 include::deploying.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/command-reference.asciidoc[]
+include::{libbeat-dir}/command-reference.asciidoc[]
 
 include::export-cloudformation-template.asciidoc[]

@@ -328,7 +328,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alerts\" "
+              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alert\" "
             }
           }
         },
@@ -455,7 +455,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alerts\" "
+              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alert\" "
             }
           }
         },
