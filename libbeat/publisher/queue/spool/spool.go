@@ -64,7 +64,7 @@ type Settings struct {
 	// buffer be flushed and reset to its original size.
 	WriteBuffer uint
 
-	Eventer queue.Eventer
+	ACKListener queue.ACKListener
 
 	WriteFlushTimeout time.Duration
 	WriteFlushEvents  uint
@@ -134,7 +134,8 @@ func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
 	if inFlushTimeout < minInFlushTimeout {
 		inFlushTimeout = minInFlushTimeout
 	}
-	inBroker, err := newInBroker(inCtx, settings.Eventer, queue, settings.Codec,
+	inBroker, err := newInBroker(
+		inCtx, settings.ACKListener, queue, settings.Codec,
 		inFlushTimeout, settings.WriteFlushEvents)
 	if err != nil {
 		return nil, err
