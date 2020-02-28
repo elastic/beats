@@ -21,7 +21,6 @@ package fileset
 
 import (
 	"encoding/json"
-	"net/http"
 	"path/filepath"
 	"testing"
 
@@ -31,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -251,13 +249,8 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: eslegtest.GetURL(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(0).Dial,
-			},
-			Timeout: 0,
-		},
+		URL:     eslegtest.GetURL(),
+		Timeout: 0,
 	})
 	if err != nil {
 		t.Fatal(err)

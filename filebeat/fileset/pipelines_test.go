@@ -25,9 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -90,13 +89,8 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			defer testESServer.Close()
 
 			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-				URL: testESServer.URL,
-				HTTP: &http.Client{
-					Transport: &http.Transport{
-						Dial: transport.NetDialer(90 * time.Second).Dial,
-					},
-					Timeout: 90 * time.Second,
-				},
+				URL:     testESServer.URL,
+				Timeout: 90 * time.Second,
 			})
 			assert.NoError(t, err)
 
