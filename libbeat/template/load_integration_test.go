@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
-	"net/http"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -33,7 +32,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -355,13 +353,8 @@ func path(t *testing.T, fileElems []string) string {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: eslegtest.GetURL(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(0).Dial,
-			},
-			Timeout: 0,
-		},
+		URL:     eslegtest.GetURL(),
+		Timeout: 0,
 	})
 	if err != nil {
 		t.Fatal(err)

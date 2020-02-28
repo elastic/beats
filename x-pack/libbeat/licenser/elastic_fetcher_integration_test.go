@@ -7,17 +7,13 @@
 package licenser
 
 import (
-	"net/http"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/esleg/eslegclient"
-
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 const (
@@ -32,12 +28,7 @@ func getTestClient() *eslegclient.Connection {
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",
 		CompressionLevel: 3,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(60 * time.Second).Dial,
-			},
-			Timeout: 60 * time.Second,
-		},
+		Timeout:          60 * time.Second,
 	})
 
 	if err != nil {
