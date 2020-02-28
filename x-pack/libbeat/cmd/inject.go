@@ -11,6 +11,9 @@ import (
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
 
+	// register processors
+	_ "github.com/elastic/beats/x-pack/libbeat/processors/add_cloudfoundry_metadata"
+
 	// register autodiscover providers
 	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/ec2"
 	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"

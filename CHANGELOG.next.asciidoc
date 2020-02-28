@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Update cloudwatch metricset mapping for both metrics and dimensions. {pull}15245[15245]
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
@@ -78,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix loading processors from annotation hints. {pull}16348[16348]
 - Fix k8s pods labels broken schema. {pull}16480[16480]
+- Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 
 *Auditbeat*
@@ -105,7 +107,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
+- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
+- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
+- Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 
 *Heartbeat*
 
@@ -138,6 +144,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
+- Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 
 *Packetbeat*
 
@@ -148,6 +155,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
@@ -175,6 +183,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
+- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 
 *Auditbeat*
 
@@ -211,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
+- Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
 
 *Heartbeat*
@@ -249,6 +260,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reuse connections in SQL module. {pull}16001[16001]
 - Improve the `logstash` module (when `xpack.enabled` is set to `true`) to use the override `cluster_uuid` returned by Logstash APIs. {issue}15772[15772] {pull}15795[15795]
 - Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
+- Add database_account azure metricset. {issue}15758[15758]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 - Add support for NATS 2.1. {pull}16317[16317]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
