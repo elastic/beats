@@ -50,6 +50,7 @@ var:
   - name: paths
     default:
       - /var/log/crowdstrike/falconhoseclient/output
+-----
 
 include::../include/var-paths.asciidoc[]
 
