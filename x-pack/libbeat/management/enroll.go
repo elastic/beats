@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/beats/libbeat/keystore"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -87,16 +89,22 @@ func Enroll(
 }
 
 func storeAccessToken(beat *instance.Beat, accessToken string) error {
-	keystore := beat.Keystore()
-	if !keystore.IsPersisted() {
-		if err := keystore.Create(false); err != nil {
+	keyStore := beat.Keystore()
+
+	wKeystore, ok := keyStore.(keystore.WritableKeystore)
+	if !ok {
+		return fmt.Errorf("the configured keystore is not writable")
+	}
+
+	if !keyStore.IsPersisted() {
+
+		if err := wKeystore.Create(false); err != nil {
 			return errors.Wrap(err, "error creating keystore")
 		}
 	}
-
-	if err := keystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
+	if err := wKeystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
 		return errors.Wrap(err, "error storing the access token")
 	}
 
-	return keystore.Save()
+	return wKeystore.Save()
 }

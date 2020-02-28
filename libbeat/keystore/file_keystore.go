@@ -51,11 +51,21 @@ const (
 // Version of the keystore format, will be added at the beginning of the file.
 var version = []byte("v1")
 
-// FileKeystore Allows to store key / secrets pair securely into an encrypted local file.
-type FileKeystore struct {
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
+type Packager interface {
+	Package() ([]byte, error)
+	ConfiguredPath() string
+}
+
+// FileKeystoreIn defines a keystore implements Keystore, WritableKeystore, ListingKeystore.
+type FileKeystoreIn interface {
 	Keystore
 	WritableKeystore
 	ListingKeystore
+}
+
+// FileKeystore Allows to store key / secrets pair securely into an encrypted local file.
+type FileKeystore struct {
 	sync.RWMutex
 	Path     string
 	secrets  map[string]serializableSecureString
@@ -87,19 +97,19 @@ func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 	}
 
 	keystore, err := NewFileKeystore(config.Path)
-	return keystore, err
+	return &keystore, err
 }
 
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their
 // own password on the keystore, the default password will be an empty string. When the keystore
 // is initialized the secrets are automatically loaded into memory.
-func NewFileKeystore(keystoreFile string) (Keystore, error) {
+func NewFileKeystore(keystoreFile string) (FileKeystore, error) {
 	return NewFileKeystoreWithPassword(keystoreFile, NewSecureString([]byte("")))
 }
 
 // NewFileKeystoreWithPassword return a new File based keystore or an error, allow to define what
 // password to use to create the keystore.
-func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (Keystore, error) {
+func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (FileKeystore, error) {
 	keystore := FileKeystore{
 		Path:     keystoreFile,
 		dirty:    false,
@@ -109,10 +119,10 @@ func NewFileKeystoreWithPassword(keystoreFile string, password *SecureString) (K
 
 	err := keystore.load()
 	if err != nil {
-		return nil, err
+		return FileKeystore{}, err
 	}
 
-	return &keystore, nil
+	return keystore, nil
 }
 
 // Retrieve return a SecureString instance that will contains both the key and the secret.

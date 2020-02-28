@@ -39,6 +39,7 @@ func TestCanCreateAKeyStore(t *testing.T) {
 
 	keystore, err := NewFileKeystore(path)
 	assert.NoError(t, err)
+
 	assert.Nil(t, keystore.Store(keyValue, secretValue))
 	assert.Nil(t, keystore.Save())
 }
@@ -289,7 +290,7 @@ func createAndReadKeystoreWithPassword(t *testing.T, password []byte) {
 
 // CreateAnExistingKeystore creates a keystore with an existing key
 /// `output.elasticsearch.password` with the value `secret`.
-func CreateAnExistingKeystore(path string) Keystore {
+func CreateAnExistingKeystore(path string) FileKeystore {
 	keystore, err := NewFileKeystore(path)
 	// Fail fast in the test suite
 	if err != nil {

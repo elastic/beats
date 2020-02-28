@@ -130,10 +130,15 @@ func createKeystore(settings instance.Settings, force bool) error {
 		return err
 	}
 
+	wKeystore, ok := store.(keystore.WritableKeystore)
+	if !ok {
+		return fmt.Errorf("the configured keystore is not writable")
+	}
+
 	if store.IsPersisted() == true && force == false {
 		response := terminal.PromptYesNo("A keystore already exists, Overwrite?", false)
 		if response == true {
-			err := store.Create(true)
+			err := wKeystore.Create(true)
 			if err != nil {
 				return fmt.Errorf("error creating the keystore: %s", err)
 			}
@@ -142,7 +147,7 @@ func createKeystore(settings instance.Settings, force bool) error {
 			return nil
 		}
 	} else {
-		err := store.Create(true)
+		err := wKeystore.Create(true)
 		if err != nil {
 			return fmt.Errorf("Error creating the keystore: %s", err)
 		}
@@ -160,6 +165,11 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 		return fmt.Errorf("could not create secret for: %s, you can only provide one key per invocation", keys)
 	}
 
+	wKeystore, ok := store.(keystore.WritableKeystore)
+	if !ok {
+		return fmt.Errorf("the configured keystore is not writable")
+	}
+
 	if store.IsPersisted() == false {
 		if force == false {
 			answer := terminal.PromptYesNo("The keystore does not exist. Do you want to create it?", false)
@@ -167,7 +177,7 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 				return errors.New("exiting without creating keystore")
 			}
 		}
-		err := store.Create(true)
+		err := wKeystore.Create(true)
 		if err != nil {
 			return fmt.Errorf("could not create keystore, error: %s", err)
 		}
@@ -202,10 +212,10 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 			return fmt.Errorf("could not read value from the input, error: %s", err)
 		}
 	}
-	if err = store.Store(key, keyValue); err != nil {
+	if err = wKeystore.Store(key, keyValue); err != nil {
 		return fmt.Errorf("could not add the key in the keystore, error: %s", err)
 	}
-	if err = store.Save(); err != nil {
+	if err = wKeystore.Save(); err != nil {
 		return fmt.Errorf("fail to save the keystore: %s", err)
 	} else {
 		fmt.Println("Successfully updated the keystore")
@@ -216,6 +226,11 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 func removeKey(store keystore.Keystore, keys []string) error {
 	if len(keys) == 0 {
 		return errors.New("you must supply at least one key to remove")
+	}
+
+	wKeystore, ok := store.(keystore.WritableKeystore)
+	if !ok {
+		return fmt.Errorf("the configured keystore is not writable")
 	}
 
 	if store.IsPersisted() == false {
@@ -229,8 +244,8 @@ func removeKey(store keystore.Keystore, keys []string) error {
 			return fmt.Errorf("could not find key '%v' in the keystore", key)
 		}
 
-		store.Delete(key)
-		err = store.Save()
+		wKeystore.Delete(key)
+		err = wKeystore.Save()
 		if err != nil {
 			return fmt.Errorf("could not update the keystore with the changes, key: %s, error: %v", key, err)
 		}
@@ -240,7 +255,11 @@ func removeKey(store keystore.Keystore, keys []string) error {
 }
 
 func list(store keystore.Keystore) error {
-	keys, err := store.List()
+	lKeystore, ok := store.(keystore.ListingKeystore)
+	if !ok {
+		return fmt.Errorf("the configured keystore is not writable")
+	}
+	keys, err := lKeystore.List()
 	if err != nil {
 		return fmt.Errorf("could not read values from the keystore, error: %s", err)
 	}

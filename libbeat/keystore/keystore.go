@@ -19,6 +19,7 @@ package keystore
 
 import (
 	"errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
@@ -64,12 +65,6 @@ type WritableKeystore interface {
 type ListingKeystore interface {
 	// List returns the list of keys in the keystore, return an empty list if none is found.
 	List() ([]string, error)
-}
-
-// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
-type Packager interface {
-	Package() ([]byte, error)
-	ConfiguredPath() string
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.
