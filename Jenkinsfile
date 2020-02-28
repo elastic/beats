@@ -686,7 +686,7 @@ def loadConfigEnvVars(){
     "^x-pack/functionbeat/.*",
     "^x-pack/libbeat/.*",
   ])
-  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
+  //env.BUILD_GENERATOR = isChanged(["^generator/.*"])
   env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
   env.BUILD_HEARTBEAT_XPACK = isChanged([
     "^heartbeat/.*",
