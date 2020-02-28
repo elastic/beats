@@ -35,9 +35,6 @@ type config struct {
 	// RestrictedFields make restricted fields available (i.e. env).
 	RestrictedFields bool `config:"restricted_fields"`
 
-	// IncludeCid make cid field available
-	IncludeCid bool `config:"include_cid"`
-
 	// MatchPIDs fields containing the PID to lookup.
 	MatchPIDs []string `config:"match_pids" validate:"required"`
 

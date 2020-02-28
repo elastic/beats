@@ -51,6 +51,8 @@ var (
 	processCgroupPaths = cgroup.ProcessCgroupPaths
 
 	instanceID atomic.Uint32
+
+	isContainerIDEnabled bool
 )
 
 type addProcessMetadata struct {
@@ -107,24 +109,24 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
 	}
 
-	var cidProvider gosigarCidProvider
+	var p addProcessMetadata
 
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
-		cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths)
-	} else {
-		dummyProcessCgroupPaths := func(_ string, pid int) (map[string]string, error) {
-			return map[string]string{}, nil
+		p = addProcessMetadata{
+			config:      config,
+			provider:    provider,
+			cidProvider: newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths),
+			log:         log,
+			mappings:    mappings,
 		}
-		cidProvider = newCidProvider(config.HostPath, []string{}, dummyProcessCgroupPaths)
-	}
-
-	p := addProcessMetadata{
-		config:      config,
-		provider:    provider,
-		cidProvider: cidProvider,
-		log:         log,
-		mappings:    mappings,
+	} else {
+		p = addProcessMetadata{
+			config:   config,
+			provider: provider,
+			log:      log,
+			mappings: mappings,
+		}
 	}
 
 	return &p, nil
@@ -190,7 +192,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	}
 	meta := metaPtr.fields
 
-	if meta, err = p.enrichContainerID(pid, meta); err != nil {
+	if err = p.enrichContainerID(pid, meta); err != nil {
 		return nil, err
 	}
 
@@ -207,19 +209,10 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 			}
 		}
 
-		ok, err := meta.HasKey(source)
+		value, err := meta.GetValue(source)
 		if err != nil {
+			// Should never happen
 			return nil, err
-		}
-
-		var value interface{}
-
-		if ok {
-			value, err = meta.GetValue(source)
-			if err != nil {
-				// Should never happen
-				return nil, err
-			}
 		}
 
 		if _, err = result.Put(dest, value); err != nil {
@@ -230,18 +223,19 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	return result, nil
 }
 
-// add container.id into meta for mapping to pickup
-func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) (common.MapStr, error) {
+// addProcessMetadata add container.id into meta for mapping to pickup
+func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) error {
+	if p.cidProvider == nil {
+		return nil
+	}
 	cid, err := p.cidProvider.GetCid(pid)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if cid != "" {
-		if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
-			return nil, err
-		}
+	if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+		return err
 	}
-	return meta, nil
+	return nil
 }
 
 // String returns the processor representation formatted as a string

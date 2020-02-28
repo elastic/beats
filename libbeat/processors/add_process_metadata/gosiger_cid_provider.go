@@ -32,7 +32,6 @@ type gosigarCidProvider struct {
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	cgroups, err := p.processCgroupPaths(p.hostPath, pid)
-
 	switch err.(type) {
 	case nil:
 		// do no thing
@@ -50,7 +49,6 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 }
 
 func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error)) gosigarCidProvider {
-
 	return gosigarCidProvider{
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
