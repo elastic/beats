@@ -250,26 +250,38 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-// TODO: reimplement without using streaming JSON reader, since monitoring bulk results only contain single items
 func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
-	reader := elasticsearch.NewJSONReader(result)
-	err := elasticsearch.BulkReadToItems(reader)
-	if err != nil {
-		log.Errorf("failed to parse monitoring bulk items: %+v", err)
+	var response struct {
+		Items []map[string]map[string]interface{} `json:"items"`
+	}
+
+	if err := json.Unmarshal(result, &response); err != nil {
+		log.Errorf("failed to parse monitoring bulk items: %v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := elasticsearch.BulkReadItemStatus(log, reader)
-		if err != nil {
-			log.Errorf("failed to parse monitoring bulk item status: %+v", err)
-			return
-		}
-		switch {
-		case status < 300, status == http.StatusConflict:
-			continue
-		default:
-			log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		for _, innerItem := range response.Items[i] {
+			var status int
+			if s, exists := innerItem["status"]; exists {
+				if v, ok := s.(int); ok {
+					status = v
+				}
+			}
+
+			var errorMsg string
+			if e, exists := innerItem["error"]; exists {
+				if v, ok := e.(string); ok {
+					errorMsg = v
+				}
+			}
+
+			switch {
+			case status < 300, status == http.StatusConflict:
+				continue
+			default:
+				log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, errorMsg)
+			}
 		}
 	}
 }
