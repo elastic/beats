@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -91,21 +92,24 @@ func makeES(
 
 		var client outputs.NetworkClient
 		client, err = NewClient(ClientSettings{
-			URL:              esURL,
-			Index:            index,
-			Pipeline:         pipeline,
-			Proxy:            proxyURL,
-			ProxyDisable:     config.ProxyDisable,
-			TLS:              tlsConfig,
-			Username:         config.Username,
-			Password:         config.Password,
-			APIKey:           config.APIKey,
-			Parameters:       params,
-			Headers:          config.Headers,
-			Timeout:          config.Timeout,
-			CompressionLevel: config.CompressionLevel,
-			Observer:         observer,
-			EscapeHTML:       config.EscapeHTML,
+			ConnectionSettings: eslegclient.ConnectionSettings{
+				URL:              esURL,
+				Proxy:            proxyURL,
+				ProxyDisable:     config.ProxyDisable,
+				TLS:              tlsConfig,
+				Username:         config.Username,
+				Password:         config.Password,
+				APIKey:           config.APIKey,
+				Parameters:       params,
+				Headers:          config.Headers,
+				Timeout:          config.Timeout,
+				CompressionLevel: config.CompressionLevel,
+				Observer:         observer,
+				EscapeHTML:       config.EscapeHTML,
+			},
+			Index:    index,
+			Pipeline: pipeline,
+			Observer: observer,
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

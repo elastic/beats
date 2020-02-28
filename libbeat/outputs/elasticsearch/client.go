@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -54,20 +53,10 @@ type Client struct {
 
 // ClientSettings contains the settings for a client.
 type ClientSettings struct {
-	URL                string
-	Proxy              *url.URL
-	ProxyDisable       bool
-	TLS                *tlscommon.TLSConfig
-	Username, Password string
-	APIKey             string
-	EscapeHTML         bool
-	Parameters         map[string]string
-	Headers            map[string]string
-	Index              outputs.IndexSelector
-	Pipeline           *outil.Selector
-	Timeout            time.Duration
-	CompressionLevel   int
-	Observer           outputs.Observer
+	eslegclient.ConnectionSettings
+	Index    outputs.IndexSelector
+	Pipeline *outil.Selector
+	Observer outputs.Observer
 }
 
 type bulkResultStats struct {
@@ -92,51 +81,13 @@ func NewClient(
 		pipeline = nil
 	}
 
-	u, err := url.Parse(s.URL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
-	}
-	if u.User != nil {
-		s.Username = u.User.Username()
-		s.Password, _ = u.User.Password()
-		u.User = nil
-
-		// Re-write URL without credentials.
-		s.URL = u.String()
-	}
-
-	log := logp.NewLogger(logSelector)
-	log.Infof("Elasticsearch url: %s", s.URL)
-
-	// TODO: add socks5 proxy support
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(s.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	if st := s.Observer; st != nil {
-		dialer = transport.StatsDialer(dialer, st)
-		tlsDialer = transport.StatsDialer(tlsDialer, st)
-	}
-
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:       s.URL,
-		Username:  s.Username,
-		Password:  s.Password,
-		APIKey:    base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
-		Headers:   s.Headers,
-		TLSConfig: s.TLS,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial:            dialer.Dial,
-				DialTLS:         tlsDialer.Dial,
-				TLSClientConfig: s.TLS.ToConfig(),
-			},
-			Timeout: s.Timeout,
-		},
+		URL:              s.URL,
+		Username:         s.Username,
+		Password:         s.Password,
+		APIKey:           base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
+		Headers:          s.Headers,
+		TLS:              s.TLS,
 		Proxy:            s.Proxy,
 		ProxyDisable:     s.ProxyDisable,
 		Parameters:       s.Parameters,
@@ -186,99 +137,6 @@ func NewClient(
 	return client, nil
 }
 
-// NewConnectedClient creates a new Elasticsearch client based on the given config.
-// It uses the NewElasticsearchClients to create a list of clients then returns
-// the first from the list that successfully connects.
-func NewConnectedClient(cfg *common.Config) (*Client, error) {
-	clients, err := NewElasticsearchClients(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	errors := []string{}
-
-	for _, client := range clients {
-		err = client.Connect()
-		if err != nil {
-			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
-			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
-			errors = append(errors, err.Error())
-			continue
-		}
-		return &client, nil
-	}
-	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
-}
-
-// NewElasticsearchClients returns a list of Elasticsearch clients based on the given
-// configuration. It accepts the same configuration parameters as the output,
-// except for the output specific configuration options (index, pipeline,
-// template) .If multiple hosts are defined in the configuration, a client is returned
-// for each of them.
-func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
-	hosts, err := outputs.ReadHostList(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	config := defaultConfig
-	if err = cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = common.ParseURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-		if proxyURL != nil {
-			logp.Info("Using proxy URL: %s", proxyURL)
-		}
-	}
-
-	params := config.Params
-	if len(params) == 0 {
-		params = nil
-	}
-
-	clients := []Client{}
-	for _, host := range hosts {
-		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
-		if err != nil {
-			logp.Err("Invalid host param set: %s, Error: %v", host, err)
-			return nil, err
-		}
-
-		client, err := NewClient(ClientSettings{
-			URL:              esURL,
-			Proxy:            proxyURL,
-			ProxyDisable:     config.ProxyDisable,
-			TLS:              tlsConfig,
-			Username:         config.Username,
-			Password:         config.Password,
-			APIKey:           config.APIKey,
-			Parameters:       params,
-			Headers:          config.Headers,
-			Timeout:          config.Timeout,
-			CompressionLevel: config.CompressionLevel,
-		}, nil)
-		if err != nil {
-			return clients, err
-		}
-		clients = append(clients, *client)
-	}
-	if len(clients) == 0 {
-		return clients, fmt.Errorf("No hosts defined in the Elasticsearch output")
-	}
-	return clients, nil
-}
-
 // Clone clones a client.
 func (client *Client) Clone() *Client {
 	// when cloning the connection callback and params are not copied. A
@@ -288,22 +146,27 @@ func (client *Client) Clone() *Client {
 
 	c, _ := NewClient(
 		ClientSettings{
-			URL:      client.URL,
+			ConnectionSettings: eslegclient.ConnectionSettings{
+				URL:   client.URL,
+				Proxy: client.Proxy,
+				// Without the following nil check on proxyURL, a nil Proxy field will try
+				// reloading proxy settings from the environment instead of leaving them
+				// empty.
+				ProxyDisable:      client.Proxy == nil,
+				TLS:               client.TLS,
+				Username:          client.Username,
+				Password:          client.Password,
+				APIKey:            client.APIKey,
+				Parameters:        nil, // XXX: do not pass params?
+				Headers:           client.Headers,
+				Timeout:           client.HTTP.Timeout,
+				CompressionLevel:  client.CompressionLevel,
+				OnConnectCallback: nil,
+				Observer:          nil,
+				EscapeHTML:        false,
+			},
 			Index:    client.index,
 			Pipeline: client.pipeline,
-			Proxy:    client.Proxy,
-			// Without the following nil check on proxyURL, a nil Proxy field will try
-			// reloading proxy settings from the environment instead of leaving them
-			// empty.
-			ProxyDisable:     client.Proxy == nil,
-			TLS:              client.TLSConfig,
-			Username:         client.Username,
-			Password:         client.Password,
-			APIKey:           client.APIKey,
-			Parameters:       nil, // XXX: do not pass params?
-			Headers:          client.Headers,
-			Timeout:          client.HTTP.Timeout,
-			CompressionLevel: client.CompressionLevel,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
@@ -567,7 +430,7 @@ func (client *Client) Test(d testing.Driver) {
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
 				netDialer := transport.NetDialer(client.timeout)
-				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.TLSConfig, client.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.TLS, client.timeout)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})

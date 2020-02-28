@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -337,18 +338,20 @@ func makeClient(
 	}
 
 	esClient, err := esout.NewClient(esout.ClientSettings{
-		URL:              url,
-		Proxy:            proxyURL,
-		TLS:              tlsConfig,
-		Username:         config.Username,
-		Password:         config.Password,
-		APIKey:           config.APIKey,
-		Parameters:       params,
-		Headers:          config.Headers,
-		Index:            outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),
-		Pipeline:         nil,
-		Timeout:          config.Timeout,
-		CompressionLevel: config.CompressionLevel,
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL:              url,
+			Proxy:            proxyURL,
+			TLS:              tlsConfig,
+			Username:         config.Username,
+			Password:         config.Password,
+			APIKey:           config.APIKey,
+			Parameters:       params,
+			Headers:          config.Headers,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		},
+		Index:    outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),
+		Pipeline: nil,
 	}, nil)
 	if err != nil {
 		return nil, err

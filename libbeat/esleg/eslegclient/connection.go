@@ -24,11 +24,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Connection manages the connection for a given client.
@@ -39,6 +40,8 @@ type Connection struct {
 
 	// buffered bulk requests
 	BulkRequ *BulkRequest
+
+	HTTP *http.Client
 
 	version common.Version
 
@@ -56,55 +59,172 @@ type ConnectionSettings struct {
 	APIKey   string
 	Headers  map[string]string
 
-	TLSConfig *tlscommon.TLSConfig
-
-	HTTP *http.Client
+	TLS *tlscommon.TLSConfig
 
 	OnConnectCallback func() error
+	Observer          transport.IOStatser
 
 	Parameters       map[string]string
 	CompressionLevel int
 	EscapeHTML       bool
+	Timeout          time.Duration
 }
 
-func NewConnection(settings ConnectionSettings) (*Connection, error) {
+// NewConnection returns a new Elasticsearch client
+func NewConnection(s ConnectionSettings) (*Connection, error) {
+	u, err := url.Parse(s.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+	}
+
+	if u.User != nil {
+		s.Username = u.User.Username()
+		s.Password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		s.URL = u.String()
+	}
+	logp.Info("elasticsearch url: %s", s.URL)
+
+	// TODO: add socks5 proxy support
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(s.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	if st := s.Observer; st != nil {
+		dialer = transport.StatsDialer(dialer, st)
+		tlsDialer = transport.StatsDialer(tlsDialer, st)
+	}
+
 	var encoder BodyEncoder
-	var err error
-	compression := settings.CompressionLevel
+	compression := s.CompressionLevel
 	if compression == 0 {
-		encoder = NewJSONEncoder(nil, settings.EscapeHTML)
+		encoder = NewJSONEncoder(nil, s.EscapeHTML)
 	} else {
-		encoder, err = NewGzipEncoder(compression, nil, settings.EscapeHTML)
+		encoder, err = NewGzipEncoder(compression, nil, s.EscapeHTML)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	bulkRequ, err := NewBulkRequest(settings.URL, "", "", settings.Parameters, nil)
+	bulkRequ, err := NewBulkRequest(s.URL, "", "", s.Parameters, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
-	if !settings.ProxyDisable {
+	if !s.ProxyDisable {
 		proxy = http.ProxyFromEnvironment
-		if settings.Proxy != nil {
-			proxy = http.ProxyURL(settings.Proxy)
-		}
-	}
-
-	if settings.HTTP != nil {
-		if t, ok := settings.HTTP.Transport.(*http.Transport); ok {
-			t.Proxy = proxy
+		if s.Proxy != nil {
+			proxy = http.ProxyURL(s.Proxy)
 		}
 	}
 
 	return &Connection{
-		ConnectionSettings: settings,
-		Encoder:            encoder,
-		BulkRequ:           bulkRequ,
-		log:                logp.NewLogger("esclientleg"),
+		ConnectionSettings: s,
+		HTTP: &http.Client{
+			Transport: &http.Transport{
+				Dial:            dialer.Dial,
+				DialTLS:         tlsDialer.Dial,
+				TLSClientConfig: s.TLS.ToConfig(),
+				Proxy:           proxy,
+			},
+			Timeout: s.Timeout,
+		},
+		Encoder:  encoder,
+		BulkRequ: bulkRequ,
+		log:      logp.NewLogger("esclientleg"),
 	}, nil
+}
+
+// NewClients returns a list of Elasticsearch clients based on the given
+// configuration. It accepts the same configuration parameters as the Elasticsearch
+// output, except for the output specific configuration options.  If multiple hosts
+// are defined in the configuration, a client is returned for each of them.
+func NewClients(cfg *common.Config) ([]Connection, error) {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	var proxyURL *url.URL
+	if !config.ProxyDisable {
+		proxyURL, err = common.ParseURL(config.ProxyURL)
+		if err != nil {
+			return nil, err
+		}
+		if proxyURL != nil {
+			logp.Info("using proxy URL: %s", proxyURL)
+		}
+	}
+
+	params := config.Params
+	if len(params) == 0 {
+		params = nil
+	}
+
+	clients := []Connection{}
+	for _, host := range config.Hosts {
+		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
+		if err != nil {
+			logp.Err("invalid host param set: %s, Error: %v", host, err)
+			return nil, err
+		}
+
+		client, err := NewConnection(ConnectionSettings{
+			URL:              esURL,
+			Proxy:            proxyURL,
+			ProxyDisable:     config.ProxyDisable,
+			TLS:              tlsConfig,
+			Username:         config.Username,
+			Password:         config.Password,
+			APIKey:           config.APIKey,
+			Parameters:       params,
+			Headers:          config.Headers,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		})
+		if err != nil {
+			return clients, err
+		}
+		clients = append(clients, *client)
+	}
+	if len(clients) == 0 {
+		return clients, fmt.Errorf("no hosts defined in the config")
+	}
+	return clients, nil
+}
+
+func NewConnectedClient(cfg *common.Config) (*Connection, error) {
+	clients, err := NewClients(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	errors := []string{}
+
+	for _, client := range clients {
+		err = client.Connect()
+		if err != nil {
+			const errMsg = "error connecting to Elasticsearch at %v: %v"
+			client.log.Errorf(errMsg, client.URL, err)
+			err = fmt.Errorf(errMsg, client.URL, err)
+			errors = append(errors, err.Error())
+			continue
+		}
+		return &client, nil
+	}
+	return nil, fmt.Errorf("couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
 }
 
 // Connect connects the client. It runs a GET request against the root URL of
