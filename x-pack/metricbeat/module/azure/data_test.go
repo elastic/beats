@@ -48,7 +48,7 @@ func TestGetDimensionValue(t *testing.T) {
 
 func TestReplaceUpperCase(t *testing.T) {
 	result := replaceUpperCase("TestReplaceUpper_Case")
-	assert.Equal(t, result, "test_replace_upper_Case")
+	assert.Equal(t, result, "Test_replace_upper_Case")
 	// should not split on acronyms
 	result = replaceUpperCase("CPU_Percentage")
 	assert.Equal(t, result, "CPU_Percentage")
