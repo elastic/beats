@@ -195,7 +195,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
 	}
 	if UseVendor {
-		args = append(args, "--env", "GOFLAGS=-mod=vendor")
+		args = append(args, "-e", "GOFLAGS=-mod=vendor")
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
