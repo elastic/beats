@@ -27,10 +27,10 @@ import (
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(Eventer, *logp.Logger, *common.Config) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *common.Config) (Queue, error)
 
-// Eventer listens to special events to be send by queue implementations.
-type Eventer interface {
+// ACKListener listens to special events to be send by queue implementations.
+type ACKListener interface {
 	OnACK(int) // number of consecutively published messages, acked by producers
 }
 
