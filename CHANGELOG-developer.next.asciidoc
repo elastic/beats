@@ -30,6 +30,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
 - Python 3 is required now to run python tests and tools. {pull}14798[14798]
 - The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
+- The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
 
 ==== Bugfixes
 
