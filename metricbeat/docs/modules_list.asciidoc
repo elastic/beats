@@ -112,6 +112,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-http-server,server>>   
 |<<metricbeat-module-ibmmq,IBM MQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-ibmmq-qmgr,qmgr>> beta[]  
+|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-iis-application_pool,application_pool>> beta[]  
+|<<metricbeat-metricset-iis-webserver,webserver>> beta[]  
+|<<metricbeat-metricset-iis-website,website>> beta[]  
 |<<metricbeat-module-istio,istio>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .5+| .5+|  |<<metricbeat-metricset-istio-citadel,citadel>> beta[]  
 |<<metricbeat-metricset-istio-galley,galley>> beta[]  
@@ -278,6 +282,7 @@ include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/http.asciidoc[]
 include::modules/ibmmq.asciidoc[]
+include::modules/iis.asciidoc[]
 include::modules/istio.asciidoc[]
 include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
