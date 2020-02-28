@@ -22,7 +22,6 @@ package logstash
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"sync"
 	"testing"
@@ -30,16 +29,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 const (
@@ -107,12 +105,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 		URL:      host,
 		Username: username,
 		Password: password,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(60 * time.Second).Dial,
-			},
-			Timeout: 60 * time.Second,
-		},
+		Timeout:  60 * time.Second,
 	})
 	if err != nil {
 		t.Fatal(err)
