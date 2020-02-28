@@ -172,7 +172,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	}
 
 	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return memqueue.NewBroker(log,
+		return memqueue.NewQueue(log,
 			memqueue.Settings{
 				Eventer: e,
 				Events:  20,
