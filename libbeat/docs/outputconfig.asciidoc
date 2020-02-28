@@ -717,7 +717,7 @@ The index root name to write events to. The default is the Beat name. For
 example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
 indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
 
-NOTE: This parameter's value will be assigned to the `metadata.beat` field. It can then be reused in Logstash's output section as `%{[@metadata][beat]}`
+NOTE: This parameter's value will be assigned to the `metadata.beat` field. It can then be accessed in Logstash's output section as `%{[@metadata][beat]}`.
 
 ===== `ssl`
 
