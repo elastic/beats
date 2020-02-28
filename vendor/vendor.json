@@ -4670,6 +4670,12 @@
 			"revisionTime": "2020-02-10T12:31:36Z"
 		},
 		{
+			"checksumSHA1": "n0mZBcr8hnekooAjhBxtbeybAwc=",
+			"path": "github.com/urso/diag-ecs/ecs",
+			"revision": "ab085841dcb9be7f8befd9135806e1a6585dff8a",
+			"revisionTime": "2020-02-10T11:43:45Z"
+		},
+		{
 			"checksumSHA1": "QXKrSi4ZkCnYbKIhsWuxG/piSG0=",
 			"path": "github.com/urso/diag/ctxfmt",
 			"revision": "21b3cc8eb79749b97f4be4fa033ed8e82c007c80",
@@ -4682,46 +4688,22 @@
 			"revisionTime": "2020-02-10T12:54:49Z"
 		},
 		{
-			"checksumSHA1": "rP0Ft8ZrRrGSMSbdx7JwdgMz770=",
+			"checksumSHA1": "EzL1KM8VlfIlBmn9DieFVvldzQk=",
 			"path": "github.com/urso/ecslog/backend",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
+			"revision": "b79160ce24a22a95b1146a13c8f135b1a621bfd6",
+			"revisionTime": "2020-02-10T12:54:49Z"
 		},
 		{
-			"checksumSHA1": "3L4vNSXK+lqMQHF/nyDGwwr1bnc=",
+			"checksumSHA1": "2ORyfKOhvewLdNAobaX8OQmIMi8=",
 			"path": "github.com/urso/ecslog/backend/appender",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
+			"revision": "b79160ce24a22a95b1146a13c8f135b1a621bfd6",
+			"revisionTime": "2020-02-10T12:54:49Z"
 		},
 		{
-			"checksumSHA1": "c5/5Qu8SMddh+VW2DqnBR3nEwMw=",
+			"checksumSHA1": "LXxyh5BbSJWZSHEqsOUF11709q8=",
 			"path": "github.com/urso/ecslog/backend/layout",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
-		},
-		{
-			"checksumSHA1": "DIM/Q3FG0w7Vzz+4I+Zgy3jhzYc=",
-			"path": "github.com/urso/ecslog/ctxtree",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
-		},
-		{
-			"checksumSHA1": "ceTMq4ANPxCFc7fOrKw9wK7SVY0=",
-			"path": "github.com/urso/ecslog/errx",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
-		},
-		{
-			"checksumSHA1": "2uz1b+A13xbrb9zKz5VW9YOST/Y=",
-			"path": "github.com/urso/ecslog/fld",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
-		},
-		{
-			"checksumSHA1": "VmPq1COo1UGII2Tl+NhGR/GfFRE=",
-			"path": "github.com/urso/ecslog/fld/ecs",
-			"revision": "cb6164201e76e9e9450a36a2f9d30865da7d72ef",
-			"revisionTime": "2019-12-16T18:45:53Z"
+			"revision": "b79160ce24a22a95b1146a13c8f135b1a621bfd6",
+			"revisionTime": "2020-02-10T12:54:49Z"
 		},
 		{
 			"checksumSHA1": "H7tCgNt2ajKK4FBJIDNlevu9MAc=",
@@ -4764,6 +4746,12 @@
 			"path": "github.com/urso/qcgen",
 			"revision": "0b059e7db4f40a062ca3d975b7500c6a0a968d87",
 			"revisionTime": "2018-01-31T10:30:24Z"
+		},
+		{
+			"checksumSHA1": "DFQp6k+7ifNXIvZe9IXKf4qG8Bs=",
+			"path": "github.com/urso/sderr",
+			"revision": "c2a16f3d43ec497b86419314127a5da5e655277d",
+			"revisionTime": "2020-02-10T12:42:43Z"
 		},
 		{
 			"checksumSHA1": "aqeInPjyAcytMRrpn9KWIBr0+tA=",

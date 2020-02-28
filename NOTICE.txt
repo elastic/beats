@@ -6662,6 +6662,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/urso/diag-ecs
+Revision: ab085841dcb9be7f8befd9135806e1a6585dff8a
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/diag-ecs/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/urso/ecslog
 Revision: b79160ce24a22a95b1146a13c8f135b1a621bfd6
 License type (autodetected): Apache-2.0
@@ -6693,6 +6702,15 @@ Dependency: github.com/urso/qcgen
 Revision: 0b059e7db4f40a062ca3d975b7500c6a0a968d87
 License type (autodetected): Apache-2.0
 ./vendor/github.com/urso/qcgen/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/sderr
+Revision: c2a16f3d43ec497b86419314127a5da5e655277d
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/sderr/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
