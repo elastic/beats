@@ -65,6 +65,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-redisenterprise>>
 * <<exported-fields-sql>>
 * <<exported-fields-stan>>
 * <<exported-fields-statsd>>
@@ -32461,6 +32462,20 @@ type: long
 type: long
 
 --
+
+[[exported-fields-redisenterprise]]
+== Redis Enterprise fields
+
+Redis metrics collected from Redis Enterprise Server.
+
+
+
+[float]
+=== redisenterprise
+
+`redisenterprise` contains the information and statistics from Redis Enterprise Server.
+
+
 
 [[exported-fields-sql]]
 == sql fields
