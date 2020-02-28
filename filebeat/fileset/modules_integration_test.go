@@ -26,8 +26,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
+=======
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
+>>>>>>> Make fileset package independent of filebeat.input
 )
 
 func TestLoadPipeline(t *testing.T) {
@@ -97,7 +103,7 @@ func TestSetupNginx(t *testing.T) {
 		&ModuleConfig{Module: "nginx"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +182,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "6.6.0"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -221,7 +227,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "6.6.0"})
 	if err != nil {
 		t.Fatal(err)
 	}
