@@ -14,7 +14,7 @@ import (
 var Bundle = provider.MustCreate(
 	"gcp",
 	provider.NewDefaultProvider("gcp", NewCLI, NewTemplateBuilder),
-	feature.NewDetails("Google Cloud Functions", "listen to events on Google Cloud", feature.Stable),
+	feature.MakeDetails("Google Cloud Functions", "listen to events on Google Cloud", feature.Stable),
 ).MustAddFunction("pubsub",
 	gcp.NewPubSub,
 	gcp.PubSubDetails(),
