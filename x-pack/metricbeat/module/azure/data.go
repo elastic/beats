@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 	"unicode"
@@ -16,8 +17,9 @@ import (
 
 const (
 	// NoDimension is used to group metrics in separate api calls in order to reduce the number of executions
-	NoDimension     = "none"
-	nativeMetricset = "monitor"
+	NoDimension           = "none"
+	nativeMetricset       = "monitor"
+	replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
 )
 
 // EventsMapping will map metric values to beats events
@@ -96,7 +98,6 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 
 // managePropertyName function will handle metric names, there are several formats the metric names are written
 func managePropertyName(metric string) string {
-
 	// replace spaces with underscores
 	resultMetricName := strings.Replace(metric, " ", "_", -1)
 	// replace backslashes with "per"
@@ -125,16 +126,19 @@ func managePropertyName(metric string) string {
 
 // replaceUpperCase func will replace upper case with '_'
 func replaceUpperCase(src string) string {
-	var result string
-	// split into fields based on class of unicode character
-	for _, r := range src {
-		if unicode.IsUpper(r) {
-			result += "_" + strings.ToLower(string(r))
-		} else {
-			result += string(r)
+	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
+	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
+		var newStr string
+		for _, r := range str {
+			// split into fields based on class of unicode character
+			if unicode.IsUpper(r) {
+				newStr += "_" + strings.ToLower(string(r))
+			} else {
+				newStr += string(r)
+			}
 		}
-	}
-	return result
+		return newStr
+	})
 }
 
 // createEvent will create a new base event

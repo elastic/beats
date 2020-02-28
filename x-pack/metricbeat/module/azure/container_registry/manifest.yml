@@ -7,12 +7,13 @@ input:
     resources:
     - resource_group: ""
       resource_type: "Microsoft.ContainerRegistry/registries"
-      timegrain: "PT5M"
       metrics:
       - name: "*"
         namespace: "Microsoft.ContainerRegistry/registries"
+        timegrain: "PT5M"
     - resource_id: ""
       timegrain: "PT5M"
       metrics:
       - name: "*"
         namespace: "Microsoft.ContainerRegistry/registries"
+        timegrain: "PT5M"

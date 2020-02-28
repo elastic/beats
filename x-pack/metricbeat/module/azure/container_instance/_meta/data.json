@@ -1,153 +1,46 @@
 {
-    "@timestamp":"2019-09-20T11:02:00.000Z",
-    "azure":{
-        "resource":{
-            "name":"obslinux",
-            "type":"Microsoft.Compute/virtualMachines",
-            "group":"resource-group"
+    "@timestamp" : "2020-02-28T14:20:00.000Z",
+    "cloud" : {
+        "provider" : "azure",
+        "region" : "westeurope"
+    },
+    "ecs" : {
+        "version" : "1.4.0"
+    },
+    "metricset" : {
+        "period" : 300000,
+        "name" : "container_instance"
+    },
+    "event" : {
+        "duration" : 2383878000,
+        "dataset" : "azure.container_instance",
+        "module" : "azure"
+    },
+    "azure" : {
+        "dimensions" : {
+            "container_name" : "testcontainergroup"
         },
-        "subscription_id":"123456-qwer-1234-5678-12345678",
-        "namespace":"Microsoft.Compute/virtualMachines",
-        "compute_vm":{
-            "inbound_flows_maximum_creation_rate":{
-                "avg":14.6
+        "container_instance" : {
+            "cpu_usage" : {
+                "avg" : 0
             },
-            "os_per_disk_write_bytes_per_sec":{
-                "avg":15261.86
-            },
-            "outbound_flows_maximum_creation_rate":{
-                "avg":18.6
-            },
-            "os_per_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "data_disk_queue_depth":{
-                "avg":0
-            },
-            "per_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "inbound_flows":{
-                "avg":60.4
-            },
-            "os_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "per_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_write_operations_per_sec":{
-                "avg":1.03
-            },
-            "outbound_flows":{
-                "avg":60.4
-            },
-            "network_in":{
-                "total":3624009.0
-            },
-            "os_per_disk_qd":{
-                "avg":0
-            },
-            "data_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "os_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "per_disk_qd":{
-                "avg":0
-            },
-            "os_disk_write_bytes_per_sec":{
-                "avg":15261.86
-            },
-            "disk_write_bytes":{
-                "total":2806782.57
-            },
-            "per_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_out":{
-                "total":704862
-            },
-            "os_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "os_per_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "os_per_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "percentage_cpu":{
-                "avg":7.683333333333334
-            },
-            "data_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_in_total":{
-                "total":6787492.0
-            },
-            "disk_read_bytes":{
-                "total":0
-            },
-            "data_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "per_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "data_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "os_disk_queue_depth":{
-                "avg":0
-            },
-            "network_out_total":{
-                "total":1889767.0
+            "memory_usage" : {
+                "avg" : 0
             }
-        }
-    },
-    "service":{
-        "type":"azure"
-    },
-    "cloud":{
-        "provider":"azure",
-        "region":"westeurope"
-    },
-    "ecs":{
-        "version":"1.1.0"
-    },
-    "host":{
-        "architecture":"x86_64",
-        "os":{
-            "build":"17134.1006",
-            "platform":"windows",
-            "version":"10.0",
-            "family":"windows",
-            "name":"Windows 10 Pro",
-            "kernel":"10.0.17134.1006 (WinBuild.160101.0800)"
         },
-        "id":"123456-qwer-1234-5678-12345678",
-        "name":"DESKTOP-RFOOE09",
-        "hostname":"DESKTOP-RFOOE09"
+        "timegrain" : "PT5M",
+        "resource" : {
+            "group" : "obs-infrastructure",
+            "tags" : {
+                "tag1" : "value1"
+            },
+            "name" : "testcontainergroup",
+            "type" : "Microsoft.ContainerInstance/containerGroups"
+        },
+        "subscription_id" : "123456-qwer-1234-5678-12345678",
+        "namespace" : "Microsoft.ContainerInstance/containerGroups"
     },
-    "agent":{
-        "hostname":"DESKTOP-RFOOE09",
-        "id":"123456-qwer-1234-5678-12345678",
-        "version":"8.0.0",
-        "type":"metricbeat",
-        "ephemeral_id":"123456-qwer-1234-5678-12345678"
-    },
-    "event":{
-        "duration":4611928900,
-        "dataset":"azure.compute_vm",
-        "module":"azure"
-    },
-    "metricset":{
-        "name":"compute_vm",
-        "period":300000
+    "service" : {
+        "type" : "azure"
     }
 }
