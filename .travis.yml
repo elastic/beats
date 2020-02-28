@@ -235,7 +235,6 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
-  - if [ $TRAVIS_OS_NAME = osx ]; then ulimit -n 1024; fi
 
 
 # Skips installations step

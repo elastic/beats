@@ -83,29 +83,5 @@
             "address": "127.0.0.1:55555",
             "type": "redisenterprise"
         }
-    },
-    {
-        "event": {
-            "dataset": "redisenterprise.proxy",
-            "duration": 115000,
-            "module": "redisenterprise"
-        },
-        "metricset": {
-            "name": "proxy",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:58281",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "redisenterprise"
-        }
     }
 ]

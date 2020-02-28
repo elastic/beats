@@ -11,30 +11,6 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:55467",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "redisenterprise"
-        }
-    },
-    {
-        "event": {
-            "dataset": "redisenterprise.node",
-            "duration": 115000,
-            "module": "redisenterprise"
-        },
-        "metricset": {
-            "name": "node",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
                 "cluster": "cluster.local",
                 "instance": "127.0.0.1:55467",
                 "job": "redisenterprise",
