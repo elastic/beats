@@ -163,12 +163,22 @@ func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, m
 	var dbInstanceIDs []string
 	dbDetailsMap := map[string]DBDetails{}
 	for _, dbInstance := range output.DBInstances {
-		dbInstanceIDs = append(dbInstanceIDs, *dbInstance.DBInstanceIdentifier)
-		dbDetails := DBDetails{
-			dbArn:        *dbInstance.DBInstanceArn,
-			dbClass:      *dbInstance.DBInstanceClass,
-			dbIdentifier: *dbInstance.DBInstanceIdentifier,
-			dbStatus:     *dbInstance.DBInstanceStatus,
+		dbDetails := DBDetails{}
+		if dbInstance.DBInstanceIdentifier != nil {
+			dbDetails.dbIdentifier = *dbInstance.DBInstanceIdentifier
+			dbInstanceIDs = append(dbInstanceIDs, *dbInstance.DBInstanceIdentifier)
+		}
+
+		if dbInstance.DBInstanceArn != nil {
+			dbDetails.dbArn = *dbInstance.DBInstanceArn
+		}
+
+		if dbInstance.DBInstanceClass != nil {
+			dbDetails.dbClass = *dbInstance.DBInstanceClass
+		}
+
+		if dbInstance.DBInstanceClass != nil {
+			dbDetails.dbStatus = *dbInstance.DBInstanceStatus
 		}
 
 		if dbInstance.AvailabilityZone != nil {
