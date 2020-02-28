@@ -238,7 +238,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
 	// FIXME: index name (first param below)
-	result, err := c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	result, err := c.es.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
 		return err
 	}

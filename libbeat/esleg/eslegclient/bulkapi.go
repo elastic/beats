@@ -74,26 +74,13 @@ func (conn *Connection) Bulk(
 	index, docType string,
 	params map[string]string, body []interface{},
 ) (BulkResult, error) {
-	return conn.BulkWith(index, docType, params, nil, body)
-}
-
-// BulkWith creates a HTTP request containing a bunch of operations and send
-// them to Elasticsearch. The request is retransmitted up to max_retries before
-// returning an error.
-func (conn *Connection) BulkWith(
-	index string,
-	docType string,
-	params map[string]string,
-	metaBuilder MetaBuilder,
-	body []interface{},
-) (BulkResult, error) {
 	if len(body) == 0 {
 		return nil, nil
 	}
 
 	enc := conn.Encoder
 	enc.Reset()
-	if err := bulkEncode(conn.log, enc, metaBuilder, body); err != nil {
+	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
 		return nil, err
 	}
 
