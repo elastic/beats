@@ -8,7 +8,7 @@ remote_write:
 ------------------------------------------------------------------------------
 
 
-Metrics sent to the http endpoint will be put by default under the `http.server` prefix.
+Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
 Also consider using secure settings for the server using TLS/SSL as shown
 
 ["source","yaml",subs="attributes"]
