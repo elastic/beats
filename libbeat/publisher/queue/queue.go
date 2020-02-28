@@ -31,7 +31,7 @@ type Factory func(ACKListener, *logp.Logger, *common.Config) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
-	OnACK(int) // number of consecutively published messages, acked by producers
+	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
 
 // Queue is responsible for accepting, forwarding and ACKing events.
