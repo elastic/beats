@@ -38,15 +38,10 @@ type Connection struct {
 	ConnectionSettings
 
 	Encoder BodyEncoder
-
-	// buffered bulk requests
-	BulkRequ *BulkRequest
-
-	HTTP *http.Client
+	HTTP    *http.Client
 
 	version common.Version
-
-	log *logp.Logger
+	log     *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -113,11 +108,6 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	bulkRequ, err := NewBulkRequest(s.URL, "", "", s.Parameters, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	var proxy func(*http.Request) (*url.URL, error)
 	if !s.ProxyDisable {
 		proxy = http.ProxyFromEnvironment
@@ -137,9 +127,8 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			},
 			Timeout: s.Timeout,
 		},
-		Encoder:  encoder,
-		BulkRequ: bulkRequ,
-		log:      logp.NewLogger("esclientleg"),
+		Encoder: encoder,
+		log:     logp.NewLogger("esclientleg"),
 	}, nil
 }
 

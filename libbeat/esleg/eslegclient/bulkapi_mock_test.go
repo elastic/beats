@@ -60,7 +60,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
 	}
@@ -96,7 +96,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err := client.Bulk(index, "type1", params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}
@@ -136,7 +136,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err := client.Bulk(index, "type1", params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}

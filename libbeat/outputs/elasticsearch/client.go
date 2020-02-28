@@ -28,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -198,19 +197,10 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	body := client.Encoder
-	body.Reset()
-
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-
-	eventType := ""
-	if client.GetVersion().Major < 7 {
-		eventType = defaultEventType
-	}
-
 	origCount := len(data)
-	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data, client.log)
+	data, bulkItems := bulkEncodePublishRequest(client.GetVersion(), client.index, client.pipeline, data, client.log)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -219,9 +209,7 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	requ := client.BulkRequ
-	requ.Reset(body)
-	status, result, sendErr := client.SendBulkRequest(requ)
+	status, result, sendErr := client.Bulk("", "", nil, bulkItems)
 	if sendErr != nil {
 		client.log.Errorf("Failed to perform any bulk index operations: %s", sendErr)
 		return data, sendErr
@@ -263,33 +251,29 @@ func (client *Client) publishEvents(
 	return nil, nil
 }
 
-// fillBulkRequest encodes all bulk requests and returns slice of events
-// successfully added to bulk request.
+// bulkEncodePublishRequest encodes all bulk requests and returns slice of events
+// successfully added to the list of bulk items and the list of bulk items.
 func bulkEncodePublishRequest(
 	log *logp.Logger,
 	version common.Version,
-	body eslegclient.BulkWriter,
 	index outputs.IndexSelector,
 	pipeline *outil.Selector,
-	eventType string,
 	data []publisher.Event,
-) []publisher.Event {
+) ([]publisher.Event, []interface{}) {
+
 	okEvents := data[:0]
+	bulkItems := []interface{}{}
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(log, version, index, pipeline, eventType, event)
+		meta, err := createEventBulkMeta(log, version, index, pipeline, event)
 		if err != nil {
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		if err := body.Add(meta, event); err != nil {
-			log.Errorf("Failed to encode event: %+v", err)
-			log.Debugf("Failed event: %v", event)
-			continue
-		}
+		bulkItems = append(bulkItems, meta, event)
 		okEvents = append(okEvents, data[i])
 	}
-	return okEvents
+	return okEvents, bulkItems
 }
 
 func createEventBulkMeta(
@@ -297,10 +281,14 @@ func createEventBulkMeta(
 	version common.Version,
 	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
-	eventType string,
 	event *beat.Event,
 	logger *logp.Logger,
 ) (interface{}, error) {
+	eventType := ""
+	if version.Major < 7 {
+		eventType = defaultEventType
+	}
+
 	pipeline, err := getPipeline(event, pipelineSel)
 	if err != nil {
 		err := fmt.Errorf("failed to select pipeline: %v", err)

@@ -58,7 +58,7 @@ type BulkMeta struct {
 	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
 
-type BulkRequest struct {
+type bulkRequest struct {
 	requ *http.Request
 }
 
@@ -70,27 +70,23 @@ type BulkResult json.RawMessage
 func (conn *Connection) Bulk(
 	index, docType string,
 	params map[string]string, body []interface{},
-) (BulkResult, error) {
+) (int, BulkResult, error) {
 	if len(body) == 0 {
-		return nil, nil
+		return 0, nil, nil
 	}
 
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	requ, err := NewBulkRequest(conn.URL, index, docType, params, enc)
+	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	_, result, err := conn.SendBulkRequest(requ)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return conn.sendBulkRequest(requ)
 }
 
 // SendMonitoringBulk creates a HTTP request to the X-Pack Monitoring API containing a bunch of
@@ -121,19 +117,19 @@ func (conn *Connection) SendMonitoringBulk(
 		return nil, err
 	}
 
-	_, result, err := conn.SendBulkRequest(requ)
+	_, result, err := conn.sendBulkRequest(requ)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func NewBulkRequest(
+func newBulkRequest(
 	urlStr string,
 	index, docType string,
 	params map[string]string,
 	body BodyEncoder,
-) (*BulkRequest, error) {
+) (*bulkRequest, error) {
 	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
 		return nil, err
@@ -147,7 +143,7 @@ func newMonitoringBulkRequest(
 	urlStr string,
 	params map[string]string,
 	body BodyEncoder,
-) (*BulkRequest, error) {
+) (*bulkRequest, error) {
 	var path string
 	var err error
 	if esVersion.Major < 7 {
@@ -168,7 +164,7 @@ func newBulkRequestWithPath(
 	path string,
 	params map[string]string,
 	body BodyEncoder,
-) (*BulkRequest, error) {
+) (*bulkRequest, error) {
 	url := addToURL(urlStr, path, "", params)
 
 	var reader io.Reader
@@ -185,12 +181,15 @@ func newBulkRequestWithPath(
 		body.AddHeader(&requ.Header)
 	}
 
-	return &BulkRequest{
+	r := bulkRequest{
 		requ: requ,
-	}, nil
+	}
+	r.reset(body)
+
+	return &r, nil
 }
 
-func (r *BulkRequest) Reset(body BodyEncoder) {
+func (r *bulkRequest) reset(body BodyEncoder) {
 	bdy := body.Reader()
 
 	rc, ok := bdy.(io.ReadCloser)
@@ -213,7 +212,7 @@ func (r *BulkRequest) Reset(body BodyEncoder) {
 	body.AddHeader(&r.requ.Header)
 }
 
-func (conn *Connection) SendBulkRequest(requ *BulkRequest) (int, BulkResult, error) {
+func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, error) {
 	status, resp, err := conn.execHTTPRequest(requ.requ)
 	return status, BulkResult(resp), err
 }

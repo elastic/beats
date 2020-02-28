@@ -248,19 +248,22 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.Equal(t, 3, requestCount)
 }
 
-type testBulkRecorder struct {
-	data     []interface{}
-	inAction bool
-}
-
 func TestBulkEncodeEvents(t *testing.T) {
 	cases := map[string]struct {
+		version string
 		docType string
 		config  common.MapStr
 		events  []common.MapStr
 	}{
-		"Beats 7.x event": {
+		"6.x": {
+			version: "6.8.0",
 			docType: "doc",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
+		},
+		"latest": {
+			version: version.GetDefaultVersion(),
+			docType: "",
 			config:  common.MapStr{},
 			events:  []common.MapStr{{"message": "test"}},
 		},
@@ -272,7 +275,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 			cfg := common.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
-				Version:     version.GetDefaultVersion(),
+				Version:     test.version,
 			}
 
 			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
@@ -291,16 +294,14 @@ func TestBulkEncodeEvents(t *testing.T) {
 				}
 			}
 
-			recorder := &testBulkRecorder{}
-
-			encoded := bulkEncodePublishRequest(logp.L(), common.Version{Major: 7, Minor: 5}, recorder, index, pipeline, test.docType, events)
+			encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(test.version), index, pipeline, events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
-			assert.False(t, recorder.inAction, "incomplete bulk")
+			assert.Equal(t, 2*len(events), len(bulkItems), "incomplete bulk")
 
 			// check meta-data for each event
-			for i := 0; i < len(recorder.data); i += 2 {
+			for i := 0; i < len(bulkItems); i += 2 {
 				var meta eslegclient.BulkMeta
-				switch v := recorder.data[i].(type) {
+				switch v := bulkItems[i].(type) {
 				case eslegclient.BulkCreateAction:
 					meta = v.Create
 				case eslegclient.BulkIndexAction:
@@ -316,21 +317,6 @@ func TestBulkEncodeEvents(t *testing.T) {
 			// TODO: customer per test case validation
 		})
 	}
-}
-
-func (r *testBulkRecorder) Add(meta, obj interface{}) error {
-	if r.inAction {
-		panic("can not add a new action if other action is active")
-	}
-
-	r.data = append(r.data, meta, obj)
-	return nil
-}
-
-func (r *testBulkRecorder) AddRaw(raw interface{}) error {
-	r.data = append(r.data)
-	r.inAction = !r.inAction
-	return nil
 }
 
 func TestClientWithAPIKey(t *testing.T) {
