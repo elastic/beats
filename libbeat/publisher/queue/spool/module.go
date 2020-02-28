@@ -62,7 +62,7 @@ func create(eventer queue.Eventer, logp *logp.Logger, cfg *common.Config) (queue
 		log = defaultLogger()
 	}
 
-	return newDiskSpool(log, path, Settings{
+	return newDiskSpool(log, path, settings{
 		Eventer:           eventer,
 		Mode:              config.File.Permissions,
 		WriteBuffer:       uint(config.Write.BufferSize),

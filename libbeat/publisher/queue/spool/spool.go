@@ -53,8 +53,8 @@ type spoolCtx struct {
 	done   chan struct{}
 }
 
-// Settings configure a new spool to be created.
-type Settings struct {
+// settings configure a new spool to be created.
+type settings struct {
 	Mode os.FileMode
 
 	File txfile.Options
@@ -77,7 +77,7 @@ const minInFlushTimeout = 100 * time.Millisecond
 const minOutFlushTimeout = 0 * time.Millisecond
 
 // newDiskSpool creates and initializes a new file based queue.
-func newDiskSpool(logger logger, path string, settings Settings) (*diskSpool, error) {
+func newDiskSpool(logger logger, path string, settings settings) (*diskSpool, error) {
 	mode := settings.Mode
 	if mode == 0 {
 		mode = os.ModePerm

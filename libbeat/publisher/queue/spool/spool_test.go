@@ -104,7 +104,7 @@ func makeTestQueue(
 			logger = new(silentLogger)
 		}
 
-		spool, err := newDiskSpool(logger, path, Settings{
+		spool, err := newDiskSpool(logger, path, settings{
 			WriteBuffer:       writeBuffer,
 			WriteFlushTimeout: flushTimeout,
 			Codec:             codecCBORL,
