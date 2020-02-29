@@ -1522,6 +1522,7 @@ output.elasticsearch:
   # The Redis data type to use for publishing events. If the data type is list,
   # the Redis RPUSH command is used. If the data type is channel, the Redis
   # PUBLISH command is used. The default value is list.
+  # If set to stream, Redis will use Redis streams https://redis.io/topics/streams-intro
   #datatype: list
 
   # The number of workers to use for each host configured to publish events to

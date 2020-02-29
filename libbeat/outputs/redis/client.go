@@ -63,6 +63,7 @@ type redisDataType uint16
 const (
 	redisListType redisDataType = iota
 	redisChannelType
+	redisStreamType
 )
 
 func newClient(
@@ -160,6 +161,9 @@ func (c *client) String() string {
 func (c *client) makePublish(
 	conn redis.Conn,
 ) (publishFn, error) {
+	if c.dataType == redisStreamType {
+		return c.makePublishSTREAM(conn)
+	}
 	if c.dataType == redisChannelType {
 		return c.makePublishPUBLISH(conn)
 	}
@@ -217,6 +221,10 @@ func (c *client) makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
 	return c.publishEventsPipeline(conn, "PUBLISH"), nil
 }
 
+func (c *client) makePublishSTREAM(conn redis.Conn) (publishFn, error) {
+	return c.publishEventsPipeline(conn, "XADD"), nil
+}
+
 func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 	// XXX: requires key.IsConst() == true
 	dest, _ := c.key.Select(&beat.Event{Fields: common.MapStr{}})
@@ -264,10 +272,16 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 			}
 
 			data = append(data, okEvents[i])
-			if err := conn.Send(command, eventKey, serializedEvent); err != nil {
-				logp.Err("Failed to execute %v: %v", command, err)
-				return okEvents, err
+			if command == "XADD" {
+				if err := conn.Send(command, eventKey, "*", "payload", serializedEvent); err != nil {
+					logp.Err("Failed to execute %v: %v", command, err)
+				}
+			} else {
+				if err := conn.Send(command, eventKey, serializedEvent); err != nil {
+					logp.Err("Failed to execute %v: %v", command, err)
+				}
 			}
+			return okEvents, err
 		}
 		c.observer.Dropped(dropped)
 

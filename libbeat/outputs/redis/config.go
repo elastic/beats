@@ -65,7 +65,7 @@ var (
 
 func (c *redisConfig) Validate() error {
 	switch c.DataType {
-	case "", "list", "channel":
+	case "", "list", "channel", "stream":
 	default:
 		return fmt.Errorf("redis data type %v not supported", c.DataType)
 	}
