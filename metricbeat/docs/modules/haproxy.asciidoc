@@ -59,8 +59,6 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
-  username : "admin"
-  password : "admin"
   enabled: true
 ----
 
