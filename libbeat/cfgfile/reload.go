@@ -69,21 +69,17 @@ type Reload struct {
 	Enabled bool          `config:"enabled"`
 }
 
-// RunnerFactory is used for creating of new Runners
+// RunnerFactory is used for validating generated configurations and creating
+// of new Runners
 type RunnerFactory interface {
+	ConfigChecker
 	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 }
 
-// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
-// without a pipeline and metadata.
+// ConfigChecker is usually combined with a RunnerFactory for implementations
+// that can check a config without a pipeline and metadata.
 type ConfigChecker interface {
 	CheckConfig(config *common.Config) error
-}
-
-// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
-type CheckableRunnerFactory interface {
-	RunnerFactory
-	ConfigChecker
 }
 
 // Runner is a simple interface providing a simple way to

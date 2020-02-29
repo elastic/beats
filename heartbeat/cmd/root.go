@@ -20,8 +20,10 @@ package cmd
 import (
 	"fmt"
 
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover"
 	"github.com/elastic/beats/v7/heartbeat/beater"
+
+	// include all heartbeat specific autodiscovery builders
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 
 	// register default heartbeat monitors
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"

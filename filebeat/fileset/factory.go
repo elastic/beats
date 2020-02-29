@@ -114,6 +114,10 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 	}, nil
 }
 
+func (f *Factory) CheckConfig(c *common.Config) error {
+	return nil
+}
+
 func (p *inputsRunner) Start() {
 	// Load pipelines
 	if p.pipelineLoaderFactory != nil {
@@ -153,6 +157,7 @@ func (p *inputsRunner) Start() {
 		moduleList.Add(m)
 	}
 }
+
 func (p *inputsRunner) Stop() {
 	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)

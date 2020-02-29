@@ -54,6 +54,10 @@ func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapS
 	}, nil
 }
 
+func (sf *SetupFactory) CheckConfig(c *common.Config) error {
+	return nil
+}
+
 // SetupCfgRunner is for loading assets of modules.
 type SetupCfgRunner struct {
 	moduleRegistry        *ModuleRegistry

@@ -33,8 +33,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
-	// Add autodiscover builders / appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover"
+	// include all metricbeat specific builders
+	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
+
+	// include all metricbeat specific appenders
+	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
 
 	// Add metricbeat default processors
 	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
@@ -177,8 +180,14 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 	if config.Autodiscover != nil {
 		var err error
-		adapter := autodiscover.NewFactoryAdapter(factory)
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
+		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
+			"metricbeat",
+			b.Publisher,
+			factory,
+			autodiscover.ConfigEvents(),
+			autodiscover.QueryConfig(),
+			config.Autodiscover,
+		)
 		if err != nil {
 			return nil, err
 		}

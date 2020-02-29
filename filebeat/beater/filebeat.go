@@ -24,7 +24,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -43,9 +42,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
+	_ "github.com/elastic/beats/v7/filebeat/include"
+
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
+
+	// include all filebeat specific builders
+	_ "github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -304,8 +308,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := fbautodiscover.NewAutodiscoverAdapter(inputLoader, moduleLoader)
-		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
+		adiscover, err = autodiscover.NewAutodiscover(
+			"filebeat",
+			b.Publisher,
+			cfgfile.MultiplexedRunnerFactory(
+				cfgfile.MatchHasField("module", moduleLoader),
+				cfgfile.MatchDefault(inputLoader),
+			),
+			autodiscover.ConfigEvents(),
+			autodiscover.QueryConfig(),
+			config.Autodiscover,
+		)
 		if err != nil {
 			return err
 		}

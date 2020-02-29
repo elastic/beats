@@ -156,14 +156,13 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	adapter := autodiscover.NewFactoryAdapter(bt.dynamicFactory)
-
-	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, adapter, bt.config.Autodiscover)
-	if err != nil {
-		return nil, err
-	}
-
-	return ad, nil
+	return autodiscover.NewAutodiscover(
+		"heartbeat", b.Publisher,
+		bt.dynamicFactory,
+		autodiscover.ConfigEvents(),
+		autodiscover.QueryConfig(),
+		bt.config.Autodiscover,
+	)
 }
 
 // Stop stops the beat.

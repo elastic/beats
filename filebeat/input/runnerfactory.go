@@ -56,3 +56,7 @@ func (r *RunnerFactory) Create(
 
 	return p, nil
 }
+
+func (r *RunnerFactory) CheckConfig(_ *common.Config) error {
+	return nil
+}
