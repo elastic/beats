@@ -22,7 +22,6 @@ package ilm_test
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -34,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -181,15 +179,10 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 
 func newRawESClient(t *testing.T) ilm.ESClient {
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:      getURL(),
-		Username: getUser(),
-		Password: getPass(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(60 * time.Second).Dial,
-			},
-			Timeout: 60 * time.Second,
-		},
+		URL:              getURL(),
+		Username:         getUser(),
+		Password:         getPass(),
+		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	})
 	if err != nil {

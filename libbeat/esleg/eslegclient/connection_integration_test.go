@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func TestConnect(t *testing.T) {
@@ -109,15 +108,11 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	}
 
 	s := ConnectionSettings{
-		URL:      hosts,
-		Username: username,
-		Password: password,
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(time.Duration(timeout) * time.Second).Dial,
-			},
-			Timeout: time.Duration(timeout) * time.Second,
-		}, CompressionLevel: 3,
+		URL:              hosts,
+		Username:         username,
+		Password:         password,
+		Timeout:          time.Duration(timeout) * time.Second,
+		CompressionLevel: 3,
 	}
 
 	if proxy != "" {
@@ -132,15 +127,11 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 // getTestingElasticsearch creates a test client.
 func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 	conn, err := NewConnection(ConnectionSettings{
-		URL:      eslegtest.GetURL(),
-		Username: eslegtest.GetUser(),
-		Password: eslegtest.GetPass(),
-		HTTP: &http.Client{
-			Transport: &http.Transport{
-				Dial: transport.NetDialer(60 * time.Second).Dial,
-			},
-			Timeout: 60 * time.Second,
-		}, CompressionLevel: 3,
+		URL:              eslegtest.GetURL(),
+		Username:         eslegtest.GetUser(),
+		Password:         eslegtest.GetPass(),
+		Timeout:          60 * time.Second,
+		CompressionLevel: 3,
 	})
 	eslegtest.InitConnection(t, conn, err)
 	return conn
