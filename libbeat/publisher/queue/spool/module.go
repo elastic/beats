@@ -39,7 +39,9 @@ func init() {
 	queue.RegisterType("spool", create)
 }
 
-func create(eventer queue.Eventer, logp *logp.Logger, cfg *common.Config) (queue.Queue, error) {
+func create(
+	ackListener queue.ACKListener, logp *logp.Logger, cfg *common.Config,
+) (queue.Queue, error) {
 	cfgwarn.Beta("Spooling to disk is beta")
 
 	config := defaultConfig()
@@ -63,7 +65,7 @@ func create(eventer queue.Eventer, logp *logp.Logger, cfg *common.Config) (queue
 	}
 
 	return NewSpool(log, path, Settings{
-		Eventer:           eventer,
+		ACKListener:       ackListener,
 		Mode:              config.File.Permissions,
 		WriteBuffer:       uint(config.Write.BufferSize),
 		WriteFlushTimeout: config.Write.FlushTimeout,
