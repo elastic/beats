@@ -267,7 +267,7 @@ For example, the following condition checks if the process name starts with
 [source,yaml]
 -----
 regexp:
-  system.process.name: "foo.*"
+  system.process.name: "^foo.*"
 -----
 
 [float]
