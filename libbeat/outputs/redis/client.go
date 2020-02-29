@@ -254,7 +254,6 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishFn {
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
-		var commandArgs redis.Args
 		serialized := make([]interface{}, 0, len(data))
 		okEvents, serialized = serializeEvents(serialized, 0, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
@@ -265,6 +264,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 		data = okEvents[:0]
 		dropped := 0
 		for i, serializedEvent := range serialized {
+			commandArgs := redis.Args{}
 			eventKey, err := key.Select(&okEvents[i].Content)
 			if err != nil {
 				logp.Err("Failed to set redis key: %v", err)
