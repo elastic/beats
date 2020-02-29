@@ -85,7 +85,7 @@ output.elasticsearch.index: "customname-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
 setup.template.name: "customname"
 setup.template.pattern: "customname-*"
 -----
-WARNING: If {ref}/ilm.html[Index Lifecycle Management] is enabled (which is the default), `setup.template.name` and `setup.template.pattern` won't be taken into account.
+WARNING: If {ref}/ilm.html[Index Lifecycle Management] is enabled (which is the default), `setup.template.name` and `setup.template.pattern` are ignored.
 
 ifndef::no_dashboards[]
 +
