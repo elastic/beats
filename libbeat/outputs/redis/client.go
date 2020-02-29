@@ -254,6 +254,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishFn {
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
+		var commandArgs redis.Args
 		serialized := make([]interface{}, 0, len(data))
 		okEvents, serialized = serializeEvents(serialized, 0, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
@@ -271,17 +272,18 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 				continue
 			}
 
+
 			data = append(data, okEvents[i])
 			if command == "XADD" {
-				if err := conn.Send(command, eventKey, "*", "payload", serializedEvent); err != nil {
-					logp.Err("Failed to execute %v: %v", command, err)
-				}
+				commandArgs = commandArgs.Add(eventKey).Add("*").Add("payload").Add(serializedEvent)
 			} else {
-				if err := conn.Send(command, eventKey, serializedEvent); err != nil {
-					logp.Err("Failed to execute %v: %v", command, err)
-				}
+				commandArgs = commandArgs.Add(eventKey).Add(serializedEvent)
 			}
-			return okEvents, err
+
+			if err := conn.Send(command, commandArgs...); err != nil {
+				logp.Err("Failed to execute %v: %v", command, err)
+				return okEvents, err
+			}
 		}
 		c.observer.Dropped(dropped)
 
