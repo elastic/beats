@@ -362,6 +362,17 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	return beater, nil
 }
 
+func SetOrOverwriteEntryInRegistry(registryName string, entryName string, value string) {
+	registry := monitoring.GetNamespace(registryName).GetRegistry()
+	if registry != nil {
+		existingEntry := registry.Get(entryName)
+		if existingEntry != nil {
+			registry.Remove(entryName)
+		}
+		monitoring.NewString(registry, entryName).Set(value)
+	}
+}
+
 func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
@@ -386,6 +397,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
+
+	SetOrOverwriteEntryInRegistry("info", "name", b.Info.Name)
+	SetOrOverwriteEntryInRegistry("beat", "name", b.Info.Name)
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
