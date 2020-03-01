@@ -105,22 +105,24 @@ func Open(path string, mode os.FileMode, opts Options) (*File, error) {
 	initOK := false
 	defer cleanup.IfNot(&initOK, cleanup.IgnoreError(file.Close))
 
-	// Create exclusive lock on the file and initialize the file state.
-	var f *File
-	if err = file.Lock(true, true); err == nil {
-		// initialize the file
-		f, err = openWith(file, opts)
+	waitLock := (opts.Flags & FlagWaitLock) == FlagWaitLock
+	if err := file.Lock(true, waitLock); err != nil {
+		return nil, fileErrWrap(op, path, err).report("failed to lock file")
 	}
+	defer cleanup.IfNot(&initOK, cleanup.IgnoreError(file.Unlock))
+
+	// initialize the file
+	f, err := openWith(file, opts)
 	if err != nil {
 		return nil, fileErrWrap(op, path, err).report("failed to open file")
 	}
-
-	initOK = true
 
 	tracef("open file: %p (%v)\n", f, path)
 	traceMetaPage(f.getMetaPage())
 
 	f.reportOpen()
+
+	initOK = true
 	return f, nil
 }
 

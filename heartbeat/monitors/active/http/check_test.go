@@ -19,15 +19,15 @@ package http
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/conditions"
 )
@@ -118,7 +118,9 @@ func TestCheckBody(t *testing.T) {
 			for _, pattern := range test.patterns {
 				patterns = append(patterns, match.MustCompile(pattern))
 			}
-			check := checkBody(patterns)(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			check := checkBody(patterns)(res, string(body))
 
 			if result := (check == nil); result != test.result {
 				if test.result {
@@ -183,7 +185,9 @@ func TestCheckJson(t *testing.T) {
 
 			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
 			require.NoError(t, err)
-			checkRes := checker(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			checkRes := checker(res, string(body))
 
 			if result := checkRes == nil; result != test.result {
 				if test.result {
@@ -249,7 +253,9 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 
 			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
 			require.NoError(t, err)
-			checkRes := checker(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			checkRes := checker(res, string(body))
 
 			if result := checkRes == nil; result != test.result {
 				if test.result {
@@ -261,4 +267,63 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 		})
 	}
 
+}
+
+func TestCheckStatus(t *testing.T) {
+
+	var matchTests = []struct {
+		description string
+		status      []uint16
+		statusRec   int
+		result      bool
+	}{
+		{
+			"not match multiple values",
+			[]uint16{200, 301, 302},
+			500,
+			false,
+		},
+		{
+			"match multiple values",
+			[]uint16{200, 301, 302},
+			200,
+			true,
+		},
+		{
+			"not match single value",
+			[]uint16{200},
+			201,
+			false,
+		},
+		{
+			"match single value",
+			[]uint16{200},
+			200,
+			true,
+		},
+	}
+
+	for _, test := range matchTests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(test.statusRec)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			check := checkStatus(test.status)(res)
+
+			if result := (check == nil); result != test.result {
+				if test.result {
+					t.Fatalf("Expected at least one of status: %d to match status: %d", test.status, test.statusRec)
+				} else {
+					t.Fatalf("Did not expect status: %d to match status: %d", test.status, test.statusRec)
+				}
+			}
+		})
+	}
 }

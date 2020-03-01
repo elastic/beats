@@ -59,11 +59,12 @@ func (c *Closer) Close() {
 		return
 	}
 
+	// Close the channel first so that all processing in Handle() ends first
+	close(c.done)
+
 	if c.callback != nil {
 		c.callback()
 	}
-
-	close(c.done)
 
 	// propagate close to children.
 	if c.children != nil {

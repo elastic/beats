@@ -1,0 +1,21 @@
+- name: dpd
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek DPD log
+  fields:
+    - name: analyzer
+      type: keyword
+      description: >
+        The analyzer that generated the violation.
+
+    - name: failure_reason
+      type: keyword
+      description: >
+        The textual reason for the analysis failure.
+
+    - name: packet_segment
+      type: keyword
+      description: |
+        (present if policy/frameworks/dpd/packet-segment-logging.bro is loaded)
+        A chunk of the payload that most likely resulted in the protocol violation.

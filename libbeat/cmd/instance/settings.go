@@ -32,6 +32,7 @@ type Settings struct {
 	Name            string
 	IndexPrefix     string
 	Version         string
+	HasDashboards   bool
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
 	ConfigOverrides []cfgfile.ConditionalOverride
@@ -43,4 +44,6 @@ type Settings struct {
 	ILM             ilm.SupportFactory
 
 	Processing processing.SupportFactory
+
+	Umask *int
 }

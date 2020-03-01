@@ -163,6 +163,18 @@ func TestGetListMetricsOutput(t *testing.T) {
 	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
 }
 
+func TestGetListMetricsOutputWithWildcard(t *testing.T) {
+	svcCloudwatch := &MockCloudWatchClient{}
+	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", svcCloudwatch)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(listMetricsOutput))
+	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
+	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+}
+
 func TestGetMetricDataPerRegion(t *testing.T) {
 	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
 
@@ -353,6 +365,14 @@ func TestFindIdentifierFromARN(t *testing.T) {
 		{
 			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
 			"notification-topic-1",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/app/ece-ui/b195d6cf21493989",
+			"app/ece-ui/b195d6cf21493989",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 		},
 	}
 

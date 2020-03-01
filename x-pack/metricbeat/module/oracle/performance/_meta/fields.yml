@@ -14,7 +14,7 @@
       description: Oracle username
     - name: io_reloads
       type: double
-      description: Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are tumber of times a PIN was requested for objects of this namespace
+      description: Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are the number of times a PIN was requested for objects of this namespace
     - name: lock_requests
       type: long
       description: Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.

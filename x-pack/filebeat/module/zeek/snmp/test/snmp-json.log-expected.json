@@ -1,0 +1,32 @@
+[
+    {
+        "@timestamp": "2018-12-03T22:59:08.916Z",
+        "destination.address": "192.168.1.1",
+        "destination.ip": "192.168.1.1",
+        "destination.port": 161,
+        "event.dataset": "zeek.snmp",
+        "event.id": "CnKW1B4w9fpRa6Nkf2",
+        "event.module": "zeek",
+        "fileset.name": "snmp",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:X15ey/8/tEH+tlelK6P+GfgwBPc=",
+        "network.protocol": "snmp",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "192.168.1.2",
+        "source.ip": "192.168.1.2",
+        "source.port": 59696,
+        "tags": [
+            "zeek.snmp"
+        ],
+        "zeek.snmp.community": "public",
+        "zeek.snmp.duration": 7.849924,
+        "zeek.snmp.get.bulk_requests": 0,
+        "zeek.snmp.get.requests": 0,
+        "zeek.snmp.get.responses": 8,
+        "zeek.snmp.set.requests": 0,
+        "zeek.snmp.up_since": "2018-12-01T02:26:44.766Z",
+        "zeek.snmp.version": "2c"
+    }
+]

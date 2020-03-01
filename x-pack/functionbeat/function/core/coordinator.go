@@ -11,12 +11,13 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 // Runner is the interface that the coordinator will follow to manage a function goroutine.
 type Runner interface {
 	fmt.Stringer
-	Run(context.Context) error
+	Run(context.Context, telemetry.T) error
 }
 
 // Coordinator takes care of managing the function goroutine, it receives the list of functions that
@@ -41,7 +42,7 @@ func NewCoordinator(log *logp.Logger,
 
 // Run starts each functions into an independent goroutine and wait until all the goroutine are
 // stopped to exit.
-func (r *Coordinator) Run(ctx context.Context) error {
+func (r *Coordinator) Run(ctx context.Context, t telemetry.T) error {
 	r.log.Debug("Coordinator is starting")
 	defer r.log.Debug("Coordinator is stopped")
 
@@ -55,14 +56,14 @@ func (r *Coordinator) Run(ctx context.Context) error {
 
 	r.log.Debugf("The coordinator is starting %d functions", len(r.runners))
 	for _, rfn := range r.runners {
-		go func(ctx context.Context, rfn Runner) {
+		go func(ctx context.Context, t telemetry.T, rfn Runner) {
 			var err error
 			defer func() { results <- err }()
-			err = r.runFunc(ctx, rfn)
+			err = r.runFunc(ctx, t, rfn)
 			if err != nil {
 				cancel()
 			}
-		}(ctx, rfn)
+		}(ctx, t, rfn)
 	}
 
 	// Wait for goroutine to complete and aggregate any errors from the goroutine and
@@ -79,12 +80,13 @@ func (r *Coordinator) Run(ctx context.Context) error {
 
 func (r *Coordinator) runFunc(
 	ctx context.Context,
+	t telemetry.T,
 	rfn Runner,
 ) error {
 	r.log.Infof("The function '%s' is starting", rfn.String())
 	defer r.log.Infof("The function '%s' is stopped", rfn.String())
 
-	err := rfn.Run(ctx)
+	err := rfn.Run(ctx, t)
 	if err != nil {
 		r.log.Errorf(
 			"Nonrecoverable error when executing the function: '%s', error: '%+v', terminating all running functions",

@@ -43,7 +43,13 @@ func GetContainerName(container common.MapStr) string {
 
 // GetHintString takes a hint and returns its value as a string
 func GetHintString(hints common.MapStr, key, config string) string {
-	if iface, err := hints.GetValue(fmt.Sprintf("%s.%s", key, config)); err == nil {
+	base := config
+	if base == "" {
+		base = key
+	} else if key != "" {
+		base = fmt.Sprint(key, ".", config)
+	}
+	if iface, err := hints.GetValue(base); err == nil {
 		if str, ok := iface.(string); ok {
 			return str
 		}
@@ -54,7 +60,13 @@ func GetHintString(hints common.MapStr, key, config string) string {
 
 // GetHintMapStr takes a hint and returns a MapStr
 func GetHintMapStr(hints common.MapStr, key, config string) common.MapStr {
-	if iface, err := hints.GetValue(fmt.Sprintf("%s.%s", key, config)); err == nil {
+	base := config
+	if base == "" {
+		base = key
+	} else if key != "" {
+		base = fmt.Sprint(key, ".", config)
+	}
+	if iface, err := hints.GetValue(base); err == nil {
 		if mapstr, ok := iface.(common.MapStr); ok {
 			return mapstr
 		}
@@ -74,7 +86,20 @@ func GetHintAsList(hints common.MapStr, key, config string) []string {
 
 // GetProcessors gets processor definitions from the hints and returns a list of configs as a MapStr
 func GetProcessors(hints common.MapStr, key string) []common.MapStr {
-	return GetConfigs(hints, key, "processors")
+	processors := GetConfigs(hints, key, "processors")
+	for _, proc := range processors {
+		for key, value := range proc {
+			if str, ok := value.(string); ok {
+				cfg := common.MapStr{}
+				if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+					logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+					continue
+				}
+				proc[key] = cfg
+			}
+		}
+	}
+	return processors
 }
 
 // GetConfigs takes in a key and returns a list of configs as a slice of MapStr

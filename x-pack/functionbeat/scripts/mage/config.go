@@ -20,10 +20,11 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		ExtraVars: map[string]interface{}{
-			"ExcludeConsole":    true,
-			"ExcludeFileOutput": true,
-			"ExcludeKafka":      true,
-			"ExcludeRedis":      true,
+			"ExcludeConsole":             true,
+			"ExcludeFileOutput":          true,
+			"ExcludeKafka":               true,
+			"ExcludeRedis":               true,
+			"UseDockerMetadataProcessor": false,
 		},
 	}
 }

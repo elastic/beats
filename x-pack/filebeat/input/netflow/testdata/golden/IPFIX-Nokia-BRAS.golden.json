@@ -56,7 +56,8 @@
           "port": 5878
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

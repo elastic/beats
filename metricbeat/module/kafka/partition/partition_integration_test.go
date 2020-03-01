@@ -44,13 +44,14 @@ const (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
-		compose.UpWithAdvertisedHostEnvFile,
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	generateKafkaData(t, service.Host(), "metricbeat-generate-data")
+	// Create initial topic
+	generateKafkaData(t, service.HostForPort(9092), "metricbeat-generate-data")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), ""))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092), ""))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
@@ -58,7 +59,10 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-	service := compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
+	)
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
@@ -66,9 +70,9 @@ func TestTopic(t *testing.T) {
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
-	generateKafkaData(t, service.Host(), testTopic)
+	generateKafkaData(t, service.HostForPort(9092), testTopic)
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), testTopic))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092), testTopic))
 	dataBefore, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
@@ -82,7 +86,7 @@ func TestTopic(t *testing.T) {
 	var i int64 = 0
 	// Create n messages
 	for ; i < n; i++ {
-		generateKafkaData(t, service.Host(), testTopic)
+		generateKafkaData(t, service.HostForPort(9092), testTopic)
 	}
 
 	dataAfter, err := mbtest.ReportingFetchV2Error(f)

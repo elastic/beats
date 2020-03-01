@@ -36,6 +36,7 @@ type httpConfig struct {
 	RedactAuthorization    bool     `config:"redact_authorization"`
 	MaxMessageSize         int      `config:"max_message_size"`
 	DecodeBody             bool     `config:"decode_body"`
+	RedactHeaders          []string `config:"redact_headers"`
 
 	StoreRawDataWithBinary bool `config:"store_raw_with_blob"`
 }

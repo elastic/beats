@@ -29,6 +29,7 @@ type client interface {
 	ListGroups() ([]string, error)
 	DescribeGroups(group []string) (map[string]kafka.GroupDescription, error)
 	FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error)
+	FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error)
 }
 
 func fetchGroupInfo(
@@ -113,12 +114,19 @@ func fetchGroupInfo(
 
 		for topic, partitions := range ret.off.Blocks {
 			for partition, info := range partitions {
+				partitionOffset, err := getPartitionOffsetFromTheLeader(b, topic, partition)
+				if err != nil {
+					logp.Err("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
+					continue
+				}
+				consumerLag := partitionOffset - info.Offset
 				event := common.MapStr{
-					"id":        ret.group,
-					"topic":     topic,
-					"partition": partition,
-					"offset":    info.Offset,
-					"meta":      info.Metadata,
+					"id":           ret.group,
+					"topic":        topic,
+					"partition":    partition,
+					"offset":       info.Offset,
+					"meta":         info.Metadata,
+					"consumer_lag": consumerLag,
 					"error": common.MapStr{
 						"code": info.Err,
 					},
@@ -133,7 +141,6 @@ func fetchGroupInfo(
 						}
 					}
 				}
-
 				emit(event)
 			}
 		}
@@ -143,6 +150,14 @@ func fetchGroupInfo(
 	close(results)
 
 	return err
+}
+
+func getPartitionOffsetFromTheLeader(b client, topic string, partitionID int32) (int64, error) {
+	offset, err := b.FetchPartitionOffsetFromTheLeader(topic, partitionID)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
 }
 
 func listGroups(b client, filter func(string) bool) ([]string, error) {

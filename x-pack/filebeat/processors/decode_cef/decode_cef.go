@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/x-pack/filebeat/processors/decode_cef/cef"
@@ -44,6 +45,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newDecodeCEF(c config) (*processor, error) {
+	cfgwarn.Beta("The " + procName + " processor is a beta feature.")
+
 	log := logp.NewLogger(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
@@ -86,7 +89,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// If the version < 0 after parsing then none of the data is valid so return here.
 	var ce cef.Event
-	if err = ce.Unpack([]byte(cefData), cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
+	if err = ce.Unpack(cefData, cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
 		if p.IgnoreFailure {
 			return event, nil
 		}
@@ -101,7 +104,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if p.ECS {
 		writeCEFHeaderToECS(&ce, event)
 
-		for key, v := range ce.Extensions {
+		for key, field := range ce.Extensions {
 			mapping, found := ecsExtensionMapping[key]
 			if !found {
 				continue
@@ -109,7 +112,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 			// Apply translation function or use a standard type translation (e.g. string to long).
 			if mapping.Translate != nil {
-				translatedValue, err := mapping.Translate(v)
+				translatedValue, err := mapping.Translate(field)
 				if err != nil {
 					cefErrors = append(cefErrors, errors.Wrap(err, key))
 					continue
@@ -117,13 +120,10 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 				if translatedValue != nil {
 					event.PutValue(mapping.Target, translatedValue)
 				}
-			} else if mapping.Type != unset {
-				translatedValue, err := toType(v, mapping.Type)
-				if err != nil {
-					cefErrors = append(cefErrors, errors.Wrap(err, key))
-					continue
-				}
-				event.PutValue(mapping.Target, translatedValue)
+			} else if field.Interface != nil {
+				event.PutValue(mapping.Target, field.Interface)
+			} else {
+				event.PutValue(mapping.Target, field.String)
 			}
 		}
 	}
@@ -165,8 +165,12 @@ func toCEFObject(cefEvent *cef.Event) common.MapStr {
 	if len(cefEvent.Extensions) > 0 {
 		extensions := make(common.MapStr, len(cefEvent.Extensions))
 		cefObject.Put("extensions", extensions)
-		for k, v := range cefEvent.Extensions {
-			extensions.Put(k, v)
+		for k, field := range cefEvent.Extensions {
+			if field.Interface != nil {
+				extensions.Put(k, field.Interface)
+			} else {
+				extensions.Put(k, field.String)
+			}
 		}
 	}
 

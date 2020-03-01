@@ -20,6 +20,7 @@ package parse
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -55,6 +56,66 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.URI)
 			assert.Equal(t, "unix:///var/lib/docker.sock", hostData.SanitizedURI)
 			assert.Equal(t, "/var/lib/docker.sock", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+unix at root", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix", hostData.URI)
+			assert.Equal(t, "http://unix", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+unix with path", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix/apath", hostData.URI)
+			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe at root", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe", hostData.URI)
+			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe with path", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
 			assert.Equal(t, "", hostData.User)
 			assert.Equal(t, "", hostData.Password)
 		}

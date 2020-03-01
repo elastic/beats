@@ -2,22 +2,36 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
-            "dimensions": {
-                "AvailabilityZone": "us-east-1b",
-                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
-            },
             "namespace": "AWS/ELB"
         },
-        "metrics": {
-            "HealthyHostCount": {
-                "avg": 2
-            },
-            "UnHealthyHostCount": {
-                "avg": 0
+        "dimensions": {
+            "Namespace": "AWS"
+        },
+        "elb": {
+            "metrics": {
+                "HealthyHostCount": {
+                    "max": 2
+                },
+                "Latency": {
+                    "avg": 0.000005960464477539062
+                },
+                "RequestCount": {
+                    "sum": 1
+                },
+                "SurgeQueueLength": {
+                    "max": 1
+                },
+                "UnHealthyHostCount": {
+                    "max": 0
+                }
             }
         }
     },
     "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
         "provider": "aws",
         "region": "us-east-1"
     },
@@ -27,7 +41,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "elb"
+        "name": "elb",
+        "period": 10000
     },
     "service": {
         "type": "aws"

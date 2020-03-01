@@ -19,16 +19,6 @@
       description: >
         Contains user configurable fields.
 
-    - name: error
-      type: group
-      description: >
-        Error fields containing additional info in case of errors.
-      fields:
-        - name: type
-          type: keyword
-          description: >
-            Error type.
-
     - name: beat.name
       type: alias
       path: host.name

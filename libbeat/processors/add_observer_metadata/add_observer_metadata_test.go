@@ -42,12 +42,12 @@ func TestConfigDefault(t *testing.T) {
 	assert.NoError(t, err)
 
 	v, err := newEvent.GetValue("observer.ip")
-	assert.Error(t, err)
-	assert.Nil(t, v)
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
 
 	v, err = newEvent.GetValue("observer.mac")
-	assert.Error(t, err)
-	assert.Nil(t, v)
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
 }
 
 func TestOverwriteFalse(t *testing.T) {
@@ -86,13 +86,13 @@ func TestOverwriteTrue(t *testing.T) {
 	assert.NotNil(t, v)
 }
 
-func TestConfigNetInfoEnabled(t *testing.T) {
+func TestConfigNetInfoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
-		"netinfo.enabled": true,
+		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
 
@@ -102,12 +102,12 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NoError(t, err)
 
 	v, err := newEvent.GetValue("observer.ip")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
+	assert.Error(t, err)
+	assert.Nil(t, v)
 
 	v, err = newEvent.GetValue("observer.mac")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
+	assert.Error(t, err)
+	assert.Nil(t, v)
 }
 
 func TestConfigGeoEnabled(t *testing.T) {

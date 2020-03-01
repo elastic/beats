@@ -27,50 +27,38 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
+	build "github.com/elastic/beats/dev-tools/mage/target/build"
+	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/dashboards"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	// mage:import
+	update "github.com/elastic/beats/dev-tools/mage/target/update"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
 )
 
 func init() {
-	common.RegisterCheckDeps(Update)
-
+	common.RegisterCheckDeps(update.Update)
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
 //CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
-}
-
-// Build builds the Beat binary.
-func Build() error {
-	return devtools.Build(devtools.DefaultBuildArgs())
-}
-
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
-// Do not use directly, use crossBuild instead.
-func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuild cross-builds the beat for all target platforms.
-func CrossBuild() error {
-	return devtools.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
@@ -84,14 +72,20 @@ func Package() {
 	devtools.UseElasticBeatOSSPackaging()
 	metricbeat.CustomizePackaging()
 
-	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(update.Update, metricbeat.PrepareModulePackagingOSS)
+	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithModulesD())
+	return devtools.TestPackages(
+		devtools.WithModulesD(),
+		devtools.WithModules(),
+
+		// To be increased or removed when more light modules are added
+		devtools.MinModules(1),
+	)
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
@@ -104,20 +98,14 @@ func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
 }
 
-func configYML() error {
-	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
+// Imports generates an include/list_{suffix}.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	// TODO to replace by a pure mage implementation:
-	// - Generate docs/fields.asciidoc
-	/*
-		mg.SerialDeps(Fields, Dashboards, Config,
-			metricbeat.PrepareModulePackagingOSS,
-			devtools.GenerateModuleIncludeListGo)
-	*/
-	return sh.Run("make", "update")
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
 }
 
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
@@ -133,7 +121,7 @@ func MockedTests(ctx context.Context) error {
 	}
 
 	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")); generate {
-		params.ExtraFlags = append(params.ExtraFlags, "-generate")
+		params.ExtraFlags = append(params.ExtraFlags, "-data")
 	}
 
 	params.Packages = nil
@@ -151,13 +139,6 @@ func Fields() error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
@@ -186,4 +167,11 @@ func FieldsDocs() error {
 // CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
 }

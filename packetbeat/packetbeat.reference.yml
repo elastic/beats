@@ -40,6 +40,13 @@ packetbeat.interfaces.device: any
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
+# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# This option does not work with `any` interface device.
+# The default option is false and requires manual set-up of promiscuous mode.
+# Warning: under some circumstances (e.g beat crash) promiscuous mode
+# can stay enabled even after beat is shut down.
+#packetbeat.interfaces.auto_promisc_mode: true
+
 #================================== Flows =====================================
 
 packetbeat.flows:
@@ -53,12 +60,18 @@ packetbeat.flows:
   # Configure reporting period. If set to -1, only killed flows will be reported
   period: 10s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 #========================== Transaction protocols =============================
 
 packetbeat.protocols:
 - type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   #enabled: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: amqp
   # Enable AMQP monitoring. Default: true
@@ -93,6 +106,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -117,6 +133,9 @@ packetbeat.protocols:
   # is included in published events. The default is true. enable `send_response` first before enable this option.
   #send_response_header: true
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Configures the default compression algorithm being used to uncompress compressed frames by name. Currently only `snappy` is can be configured.
   # By default no compressor is configured.
   #compressor: "snappy"
@@ -127,6 +146,9 @@ packetbeat.protocols:
 - type: dhcpv4
   # Configure the DHCP for IPv4 ports.
   ports: [67, 68]
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: dns
   # Enable DNS monitoring. Default: true
@@ -153,6 +175,9 @@ packetbeat.protocols:
   # Default: false
   # send_request:  true
   # send_response: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -181,6 +206,11 @@ packetbeat.protocols:
   # Instead of sending a white list of headers to Elasticsearch, you can send
   # all headers by setting this option to true. The default is false.
   #send_all_headers: false
+
+  # A list of headers to redact if present in the HTTP request. This will keep
+  # the header field present, but will redact it's value to show the headers
+  # presence.
+  #redact_headers: []
 
   # The list of content types for which Packetbeat includes the full HTTP
   # payload. If the request's or response's Content-Type matches any on this
@@ -215,6 +245,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -269,6 +302,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -288,6 +324,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -309,6 +348,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -328,6 +370,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -393,6 +438,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -423,6 +471,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -442,6 +493,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -473,6 +527,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw certificates will be stored
   # in PEM format under the `raw` key. The default is false.
   #include_raw_certificates: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 #=========================== Monitored processes ==============================
 
@@ -685,8 +742,7 @@ packetbeat.ignore_outgoing: false
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -784,8 +840,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -852,9 +911,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -877,6 +936,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -944,9 +1009,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -970,6 +1035,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1117,9 +1188,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -1156,6 +1227,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -1229,9 +1302,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -1401,7 +1474,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -1427,7 +1499,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1447,24 +1518,24 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'packetbeat-%{[agent.version]}'. 
+# name is 'packetbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "packetbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'packetbeat-%{[agent.version]}'.
+# 'packetbeat'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
@@ -1489,6 +1560,9 @@ setup.kibana:
   # Optional HTTP path
   #path: ""
 
+  # Optional Kibana space ID.
+  #space.id: ""
+
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
@@ -1498,9 +1572,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1622,8 +1696,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
@@ -1671,9 +1748,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1701,6 +1778,14 @@ logging.files:
   #metrics.period: 10s
   #state.period: 1m
 
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
+
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
@@ -1710,11 +1795,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

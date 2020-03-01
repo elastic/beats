@@ -11,13 +11,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
@@ -27,6 +31,7 @@ var (
 	supportedOutputs = []string{
 		"elasticsearch",
 		"logstash",
+		"console", // for local debugging
 	}
 )
 
@@ -39,11 +44,12 @@ var (
 // - Run on a read only filesystem
 // - More execution constraints based on speed and memory usage.
 type Functionbeat struct {
-	ctx      context.Context
-	log      *logp.Logger
-	cancel   context.CancelFunc
-	Provider provider.Provider
-	Config   *config.Config
+	Ctx       context.Context
+	log       *logp.Logger
+	cancel    context.CancelFunc
+	telemetry telemetry.T
+	Provider  provider.Provider
+	Config    *config.Config
 }
 
 // New creates an instance of functionbeat.
@@ -53,37 +59,23 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %+v", err)
 	}
 
-	provider, err := getProvider(c.Provider)
+	provider, err := provider.Create(c.Provider)
 	if err != nil {
 		return nil, err
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 
+	telemetryReg := monitoring.GetNamespace("state").GetRegistry().NewRegistry("functionbeat")
+
 	bt := &Functionbeat{
-		ctx:      ctx,
-		cancel:   cancel,
-		log:      logp.NewLogger("functionbeat"),
-		Provider: provider,
-		Config:   c,
+		Ctx:       ctx,
+		log:       logp.NewLogger("functionbeat"),
+		cancel:    cancel,
+		telemetry: telemetry.New(telemetryReg),
+		Provider:  provider,
+		Config:    c,
 	}
 	return bt, nil
-}
-
-func getProvider(cfg *common.Config) (provider.Provider, error) {
-	providers, err := provider.List()
-	if err != nil {
-		return nil, err
-	}
-	if len(providers) != 1 {
-		return nil, fmt.Errorf("too many providers are available, expected one, got: %s", providers)
-	}
-
-	providerCfg, err := cfg.Child(providers[0], -1)
-	if err != nil {
-		return nil, err
-	}
-
-	return provider.NewProvider(providers[0], providerCfg)
 }
 
 // Run starts functionbeat.
@@ -96,13 +88,13 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	}
 
 	if outputName == "elasticsearch" {
-		licenser.Enforce(logp.NewLogger("license"), b.Info.Name, licenser.BasicAndAboveOrTrial)
+		licenser.Enforce(b.Info.Name, licenser.BasicAndAboveOrTrial)
 	}
 
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")
 
-	clientFactory := makeClientFactory(bt.log, b.Publisher)
+	clientFactory := makeClientFactory(bt.log, b.Publisher, b.Info)
 
 	enabledFunctions := bt.enabledFunctions()
 	bt.log.Infof("Functionbeat is configuring enabled functions: %s", strings.Join(enabledFunctions, ", "))
@@ -117,7 +109,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	// When an error reach the coordinator we assume that we cannot recover from it and we initiate
 	// a shutdown and return an aggregated errors.
 	coordinator := core.NewCoordinator(logp.NewLogger("coordinator"), functions...)
-	err = coordinator.Run(bt.ctx)
+	err = coordinator.Run(bt.Ctx, bt.telemetry)
 	if err != nil {
 		return err
 	}
@@ -149,21 +141,30 @@ func isOutputSupported(name string) bool {
 	return false
 }
 
-func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
+type fnExtraConfig struct {
+	Processors processors.PluginConfig `config:"processors"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
+
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+
+	// ES output index pattern
+	Index fmtstr.EventFormatString `config:"index"`
+}
+
+func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline, beatInfo beat.Info) func(*common.Config) (core.Client, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
 	return func(cfg *common.Config) (core.Client, error) {
-		c := struct {
-			Processors           processors.PluginConfig `config:"processors"`
-			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-		}{}
+		c := fnExtraConfig{}
 
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
 
-		processors, err := processors.New(c.Processors)
+		funcProcessors, err := processorsForFunction(beatInfo, c)
 		if err != nil {
 			return nil, err
 		}
@@ -171,8 +172,9 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 		client, err := core.NewSyncClient(log, pipeline, beat.ClientConfig{
 			PublishMode: beat.GuaranteedSend,
 			Processing: beat.ProcessingConfig{
-				Processor:     processors,
+				Processor:     funcProcessors,
 				EventMetadata: c.EventMetadata,
+				KeepNull:      c.KeepNull,
 			},
 		})
 

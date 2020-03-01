@@ -1,20 +1,23 @@
 [role="xpack"]
 [[securing-beats]]
-== Configure {beatname_uc} to use {security}
+== Configure {beatname_uc} to use {security-features}
 
 [subs="attributes"]
 ++++
-<titleabbrev>Use {security}</titleabbrev>
+<titleabbrev>Use {security-features}</titleabbrev>
 ++++
 
 If you want {beatname_uc} to connect to a cluster that has
-{stack-ov}/elasticsearch-security.html[{security}] enabled, there are extra
-configuration steps:
+{security-features} enabled, there are extra configuration steps:
 
 . <<feature-roles>>.
 +
 You can use role-based access control to grant {beatname_uc} users access to
-secured resources. 
+secured resources.
+
+. <<beats-api-keys>>.
++
+You can use API keys to grant access to {es} more securely.
 
 . <<beats-basic-auth>>.
 +
@@ -26,19 +29,13 @@ authentication credentials or present a client certificate.
 If encryption is enabled on the cluster, you need to enable HTTPS in the
 {beatname_uc} configuration.
 
-. <<beats-system-user>>.
-+
-{beatname_uc} uses the +{beat_monitoring_user}+ user to send monitoring data to {es}. If
-you plan to monitor {beatname_uc} in {kib} and have not yet set up the
-password, set it up now.
-
-For more information about {security}, see
-{xpack-ref}/elasticsearch-security.html[Securing the {stack}].
+For more information about {security-features}, see
+{ref}/secure-cluster.html[Secure a cluster].
 
 include::users.asciidoc[]
+
+include::api-keys.asciidoc[]
 
 include::basic-auth.asciidoc[]
 
 include::tls.asciidoc[]
-
-include::beats-system.asciidoc[]

@@ -11,15 +11,14 @@ There are two modules that collect metrics about {es}:
 monitoring of Elasticsearch across multiple versions. The default metricsets in
 this module are `node` and `node_stats`.
 * The Elasticsearch X-Pack module enables you to monitor more Elasticsearch
-metrics with our {stack-ov}/xpack-monitoring.html[monitoring] feature. The
-default metricsets in this module are `ccr`, `cluster_stats`, `index`,
-`index_recovery`, `index_summary`, `ml_job`, `node_stats`, and `shard`.
+metrics with our {stack} {monitor-features}. The default metricsets in this
+module are `ccr`, `cluster_stats`, `enrich`, ``index`, `index_recovery`,
+`index_summary`, `ml_job`, `node_stats`, and `shard`.
 
 [float]
-=== Compability
+=== Compatibility
 
-The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
-work with all 6.x versions.
+The Elasticsearch module works with Elasticsearch 6.7.0 and later.
 
 
 [float]
@@ -66,6 +65,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
 
+* <<metricbeat-metricset-elasticsearch-enrich,enrich>>
+
 * <<metricbeat-metricset-elasticsearch-index,index>>
 
 * <<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>
@@ -85,6 +86,8 @@ The following metricsets are available:
 include::elasticsearch/ccr.asciidoc[]
 
 include::elasticsearch/cluster_stats.asciidoc[]
+
+include::elasticsearch/enrich.asciidoc[]
 
 include::elasticsearch/index.asciidoc[]
 

@@ -21,7 +21,7 @@
       description: >
         Timestamp of last occurrence of event
   - name: message
-    type: keyword
+    type: text
     description: >
       Message recorded for the given event
     copy_to: message

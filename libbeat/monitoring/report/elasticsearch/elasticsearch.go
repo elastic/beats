@@ -84,6 +84,7 @@ func defaultConfig(settings report.Settings) config {
 		Headers:          nil,
 		Username:         "beats_system",
 		Password:         "",
+		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
 		TLS:              nil,
@@ -118,6 +119,12 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
+	}
+
+	// Unset username which is set by default, even if no password is set
+	if config.APIKey != "" {
+		config.Username = ""
+		config.Password = ""
 	}
 
 	// check endpoint availability on startup only every 30 seconds
@@ -164,11 +171,11 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return memqueue.NewBroker(log,
+	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+		return memqueue.NewQueue(log,
 			memqueue.Settings{
-				Eventer: e,
-				Events:  20,
+				ACKListener: ackListener,
+				Events:      20,
 			}), nil
 	}
 
@@ -246,10 +253,10 @@ func (r *reporter) initLoop(c config) {
 			break
 		} else {
 			if !logged {
-				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying.")
+				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying. Error: ", err)
 				logged = true
 			}
-			debugf("Monitoring could not connect to elasticsearch, failed with %v", err)
+			debugf("Monitoring could not connect to Elasticsearch, failed with %v", err)
 		}
 
 		select {
@@ -339,6 +346,7 @@ func makeClient(
 		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
+		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
 		Index:            outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),

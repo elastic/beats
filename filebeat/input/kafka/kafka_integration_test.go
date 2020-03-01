@@ -147,16 +147,21 @@ func TestInput(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	for _, m := range messages {
+	for range messages {
 		select {
 		case event := <-events:
-			text, err := event.Fields.GetValue("message")
+			v, err := event.Fields.GetValue("message")
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, text, m.message)
+			text, ok := v.(string)
+			if !ok {
+				t.Fatal("could not get message text from event")
+			}
+			msg := findMessage(t, text, messages)
+			assert.Equal(t, text, msg.message)
 
-			checkMatchingHeaders(t, event, m.headers)
+			checkMatchingHeaders(t, event, msg.headers)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
@@ -176,6 +181,92 @@ func TestInput(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+}
+
+func TestInputWithMultipleEvents(t *testing.T) {
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
+	context := input.Context{
+		Done:     make(chan struct{}),
+		BeatDone: make(chan struct{}),
+	}
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":                        getTestKafkaHost(),
+		"topics":                       []string{testTopic},
+		"group_id":                     "filebeat",
+		"wait_close":                   0,
+		"expand_event_list_from_field": "records",
+	})
+
+	// Route input events through our capturer instead of sending through ES.
+	events := make(chan beat.Event, 100)
+	defer close(events)
+	capturer := NewEventCapturer(events)
+	defer capturer.Close()
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+		return channel.SubOutlet(capturer), nil
+	})
+
+	input, err := NewInput(config, connector, context)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Run the input and wait for finalization
+	input.Run()
+
+	timeout := time.After(30 * time.Second)
+	select {
+	case event := <-events:
+		text, err := event.Fields.GetValue("message")
+		if err != nil {
+			t.Fatal(err)
+		}
+		msgs := []string{"{\"val\":\"val1\"}", "{\"val\":\"val2\"}"}
+		assert.Contains(t, msgs, text)
+		checkMatchingHeaders(t, event, message.headers)
+	case <-timeout:
+		t.Fatal("timeout waiting for incoming events")
+	}
+
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	close(context.Done)
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
+	var msg *testMessage
+	for _, m := range msgs {
+		if text == m.message {
+			msg = &m
+			break
+		}
+	}
+
+	assert.NotNil(t, msg)
+	return msg
 }
 
 func checkMatchingHeaders(

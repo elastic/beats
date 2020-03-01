@@ -53,8 +53,7 @@ type Beat struct {
 	Info      Info     // beat metadata.
 	Publisher Pipeline // Publisher pipeline
 
-	SetupMLCallback SetupMLCallback // setup callback for ML job configs
-	InSetupCmd      bool            // this is set to true when the `setup` command is called
+	InSetupCmd bool // this is set to true when the `setup` command is called
 
 	OverwritePipelinesCallback OverwritePipelinesCallback // ingest pipeline loader callback
 	// XXX: remove Config from public interface.
@@ -74,10 +73,6 @@ type BeatConfig struct {
 	// output/publishing related configurations
 	Output common.ConfigNamespace `config:"output"`
 }
-
-// SetupMLCallback can be used by the Beat to register MachineLearning configurations
-// for the enabled modules.
-type SetupMLCallback func(*Beat, *common.Config) error
 
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.

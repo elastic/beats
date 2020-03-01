@@ -37,6 +37,28 @@ const (
 	FieldsAllYML = "build/fields/fields.all.yml"
 )
 
+// IncludeListOptions stores the options for IncludeList generation
+type IncludeListOptions struct {
+	ImportDirs       []string
+	ModuleDirs       []string
+	ModulesToExclude []string
+	Outfile          string
+	BuildTags        string
+	Pkg              string
+}
+
+// DefaultIncludeListOptions initializes IncludeListOptions struct with default values
+func DefaultIncludeListOptions() IncludeListOptions {
+	return IncludeListOptions{
+		ImportDirs:       nil,
+		ModuleDirs:       []string{"module"},
+		ModulesToExclude: nil,
+		Outfile:          "include/list.go",
+		BuildTags:        "",
+		Pkg:              "include",
+	}
+}
+
 // FieldsBuilder is the interface projects to implement for building field data.
 type FieldsBuilder interface {
 	// Generate all fields.go files.
@@ -143,13 +165,13 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
 func GenerateModuleIncludeListGo() error {
-	return GenerateIncludeListGo(nil, []string{"module"})
+	return GenerateIncludeListGo(DefaultIncludeListOptions())
 }
 
 // GenerateIncludeListGo generates an include/list.go file containing imports
 // for the packages that match the paths (or globs) in importDirs (optional)
 // and moduleDirs (optional).
-func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
+func GenerateIncludeListGo(options IncludeListOptions) error {
 	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -160,22 +182,29 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 	includeListCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
+		"-out", options.Outfile, "-buildTags", options.BuildTags,
+		"-pkg", options.Pkg,
 	)
 
 	var args []string
-	for _, dir := range importDirs {
+	for _, dir := range options.ImportDirs {
 		if !filepath.IsAbs(dir) {
 			dir = CWD(dir)
 		}
 		args = append(args, "-import", dir)
 	}
-	for _, dir := range moduleDirs {
+	for _, dir := range options.ModuleDirs {
 		if !filepath.IsAbs(dir) {
 			dir = CWD(dir)
 		}
 		args = append(args, "-moduleDir", dir)
 	}
-
+	for _, dir := range options.ModulesToExclude {
+		if !filepath.IsAbs(dir) {
+			dir = CWD(dir)
+		}
+		args = append(args, "-moduleExcludeDirs", dir)
+	}
 	return includeListCmd(args...)
 }
 

@@ -1,0 +1,47 @@
+{
+    "@timestamp": "2019-12-18T14:47:52.427Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
+    },
+    "event": {
+      "dataset": "kubernetes.service",
+      "module": "kubernetes",
+      "duration": 44555276
+    },
+    "metricset": {
+      "name": "state_service",
+      "period": 10000
+    },
+    "service": {
+      "type": "kubernetes",
+      "address": "kube-state-metrics.kube-system:8080"
+    },
+    "kubernetes": {
+      "service": {
+        "type": "ClusterIP",
+        "name": "productpage",
+        "created": "2019-11-25T21:08:36.000Z",
+        "cluster_ip": "10.104.43.66"
+      },
+      "namespace": "default",
+      "labels": {
+        "app": "productpage"
+      }
+    },
+    "agent": {
+      "type": "metricbeat",
+      "ephemeral_id": "c2655cd5-2091-4cd2-848d-6abba04bc26c",
+      "hostname": "minikube",
+      "id": "e9952df4-592e-4102-84a6-ad0b333b3b98",
+      "version": "8.0.0"
+    },
+    "ecs": {
+      "version": "1.2.0"
+    },
+    "host": {
+      "name": "minikube"
+    }
+  }
+  

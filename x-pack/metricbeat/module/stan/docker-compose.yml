@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  stan:
+    image: docker.elastic.co/integrations-ci/beats-stan:${STAN_VERSION:-0.15.1}-1
+    build:
+      context: ./_meta
+      args:
+        STAN_VERSION: ${STAN_VERSION:-0.15.1}
+    ports:
+      - 8222

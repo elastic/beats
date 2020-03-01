@@ -32,10 +32,22 @@ import (
 
 const defaultNode = "localhost"
 
+func getKubeConfigEnvironmentVariable() string {
+	envKubeConfig := os.Getenv("KUBECONFIG")
+	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
+		return envKubeConfig
+	}
+	return ""
+}
+
 // GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
 // in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
 // it parses the config file to get the config required to build a client.
 func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+	if kubeconfig == "" {
+		kubeconfig = getKubeConfigEnvironmentVariable()
+	}
+
 	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
@@ -49,65 +61,66 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
-// IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not.
+// IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
+// taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
-	if kubeconfig == "" {
-		return true
+	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" {
+		return false
 	}
-
-	return false
+	return true
 }
 
 // DiscoverKubernetesNode figures out the Kubernetes node to use.
 // If host is provided in the config use it directly.
 // If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
 // If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-func DiscoverKubernetesNode(host string, inCluster bool, client kubernetes.Interface) (node string) {
+func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (node string) {
 	if host != "" {
-		logp.Info("kubernetes: Using node %s provided in the config", host)
+		log.Infof("kubernetes: Using node %s provided in the config", host)
 		return host
 	}
 
 	if inCluster {
 		ns, err := inClusterNamespace()
 		if err != nil {
-			logp.Err("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
+			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
 			return defaultNode
 		}
 		podName, err := os.Hostname()
 		if err != nil {
-			logp.Err("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
+			log.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
 			return defaultNode
 		}
-		logp.Info("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
+		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
 		pod, err := client.CoreV1().Pods(ns).Get(podName, metav1.GetOptions{})
 		if err != nil {
-			logp.Err("kubernetes: Querying for pod failed with error: %+v", err.Error())
+			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
 			return defaultNode
 		}
-		logp.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
+		log.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
 		return pod.Spec.NodeName
 	}
 
 	mid := machineID()
 	if mid == "" {
-		logp.Err("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
+		log.Error("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
 		return defaultNode
 	}
 
 	nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
 	if err != nil {
-		logp.Err("kubernetes: Querying for nodes failed with error: %+v", err.Error())
+		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
 		return defaultNode
 	}
 	for _, n := range nodes.Items {
 		if n.Status.NodeInfo.MachineID == mid {
-			logp.Info("kubernetes: Using node %s discovered by machine-id matching", n.GetObjectMeta().GetName())
-			return n.GetObjectMeta().GetName()
+			name := n.GetObjectMeta().GetName()
+			log.Infof("kubernetes: Using node %s discovered by machine-id matching", name)
+			return name
 		}
 	}
 
-	logp.Warn("kubernetes: Couldn't discover node, using localhost as default")
+	log.Warn("kubernetes: Couldn't discover node, using localhost as default")
 	return defaultNode
 }
 

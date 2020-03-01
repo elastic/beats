@@ -10,9 +10,9 @@ This is the Logstash module.
 The default metricsets are `node` and `node_stats`.
 
 [float]
-=== Compability
+=== Compatibility
 
-The logstash module is tested with logstash 6.3.
+The Logstash module works with Logstash 7.3.0 and later.
 
 
 [float]

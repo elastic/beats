@@ -21,7 +21,7 @@ example configuration on how to do it.
 The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
 
@@ -67,9 +67,10 @@ metricbeat.modules:
     - system
     - volume
   period: 10s
-  hosts: ["localhost:10255"]
   enabled: true
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  hosts: ["https://${HOSTNAME}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -79,6 +80,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -92,6 +95,11 @@ metricbeat.modules:
     - state_pod
     - state_container
     - state_cronjob
+    - state_resourcequota
+    - state_service
+    - state_persistentvolume
+    - state_persistentvolumeclaim
+    - state_storageclass
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -99,6 +107,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # Kubernetes events
@@ -175,11 +185,19 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
 
+* <<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>
+
 * <<metricbeat-metricset-kubernetes-state_pod,state_pod>>
 
 * <<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>
 
+* <<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>
+
+* <<metricbeat-metricset-kubernetes-state_service,state_service>>
+
 * <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
+
+* <<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>>
 
 * <<metricbeat-metricset-kubernetes-system,system>>
 
@@ -209,11 +227,19 @@ include::kubernetes/state_deployment.asciidoc[]
 
 include::kubernetes/state_node.asciidoc[]
 
+include::kubernetes/state_persistentvolumeclaim.asciidoc[]
+
 include::kubernetes/state_pod.asciidoc[]
 
 include::kubernetes/state_replicaset.asciidoc[]
 
+include::kubernetes/state_resourcequota.asciidoc[]
+
+include::kubernetes/state_service.asciidoc[]
+
 include::kubernetes/state_statefulset.asciidoc[]
+
+include::kubernetes/state_storageclass.asciidoc[]
 
 include::kubernetes/system.asciidoc[]
 

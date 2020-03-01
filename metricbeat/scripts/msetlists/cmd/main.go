@@ -22,11 +22,20 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/libbeat/paths"
 	_ "github.com/elastic/beats/metricbeat/include"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/scripts/msetlists"
 )
 
 func main() {
+	// Disable permission checks so it reads light modules in any case
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+
+	path := paths.Resolve(paths.Home, "../metricbeat/module")
+	lm := mb.NewLightModulesSource(path)
+	mb.Registry.SetSecondarySource(lm)
+
 	msList := msetlists.DefaultMetricsets()
 
 	raw, err := json.MarshalIndent(msList, "", "  ")

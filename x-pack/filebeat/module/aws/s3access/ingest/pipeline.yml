@@ -10,16 +10,21 @@ processors:
           %{S3OPERATION:aws.s3access.operation} (?:-|%{S3KEY:aws.s3access.key}) (?:-|\"%{DATA:aws.s3access.request_uri}\")
           %{NUMBER:aws.s3access.http_status:long} (?:-|%{WORD:aws.s3access.error_code}) (?:-|%{NUMBER:aws.s3access.bytes_sent:long})
           (?:-|%{NUMBER:aws.s3access.object_size:long}) (?:-|%{NUMBER:aws.s3access.total_time:long}) (?:-|%{NUMBER:aws.s3access.turn_around_time:long})
-          (?:-|\"%{DATA:aws.s3access.referrer}\") (?:-|\"(-|%{DATA:aws.s3access.user_agent})\") (?:-|%{S3KEY:aws.s3access.version_id})
+          (?:-|\"-\"|\"%{DATA:aws.s3access.referrer}\") (?:-|\"(-|%{DATA:aws.s3access.user_agent})\") (?:-|%{S3KEY:aws.s3access.version_id})
           (?:-|%{S3ID:aws.s3access.host_id}) (?:-|%{S3VERSION:aws.s3access.signature_version}) (?:-|%{S3KEY:aws.s3access.cipher_suite})
           (?:-|%{WORD:aws.s3access.authentication_type}) (?:-|%{S3ID:aws.s3access.host_header}) (?:-|%{S3VERSION:aws.s3access.tls_version})
       pattern_definitions:
         S3REQUESTER: "[a-zA-Z0-9\\/_\\.\\-%:@]+"
         S3REQUESTID: "[a-zA-Z0-9]+"
         S3OPERATION: "%{WORD}.%{WORD}.%{WORD}"
-        S3KEY: "[a-zA-Z0-9\\/_\\.\\-%]+"
+        S3KEY: "[a-zA-Z0-9\\/_\\.\\-%+]+"
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
+
+  - append:
+      if: "ctx?.aws?.s3access?.bucket_owner != null"
+      field: related.user
+      value: "{{aws.s3access.bucket_owner}}"
 
   #
   # Parse the date included in s3 access logs
@@ -30,6 +35,104 @@ processors:
       ignore_failure: true
       formats:
         - "dd/MMM/yyyy:H:m:s Z"
+
+  - set:
+      if: "ctx?.aws?.s3access?.remote_ip != null"
+      field: client.ip
+      value: "{{aws.s3access.remote_ip}}"
+
+  - append:
+      if: "ctx?.aws?.s3access?.remote_ip != null"
+      field: related.ip
+      value: "{{aws.s3access.remote_ip}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.remote_ip != null"
+      field: client.address
+      value: "{{aws.s3access.remote_ip}}"
+
+  - geoip:
+      if: "ctx?.aws?.s3access?.remote_ip != null"
+      field: aws.s3access.remote_ip
+      target_field: geo
+
+  - set:
+      if: "ctx?.aws?.s3access?.requester != null"
+      field: client.user.id
+      value: "{{aws.s3access.requester}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.request_id != null"
+      field: event.id
+      value: "{{aws.s3access.request_id}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.operation != null"
+      field: event.action
+      value: "{{aws.s3access.operation}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.http_status != null"
+      field: http.response.status_code
+      value: "{{aws.s3access.http_status}}"
+
+  - convert:
+      if: "ctx?.http?.response?.status_code != null"
+      field: http.response.status_code
+      type: long
+
+  - set:
+      if: "ctx?.aws?.s3access?.error_code != null"
+      field: event.outcome
+      value: failure
+
+  - set:
+      if: "ctx?.aws?.s3access?.error_code != null"
+      field: event.code
+      value: "{{aws.s3access.error_code}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.error_code == null"
+      field: event.outcome
+      value: success
+
+  - set:
+      if: "ctx?.aws?.s3access?.total_time != null"
+      field: event.duration
+      value: "{{aws.s3access.total_time}}"
+
+  - set:
+      if: "ctx?.aws?.s3access?.referrer != null"
+      field: http.request.referrer
+      value: "{{aws.s3access.referrer}}"
+
+  - user_agent:
+      if: "ctx?.aws?.s3access?.user_agent != null"
+      field: aws.s3access.user_agent
+
+  - set:
+      field: tls.cipher
+      value: '{{aws.s3access.cipher_suite}}'
+      if: ctx.aws?.s3access?.cipher_suite != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.s3access?.tls_version != null
+      source: >-
+        def parts = ctx.aws.s3access.tls_version.toLowerCase().splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        ctx.tls.version = parts[1];
+        ctx.tls.version_protocol = parts[0]
+
+  - set:
+      field: cloud.provider
+      value: aws
+
+  - set:
+      field: event.kind
+      value: event
 
   #
   # Remove temporary fields

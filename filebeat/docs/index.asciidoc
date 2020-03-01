@@ -1,12 +1,13 @@
 = Filebeat Reference
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat/docs
 
-include::{libbeat-dir}/docs/version.asciidoc[]
+include::{libbeat-dir}/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :beatname_pkg: {beatname_lc}
@@ -18,10 +19,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_solutions:
 :ignores_max_retries:
 :has_docker_label_ex:
-:has_decode_cef_processor:
-:has_decode_csv_fields_processor:
-:has_script_processor:
-:has_timestamp_processor:
 :has_modules_command:
 :has_registry:
 :deb_os:
@@ -31,7 +28,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :docker_platform:
 :win_os:
 
-include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -39,7 +36,7 @@ include::./getting-started.asciidoc[]
 
 include::./modules-getting-started.asciidoc[]
 
-include::{libbeat-dir}/docs/repositories.asciidoc[]
+include::{libbeat-dir}/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -49,19 +46,19 @@ include::./how-filebeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-central-management.asciidoc[]
+include::{libbeat-dir}/shared-central-management.asciidoc[]
 
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
+include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
+include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
+include::{libbeat-dir}/contributing-to-beats.asciidoc[]
 

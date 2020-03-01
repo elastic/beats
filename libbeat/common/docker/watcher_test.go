@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -457,7 +459,7 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 		done:       make(chan interface{}),
 	}
 
-	w, err := NewWatcherWithClient(client, 200*time.Millisecond, enable)
+	w, err := NewWatcherWithClient(logp.L(), client, 200*time.Millisecond, enable)
 	if err != nil {
 		t.Fatal(err)
 	}

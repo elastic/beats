@@ -14,31 +14,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
-const xPackURL = "/_xpack"
+const xPackURL = "/_license"
 
 // params defaults query parameters to send to the '_xpack' endpoint by default we only need
 // machine parseable data.
 var params = map[string]string{
 	"human": "false",
-}
-
-var stateLookup = map[string]State{
-	"inactive": Inactive,
-	"active":   Active,
-}
-
-var licenseLookup = map[string]LicenseType{
-	"oss":      OSS,
-	"trial":    Trial,
-	"standard": Standard,
-	"basic":    Basic,
-	"gold":     Gold,
-	"platinum": Platinum,
 }
 
 // UnmarshalJSON takes a bytes array and convert it to the appropriate license type.
@@ -143,8 +128,7 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 
 // Xpack Response, temporary struct to merge the features into the license struct.
 type xpackResponse struct {
-	License  License  `json:"license"`
-	Features features `json:"features"`
+	License License `json:"license"`
 }
 
 func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
@@ -155,7 +139,6 @@ func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 	}
 
 	license := info.License
-	license.Features = info.Features
 
 	return &license, nil
 }
@@ -206,21 +189,4 @@ func newESClientMux(clients []elasticsearch.Client) *esClientMux {
 	})
 
 	return &esClientMux{idx: idx, clients: tmp}
-}
-
-// Create takes a raw configuration and will create a a license manager based on the elasticsearch
-// output configuration, if no output is found we return an error.
-func Create(cfg *common.ConfigNamespace, refreshDelay, graceDelay time.Duration) (*Manager, error) {
-	if !cfg.IsSet() || cfg.Name() != "elasticsearch" {
-		return nil, ErrNoElasticsearchConfig
-	}
-
-	clients, err := elasticsearch.NewElasticsearchClients(cfg.Config())
-	if err != nil {
-		return nil, err
-	}
-	clientsMux := newESClientMux(clients)
-
-	manager := New(clientsMux, refreshDelay, graceDelay)
-	return manager, nil
 }

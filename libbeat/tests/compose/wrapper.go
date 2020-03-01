@@ -21,6 +21,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -36,6 +37,8 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 const (
@@ -53,7 +56,7 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := client.NewEnvClient()
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -183,12 +186,21 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
+	// Try to pull the image before building it
+	var stderr bytes.Buffer
+	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	pull.Stdout = nil
+	pull.Stderr = &stderr
+	if err := pull.Run(); err != nil {
+		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
+	}
+
 	err := d.cmd(ctx, "up", args...).Run()
 	if err != nil {
 		return err
 	}
 	if opts.SetupAdvertisedHostEnvFile {
-		return d.setupAdvertisedHost(ctx, service)
+		return d.setupAdvertisedHost(ctx, service, opts.SetupAdvertisedHostEnvFilePort)
 	}
 	return nil
 }
@@ -227,7 +239,7 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 // setupAdvertisedHost adds a file to a container with its address, this can
 // be used in services that need to configure an address to be advertised to
 // clients.
-func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string) error {
+func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string, port int) error {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
 	if err != nil {
 		return errors.Wrap(err, "setupAdvertisedHost")
@@ -238,7 +250,7 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string)
 
 	for _, c := range containers {
 		w := &wrapperContainer{info: c}
-		content := fmt.Sprintf("SERVICE_HOST=%s", w.Host())
+		content := fmt.Sprintf("SERVICE_HOST=%s", w.HostForPort(port))
 
 		err := writeToContainer(ctx, d.client, c.ID, "/run/compose_env", content)
 		if err != nil {
@@ -300,19 +312,101 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		}
 	}
 
+	serviceNames, err := d.serviceNames(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get container list")
+	}
+
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		c, err := d.client.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: f,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get container list")
 		}
-		containers = append(containers, c...)
+		for _, container := range list {
+			serviceName, ok := container.Labels[labelComposeService]
+			if !ok || !contains(serviceNames, serviceName) {
+				// Service is not defined in current docker compose file, ignore it
+				continue
+			}
+			containers = append(containers, container)
+		}
 	}
 
 	return containers, nil
+}
+
+// KillOld is a workaround for issues in CI with heavy load caused by having too many
+// running containers.
+// It kills all containers not related to services in `except`.
+func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
+	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return errors.Wrap(err, "listing containers to be killed")
+	}
+	for _, container := range list {
+		container := wrapperContainer{info: container}
+		serviceName, ok := container.info.Labels[labelComposeService]
+		if !ok || contains(except, serviceName) {
+			continue
+		}
+
+		if container.Running() && container.Old() {
+			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+		}
+	}
+	return nil
+}
+
+func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
+	var stdout bytes.Buffer
+	cmd := d.cmd(ctx, "config", "--services")
+	cmd.Stdout = &stdout
+	err := cmd.Run()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get list of service names")
+	}
+	return strings.Fields(stdout.String()), nil
+}
+
+// Inspect a container.
+func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
+	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return "", errors.Wrap(err, "listing containers to be inspected")
+	}
+
+	var found bool
+	var c types.Container
+	for _, container := range list {
+		aServiceName, ok := container.Labels[labelComposeService]
+		if ok && serviceName == aServiceName {
+			c = container
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return "", errors.Errorf("container not found for service '%s'", serviceName)
+	}
+
+	inspect, err := d.client.ContainerInspect(ctx, c.ID)
+	if err != nil {
+		return "", errors.Wrap(err, "container failed inspection")
+	} else if inspect.State == nil {
+		return "empty container state", nil
+	}
+
+	state, err := json.Marshal(inspect.State)
+	if err != nil {
+		return "", errors.Wrap(err, "container inspection failed")
+	}
+
+	return string(state), nil
 }
 
 func makeFilter(project, service string, projectFilter Filter) filters.Args {

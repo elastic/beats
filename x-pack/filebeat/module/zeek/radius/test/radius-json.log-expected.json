@@ -1,0 +1,28 @@
+[
+    {
+        "@timestamp": "2008-08-01T22:52:17.916Z",
+        "destination.address": "10.0.0.100",
+        "destination.ip": "10.0.0.100",
+        "destination.port": 1812,
+        "event.dataset": "zeek.radius",
+        "event.id": "CRe9VD3flCDWbPmpIh",
+        "event.module": "zeek",
+        "fileset.name": "radius",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:3SdDgWXPnheV2oGfVmxQjfwtr8E=",
+        "network.protocol": "radius",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "10.0.0.1",
+        "source.ip": "10.0.0.1",
+        "source.port": 1645,
+        "tags": [
+            "zeek.radius"
+        ],
+        "zeek.radius.mac": "00:14:22:e9:54:5e",
+        "zeek.radius.result": "success",
+        "zeek.radius.username": "John.McGuirk",
+        "zeek.session_id": "CRe9VD3flCDWbPmpIh"
+    }
+]

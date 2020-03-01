@@ -5,14 +5,16 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-beat]]
 == Beat module
 
-This is the Beat module.
+The Beat module contains a minimal set of metrics to enable monitoring of any Beat or other software based on libbeat across
+multiple versions. To monitor more Beat metrics, use our {stack}
+{monitor-features}.
 
 The default metricsets are `state` and `stats`.
 
 [float]
-=== Compability
+=== Compatibility
 
-The beat module is tested with metricbeat 7.3.0.
+The Beat module works with Beats 7.3.0 and later.
 
 
 [float]

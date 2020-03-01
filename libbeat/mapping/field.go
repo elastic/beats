@@ -76,8 +76,9 @@ type Field struct {
 	UrlTemplate          []VersionizedString `config:"url_template"`
 	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
-	Overwrite bool `config:"overwrite"`
-	Path      string
+	Overwrite    bool  `config:"overwrite"`
+	DefaultField *bool `config:"default_field"`
+	Path         string
 }
 
 // ObjectTypeCfg defines type and configuration of object attributes
@@ -131,6 +132,8 @@ func (f *Field) validateType() error {
 		return dateType.validate(f.Format)
 	case "geo_point":
 		return geoPointType.validate(f.Format)
+	case "date_range":
+		return dateRangeType.validate(f.Format)
 	case "boolean", "binary", "ip", "alias", "array":
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
@@ -157,10 +160,11 @@ type fieldTypeGroup struct {
 }
 
 var (
-	stringType   = fieldTypeGroup{"string", []string{"string", "url"}}
-	numberType   = fieldTypeGroup{"number", []string{"string", "url", "bytes", "duration", "number", "percent", "color"}}
-	dateType     = fieldTypeGroup{"date", []string{"string", "url", "date"}}
-	geoPointType = fieldTypeGroup{"geo_point", []string{"geo_point"}}
+	stringType    = fieldTypeGroup{"string", []string{"string", "url"}}
+	numberType    = fieldTypeGroup{"number", []string{"string", "url", "bytes", "duration", "number", "percent", "color"}}
+	dateType      = fieldTypeGroup{"date", []string{"string", "url", "date"}}
+	geoPointType  = fieldTypeGroup{"geo_point", []string{"geo_point"}}
+	dateRangeType = fieldTypeGroup{"date_range", []string{"date_range"}}
 )
 
 func (g *fieldTypeGroup) validate(formatter string) error {

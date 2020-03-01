@@ -64,7 +64,7 @@ func (w *clientWorker) run() {
 			w.observer.outBatchSend(len(batch.events))
 
 			if err := w.client.Publish(batch); err != nil {
-				return
+				break
 			}
 		}
 	}

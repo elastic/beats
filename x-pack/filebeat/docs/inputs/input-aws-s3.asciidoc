@@ -30,8 +30,8 @@ stopped and the sqs message will be returned back to the queue.
 {beatname_lc}.inputs:
 - type: s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  access_key_id: my-access-key
-  secret_access_key: my-secret-access-key
+  credential_profile_name: elastic-beats
+  expand_event_list_from_field: Records
 ----
 
 The `s3` input supports the following configuration options plus the
@@ -45,12 +45,56 @@ URL of the AWS SQS queue that messages will be received from. Required.
 [float]
 ==== `visibility_timeout`
 
-The duration (in seconds) that the received messages are hidden from subsequent
+The duration that the received messages are hidden from subsequent
 retrieve requests after being retrieved by a ReceiveMessage request.
-This value needs to be a lot bigger than filebeat collection frequency so
+This value needs to be a lot bigger than {beatname_uc} collection frequency so
 if it took too long to read the s3 log, this sqs message will not be reprocessed.
 The default visibility timeout for a message is 300 seconds. The minimum
 is 0 seconds. The maximum is 12 hours.
+
+[float]
+==== `expand_event_list_from_field`
+
+If the fileset using this input expects to receive multiple messages bundled
+under a specific field then the config option expand_event_list_from_field value
+can be assigned the name of the field. This setting will be able to split the
+messages under the group value into separate events. For example, CloudTrail logs
+are in JSON format and events are found under the JSON object "Records".
+
+Note: When `expand_event_list_from_field` parameter is given in the config, s3
+input will assume the logs are in JSON format and decode them as JSON. Content
+type will not be checked.
+
+[float]
+==== `api_timeout`
+
+The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+will be interrupted.
+The default AWS API timeout for a message is 120 seconds. The minimum
+is 0 seconds. The maximum is half of the visibility timeout value.
+
+["source","json"]
+----
+{
+    "Records": [
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:51:00Z",
+            "awsRegion": "us-east-1",
+            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
+            ...
+        },
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:52:00Z",
+            "awsRegion": "us-east-1",
+            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
+            ...
+        }
+    ]
+}
+```
+----
 
 [float]
 ==== `aws credentials`
@@ -59,11 +103,43 @@ In order to make AWS API calls, `s3` input requires AWS credentials.Please see
  <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
+=== AWS Permissions
+Specific AWS permissions are required for IAM user to access SQS and S3:
+----
+s3:GetObject
+sqs:ReceiveMessage
+sqs:ChangeMessageVisibility
+sqs:DeleteMessage
+----
+
+[float]
 === S3 and SQS setup
 Enable bucket notification: any new object creation in S3 bucket will also
 create a notification through SQS. Please see
 https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
 for more details.
+
+[float]
+=== Parallel Processing
+Multiple Filebeat instances can read from the same SQS queues at the same time.
+To horizontally scale processing when there are large amounts of log data
+flowing into an S3 bucket, you can run multiple {beatname_uc} instances that
+read from the same SQS queues at the same time. No additional configuration is
+required.
+
+Using SQS ensures that each message in the queue is processed only once
+even when multiple {beatname_uc} instances are running in parallel. To prevent
+{beatname_uc} from receiving and processing the message more than once, set the
+visibility timeout.
+
+The visibility timeout begins when SQS returns a message to Filebeat.
+During this time, Filebeat processes and deletes the message. However, if
+Filebeat fails before deleting the message and your system doesn't call the
+DeleteMessage action for that message before the visibility timeout expires, the
+message becomes visible to other {beatname_uc} instances, and the message is
+received again. By default, the visibility timeout is set to 5 minutes for s3
+input in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read
+SQS messages and process related s3 log files.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

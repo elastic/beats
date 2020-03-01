@@ -1,0 +1,35 @@
+- name: threading
+  type: group
+  description: Threading metrics from the Catalina's ThreadPool JMX
+  release: beta
+  fields:
+    - name: busy
+      description: Current busy threads from the ThreadPool
+      type: long
+    - name: max
+      description: Max threads from the ThreadPool
+      type: long
+    - name: current
+      description: Current number of threads, taken from the ThreadPool
+      type: long
+    - name: keep_alive.total
+      description: Total keep alive on the ThreadPool
+      type: long
+    - name: keep_alive.timeout.ms
+      description: Keep alive timeout on the ThreadPool
+      type: long
+    - name: started.total
+      description: Current started threads at JVM level (from java.lang:type=Threading)
+      type: long
+    - name: user.time.ms
+      description: User time in milliseconds (from java.lang:type=Threading)
+      type: long
+    - name: cpu.time.ms
+      description: CPU time in milliseconds (from java.lang:type=Threading)
+      type: long
+    - name: total
+      description: Total threads at the JVM level (from java.lang:type=Threading)
+      type: long
+    - name: peak
+      description: Peak number of threads at JVM level (from java.lang:type=Threading)
+      type: long

@@ -36,7 +36,23 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2
 GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
 GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
-ES_HOST?="elasticsearch"
+ES_HOST?=elasticsearch
+ES_PORT?=9200
+ES_USER?=beats
+ES_PASS?=testing
+ES_HOST_SSL?=elasticsearchssl
+ES_PORT_SSL?=9200
+KIBANA_HOST?=kibana
+KIBANA_PORT?=5601
+# Kibana's Elaticsearch user
+KIBANA_ES_USER?=beats
+KIBANA_ES_PASS?=testing
+# The beat's Kibana user
+BEAT_KIBANA_USER?=${KIBANA_ES_USER}
+BEAT_KIBANA_PASS?=${KIBANA_ES_PASS}
+# Define a superuser, e.g. for initial setup
+ES_SUPERUSER_USER?=admin
+ES_SUPERUSER_PASS?=changeme
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
@@ -46,7 +62,7 @@ COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
+GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
@@ -63,7 +79,7 @@ TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration t
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
 STRESS_TEST_OPTIONS?=-timeout=20m -race -v
-GOX_OS?=linux darwin windows openbsd ## @Building List of all OS to be supported by "make crosscompile".
+GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 # XXX: Should be switched back to `snapshot` once the Elasticsearch
@@ -75,10 +91,12 @@ DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
+PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
+PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
-VIRTUALENV_PARAMS?=
+VENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
@@ -108,7 +126,7 @@ ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 
 # Create test coverage binary
 ${BEAT_NAME}.test: $(GOFILES_ALL)
-	@go build -i -o /dev/null
+	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 .PHONY: crosscompile
@@ -125,17 +143,15 @@ check: check-headers mage ## @build Checks project and source code if everything
 	@mage check
 
 .PHONY: $(.OVER)check-headers
-$(.OVER)check-headers:
+$(.OVER)check-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -license ${LICENSE}
+	@mage checkLicenseHeaders
 endif
 
 .PHONY: $(.OVER)add-headers
-$(.OVER)add-headers:
+$(.OVER)add-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
-	@go-licenser -license ${LICENSE}
+	@mage addLicenseHeaders
 endif
 
 .PHONY: fmt
@@ -175,22 +191,18 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	go test -i ${GOPACKAGES}
 	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
-	go test -i ${GOPACKAGES}
 	go test $(RACE) ${GOPACKAGES}
 
 .PHONY: integration-tests
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
-integration-tests: prepare-tests
+integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	go test -i ${GOPACKAGES}
 	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
-#
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 integration-tests-environment: prepare-tests build-image
@@ -199,20 +211,25 @@ integration-tests-environment: prepare-tests build-image
 	#
 	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
 	# by default because it can create noise if the test inside the container fails.
-	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
+	${DOCKER_COMPOSE} run \
+	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
+	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
+	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
+	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  beat make integration-tests
 
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} -e PYTHON_EXE=${PYTHON_EXE} beat make system-tests
 
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
@@ -241,7 +258,7 @@ load-tests: ## @testing Runs load tests
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -e ${PYTHON_ENV}/bin/activate || virtualenv $(if ${PYTHON_EXE},-p ${PYTHON_EXE}) ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
+	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
@@ -299,8 +316,8 @@ testsuite: clean update
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
-coverage-report:
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
+coverage-report: python-env
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
 	go tool cover -html=${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 	test ! -s ${COVERAGE_DIR}/integration.cov   || go tool cover -html=${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
 	test ! -s ${COVERAGE_DIR}/system.cov || go tool cover -html=${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
@@ -328,7 +345,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
@@ -337,7 +354,7 @@ endif
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
 	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 endif
 
 .PHONY: docs
@@ -382,10 +399,23 @@ stop-environment:
 write-environment:
 	mkdir -p ${BUILD_DIR}
 	echo "BEAT_STRICT_PERMS=false" > ${BUILD_DIR}/test.env
+	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
-	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
-	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
-	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_HOST_SSL=${ES_HOST_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT_SSL=${ES_PORT_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_PASS=${ES_SUPERUSER_PASS}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_HOST=${KIBANA_HOST}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PORT=${KIBANA_PORT}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_USER=${BEAT_KIBANA_USER}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PASS=${BEAT_KIBANA_PASS}" >> ${BUILD_DIR}/test.env
+	# set Kibana ENV variables
+	echo "ELASTICSEARCH_URL=${ES_HOST}:${ES_PORT}" > ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_USERNAME=${KIBANA_ES_USER}" >> ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_PASSWORD=${KIBANA_ES_PASS}" >> ${BUILD_DIR}/kibana.test.env
 
 # Tails the environment logs
 .PHONY: env-logs
@@ -393,8 +423,7 @@ env-logs:
 	${DOCKER_COMPOSE} logs -f
 
 fix-permissions:
-	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
+	sh ${ES_BEATS}/script/fix_permissions.sh "${PWD}"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
@@ -403,10 +432,10 @@ get_version: ## @packaging get the version of the beat.
 	@${ES_BEATS}/dev-tools/get_version
 
 help: ## @help Show this help.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
 
 help_variables: ## @help Show Makefile customizable variables.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
 
 # Generates a seccomp whitelist policy for the binary pointed to by
 # SECCOMP_BINARY.

@@ -219,8 +219,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1MiwxXQ=="
+      "updated_at": "2019-09-12T16:35:04.005Z",
+      "version": "WzYwMDMsN10="
     },
     {
       "attributes": {
@@ -241,6 +241,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -248,6 +249,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -260,7 +262,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeWriteOps.avg",
+                    "field": "aws.ebs.metrics.VolumeWriteOps.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -270,7 +272,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -289,8 +291,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1MywxXQ=="
+      "updated_at": "2019-09-12T16:31:45.681Z",
+      "version": "WzU5ODMsN10="
     },
     {
       "attributes": {
@@ -311,6 +313,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -318,6 +321,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -330,7 +334,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeReadOps.avg",
+                    "field": "aws.ebs.metrics.VolumeReadOps.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -340,7 +344,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -359,8 +363,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1NCwxXQ=="
+      "updated_at": "2019-09-12T16:31:31.261Z",
+      "version": "WzU5ODEsN10="
     },
     {
       "attributes": {
@@ -381,6 +385,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -388,6 +393,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -400,7 +406,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeWriteBytes.avg",
+                    "field": "aws.ebs.metrics.VolumeWriteBytes.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -410,7 +416,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -429,8 +435,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1NSwxXQ=="
+      "updated_at": "2019-09-12T16:32:46.176Z",
+      "version": "WzU5OTAsN10="
     },
     {
       "attributes": {
@@ -451,6 +457,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -458,6 +465,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -470,7 +478,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeReadBytes.avg",
+                    "field": "aws.ebs.metrics.VolumeReadBytes.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -480,7 +488,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -499,8 +507,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1NiwxXQ=="
+      "updated_at": "2019-09-12T16:32:02.907Z",
+      "version": "WzU5ODUsN10="
     },
     {
       "attributes": {
@@ -521,6 +529,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -528,6 +537,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -540,7 +550,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeQueueLength.avg",
+                    "field": "aws.ebs.metrics.VolumeQueueLength.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -550,7 +560,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -569,8 +579,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI1NywxXQ=="
+      "updated_at": "2019-09-12T16:30:59.507Z",
+      "version": "WzU5NzgsN10="
     },
     {
       "attributes": {
@@ -591,6 +601,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -598,6 +609,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -610,7 +622,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeTotalWriteTime.sum",
+                    "field": "aws.ebs.metrics.VolumeTotalWriteTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -620,7 +632,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -639,8 +651,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:35:39.480Z",
-      "version": "WzU4MiwxXQ=="
+      "updated_at": "2019-09-12T16:32:19.881Z",
+      "version": "WzU5ODcsN10="
     },
     {
       "attributes": {
@@ -661,6 +673,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -668,6 +681,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -680,7 +694,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeTotalReadTime.sum",
+                    "field": "aws.ebs.metrics.VolumeTotalReadTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -690,7 +704,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -709,8 +723,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:58:30.205Z",
-      "version": "WzU4NSwxXQ=="
+      "updated_at": "2019-09-12T16:33:13.538Z",
+      "version": "WzU5OTMsN10="
     },
     {
       "attributes": {
@@ -753,7 +767,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeIdleTime.sum",
+                    "field": "aws.ebs.metrics.VolumeIdleTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -763,7 +777,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.VolumeId",
+                "terms_field": "aws.dimensions.VolumeId",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
               }
             ],
@@ -782,8 +796,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:45:56.417Z",
-      "version": "WzU4NCwxXQ=="
+      "updated_at": "2019-09-12T16:31:19.709Z",
+      "version": "WzU5ODAsN10="
     },
     {
       "attributes": {
@@ -805,7 +819,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "aws.cloudwatch.dimensions.VolumeId",
+                "fieldName": "aws.dimensions.VolumeId",
                 "id": "1565034367477",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "volume id",
@@ -840,8 +854,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:01.848Z",
-      "version": "WzI2MSwxXQ=="
+      "updated_at": "2019-09-12T16:29:31.115Z",
+      "version": "WzU2MTIsN10="
     },
     {
       "attributes": {
@@ -882,7 +896,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Region Filter [Metricbeat AWS]",
+          "title": "AWS Region Filter",
           "type": "input_control_vis"
         }
       },
@@ -898,8 +912,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-08-07T23:07:05.935Z",
-      "version": "WzMwMywxXQ=="
+      "updated_at": "2019-09-12T16:29:35.238Z",
+      "version": "WzU2NTQsN10="
     }
   ],
   "version": "7.3.0"

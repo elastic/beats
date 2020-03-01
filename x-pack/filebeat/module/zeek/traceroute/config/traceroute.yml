@@ -1,0 +1,29 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.traceroute"
+
+        - from: "zeek.traceroute.src"
+          to: "source.address"
+
+        - from: "zeek.traceroute.dst"
+          to: "destination.address"
+
+        - from: "zeek.traceroute.proto"
+          to: "network.transport"
+
+      ignore_missing: true
+      fail_on_error: false

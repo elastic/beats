@@ -28,12 +28,14 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.timestamp"
 
 func init() {
 	processors.RegisterPlugin("timestamp", New)
+	jsprocessor.RegisterPlugin("Timestamp", New)
 }
 
 type processor struct {
@@ -55,7 +57,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
-	loc, err := tz.LoadLocation(c.Timezone)
+	loc, err := loadLocation(c.Timezone)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load timezone")
 	}
@@ -80,6 +82,21 @@ func newFromConfig(c config) (*processor, error) {
 	}
 
 	return p, nil
+}
+
+var timezoneFormats = []string{"-07", "-0700", "-07:00"}
+
+func loadLocation(timezone string) (*time.Location, error) {
+	for _, format := range timezoneFormats {
+		t, err := time.Parse(format, timezone)
+		if err == nil {
+			name, offset := t.Zone()
+			return time.FixedZone(name, offset), nil
+		}
+	}
+
+	// Rest of location formats
+	return tz.LoadLocation(timezone)
 }
 
 func (p *processor) String() string {

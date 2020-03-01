@@ -29,12 +29,14 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
 func init() {
 	processors.RegisterPlugin("add_host_metadata", New)
+	jsprocessor.RegisterPlugin("AddHostMetadata", New)
 }
 
 type addHostMetadata struct {

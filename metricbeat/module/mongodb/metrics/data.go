@@ -22,7 +22,7 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
-var schema = s.Schema{
+var schemaMetrics = s.Schema{
 	"commands": c.Dict("metrics.commands", s.Schema{
 		"is_self":                 c.Dict("_isSelf", commandSchema),
 		"aggregate":               c.Dict("aggregate", commandSchema),
