@@ -92,6 +92,7 @@ type httpPlugin struct {
 	redactHeaders       []string
 	maxMessageSize      int
 	mustDecodeBody      bool
+
 	storeRawDataWithBinary bool
 
 	parserConfig parserConfig
