@@ -6,8 +6,14 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
-    - name: jolokia
-      type: group
+    - name: jvm.jmx.metrics.string.*
+      type: object
+      object_type: keyword
       description: >
-          jolokia contains metrics exposed via jolokia agent
-      fields:
+        JMX string metrics
+    - name: jvm.jmx.metrics.numeric.*
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        JMX numeric metrics
