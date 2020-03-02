@@ -25,6 +25,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
+
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/pkg/errors"
@@ -107,7 +109,7 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	var q Query
+	var q pdh.Query
 	err := q.Open()
 	if err != nil {
 		t.Fatal(err)
@@ -118,7 +120,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = q.AddCounter(path[0], counter, false)
+	err = q.AddCounter(path[0], counter.InstanceName, counter.Format, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +180,7 @@ func TestNonExistingCounter(t *testing.T) {
 	config.CounterConfig[0].Format = "float"
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
 	}
 
 	if handle != nil {
@@ -201,7 +203,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 	values, err := handle.Read()
 
 	if assert.Error(t, err) {
-		assert.EqualValues(t, PDH_NO_DATA, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_NO_DATA, errors.Cause(err))
 	}
 
 	if handle != nil {
@@ -222,7 +224,7 @@ func TestNonExistingObject(t *testing.T) {
 	config.CounterConfig[0].Format = "float"
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
 	}
 
 	if handle != nil {
@@ -232,7 +234,7 @@ func TestNonExistingObject(t *testing.T) {
 }
 
 func TestLongOutputFormat(t *testing.T) {
-	var query Query
+	var query pdh.Query
 	err := query.Open()
 	if err != nil {
 		t.Fatal(err)
@@ -244,8 +246,8 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter, false)
-	if err != nil && err != PDH_NO_MORE_DATA {
+	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	if err != nil && err != pdh.PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
 
@@ -272,7 +274,7 @@ func TestLongOutputFormat(t *testing.T) {
 }
 
 func TestFloatOutputFormat(t *testing.T) {
-	var query Query
+	var query pdh.Query
 	err := query.Open()
 	if err != nil {
 		t.Fatal(err)
@@ -284,8 +286,8 @@ func TestFloatOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter, false)
-	if err != nil && err != PDH_NO_MORE_DATA {
+	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	if err != nil && err != pdh.PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
 

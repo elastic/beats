@@ -17,7 +17,7 @@
 
 // +build windows
 
-package perfmon
+package pdh
 
 import (
 	"strconv"
