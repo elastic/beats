@@ -32,6 +32,16 @@ function OktaSystem(keep_original_message) {
         evt.Delete("message");
     };
 
+    var categorizeEvent = new processor.AddFields({
+        target: "event",
+        fields: {
+            category: "authentication",
+            kind: "event",
+            type: "access",
+
+        },
+    });
+
     var convertFields = new processor.Convert({
         fields: [
             { from: "json.displayMessage", to: "okta.display_message" },
@@ -57,29 +67,29 @@ function OktaSystem(keep_original_message) {
             { from: "json.target", to: "okta.target" },
             { from: "json.transaction.id", to: "okta.transaction.id" },
             { from: "json.transaction.type", to: "okta.transaction.type" },
-            { from: "json.debugContext.debugData.deviceFingerprint", to: "okta.debug_context.debug_data.device_fingerprint" },
-            { from: "json.debugContext.debugData.requestId", to: "okta.debug_context.debug_data.request_id" },
-            { from: "json.debugContext.debugData.requestUri", to: "okta.debug_context.debug_data.request_uri" },
-            { from: "json.debugContext.debugData.threatSuspected", to: "okta.debug_context.debug_data.threat_suspected" },
-            { from: "json.debugContext.debugData.url", to: "okta.debug_context.debug_data.url" },
-            { from: "json.authenticationContext.authenticationProvider", to: "okta.authentication_context.authentication_provider" },
-            { from: "json.authenticationContext.authenticationStep", to: "okta.authentication_context.authentication_step" },
-            { from: "json.authenticationContext.credentialProvider", to: "okta.authentication_context.credential_provider" },
-            { from: "json.authenticationContext.credentialType", to: "okta.authentication_context.credential_type" },
-            { from: "json.authenticationContext.externalSessionId", to: "okta.authentication_context.external_session_id" },
-            { from: "json.authenticationContext.interface", to: "okta.authentication_context.authentication_provider" },
-            { from: "json.authenticationContext.issuer", to: "okta.authentication_context.issuer" },
-            { from: "json.securityContext.asNumber", to: "okta.security_context.as.number" },
-            { from: "json.securityContext.asOrg", to: "okta.security_context.as.organization.name" },
-            { from: "json.securityContext.domain", to: "okta.security_context.domain" },
-            { from: "json.securityContext.isProxy", to: "okta.security_context.is_proxy" },
-            { from: "json.securityContext.isp", to: "okta.security_context.isp" },
+            { from: "json.debugcontext.debugdata.devicefingerprint", to: "okta.debug_context.debug_data.device_fingerprint" },
+            { from: "json.debugcontext.debugdata.requestid", to: "okta.debug_context.debug_data.request_id" },
+            { from: "json.debugcontext.debugdata.requesturi", to: "okta.debug_context.debug_data.request_uri" },
+            { from: "json.debugcontext.debugdata.threatsuspected", to: "okta.debug_context.debug_data.threat_suspected" },
+            { from: "json.debugcontext.debugdata.url", to: "okta.debug_context.debug_data.url" },
+            { from: "json.authenticationcontext.authenticationprovider", to: "okta.authentication_context.authentication_provider" },
+            { from: "json.authenticationcontext.authenticationstep", to: "okta.authentication_context.authentication_step" },
+            { from: "json.authenticationcontext.credentialprovider", to: "okta.authentication_context.credential_provider" },
+            { from: "json.authenticationcontext.credentialtype", to: "okta.authentication_context.credential_type" },
+            { from: "json.authenticationcontext.externalsessionid", to: "okta.authentication_context.external_session_id" },
+            { from: "json.authenticationcontext.interface", to: "okta.authentication_context.authentication_provider" },
+            { from: "json.authenticationcontext.issuer", to: "okta.authentication_context.issuer" },
+            { from: "json.securitycontext.asnumber", to: "okta.security_context.as.number" },
+            { from: "json.securitycontext.asorg", to: "okta.security_context.as.organization.name" },
+            { from: "json.securitycontext.domain", to: "okta.security_context.domain" },
+            { from: "json.securitycontext.isproxy", to: "okta.security_context.is_proxy" },
+            { from: "json.securitycontext.isp", to: "okta.security_context.isp" },
         ],
         mode: "rename",
         ignore_missing: true,
     });
 
-    var copyFields = new processor.Convert({
+    var copyfields = new processor.convert({
         fields: [
             { from: "okta.client.user_agent.raw_user_agent", to: "user_agent.original" },
             { from: "okta.client.ip", to: "client.ip" },
@@ -87,6 +97,9 @@ function OktaSystem(keep_original_message) {
             { from: "okta.security_context.as", to: "client.as" },
             { from: "okta.security_context.domain", to: "client.domain" },
             { from: "okta.security_context.domain", to: "source.domain" },
+            { from: "okta.outcome.result", to: "event.outcome" },
+            { from: "okta.uuid", to: "event.id" },
+            { from: "okta.event_type", to: "event.action" },
         ],
         fail_on_error: false,
     });
@@ -105,6 +118,15 @@ function OktaSystem(keep_original_message) {
         }
     };
 
+    // Set user info if actor type is User
+    var setUserInfo = function(evt) {
+        if (evt.Get("okta.actor.type") === "User") {
+	    evt.Put("user.full_name", evt.Get("okta.actor.display_name"));
+	    evt.Put("user.id", evt.Get("okta.actor.id"));
+        }
+    };
+
+
     // Drop extra fields
     var dropExtraFields = function(evt) {
         evt.Delete("json");
@@ -115,9 +137,11 @@ function OktaSystem(keep_original_message) {
         .Add(parseTimestamp)
         .Add(saveOriginalMessage)
         .Add(dropOriginalMessage)
+        .Add(categorizeEvent)
         .Add(convertFields)
         .Add(copyFields)
         .Add(renameNestedFields)
+        .Add(setUserInfo)
         .Add(dropExtraFields)
         .Build();
 
