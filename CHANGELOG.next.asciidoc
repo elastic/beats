@@ -127,7 +127,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Windows .exe files now have embedded file version info. {issue}15232[15232]t
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
-- Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 
 *Auditbeat*
 
@@ -198,14 +197,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
-- Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
-- Add region parameter in googlecloud module. {issue}15780[15780] {pull}16203[16203]
-- Add support for NATS 2.1. {pull}16317[16317]
-- Add Load Balancing metricset to GCP {pull}15559[15559]
-- Add support for Dropwizard metrics 4.1. {pull}16332[16332]
-- Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
-- Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
-- Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 
 *Packetbeat*
 
