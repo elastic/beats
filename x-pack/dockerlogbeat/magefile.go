@@ -203,11 +203,6 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 
 // Uninstall removes working objects and containers
 func Uninstall(ctx context.Context) error {
-	// name, err := getPluginName()
-	// if err != nil {
-	// 	return err
-	// }
-
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return errors.Wrap(err, "Error creating docker client")
