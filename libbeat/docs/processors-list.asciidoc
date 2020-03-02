@@ -104,7 +104,6 @@ endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
-
 ifndef::no_add_cloud_metadata_processor[]
 include::{libbeat-processors-dir}/add_cloud_metadata/docs/add_cloud_metadata.asciidoc[]
 endif::[]
@@ -206,4 +205,3 @@ include::{libbeat-processors-dir}/translate_sid/docs/translate_sid.asciidoc[]
 endif::[]
 
 //# end::processors-include[]
-
