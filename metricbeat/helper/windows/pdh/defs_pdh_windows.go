@@ -20,7 +20,7 @@
 
 // +build ignore
 
-package perfmon
+package pdh
 
 /*
 #include <pdh.h>
