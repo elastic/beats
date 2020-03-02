@@ -2,7 +2,6 @@
 // be preserved.
 
 //# tag::processors-list[]
-
 ifndef::no_add_cloud_metadata_processor[]
 * <<add-cloud-metadata,`add_cloud_metadata`>>
 endif::[]
@@ -207,5 +206,4 @@ include::{libbeat-processors-dir}/translate_sid/docs/translate_sid.asciidoc[]
 endif::[]
 
 //# end::processors-include[]
-
 
