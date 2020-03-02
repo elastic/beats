@@ -258,6 +258,10 @@ func (s *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightM
 func (s *LightModulesSource) moduleNames() ([]string, error) {
 	modules := make(map[string]bool)
 	for _, dir := range s.paths {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			s.log.Debugf("Light modules directory '%d' doesn't exist", dir)
+			continue
+		}
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
 			return nil, errors.Wrapf(err, "listing modules on path '%s'", dir)
