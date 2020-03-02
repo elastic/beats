@@ -169,7 +169,7 @@ func connectTCP(timeout time.Duration) TransportFactory {
 			Proxy:   proxy,
 			Timeout: timeout,
 		}
-		return transport.NewClient(&cfg, "tcp", addr, 0)
+		return transport.NewClient(cfg, "tcp", addr, 0)
 	}
 }
 
@@ -187,7 +187,7 @@ func connectTLS(timeout time.Duration, certName string) TransportFactory {
 			TLS:     tlsConfig,
 			Timeout: timeout,
 		}
-		return transport.NewClient(&cfg, "tcp", addr, 0)
+		return transport.NewClient(cfg, "tcp", addr, 0)
 	}
 }
 

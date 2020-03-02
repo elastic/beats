@@ -136,7 +136,7 @@ func makeRedis(
 			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
 		}
 
-		transp := &transport.Config{
+		transp := transport.Config{
 			Timeout: config.Timeout,
 			Proxy:   &config.Proxy,
 			TLS:     tls,

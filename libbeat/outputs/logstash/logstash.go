@@ -59,7 +59,7 @@ func makeLogstash(
 		return outputs.Fail(err)
 	}
 
-	transp := &transport.Config{
+	transp := transport.Config{
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,

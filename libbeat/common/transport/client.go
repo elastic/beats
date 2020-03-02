@@ -31,7 +31,7 @@ type Client struct {
 	dialer  Dialer
 	network string
 	host    string
-	config  *Config
+	config  Config
 
 	conn  net.Conn
 	mutex sync.Mutex
@@ -44,7 +44,7 @@ type Config struct {
 	Stats   IOStatser
 }
 
-func MakeDialer(c *Config) (Dialer, error) {
+func MakeDialer(c Config) (Dialer, error) {
 	var err error
 	dialer := NetDialer(c.Timeout)
 	dialer, err = ProxyDialer(c.Proxy, dialer)
@@ -61,7 +61,7 @@ func MakeDialer(c *Config) (Dialer, error) {
 	return dialer, nil
 }
 
-func NewClient(c *Config, network, host string, defaultPort int) (*Client, error) {
+func NewClient(c Config, network, host string, defaultPort int) (*Client, error) {
 	// do some sanity checks regarding network and Config matching +
 	// address being parseable
 	switch network {
@@ -83,7 +83,7 @@ func NewClient(c *Config, network, host string, defaultPort int) (*Client, error
 	return NewClientWithDialer(dialer, c, network, host, defaultPort)
 }
 
-func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort int) (*Client, error) {
+func NewClientWithDialer(d Dialer, c Config, network, host string, defaultPort int) (*Client, error) {
 	// check address being parseable
 	host = fullAddress(host, defaultPort)
 	_, _, err := net.SplitHostPort(host)

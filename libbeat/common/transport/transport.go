@@ -40,7 +40,7 @@ func (d DialerFunc) Dial(network, address string) (net.Conn, error) {
 	return d(network, address)
 }
 
-func Dial(c *Config, network, address string) (net.Conn, error) {
+func Dial(c Config, network, address string) (net.Conn, error) {
 	d, err := MakeDialer(c)
 	if err != nil {
 		return nil, err
