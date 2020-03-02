@@ -89,17 +89,17 @@ function OktaSystem(keep_original_message) {
         ignore_missing: true,
     });
 
-    var copyfields = new processor.convert({
+    var copyFields = new processor.Convert({
         fields: [
             { from: "okta.client.user_agent.raw_user_agent", to: "user_agent.original" },
             { from: "okta.client.ip", to: "client.ip" },
             { from: "okta.client.ip", to: "source.ip" },
+            { from: "okta.event_type", to: "event.action" },
+            { from: "okta.outcome.result", to: "event.outcome" },
             { from: "okta.security_context.as", to: "client.as" },
             { from: "okta.security_context.domain", to: "client.domain" },
             { from: "okta.security_context.domain", to: "source.domain" },
-            { from: "okta.outcome.result", to: "event.outcome" },
             { from: "okta.uuid", to: "event.id" },
-            { from: "okta.event_type", to: "event.action" },
         ],
         fail_on_error: false,
     });
