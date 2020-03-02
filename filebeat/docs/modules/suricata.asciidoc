@@ -16,24 +16,13 @@ Suricata Eve JSON format].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 This module has been developed against Suricata v4.0.4, but is expected to work
 with other versions of Suricata.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with sample dashboards. For example:
-
-[role="screenshot"]
-image::./images/filebeat-suricata-events.png[]
-
-[role="screenshot"]
-image::./images/filebeat-suricata-alerts.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -55,6 +44,17 @@ include::../include/config-option-intro.asciidoc[]
 ==== `eve` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/filebeat-suricata-events.png[]
+
+[role="screenshot"]
+image::./images/filebeat-suricata-alerts.png[]
 
 :has-dashboards!:
 

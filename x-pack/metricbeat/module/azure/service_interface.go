@@ -14,5 +14,5 @@ type Service interface {
 	GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error)
 	GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error)
 	GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error)
-	GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error)
+	GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error)
 }

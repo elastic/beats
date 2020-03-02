@@ -2,6 +2,10 @@
 [role="xpack"]
 === Decode CEF
 
+++++
+<titleabbrev>decode_cef</titleabbrev>
+++++
+
 beta[]
 
 The `decode_cef` processor decodes Common Event Format (CEF) messages. This
