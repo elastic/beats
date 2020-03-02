@@ -68,11 +68,11 @@ func (c *config) Validate() error {
 	case "POST":
 		break
 	default:
-		return errors.Errorf("httpjson input: Invalid http_method, %s ", c.HTTPMethod)
+		return errors.Errorf("httpjson input: Invalid http_method, %s", c.HTTPMethod)
 	}
 	if c.NoHTTPBody {
 		if len(c.HTTPRequestBody) > 0 {
-			return errors.Errorf("invalid configuration: both np_http_bpdy and http_request_body cannot be set simultaneously")
+			return errors.Errorf("invalid configuration: both no_http_body and http_request_body cannot be set simultaneously")
 		}
 		if c.Pagination != nil && (len(c.Pagination.ExtraBodyContent) > 0 || c.Pagination.RequestField != "") {
 			return errors.Errorf("invalid configuration: both no_http_body and pagination.extra_body_content or pagination.req_field cannot be set simultaneously")

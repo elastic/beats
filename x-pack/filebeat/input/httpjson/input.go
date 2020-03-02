@@ -259,7 +259,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			return errors.Wrapf(err, "failed to read http.response.body")
 		}
 		if msg.StatusCode != http.StatusOK {
-			in.log.Debug("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
+			in.log.Debugw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
 			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
 		var m, v interface{}
@@ -298,7 +298,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				}
 			}
 		default:
-			in.log.Debugf("http.response.body is not a valid JSON object", string(responseData))
+			in.log.Debug("http.response.body is not a valid JSON object", string(responseData))
 			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
 		}
 
