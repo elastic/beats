@@ -97,7 +97,6 @@ func (t testEvent) SubType() string               { return t.subType }
 func (t testEvent) Time() time.Time               { return t.timestamp }
 func (t testEvent) Message() string               { return t.message }
 func (testEvent) Payload() map[string]interface{} { return map[string]interface{}{} }
-func (testEvent) Data() string                    { return "" }
 
 func JSONString(event testEvent) string {
 	timestamp := event.timestamp.Format(timeFormat)

@@ -16,17 +16,18 @@ import (
 
 const (
 	defaultThreshold = 1000
+	agentIDKey       = "elastic.agent.id"
 )
 
 type ackFn func()
 
 type event struct {
+	AgentID   string                 `json:"agent_id"`
 	EventType string                 `json:"type"`
 	Ts        fleetapi.Time          `json:"timestamp"`
 	SubType   string                 `json:"subtype"`
 	Msg       string                 `json:"message"`
 	Payload   map[string]interface{} `json:"payload,omitempty"`
-	Data      string                 `json:"data,omitempty"`
 }
 
 func (e *event) Type() string {
@@ -43,6 +44,7 @@ func (e *event) Message() string {
 
 // Reporter is a reporter without any effects, serves just as a showcase for further implementations.
 type Reporter struct {
+	info      agentInfo
 	logger    *logger.Logger
 	queue     []fleetapi.SerializableEvent
 	qlock     sync.Mutex
@@ -57,6 +59,7 @@ type agentInfo interface {
 // NewReporter creates a new fleet reporter.
 func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig) (*Reporter, error) {
 	r := &Reporter{
+		info:      agentInfo,
 		queue:     make([]fleetapi.SerializableEvent, 0),
 		logger:    l,
 		threshold: c.Threshold,
@@ -71,12 +74,12 @@ func (r *Reporter) Report(ctx context.Context, e reporter.Event) error {
 	defer r.qlock.Unlock()
 
 	r.queue = append(r.queue, &event{
+		AgentID:   r.info.AgentID(),
 		EventType: e.Type(),
 		Ts:        fleetapi.Time(e.Time()),
 		SubType:   e.SubType(),
 		Msg:       e.Message(),
 		Payload:   e.Payload(),
-		Data:      e.Data(),
 	})
 
 	if r.threshold > 0 && len(r.queue) > r.threshold {

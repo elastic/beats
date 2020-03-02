@@ -14,6 +14,38 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
 )
 
+func TestEventsHaveAgentID(t *testing.T) {
+	// setup client
+	threshold := 10
+	r := newTestReporter(1*time.Second, threshold)
+
+	// report events
+	firstBatchSize := 5
+	ee := getEvents(firstBatchSize)
+	for _, e := range ee {
+		r.Report(context.Background(), e)
+	}
+
+	// check after delay for output
+	reportedEvents, _ := r.Events()
+	if reportedCount := len(reportedEvents); reportedCount != firstBatchSize {
+		t.Fatalf("expected %v events got %v", firstBatchSize, reportedCount)
+	}
+
+	for _, e := range reportedEvents {
+		re, ok := e.(*event)
+
+		if !ok {
+			t.Fatal("reported event is not an event")
+		}
+
+		if re.AgentID != "agentID" {
+			t.Fatalf("reported event id incorrect, expected: 'agentID', got: '%v'", re.AgentID)
+		}
+	}
+
+}
+
 func TestReporting(t *testing.T) {
 	// setup client
 	threshold := 10
@@ -179,6 +211,7 @@ func getEvents(count int) []reporter.Event {
 func newTestReporter(frequency time.Duration, threshold int) *Reporter {
 	log, _ := logger.New()
 	r := &Reporter{
+		info:      &testInfo{},
 		queue:     make([]fleetapi.SerializableEvent, 0),
 		logger:    log,
 		threshold: threshold,
@@ -187,6 +220,10 @@ func newTestReporter(frequency time.Duration, threshold int) *Reporter {
 	return r
 }
 
+type testInfo struct{}
+
+func (*testInfo) AgentID() string { return "agentID" }
+
 type testStateEvent struct{}
 
 func (testStateEvent) Type() string                    { return reporter.EventTypeState }
@@ -194,7 +231,6 @@ func (testStateEvent) SubType() string                 { return reporter.EventSu
 func (testStateEvent) Time() time.Time                 { return time.Unix(0, 1) }
 func (testStateEvent) Message() string                 { return "hello" }
 func (testStateEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-func (testStateEvent) Data() string                    { return "" }
 
 type testErrorEvent struct{}
 
@@ -203,4 +239,3 @@ func (testErrorEvent) SubType() string                 { return "PATH" }
 func (testErrorEvent) Time() time.Time                 { return time.Unix(0, 1) }
 func (testErrorEvent) Message() string                 { return "hello" }
 func (testErrorEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-func (testErrorEvent) Data() string                    { return "" }

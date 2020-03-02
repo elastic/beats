@@ -450,7 +450,6 @@ func (testStateEvent) SubType() string                 { return repo.EventSubTyp
 func (testStateEvent) Time() time.Time                 { return time.Unix(0, 1) }
 func (testStateEvent) Message() string                 { return "hello" }
 func (testStateEvent) Payload() map[string]interface{} { return map[string]interface{}{"key": 1} }
-func (testStateEvent) Data() string                    { return "" }
 
 type request struct {
 	Events []interface{} `json:"events"`
