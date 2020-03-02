@@ -46,6 +46,7 @@ type observerMetadata struct {
 	data    common.MapStrPointer
 	geoData common.MapStr
 	config  Config
+	logger  *logp.Logger
 }
 
 const (
@@ -62,6 +63,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	p := &observerMetadata{
 		config: config,
 		data:   common.NewMapStrPointer(nil),
+		logger: logp.NewLogger("add_observer_metadata"),
 	}
 	p.loadData()
 
@@ -135,7 +137,7 @@ func (p *observerMetadata) loadData() error {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
 		if err != nil {
-			logp.Info("Error when getting network information %v", err)
+			p.logger.Infof("Error when getting network information %v", err)
 		}
 
 		if len(ipList) > 0 {
