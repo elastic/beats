@@ -282,6 +282,5 @@ func (s *LightModulesSource) moduleNames() ([]string, error) {
 	for name := range modules {
 		names = append(names, name)
 	}
-
 	return names, nil
 }
