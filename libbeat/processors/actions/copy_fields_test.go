@@ -20,6 +20,8 @@ package actions
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -27,7 +29,7 @@ import (
 )
 
 func TestCopyFields(t *testing.T) {
-
+	log := logp.NewLogger("copy_fields_test")
 	var tests = map[string]struct {
 		FromTo   fromTo
 		Input    common.MapStr
@@ -130,6 +132,7 @@ func TestCopyFields(t *testing.T) {
 						test.FromTo,
 					},
 				},
+				log,
 			}
 
 			event := &beat.Event{
