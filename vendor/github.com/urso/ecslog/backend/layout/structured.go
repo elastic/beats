@@ -1,15 +1,19 @@
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+
 package layout
 
 import (
 	"bytes"
 	"io"
-	"path/filepath"
 
+	"github.com/urso/diag"
+	"github.com/urso/diag-ecs/ecs"
 	"github.com/urso/ecslog/backend"
-	"github.com/urso/ecslog/ctxtree"
-	"github.com/urso/ecslog/errx"
-	"github.com/urso/ecslog/fld"
-	"github.com/urso/ecslog/fld/ecs"
+	"github.com/urso/sderr"
 
 	structform "github.com/elastic/go-structform"
 	"github.com/elastic/go-structform/cborl"
@@ -21,7 +25,7 @@ import (
 type structLayout struct {
 	out         io.Writer
 	buf         bytes.Buffer
-	fields      *ctxtree.Ctx
+	fields      *diag.Context
 	makeEncoder func(io.Writer) structform.Visitor
 	types       *gotype.Iterator
 	typeOpts    []gotype.FoldOption
@@ -42,26 +46,26 @@ type errorVal struct {
 // Each error in the multierror must be deal separately, creating and reporting
 // it's local context.
 type multiErrOf struct {
-	err error // use errx.NumCause and errx.Cause
+	err error
 }
 
 type multiErr struct {
 	errs []error
 }
 
-func JSON(fields []fld.Field, opts ...gotype.FoldOption) Factory {
+func JSON(fields []diag.Field, opts ...gotype.FoldOption) Factory {
 	return Structured(func(w io.Writer) structform.Visitor {
 		return json.NewVisitor(w)
 	}, fields, opts...)
 }
 
-func UBJSON(fields []fld.Field, opts ...gotype.FoldOption) Factory {
+func UBJSON(fields []diag.Field, opts ...gotype.FoldOption) Factory {
 	return Structured(func(w io.Writer) structform.Visitor {
 		return ubjson.NewVisitor(w)
 	}, fields, opts...)
 }
 
-func CBOR(fields []fld.Field, opts ...gotype.FoldOption) Factory {
+func CBOR(fields []diag.Field, opts ...gotype.FoldOption) Factory {
 	return Structured(func(w io.Writer) structform.Visitor {
 		return cborl.NewVisitor(w)
 	}, fields, opts...)
@@ -69,11 +73,11 @@ func CBOR(fields []fld.Field, opts ...gotype.FoldOption) Factory {
 
 func Structured(
 	makeEncoder func(io.Writer) structform.Visitor,
-	fields []fld.Field,
+	fields []diag.Field,
 	opts ...gotype.FoldOption,
 ) Factory {
 	return func(out io.Writer) (Layout, error) {
-		logCtx := ctxtree.New(nil, nil)
+		logCtx := diag.NewContext(nil, nil)
 		logCtx.AddFields(fields...)
 
 		l := &structLayout{
@@ -97,7 +101,7 @@ func (l *structLayout) reset() {
 func (l *structLayout) UseContext() bool { return true }
 
 func (l *structLayout) Log(msg backend.Message) {
-	var userCtx, stdCtx ctxtree.Ctx
+	var userCtx, stdCtx *diag.Context
 
 	if msg.Context.Len() > 0 {
 		userCtx = msg.Context.User()
@@ -106,22 +110,21 @@ func (l *structLayout) Log(msg backend.Message) {
 
 	file := msg.Caller.File()
 
-	ctx := ctxtree.New(&stdCtx, nil)
-	ctx.AddFields([]fld.Field{
+	ctx := diag.NewContext(stdCtx, nil)
+	ctx.AddFields([]diag.Field{
 		ecs.Log.Level(msg.Level.String()),
 
-		ecs.Log.FilePath(file),
-		ecs.Log.FileBasename(filepath.Base(file)),
-		ecs.Log.FileLine(msg.Caller.Line()),
+		ecs.Log.Origin.File.Name(file),
+		ecs.Log.Origin.File.Line(msg.Caller.Line()),
 
 		ecs.Message(msg.Message),
 	}...)
 	if msg.Name != "" {
-		ctx.AddField(ecs.Log.Name(msg.Name))
+		ctx.AddField(ecs.Log.Logger(msg.Name))
 	}
 
 	if userCtx.Len() > 0 {
-		ctx.AddField(fld.Any("fields", &userCtx))
+		ctx.AddField(diag.Any("fields", &userCtx))
 	}
 
 	// Add error values to the context. So to guarantee an error value is not
@@ -132,33 +135,33 @@ func (l *structLayout) Log(msg backend.Message) {
 	case 1:
 		cause := msg.Causes[0]
 		if errCtx := buildErrCtx(cause); errCtx.Len() > 0 {
-			ctx.AddField(fld.Any("error.ctx", &errCtx))
+			ctx.AddField(diag.Any("error.ctx", &errCtx))
 		}
-		ctx.AddField(fld.String("error.message", cause.Error()))
+		ctx.AddField(diag.String("error.message", cause.Error()))
 
-		if file, line := errx.At(cause); file != "" {
-			ctx.AddField(fld.String("error.at.file", file))
-			ctx.AddField(fld.Int("error.at.line", line))
+		if file, line := sderr.At(cause); file != "" {
+			ctx.AddField(diag.String("error.at.file", file))
+			ctx.AddField(diag.Int("error.at.line", line))
 		}
 
-		n := errx.NumCauses(cause)
+		n := sderr.NumCauses(cause)
 		switch n {
 		case 0:
 			// nothing
 		case 1:
-			ctx.AddField(fld.Any("error.cause", errorVal{errx.Cause(cause, 0)}))
+			ctx.AddField(diag.Any("error.cause", errorVal{sderr.Unwrap(cause)}))
 
 		default:
-			ctx.AddField(fld.Any("error.causes", multiErrOf{cause}))
+			ctx.AddField(diag.Any("error.causes", multiErrOf{cause}))
 		}
 
 	default:
-		ctx.AddField(fld.Any("error.causes", multiErr{msg.Causes}))
+		ctx.AddField(diag.Any("error.causes", multiErr{msg.Causes}))
 	}
 
 	// link predefined fields
 	if l.fields.Len() > 0 {
-		ctx = ctxtree.New(l.fields, ctx)
+		ctx = diag.NewContext(l.fields, ctx)
 	}
 
 	v := (*structVisitor)(l)
@@ -170,7 +173,7 @@ func (l *structLayout) Log(msg backend.Message) {
 	}
 }
 
-func (v *structVisitor) Process(ctx *ctxtree.Ctx) error {
+func (v *structVisitor) Process(ctx *diag.Context) error {
 	if err := v.Begin(); err != nil {
 		return err
 	}
@@ -194,7 +197,7 @@ func (v structVisitor) OnObjEnd() error {
 	return v.visitor.OnObjectFinished()
 }
 
-func (v structVisitor) OnValue(key string, val fld.Value) error {
+func (v structVisitor) OnValue(key string, val diag.Value) error {
 	var err error
 
 	if err = v.visitor.OnKey(key); err != nil {
@@ -203,7 +206,7 @@ func (v structVisitor) OnValue(key string, val fld.Value) error {
 
 	val.Reporter.Ifc(&val, func(ifc interface{}) {
 		switch val := ifc.(type) {
-		case *ctxtree.Ctx:
+		case *diag.Context:
 			if err = v.Begin(); err != nil {
 				return
 			}
@@ -234,7 +237,7 @@ func (v structVisitor) OnErrorValue(err error, withCtx bool) error {
 		return err
 	}
 
-	if file, line := errx.At(err); file != "" {
+	if file, line := sderr.At(err); file != "" {
 		if err := v.visitor.OnKey("at"); err != nil {
 			return err
 		}
@@ -276,22 +279,22 @@ func (v structVisitor) OnErrorValue(err error, withCtx bool) error {
 		}
 	}
 
-	n := errx.NumCauses(err)
+	n := sderr.NumCauses(err)
 	switch n {
 	case 0:
 		// nothing to do
 
 	case 1:
 		// add cause
-		cause := errx.Cause(err, 0)
+		cause := sderr.Cause(err, 0)
 		if cause != nil {
-			if err := v.OnValue("cause", fld.ValAny(errorVal{cause})); err != nil {
+			if err := v.OnValue("cause", diag.ValAny(errorVal{cause})); err != nil {
 				return err
 			}
 		}
 
 	default:
-		if err := v.OnValue("causes", fld.ValAny(multiErrOf{err})); err != nil {
+		if err := v.OnValue("causes", diag.ValAny(multiErrOf{err})); err != nil {
 			return err
 		}
 
@@ -312,9 +315,9 @@ func (v structVisitor) OnMultiErrValueIter(parent error) error {
 		return err
 	}
 
-	n := errx.NumCauses(parent)
+	n := sderr.NumCauses(parent)
 	for i := 0; i < n; i++ {
-		cause := errx.Cause(parent, i)
+		cause := sderr.Cause(parent, i)
 		if cause != nil {
 			if err := v.OnErrorValue(cause, true); err != nil {
 				return err
@@ -341,21 +344,21 @@ func (v structVisitor) OnMultiErr(errs []error) error {
 	return v.visitor.OnArrayFinished()
 }
 
-func buildErrCtx(err error) (errCtx ctxtree.Ctx) {
-	var linkedCtx ctxtree.Ctx
+func buildErrCtx(err error) (errCtx *diag.Context) {
+	var linkedCtx *diag.Context
 
-	causeCtx := errx.ErrContext(err)
+	causeCtx := sderr.Context(err)
 	if causeCtx.Len() > 0 {
-		linkedCtx = linkLinearErrCtx(*causeCtx, err)
+		linkedCtx = linkLinearErrCtx(causeCtx, err)
 	} else {
 		linkedCtx = linkLinearErrCtx(linkedCtx, err)
 	}
 
 	stdCtx := linkedCtx.Standardized()
-	errCtx = ctxtree.Make(&stdCtx, nil)
+	errCtx = diag.NewContext(stdCtx, nil)
 
 	if userCtx := linkedCtx.User(); userCtx.Len() > 0 {
-		errCtx.AddField(fld.Any("fields", &userCtx))
+		errCtx.AddField(diag.Any("fields", &userCtx))
 	}
 
 	return errCtx
@@ -363,17 +366,17 @@ func buildErrCtx(err error) (errCtx ctxtree.Ctx) {
 
 // linkLinearErrCtx links all error context in a linear chain. Stops if a
 // multierror is discovered.
-func linkLinearErrCtx(ctx ctxtree.Ctx, err error) ctxtree.Ctx {
+func linkLinearErrCtx(ctx *diag.Context, err error) *diag.Context {
 	for err != nil {
-		n := errx.NumCauses(err)
+		n := sderr.NumCauses(err)
 		if n != 1 {
 			return ctx
 		}
 
-		cause := errx.Cause(err, 0)
-		causeCtx := errx.ErrContext(cause)
+		cause := sderr.Unwrap(err)
+		causeCtx := sderr.Context(cause)
 		if causeCtx.Len() > 0 {
-			ctx = ctxtree.Make(&ctx, causeCtx)
+			ctx = diag.NewContext(ctx, causeCtx)
 		}
 
 		err = cause

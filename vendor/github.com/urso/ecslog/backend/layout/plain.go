@@ -1,3 +1,9 @@
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+
 package layout
 
 import (
@@ -7,10 +13,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/urso/diag"
+	"github.com/urso/sderr"
+
 	"github.com/urso/ecslog/backend"
-	"github.com/urso/ecslog/ctxtree"
-	"github.com/urso/ecslog/errx"
-	"github.com/urso/ecslog/fld"
 )
 
 type textLayout struct {
@@ -102,14 +108,14 @@ func (l *textLayout) Log(msg backend.Message) {
 func (l *textLayout) OnErrorValue(err error, indent string) error {
 	l.buf.WriteString(indent)
 
-	if file, line := errx.At(err); file != "" {
+	if file, line := sderr.At(err); file != "" {
 		fmt.Fprintf(&l.buf, "%v:%v\t", filepath.Base(file), line)
 	}
 
 	l.buf.WriteString(err.Error())
 
 	if l.withCtx {
-		if ctx := errx.ErrContext(err); ctx.Len() > 0 {
+		if ctx := sderr.Context(err); ctx.Len() > 0 {
 			ctx.VisitKeyValues(&textCtxPrinter{buf: &l.buf})
 		}
 	}
@@ -118,12 +124,12 @@ func (l *textLayout) OnErrorValue(err error, indent string) error {
 		return ioErr
 	}
 
-	n := errx.NumCauses(err)
+	n := sderr.NumCauses(err)
 	switch n {
 	case 0:
 		// do nothing
 	case 1:
-		cause := errx.Cause(err, 0)
+		cause := sderr.Unwrap(err)
 		if cause != nil {
 			return l.OnErrorValue(cause, indent)
 		}
@@ -132,7 +138,7 @@ func (l *textLayout) OnErrorValue(err error, indent string) error {
 		written := 0
 		fmt.Fprintf(&l.buf, "%vmulti-error caused by:\n", indent)
 		for i := 0; i < n; i++ {
-			cause := errx.Cause(err, i)
+			cause := sderr.Cause(err, i)
 			if cause != nil {
 				if written != 0 {
 					fmt.Fprintf(&l.buf, "%vand\n", indent)
@@ -177,11 +183,11 @@ func (p *textCtxPrinter) OnObjEnd() error {
 	return err
 }
 
-func (p *textCtxPrinter) OnValue(key string, v fld.Value) (err error) {
+func (p *textCtxPrinter) OnValue(key string, v diag.Value) (err error) {
 	p.onKey(key)
 	v.Reporter.Ifc(&v, func(value interface{}) {
 		switch v := value.(type) {
-		case *ctxtree.Ctx:
+		case *diag.Context:
 			p.buf.WriteRune('{')
 			err = v.VisitKeyValues(p)
 			p.buf.WriteRune('}')

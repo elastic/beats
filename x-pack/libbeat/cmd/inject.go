@@ -15,6 +15,8 @@ import (
 
 	// Register fleet
 	_ "github.com/elastic/beats/x-pack/libbeat/management/fleet"
+	// register processors
+	_ "github.com/elastic/beats/x-pack/libbeat/processors/add_cloudfoundry_metadata"
 
 	// register autodiscover providers
 	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/ec2"
