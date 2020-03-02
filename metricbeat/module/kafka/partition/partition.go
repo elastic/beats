@@ -175,18 +175,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) selectPartitionOffsets(topicPartitionPartitionOffsets map[string]map[int32]*kafka.PartitionOffsets,
-	topic *sarama.TopicMetadata, partition *sarama.PartitionMetadata) (*kafka.PartitionOffsets, error) {
-	offsets := topicPartitionPartitionOffsets[topic.Name][partition.ID]
-	if offsets == nil {
-		err := fmt.Errorf("no partition offsets defined (%v:%v)", topic.Name, partition.ID)
-		return nil, err
-	} else if offsets.Err != nil {
-		err := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %v",
+func (m *MetricSet) selectPartitionOffsets(topicPartitionPartitionOffsets map[string]map[int32]kafka.PartitionOffsets,
+	topic *sarama.TopicMetadata, partition *sarama.PartitionMetadata) (offsets kafka.PartitionOffsets, err error) {
+	offsets = topicPartitionPartitionOffsets[topic.Name][partition.ID]
+	if offsets.Err != nil {
+		err = fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %v",
 			topic.Name, partition.ID, offsets.Err)
-		return nil, err
+		return
 	}
-	return offsets, nil
+	return
 }
 
 func (m *MetricSet) reportPartitionOffsetsError(r mb.ReporterV2, err error) {
