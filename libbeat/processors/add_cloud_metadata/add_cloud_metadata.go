@@ -37,8 +37,6 @@ const (
 	metadataHost = "169.254.169.254"
 )
 
-var debugf = logp.MakeDebug("filters")
-
 // init registers the add_cloud_metadata processor.
 func init() {
 	processors.RegisterPlugin("add_cloud_metadata", New)
@@ -49,6 +47,7 @@ type addCloudMetadata struct {
 	initOnce sync.Once
 	initData *initData
 	metadata common.MapStr
+	logger   *logp.Logger
 }
 
 type initData struct {
@@ -71,6 +70,7 @@ func New(c *common.Config) (processors.Processor, error) {
 	}
 	p := &addCloudMetadata{
 		initData: &initData{fetchers, config.Timeout, config.Overwrite},
+		logger:   logp.NewLogger("add_cloud_metadata"),
 	}
 
 	go p.init()
@@ -84,13 +84,13 @@ func (r result) String() string {
 
 func (p *addCloudMetadata) init() {
 	p.initOnce.Do(func() {
-		result := fetchMetadata(p.initData.fetchers, p.initData.timeout)
+		result := p.fetchMetadata()
 		if result == nil {
-			logp.Info("add_cloud_metadata: hosting provider type not detected.")
+			p.logger.Info("add_cloud_metadata: hosting provider type not detected.")
 			return
 		}
 		p.metadata = result.metadata
-		logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
+		p.logger.Infof("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
 			result.provider, result.metadata.String())
 	})
 }
