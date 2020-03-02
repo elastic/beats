@@ -1,6 +1,10 @@
 [[rename-fields]]
 === Rename fields from events
 
+++++
+<titleabbrev>rename</titleabbrev>
+++++
+
 The `rename` processor specifies a list of fields to rename. Under the `fields`
 key, each entry contains a `from: old-key` and a `to: new-key` pair, where:
 

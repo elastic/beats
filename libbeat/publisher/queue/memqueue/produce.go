@@ -25,12 +25,12 @@ import (
 )
 
 type forgetfulProducer struct {
-	broker    *Broker
+	broker    *broker
 	openState openState
 }
 
 type ackProducer struct {
-	broker    *Broker
+	broker    *broker
 	cancel    bool
 	seq       uint32
 	state     produceState
@@ -53,7 +53,7 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		isOpen: atomic.MakeBool(true),
