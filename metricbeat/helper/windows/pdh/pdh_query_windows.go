@@ -17,7 +17,7 @@
 
 // +build windows
 
-package perfmon
+package pdh
 
 import (
 	"regexp"
@@ -43,8 +43,8 @@ type Counter struct {
 
 // Query contains the pdh.
 type Query struct {
-	handle   PdhQueryHandle
-	counters map[string]*Counter
+	Handle   PdhQueryHandle
+	Counters map[string]*Counter
 }
 
 // CounterValue contains the performance counter values.
@@ -60,42 +60,42 @@ func (q *Query) Open() error {
 	if err != nil {
 		return err
 	}
-	q.handle = h
-	q.counters = make(map[string]*Counter)
+	q.Handle = h
+	q.Counters = make(map[string]*Counter)
 	return nil
 }
 
 // AddEnglishCounter adds the specified counter to the query.
 func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) {
-	h, err := PdhAddEnglishCounter(q.handle, counterPath, 0)
+	h, err := PdhAddEnglishCounter(q.Handle, counterPath, 0)
 	return h, err
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
-	if _, found := q.counters[counterPath]; found {
+func (q *Query) AddCounter(counterPath string, instance string, format string, wildcard bool) error {
+	if _, found := q.Counters[counterPath]; found {
 		return nil
 	}
 	var err error
 	var instanceName string
 	// Extract the instance name from the counterPath.
-	if counter.InstanceName == "" || wildcard {
-		instanceName, err = matchInstanceName(counterPath)
+	if instance == "" || wildcard {
+		instanceName, err = MatchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
 	} else {
-		instanceName = counter.InstanceName
+		instanceName = instance
 	}
-	h, err := PdhAddCounter(q.handle, counterPath, 0)
+	h, err := PdhAddCounter(q.Handle, counterPath, 0)
 	if err != nil {
 		return err
 	}
 
-	q.counters[counterPath] = &Counter{
+	q.Counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
-		format:       getPDHFormat(counter.Format),
+		format:       getPDHFormat(format),
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 		}
 	}
 	unused := make(map[string]*Counter)
-	for counterPath, counter := range q.counters {
+	for counterPath, counter := range q.Counters {
 		if !matchCounter(counterPath, counters) {
 			unused[counterPath] = counter
 		}
@@ -147,7 +147,7 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 		if err != nil {
 			return err
 		}
-		delete(q.counters, counterPath)
+		delete(q.Counters, counterPath)
 	}
 	return nil
 }
@@ -163,19 +163,31 @@ func matchCounter(counterPath string, counterList []string) bool {
 
 // CollectData collects the value for all counters in the query.
 func (q *Query) CollectData() error {
-	return PdhCollectQueryData(q.handle)
+	return PdhCollectQueryData(q.Handle)
 }
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
-	if q.counters == nil || len(q.counters) == 0 {
+	if q.Counters == nil || len(q.Counters) == 0 {
 		return nil, errors.New("no counter list found")
 	}
-	rtn := make(map[string][]CounterValue, len(q.counters))
-	for path, counter := range q.counters {
+	rtn := make(map[string][]CounterValue, len(q.Counters))
+	for path, counter := range q.Counters {
 		rtn[path] = append(rtn[path], getCounterValue(counter))
 	}
 	return rtn, nil
+}
+
+// GetCountersAndInstances returns a list of counters and instances for a given object
+func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
+	counters, instances, err := PdhEnumObjectItems(objectName)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "Unable to retrieve counter and instance list for %s", objectName)
+	}
+	if len(counters) == 0 && len(instances) == 0 {
+		return nil, nil, errors.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+	}
+	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
 
 // ExpandWildCardPath  examines local computer and returns those counter paths that match the given counter path which contains wildcard characters.
@@ -206,11 +218,11 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 
 // Close closes the query and all of its counters.
 func (q *Query) Close() error {
-	return PdhCloseQuery(q.handle)
+	return PdhCloseQuery(q.Handle)
 }
 
-// matchInstanceName will check first for instance and then for any objects names.
-func matchInstanceName(counterPath string) (string, error) {
+// MatchInstanceName will check first for instance and then for any objects names.
+func MatchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) != 2 {
 		matches = objectNameRegexp.FindStringSubmatch(counterPath)

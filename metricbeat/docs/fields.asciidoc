@@ -42,6 +42,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-ibmmq>>
+* <<exported-fields-iis>>
 * <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
@@ -16949,6 +16950,63 @@ IBM MQ module
 
 
 
+
+[[exported-fields-iis]]
+== iis fields
+
+iis module
+
+
+
+[float]
+=== iis
+
+
+
+
+[float]
+=== application_pool
+
+application_pool
+
+
+
+*`iis.application_pool.name`*::
++
+--
+application pool name
+
+
+type: keyword
+
+--
+
+*`iis.webserver.*.*`*::
++
+--
+webserver
+
+
+type: object
+
+--
+
+[float]
+=== website
+
+website
+
+
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
 
 [[exported-fields-istio]]
 == istio fields
