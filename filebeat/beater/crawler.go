@@ -52,11 +52,13 @@ func newCrawler(
 	once bool,
 ) (*crawler, error) {
 	return &crawler{
-		out:          out,
-		inputs:       map[uint64]*input.Runner{},
-		inputConfigs: inputConfigs,
-		once:         once,
-		beatDone:     beatDone,
+		out:            out,
+		inputs:         map[uint64]*input.Runner{},
+		inputsFactory:  inputFactory,
+		modulesFactory: module,
+		inputConfigs:   inputConfigs,
+		once:           once,
+		beatDone:       beatDone,
 	}, nil
 }
 
