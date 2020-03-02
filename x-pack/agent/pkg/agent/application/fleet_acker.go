@@ -40,6 +40,7 @@ func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
+		AgentID: f.agentInfo.AgentID(),
 		Actions: []string{
 			action.ID(),
 		},

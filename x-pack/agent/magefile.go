@@ -19,10 +19,10 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/agent/release"
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/x-pack/agent/pkg/release"
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
@@ -358,7 +358,7 @@ func flags() string {
 	commitID := commitID()
 
 	return fmt.Sprintf(
-		`-X "github.com/elastic/beats/agent/release.buildTime=%s" -X "github.com/elastic/beats/agent/release.commit=%s"`,
+		`-X "github.com/elastic/beats/x-pack/agent/pkg/release.buildTime=%s" -X "github.com/elastic/beats/x-pack/agent/pkg/release.commit=%s"`,
 		ts,
 		commitID,
 	)

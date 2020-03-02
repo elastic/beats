@@ -1,0 +1,4 @@
+default: true
+input:
+  module: http
+  metricset: json

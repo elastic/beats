@@ -75,7 +75,6 @@ type reportableEvent struct {
 	Time    string
 	Message string
 	Payload map[string]interface{} `json:"payload,omitempty"`
-	Data    string                 `json:"data,omitempty"`
 }
 
 func makeEventReportable(event reporter.Event) reportableEvent {
@@ -85,7 +84,6 @@ func makeEventReportable(event reporter.Event) reportableEvent {
 		Time:    event.Time().Format(timeFormat),
 		Message: event.Message(),
 		Payload: event.Payload(),
-		Data:    event.Data(),
 	}
 }
 

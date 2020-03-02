@@ -17,6 +17,8 @@ func NewMetadataServiceForConfig(c config) (googlecloud.MetadataService, error) 
 	switch c.ServiceName {
 	case googlecloud.ServiceCompute:
 		return compute.NewMetadataService(c.ProjectID, c.Zone, c.opt...)
+	case googlecloud.ServicePubsub, googlecloud.ServiceLoadBalancing:
+		return nil, nil
 	default:
 		return nil, errors.Errorf("service '%s' not supported", c.ServiceName)
 	}
