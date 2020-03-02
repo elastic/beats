@@ -267,6 +267,9 @@ func (s *LightModulesSource) moduleNames() ([]string, error) {
 			return nil, errors.Wrapf(err, "listing modules on path '%s'", dir)
 		}
 		for _, f := range files {
+			if !f.IsDir() {
+				continue
+			}
 			modulePath := filepath.Join(dir, f.Name(), moduleYML)
 			if _, err := os.Stat(modulePath); os.IsNotExist(err) {
 				continue
@@ -279,5 +282,6 @@ func (s *LightModulesSource) moduleNames() ([]string, error) {
 	for name := range modules {
 		names = append(names, name)
 	}
+
 	return names, nil
 }
