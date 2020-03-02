@@ -46,10 +46,7 @@ include::../include/var-paths.asciidoc[]
 This module comes with sample dashboards. For example:
 
 [role="screenshot"]
-image::./images/filebeat-suricata-events.png[]
-
-[role="screenshot"]
-image::./images/filebeat-suricata-alerts.png[]
+image::./images/kibana-suricata.png[]
 
 :has-dashboards!:
 
