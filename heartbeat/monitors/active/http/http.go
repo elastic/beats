@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
 func init() {
@@ -48,7 +47,7 @@ func create(
 		return nil, 0, err
 	}
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, 0, err
 	}
