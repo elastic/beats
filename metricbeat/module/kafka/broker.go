@@ -78,7 +78,7 @@ type PartitionOffsets struct {
 	Offset int64
 }
 
-type brokerTopicPartitionsMap map[int32]map[string]int32
+type brokerTopicPartitionsMap map[int32]map[string][]int32
 
 type brokersMap map[int32]*sarama.Broker
 
@@ -322,9 +322,9 @@ func (b *Broker) groupBrokersPerTopicPartitions(topics []*sarama.TopicMetadata) 
 			}
 
 			if _, ok := leaderTopicPartition[broker.ID()]; !ok {
-				leaderTopicPartition[broker.ID()] = map[string]int32{}
+				leaderTopicPartition[broker.ID()] = map[string][]int32{}
 			}
-			leaderTopicPartition[broker.ID()][topic.Name] = partition.ID
+			leaderTopicPartition[broker.ID()][topic.Name] = append(leaderTopicPartition[broker.ID()][topic.Name], partition.ID)
 			leaderBrokers[broker.ID()] = broker
 		}
 	}
@@ -337,8 +337,10 @@ func (b *Broker) fetchGroupedPartitionOffsetsPerBroker(leaderTopicPartition brok
 
 	for leader, topicPartition := range leaderTopicPartition {
 		req := new(sarama.OffsetRequest)
-		for topic, partition := range leaderTopicPartition[leader] {
-			req.AddBlock(topic, partition, time, 1)
+		for topic, partitions := range leaderTopicPartition[leader] {
+			for _, partition := range partitions {
+				req.AddBlock(topic, partition, time, 1)
+			}
 		}
 
 		resp, err := leaderBrokers[leader].GetAvailableOffsets(req)
@@ -347,24 +349,26 @@ func (b *Broker) fetchGroupedPartitionOffsetsPerBroker(leaderTopicPartition brok
 			continue
 		}
 
-		for topic, partition := range topicPartition {
+		for topic, partitions := range topicPartition {
 			if _, ok := topicPartitionPartitionOffsets[topic]; !ok {
 				topicPartitionPartitionOffsets[topic] = map[int32]*PartitionOffsets{}
 			}
 
-			if err != nil {
-				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
-				continue
-			}
+			for _, partition := range partitions {
+				if err != nil {
+					topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
+					continue
+				}
 
-			block := resp.GetBlock(topic, partition)
-			if len(block.Offsets) == 0 || block.Err != 0 {
-				err = fmt.Errorf("block offsets is invalid (topicName: %s, partitionID: %d, leaderID: %d): %v",
-					topic, partition, leader, block.Err.Error())
-				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
-				continue
+				block := resp.GetBlock(topic, partition)
+				if len(block.Offsets) == 0 || block.Err != 0 {
+					err = fmt.Errorf("block offsets is invalid (topicName: %s, partitionID: %d, leaderID: %d): %v",
+						topic, partition, leader, block.Err.Error())
+					topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Err: err, Offset: -1}
+					continue
+				}
+				topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Offset: block.Offsets[0]}
 			}
-			topicPartitionPartitionOffsets[topic][partition] = &PartitionOffsets{Offset: block.Offsets[0]}
 		}
 	}
 	return topicPartitionPartitionOffsets
