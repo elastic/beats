@@ -299,7 +299,7 @@ func Package() {
 	}
 
 	// package agent
-	devtools.UseElasticBeatAgentPackaging()
+	devtools.UseElasticAgentPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
