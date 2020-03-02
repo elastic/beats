@@ -346,18 +346,6 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
-#--------------------------------- Iis Module ---------------------------------
-- module: iis
-  metricsets:
-    - webserver
-    - website
-    - application_pool
-  enabled: true
-  period: 10s
-
- # filter on application pool names
- # application_pool.name: []
-
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
