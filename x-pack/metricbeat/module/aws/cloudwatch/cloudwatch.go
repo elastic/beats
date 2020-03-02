@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -66,7 +67,16 @@ type Config struct {
 	Dimensions         []Dimension `config:"dimensions"`
 	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
 	Statistic          []string    `config:"statistic"`
-	Tags               []aws.Tag   `config:"tags"`
+	TagsFilter         []aws.Tag   `config:"tags_filter"`
+	Tags               []aws.Tag   `config:"tags"` // Deprecated.
+}
+
+// Validate checks for deprecated config options
+func (c Config) Validate() error {
+	if c.Tags != nil {
+		cfgwarn.Deprecate("8.0.0", "tags is deprecated. Use tags_filter instead")
+	}
+	return nil
 }
 
 type metricsWithStatistics struct {
@@ -305,10 +315,17 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 			if config.ResourceTypeFilter != "" {
 				if _, ok := resourceTypesWithTags[config.ResourceTypeFilter]; ok {
-					resourceTypesWithTags[config.ResourceTypeFilter] = config.Tags
-
+					if config.TagsFilter != nil {
+						resourceTypesWithTags[config.ResourceTypeFilter] = config.TagsFilter
+					} else {
+						resourceTypesWithTags[config.ResourceTypeFilter] = config.Tags
+					}
 				} else {
-					resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.Tags...)
+					if config.TagsFilter != nil {
+						resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.TagsFilter...)
+					} else {
+						resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.Tags...)
+					}
 				}
 			}
 			continue
@@ -316,10 +333,14 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               config.Tags,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceTypeFilter,
 			dimensions:         cloudwatchDimensions,
+		}
+		if config.TagsFilter != nil {
+			configPerNamespace.tags = config.TagsFilter
+		} else {
+			configPerNamespace.tags = config.Tags
 		}
 
 		if _, ok := namespaceDetailTotal[config.Namespace]; ok {

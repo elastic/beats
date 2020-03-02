@@ -500,7 +500,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:          "AWS/EC2",
 					MetricName:         []string{"CPUUtilization"},
 					ResourceTypeFilter: resourceTypeEC2,
-					Tags: []aws.Tag{
+					TagsFilter: []aws.Tag{
 						{
 							Key:   "name",
 							Value: "test-ec2",
@@ -512,7 +512,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					MetricName:         []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
 					Statistic:          []string{"Sum"},
 					ResourceTypeFilter: "elasticloadbalancing",
-					Tags: []aws.Tag{
+					TagsFilter: []aws.Tag{
 						{
 							Key:   "name",
 							Value: "test-elb1",
@@ -524,7 +524,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					MetricName:         []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
 					Statistic:          []string{"Maximum"},
 					ResourceTypeFilter: "elasticloadbalancing",
-					Tags: []aws.Tag{
+					TagsFilter: []aws.Tag{
 						{
 							Key:   "name",
 							Value: "test-elb2",
@@ -545,7 +545,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					MetricName:         []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
 					Statistic:          []string{"Sum"},
 					ResourceTypeFilter: "elasticloadbalancing",
-					Tags: []aws.Tag{
+					TagsFilter: []aws.Tag{
 						{
 							Key:   "name",
 							Value: "test-elb1",
@@ -557,7 +557,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					MetricName:         []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
 					Statistic:          []string{"Maximum"},
 					ResourceTypeFilter: "elasticloadbalancing",
-					Tags: []aws.Tag{
+					TagsFilter: []aws.Tag{
 						{
 							Key:   "name",
 							Value: "test-elb2",
