@@ -38,6 +38,14 @@
       }
     },
     {
+      "convert": {
+        "field": "zeek.smtp.tls",
+        "target_field": "tls.established",
+        "type": "boolean",
+        "ignore_missing": true
+      }
+    },
+    {
       "date": {
         "field": "zeek.smtp.date",
         "target_field": "zeek.smtp.date",

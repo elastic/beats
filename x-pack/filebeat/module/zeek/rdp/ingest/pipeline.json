@@ -26,6 +26,14 @@
       }
     },
     {
+      "convert": {
+        "field": "zeek.rdp.ssl",
+        "target_field": "tls.established",
+        "type": "boolean",
+        "ignore_missing": true
+      }
+    },
+    {
       "set": {
         "field": "source.ip",
         "value": "{{source.address}}"

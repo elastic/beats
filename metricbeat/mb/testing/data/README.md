@@ -13,15 +13,15 @@ The idea is simple, head to `beats/metricbeat/mb/testing/data` and run `go test 
 An alternative is to just run from metricbeat `mage mockedTests` to achieve the same result but using environment variables instead of flags, for example: `MODULE=apache GENERATE=true mage mockedTests`
 
 ##### Worth to mention
-- If the input file in `testdata` folder is prefixed (named) `docs`, whatever its extension is, and the flag `-generate` is passed; the framework will also create a `docs.json` file in `_meta` folder of the metricset as historically has been done in Metricbeat.
+- If the input file in `testdata` folder is prefixed (named) `docs`, whatever its extension is, and the flag `-data` is passed; the framework will also create a `docs.json` file in `_meta` folder of the metricset as historically has been done in Metricbeat.
 - Config file **must** be called `config.yml` and be located inside `metricbeat/module/{module}/{metricset}/_meta/testdata`
 
 ### Available flags / environment variables
 
-- `-generate`: It will regenerate the _expected_ JSON file with the output of an event an place it within `testdata` folder. For example: `go test . -generate`. If using mage, a environment variable `GENERATE` is available to 
+- `-data`: It will regenerate the _expected_ JSON file with the output of an event an place it within `testdata` folder. For example: `go test . -data`. If using mage, a environment variable `GENERATE` is available to 
 - `-module`: Test only the specified module. For example `go test . -module=apache`. If using mage `MODULE` environment variable must be set with the _module_ name that must be tested.
 
-> You can also combine both flags with `go test . -generate -module=apache` to generate files for Apache module only.
+> You can also combine both flags with `go test . -data -module=apache` to generate files for Apache module only.
 
 ### Available settings in `config.yml`
 

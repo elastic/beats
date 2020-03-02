@@ -71,8 +71,8 @@ func (g *guessSyscallArgs) Provides() []string {
 func (g *guessSyscallArgs) Requires() []string {
 	return []string{
 		"SYS_GETTIMEOFDAY",
-		"SYS_P1",
-		"SYS_P2",
+		"_SYS_P1",
+		"_SYS_P2",
 	}
 }
 
@@ -84,7 +84,7 @@ func (g *guessSyscallArgs) Probes() ([]helper.ProbeDef, error) {
 			Probe: tracing.Probe{
 				Name:      "syscall_args_guess",
 				Address:   "{{.SYS_GETTIMEOFDAY}}",
-				Fetchargs: "p1reg={{.SYS_P1}} p2reg={{.SYS_P2}} p1pt=+0x70({{.SYS_P1}}) p2pt=+0x68({{(.SYS_P1)}})",
+				Fetchargs: "p1reg={{._SYS_P1}} p2reg={{._SYS_P2}} p1pt=+0x70({{._SYS_P1}}) p2pt=+0x68({{(._SYS_P1)}})",
 			},
 			Decoder: helper.NewStructDecoder(func() interface{} { return new(syscallGuess) }),
 		},
@@ -116,20 +116,15 @@ func (g *guessSyscallArgs) Extract(ev interface{}) (common.MapStr, bool) {
 	}
 
 	if args.RegP1 == g.expected[0] && args.RegP2 == g.expected[1] {
-		// Current kernel uses the old calling convention. There's no need to
-		// adjust the SYS_Pn variables.
-		// However, a Guesser always has to return the variables it declares
-		// in Provides().
-		dummyResult := common.MapStr{}
-		for _, name := range g.Provides() {
-			value, found := g.ctx.Vars[name]
-			if value == nil || !found {
-				g.ctx.Log.Errorf("Expected variable %s is not available. value=%s found=%v", name, value, found)
-				return nil, false
-			}
-			dummyResult[name] = value
-		}
-		return dummyResult, true
+		// Current kernel uses the old calling convention.
+		return common.MapStr{
+			"SYS_P1": g.ctx.Vars["_SYS_P1"],
+			"SYS_P2": g.ctx.Vars["_SYS_P2"],
+			"SYS_P3": g.ctx.Vars["_SYS_P3"],
+			"SYS_P4": g.ctx.Vars["_SYS_P4"],
+			"SYS_P5": g.ctx.Vars["_SYS_P5"],
+			"SYS_P6": g.ctx.Vars["_SYS_P6"],
+		}, true
 	}
 	// New calling convention detected. Adjust syscall arguments to read
 	// well known offsets of the pt_regs structure at position 1.

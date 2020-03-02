@@ -92,9 +92,11 @@ func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error
 	return (*nullCLI)(nil), nil
 }
 
-func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
-func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
-func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
+func (*nullCLI) Deploy(_ string) error  { return fmt.Errorf("deploy not implemented") }
+func (*nullCLI) Update(_ string) error  { return fmt.Errorf("update not implemented") }
+func (*nullCLI) Remove(_ string) error  { return fmt.Errorf("remove not implemented") }
+func (*nullCLI) Export(_ string) error  { return fmt.Errorf("export not implemented") }
+func (*nullCLI) Package(_ string) error { return fmt.Errorf("package not implemented") }
 
 // nullTemplateBuilder is used when a provider does not implement a template builder functionality.
 type nullTemplateBuilder struct{}

@@ -44,6 +44,8 @@ const (
 	timeout     = "timeout"
 	ssl         = "ssl"
 	metricspath = "metrics_path"
+	username    = "username"
+	password    = "password"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
@@ -112,6 +114,8 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	sslConf := m.getSSLConfig(hints)
 	procs := m.getProcessors(hints)
 	metricspath := m.getMetricPath(hints)
+	username := m.getUsername(hints)
+	password := m.getPassword(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
@@ -130,15 +134,21 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if metricspath != "" {
 		moduleConfig["metrics_path"] = metricspath
 	}
+	if username != "" {
+		moduleConfig["username"] = username
+	}
+	if password != "" {
+		moduleConfig["password"] = password
+	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: +%v", *cfg)
+	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
@@ -196,6 +206,14 @@ func (m *metricHints) getNamespace(hints common.MapStr) string {
 
 func (m *metricHints) getMetricPath(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, metricspath)
+}
+
+func (m *metricHints) getUsername(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, username)
+}
+
+func (m *metricHints) getPassword(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, password)
 }
 
 func (m *metricHints) getPeriod(hints common.MapStr) string {

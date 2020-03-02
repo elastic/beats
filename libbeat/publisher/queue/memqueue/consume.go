@@ -27,7 +27,7 @@ import (
 )
 
 type consumer struct {
-	broker *Broker
+	broker *broker
 	resp   chan getResponse
 
 	done   chan struct{}
@@ -49,7 +49,7 @@ const (
 	batchACK
 )
 
-func newConsumer(b *Broker) *consumer {
+func newConsumer(b *broker) *consumer {
 	return &consumer{
 		broker: b,
 		resp:   make(chan getResponse),

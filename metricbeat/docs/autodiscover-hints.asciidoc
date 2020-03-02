@@ -36,6 +36,16 @@ The time interval for metrics retrieval, ie: 10s
 Metrics retrieval timeout, default: 3s
 
 [float]
+===== `co.elastic.metrics/username`
+
+The username to use for authentication
+
+[float]
+===== `co.elastic.metrics/password`
+
+The password to use for authentication. It is recommended to retrieve this sensitive information from an ENV variable or a keystore and avoid placing passwords in plain text
+
+[float]
 ===== `co.elastic.metrics/ssl.*`
 
 SSL parameters, as seen in <<configuration-ssl>>.

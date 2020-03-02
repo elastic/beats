@@ -81,7 +81,7 @@ func TestFetch(t *testing.T) {
 	for retries := 0; retries < 3; retries++ {
 		data, errors = mbtest.ReportingFetchV2Error(f)
 		if len(data) > 0 {
-			break
+			continue
 		}
 		time.Sleep(500 * time.Millisecond)
 	}

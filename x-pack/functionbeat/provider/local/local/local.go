@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 const stdinName = "stdin"
@@ -23,11 +24,11 @@ const stdinName = "stdin"
 var Bundle = provider.MustCreate(
 	"local",
 	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
-	feature.NewDetails("local events", "allows to trigger events locally.", feature.Experimental),
+	feature.MakeDetails("local events", "allows to trigger events locally.", feature.Experimental),
 ).MustAddFunction(
 	stdinName,
 	NewStdinFunction,
-	feature.NewDetails(stdinName, "read events from stdin", feature.Experimental),
+	feature.MakeDetails(stdinName, "read events from stdin", feature.Experimental),
 ).Bundle()
 
 // StdinFunction reads events from STIN and terminates when stdin is completed.
@@ -43,7 +44,7 @@ func NewStdinFunction(
 
 // Run reads events from the STDIN and send them to the publisher pipeline, will stop reading by
 // either by an external signal to stop or by reaching EOF. When EOF is reached functionbeat will shutdown.
-func (s *StdinFunction) Run(ctx context.Context, client core.Client) error {
+func (s *StdinFunction) Run(ctx context.Context, client core.Client, _ telemetry.T) error {
 	errChan := make(chan error)
 	defer close(errChan)
 	lineChan := make(chan string)

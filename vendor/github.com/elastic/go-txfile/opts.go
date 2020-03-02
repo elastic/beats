@@ -56,10 +56,15 @@ type Options struct {
 type Flag uint64
 
 const (
+	// FlagWaitLock instructs the open function to block until the file lock could
+	// be acquired. By default open will return with an error if the lock file
+	// can not be generated, opened or locked.
+	FlagWaitLock Flag = 1 << iota
+
 	// FlagUnboundMaxSize configures the file max size to be unbound. This sets
 	// MaxSize to 0. If MaxSize and Prealloc is set, up to MaxSize bytes are
 	// preallocated on disk (truncate).
-	FlagUnboundMaxSize Flag = 1 << iota
+	FlagUnboundMaxSize
 
 	// FlagUpdMaxSize updates the file max size setting. If not set, the max size
 	// setting is read from the file to be opened.

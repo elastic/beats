@@ -35,7 +35,7 @@ You can query a unix socket using the `CURL` command and the `--unix-socket` fla
 
 [source,js]
 ----
-curl -XGET --unix-socket '/var/run/{beatname_lc}.sock' 'http://unix/stats/?pretty'
+curl -XGET --unix-socket '/var/run/{beatname_lc}.sock' 'http:/stats/?pretty'
 ----
 
 
@@ -118,6 +118,7 @@ curl -XGET 'localhost:5066/stats?pretty'
         "starts": 0,
         "stops": 0
       },
+      "scans": 1,
       "reloads": 1
     },
     "output": {

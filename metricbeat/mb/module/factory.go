@@ -18,8 +18,6 @@
 package module
 
 import (
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -29,40 +27,50 @@ import (
 // Factory creates new Runner instances from configuration objects.
 // It is used to register and reload modules.
 type Factory struct {
-	options []Option
+	beatInfo beat.Info
+	options  []Option
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 	return &Factory{
-		options: options,
+		beatInfo: beatInfo,
+		options:  options,
 	}
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	var errs multierror.Errors
-
-	connector, err := NewConnector(p, c, meta)
-	if err != nil {
-		errs = append(errs, err)
-	}
-	w, err := NewWrapper(c, mb.Registry, r.options...)
-	if err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := errs.Err(); err != nil {
-		return nil, err
-	}
-
-	client, err := connector.Connect()
+	module, metricSets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
 		return nil, err
 	}
 
-	mr := NewRunner(client, w)
-	return mr, nil
+	var runners []Runner
+	for _, metricSet := range metricSets {
+		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.options...)
+		if err != nil {
+			return nil, err
+		}
+
+		connector, err := NewConnector(r.beatInfo, p, c, meta)
+		if err != nil {
+			return nil, err
+		}
+
+		err = connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := connector.Connect()
+		if err != nil {
+			return nil, err
+		}
+		runners = append(runners, NewRunner(client, wrapper))
+	}
+
+	return newRunnerGroup(runners), nil
 }
 
 // CheckConfig checks if a config is valid or not

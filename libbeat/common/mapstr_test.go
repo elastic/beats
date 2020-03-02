@@ -1002,3 +1002,26 @@ func BenchmarkWalkMap(b *testing.B) {
 		}
 	})
 }
+
+func TestFormat(t *testing.T) {
+	input := MapStr{
+		"foo":      "bar",
+		"password": "SUPER_SECURE",
+	}
+
+	tests := map[string]string{
+		"%v":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%s":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+	}
+
+	for verb, expected := range tests {
+		t.Run(verb, func(t *testing.T) {
+			actual := fmt.Sprintf(verb, input)
+			assert.Equal(t, expected, actual)
+		})
+	}
+}

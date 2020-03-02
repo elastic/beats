@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -23,15 +24,17 @@ type Config struct {
 	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
+	DefaultResourceType string           `config:"default_resource_type"`
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID      []string       `config:"resource_id"`
-	Group   []string       `config:"resource_group"`
-	Metrics []MetricConfig `config:"metrics"`
-	Type    string         `config:"resource_type"`
-	Query   string         `config:"resource_query"`
+	ID          []string       `config:"resource_id"`
+	Group       []string       `config:"resource_group"`
+	Metrics     []MetricConfig `config:"metrics"`
+	Type        string         `config:"resource_type"`
+	Query       string         `config:"resource_query"`
+	ServiceType []string       `config:"service_type"`
 }
 
 // MetricConfig contains metric specific configuration.
@@ -72,8 +75,8 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client    *Client
-	MapMetric mapMetric
+	Client     *Client
+	MapMetrics mapResourceMetrics
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -100,7 +103,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 				return nil, errors.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
 			}
 		}
-
+		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
+		var resources []ResourceConfig
+		for _, resource := range config.Resources {
+			if len(resource.Group) != 0 || len(resource.ID) != 0 {
+				resources = append(resources, resource)
+			}
+		}
+		if len(resources) == 0 && len(config.Resources) != 0 {
+			res := config.Resources[0]
+			res.Query = fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType)
+			resources = append(resources, res)
+		}
+		config.Resources = resources
 	}
 	// instantiate monitor client
 	monitorClient, err := NewClient(config)
@@ -117,7 +132,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.Client.InitResources(m.MapMetric, report)
+	err := m.Client.InitResources(m.MapMetrics, report)
 	if err != nil {
 		return err
 	}
@@ -126,9 +141,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return nil
 	}
 	// retrieve metrics
-	err = m.Client.GetMetricValues(report)
-	if err != nil {
-		return err
+	groupedMetrics := groupMetricsByResource(m.Client.Resources.Metrics)
+
+	for _, metrics := range groupedMetrics {
+		results := m.Client.GetMetricValues(metrics, report)
+		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
+		if err != nil {
+			return errors.Wrap(err, "error running EventsMapping")
+		}
 	}
-	return EventsMapping(report, m.Client.Resources.Metrics, m.BaseMetricSet.Name())
+	return nil
 }

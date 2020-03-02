@@ -26,6 +26,7 @@ type tlsConfig struct {
 	config.ProtocolCommon  `config:",inline"`
 	SendCertificates       bool     `config:"send_certificates"`
 	IncludeRawCertificates bool     `config:"include_raw_certificates"`
+	IncludeDetailedFields  bool     `config:"include_detailed_fields"`
 	Fingerprints           []string `config:"fingerprints"`
 }
 
@@ -34,8 +35,8 @@ var (
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
-		SendCertificates:       true,
-		IncludeRawCertificates: false,
-		Fingerprints:           []string{"sha1"},
+		SendCertificates:      true,
+		IncludeDetailedFields: true,
+		Fingerprints:          []string{"sha1"},
 	}
 )

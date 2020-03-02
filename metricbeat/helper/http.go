@@ -30,9 +30,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
+// from HTTP endpoint.
 type HTTP struct {
 	hostData mb.HostData
 	client   *http.Client // HTTP client that is reused across requests.
@@ -72,9 +75,18 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		return nil, err
 	}
 
-	var dialer, tlsDialer transport.Dialer
+	// Ensure backward compatibility
+	builder := hostData.Transport
+	if builder == nil {
+		builder = dialer.NewDefaultDialerBuilder()
+	}
 
-	dialer = transport.NetDialer(config.ConnectTimeout)
+	dialer, err := builder.Make(config.ConnectTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	var tlsDialer transport.Dialer
 	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
@@ -84,9 +96,10 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		hostData: hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
-				Dial:    dialer.Dial,
-				DialTLS: tlsDialer.Dial,
-				Proxy:   http.ProxyFromEnvironment,
+				Dial:            dialer.Dial,
+				DialTLS:         tlsDialer.Dial,
+				TLSClientConfig: tlsConfig.ToConfig(),
+				Proxy:           http.ProxyFromEnvironment,
 			},
 			Timeout: config.Timeout,
 		},

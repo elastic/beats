@@ -4,18 +4,18 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-appsearch]]
 [role="xpack"]
-== appsearch module
+== App Search module
 
 beta[]
 
-This is the appsearch module.
+This is the App Search module.
 
 
 
 [float]
 === Example configuration
 
-The appsearch module supports the standard configuration options that are described
+The App Search module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

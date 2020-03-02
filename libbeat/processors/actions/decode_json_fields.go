@@ -40,7 +40,9 @@ type decodeJSONFields struct {
 	overwriteKeys bool
 	addErrorKey   bool
 	processArray  bool
+	documentID    string
 	target        *string
+	logger        *logp.Logger
 }
 
 type config struct {
@@ -50,6 +52,7 @@ type config struct {
 	AddErrorKey   bool     `config:"add_error_key"`
 	ProcessArray  bool     `config:"process_array"`
 	Target        *string  `config:"target"`
+	DocumentID    string   `config:"document_id"`
 }
 
 var (
@@ -60,13 +63,11 @@ var (
 	errProcessingSkipped = errors.New("processing skipped")
 )
 
-var debug = logp.MakeDebug("filters")
-
 func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		checks.ConfigChecked(NewDecodeJSONFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when")))
+			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when", "document_id")))
 
 	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
 }
@@ -74,14 +75,24 @@ func init() {
 // NewDecodeJSONFields construct a new decode_json_fields processor.
 func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
+	logger := logp.NewLogger("truncate_fields")
 
 	err := c.Unpack(&config)
 	if err != nil {
-		logp.Warn("Error unpacking config for decode_json_fields")
+		logger.Warn("Error unpacking config for decode_json_fields")
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, addErrorKey: config.AddErrorKey, processArray: config.ProcessArray, target: config.Target}
+	f := &decodeJSONFields{
+		fields:        config.Fields,
+		maxDepth:      config.MaxDepth,
+		overwriteKeys: config.OverwriteKeys,
+		addErrorKey:   config.AddErrorKey,
+		processArray:  config.ProcessArray,
+		documentID:    config.DocumentID,
+		target:        config.Target,
+		logger:        logger,
+	}
 	return f, nil
 }
 
@@ -91,7 +102,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.fields {
 		data, err := event.GetValue(field)
 		if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
-			debug("Error trying to GetValue for field : %s in event : %v", field, event)
+			f.logger.Debugf("Error trying to GetValue for field : %s in event : %v", field, event)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -105,7 +116,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		var output interface{}
 		err = unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
-			debug("Error trying to unmarshal %s", text)
+			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -113,6 +124,18 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		target := field
 		if f.target != nil {
 			target = *f.target
+		}
+
+		var id string
+		if key := f.documentID; key != "" {
+			if dict, ok := output.(map[string]interface{}); ok {
+				if tmp, err := common.MapStr(dict).GetValue(key); err == nil {
+					if v, ok := tmp.(string); ok {
+						id = v
+						common.MapStr(dict).Delete(key)
+					}
+				}
+			}
 		}
 
 		if target != "" {
@@ -127,9 +150,16 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if err != nil {
-			debug("Error trying to Put value %v for field : %s", output, field)
+			f.logger.Debugf("Error trying to Put value %v for field : %s", output, field)
 			errs = append(errs, err.Error())
 			continue
+		}
+
+		if id != "" {
+			if event.Meta == nil {
+				event.Meta = common.MapStr{}
+			}
+			event.Meta["_id"] = id
 		}
 	}
 

@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
-	for _, netsStats := range netsStatsList {
-		eventMapping(r, &netsStats)
+	for i := range netsStatsList {
+		eventMapping(r, &netsStatsList[i])
 	}
 }
 

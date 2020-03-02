@@ -18,6 +18,7 @@
                     "GREEDYMULTILINE" : "(.|\n)*"
                 },
                 "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\\s*\\]\\[%{WORD:logstash.log.pipeline_id}\\] %{GREEDYMULTILINE:message}",
                     "\\[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\\s*\\] %{GREEDYMULTILINE:message}"
                 ]
             }

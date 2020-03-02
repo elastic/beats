@@ -166,7 +166,7 @@ func makeES(
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err := parseProxyURL(config.ProxyURL)
+		proxyURL, err = parseProxyURL(config.ProxyURL)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -291,7 +291,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err := parseProxyURL(config.ProxyURL)
+		proxyURL, err = parseProxyURL(config.ProxyURL)
 		if err != nil {
 			return nil, err
 		}
