@@ -24,40 +24,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
-type selectedEvents []string
-
 type queryConfigFrom string
 
-// SelectEvents creates an event selector that will filter
-// for the configured fields only.
-func SelectEvents(events ...string) EventSelector {
-	if len(events) == 0 {
-		events = []string{"config"}
-	}
-	return selectedEvents(events)
-}
-
-// ConfigEvents creates an EventSelector that will match "config" events only.
-func ConfigEvents() EventSelector {
-	return SelectEvents("config")
-}
-
-func (s selectedEvents) EventFilter() []string {
-	return []string(s)
-}
+var defaultConfigQuery = queryConfigFrom("config")
 
 // EventConfigQuery creates an EventConfigurer that tries to cast the given event
 // field from from the buf event into a []*common.Config.
 func EventConfigQuery(field string) EventConfigurer {
-	if field == "" {
-		field = "config"
+	if field == "" || field == "config" {
+		return defaultConfigQuery
 	}
 	return queryConfigFrom(field)
 }
 
 // QueryConfig extract an array of *common.Config from bus.Event.
 // The configurations are expected to be in the 'config' field.
-func QueryConfig() EventConfigurer { return EventConfigQuery("config") }
+func QueryConfig() EventConfigurer { return defaultConfigQuery }
+
+func (q queryConfigFrom) EventFilter() []string { return []string{string(q)} }
 
 func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*common.Config, error) {
 	config, ok := e[string(q)].([]*common.Config)

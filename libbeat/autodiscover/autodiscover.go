@@ -39,14 +39,10 @@ const (
 
 // TODO autodiscover providers config reload
 
-// EventSelector returns the bus filter to retrieve runner start/stop triggering events
-type EventSelector interface {
-	EventFilter() []string
-}
-
 // EventConfigurer generates a valid list of configs from the given event, the
-// received event will have all keys defined by `StartFilter`
+// received event will have all keys defined by `StartFilter`.
 type EventConfigurer interface {
+	EventFilter() []string
 	CreateConfig(bus.Event) ([]*common.Config, error)
 }
 
@@ -56,7 +52,6 @@ type Autodiscover struct {
 	bus             bus.Bus
 	defaultPipeline beat.Pipeline
 	factory         cfgfile.RunnerFactory
-	selector        EventSelector
 	configurer      EventConfigurer
 	providers       []Provider
 	configs         map[string]map[uint64]*reload.ConfigWithMeta
@@ -71,7 +66,6 @@ func NewAutodiscover(
 	name string,
 	pipeline beat.Pipeline,
 	factory cfgfile.RunnerFactory,
-	selector EventSelector,
 	configurer EventConfigurer,
 	config *Config,
 ) (*Autodiscover, error) {
@@ -95,7 +89,6 @@ func NewAutodiscover(
 		bus:             bus,
 		defaultPipeline: pipeline,
 		factory:         factory,
-		selector:        selector,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
 		runners:         cfgfile.NewRunnerList("autodiscover", factory, pipeline),
@@ -112,7 +105,7 @@ func (a *Autodiscover) Start() {
 	}
 
 	a.logger.Info("Starting autodiscover manager")
-	a.listener = a.bus.Subscribe(a.selector.EventFilter()...)
+	a.listener = a.bus.Subscribe(a.configurer.EventFilter()...)
 
 	// It is important to start the worker first before starting the producer.
 	// In hosts that have large number of workloads, it is easy to have an initial

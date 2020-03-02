@@ -315,7 +315,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 				cfgfile.MatchHasField("module", moduleLoader),
 				cfgfile.MatchDefault(inputLoader),
 			),
-			autodiscover.ConfigEvents(),
 			autodiscover.QueryConfig(),
 			config.Autodiscover,
 		)
