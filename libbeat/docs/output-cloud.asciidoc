@@ -41,8 +41,6 @@ The Cloud ID, which can be found in the {ecloud} web console, is used by
 {beatname_uc} to resolve the {es} and {kib} URLs. This setting
 overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings.
 
-NOTE: The base64 encoded `cloud.id` found in the {ecloud} web console does not explicitly specify a port. This means that {beatname_uc} will default to using port 443 when using `cloud.id`, not the commonly configured cloud endpoint port 9243.
-
 ==== `cloud.auth`
 
 When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` and
