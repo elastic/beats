@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"regexp"
 	"strings"
 	"time"
 
@@ -33,7 +34,7 @@ type config struct {
 
 // Pagination contains information about httpjson pagination settings
 type Pagination struct {
-	IsEnabled        bool          `config:"enabled"`
+	Enabled          *bool         `config:"enabled"`
 	ExtraBodyContent common.MapStr `config:"extra_body_content"`
 	Header           *Header       `config:"header"`
 	IDField          string        `config:"id_field"`
@@ -41,10 +42,16 @@ type Pagination struct {
 	URL              string        `config:"url"`
 }
 
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (p *Pagination) IsEnabled() bool {
+	return p != nil && (p.Enabled == nil || *p.Enabled)
+}
+
 // HTTP Header information for pagination
 type Header struct {
-	FieldName    string `config:"field_name"`
-	RegexPattern string `config:"regex_pattern"`
+	FieldName    string `config:"field_name" validate:"required"`
+	RegexPattern string `config:"regex_pattern" validate:"required"`
+	re           *regexp.Regexp
 }
 
 // HTTP Header Rate Limit information
@@ -61,7 +68,27 @@ func (c *config) Validate() error {
 	case "POST":
 		break
 	default:
-		return errors.Errorf("httpjson input: Invalid http_method, %s - ", c.HTTPMethod)
+		return errors.Errorf("httpjson input: Invalid http_method, %s ", c.HTTPMethod)
+	}
+	if c.NoHTTPBody {
+		if len(c.HTTPRequestBody) > 0 {
+			return errors.Errorf("invalid configuration: both np_http_bpdy and http_request_body cannot be set simultaneously")
+		}
+		if c.Pagination != nil && (len(c.Pagination.ExtraBodyContent) > 0 || c.Pagination.RequestField != "") {
+			return errors.Errorf("invalid configuration: both no_http_body and pagination.extra_body_content or pagination.req_field cannot be set simultaneously")
+		}
+	}
+	if c.Pagination != nil {
+		if c.Pagination.Header != nil {
+			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" {
+				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field cannot be set simultaneously")
+			}
+			re, err := regexp.Compile(c.Pagination.Header.RegexPattern)
+			if err != nil {
+				return err
+			}
+			c.Pagination.Header.re = re
+		}
 	}
 	return nil
 }
