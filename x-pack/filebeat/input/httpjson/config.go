@@ -50,8 +50,7 @@ func (p *Pagination) IsEnabled() bool {
 // HTTP Header information for pagination
 type Header struct {
 	FieldName    string `config:"field_name" validate:"required"`
-	RegexPattern string `config:"regex_pattern" validate:"required"`
-	re           *regexp.Regexp
+	RegexPattern *regexp.Regexp `config:"regex_pattern" validate:"required"`
 }
 
 // HTTP Header Rate Limit information
@@ -83,11 +82,6 @@ func (c *config) Validate() error {
 			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" {
 				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field cannot be set simultaneously")
 			}
-			re, err := regexp.Compile(c.Pagination.Header.RegexPattern)
-			if err != nil {
-				return err
-			}
-			c.Pagination.Header.re = re
 		}
 	}
 	return nil
