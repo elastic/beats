@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
@@ -38,7 +39,7 @@ type Client struct {
 
 type Config struct {
 	Proxy   *ProxyConfig
-	TLS     *TLSConfig
+	TLS     *tlscommon.TLSConfig
 	Timeout time.Duration
 	Stats   IOStatser
 }
