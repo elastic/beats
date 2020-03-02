@@ -13,7 +13,6 @@ type Event interface {
 	Time() time.Time
 	Message() string
 	Payload() map[string]interface{}
-	Data() string
 }
 
 type event struct {
@@ -22,7 +21,6 @@ type event struct {
 	timestamp time.Time
 	message   string
 	payload   map[string]interface{}
-	data      string
 }
 
 func (e event) Type() string                    { return e.eventype }
@@ -30,4 +28,3 @@ func (e event) SubType() string                 { return e.subType }
 func (e event) Time() time.Time                 { return e.timestamp }
 func (e event) Message() string                 { return e.message }
 func (e event) Payload() map[string]interface{} { return e.payload }
-func (e event) Data() string                    { return e.data }
