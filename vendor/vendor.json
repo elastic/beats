@@ -3926,6 +3926,12 @@
 			"revisionTime": "2019-07-30T05:26:13Z"
 		},
 		{
+			"checksumSHA1": "ByRdQMv2yl16W6Tp9gUW1nNmpuI=",
+			"path": "github.com/hashicorp/errwrap",
+			"revision": "8a6fb523712970c966eefc6b39ed2c5e74880354",
+			"revisionTime": "2018-08-24T00:39:10Z"
+		},
+		{
 			"checksumSHA1": "P1Enisj7Nzf3wMl6lgPPar0ljoY=",
 			"path": "github.com/hashicorp/go-immutable-radix",
 			"revision": "0146a9aba1948ded4ed290cfd3fded2c15313f63",
