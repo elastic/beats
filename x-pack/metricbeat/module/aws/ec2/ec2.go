@@ -45,7 +45,6 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	TagsFilter []aws.Tag `config:"tags_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -54,15 +53,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
-	}
-
-	config := struct {
-		Tags []aws.Tag `config:"tags_filter"`
-	}{}
-
-	err = base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
@@ -76,8 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:  metricSet,
-		TagsFilter: config.Tags,
+		MetricSet: metricSet,
 	}, nil
 }
 
@@ -201,6 +190,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					// If tag filter doesn't exist in tagKeys/tagValues,
 					// then do not report this event/instance.
 					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+						delete(events, instanceID)
 						continue
 					}
 				}

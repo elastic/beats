@@ -211,7 +211,6 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 
 	metricSet := MetricSet{
 		&aws.MetricSet{},
-		nil,
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
@@ -220,6 +219,145 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
 	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
 	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
+}
+
+func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
+	expectedEvent := mb.Event{
+		RootFields: common.MapStr{
+			"cloud": common.MapStr{
+				"region":            regionName,
+				"provider":          "aws",
+				"instance":          common.MapStr{"id": "i-123"},
+				"machine":           common.MapStr{"type": "t2.medium"},
+				"availability_zone": "us-west-1a",
+			},
+		},
+		MetricSetFields: common.MapStr{
+			"cpu": common.MapStr{
+				"total": common.MapStr{"pct": 0.25},
+			},
+			"instance": common.MapStr{
+				"image":            common.MapStr{"id": "image-123"},
+				"core":             common.MapStr{"count": int64(1)},
+				"threads_per_core": int64(1),
+				"state":            common.MapStr{"code": int64(16), "name": "running"},
+				"monitoring":       common.MapStr{"state": "disabled"},
+				"public": common.MapStr{
+					"dns_name": "ec2-1-2-3-4.us-west-1.compute.amazonaws.com",
+					"ip":       "1.2.3.4",
+				},
+				"private": common.MapStr{
+					"dns_name": "ip-5-6-7-8.us-west-1.compute.internal",
+					"ip":       "5.6.7.8",
+				},
+			},
+			"tags": common.MapStr{
+				"app_kubernetes_io/name": "foo",
+				"helm_sh/chart":          "foo-chart",
+			},
+		},
+	}
+
+	svcEC2Mock := &MockEC2Client{}
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(instanceIDs))
+	instanceID := instanceIDs[0]
+	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
+
+	getMetricDataOutput := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id3,
+			Label:      &label3,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id4,
+			Label:      &label4,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+	}
+
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{{
+				Key:   "app.kubernetes.io/name",
+				Value: "foo",
+			}},
+		},
+	}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
+
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
+	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
+	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
+}
+
+func TestCreateCloudWatchEventsWithNotMatchingTagsFilter(t *testing.T) {
+	svcEC2Mock := &MockEC2Client{}
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(instanceIDs))
+	instanceID := instanceIDs[0]
+	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
+
+	getMetricDataOutput := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id3,
+			Label:      &label3,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id4,
+			Label:      &label4,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+	}
+
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{{
+				Key:   "app_kubernetes_io/name",
+				Value: "not_foo",
+			}},
+		},
+	}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(events))
 }
 
 func TestConstructMetricQueries(t *testing.T) {
