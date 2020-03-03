@@ -79,7 +79,7 @@ func TestGetMetricValues(t *testing.T) {
 		}
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Once().
-			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
+			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
@@ -101,7 +101,7 @@ func TestGetMetricValues(t *testing.T) {
 		}
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
+			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)

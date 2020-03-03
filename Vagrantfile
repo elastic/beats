@@ -24,8 +24,8 @@
 # freebsd and openbsd
 # -------------------
 #   - Use gmake instead of make.
-#   - Folder syncing doesn't work well. Consider copying the files into the box or
-#     cloning the project inside the box.
+#   - Folder syncing doesn't work well. Consider copying the files into the box
+#     or cloning the project inside the box.
 ###
 
 # Read the branch's Go version from the .go-version file.
@@ -82,27 +82,14 @@ if (-Not (Get-Command "choco" -ErrorAction SilentlyContinue)) {
 choco feature disable -n=showDownloadProgress
 
 if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
-    echo "Installing python2"
-    choco install python2 -y -r
+    echo "Installing python 3"
+    choco install python -y -r --version 3.8.1.20200110
     refreshenv
-    $env:PATH = "$env:PATH;C:\\Python27;C:\\Python27\\Scripts"
+    $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
 }
 
-if (-Not (Get-Command "pip" -ErrorAction SilentlyContinue)) {
-    echo "Installing pip"
-    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile get-pip.py
-    python get-pip.py -U --force-reinstall 2>&1 | %{ "$_" }
-    rm get-pip.py
-    Invoke-WebRequest
-} else {
-    echo "Updating pip"
-    python -m pip install --upgrade pip 2>&1 | %{ "$_" }
-}
-
-if (-Not (Get-Command "virtualenv" -ErrorAction SilentlyContinue)) {
-    echo "Installing virtualenv"
-    python -m pip install virtualenv 2>&1 | %{ "$_" }
-}
+echo "Updating pip"
+python -m pip install --upgrade pip 2>&1 | %{ "$_" }
 
 if (-Not (Get-Command "git" -ErrorAction SilentlyContinue)) {
     echo "Installing git"
@@ -113,6 +100,9 @@ if (-Not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
     echo "Installing mingw (gcc)"
     choco install mingw -y -r
 }
+
+echo "Setting PYTHON_ENV in VM to point to C:\\beats-python-env."
+[System.Environment]::SetEnvironmentVariable("PYTHON_ENV", "C:\\beats-python-env", [System.EnvironmentVariableTarget]::Machine)
 SCRIPT
 
 # Provisioning for Unix/Linux
@@ -129,7 +119,7 @@ def linuxGvmProvision(arch="amd64")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-linux-#{arch}
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
@@ -145,7 +135,7 @@ def linuxDebianProvision()
 #!/usr/bin/env bash
 set -eio pipefail
 apt-get update
-apt-get install -y make gcc python-pip python-virtualenv git
+apt-get install -y make gcc python3 python3-pip python3-venv git
 SCRIPT
 end
 
@@ -245,7 +235,8 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git rpm-devel"
+    c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
+    c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
   end
 
   config.vm.define "centos7", primary: true do |c|
@@ -254,25 +245,16 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git rpm-devel"
+    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
-  config.vm.define "fedora29", primary: true do |c|
-    c.vm.box = "bento/fedora-29"
+  config.vm.define "fedora31", primary: true do |c|
+    c.vm.box = "bento/fedora-31"
     c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git rpm-devel"
-  end
-
-  config.vm.define "sles12", primary: true do |c|
-    c.vm.box = "elastic/sles-12-x86_64"
-    c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "pip install virtualenv"
+    c.vm.provision "shell", inline: "dnf install -y make gcc python3 python3-pip git rpm-devel"
   end
 
   config.vm.define "archlinux", primary: true do |c|
@@ -281,6 +263,6 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python-pip python-virtualenv git"
+    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"
   end
 end

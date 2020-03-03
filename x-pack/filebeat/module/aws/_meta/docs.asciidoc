@@ -18,6 +18,8 @@ from network interfaces in AWS VPC. ELB access logs captures detailed informatio
 about requests sent to the load balancer. CloudTrail logs contain events
 that represent actions taken by a user, role or AWS service.
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Module configuration
 
@@ -28,18 +30,12 @@ Example config:
 - module: aws
   s3access:
     enabled: false
-
-    # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    # var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    # var.credential_profile_name: fb-aws
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
 
   elb:
     enabled: false
@@ -98,6 +94,19 @@ Filename of AWS credential file.
 *`var.credential_profile_name`*::
 
 AWS credential profile name.
+
+*`var.visibility_timeout`*::
+
+The duration that the received messages are hidden from ReceiveMessage request.
+Default to be 300 seconds.
+
+*`var.api_timeout`*::
+
+Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
+*`var.endpoint`*::
+
+Custom endpoint used to access AWS APIs.
 
 [float]
 === cloudtrail fileset

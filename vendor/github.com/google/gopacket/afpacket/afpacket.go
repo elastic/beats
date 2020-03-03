@@ -337,18 +337,20 @@ func (h *TPacket) Stats() (Stats, error) {
 func (h *TPacket) InitSocketStats() error {
 	if h.tpVersion == TPacketVersion3 {
 		socklen := unsafe.Sizeof(h.socketStatsV3)
+		slt := C.socklen_t(socklen)
 		var ssv3 SocketStatsV3
 
-		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ssv3), &socklen)
+		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ssv3), uintptr(unsafe.Pointer(&slt)))
 		if err != nil {
 			return err
 		}
 		h.socketStatsV3 = SocketStatsV3{}
 	} else {
 		socklen := unsafe.Sizeof(h.socketStats)
+		slt := C.socklen_t(socklen)
 		var ss SocketStats
 
-		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ss), &socklen)
+		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ss), uintptr(unsafe.Pointer(&slt)))
 		if err != nil {
 			return err
 		}
@@ -364,9 +366,10 @@ func (h *TPacket) SocketStats() (SocketStats, SocketStatsV3, error) {
 	// We need to save the counters since asking for the stats will clear them
 	if h.tpVersion == TPacketVersion3 {
 		socklen := unsafe.Sizeof(h.socketStatsV3)
+		slt := C.socklen_t(socklen)
 		var ssv3 SocketStatsV3
 
-		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ssv3), &socklen)
+		err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ssv3), uintptr(unsafe.Pointer(&slt)))
 		if err != nil {
 			return SocketStats{}, SocketStatsV3{}, err
 		}
@@ -377,9 +380,10 @@ func (h *TPacket) SocketStats() (SocketStats, SocketStatsV3, error) {
 		return h.socketStats, h.socketStatsV3, nil
 	}
 	socklen := unsafe.Sizeof(h.socketStats)
+	slt := C.socklen_t(socklen)
 	var ss SocketStats
 
-	err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ss), &socklen)
+	err := getsockopt(h.fd, unix.SOL_PACKET, unix.PACKET_STATISTICS, unsafe.Pointer(&ss), uintptr(unsafe.Pointer(&slt)))
 	if err != nil {
 		return SocketStats{}, SocketStatsV3{}, err
 	}

@@ -20,7 +20,7 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/filebeat/cmd"
+	"github.com/elastic/beats/v7/filebeat/cmd"
 )
 
 // The basic model of execution:

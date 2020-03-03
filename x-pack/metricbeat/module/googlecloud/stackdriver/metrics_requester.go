@@ -17,8 +17,8 @@ import (
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 func newStackdriverMetricsRequester(ctx context.Context, c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
@@ -52,13 +52,11 @@ type stackdriverMetricsRequester struct {
 func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
-	filter := r.getFilterForMetric(m)
-
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   filter,
+		Filter:   r.getFilterForMetric(m),
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
@@ -77,6 +75,18 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 	}
 
 	return
+}
+
+func constructFilter(m string, region string, zone string) string {
+	filter := fmt.Sprintf(`metric.type="%s" AND resource.labels.zone = `, m)
+	// If region is specified, use region as filter resource label.
+	// If region is empty but zone is given, use zone instead.
+	if region != "" {
+		filter += fmt.Sprintf(`starts_with("%s")`, region)
+	} else if zone != "" {
+		filter += fmt.Sprintf(`"%s"`, zone)
+	}
+	return filter
 }
 
 func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) ([]*monitoringpb.TimeSeries, error) {
@@ -120,9 +130,16 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	case googlecloud.ServicePubsub, googlecloud.ServiceLoadBalancing:
 		return
 	default:
-		f = fmt.Sprintf(`%s AND resource.labels.zone = "%s"`, f, r.config.Zone)
+		if r.config.Region != "" && r.config.Zone != "" {
+			r.logger.Warnf("when region %s and zone %s config parameter "+
+				"both are provided, only use region", r.config.Region, r.config.Zone)
+		}
+		if r.config.Region != "" {
+			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, r.config.Region)
+		} else if r.config.Zone != "" {
+			f = fmt.Sprintf(`%s AND resource.labels.zone = "%s"`, f, r.config.Zone)
+		}
 	}
-
 	return
 }
 

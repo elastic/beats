@@ -16,9 +16,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 // Config defines all required and optional parameters for aws metricsets
@@ -32,6 +32,7 @@ type Config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	RegionsList []string
+	Endpoint    string
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
 	AccountName string
@@ -86,7 +87,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account name
-	svcIam := iam.New(awsConfig)
+	awsConfig.Region = "us-east-1"
+	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "iam", "", awsConfig))
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
 	if err != nil {
@@ -100,7 +103,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Get IAM account id
-	svcSts := sts.New(awsConfig)
+	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "sts", "", awsConfig))
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
@@ -111,9 +115,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		// set default region to make initial aws api call
-		awsConfig.Region = "us-west-1"
-		svcEC2 := ec2.New(awsConfig)
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", "", awsConfig))
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err

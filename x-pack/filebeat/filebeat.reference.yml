@@ -119,6 +119,9 @@ filebeat.modules:
     # Default to be 120s
     #var.api_timeout: 120s
 
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   elb:
     enabled: false
 
@@ -141,6 +144,9 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
 
   vpcflow:
     enabled: false
@@ -165,6 +171,9 @@ filebeat.modules:
     # Default to be 120s
     #var.api_timeout: 120s
 
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
   cloudtrail:
     enabled: false
 
@@ -187,6 +196,9 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -547,6 +559,12 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -1548,8 +1566,7 @@ filebeat.inputs:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1748,7 +1765,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1847,7 +1864,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2034,6 +2051,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -2279,7 +2298,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -2338,10 +2356,10 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
@@ -2365,6 +2383,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
