@@ -1,4 +1,4 @@
-- name: cloudwatch_ec2
+- name: ec2
   type: group
   release: beta
   default_field: false

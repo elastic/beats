@@ -51,6 +51,15 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
 
+  ec2:
+    enabled: false
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
+
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
@@ -118,11 +127,17 @@ on, it only reads the CloudTrail logs.
 === cloudwatch fileset
 
 Users can use Amazon CloudWatch Logs to monitor, store, and access log files
-from Amazon EC2 instances, AWS CloudTrail, Route 53, and other sources.
-Then export logs from log groups to Amazon S3 bucket which has SQS notification
-setup already. Right now, this fileset only parses EC2 logs into fields like `ip`
-and `program_name`. For logs from other services, this fileset will store them into
-`message` field.
+from different sources. Export logs from log groups to Amazon S3 bucket which
+has SQS notification setup already. This fileset will parse these logs into
+`timestamp` and `message` field.
+
+[float]
+=== ec2 fileset
+
+This fileset is specifically for EC2 logs stored in AWS CloudWatch. Export logs
+from log groups to Amazon S3 bucket which has SQS notification setup already.
+With this fileset, EC2 logs will be parsed into fields like  `ip`
+and `program_name`. For logs from other services, please use `cloudwatch` fileset.
 
 [float]
 === elb fileset

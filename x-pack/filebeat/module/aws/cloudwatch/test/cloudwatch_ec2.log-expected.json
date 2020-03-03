@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-02-27T19:29:13.341Z",
+        "@timestamp": "2020-03-03T15:08:08.438Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",
@@ -10,7 +10,7 @@
         "service.type": "aws"
     },
     {
-        "@timestamp": "2020-02-27T19:29:13.348Z",
+        "@timestamp": "2020-03-03T15:08:08.446Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",
@@ -20,7 +20,7 @@
         "service.type": "aws"
     },
     {
-        "@timestamp": "2020-02-27T19:29:13.355Z",
+        "@timestamp": "2020-03-03T15:08:08.453Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",
@@ -30,7 +30,7 @@
         "service.type": "aws"
     },
     {
-        "@timestamp": "2020-02-27T19:29:13.355Z",
+        "@timestamp": "2020-03-03T15:08:08.453Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",
@@ -40,7 +40,7 @@
         "service.type": "aws"
     },
     {
-        "@timestamp": "2020-02-27T19:29:13.355Z",
+        "@timestamp": "2020-03-03T15:08:08.453Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",
@@ -50,7 +50,7 @@
         "service.type": "aws"
     },
     {
-        "@timestamp": "2020-02-27T19:29:13.355Z",
+        "@timestamp": "2020-03-03T15:08:08.453Z",
         "event.dataset": "aws.cloudwatch",
         "event.module": "aws",
         "fileset.name": "cloudwatch",

@@ -1320,13 +1320,13 @@ Fields for AWS CloudWatch logs.
 
 
 [float]
-=== cloudwatch_ec2
+=== ec2
 
 Fields for AWS EC2 logs in CloudWatch.
 
 
 
-*`aws.cloudwatch_ec2.ip_address`*::
+*`aws.ec2.ip_address`*::
 +
 --
 The internet address of the requester.
@@ -1336,7 +1336,7 @@ type: keyword
 
 --
 
-*`aws.cloudwatch_ec2.program_name`*::
+*`aws.ec2.program_name`*::
 +
 --
 The program name of the log entry.
