@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
