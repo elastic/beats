@@ -326,7 +326,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					if err == common.ErrKeyNotFound {
 						in.log.Info("Pagination finished.")
 						return nil
-					} else { 
+					} else {
 						return errors.Wrapf(err, "failed to retrieve id_field for pagination")
 					}
 				}
