@@ -146,6 +146,8 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
+	t.Skip("Concurrency issue see https://github.com/elastic/beats/issues/16771 for a stacktrace")
+
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
 		Duration: 5 * time.Second,
