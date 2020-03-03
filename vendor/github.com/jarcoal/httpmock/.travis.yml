@@ -1,0 +1,39 @@
+language: go
+go_import_path: github.com/jarcoal/httpmock
+
+sudo: false
+
+matrix:
+  include:
+    - go: 1.7.x
+    - go: 1.8.x
+    - go: 1.9.x
+    - go: 1.10.x
+    - go: 1.11.x
+    - go: 1.12.x
+      env:
+        - USE_LINTER=1
+      install:
+        - >
+          version=1.15.0; name=golangci-lint-$version-linux-amd64;
+          wget -q -O - https://github.com/golangci/golangci-lint/releases/download/v$version/$name.tar.gz |
+            tar -zxvf - -C $GOPATH/bin &&
+              mv $GOPATH/bin/$name/golangci-lint $GOPATH/bin
+      after_success:
+        - go get github.com/mattn/goveralls
+        - goveralls -coverprofile=coverage.out -service=travis-ci
+    - go: master
+  allow_failures:
+    - go: master
+  fast_finish: true
+
+script:
+  - export GORACE="halt_on_error=1"
+  - go test -race -covermode=atomic -coverprofile=coverage.out ./...
+  - >
+    if [ "$USE_LINTER" = 1 ]; then
+      golangci-lint run -E gofmt -E golint -E maligned -E misspell -E prealloc -E unconvert ./...;
+    fi
+
+notifications:
+  email: false

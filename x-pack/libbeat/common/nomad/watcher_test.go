@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/elastic/beats/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	api "github.com/hashicorp/nomad/api"
 	"github.com/hashicorp/nomad/nomad/mock"
 	"github.com/stretchr/testify/assert"

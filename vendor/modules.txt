@@ -116,6 +116,8 @@ github.com/akavel/rsrc/coff
 github.com/akavel/rsrc/ico
 # github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 github.com/andrewkroh/sys/windows/svc/eventlog
+# github.com/armon/go-metrics v0.0.0-20190430140413-ec5e00d3c878
+github.com/armon/go-metrics
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 github.com/armon/go-socks5
 # github.com/aws/aws-lambda-go v1.6.0
@@ -288,6 +290,8 @@ github.com/bsm/sarama-cluster
 # github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
 github.com/cavaliercoder/go-rpm
 github.com/cavaliercoder/go-rpm/version
+# github.com/cespare/xxhash v1.1.0
+github.com/cespare/xxhash
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
 # github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
@@ -405,6 +409,124 @@ github.com/eapache/queue
 # github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
+# github.com/elastic/beats v7.6.0+incompatible
+github.com/elastic/beats/libbeat/api
+github.com/elastic/beats/libbeat/api/npipe
+github.com/elastic/beats/libbeat/asset
+github.com/elastic/beats/libbeat/autodiscover
+github.com/elastic/beats/libbeat/autodiscover/appenders/config
+github.com/elastic/beats/libbeat/autodiscover/builder
+github.com/elastic/beats/libbeat/autodiscover/meta
+github.com/elastic/beats/libbeat/autodiscover/providers/docker
+github.com/elastic/beats/libbeat/autodiscover/providers/jolokia
+github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes
+github.com/elastic/beats/libbeat/autodiscover/template
+github.com/elastic/beats/libbeat/beat
+github.com/elastic/beats/libbeat/cfgfile
+github.com/elastic/beats/libbeat/cloudid
+github.com/elastic/beats/libbeat/cmd/instance
+github.com/elastic/beats/libbeat/common
+github.com/elastic/beats/libbeat/common/atomic
+github.com/elastic/beats/libbeat/common/backoff
+github.com/elastic/beats/libbeat/common/bus
+github.com/elastic/beats/libbeat/common/cfgtype
+github.com/elastic/beats/libbeat/common/cfgwarn
+github.com/elastic/beats/libbeat/common/docker
+github.com/elastic/beats/libbeat/common/dtfmt
+github.com/elastic/beats/libbeat/common/file
+github.com/elastic/beats/libbeat/common/flowhash
+github.com/elastic/beats/libbeat/common/fmtstr
+github.com/elastic/beats/libbeat/common/jsontransform
+github.com/elastic/beats/libbeat/common/kafka
+github.com/elastic/beats/libbeat/common/kubernetes
+github.com/elastic/beats/libbeat/common/kubernetes/metadata
+github.com/elastic/beats/libbeat/common/match
+github.com/elastic/beats/libbeat/common/reload
+github.com/elastic/beats/libbeat/common/safemapstr
+github.com/elastic/beats/libbeat/common/schema
+github.com/elastic/beats/libbeat/common/schema/mapstriface
+github.com/elastic/beats/libbeat/common/seccomp
+github.com/elastic/beats/libbeat/common/streambuf
+github.com/elastic/beats/libbeat/common/transport/tlscommon
+github.com/elastic/beats/libbeat/conditions
+github.com/elastic/beats/libbeat/dashboards
+github.com/elastic/beats/libbeat/feature
+github.com/elastic/beats/libbeat/idxmgmt
+github.com/elastic/beats/libbeat/idxmgmt/ilm
+github.com/elastic/beats/libbeat/keystore
+github.com/elastic/beats/libbeat/kibana
+github.com/elastic/beats/libbeat/logp
+github.com/elastic/beats/libbeat/logp/configure
+github.com/elastic/beats/libbeat/management
+github.com/elastic/beats/libbeat/mapping
+github.com/elastic/beats/libbeat/metric/system/cpu
+github.com/elastic/beats/libbeat/metric/system/host
+github.com/elastic/beats/libbeat/metric/system/memory
+github.com/elastic/beats/libbeat/metric/system/process
+github.com/elastic/beats/libbeat/monitoring
+github.com/elastic/beats/libbeat/monitoring/adapter
+github.com/elastic/beats/libbeat/monitoring/report
+github.com/elastic/beats/libbeat/monitoring/report/elasticsearch
+github.com/elastic/beats/libbeat/monitoring/report/log
+github.com/elastic/beats/libbeat/outputs
+github.com/elastic/beats/libbeat/outputs/codec
+github.com/elastic/beats/libbeat/outputs/codec/format
+github.com/elastic/beats/libbeat/outputs/codec/json
+github.com/elastic/beats/libbeat/outputs/console
+github.com/elastic/beats/libbeat/outputs/elasticsearch
+github.com/elastic/beats/libbeat/outputs/fileout
+github.com/elastic/beats/libbeat/outputs/kafka
+github.com/elastic/beats/libbeat/outputs/logstash
+github.com/elastic/beats/libbeat/outputs/outil
+github.com/elastic/beats/libbeat/outputs/redis
+github.com/elastic/beats/libbeat/outputs/transport
+github.com/elastic/beats/libbeat/paths
+github.com/elastic/beats/libbeat/plugin
+github.com/elastic/beats/libbeat/processors
+github.com/elastic/beats/libbeat/processors/actions
+github.com/elastic/beats/libbeat/processors/add_cloud_metadata
+github.com/elastic/beats/libbeat/processors/add_docker_metadata
+github.com/elastic/beats/libbeat/processors/add_host_metadata
+github.com/elastic/beats/libbeat/processors/add_id
+github.com/elastic/beats/libbeat/processors/add_id/generator
+github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata
+github.com/elastic/beats/libbeat/processors/add_locale
+github.com/elastic/beats/libbeat/processors/add_observer_metadata
+github.com/elastic/beats/libbeat/processors/add_process_metadata
+github.com/elastic/beats/libbeat/processors/checks
+github.com/elastic/beats/libbeat/processors/communityid
+github.com/elastic/beats/libbeat/processors/convert
+github.com/elastic/beats/libbeat/processors/dissect
+github.com/elastic/beats/libbeat/processors/dns
+github.com/elastic/beats/libbeat/processors/extract_array
+github.com/elastic/beats/libbeat/processors/fingerprint
+github.com/elastic/beats/libbeat/processors/registered_domain
+github.com/elastic/beats/libbeat/processors/script/javascript
+github.com/elastic/beats/libbeat/processors/script/javascript/module
+github.com/elastic/beats/libbeat/processors/script/javascript/module/console
+github.com/elastic/beats/libbeat/processors/script/javascript/module/net
+github.com/elastic/beats/libbeat/processors/script/javascript/module/path
+github.com/elastic/beats/libbeat/processors/script/javascript/module/processor
+github.com/elastic/beats/libbeat/processors/script/javascript/module/require
+github.com/elastic/beats/libbeat/processors/timeseries
+github.com/elastic/beats/libbeat/processors/timestamp
+github.com/elastic/beats/libbeat/processors/util
+github.com/elastic/beats/libbeat/publisher
+github.com/elastic/beats/libbeat/publisher/includes
+github.com/elastic/beats/libbeat/publisher/pipeline
+github.com/elastic/beats/libbeat/publisher/processing
+github.com/elastic/beats/libbeat/publisher/queue
+github.com/elastic/beats/libbeat/publisher/queue/memqueue
+github.com/elastic/beats/libbeat/publisher/queue/spool
+github.com/elastic/beats/libbeat/service
+github.com/elastic/beats/libbeat/template
+github.com/elastic/beats/libbeat/testing
+github.com/elastic/beats/libbeat/version
+github.com/elastic/beats/metricbeat/helper/dialer
+github.com/elastic/beats/metricbeat/include/fields
+github.com/elastic/beats/metricbeat/mb
+github.com/elastic/beats/metricbeat/mb/testing
+github.com/elastic/beats/metricbeat/mb/testing/flags
 # github.com/elastic/ecs v1.4.0
 github.com/elastic/ecs/code/go/ecs
 # github.com/elastic/go-libaudit v0.4.0
@@ -481,7 +603,7 @@ github.com/elastic/gosigar/cgroup
 github.com/elastic/gosigar/sys
 github.com/elastic/gosigar/sys/linux
 github.com/elastic/gosigar/sys/windows
-# github.com/fatih/color v1.5.0
+# github.com/fatih/color v1.9.0
 github.com/fatih/color
 # github.com/fsnotify/fsevents v0.0.0-00010101000000-000000000000 => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 github.com/fsnotify/fsevents
@@ -515,7 +637,7 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 # github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7
 github.com/golang/groupcache/lru
-# github.com/golang/protobuf v1.3.2
+# github.com/golang/protobuf v1.3.4
 github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go
@@ -561,10 +683,29 @@ github.com/googleapis/gax-go/v2
 github.com/googleapis/gnostic/OpenAPIv2
 github.com/googleapis/gnostic/compiler
 github.com/googleapis/gnostic/extensions
-# github.com/gorhill/cronexpr v0.0.0-20161205141322-d520615e531a
+# github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 github.com/gorhill/cronexpr
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
+# github.com/hashicorp/consul/api v1.4.0
+github.com/hashicorp/consul/api
+# github.com/hashicorp/errwrap v1.0.0
+github.com/hashicorp/errwrap
+# github.com/hashicorp/go-cleanhttp v0.5.1
+github.com/hashicorp/go-cleanhttp
+# github.com/hashicorp/go-hclog v0.12.0
+github.com/hashicorp/go-hclog
+# github.com/hashicorp/go-immutable-radix v1.1.0
+github.com/hashicorp/go-immutable-radix
+# github.com/hashicorp/go-msgpack v0.5.5
+github.com/hashicorp/go-msgpack/codec
+# github.com/hashicorp/go-multierror v1.0.0
+github.com/hashicorp/go-multierror
+# github.com/hashicorp/go-plugin v1.1.0
+github.com/hashicorp/go-plugin
+github.com/hashicorp/go-plugin/internal/plugin
+# github.com/hashicorp/go-rootcerts v1.0.2
+github.com/hashicorp/go-rootcerts
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
 # github.com/hashicorp/go-version v1.0.0
@@ -572,6 +713,38 @@ github.com/hashicorp/go-version
 # github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
+# github.com/hashicorp/hcl v1.0.0
+github.com/hashicorp/hcl
+github.com/hashicorp/hcl/hcl/ast
+github.com/hashicorp/hcl/hcl/parser
+github.com/hashicorp/hcl/hcl/scanner
+github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/json/scanner
+github.com/hashicorp/hcl/json/token
+# github.com/hashicorp/nomad v0.10.4
+github.com/hashicorp/nomad/acl
+github.com/hashicorp/nomad/command/agent/pprof
+github.com/hashicorp/nomad/helper
+github.com/hashicorp/nomad/helper/args
+github.com/hashicorp/nomad/helper/constraints/semver
+github.com/hashicorp/nomad/helper/flatmap
+github.com/hashicorp/nomad/helper/uuid
+github.com/hashicorp/nomad/lib/kheap
+github.com/hashicorp/nomad/nomad/mock
+github.com/hashicorp/nomad/nomad/structs
+github.com/hashicorp/nomad/plugins/shared/structs
+github.com/hashicorp/nomad/plugins/shared/structs/proto
+# github.com/hashicorp/nomad/api v0.0.0-20200303123313-e70221216db3
+github.com/hashicorp/nomad/api
+github.com/hashicorp/nomad/api/contexts
+# github.com/hashicorp/raft v1.1.2
+github.com/hashicorp/raft
+# github.com/hashicorp/serf v0.8.2
+github.com/hashicorp/serf/coordinate
+# github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb
+github.com/hashicorp/yamux
 # github.com/haya14busa/go-actions-toolkit v0.0.0-20200105081403-ca0307860f01
 github.com/haya14busa/go-actions-toolkit/core
 # github.com/imdario/mergo v0.3.6
@@ -581,6 +754,8 @@ github.com/inconshreveable/mousetrap
 # github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2 => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3
 github.com/insomniacslk/dhcp/dhcpv4
 github.com/insomniacslk/dhcp/iana
+# github.com/jarcoal/httpmock v1.0.4
+github.com/jarcoal/httpmock
 # github.com/jcmturner/gofork v1.0.0
 github.com/jcmturner/gofork/encoding/asn1
 github.com/jcmturner/gofork/x/crypto/pbkdf2
@@ -628,11 +803,11 @@ github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
-# github.com/mattn/go-colorable v0.0.8
+# github.com/mattn/go-colorable v0.1.4
 github.com/mattn/go-colorable
 # github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe
 github.com/mattn/go-ieproxy
-# github.com/mattn/go-isatty v0.0.2
+# github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/mattn/go-shellwords v1.0.7
 github.com/mattn/go-shellwords
@@ -640,8 +815,12 @@ github.com/mattn/go-shellwords
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/miekg/dns v1.1.15
 github.com/miekg/dns
+# github.com/mitchellh/copystructure v1.0.0
+github.com/mitchellh/copystructure
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
+# github.com/mitchellh/go-testing-interface v1.0.0
+github.com/mitchellh/go-testing-interface
 # github.com/mitchellh/gox v1.0.1
 github.com/mitchellh/gox
 # github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
@@ -650,12 +829,16 @@ github.com/mitchellh/hashstructure
 github.com/mitchellh/iochan
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
+# github.com/mitchellh/reflectwalk v1.0.0
+github.com/mitchellh/reflectwalk
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
 # github.com/morikuni/aec v1.0.0
 github.com/morikuni/aec
+# github.com/oklog/run v1.0.0
+github.com/oklog/run
 # github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483
 github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
@@ -707,6 +890,8 @@ github.com/reviewdog/reviewdog/service/github
 github.com/reviewdog/reviewdog/service/github/githubutils
 github.com/reviewdog/reviewdog/service/gitlab
 github.com/reviewdog/reviewdog/service/serviceutil
+# github.com/ryanuber/go-glob v1.0.0
+github.com/ryanuber/go-glob
 # github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e
 github.com/samuel/go-parser/parser
 # github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
@@ -738,6 +923,8 @@ github.com/tsg/gopacket
 github.com/tsg/gopacket/afpacket
 github.com/tsg/gopacket/layers
 github.com/tsg/gopacket/pcap
+# github.com/ugorji/go/codec v1.1.7
+github.com/ugorji/go/codec
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
 # github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b
@@ -862,7 +1049,7 @@ golang.org/x/oauth2/jwt
 # golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c
+# golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -993,6 +1180,8 @@ google.golang.org/grpc/credentials/oauth
 google.golang.org/grpc/encoding
 google.golang.org/grpc/encoding/proto
 google.golang.org/grpc/grpclog
+google.golang.org/grpc/health
+google.golang.org/grpc/health/grpc_health_v1
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/balancerload
@@ -1061,7 +1250,7 @@ gopkg.in/mgo.v2/bson
 gopkg.in/mgo.v2/internal/json
 gopkg.in/mgo.v2/internal/sasl
 gopkg.in/mgo.v2/internal/scram
-# gopkg.in/yaml.v2 v2.2.7
+# gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
 # honnef.co/go/tools v0.0.1-2019.2.3
 honnef.co/go/tools/arg

@@ -13,15 +13,14 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/hashicorp/nomad/api"
 	"github.com/hashicorp/nomad/helper"
-	"github.com/hashicorp/nomad/nomad/structs"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/jarcoal/httpmock.v1"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/tests/resources"
-	"github.com/elastic/beats/x-pack/libbeat/common/nomad"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -112,8 +111,8 @@ func TestEmitEvent(t *testing.T) {
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
-					Type:        helper.StringToPtr(structs.JobTypeService),
-					Status:      helper.StringToPtr(structs.JobStatusRunning),
+					Type:        helper.StringToPtr(nomad.JobTypeService),
+					Status:      helper.StringToPtr(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -177,7 +176,7 @@ func TestEmitEvent(t *testing.T) {
 					"region":    "global",
 					"type":      "service",
 					"alloc_id":  UUID.String(),
-					"status":    structs.AllocClientStatusRunning,
+					"status":    nomad.AllocClientStatusRunning,
 				},
 			},
 		},
@@ -195,8 +194,8 @@ func TestEmitEvent(t *testing.T) {
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
-					Type:        helper.StringToPtr(structs.JobTypeService),
-					Status:      helper.StringToPtr(structs.JobStatusRunning),
+					Type:        helper.StringToPtr(nomad.JobTypeService),
+					Status:      helper.StringToPtr(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",

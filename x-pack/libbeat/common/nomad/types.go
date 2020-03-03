@@ -6,7 +6,6 @@ package nomad
 
 import (
 	api "github.com/hashicorp/nomad/api"
-	// api "github.com/hashicorp/nomad/nomad/structs"
 )
 
 // Resource contains data about a nomad allocation
@@ -35,4 +34,21 @@ const (
 	AllocClientStatusComplete = api.AllocClientStatusComplete
 	AllocClientStatusFailed   = api.AllocClientStatusFailed
 	AllocClientStatusLost     = api.AllocClientStatusLost
+)
+
+const (
+	// JobTypeService indicates a long-running processes
+	JobTypeService = api.JobTypeService
+
+	// JobTypeBatch indicates a short-lived process
+	JobTypeBatch = api.JobTypeBatch
+
+	// JobTypeSystem indicates a system process that should run on all clients
+	JobTypeSystem = api.JobTypeSystem
+
+	// PeriodicSpecCron is used for a cron spec.
+	PeriodicSpecCron = api.PeriodicSpecCron
+
+	// DefaultNamespace is the default namespace.
+	DefaultNamespace = api.DefaultNamespace
 )
