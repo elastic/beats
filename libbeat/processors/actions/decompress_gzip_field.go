@@ -25,11 +25,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/checks"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 )
 
 type decompressGzipField struct {

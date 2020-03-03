@@ -74,6 +74,7 @@ type (
 		handlersMu    sync.Mutex
 		partitionIDs  []string
 		noBanner      bool
+		webSocketConnection bool
 		env           *azure.Environment
 	}
 
@@ -113,6 +114,14 @@ func WithConsumerGroup(consumerGroup string) EventProcessorHostOption {
 func WithEnvironment(env azure.Environment) EventProcessorHostOption {
 	return func(host *EventProcessorHost) error {
 		host.env = &env
+		return nil
+	}
+}
+
+// WithWebSocketConnection will configure an EventProcessorHost to use websockets
+func WithWebSocketConnection() EventProcessorHostOption {
+	return func(host *EventProcessorHost) error {
+		host.webSocketConnection = true
 		return nil
 	}
 }
@@ -165,6 +174,10 @@ func NewFromConnectionString(ctx context.Context, connStr string, leaser Leaser,
 		hubOpts = append(hubOpts, eventhub.HubWithEnvironment(*host.env))
 	}
 
+	if host.webSocketConnection {
+		hubOpts = append(hubOpts, eventhub.HubWithWebSocketConnection())
+	}
+
 	client, err := eventhub.NewHubFromConnectionString(connStr, hubOpts...)
 	if err != nil {
 		tab.For(ctx).Error(err)
@@ -215,6 +228,10 @@ func New(ctx context.Context, namespace, hubName string, tokenProvider auth.Toke
 	hubOpts := []eventhub.HubOption{eventhub.HubWithOffsetPersistence(persister)}
 	if host.env != nil {
 		hubOpts = append(hubOpts, eventhub.HubWithEnvironment(*host.env))
+	}
+
+	if host.webSocketConnection {
+		hubOpts = append(hubOpts, eventhub.HubWithWebSocketConnection())
 	}
 
 	client, err := eventhub.NewHub(namespace, hubName, tokenProvider, hubOpts...)

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func MockResource() resources.GenericResource {
@@ -121,30 +121,4 @@ func TestMapMetric(t *testing.T) {
 		}
 		m.AssertExpectations(t)
 	})
-}
-
-func TestContainsDimension(t *testing.T) {
-	dimension := "VMName"
-	dim1 := "SlotID"
-	dim2 := "VNU"
-	dim3 := "VMName"
-	dimensionList := []insights.LocalizableString{
-		{
-			Value:          &dim1,
-			LocalizedValue: &dim1,
-		},
-		{
-			Value:          &dim2,
-			LocalizedValue: &dim2,
-		},
-		{
-			Value:          &dim3,
-			LocalizedValue: &dim3,
-		},
-	}
-	result := containsDimension(dimension, dimensionList)
-	assert.True(t, result)
-	dimension = "VirtualMachine"
-	result = containsDimension(dimension, dimensionList)
-	assert.False(t, result)
 }
