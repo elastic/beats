@@ -1,6 +1,10 @@
 [[add-fields]]
 === Add fields
 
+++++
+<titleabbrev>add_fields</titleabbrev>
+++++
+
 The `add_fields` processor adds additional fields to the event.  Fields can be
 scalar values, arrays, dictionaries, or any nested combination of these.  By
 default the fields that you specify will be grouped under the `fields`
