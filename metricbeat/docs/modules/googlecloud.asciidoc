@@ -86,6 +86,7 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
+  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
@@ -99,6 +100,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
+* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
+
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
 * <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
@@ -106,6 +109,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
 include::googlecloud/compute.asciidoc[]
+
+include::googlecloud/loadbalancing.asciidoc[]
 
 include::googlecloud/pubsub.asciidoc[]
 
