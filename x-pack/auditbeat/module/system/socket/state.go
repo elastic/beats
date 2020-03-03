@@ -714,6 +714,7 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 		sock.closing = true
 		s.socketLRU.remove(sock)
 		s.closing.add(sock)
+		s.socketLRU.remove(sock)
 	}
 	return nil
 }
