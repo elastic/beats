@@ -15,15 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
+// +build integration
 // +build windows
 
 package webserver
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -33,23 +31,26 @@ import (
 )
 
 func TestData(t *testing.T) {
-	m := mbtest.NewFetcher(t, getConfig())
-	m.WriteEvents(t, "")
+	c := map[string]interface{}{
+		"module":     "iis",
+		"metricsets": []string{"webserver"},
+	}
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, c)
+	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
+		// should find a way to first check if iis is running
+		//	t.Fatal("write", err)
+	}
 }
 
 func TestFetch(t *testing.T) {
-	m := mbtest.NewFetcher(t, getConfig())
-	events, errs := m.FetchEvents()
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+	c := map[string]interface{}{
 		"module":     "iis",
 		"metricsets": []string{"webserver"},
+	}
+	m := mbtest.NewFetcher(t, c)
+	_, errs := m.FetchEvents()
+	if len(errs) > 0 {
+		// should find a way to first check if iis is running
+		//t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 }
