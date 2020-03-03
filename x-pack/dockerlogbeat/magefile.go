@@ -218,17 +218,20 @@ func Uninstall(ctx context.Context) error {
 	for _, plugin := range plugins {
 		if strings.Contains(plugin.Name, logDriverName) {
 			toRemoveName = plugin.Name
+			break
 		}
 	}
-	if toRemoveName != "" {
-		err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error disabling plugin")
-		}
-		err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error removing plugin")
-		}
+	if toRemoveName == "" {
+		return nil
+	}
+
+	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error disabling plugin")
+	}
+	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error removing plugin")
 	}
 
 	return nil
