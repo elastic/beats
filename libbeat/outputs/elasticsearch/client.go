@@ -29,14 +29,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.

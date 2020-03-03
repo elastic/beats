@@ -29,17 +29,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 var userAgent = useragent.UserAgent("Heartbeat")

@@ -20,7 +20,7 @@ package pipeline
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 type ackBuilder interface {

@@ -1,0 +1,46 @@
+{
+    "@timestamp" : "2020-02-28T14:20:00.000Z",
+    "cloud" : {
+        "provider" : "azure",
+        "region" : "westeurope"
+    },
+    "ecs" : {
+        "version" : "1.4.0"
+    },
+    "metricset" : {
+        "period" : 300000,
+        "name" : "container_instance"
+    },
+    "event" : {
+        "duration" : 2383878000,
+        "dataset" : "azure.container_instance",
+        "module" : "azure"
+    },
+    "azure" : {
+        "dimensions" : {
+            "container_name" : "testcontainergroup"
+        },
+        "container_instance" : {
+            "cpu_usage" : {
+                "avg" : 0
+            },
+            "memory_usage" : {
+                "avg" : 0
+            }
+        },
+        "timegrain" : "PT5M",
+        "resource" : {
+            "group" : "obs-infrastructure",
+            "tags" : {
+                "tag1" : "value1"
+            },
+            "name" : "testcontainergroup",
+            "type" : "Microsoft.ContainerInstance/containerGroups"
+        },
+        "subscription_id" : "123456-qwer-1234-5678-12345678",
+        "namespace" : "Microsoft.ContainerInstance/containerGroups"
+    },
+    "service" : {
+        "type" : "azure"
+    }
+}
