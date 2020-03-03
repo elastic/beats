@@ -221,7 +221,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	return result, nil
 }
 
-// enrichContainerID add container.id into meta for mapping to pickup
+// enrichContainerID adds container.id into meta for mapping to pickup
 func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) error {
 	if p.cidProvider == nil {
 		return nil
