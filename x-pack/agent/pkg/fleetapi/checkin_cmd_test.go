@@ -54,10 +54,10 @@ Something went wrong
 			raw := `
 {
 	"actions": [{
-		"type": "POLICY_CHANGE",
+		"type": "CONFIG_CHANGE",
 		"id": "id1",
 		"data": {
-			"policy": {
+			"config": {
 				"id": "policy-id",
 				"outputs": {
 					"default": {
@@ -102,7 +102,7 @@ Something went wrong
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
 		},
 	))
 
@@ -112,10 +112,10 @@ Something went wrong
 {
     "actions": [
         {
-            "type": "POLICY_CHANGE",
+            "type": "CONFIG_CHANGE",
             "id": "id1",
             "data": {
-                "policy": {
+                "config": {
                     "id": "policy-id",
                     "outputs": {
                         "default": {
@@ -165,7 +165,7 @@ Something went wrong
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
 
 			// UnknownAction
 			require.Equal(t, "id2", r.Actions[1].ID())

@@ -57,10 +57,10 @@ func TestActionStore(t *testing.T) {
 
 	t.Run("can save to disk known action type",
 		withFile(func(t *testing.T, file string) {
-			actionPolicyChange := &fleetapi.ActionPolicyChange{
+			actionConfigChange := &fleetapi.ActionConfigChange{
 				ActionID:   "abc123",
-				ActionType: "POLICY_CHANGE",
-				Policy: map[string]interface{}{
+				ActionType: "CONFIG_CHANGE",
+				Config: map[string]interface{}{
 					"hello": "world",
 				},
 			}
@@ -70,7 +70,7 @@ func TestActionStore(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
-			store.Add(actionPolicyChange)
+			store.Add(actionConfigChange)
 			err = store.Save()
 			require.NoError(t, err)
 			require.Equal(t, 1, len(store.Actions()))
@@ -82,12 +82,12 @@ func TestActionStore(t *testing.T) {
 			actions := store1.Actions()
 			require.Equal(t, 1, len(actions))
 
-			require.Equal(t, actionPolicyChange, actions[0])
+			require.Equal(t, actionConfigChange, actions[0])
 		}))
 
 	t.Run("when we ACK we save to disk",
 		withFile(func(t *testing.T, file string) {
-			actionPolicyChange := &fleetapi.ActionPolicyChange{
+			actionConfigChange := &fleetapi.ActionConfigChange{
 				ActionID: "abc123",
 			}
 
@@ -98,7 +98,7 @@ func TestActionStore(t *testing.T) {
 			acker := newActionStoreAcker(&testAcker{}, store)
 			require.Equal(t, 0, len(store.Actions()))
 
-			require.NoError(t, acker.Ack(context.Background(), actionPolicyChange))
+			require.NoError(t, acker.Ack(context.Background(), actionConfigChange))
 			require.Equal(t, 1, len(store.Actions()))
 		}))
 }

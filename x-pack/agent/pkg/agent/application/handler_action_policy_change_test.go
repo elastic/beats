@@ -32,35 +32,35 @@ func TestPolicyChange(t *testing.T) {
 	log, _ := logger.New()
 	ack := newNoopAcker()
 
-	t.Run("Receive a policy change and successfully emits a raw configuration", func(t *testing.T) {
+	t.Run("Receive a config change and successfully emits a raw configuration", func(t *testing.T) {
 		emitter := &mockEmitter{}
 
-		policy := map[string]interface{}{"hello": "world"}
-		action := &fleetapi.ActionPolicyChange{
+		conf := map[string]interface{}{"hello": "world"}
+		action := &fleetapi.ActionConfigChange{
 			ActionID:   "abc123",
-			ActionType: "POLICY_CHANGE",
-			Policy:     policy,
+			ActionType: "CONFIG_CHANGE",
+			Config:     conf,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.NoError(t, err)
-		require.Equal(t, config.MustNewConfigFrom(policy), emitter.policy)
+		require.Equal(t, config.MustNewConfigFrom(conf), emitter.policy)
 	})
 
-	t.Run("Receive a policy and fail to emits a raw configuration", func(t *testing.T) {
+	t.Run("Receive a config and fail to emits a raw configuration", func(t *testing.T) {
 		mockErr := errors.New("error returned")
 		emitter := &mockEmitter{err: mockErr}
 
-		policy := map[string]interface{}{"hello": "world"}
-		action := &fleetapi.ActionPolicyChange{
+		conf := map[string]interface{}{"hello": "world"}
+		action := &fleetapi.ActionConfigChange{
 			ActionID:   "abc123",
-			ActionType: "POLICY_CHANGE",
-			Policy:     policy,
+			ActionType: "CONFIG_CHANGE",
+			Config:     conf,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.Error(t, err)
@@ -69,21 +69,21 @@ func TestPolicyChange(t *testing.T) {
 
 func TestPolicyAcked(t *testing.T) {
 	log, _ := logger.New()
-	t.Run("Policy change should not ACK on error", func(t *testing.T) {
+	t.Run("Config change should not ACK on error", func(t *testing.T) {
 		tacker := &testAcker{}
 
 		mockErr := errors.New("error returned")
 		emitter := &mockEmitter{err: mockErr}
 
-		policy := map[string]interface{}{"hello": "world"}
+		config := map[string]interface{}{"hello": "world"}
 		actionID := "abc123"
-		action := &fleetapi.ActionPolicyChange{
+		action := &fleetapi.ActionConfigChange{
 			ActionID:   actionID,
-			ActionType: "POLICY_CHANGE",
-			Policy:     policy,
+			ActionType: "CONFIG_CHANGE",
+			Config:     config,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.Error(t, err)
@@ -92,20 +92,20 @@ func TestPolicyAcked(t *testing.T) {
 		assert.EqualValues(t, 0, len(actions))
 	})
 
-	t.Run("Policy change should ACK", func(t *testing.T) {
+	t.Run("Config change should ACK", func(t *testing.T) {
 		tacker := &testAcker{}
 
 		emitter := &mockEmitter{}
 
-		policy := map[string]interface{}{"hello": "world"}
+		config := map[string]interface{}{"hello": "world"}
 		actionID := "abc123"
-		action := &fleetapi.ActionPolicyChange{
+		action := &fleetapi.ActionConfigChange{
 			ActionID:   actionID,
-			ActionType: "POLICY_CHANGE",
-			Policy:     policy,
+			ActionType: "CONFIG_CHANGE",
+			Config:     config,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.NoError(t, err)
