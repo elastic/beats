@@ -10,7 +10,7 @@ import (
 	"github.com/urso/ecslog/backend/appender"
 	"github.com/urso/ecslog/backend/layout"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
 )
 
 // Logger alias ecslog.Logger with Logger.

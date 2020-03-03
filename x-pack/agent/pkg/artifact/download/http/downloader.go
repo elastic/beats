@@ -14,9 +14,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 const (

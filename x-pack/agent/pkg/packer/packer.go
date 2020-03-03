@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 )
 
 // PackMap represents multiples files packed, the key represent the path of the file and raw bytes of

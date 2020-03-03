@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 )
 
 // Action base interface for all the implemented action from the fleet API.

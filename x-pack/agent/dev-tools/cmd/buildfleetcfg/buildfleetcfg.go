@@ -13,8 +13,8 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/elastic/beats/licenses"
-	"github.com/elastic/beats/x-pack/agent/pkg/packer"
+	"github.com/elastic/beats/v7/licenses"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/packer"
 )
 
 var (
@@ -35,7 +35,7 @@ var tmpl = template.Must(template.New("cfg").Parse(`
 
 package application
 
-import "github.com/elastic/beats/x-pack/agent/pkg/packer"
+import "github.com/elastic/beats/v7/x-pack/agent/pkg/packer"
 
 // DefaultAgentFleetConfig is the content of the default configuration when we enroll a beat, the agent.yml
 // will be replaced with this variables.

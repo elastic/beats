@@ -5,10 +5,10 @@
 package config
 
 import (
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/retry"
 )
 
 // Config is an operator configuration

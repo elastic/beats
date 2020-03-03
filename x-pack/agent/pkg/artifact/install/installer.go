@@ -8,9 +8,9 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/install/tar"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/install/zip"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/tar"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/zip"
 )
 
 var (

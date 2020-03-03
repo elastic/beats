@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
 )
 
 type logger interface {

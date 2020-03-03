@@ -9,16 +9,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
-	operatorCfg "github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/stateresolver"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring/beats"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/configrequest"
+	operatorCfg "github.com/elastic/beats/v7/x-pack/agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/stateresolver"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app/monitoring/beats"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/state"
 )
 
 func TestGenerateSteps(t *testing.T) {

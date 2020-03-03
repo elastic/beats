@@ -11,8 +11,8 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/server"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/server"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
 
 func main() {

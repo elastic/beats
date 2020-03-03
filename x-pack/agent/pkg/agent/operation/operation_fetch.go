@@ -8,11 +8,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
 
 // operationFetch fetches artifact from preconfigured source

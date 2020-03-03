@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/cli"
 )
 
 func TestCmd(t *testing.T) {

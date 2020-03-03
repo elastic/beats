@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
 
 type rOp int

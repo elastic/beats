@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
 )
 
 type action = fleetapi.Action

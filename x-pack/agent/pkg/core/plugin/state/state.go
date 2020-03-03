@@ -4,7 +4,7 @@
 
 package state
 
-import "github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
+import "github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/process"
 
 // Status describes the current status of the application process.
 type Status int

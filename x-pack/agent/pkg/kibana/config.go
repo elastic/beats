@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Config is the configuration for the Kibana client.

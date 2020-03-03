@@ -15,12 +15,12 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/authority"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/authority"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
 
 const (
@@ -83,7 +83,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	spec.Args = a.monitor.EnrichArgs(spec.Args)
 
 	// specify beat name to avoid data lock conflicts
-	// as for https://github.com/elastic/beats/pull/14030 more than one instance
+	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
 	// of the beat with same data path fails to start
 	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 

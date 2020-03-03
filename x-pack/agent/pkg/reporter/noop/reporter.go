@@ -7,7 +7,7 @@ package noop
 import (
 	"context"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
 )
 
 // Reporter is a reporter without any effects, serves just as a showcase for further implementations.

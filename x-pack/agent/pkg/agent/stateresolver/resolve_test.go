@@ -11,10 +11,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/x-pack/agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 func TestResolver(t *testing.T) {

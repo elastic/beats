@@ -7,11 +7,11 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/process"
 )
 
 // operationStart start installed process

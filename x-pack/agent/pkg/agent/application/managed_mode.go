@@ -13,15 +13,15 @@ import (
 
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-	reporting "github.com/elastic/beats/x-pack/agent/pkg/reporter"
-	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
-	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
+	reporting "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
+	fleetreporter "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter/fleet"
+	logreporter "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter/log"
 )
 
 var gatewaySettings = &fleetGatewaySettings{

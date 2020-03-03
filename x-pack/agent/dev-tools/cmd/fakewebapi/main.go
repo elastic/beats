@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
 )
 
 var (

@@ -12,12 +12,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	c "github.com/elastic/beats/libbeat/common/cli"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/cli"
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	c "github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
 
 var defaultDelay = 1 * time.Second

@@ -12,9 +12,9 @@ import (
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
 )
 
 // AgentConfigFile is a name of file used to store agent information

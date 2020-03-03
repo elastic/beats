@@ -19,16 +19,16 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/x-pack/agent/pkg/release"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
 )
 
 const (
@@ -358,7 +358,7 @@ func flags() string {
 	commitID := commitID()
 
 	return fmt.Sprintf(
-		`-X "github.com/elastic/beats/x-pack/agent/pkg/release.buildTime=%s" -X "github.com/elastic/beats/x-pack/agent/pkg/release.commit=%s"`,
+		`-X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.buildTime=%s" -X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.commit=%s"`,
 		ts,
 		commitID,
 	)

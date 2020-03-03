@@ -15,8 +15,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
 )
 
 func TestLazyAcker(t *testing.T) {

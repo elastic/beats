@@ -5,11 +5,11 @@
 package localremote
 
 import (
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download/composed"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download/fs"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download/http"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download/composed"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download/fs"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download/http"
 )
 
 // NewVerifier creates a downloader which first checks local directory

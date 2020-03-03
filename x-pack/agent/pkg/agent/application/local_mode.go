@@ -7,14 +7,14 @@ package application
 import (
 	"context"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/application/info"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/dir"
-	reporting "github.com/elastic/beats/x-pack/agent/pkg/reporter"
-	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/dir"
+	reporting "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
+	logreporter "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter/log"
 )
 
 type emitterFunc func(*config.Config) error

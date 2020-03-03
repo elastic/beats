@@ -12,9 +12,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/crypto"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/crypto"
 )
 
 const perms = 0600

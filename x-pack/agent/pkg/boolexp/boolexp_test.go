@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/boolexp/parser"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/boolexp/parser"
 )
 
 var showDebug = lookupEnvOrDefault("DEBUG", "0")

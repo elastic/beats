@@ -7,8 +7,8 @@ package program
 import (
 	"fmt"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/x-pack/agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/boolexp"
 )
 
 type env struct {

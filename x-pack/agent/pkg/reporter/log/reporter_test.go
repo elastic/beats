@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
 )
 
 type testCase struct {

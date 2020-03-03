@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-	"github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
 )
 
 func TestEventsHaveAgentID(t *testing.T) {

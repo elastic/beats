@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download"
 )
 
 type FailingDownloader struct {

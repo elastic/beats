@@ -5,9 +5,9 @@
 package monitoring
 
 import (
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring/beats"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app/monitoring/beats"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app/monitoring/noop"
 )
 
 // Monitor is a monitoring interface providing information about the way

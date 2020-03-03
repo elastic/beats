@@ -5,8 +5,8 @@
 package application
 
 import (
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/program"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
 )
 
 const (

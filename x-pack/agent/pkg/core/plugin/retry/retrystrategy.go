@@ -7,7 +7,7 @@ package retry
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 // DoWithBackoff ignores retry config of delays and lets backoff decide how much time it needs.

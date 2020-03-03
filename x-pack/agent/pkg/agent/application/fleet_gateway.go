@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/scheduler"
 )
 
 type dispatcher interface {

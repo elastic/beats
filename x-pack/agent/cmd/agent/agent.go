@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/cmd"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/cmd"
 )
 
 // main just a wrapper, all commands are defined in 'pkg/agent/cmd'.

@@ -11,11 +11,11 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig"
 )
 
 const (

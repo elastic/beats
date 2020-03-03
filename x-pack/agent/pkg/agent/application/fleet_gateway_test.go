@@ -20,10 +20,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
-	repo "github.com/elastic/beats/x-pack/agent/pkg/reporter"
-	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
-	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
+	repo "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter"
+	fleetreporter "github.com/elastic/beats/v7/x-pack/agent/pkg/reporter/fleet"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/scheduler"
 )
 
 type clientCallbackFunc func(headers http.Header, body io.Reader) (*http.Response, error)

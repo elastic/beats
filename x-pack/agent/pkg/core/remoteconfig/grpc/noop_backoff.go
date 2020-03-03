@@ -5,7 +5,7 @@
 package grpc
 
 import (
-	"github.com/elastic/beats/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 // NoopBackoff implements a backoff interface without any wait.

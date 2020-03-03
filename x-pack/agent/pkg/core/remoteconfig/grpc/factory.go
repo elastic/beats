@@ -13,8 +13,8 @@ import (
 
 	rpc "google.golang.org/grpc"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig"
 )
 
 // NewConnFactory creates a factory used to create connection. Hides implementation details

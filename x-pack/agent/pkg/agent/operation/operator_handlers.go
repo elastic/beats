@@ -7,10 +7,10 @@ package operation
 import (
 	"fmt"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
-	"github.com/elastic/beats/x-pack/agent/pkg/agent/errors"
-	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app"
 )
 
 type handleFunc func(step configrequest.Step) error
