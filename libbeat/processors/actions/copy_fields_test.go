@@ -20,12 +20,11 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestCopyFields(t *testing.T) {
