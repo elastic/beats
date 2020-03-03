@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// NewProviderFromClientSecret returns a token provider that uses a secret
+// for authentication.
 func NewProviderFromClientSecret(endpoint, resource, applicationID, tenantID, secret string) (p TokenProvider, err error) {
 	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
 	if err != nil {

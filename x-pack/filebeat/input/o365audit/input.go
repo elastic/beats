@@ -108,9 +108,9 @@ func newInput(
 	}()
 
 	pollers := make(map[stream]*poll.Poller)
-	for _, tenantID := range config.tenants {
+	for _, tenantID := range config.TenantID {
 		// MaxRequestsPerMinute limitation is per tenant.
-		delay := time.Duration(len(config.contentTypes)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
+		delay := time.Duration(len(config.ContentType)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
 		auth, err := config.NewTokenProvider(tenantID)
 		if err != nil {
 			return nil, err
@@ -118,7 +118,7 @@ func newInput(
 		if _, err = auth.Token(); err != nil {
 			return nil, errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
 		}
-		for _, contentType := range config.contentTypes {
+		for _, contentType := range config.ContentType {
 			key := stream{
 				tenantID:    tenantID,
 				contentType: contentType,

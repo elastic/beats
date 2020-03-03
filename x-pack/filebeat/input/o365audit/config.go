@@ -27,17 +27,14 @@ type Config struct {
 
 	// TenantID (aka. Directory ID) is a list of tenants for which to fetch
 	// the audit logs. This can be a string or a list of strings.
-	TenantID interface{} `config:"tenant_id,replace" validate:"required"`
+	TenantID stringList `config:"tenant_id,replace" validate:"required"`
 
 	// Content-Type is a list of content-types to fetch.
 	// This can be a string or a list of strings.
-	ContentType interface{} `config:"content_type,replace"`
+	ContentType stringList `config:"content_type,replace"`
 
 	// API contains settings to adapt to changes on the API.
 	API APIConfig `config:"api"`
-
-	tenants      []string
-	contentTypes []string
 }
 
 // APIConfig contains advanced settings that are only supposed to be changed
@@ -149,36 +146,32 @@ func (c *Config) Validate() (err error) {
 			return errors.Wrap(err, "invalid certificate config")
 		}
 	}
-	if c.tenants, err = asStringList(c.TenantID); err != nil {
-		return errors.Wrap(err, "error validating tenant_id")
-	}
-	if c.contentTypes, err = asStringList(c.ContentType); err != nil {
-		return errors.Wrap(err, "error validating content_type")
-	}
 	return nil
 }
 
-// A helper to allow defining a field either as a string or a list of strings.
-func asStringList(value interface{}) (list []string, err error) {
+type stringList []string
+
+// Unpack populates the stringList with either a single string value or an array.
+func (s *stringList) Unpack(value interface{}) error {
 	switch v := value.(type) {
 	case string:
-		list = []string{v}
+		*s = []string{v}
 	case []string:
-		list = v
+		*s = v
 	case []interface{}:
-		list = make([]string, len(v))
+		*s = make([]string, len(v))
 		for idx, ival := range v {
 			str, ok := ival.(string)
 			if !ok {
-				return nil, fmt.Errorf("string value required. Found %v (type %T) at position %d",
+				return fmt.Errorf("string value required. Found %v (type %T) at position %d",
 					ival, ival, idx+1)
 			}
-			list[idx] = str
+			(*s)[idx] = str
 		}
 	default:
-		return nil, fmt.Errorf("array of strings required. Found %v (type %T)", value, value)
+		return fmt.Errorf("array of strings required. Found %v (type %T)", value, value)
 	}
-	return list, nil
+	return nil
 }
 
 // NewTokenProvider returns an auth.TokenProvider for the given tenantID.
