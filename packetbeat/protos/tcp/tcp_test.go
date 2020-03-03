@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"

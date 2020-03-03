@@ -8,9 +8,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	cfcommon "github.com/elastic/beats/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 )
 
 // ModuleName is the name of this module.

@@ -18,4 +18,5 @@ if [[ ! -f "${CHECK_DATABASE_CREATED}" ]]; then
   touch ${CHECK_DATABASE_CREATED}
 fi
 
-curl -s --insecure https://127.0.0.1:8070 >/dev/null
+curl -s --insecure https://127.0.0.1:8070 | grep -q "node_cpu" >/dev/null
+curl -s --insecure https://127.0.0.1:8070 | grep -q "listener_egress_bytes" >/dev/null
