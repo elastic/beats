@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": 1547688796000,
+        "@timestamp": "2019-01-17T01:33:16.636Z",
         "event.dataset": "zeek.files",
         "event.id": "C8I0zn3r9EPbfLgta6",
         "event.module": "zeek",
@@ -37,7 +37,7 @@
         "zeek.session_id": "C8I0zn3r9EPbfLgta6"
     },
     {
-        "@timestamp": 1547688801000,
+        "@timestamp": "2019-01-17T01:33:21.566Z",
         "event.dataset": "zeek.files",
         "event.id": "C6sjVo23iNApLnlAt6",
         "event.module": "zeek",
