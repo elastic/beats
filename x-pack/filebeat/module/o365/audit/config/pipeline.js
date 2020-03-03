@@ -441,13 +441,45 @@ function yammerSchema(debug) {
         ignore_missing: true,
         fail_on_error: false
     }));
-    builder.Add("setEventFields", new processor.AddFields({
-        target: 'event',
-        fields: {
-            category: 'file',
-        },
-        'when.equals.o365audit.DataExportTime': 'data',
-    }));
+
+    var actionToCategoryType = {
+        // Network or verified admin changes the information that appears on
+        // member profiles for network users network.
+        ProcessProfileFields: [ "iam", "user"],
+        // Verified admin updates the Yammer network's security configuration.
+        // This includes setting password expiration policies and restrictions
+        // on IP addresses.
+        NetworkSecurityConfigurationUpdated: [ "iam", "admin"],
+        // User uploads a file.
+        FileCreated: [ "file", "creation"],
+        // User creates a group.
+        GroupCreation: [ "iam", "group"],
+        // A group is deleted from Yammer.
+        GroupDeletion: [ "iam", "group"],
+        // User downloads a file.
+        FileDownloaded: [ "file", "access"],
+        // User shares a file with another user.
+        FileShared: [ "file", "access"],
+        // Network or verified admin suspends (deactivates) a user from Yammer.
+        NetworkUserSuspended: [ "iam", "user"],
+        // User account is suspended (deactivated).
+        UserSuspension: [ "iam", "user"],
+        // User changes the description of a file.
+        FileUpdateDescription: [ "file", "access"],
+        // User changes the name of a file.
+        FileUpdateName: [ "file", "creation"],
+        // User views a file.
+        FileVisited: [ "file", "access"],
+    };
+
+    builder.Add("setEventFields", function(evt) {
+        var action = evt.Get("event.action");
+        if (action == null) return;
+        var fields = actionToCategoryType[action];
+        if (fields == null) return;
+        evt.Put("event.category", fields[0]);
+        evt.Put("event.type", fields[1]);
+    });
     return builder.Build();
 }
 
