@@ -77,21 +77,11 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				if key != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 				}
-				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(metricGroup, resource, "", resourceSize, metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
 			}
 		}
 	}
 	return metrics, nil
-}
-
-// containsDimension will check if the dimension value is found in the list
-func containsDimension(dimension string, dimensions []insights.LocalizableString) bool {
-	for _, dim := range dimensions {
-		if *dim.Value == dimension {
-			return true
-		}
-	}
-	return false
 }
 
 // mapResourceSize func will try to map if existing the resource size, for the vmss it seems that SKU is populated and resource size is mapped in the name

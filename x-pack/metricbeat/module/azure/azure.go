@@ -106,7 +106,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
 		var resources []ResourceConfig
 		for _, resource := range config.Resources {
-			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.ID) {
+			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.Id) {
 				resources = append(resources, resource)
 			}
 		}
