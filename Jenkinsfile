@@ -459,7 +459,6 @@ pipeline {
             }
           }
         }
-         Temporarily disable generator jobs
         stage('Generators'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
