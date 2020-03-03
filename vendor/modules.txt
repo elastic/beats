@@ -410,6 +410,7 @@ github.com/elastic/ecs/code/go/ecs
 # github.com/elastic/go-concert v0.0.0-20200228180355-799bc08efe32
 github.com/elastic/go-concert
 github.com/elastic/go-concert/atomic
+github.com/elastic/go-concert/ctxtool
 # github.com/elastic/go-libaudit v0.4.0
 github.com/elastic/go-libaudit
 github.com/elastic/go-libaudit/aucoalesce
@@ -743,6 +744,9 @@ github.com/tsg/gopacket
 github.com/tsg/gopacket/afpacket
 github.com/tsg/gopacket/layers
 github.com/tsg/gopacket/pcap
+# github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797
+github.com/urso/diag
+github.com/urso/diag/ctxfmt
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
 # github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b
@@ -751,6 +755,8 @@ github.com/urso/magetools/ctrl
 github.com/urso/magetools/fs
 github.com/urso/magetools/gotool
 github.com/urso/magetools/mgenv
+# github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec
+github.com/urso/sderr
 # github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 github.com/vmware/govmomi
 github.com/vmware/govmomi/find

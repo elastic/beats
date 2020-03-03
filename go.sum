@@ -608,6 +608,8 @@ github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b/go.mod h1:jAqhj/JBVC
 github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a h1:vVmCas8T0lbxAI1GuQO45L0o/OrWJSXtiK6vH27Qspg=
 github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a/go.mod h1:RIkfovP3Y7my19aXEjjbNd9E5TlHozzAyt7B8AaEcwg=
 github.com/urfave/cli v0.0.0-20171014202726-7bc6a0acffa5/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
+github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 h1:OHNw/6pXODJAB32NujjdQO/KIYQ3KAbHQfCzH81XdCs=
+github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797/go.mod h1:pNWFTeQ+V1OYT/TzWpnWb6eQBdoXpdx+H+lrH97/Oyo=
 github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e h1:NiofbjIUI5gR+ybDsGSVH1fWyjSeDYiYVJHT1+kcsak=
 github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e/go.mod h1:6GfHrdWBQYjFRIznu7XuQH4lYB2w8nO4bnImVKkzPOM=
 github.com/urso/magetools v0.0.0-20190919040553-290c89e0c230/go.mod h1:DFxTNgS/ExCGmmjVjSOgS2WjtfjKXgCyDzAFgbtovSA=
@@ -615,6 +617,8 @@ github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b h1:eRYRTx+2CteM4P2U
 github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b/go.mod h1:DFxTNgS/ExCGmmjVjSOgS2WjtfjKXgCyDzAFgbtovSA=
 github.com/urso/qcgen v0.0.0-20180131103024-0b059e7db4f4 h1:hhA8EBThzz9PztawVTycKvfETVuBqxAQ5keFlAVtbAw=
 github.com/urso/qcgen v0.0.0-20180131103024-0b059e7db4f4/go.mod h1:RspW+E2Yb7Fs7HclB2tiDaiu6Rp41BiIG4Wo1YaoXGc=
+github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec h1:HkZIDJrMKZHPsYhmH2XjTTSk1pbMCFfpxSnyzZUFm+k=
+github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec/go.mod h1:Wp40HwmjM59FkDIVFfcCb9LzBbnc0XAMp8++hJuWvSU=
 github.com/vbatts/tar-split v0.11.1/go.mod h1:LEuURwDEiWjRjwu46yU3KVGuUdVv/dcnpcEPSzR8z6g=
 github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41 h1:NeNpIvfvaFOh0BH7nMEljE5Rk/VJlxhm58M41SeOD20=
 github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41/go.mod h1:URlwyTFZX72RmxtxuaFL2Uj3fD1JTvZdx59bHWk6aFU=
@@ -641,6 +645,7 @@ go.opencensus.io v0.22.2 h1:75k/FF0Q2YM8QYo07VPddOLBslDt1MZOdEslOHvmzAs=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.uber.org/atomic v1.3.1 h1:U8WaWEmp56LGz7PReduqHRVF6zzs9GbMC2NEZ42dxSQ=
 go.uber.org/atomic v1.3.1/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
+go.uber.org/goleak v1.0.0 h1:qsup4IcBdlmsnGfqyLl4Ntn3C2XCCuKAE7DwHpScyUo=
 go.uber.org/goleak v1.0.0/go.mod h1:8a7PlsEVH3e/a/GLqe5IIrQx6GzcnRmZEufDUTk4A7A=
 go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04 h1:8sYuFs2lovgFwQi15/wIkCkGX9sL8RouzbWUmBjTcXk=
 go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04/go.mod h1:wR5kodmAFQ0UK8QlbwjlSNy0Z68gJhDJUG5sjR94q/0=
