@@ -27,7 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	helper "github.com/elastic/v7/beats/libbeat/common/file"
+	helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/registry"
 	"github.com/elastic/beats/v7/libbeat/registry/backend/memlog"
