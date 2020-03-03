@@ -33,28 +33,35 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
-	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	schedule "github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func testRequest(t *testing.T, testURL string) *beat.Event {
-	return testTLSRequest(t, testURL, nil)
+func testRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
+	return testTLSRequest(t, testURL, useUrls, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
+func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
-		"urls":    testURL,
 		"timeout": "1s",
+	}
+
+	if useUrls {
+		configSrc["urls"] = testURL
+	} else {
+		configSrc["hosts"] = testURL
 	}
 
 	if extraConfig != nil {
@@ -69,7 +76,8 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "tls", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "tls", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -80,10 +88,10 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	return event
 }
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, *beat.Event) {
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
-	event := testRequest(t, server.URL)
+	event := testRequest(t, server.URL, useUrls)
 
 	return server, event
 }
@@ -100,6 +108,7 @@ func httpBaseChecks(urlStr string) validator.Validator {
 func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		httpBaseChecks(url),
+		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
 				"response.status_code":   statusCode,
@@ -111,6 +120,33 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 			},
 		}),
 	)
+}
+
+func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
+	return lookslike.Compose(
+		httpBaseChecks(url),
+		httpBodyChecks(),
+		lookslike.MustCompile(map[string]interface{}{
+			"http": map[string]interface{}{
+				"response.status_code": statusCode,
+				"rtt.total.us":         isdef.IsDuration,
+			},
+		}),
+	)
+}
+
+func httpBodyChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http.response.body.bytes": isdef.IsIntGt(-1),
+		"http.response.body.hash":  isdef.IsString,
+	})
+}
+
+func respondingHTTPBodyChecks(body string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http.response.body.content": body,
+		"http.response.body.bytes":   len(body),
+	})
 }
 
 var upStatuses = []int{
@@ -194,7 +230,27 @@ func TestUpStatuses(t *testing.T) {
 	for _, status := range upStatuses {
 		status := status
 		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
+
+			testslike.Test(
+				t,
+				lookslike.Strict(lookslike.Compose(
+					hbtest.BaseChecks("127.0.0.1", "up", "http"),
+					hbtest.RespondingTCPChecks(),
+					hbtest.SummaryChecks(1, 0),
+					respondingHTTPChecks(server.URL, status),
+				)),
+				event.Fields,
+			)
+		})
+	}
+}
+
+func TestUpStatusesWithUrlsConfig(t *testing.T) {
+	for _, status := range upStatuses {
+		status := status
+		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), true)
 
 			testslike.Test(
 				t,
@@ -214,7 +270,7 @@ func TestDownStatuses(t *testing.T) {
 	for _, status := range downStatuses {
 		status := status
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
 
 			testslike.Test(
 				t,
@@ -224,6 +280,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.SummaryChecks(0, 1),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
+					respondingHTTPBodyChecks("hello, world!"),
 				)),
 				event.Fields,
 			)
@@ -236,7 +293,7 @@ func TestLargeResponse(t *testing.T) {
 	defer server.Close()
 
 	configSrc := map[string]interface{}{
-		"urls":                server.URL,
+		"hosts":               server.URL,
 		"timeout":             "1s",
 		"check.response.body": "x",
 	}
@@ -247,7 +304,8 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -288,7 +346,7 @@ func runHTTPSServerCheck(
 	// we give it a few attempts to see if the server can come up before we run the real assertions.
 	var event *beat.Event
 	for i := 0; i < 10; i++ {
-		event = testTLSRequest(t, server.URL, mergedExtraConfig)
+		event = testTLSRequest(t, server.URL, false, mergedExtraConfig)
 		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
 			break
 		}
@@ -359,7 +417,7 @@ func TestConnRefusedJob(t *testing.T) {
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url)
+	event := testRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -381,7 +439,7 @@ func TestUnreachableJob(t *testing.T) {
 	port := uint16(1234)
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url)
+	event := testRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -393,4 +451,83 @@ func TestUnreachableJob(t *testing.T) {
 		)),
 		event.Fields,
 	)
+}
+
+func TestRedirect(t *testing.T) {
+	redirectingPaths := map[string]string{
+		"/redirect_one": "/redirect_two",
+		"/redirect_two": "/",
+	}
+	expectedBody := "TargetBody"
+	server := httptest.NewServer(hbtest.RedirectHandler(redirectingPaths, expectedBody))
+	defer server.Close()
+
+	testURL := server.URL + "/redirect_one"
+	configSrc := map[string]interface{}{
+		"urls":                testURL,
+		"timeout":             "1s",
+		"check.response.body": expectedBody,
+		"max_redirects":       10,
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	jobs, _, err := create("redirect", config)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
+
+	// Run this test multiple times since in the past we had an issue where the redirects
+	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
+	for i := 0; i < 10; i++ {
+		event := &beat.Event{}
+		_, err = job(event)
+		require.NoError(t, err)
+
+		testslike.Test(
+			t,
+			lookslike.Strict(lookslike.Compose(
+				hbtest.BaseChecks("", "up", "http"),
+				hbtest.SummaryChecks(1, 0),
+				minimalRespondingHTTPChecks(testURL, 200),
+				lookslike.MustCompile(map[string]interface{}{
+					"http.response.redirects": []string{
+						server.URL + redirectingPaths["/redirect_one"],
+						server.URL + redirectingPaths["/redirect_two"],
+					},
+				}),
+			)),
+			event.Fields,
+		)
+	}
+}
+
+func TestNewRoundTripper(t *testing.T) {
+	configs := map[string]Config{
+		"Plain":      {Timeout: time.Second},
+		"With Proxy": {Timeout: time.Second, ProxyURL: "http://localhost:1234"},
+	}
+
+	for name, config := range configs {
+		t.Run(name, func(t *testing.T) {
+			transp, err := newRoundTripper(&config, &transport.TLSConfig{})
+			require.NoError(t, err)
+
+			if config.ProxyURL == "" {
+				require.Nil(t, transp.Proxy)
+			} else {
+				require.NotNil(t, transp.Proxy)
+			}
+
+			// It's hard to compare func types in tests
+			require.NotNil(t, transp.Dial)
+			require.NotNil(t, transport.TLSDialer)
+
+			require.Equal(t, (&transport.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			require.True(t, transp.DisableKeepAlives)
+		})
+	}
+
 }

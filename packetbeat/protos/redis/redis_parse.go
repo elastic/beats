@@ -20,9 +20,9 @@ package redis
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type parser struct {
@@ -44,15 +44,11 @@ type redisMessage struct {
 	message   common.NetString
 	method    common.NetString
 	path      common.NetString
-
-	next *redisMessage
 }
 
-const (
-	start = iota
-	bulkArray
-	simpleMessage
-)
+func (msg *redisMessage) Size() int {
+	return len(msg.message)
+}
 
 var (
 	empty    = common.NetString("")

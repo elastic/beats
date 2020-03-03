@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func Test_addCertMetdata(t *testing.T) {
@@ -39,6 +39,19 @@ func Test_addCertMetdata(t *testing.T) {
 		},
 		NotBefore:             goodNotBefore,
 		NotAfter:              goodNotAfter,
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	expiredNotAfter := time.Now().Add(-time.Hour)
+	expiredCert := x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Organization: []string{"Acme Co"},
+		},
+		NotBefore:             goodNotBefore,
+		NotAfter:              expiredNotAfter,
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
@@ -76,27 +89,35 @@ func Test_addCertMetdata(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		chains   [][]*x509.Certificate
+		certs    []*x509.Certificate
 		expected expected
 	}{
 		{
 			"Valid cert",
-			[][]*x509.Certificate{{&goodCert}},
+			[]*x509.Certificate{&goodCert},
 			expected{
 				notBefore: goodNotBefore,
 				notAfter:  &goodNotAfter,
 			},
 		},
 		{
+			"Expired cert",
+			[]*x509.Certificate{&expiredCert},
+			expected{
+				notBefore: goodNotBefore,
+				notAfter:  &expiredNotAfter,
+			},
+		},
+		{
 			"Missing not before",
-			[][]*x509.Certificate{{&missingNotBeforeCert}},
+			[]*x509.Certificate{&missingNotBeforeCert},
 			expected{
 				notAfter: &goodNotAfter,
 			},
 		},
 		{
 			"Missing not after",
-			[][]*x509.Certificate{{&missingNotAfterCert}},
+			[]*x509.Certificate{&missingNotAfterCert},
 			expected{
 				notBefore: goodNotBefore,
 			},
@@ -105,7 +126,7 @@ func Test_addCertMetdata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			event := common.MapStr{}
-			addCertMetdata(event, tt.chains)
+			addCertMetdata(event, tt.certs)
 			v, err := event.GetValue("tls.certificate_not_valid_before")
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expected.notBefore, v)

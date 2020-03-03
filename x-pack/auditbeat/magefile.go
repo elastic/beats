@@ -15,11 +15,18 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 	devtools.BeatLicense = "Elastic License"
 	devtools.Platforms = devtools.Platforms.Filter("!linux/ppc64 !linux/mips64")
@@ -58,11 +65,6 @@ func BuildGoDaemon() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -125,23 +127,6 @@ func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
 }
 
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
 // UnitTest executes the unit tests.
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -154,30 +139,10 @@ func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
-}
-
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
 	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
-func PythonIntegTest(ctx context.Context) error {
-	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
-	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	})
 }
 
 // -----------------------------------------------------------------------------
@@ -256,7 +221,7 @@ func installDependencies(pkg, arch string) error {
 	// TODO: This is only for debian 7 and should be removed when move to a newer OS. This flag is
 	// going to be used unnecessary when building using non-debian7 images
 	// (like when making the linux/arm binaries) and we should remove it soonish.
-	// See https://github.com/elastic/beats/issues/11750 for more details.
+	// See https://github.com/elastic/beats/v7/issues/11750 for more details.
 	if err := sh.Run("apt-get", "update", "-o", "Acquire::Check-Valid-Until=false"); err != nil {
 		return err
 	}

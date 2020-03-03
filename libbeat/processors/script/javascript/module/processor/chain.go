@@ -21,9 +21,9 @@ import (
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 )
 
 // chainBuilder builds a new processor chain.
@@ -42,7 +42,7 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 		}
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
-		for name, fn := range constructors {
+		for name, fn := range registry.Constructors() {
 			c.this.Set(name, c.makeBuilderFunc(fn))
 		}
 		call.This.Set("Add", c.Add)
@@ -98,9 +98,7 @@ func (b *chainBuilder) Build(call goja.FunctionCall) goja.Value {
 	}
 
 	p := &beatProcessor{b.runtime, &b.chain}
-	o := b.runtime.NewObject()
-	o.Set("Run", p.Run)
-	return o
+	return b.runtime.ToValue(p)
 }
 
 type gojaCall interface {
@@ -126,6 +124,7 @@ func newJSProcessor(fn jsFunction) *jsProcessor {
 func (p *jsProcessor) run(event javascript.Event) error {
 	p.call.Arguments[0] = event.JSObject()
 	p.fn(p.call)
+	p.call.Arguments[0] = nil
 	return nil
 }
 

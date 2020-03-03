@@ -8,46 +8,52 @@ processors:
 
 # Set @timestamp to the time when the entry was generated at the data plane.
  - date:
+     if: "ctx.event.timezone == null"
      field: "_temp_.generated_time"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null"
-    field: "@timestamp"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null"
+     field: "_temp_.generated_time"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.created is the time the event was received at the management plane.
  - date:
+     if: "ctx.event.timezone == null && ctx.event.created != null "
      field: "event.created"
      target_field: "event.created"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null && ctx.event.created != null "
-    field: "event.created"
-    target_field: "event.created"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null && ctx.event.created != null "
+     field: "event.created"
+     target_field: "event.created"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.start (traffic only) is the time the session started.
  - date:
+     if: "ctx.event.timezone == null && ctx.event.start != null"
      field: "event.start"
      target_field: "event.start"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null && ctx.event.start != null"
-    field: "event.start"
-    target_field: "event.start"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null && ctx.event.start != null"
+     field: "event.start"
+     target_field: "event.start"
+     timezone: "{{ event.timezone }}"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # convert integer fields as the output of the CSV processor is always a string.
  - convert: { type: long, ignore_missing: true, field: client.bytes }
@@ -67,8 +73,8 @@ processors:
  - convert: { type: long, ignore_missing: true, field: event.duration }
  - convert: { type: long, ignore_missing: true, field: _temp_.labels }
  - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
- - convert: { type: long, ignore_missing: true, field: panw.panos.source.nat.port }
- - convert: { type: long, ignore_missing: true, field: panw.panos.destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
@@ -298,15 +304,15 @@ processors:
      value:
        - '{{destination.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.source?.nat?.ip != null'
+     if: 'ctx?.source?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.source.nat.ip}}'
+       - '{{source.nat.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.destination?.nat?.ip != null'
+     if: 'ctx?.destination?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.destination.nat.ip}}'
+       - '{{destination.nat.ip}}'
 
 # Geolocation for source.
  - geoip:
@@ -319,6 +325,52 @@ processors:
      if: 'ctx?.destination?.ip != null'
      field: destination.ip
      target_field: destination.geo
+
+# IP Autonomous System (AS) Lookup
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: source.ip
+     target_field: source.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: destination.ip
+     target_field: destination.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - rename:
+     field: source.as.asn
+     target_field: source.as.number
+     ignore_missing: true
+ - rename:
+     field: source.as.organization_name
+     target_field: source.as.organization.name
+     ignore_missing: true
+ - rename:
+     field: destination.as.asn
+     target_field: destination.as.number
+     ignore_missing: true
+ - rename:
+     field: destination.as.organization_name
+     target_field: destination.as.organization.name
+     ignore_missing: true
+
+# Set source|destination.geo.name from panw's srcloc|dstloc
+ - rename:
+     if: 'ctx.source?.geo?.name == null'
+     field: _temp_.srcloc
+     target_field: source.geo.name
+     ignore_missing: true
+ - rename:
+     if: 'ctx.destination?.geo?.name == null'
+     field: _temp_.dstloc
+     target_field: destination.geo.name
+     ignore_missing: true
 
 # Append NAT community_id to network.community_id
  - append:

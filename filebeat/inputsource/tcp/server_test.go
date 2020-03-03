@@ -28,9 +28,10 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/filebeat/inputsource"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var defaultConfig = Config{
@@ -167,7 +168,9 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			if !assert.NoError(t, err) {
 				return
 			}
-			server, err := New(&config, test.splitFunc, to)
+
+			factory := SplitHandlerFactory(to, test.splitFunc)
+			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -178,7 +181,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			defer server.Stop()
 
 			conn, err := net.Dial("tcp", server.Listener.Addr().String())
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
 
@@ -217,7 +220,10 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	server, err := New(&config, bufio.ScanLines, to)
+
+	factory := SplitHandlerFactory(to, bufio.ScanLines)
+
+	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
 		return
 	}

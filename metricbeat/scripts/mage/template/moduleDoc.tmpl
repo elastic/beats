@@ -1,0 +1,49 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[{{getBeatName}}-module-{{.Base}}]]
+{{- if .IsXpack}}
+[role="xpack"]{{end}}
+== {{.Title}} module
+
+{{if not (eq .Release "ga") -}}
+{{.Release}}[]
+
+{{end -}}
+
+{{.Asciidoc}}
+
+[float]
+=== Example configuration
+
+The {{.Title}} module supports the standard configuration options that are described
+in <<configuration-{{getBeatName}}>>. Here is an example configuration:
+
+[source,yaml]
+----
+{{getBeatName}}.modules:
+{{.CfgFile -}}
+----
+{{/* This is ugly, yes. The python script basically does the same thing, to ensure we always get SSL, then HTTP */ -}}{{$added := false}}
+{{- range $opt := .Settings}}{{if eq $opt "ssl"}}
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.{{$added = true}}{{end}}{{end -}}
+{{- range $opt := .Settings}}{{if eq $opt "http"}}
+It also supports the options described in <<module-http-config-options>>.{{$added = true}}{{end}}{{end}}
+{{- if $added}}
+{{end}}
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+{{range $metricset := .Metricsets -}}
+* {{$metricset.Link}}
+
+{{end -}}
+{{range $metricset := .Metricsets -}}
+include::{{$.Base}}/{{$metricset.Title}}.asciidoc[]
+
+{{end -}}
+
+

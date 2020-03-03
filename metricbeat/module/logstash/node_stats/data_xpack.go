@@ -21,16 +21,35 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+type jvm struct {
+	GC  map[string]interface{} `json:"gc"`
+	Mem struct {
+		HeapMaxInBytes  int `json:"heap_max_in_bytes"`
+		HeapUsedInBytes int `json:"heap_used_in_bytes"`
+		HeapUsedPercent int `json:"heap_used_percent"`
+	} `json:"mem"`
+	UptimeInMillis int `json:"uptime_in_millis"`
+}
+
+type events struct {
+	DurationInMillis int `json:"duration_in_millis"`
+	In               int `json:"in"`
+	Filtered         int `json:"filtered"`
+	Out              int `json:"out"`
+}
+
 type commonStats struct {
-	Events  map[string]interface{} `json:"events"`
-	JVM     map[string]interface{} `json:"jvm"`
+	Events  events                 `json:"events"`
+	JVM     jvm                    `json:"jvm"`
 	Reloads map[string]interface{} `json:"reloads"`
 	Queue   struct {
 		EventsCount int `json:"events_count"`
@@ -38,9 +57,8 @@ type commonStats struct {
 }
 
 type cpu struct {
-	Percent     int                    `json:"percent"`
-	LoadAverage map[string]interface{} `json:"load_average"`
-	NumCPUs     int                    `json:"num_cpus"`
+	Percent     int                    `json:"percent,omitempty"`
+	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
 }
 
 type process struct {
@@ -49,28 +67,58 @@ type process struct {
 	CPU                 cpu `json:"cpu"`
 }
 
+type cgroup struct {
+	CPUAcct map[string]interface{} `json:"cpuacct"`
+	CPU     struct {
+		Stat         map[string]interface{} `json:"stat"`
+		ControlGroup string                 `json:"control_group"`
+	} `json:"cpu"`
+}
+
 type os struct {
-	CPU cpu `json:"cpu"`
+	CPU    cpu    `json:"cpu"`
+	CGroup cgroup `json:"cgroup,omitempty"`
+}
+
+type pipeline struct {
+	BatchSize int `json:"batch_size"`
+	Workers   int `json:"workers"`
 }
 
 type nodeInfo struct {
-	ID          string                 `json:"id,omitempty"`
-	UUID        string                 `json:"uuid"`
-	EphemeralID string                 `json:"ephemeral_id"`
-	Name        string                 `json:"name"`
-	Host        string                 `json:"host"`
-	Version     string                 `json:"version"`
-	Snapshot    bool                   `json:"snapshot"`
-	Status      string                 `json:"status"`
-	HTTPAddress string                 `json:"http_address"`
-	Pipeline    map[string]interface{} `json:"pipeline"`
+	ID          string   `json:"id,omitempty"`
+	UUID        string   `json:"uuid"`
+	EphemeralID string   `json:"ephemeral_id"`
+	Name        string   `json:"name"`
+	Host        string   `json:"host"`
+	Version     string   `json:"version"`
+	Snapshot    bool     `json:"snapshot"`
+	Status      string   `json:"status"`
+	HTTPAddress string   `json:"http_address"`
+	Pipeline    pipeline `json:"pipeline"`
+}
+
+// inNodeInfo represents the Logstash node info to be parsed from the Logstash API
+// response. It contains nodeInfo (which is also used as-is elsewhere) + monitoring
+// information.
+type inNodeInfo struct {
+	nodeInfo
+	Monitoring struct {
+		ClusterID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
+}
+
+type reloads struct {
+	Successes int `json:"successes"`
+	Failures  int `json:"failures"`
 }
 
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
-	nodeInfo
+	inNodeInfo
 	commonStats
 	Process   process                  `json:"process"`
+	OS        os                       `json:"os"`
 	Pipelines map[string]PipelineStats `json:"pipelines"`
 }
 
@@ -90,7 +138,7 @@ type PipelineStats struct {
 	Hash        string                   `json:"hash"`
 	EphemeralID string                   `json:"ephemeral_id"`
 	Events      map[string]interface{}   `json:"events"`
-	Reloads     map[string]interface{}   `json:"reloads"`
+	Reloads     reloads                  `json:"reloads"`
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
@@ -119,8 +167,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	o := os{
 		cpu{
 			LoadAverage: nodeStats.Process.CPU.LoadAverage,
-			NumCPUs:     nodeStats.Process.CPU.NumCPUs,
 		},
+		nodeStats.OS.CGroup,
 	}
 
 	var pipelines []PipelineStats
@@ -130,7 +178,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
-	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, nodeStats.Monitoring.ClusterID)
 
 	for clusterUUID, clusterPipelines := range clusterToPipelinesMap {
 		logstashStats := LogstashStats{
@@ -161,24 +209,22 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	return nil
 }
 
-func makeClusterToPipelinesMap(pipelines []PipelineStats) map[string][]PipelineStats {
+func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID string) map[string][]PipelineStats {
 	var clusterToPipelinesMap map[string][]PipelineStats
 	clusterToPipelinesMap = make(map[string][]PipelineStats)
+
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
 
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
 		for _, vertex := range pipeline.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs = append(clusterUUIDs, clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one

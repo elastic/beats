@@ -19,14 +19,15 @@ package logstash
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -82,6 +83,7 @@ var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
+	*helper.HTTP
 	XPack bool
 }
 
@@ -91,7 +93,10 @@ type graph struct {
 }
 
 type graphContainer struct {
-	Graph *graph `json:"graph,omitempty"`
+	Graph   *graph `json:"graph,omitempty"`
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	Hash    string `json:"hash"`
 }
 
 // PipelineState represents the state (shape) of a Logstash pipeline
@@ -117,26 +122,36 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
+		http,
 		config.XPack,
 	}, nil
 }
 
-// GetPipelines returns the list of pipelines running on a Logstash node
-func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
-	content, err := fetchPath(http, resetURI, "_node/pipelines", "graph=true")
+// GetPipelines returns the list of pipelines running on a Logstash node and,
+// optionally, an override cluster UUID.
+func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
+	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
-		return nil, errors.Wrap(err, "could not fetch node pipelines")
+		return nil, "", errors.Wrap(err, "could not fetch node pipelines")
 	}
 
 	pipelinesResponse := struct {
+		Monitoring struct {
+			ClusterID string `json:"cluster_uuid"`
+		} `json:"monitoring"`
 		Pipelines map[string]PipelineState `json:"pipelines"`
 	}{}
 
 	err = json.Unmarshal(content, &pipelinesResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not parse node pipelines response")
+		return nil, "", errors.Wrap(err, "could not parse node pipelines response")
 	}
 
 	var pipelines []PipelineState
@@ -145,13 +160,51 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 		pipelines = append(pipelines, pipeline)
 	}
 
-	return pipelines, nil
+	return pipelines, pipelinesResponse.Monitoring.ClusterID, nil
 }
 
-// GetVersion returns the version of the Logstash node
-func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {
+// CheckPipelineGraphAPIsAvailable returns an error if pipeline graph APIs are not
+// available in the version of the Logstash node.
+func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
+	logstashVersion, err := m.getVersion()
+	if err != nil {
+		return err
+	}
+
+	arePipelineGraphAPIsAvailable := elastic.IsFeatureAvailable(logstashVersion, PipelineGraphAPIsAvailableVersion)
+
+	if !arePipelineGraphAPIsAvailable {
+		const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), PipelineGraphAPIsAvailableVersion, logstashVersion)
+	}
+
+	return nil
+}
+
+// GetVertexClusterUUID returns the correct cluster UUID value for the given Elasticsearch
+// vertex from a Logstash pipeline. If the vertex has no cluster UUID associated with it,
+// the given override cluster UUID is returned.
+func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
+	c, ok := vertex["cluster_uuid"]
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	if clusterUUID == "" {
+		return overrideClusterUUID
+	}
+
+	return clusterUUID
+}
+
+func (m *MetricSet) getVersion() (*common.Version, error) {
 	const rootPath = "/"
-	content, err := fetchPath(http, currentPath, rootPath, "")
+	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
 		return nil, err
 	}
@@ -168,21 +221,16 @@ func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) 
 	return response.Version, nil
 }
 
-// ArePipelineGraphAPIsAvailable returns whether Logstash APIs that returns pipeline graphs
-// are available in the given version of Logstash
-func ArePipelineGraphAPIsAvailable(currentLogstashVersion *common.Version) bool {
-	return elastic.IsFeatureAvailable(currentLogstashVersion, PipelineGraphAPIsAvailableVersion)
-}
-
-func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {
-	defer http.SetURI(resetURI)
+func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {
+	currentURI := httpHelper.GetURI()
+	defer httpHelper.SetURI(currentURI)
 
 	// Parses the uri to replace the path
-	u, _ := url.Parse(resetURI)
+	u, _ := url.Parse(currentURI)
 	u.Path = path
 	u.RawQuery = query
 
 	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
-	return http.FetchContent()
+	httpHelper.SetURI(u.String())
+	return httpHelper.FetchContent()
 }

@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgtype"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Name is the human readable name and identifier.
@@ -35,6 +35,7 @@ type Config struct {
 	Host           string                  `config:"host"`
 	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
 	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
+	MaxConnections int                     `config:"max_connections"`
 	TLS            *tlscommon.ServerConfig `config:"ssl"`
 }
 

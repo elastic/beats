@@ -31,19 +31,65 @@ type Process struct {
 	// Process id.
 	PID int64 `ecs:"pid"`
 
+	// Process id.
+	ParentPID int64 `ecs:"parent.pid"`
+
 	// Process name.
 	// Sometimes called program name or similar.
 	Name string `ecs:"name"`
 
+	// Process name.
+	// Sometimes called program name or similar.
+	ParentName string `ecs:"parent.name"`
+
 	// Parent process' pid.
 	PPID int64 `ecs:"ppid"`
 
-	// Array of process arguments.
+	// Parent process' pid.
+	ParentPPID int64 `ecs:"parent.ppid"`
+
+	// Identifier of the group of processes the process belongs to.
+	PGID int64 `ecs:"pgid"`
+
+	// Identifier of the group of processes the process belongs to.
+	ParentPGID int64 `ecs:"parent.pgid"`
+
+	// Full command line that started the process, including the absolute path
+	// to the executable, and all arguments.
+	// Some arguments may be filtered to protect sensitive information.
+	CommandLine string `ecs:"command_line"`
+
+	// Full command line that started the process, including the absolute path
+	// to the executable, and all arguments.
+	// Some arguments may be filtered to protect sensitive information.
+	ParentCommandLine string `ecs:"parent.command_line"`
+
+	// Array of process arguments, starting with the absolute path to the
+	// executable.
 	// May be filtered to protect sensitive information.
 	Args []string `ecs:"args"`
 
+	// Array of process arguments.
+	// May be filtered to protect sensitive information.
+	ParentArgs string `ecs:"parent.args"`
+
+	// Length of the process.args array.
+	// This field can be useful for querying or performing bucket analysis on
+	// how many arguments were provided to start a process. More arguments may
+	// be an indication of suspicious activity.
+	ArgsCount int64 `ecs:"args_count"`
+
+	// Length of the process.args array.
+	// This field can be useful for querying or performing bucket analysis on
+	// how many arguments were provided to start a process. More arguments may
+	// be an indication of suspicious activity.
+	ParentArgsCount int64 `ecs:"parent.args_count"`
+
 	// Absolute path to the process executable.
 	Executable string `ecs:"executable"`
+
+	// Absolute path to the process executable.
+	ParentExecutable string `ecs:"parent.executable"`
 
 	// Process title.
 	// The proctitle, some times the same as process name. Can also be
@@ -51,12 +97,49 @@ type Process struct {
 	// currently opened.
 	Title string `ecs:"title"`
 
+	// Process title.
+	// The proctitle, some times the same as process name. Can also be
+	// different: for example a browser setting its title to the web page
+	// currently opened.
+	ParentTitle string `ecs:"parent.title"`
+
 	// Thread ID.
 	ThreadID int64 `ecs:"thread.id"`
+
+	// Thread ID.
+	ParentThreadID int64 `ecs:"parent.thread.id"`
+
+	// Thread name.
+	ThreadName string `ecs:"thread.name"`
+
+	// Thread name.
+	ParentThreadName string `ecs:"parent.thread.name"`
 
 	// The time the process started.
 	Start time.Time `ecs:"start"`
 
+	// The time the process started.
+	ParentStart time.Time `ecs:"parent.start"`
+
+	// Seconds the process has been up.
+	Uptime int64 `ecs:"uptime"`
+
+	// Seconds the process has been up.
+	ParentUptime int64 `ecs:"parent.uptime"`
+
 	// The working directory of the process.
 	WorkingDirectory string `ecs:"working_directory"`
+
+	// The working directory of the process.
+	ParentWorkingDirectory string `ecs:"parent.working_directory"`
+
+	// The exit code of the process, if this is a termination event.
+	// The field should be absent if there is no exit code for the event (e.g.
+	// process start).
+	ExitCode int64 `ecs:"exit_code"`
+
+	// The exit code of the process, if this is a termination event.
+	// The field should be absent if there is no exit code for the event (e.g.
+	// process start).
+	ParentExitCode int64 `ecs:"parent.exit_code"`
 }

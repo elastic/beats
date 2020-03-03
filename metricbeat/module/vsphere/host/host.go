@@ -25,9 +25,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -81,9 +81,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-
-	ctx, cancel := context.WithCancel(context.Background())
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
@@ -91,7 +90,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in NewClient")
 	}
 
-	defer client.Logout(ctx)
+	defer func() {
+		if err := client.Logout(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+		}
+	}()
 
 	c := client.Client
 
@@ -103,7 +106,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
-	defer v.Destroy(ctx)
+	defer func() {
+		if err := v.Destroy(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+		}
+	}()
 
 	// Retrieve summary property for all hosts.
 	var hst []mo.HostSystem

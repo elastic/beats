@@ -7,7 +7,7 @@ package cache
 import (
 	"testing"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ type CacheTestItem struct {
 }
 
 func (item CacheTestItem) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(item.s)
 	return h.Sum64()
 }

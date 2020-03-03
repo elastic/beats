@@ -15,51 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration,linux
+
 package cluster_status
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	service := compose.EnsureUpWithTimeout(t, 120, "ceph-api")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",
 		"metricsets": []string{"cluster_status"},
-		"hosts":      getTestCephHost(),
+		"hosts":      []string{host},
 	}
-}
-
-const (
-	cephDefaultHost = "127.0.0.1"
-	cephDefaultPort = "5000"
-)
-
-func getTestCephHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("CEPH_HOST", cephDefaultHost),
-		getenv("CEPH_PORT", cephDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

@@ -9,23 +9,30 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
-)
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
-const (
-	dirModulesGenerated = "build/package/module"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -54,11 +61,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -70,7 +72,6 @@ func Package() {
 	devtools.UseElasticBeatXPackPackaging()
 	metricbeat.CustomizePackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
-	packageLightModules()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -84,7 +85,8 @@ func TestPackages() error {
 		devtools.WithModules(),
 
 		// To be increased or removed when more light modules are added
-		devtools.MinModules(1))
+		devtools.MinModules(5),
+	)
 }
 
 // Fields generates a fields.yml and fields.go for each module.
@@ -122,23 +124,6 @@ func Update() {
 		devtools.GenerateModuleIncludeListGo)
 }
 
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
 // UnitTest executes the unit tests.
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -151,100 +136,33 @@ func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
-}
-
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.Deps(devtools.BuildSystemTestBinary)
 	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	devtools.AddIntegTestUsage()
+	defer devtools.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
+}
+
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.SerialDeps(Fields, Dashboards)
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
-}
-
-// prepareLightModules generates light modules
-func prepareLightModules(path string) error {
-	err := devtools.Clean([]string{dirModulesGenerated})
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(dirModulesGenerated, 0755); err != nil {
-		return err
-	}
-
-	filePatterns := []string{
-		"*/module.yml",
-		"*/*/manifest.yml",
-	}
-
-	var files []string
-	for _, pattern := range filePatterns {
-		matches, err := filepath.Glob(filepath.Join(path, pattern))
-		if err != nil {
-			return err
-		}
-		files = append(files, matches...)
-	}
-
-	if len(files) == 0 {
-		return fmt.Errorf("no light modules found")
-	}
-
-	for _, file := range files {
-		rel, _ := filepath.Rel(path, file)
-		dest := filepath.Join(dirModulesGenerated, rel)
-		err := (&devtools.CopyTask{
-			Source:  file,
-			Dest:    dest,
-			Mode:    0644,
-			DirMode: 0755,
-		}).Execute()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// packageLightModules customizes packaging to add light modules
-func packageLightModules() error {
-	prepareLightModules("module")
-
-	var (
-		moduleTarget = "module"
-		module       = devtools.PackageFile{
-			Mode:   0644,
-			Source: dirModulesGenerated,
-		}
-	)
-
-	for _, args := range devtools.Packages {
-		pkgType := args.Types[0]
-		switch pkgType {
-		case devtools.TarGz, devtools.Zip, devtools.Docker:
-			args.Spec.Files[moduleTarget] = module
-		case devtools.Deb, devtools.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-		case devtools.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
-		default:
-			return fmt.Errorf("unhandled package type: %v", pkgType)
-		}
-	}
-	return nil
 }

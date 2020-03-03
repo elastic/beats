@@ -1,0 +1,59 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.x509"
+
+        - from: "zeek.x509.id"
+          to: "zeek.session_id"
+
+        - from: "zeek.x509.certificate.not_valid_before"
+          to: "zeek.x509.certificate.valid.from"
+
+        - from: "zeek.x509.certificate.not_valid_after"
+          to: "zeek.x509.certificate.valid.until"
+
+        - from: "zeek.x509.basic_constraints.ca"
+          to: "zeek.x509.basic_constraints.certificate_authority"
+
+        - from: "zeek.x509.basic_constraints.path_len"
+          to: "zeek.x509.basic_constraints.path_length"
+
+        - from: "zeek.x509.certificate.cn"
+          to: "zeek.x509.certificate.common_name"
+
+        - from: "zeek.x509.certificate.issuer"
+          to: "zeek.x509.certificate.iss"
+
+        - from: "zeek.x509.certificate.subject"
+          to: "zeek.x509.certificate.sub"
+
+        - from: "zeek.x509.certificate.key_alg"
+          to: "zeek.x509.certificate.key.algorithm"
+
+        - from: "zeek.x509.certificate.key_length"
+          to: "zeek.x509.certificate.key.length"
+
+        - from: "zeek.x509.certificate.key_type"
+          to: "zeek.x509.certificate.key.type"
+
+        - from: "zeek.x509.certificate.sig_alg"
+          to: "zeek.x509.certificate.signature_algorithm"
+
+        - from: "zeek.x509.logcert"
+          to: "zeek.x509.log_cert"
+
+      ignore_missing: true
+      fail_on_error: false

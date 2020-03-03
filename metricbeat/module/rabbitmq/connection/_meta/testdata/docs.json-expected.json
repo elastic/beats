@@ -6,12 +6,16 @@
             "module": "rabbitmq"
         },
         "metricset": {
-            "name": "connection"
+            "name": "connection",
+            "period": 10000
         },
         "rabbitmq": {
             "connection": {
                 "channel_max": 65535,
                 "channels": 2,
+                "client_provided": {
+                    "name": "Connection2"
+                },
                 "frame_max": 131072,
                 "host": "::1",
                 "name": "[::1]:60940 -\u003e [::1]:5672",
@@ -29,6 +33,7 @@
                     "port": 60940
                 },
                 "port": 5672,
+                "state": "running",
                 "type": "network"
             },
             "node": {
@@ -51,12 +56,16 @@
             "module": "rabbitmq"
         },
         "metricset": {
-            "name": "connection"
+            "name": "connection",
+            "period": 10000
         },
         "rabbitmq": {
             "connection": {
                 "channel_max": 65535,
                 "channels": 8,
+                "client_provided": {
+                    "name": "Connection1"
+                },
                 "frame_max": 131072,
                 "host": "::1",
                 "name": "[::1]:60938 -\u003e [::1]:5672",
@@ -74,6 +83,7 @@
                     "port": 60938
                 },
                 "port": 5672,
+                "state": "running",
                 "type": "network"
             },
             "node": {

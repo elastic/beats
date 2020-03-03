@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -12,13 +12,17 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-activemq>>
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cloudfoundry>>
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
@@ -33,10 +37,14 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-golang>>
+* <<exported-fields-googlecloud>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
+* <<exported-fields-ibmmq>>
+* <<exported-fields-iis>>
+* <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -59,7 +67,12 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-redisenterprise>>
+* <<exported-fields-sql>>
+* <<exported-fields-stan>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
+* <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
@@ -67,6 +80,407 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 --
+[[exported-fields-activemq]]
+== activemq fields
+
+activemq module
+
+
+
+[float]
+=== activemq
+
+
+
+
+[float]
+=== broker
+
+Broker metrics from org.apache.activemq:brokerName=*,type=Broker
+
+
+*`activemq.broker.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.broker.name`*::
++
+--
+Broker name
+
+type: keyword
+
+--
+
+*`activemq.broker.memory.broker.pct`*::
++
+--
+The percentage of the memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.memory.store.pct`*::
++
+--
+Percent of store limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.memory.temp.pct`*::
++
+--
+The percentage of the temp usage limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.connections.count`*::
++
+--
+Total number of connections.
+
+type: long
+
+--
+
+*`activemq.broker.consumers.count`*::
++
+--
+Number of message consumers.
+
+type: long
+
+--
+
+*`activemq.broker.messages.dequeue.count`*::
++
+--
+Number of messages that have been acknowledged on the broker.
+
+type: long
+
+--
+
+*`activemq.broker.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.broker.messages.count`*::
++
+--
+Number of unacknowledged messages on the broker.
+
+type: long
+
+--
+
+*`activemq.broker.producers.count`*::
++
+--
+Number of message producers active on destinations on the broker.
+
+type: long
+
+--
+
+[float]
+=== queue
+
+Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
+
+
+*`activemq.queue.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.queue.name`*::
++
+--
+Queue name
+
+type: keyword
+
+--
+
+*`activemq.queue.size`*::
++
+--
+Queue size
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.time.avg`*::
++
+--
+Average time a message was held on this destination.
+
+type: double
+
+--
+
+*`activemq.queue.messages.size.avg`*::
++
+--
+Average message size on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.consumers.count`*::
++
+--
+Number of consumers subscribed to this destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.dequeue.count`*::
++
+--
+Number of messages that has been acknowledged (and removed) from the destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.dispatch.count`*::
++
+--
+Number of messages that has been delivered to consumers, including those not acknowledged.
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.expired.count`*::
++
+--
+Number of messages that have been expired.
+
+type: long
+
+--
+
+*`activemq.queue.messages.inflight.count`*::
++
+--
+Number of messages that have been dispatched to, but not acknowledged by, consumers.
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.time.max`*::
++
+--
+The longest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.memory.broker.pct`*::
++
+--
+Percent of memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.queue.messages.enqueue.time.min`*::
++
+--
+The shortest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.producers.count`*::
++
+--
+Number of producers attached to this destination.
+
+type: long
+
+--
+
+[float]
+=== topic
+
+Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
+
+
+*`activemq.topic.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.topic.name`*::
++
+--
+Topic name
+
+type: keyword
+
+--
+
+*`activemq.topic.messages.enqueue.time.avg`*::
++
+--
+Average time a message was held on this destination.
+
+type: double
+
+--
+
+*`activemq.topic.messages.size.avg`*::
++
+--
+Average message size on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.consumers.count`*::
++
+--
+Number of consumers subscribed to this destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.dequeue.count`*::
++
+--
+Number of messages that has been acknowledged (and removed) from the destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.dispatch.count`*::
++
+--
+Number of messages that has been delivered to consumers, including those not acknowledged.
+
+type: long
+
+--
+
+*`activemq.topic.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.expired.count`*::
++
+--
+Number of messages that have been expired.
+
+type: long
+
+--
+
+*`activemq.topic.messages.inflight.count`*::
++
+--
+Number of messages that have been dispatched to, but not acknowledged by, consumers.
+
+type: long
+
+--
+
+*`activemq.topic.messages.enqueue.time.max`*::
++
+--
+The longest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.memory.broker.pct`*::
++
+--
+Percent of memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.topic.messages.enqueue.time.min`*::
++
+--
+The shortest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.producers.count`*::
++
+--
+Number of producers attached to this destination.
+
+type: long
+
+--
+
 [[exported-fields-aerospike]]
 == Aerospike fields
 
@@ -820,12 +1234,294 @@ type: long
 
 --
 
+[[exported-fields-appsearch]]
+== App Search fields
+
+App Search module
+
+
+
+[float]
+=== appsearch
+
+
+
+
+[float]
+=== stats
+
+App Search stats
+
+
+
+[float]
+=== jvm
+
+JVM stats
+
+
+
+[float]
+=== memory_usage
+
+Memory usage
+
+
+
+*`appsearch.stats.jvm.memory_usage.heap_init.bytes`*::
++
+--
+Heap init used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_used.bytes`*::
++
+--
+Heap used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_committed.bytes`*::
++
+--
+Committed heap to the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_max.bytes`*::
++
+--
+Max heap used by the JVM in bytes
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_init.bytes`*::
++
+--
+Non-Heap initial memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_committed.bytes`*::
++
+--
+Non-Heap committed memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+[float]
+=== queues
+
+Worker queues
+
+
+
+*`appsearch.stats.queues.analytics_events.count`*::
++
+--
+Number of pending jobs in the `analytics_events` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.document_destroyer.count`*::
++
+--
+Number of pending jobs in the `document_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.engine_destroyer.count`*::
++
+--
+Number of pending jobs in the `engine_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.index_adder.count`*::
++
+--
+Number of pending jobs in the `index_adder` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.indexed_doc_remover.count`*::
++
+--
+Number of pending jobs in the `indexed_doc_remover` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.mailer.count`*::
++
+--
+Number of pending jobs in the `mailer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.refresh_document_counts.count`*::
++
+--
+Number of pending jobs in the `refresh_document_counts` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.reindexer.count`*::
++
+--
+Number of pending jobs in the `reindexer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.schema_updater.count`*::
++
+--
+Number of pending jobs in the `schema_updater` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.failed.count`*::
++
+--
+Number of failed jobs waiting to be retried.
+
+
+type: long
+
+--
+
+[float]
+=== requests
+
+Request metrics
+
+
+
+*`appsearch.stats.requests.count`*::
++
+--
+Number of recently completed requests
+
+
+type: long
+
+--
+
+[float]
+=== api.duration
+
+API response time metrics
+
+
+
+*`appsearch.stats.requests.api.duration.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.api.duration.max.ms`*::
++
+--
+Max response time in milliseconds
+
+
+type: long
+
+--
+
+[float]
+=== web.response_time
+
+Dashboard response time metrics
+
+
+
+*`appsearch.stats.requests.web.response_time.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.web.response_time.max.ms`*::
++
+--
+Max response time in milliseconds
+
+
+type: long
+
+--
+
 [[exported-fields-aws]]
 == aws fields
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 
 
+
+*`cloud.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+
+
+type: keyword
+
+--
 
 [float]
 === aws
@@ -842,6 +1538,42 @@ Tag key value pairs from aws resources.
 type: object
 
 --
+
+*`aws.s3.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+
+type: keyword
+
+--
+
+*`aws.dimensions.*`*::
++
+--
+Metric dimensions.
+
+
+type: object
+
+--
+
+*`aws.*.metrics.*.*`*::
++
+--
+Metrics that returned from Cloudwatch API query.
+
+
+type: object
+
+--
+
+[float]
+=== billing
+
+`billing` contains the estimated charges for your AWS account in Cloudwatch.
+
 
 [float]
 === cloudwatch
@@ -860,25 +1592,17 @@ type: keyword
 
 --
 
-*`aws.cloudwatch.metrics.*`*::
-+
---
-Metrics that returned from Cloudwatch api query.
+[float]
+=== dynamodb
+
+`dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
 
 
-type: object
+[float]
+=== ebs
 
---
+`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
 
-*`aws.cloudwatch.dimensions.*`*::
-+
---
-Cloudwatch metric dimensions.
-
-
-type: object
-
---
 
 [float]
 === ec2
@@ -947,10 +1671,30 @@ type: long
 
 --
 
+*`aws.ec2.network.in.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.packets`*::
 +
 --
 The number of packets sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
+*`aws.ec2.network.out.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
 
 
 type: long
@@ -969,6 +1713,16 @@ format: bytes
 
 --
 
+*`aws.ec2.network.in.bytes_per_sec`*::
++
+--
+The number of bytes per second received on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.bytes`*::
 +
 --
@@ -978,6 +1732,16 @@ The number of bytes sent out on all network interfaces by the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.network.out.bytes_per_sec`*::
++
+--
+The number of bytes per second sent out on all network interfaces by the instance.
+
+
+type: long
 
 --
 
@@ -993,6 +1757,16 @@ format: bytes
 
 --
 
+*`aws.ec2.diskio.read.bytes_per_sec`*::
++
+--
+Bytes read per second from all instance store volumes available to the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
@@ -1002,6 +1776,16 @@ Bytes written to all instance store volumes available to the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.diskio.write.bytes_per_sec`*::
++
+--
+Bytes written per second to all instance store volumes available to the instance.
+
+
+type: long
 
 --
 
@@ -1015,10 +1799,30 @@ type: long
 
 --
 
+*`aws.ec2.diskio.read.ops_per_sec`*::
++
+--
+Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.ops`*::
 +
 --
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
+*`aws.ec2.diskio.write.ops_per_sec`*::
++
+--
+Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
 
 
 type: long
@@ -1156,6 +1960,18 @@ type: integer
 --
 
 [float]
+=== elb
+
+`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
+
+
+[float]
+=== lambda
+
+`lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
+
+
+[float]
 === rds
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
@@ -1250,7 +2066,7 @@ type: keyword
 The number of outstanding IOs (read/write requests) waiting to access the disk.
 
 
-type: long
+type: float
 
 --
 
@@ -1394,6 +2210,30 @@ format: bytes
 
 --
 
+*`aws.rds.volume.read.iops`*::
++
+--
+The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.volume.write.iops`*::
++
+--
+The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`aws.rds.free_local_storage.bytes`*::
 +
 --
@@ -1422,7 +2262,7 @@ type: long
 The average number of commit operations per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1432,7 +2272,7 @@ type: long
 The average number of delete queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1442,7 +2282,7 @@ type: long
 The average number of DDL requests per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1452,7 +2292,7 @@ type: long
 The average number of inserts, updates, and deletes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1462,7 +2302,7 @@ type: long
 The average number of insert queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1472,7 +2312,7 @@ type: long
 The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1482,7 +2322,7 @@ type: long
 The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1492,7 +2332,7 @@ type: long
 The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1502,7 +2342,7 @@ type: long
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 --
 
@@ -1512,7 +2352,7 @@ type: long
 The average number of select queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1522,7 +2362,7 @@ type: long
 The average number of update queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1532,7 +2372,7 @@ type: long
 The average number of bytes written to disk per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1542,7 +2382,7 @@ type: long
 The amount of latency for commit operations, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1554,7 +2394,7 @@ format: duration
 The amount of latency for data definition language (DDL) requests, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1566,7 +2406,7 @@ format: duration
 The amount of latency for inserts, updates, and deletes, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1578,7 +2418,7 @@ format: duration
 The amount of latency for insert queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1590,7 +2430,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1602,7 +2442,7 @@ format: duration
 The amount of latency for select queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1614,7 +2454,7 @@ format: duration
 The amount of latency for update queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1626,7 +2466,19 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
+
+format: duration
+
+--
+
+*`aws.rds.latency.delete`*::
++
+--
+The amount of latency for delete queries, in milliseconds.
+
+
+type: float
 
 format: duration
 
@@ -1684,22 +2536,232 @@ type: long
 
 --
 
+*`aws.rds.db_instance.db_cluster_identifier`*::
++
+--
+This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.role`*::
++
+--
+DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.engine_name`*::
++
+--
+Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+
+
+type: keyword
+
+--
+
+*`aws.rds.aurora_bin_log_replica_lag`*::
++
+--
+The amount of time a replica DB cluster running on Aurora with MySQL compatibility lags behind the source DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.replicated_write_io.bytes`*::
++
+--
+In an Aurora Global Database, the number of write I/O operations replicated from the primary AWS Region to the cluster volume in a secondary AWS Region.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.data_transfer.bytes`*::
++
+--
+In an Aurora Global Database, the amount of redo log data transferred from the master AWS Region to a secondary AWS Region.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_global_db.replication_lag.ms`*::
++
+--
+For an Aurora Global Database, the amount of lag when replicating updates from the primary AWS Region, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag.ms`*::
++
+--
+For an Aurora Replica, the amount of lag when replicating updates from the primary instance, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag_max.ms`*::
++
+--
+The maximum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_replica.lag_min.ms`*::
++
+--
+The minimum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_change_records.creation_rate`*::
++
+--
+The number of backtrack change records created over five minutes for your DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_change_records.stored`*::
++
+--
+The actual number of backtrack change records used by your DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_window.actual`*::
++
+--
+The difference between the target backtrack window and the actual backtrack window.
+
+
+type: long
+
+--
+
+*`aws.rds.backtrack_window.alert`*::
++
+--
+The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.
+
+
+type: long
+
+--
+
+*`aws.rds.storage_used.backup_retention_period.bytes`*::
++
+--
+The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
+
+
+type: long
+
+--
+
+*`aws.rds.storage_used.snapshot.bytes`*::
++
+--
+The total amount of backup storage in bytes consumed by all Aurora snapshots for an Aurora DB cluster outside its backup retention window.
+
+
+type: long
+
+--
+
+*`aws.rds.cache_hit_ratio.buffer`*::
++
+--
+The percentage of requests that are served by the buffer cache.
+
+
+type: long
+
+--
+
+*`aws.rds.cache_hit_ratio.result_set`*::
++
+--
+The percentage of requests that are served by the Resultset cache.
+
+
+type: long
+
+--
+
+*`aws.rds.engine_uptime.sec`*::
++
+--
+The amount of time that the instance has been running, in seconds.
+
+
+type: long
+
+--
+
+*`aws.rds.rds_to_aurora_postgresql_replica_lag.sec`*::
++
+--
+The amount of lag in seconds when replicating updates from the primary RDS PostgreSQL instance to other nodes in the cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.backup_storage_billed_total.bytes`*::
++
+--
+The total amount of backup storage in bytes for which you are billed for a given Aurora DB cluster.
+
+
+type: long
+
+--
+
+*`aws.rds.aurora_volume_left_total.bytes`*::
++
+--
+The remaining available space for the cluster volume, measured in bytes.
+
+
+type: long
+
+--
+
 [float]
 === s3_daily_storage
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
-*`aws.s3_daily_storage.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
 
 *`aws.s3_daily_storage.bucket.size.bytes`*::
 +
@@ -1729,16 +2791,6 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
-*`aws.s3_request.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
 
 *`aws.s3_request.requests.total`*::
 +
@@ -1913,6 +2965,12 @@ format: duration
 --
 
 [float]
+=== sns
+
+`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
+[float]
 === sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
@@ -2023,6 +3081,205 @@ type: keyword
 
 --
 
+[float]
+=== usage
+
+`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
+
+[float]
+=== vpc
+
+`vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
+
+
+[[exported-fields-azure]]
+== azure fields
+
+azure module
+
+
+
+[float]
+=== azure
+
+
+
+
+*`azure.timegrain`*::
++
+--
+The Azure metric timegrain
+
+
+type: keyword
+
+--
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.*.*`*::
++
+--
+compute_vm
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.*.*`*::
++
+--
+compute_vm_scaleset
+
+
+type: object
+
+--
+
+*`azure.container_instance.*.*`*::
++
+--
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
+
+
+type: object
+
+--
+
+*`azure.database_account.*.*`*::
++
+--
+database account
+
+
+type: object
+
+--
+
+[float]
+=== monitor
+
+monitor
+
+
+
+*`azure.monitor.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.storage.*.*`*::
++
+--
+storage account
+
+
+type: object
+
+--
+
 [[exported-fields-beat-common]]
 == Beat fields
 
@@ -2055,23 +3312,6 @@ Contains user configurable fields.
 
 
 type: object
-
---
-
-[float]
-=== error
-
-Error fields containing additional info in case of errors.
-
-
-
-*`error.type`*::
-+
---
-Error type.
-
-
-type: keyword
 
 --
 
@@ -2752,6 +3992,116 @@ type: long
 --
 
 [float]
+=== mgr_cluster_disk
+
+see: cluster_disk
+
+
+[float]
+=== mgr_cluster_health
+
+see: cluster_health
+
+
+[float]
+=== mgr_osd_perf
+
+OSD performance metrics of Ceph cluster
+
+
+
+*`ceph.mgr_osd_perf.id`*::
++
+--
+OSD ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ms`*::
++
+--
+Commit latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ms`*::
++
+--
+Apply latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ns`*::
++
+--
+Commit latency in ns
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ns`*::
++
+--
+Apply latency in ns
+
+type: long
+
+--
+
+[float]
+=== mgr_osd_pool_stats
+
+OSD pool stats of Ceph cluster
+
+
+
+*`ceph.mgr_osd_pool_stats.pool_name`*::
++
+--
+Pool name
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_pool_stats.pool_id`*::
++
+--
+Pool ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_pool_stats.client_io_rate`*::
++
+--
+Client I/O rates
+
+type: object
+
+--
+
+[float]
+=== mgr_osd_tree
+
+see: osd_tree
+
+
+[float]
+=== mgr_pool_disk
+
+see: pool_disk
+
+
+[float]
 === monitor_health
 
 monitor_health stats data
@@ -3279,6 +4629,177 @@ alias to: cloud.region
 
 --
 
+[[exported-fields-cloudfoundry]]
+== cloudfoundry fields
+
+Cloud Foundry module
+
+
+
+[float]
+=== cloudfoundry
+
+
+
+
+[float]
+=== app
+
+The application the metric is associated with.
+
+
+
+*`cloudfoundry.app.id`*::
++
+--
+The ID of the application.
+
+
+type: keyword
+
+--
+
+[float]
+=== container
+
+`container` contains container metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.container.instance_index`*::
++
+--
+Index of the instance the metric belongs to.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.cpu.pct`*::
++
+--
+CPU usage percentage.
+
+
+type: float
+
+--
+
+*`cloudfoundry.container.memory.bytes`*::
++
+--
+Bytes of used memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.memory.quota.bytes`*::
++
+--
+Bytes of available memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.bytes`*::
++
+--
+Bytes of used storage.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.quota.bytes`*::
++
+--
+Bytes of available storage.
+
+
+type: long
+
+--
+
+[float]
+=== counter
+
+`counter` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.counter.name`*::
++
+--
+The name of the counter.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.counter.delta`*::
++
+--
+The difference between the last time the counter event occurred.
+
+
+type: long
+
+--
+
+*`cloudfoundry.counter.total`*::
++
+--
+The total value for the counter.
+
+
+type: long
+
+--
+
+[float]
+=== value
+
+`value` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.value.name`*::
++
+--
+The name of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.unit`*::
++
+--
+The unit of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.value`*::
++
+--
+The value of the value.
+
+
+type: float
+
+--
+
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
@@ -3314,13 +4835,13 @@ The name of the metricset that generated the event.
 
 --
 
-*`process.pgid`*::
+*`metricset.period`*::
 +
 --
-Process group id.
+Current data collection period for this event in milliseconds.
 
 
-type: long
+type: integer
 
 --
 
@@ -3349,6 +4870,24 @@ The document type. Always set to "doc".
 example: metricsets
 
 required: True
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
 
 --
 
@@ -4785,7 +6324,19 @@ Percentage of time in kernel space.
 
 type: scaled_float
 
-format: percentage
+format: percent
+
+--
+
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -4807,7 +6358,19 @@ Percentage of total CPU time in the system.
 
 type: scaled_float
 
-format: percentage
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -4829,7 +6392,19 @@ Percentage of time in user space.
 
 type: scaled_float
 
-format: percentage
+format: percent
+
+--
+
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -4851,7 +6426,19 @@ Total CPU usage.
 
 type: scaled_float
 
-format: percentage
+format: percent
+
+--
+
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -4863,7 +6450,19 @@ Percentage of CPU time in this core.
 
 type: object
 
-format: percentage
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
+
+
+type: object
+
+format: percent
 
 --
 
@@ -4927,7 +6526,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current reads per second
 
@@ -4979,7 +6578,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current writes per second
 
@@ -5031,7 +6630,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of reads and writes per second
 
@@ -5371,6 +6970,16 @@ Memory metrics.
 
 
 
+*`docker.memory.stats.*`*::
++
+--
+Raw memory stats from the cgroups memory.stat interface
+
+
+type: object
+
+--
+
 [float]
 === commit
 
@@ -5463,7 +7072,7 @@ Memory resident set size percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -5494,7 +7103,7 @@ Memory usage percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -5767,7 +7376,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 
@@ -5863,6 +7472,41 @@ example: 6.0.0-rc2
 --
 
 [float]
+=== as
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+*`as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+[float]
 === client
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
@@ -5877,6 +7521,35 @@ Some event client addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`client.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`client.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`client.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -6011,6 +7684,28 @@ type: keyword
 
 --
 
+*`client.nat.ip`*::
++
+--
+Translated IP of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`client.nat.port`*::
++
+--
+Translated port of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`client.packets`*::
 +
 --
@@ -6033,6 +7728,41 @@ format: string
 
 --
 
+*`client.registered_domain`*::
++
+--
+The highest registered client domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`client.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`client.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`client.user.email`*::
 +
 --
@@ -6050,6 +7780,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`client.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`client.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -6098,6 +7845,13 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+*`client.user.name.text`*::
++
+--
+type: text
 
 --
 
@@ -6263,6 +8017,35 @@ type: keyword
 
 --
 
+*`destination.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`destination.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`destination.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
 *`destination.bytes`*::
 +
 --
@@ -6394,6 +8177,28 @@ type: keyword
 
 --
 
+*`destination.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`destination.nat.port`*::
++
+--
+Port the source session is translated to by NAT Device.
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`destination.packets`*::
 +
 --
@@ -6416,6 +8221,41 @@ format: string
 
 --
 
+*`destination.registered_domain`*::
++
+--
+The highest registered destination domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`destination.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`destination.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`destination.user.email`*::
 +
 --
@@ -6433,6 +8273,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`destination.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`destination.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -6481,6 +8338,229 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+*`destination.user.name.text`*::
++
+--
+type: text
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
+
+*`dns.answers`*::
++
+--
+An array containing an object for each answer section returned by the server.
+The main keys that should be present in these objects are defined by ECS. Records that have more information may contain more keys than what ECS defines.
+Not all DNS data sources give all details about DNS answers. At minimum, answer objects must contain the `data` key. If more information is available, map as much of it to ECS as possible, and add any additional fields to the answer objects as custom fields.
+
+type: object
+
+--
+
+*`dns.answers.class`*::
++
+--
+The class of DNS data contained in this resource record.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.answers.data`*::
++
+--
+The data describing the resource.
+The meaning of this data depends on the type and class of the resource record.
+
+type: keyword
+
+example: 10.10.10.10
+
+--
+
+*`dns.answers.name`*::
++
+--
+The domain name to which this resource record pertains.
+If a chain of CNAME is being resolved, each answer's `name` should be the one that corresponds with the answer's `data`. It should not simply be the original `question.name` repeated.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.answers.ttl`*::
++
+--
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+type: long
+
+example: 180
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.header_flags`*::
++
+--
+Array of 2 letter DNS header flags.
+Expected values are: AA, TC, RD, RA, AD, CD, DO.
+
+type: keyword
+
+example: ['RD', 'RA']
+
+--
+
+*`dns.id`*::
++
+--
+The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+type: keyword
+
+example: 62111
+
+--
+
+*`dns.op_code`*::
++
+--
+The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+type: keyword
+
+example: QUERY
+
+--
+
+*`dns.question.class`*::
++
+--
+The class of records being queried.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.question.name`*::
++
+--
+The name being queried.
+If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.question.registered_domain`*::
++
+--
+The highest registered domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`dns.question.subdomain`*::
++
+--
+The subdomain is all of the labels under the registered_domain.
+If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: www
+
+--
+
+*`dns.question.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`dns.question.type`*::
++
+--
+The type of record being queried.
+
+type: keyword
+
+example: AAAA
+
+--
+
+*`dns.resolved_ip`*::
++
+--
+Array containing all IPs seen in `answers.data`.
+The `answers` array can be difficult to use, because of the variety of data formats it can contain. Extracting all IP addresses seen in there to `dns.resolved_ip` makes it possible to index them as IP addresses, and makes them easier to visualize and query for.
+
+type: ip
+
+example: ['10.10.10.10', '10.10.10.11']
+
+--
+
+*`dns.response_code`*::
++
+--
+The DNS response code.
+
+type: keyword
+
+example: NOERROR
+
+--
+
+*`dns.type`*::
++
+--
+The type of DNS event captured, query or answer.
+If your source of DNS events only gives you DNS queries, you should only create dns events of type `dns.type:query`.
+If your source of DNS events gives you answers as well, you should create one event per query (optionally as soon as the query is seen). And a second event containing all query details as well as an array of answers.
+
+type: keyword
+
+example: answer
 
 --
 
@@ -6538,6 +8618,33 @@ type: text
 
 --
 
+*`error.stack_trace`*::
++
+--
+The stack trace of this error in plain text.
+
+type: keyword
+
+--
+
+*`error.stack_trace.text`*::
++
+--
+type: text
+
+--
+
+*`error.type`*::
++
+--
+The type of the error, for example the class name of the exception.
+
+type: keyword
+
+example: java.lang.NullPointerException
+
+--
+
 [float]
 === event
 
@@ -6560,12 +8667,25 @@ example: user-password-change
 *`event.category`*::
 +
 --
-Event category.
-This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the second level in the ECS category hierarchy.
+`event.category` represents the "big buckets" of ECS categories. For example, filtering on `event.category:process` yields all events relating to process activity. This field is closely related to `event.type`, which is used as a subcategory.
+This field is an array. This will allow proper categorization of some events that fall in multiple categories.
 
 type: keyword
 
-example: user-management
+example: authentication
+
+--
+
+*`event.code`*::
++
+--
+Identification code for this event, if one exists.
+Some event sources use event codes to identify messages unambiguously, regardless of message language or wording adjustments over time. An example of this is the Windows Event ID.
+
+type: keyword
+
+example: 4648
 
 --
 
@@ -6579,17 +8699,20 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
+example: 2016-05-23 08:05:34.857000
+
 --
 
 *`event.dataset`*::
 +
 --
 Name of the dataset.
-The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+If an event source publishes more than one type of log or events (e.g. access log, error log), the dataset is used to specify which one the event comes from.
+It's recommended but not required to start the dataset name with the module name, followed by a dot, then the dataset name.
 
 type: keyword
 
-example: stats
+example: apache.access
 
 --
 
@@ -6636,15 +8759,29 @@ example: 8a4f500d
 
 --
 
+*`event.ingested`*::
++
+--
+Timestamp when an event arrived in the central data store.
+This is different from `@timestamp`, which is when the event originally occurred.  It's also different from `event.created`, which is meant to capture the first time an agent saw the event.
+In normal conditions, assuming no tampering, the timestamps should chronologically look like this: `@timestamp` < `event.created` < `event.ingested`.
+
+type: date
+
+example: 2016-05-23 08:05:35.101000
+
+--
+
 *`event.kind`*::
 +
 --
-The kind of the event.
-This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the highest level in the ECS category hierarchy.
+`event.kind` gives high-level information about what type of information the event contains, without being specific to the contents of the event. For example, values of this field distinguish alert events from metric events.
+The value of this field can be used to inform how these kinds of events should be handled. They may warrant different retention, different access control, it may also help understand whether the data coming in at a regular interval or not.
 
 type: keyword
 
-example: state
+example: alert
 
 --
 
@@ -6652,11 +8789,11 @@ example: state
 +
 --
 Name of the module this data is coming from.
-This information is coming from the modules used in Beats or Logstash.
+If your monitoring agent supports the concept of modules or plugins to process events of a given source (e.g. Apache logs), `event.module` should contain the name of this module.
 
 type: keyword
 
-example: mysql
+example: apache
 
 --
 
@@ -6675,12 +8812,24 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 *`event.outcome`*::
 +
 --
-The outcome of the event.
-If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
+`event.outcome` simply denotes whether the event represent a success or a failure. Note that not all events will have an associated outcome. For example, this field is generally not populated for metric events or events with `event.type:info`.
 
 type: keyword
 
 example: success
+
+--
+
+*`event.provider`*::
++
+--
+Source of the event.
+Event transports such as Syslog or the Windows Event Log typically mention the source of an event. It can be the name of the software that generated the event (e.g. Sysmon, httpd), or of a subsystem of the operating system (kernel, Microsoft-Windows-Security-Auditing).
+
+type: keyword
+
+example: kernel
 
 --
 
@@ -6703,10 +8852,24 @@ type: float
 
 --
 
+*`event.sequence`*::
++
+--
+Sequence number of the event.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+
+type: long
+
+format: string
+
+--
+
 *`event.severity`*::
 +
 --
-Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+The numeric severity of the event according to your event source.
+What the different severity values mean can be different between sources and use cases. It's up to the implementer to make sure severities are consistent across events from the same source.
+The Syslog severity belongs in `log.syslog.severity.code`. `event.severity` is meant to represent the severity according to the event source (e.g. firewall, IDS). If the event source does not publish its own severity, you may optionally copy the `log.syslog.severity.code` to `event.severity`.
 
 type: long
 
@@ -6738,8 +8901,9 @@ type: keyword
 *`event.type`*::
 +
 --
-Reserved for future usage.
-Please avoid using this field for user data.
+This is one of four ECS Categorization Fields, and indicates the third level in the ECS category hierarchy.
+`event.type` represents a categorization "sub-bucket" that, when used along with the `event.category` field values, enables filtering events down to a level appropriate for single visualization.
+This field is an array. This will allow proper categorization of some events that fall in multiple event types.
 
 type: keyword
 
@@ -6752,10 +8916,43 @@ A file is defined as a set of information that has been created on, or has exist
 File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
 
 
+*`file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
+
+--
+
+*`file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
 *`file.ctime`*::
 +
 --
-Last time file metadata changed.
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
 
 type: date
 
@@ -6768,13 +8965,37 @@ Device that is the source of the file.
 
 type: keyword
 
+example: sda
+
+--
+
+*`file.directory`*::
++
+--
+Directory where the file is located. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`file.drive_letter`*::
++
+--
+Drive letter where the file is located. This field is only relevant on Windows.
+The value should be uppercase, and not include the colon.
+
+type: keyword
+
+example: C
+
 --
 
 *`file.extension`*::
 +
 --
 File extension.
-This should allow easy filtering by file extensions.
 
 type: keyword
 
@@ -6789,12 +9010,52 @@ Primary group ID (GID) of the file.
 
 type: keyword
 
+example: 1001
+
 --
 
 *`file.group`*::
 +
 --
 Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha512`*::
++
+--
+SHA512 hash.
 
 type: keyword
 
@@ -6807,6 +9068,8 @@ Inode representing the file in the filesystem.
 
 type: keyword
 
+example: 256383
+
 --
 
 *`file.mode`*::
@@ -6816,16 +9079,27 @@ Mode of the file in octal representation.
 
 type: keyword
 
-example: 416
+example: 0640
 
 --
 
 *`file.mtime`*::
 +
 --
-Last time file content was modified.
+Last time the file content was modified.
 
 type: date
+
+--
+
+*`file.name`*::
++
+--
+Name of the file including the extension, without the directory.
+
+type: keyword
+
+example: example.png
 
 --
 
@@ -6836,23 +9110,37 @@ File owner's username.
 
 type: keyword
 
+example: alice
+
 --
 
 *`file.path`*::
 +
 --
-Path to the file.
+Full path to the file, including the file name. It should include the drive letter, when appropriate.
 
 type: keyword
+
+example: /home/alice/example.png
+
+--
+
+*`file.path.text`*::
++
+--
+type: text
 
 --
 
 *`file.size`*::
 +
 --
-File size in bytes (field is only added when `type` is `file`).
+File size in bytes.
+Only relevant when `file.type` is "file".
 
 type: long
+
+example: 16384
 
 --
 
@@ -6865,12 +9153,21 @@ type: keyword
 
 --
 
+*`file.target_path.text`*::
++
+--
+type: text
+
+--
+
 *`file.type`*::
 +
 --
 File type (file, dir, or symlink).
 
 type: keyword
+
+example: file
 
 --
 
@@ -6880,6 +9177,8 @@ type: keyword
 The user ID (UID) or security identifier (SID) of the file owner.
 
 type: keyword
+
+example: 1001
 
 --
 
@@ -6986,6 +9285,16 @@ example: Quebec
 The group fields are meant to represent groups that are relevant to the event.
 
 
+*`group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`group.id`*::
 +
 --
@@ -6999,6 +9308,49 @@ type: keyword
 +
 --
 Name of the group.
+
+type: keyword
+
+--
+
+[float]
+=== hash
+
+The hash fields represent different hash algorithms and their values.
+Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+
+
+*`hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`hash.sha512`*::
++
+--
+SHA512 hash.
 
 type: keyword
 
@@ -7019,6 +9371,18 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.domain`*::
++
+--
+Name of the domain of which the host is a member.
+For example, on Windows this could be the host's Active Directory domain or NetBIOS domain name. For Linux this could be the domain of the host's LDAP provider.
+
+type: keyword
+
+example: CONTOSO
 
 --
 
@@ -7183,6 +9547,13 @@ example: Mac OS Mojave
 
 --
 
+*`host.os.full.text`*::
++
+--
+type: text
+
+--
+
 *`host.os.kernel`*::
 +
 --
@@ -7202,6 +9573,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`host.os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -7237,6 +9615,27 @@ type: keyword
 
 --
 
+*`host.uptime`*::
++
+--
+Seconds the host has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`host.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`host.user.email`*::
 +
 --
@@ -7254,6 +9653,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`host.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`host.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -7305,6 +9721,13 @@ example: albert
 
 --
 
+*`host.user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === http
 
@@ -7332,6 +9755,13 @@ The full HTTP request body.
 type: keyword
 
 example: Hello world
+
+--
+
+*`http.request.body.content.text`*::
++
+--
+type: text
 
 --
 
@@ -7395,6 +9825,13 @@ example: Hello world
 
 --
 
+*`http.response.body.content.text`*::
++
+--
+type: text
+
+--
+
 *`http.response.bytes`*::
 +
 --
@@ -7435,18 +9872,65 @@ example: 1.1
 [float]
 === log
 
-Fields which are specific to log events.
+Details about the event's logging mechanism or logging transport.
+The log.* fields are typically populated with details about the logging mechanism used to create and/or transport the event. For example, syslog details belong under `log.syslog.*`.
+The details specific to your event source are typically not logged under `log.*`, but rather in `event.*` or in other ECS fields.
 
 
 *`log.level`*::
 +
 --
 Original log level of the log event.
-Some examples are `warn`, `error`, `i`.
+If the source of the event provides a log level or textual severity, this is the one that goes in `log.level`. If your source doesn't specify one, you may put your event transport's severity here (e.g. Syslog severity).
+Some examples are `warn`, `err`, `i`, `informational`.
 
 type: keyword
 
-example: err
+example: error
+
+--
+
+*`log.logger`*::
++
+--
+The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
+
+type: keyword
+
+example: org.elasticsearch.bootstrap.Bootstrap
+
+--
+
+*`log.origin.file.line`*::
++
+--
+The line number of the file containing the source code which originated the log event.
+
+type: integer
+
+example: 42
+
+--
+
+*`log.origin.file.name`*::
++
+--
+The name of the file containing the source code which originated the log event. Note that this is not the name of the log file.
+
+type: keyword
+
+example: Bootstrap.java
+
+--
+
+*`log.origin.function`*::
++
+--
+The name of the function or method which originated the log event.
+
+type: keyword
+
+example: init
 
 --
 
@@ -7460,6 +9944,78 @@ This field is not indexed and doc_values are disabled so it can't be queried but
 type: keyword
 
 example: Sep 19 08:26:10 localhost My log
+
+--
+
+*`log.syslog`*::
++
+--
+The Syslog metadata of the event, if the event was transmitted via Syslog. Please see RFCs 5424 or 3164.
+
+type: object
+
+--
+
+*`log.syslog.facility.code`*::
++
+--
+The Syslog numeric facility of the log event, if available.
+According to RFCs 5424 and 3164, this value should be an integer between 0 and 23.
+
+type: long
+
+example: 23
+
+format: string
+
+--
+
+*`log.syslog.facility.name`*::
++
+--
+The Syslog text-based facility of the log event, if available.
+
+type: keyword
+
+example: local7
+
+--
+
+*`log.syslog.priority`*::
++
+--
+Syslog numeric priority of the event, if available.
+According to RFCs 5424 and 3164, the priority is 8 * facility + severity. This number is therefore expected to contain a value between 0 and 191.
+
+type: long
+
+example: 135
+
+format: string
+
+--
+
+*`log.syslog.severity.code`*::
++
+--
+The Syslog numeric severity of the log event, if available.
+If the event source publishing via Syslog provides a different numeric severity value (e.g. firewall, IDS), your source's numeric severity should go to `event.severity`. If the event source does not specify a distinct severity, you can optionally copy the Syslog severity to `event.severity`.
+
+type: long
+
+example: 3
+
+--
+
+*`log.syslog.severity.name`*::
++
+--
+The Syslog numeric severity of the log event, if available.
+If the event source publishing via Syslog provides a different severity value (e.g. firewall, IDS), your source's text severity should go to `log.level`. If the event source does not specify a distinct severity, you can optionally copy the Syslog severity to `log.level`.
+
+type: keyword
+
+example: Error
 
 --
 
@@ -7613,7 +10169,7 @@ example: ipv4
 === observer
 
 An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
-This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
+This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, web proxies, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 *`observer.geo.city_name`*::
@@ -7733,6 +10289,19 @@ type: keyword
 
 --
 
+*`observer.name`*::
++
+--
+Custom name of the observer.
+This is a name that can be given to an observer. This can be helpful for example if multiple firewalls of the same model are used in an organization.
+If no custom name is needed, the field can be left empty.
+
+type: keyword
+
+example: 1_proxySG
+
+--
+
 *`observer.os.family`*::
 +
 --
@@ -7752,6 +10321,13 @@ Operating system name, including the version or code name.
 type: keyword
 
 example: Mac OS Mojave
+
+--
+
+*`observer.os.full.text`*::
++
+--
+type: text
 
 --
 
@@ -7777,6 +10353,13 @@ example: Mac OS X
 
 --
 
+*`observer.os.name.text`*::
++
+--
+type: text
+
+--
+
 *`observer.os.platform`*::
 +
 --
@@ -7796,6 +10379,17 @@ Operating system version as a raw string.
 type: keyword
 
 example: 10.14.1
+
+--
+
+*`observer.product`*::
++
+--
+The product name of the observer.
+
+type: keyword
+
+example: s200
 
 --
 
@@ -7823,9 +10417,11 @@ example: firewall
 *`observer.vendor`*::
 +
 --
-observer vendor information.
+Vendor name of the observer.
 
 type: keyword
+
+example: Symantec
 
 --
 
@@ -7863,6 +10459,13 @@ type: keyword
 
 --
 
+*`organization.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === os
 
@@ -7891,6 +10494,13 @@ example: Mac OS Mojave
 
 --
 
+*`os.full.text`*::
++
+--
+type: text
+
+--
+
 *`os.kernel`*::
 +
 --
@@ -7910,6 +10520,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -7936,6 +10553,158 @@ example: 10.14.1
 --
 
 [float]
+=== package
+
+These fields contain information about an installed software package. It contains general information about a package, such as name, version or size. It also contains installation details, such as time or location.
+
+
+*`package.architecture`*::
++
+--
+Package architecture.
+
+type: keyword
+
+example: x86_64
+
+--
+
+*`package.build_version`*::
++
+--
+Additional information about the build version of the installed package.
+For example use the commit SHA of a non-released package.
+
+type: keyword
+
+example: 36f4f7e89dd61b0988b12ee000b98966867710cd
+
+--
+
+*`package.checksum`*::
++
+--
+Checksum of the installed package for verification.
+
+type: keyword
+
+example: 68b329da9893e34099c7d8ad5cb9c940
+
+--
+
+*`package.description`*::
++
+--
+Description of the package.
+
+type: keyword
+
+example: Open source programming language to build simple/reliable/efficient software.
+
+--
+
+*`package.install_scope`*::
++
+--
+Indicating how the package was installed, e.g. user-local, global.
+
+type: keyword
+
+example: global
+
+--
+
+*`package.installed`*::
++
+--
+Time when package was installed.
+
+type: date
+
+--
+
+*`package.license`*::
++
+--
+License under which the package was released.
+Use a short name, e.g. the license identifier from SPDX License List where possible (https://spdx.org/licenses/).
+
+type: keyword
+
+example: Apache License 2.0
+
+--
+
+*`package.name`*::
++
+--
+Package name
+
+type: keyword
+
+example: go
+
+--
+
+*`package.path`*::
++
+--
+Path where the package is installed.
+
+type: keyword
+
+example: /usr/local/Cellar/go/1.12.9/
+
+--
+
+*`package.reference`*::
++
+--
+Home page or reference URL of the software in this package, if available.
+
+type: keyword
+
+example: https://golang.org
+
+--
+
+*`package.size`*::
++
+--
+Package size in bytes.
+
+type: long
+
+example: 62231
+
+format: string
+
+--
+
+*`package.type`*::
++
+--
+Type of package.
+This should contain the package file type, rather than the package manager name. Examples: rpm, dpkg, brew, npm, gem, nupkg, jar.
+
+type: keyword
+
+example: rpm
+
+--
+
+*`package.version`*::
++
+--
+Package version
+
+type: keyword
+
+example: 1.12.9
+
+--
+
+[float]
 === process
 
 These fields contain information about a process.
@@ -7945,12 +10714,43 @@ These fields can help you correlate metrics information with a process id/name f
 *`process.args`*::
 +
 --
-Array of process arguments.
+Array of process arguments, starting with the absolute path to the executable.
 May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['ssh', '-l', 'user', '10.0.0.16']
+example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
+
+--
+
+*`process.command_line.text`*::
++
+--
+type: text
 
 --
 
@@ -7965,6 +10765,61 @@ example: /usr/bin/ssh
 
 --
 
+*`process.executable.text`*::
++
+--
+type: text
+
+--
+
+*`process.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
+
+--
+
+*`process.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -7974,6 +10829,234 @@ Sometimes called program name or similar.
 type: keyword
 
 example: ssh
+
+--
+
+*`process.name.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.args`*::
++
+--
+Array of process arguments.
+May be filtered to protect sensitive information.
+
+type: keyword
+
+example: ['ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.parent.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.parent.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
+
+--
+
+*`process.parent.command_line.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.executable`*::
++
+--
+Absolute path to the process executable.
+
+type: keyword
+
+example: /usr/bin/ssh
+
+--
+
+*`process.parent.executable.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
+
+--
+
+*`process.parent.name`*::
++
+--
+Process name.
+Sometimes called program name or similar.
+
+type: keyword
+
+example: ssh
+
+--
+
+*`process.parent.name.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.pid`*::
++
+--
+Process id.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.ppid`*::
++
+--
+Parent process' pid.
+
+type: long
+
+example: 4241
+
+format: string
+
+--
+
+*`process.parent.start`*::
++
+--
+The time the process started.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
+*`process.parent.thread.id`*::
++
+--
+Thread ID.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
+*`process.parent.title`*::
++
+--
+Process title.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+type: keyword
+
+--
+
+*`process.parent.title.text`*::
++
+--
+type: text
+
+--
+
+*`process.parent.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`process.parent.working_directory`*::
++
+--
+The working directory of the process.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`process.parent.working_directory.text`*::
++
+--
+type: text
+
+--
+
+*`process.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
 
 --
 
@@ -8027,6 +11110,17 @@ format: string
 
 --
 
+*`process.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
 *`process.title`*::
 +
 --
@@ -8034,6 +11128,24 @@ Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
 type: keyword
+
+--
+
+*`process.title.text`*::
++
+--
+type: text
+
+--
+
+*`process.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
 
 --
 
@@ -8045,6 +11157,98 @@ The working directory of the process.
 type: keyword
 
 example: /home/alice
+
+--
+
+*`process.working_directory.text`*::
++
+--
+type: text
+
+--
+
+[float]
+=== registry
+
+Fields related to Windows Registry operations.
+
+
+*`registry.data.bytes`*::
++
+--
+Original bytes written with base64 encoding.
+For Windows registry operations, such as SetValueEx and RegQueryValueEx, this corresponds to the data pointed by `lp_data`. This is optional but provides better recoverability and should be populated for REG_BINARY encoded values.
+
+type: keyword
+
+example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
+
+--
+
+*`registry.data.strings`*::
++
+--
+Content when writing string types.
+Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`registry.data.type`*::
++
+--
+Standard registry type for encoding contents
+
+type: keyword
+
+example: REG_SZ
+
+--
+
+*`registry.hive`*::
++
+--
+Abbreviated name for the hive.
+
+type: keyword
+
+example: HKLM
+
+--
+
+*`registry.key`*::
++
+--
+Hive-relative path of keys.
+
+type: keyword
+
+example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
+
+--
+
+*`registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
 
 --
 
@@ -8065,6 +11269,111 @@ type: ip
 
 --
 
+*`related.user`*::
++
+--
+All the user names seen on your event.
+
+type: keyword
+
+--
+
+[float]
+=== rule
+
+Rule fields are used to capture the specifics of any observer or agent rules that generate alerts or other notable events.
+Examples of data sources that would populate the rule fields include: network admission control platforms, network or host IDS/IPS, network firewalls, web application firewalls, url filters, endpoint detection and response (EDR) systems, etc.
+
+
+*`rule.category`*::
++
+--
+A categorization value keyword used by the entity using the rule for detection of this event.
+
+type: keyword
+
+example: Attempted Information Leak
+
+--
+
+*`rule.description`*::
++
+--
+The description of the rule generating the event.
+
+type: keyword
+
+example: Block requests to public DNS over HTTPS / TLS protocols
+
+--
+
+*`rule.id`*::
++
+--
+A rule ID that is unique within the scope of an agent, observer, or other entity using the rule for detection of this event.
+
+type: keyword
+
+example: 101
+
+--
+
+*`rule.name`*::
++
+--
+The name of the rule or signature generating the event.
+
+type: keyword
+
+example: BLOCK_DNS_over_TLS
+
+--
+
+*`rule.reference`*::
++
+--
+Reference URL to additional information about the rule used to generate this event.
+The URL can point to the vendor's documentation about the rule. If that's not available, it can also be a link to a more general page describing this type of alert.
+
+type: keyword
+
+example: https://en.wikipedia.org/wiki/DNS_over_TLS
+
+--
+
+*`rule.ruleset`*::
++
+--
+Name of the ruleset, policy, group, or parent category in which the rule used to generate this event is a member.
+
+type: keyword
+
+example: Standard_Protocol_Filters
+
+--
+
+*`rule.uuid`*::
++
+--
+A rule ID that is unique within the scope of a set or group of agents, observers, or other entities using the rule for detection of this event.
+
+type: keyword
+
+example: 1100110011
+
+--
+
+*`rule.version`*::
++
+--
+The version / revision of the rule being used for analysis.
+
+type: keyword
+
+example: 1.1
+
+--
+
 [float]
 === server
 
@@ -8080,6 +11389,35 @@ Some event server addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`server.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`server.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`server.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -8214,6 +11552,28 @@ type: keyword
 
 --
 
+*`server.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`server.nat.port`*::
++
+--
+Translated port of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`server.packets`*::
 +
 --
@@ -8236,6 +11596,41 @@ format: string
 
 --
 
+*`server.registered_domain`*::
++
+--
+The highest registered server domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`server.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`server.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`server.user.email`*::
 +
 --
@@ -8253,6 +11648,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`server.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`server.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -8304,6 +11716,13 @@ example: albert
 
 --
 
+*`server.user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === service
 
@@ -8326,9 +11745,9 @@ example: 8a4f500f
 *`service.id`*::
 +
 --
-Unique identifier of the running service.
-This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
-Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
 
 type: keyword
 
@@ -8340,13 +11759,25 @@ example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
 +
 --
 Name of the service data is collected from.
-The name of the service is normally user given. This allows if two instances of the same service are running on the same machine they can be differentiated by the `service.name`.
-Also it allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
-In the case of Elasticsearch the service.name could contain the cluster name. For Beats the service.name is by default a copy of the `service.type` field if no name is specified.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
 
 type: keyword
 
 example: elasticsearch-metrics
+
+--
+
+*`service.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
 
 --
 
@@ -8398,6 +11829,35 @@ Some event source addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`source.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`source.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`source.as.organization.name.text`*::
++
+--
+type: text
 
 --
 
@@ -8532,6 +11992,28 @@ type: keyword
 
 --
 
+*`source.nat.ip`*::
++
+--
+Translated ip of source based NAT sessions (e.g. internal client to internet)
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`source.nat.port`*::
++
+--
+Translated port of source based NAT sessions. (e.g. internal client to internet)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`source.packets`*::
 +
 --
@@ -8554,6 +12036,41 @@ format: string
 
 --
 
+*`source.registered_domain`*::
++
+--
+The highest registered source domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`source.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`source.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`source.user.email`*::
 +
 --
@@ -8571,6 +12088,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`source.user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`source.user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -8622,6 +12156,455 @@ example: albert
 
 --
 
+*`source.user.name.text`*::
++
+--
+type: text
+
+--
+
+[float]
+=== threat
+
+Fields to classify events and alerts according to a threat taxonomy such as the Mitre ATT&CK framework.
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+
+
+*`threat.framework`*::
++
+--
+Name of the threat framework used to further categorize and classify the tactic and technique of the reported threat. Framework classification can be provided by detecting systems, evaluated at ingest time, or retrospectively tagged to events.
+
+type: keyword
+
+example: MITRE ATT&CK
+
+--
+
+*`threat.tactic.id`*::
++
+--
+The id of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+
+type: keyword
+
+example: TA0040
+
+--
+
+*`threat.tactic.name`*::
++
+--
+Name of the type of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+
+type: keyword
+
+example: impact
+
+--
+
+*`threat.tactic.reference`*::
++
+--
+The reference url of tactic used by this threat. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+
+type: keyword
+
+example: https://attack.mitre.org/tactics/TA0040/
+
+--
+
+*`threat.technique.id`*::
++
+--
+The id of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+
+type: keyword
+
+example: T1499
+
+--
+
+*`threat.technique.name`*::
++
+--
+The name of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+
+type: keyword
+
+example: endpoint denial of service
+
+--
+
+*`threat.technique.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.technique.reference`*::
++
+--
+The reference url of technique used by this tactic. You can use the Mitre ATT&CK Matrix Tactic categorization, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+
+type: keyword
+
+example: https://attack.mitre.org/techniques/T1499/
+
+--
+
+[float]
+=== tls
+
+Fields related to a TLS connection. These fields focus on the TLS protocol itself and intentionally avoids in-depth analysis of the related x.509 certificate files.
+
+
+*`tls.cipher`*::
++
+--
+String indicating the cipher used during the current connection.
+
+type: keyword
+
+example: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+
+--
+
+*`tls.client.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.client.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.client.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.client.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.client.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.client.issuer`*::
++
+--
+Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.ja3`*::
++
+--
+A hash that identifies clients based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: d4e5b18d6b55c71272893221c96ba240
+
+--
+
+*`tls.client.not_after`*::
++
+--
+Date/Time indicating when client certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.not_before`*::
++
+--
+Date/Time indicating when client certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.server_name`*::
++
+--
+Also called an SNI, this tells the server which hostname to which the client is attempting to connect. When this value is available, it should get copied to `destination.domain`.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`tls.client.subject`*::
++
+--
+Distinguished name of subject of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=myclient, OU=Documentation Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.supported_ciphers`*::
++
+--
+Array of ciphers offered by the client during the client hello.
+
+type: keyword
+
+example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+
+--
+
+*`tls.curve`*::
++
+--
+String indicating the curve used for the given cipher, when applicable.
+
+type: keyword
+
+example: secp256r1
+
+--
+
+*`tls.established`*::
++
+--
+Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
+
+type: boolean
+
+--
+
+*`tls.next_protocol`*::
++
+--
+String indicating the protocol being tunneled. Per the values in the IANA registry (https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
+
+type: keyword
+
+example: http/1.1
+
+--
+
+*`tls.resumed`*::
++
+--
+Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
+
+type: boolean
+
+--
+
+*`tls.server.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.server.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.server.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.server.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.server.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.server.issuer`*::
++
+--
+Subject of the issuer of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.server.ja3s`*::
++
+--
+A hash that identifies servers based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: 394441ab65754e2207b1e1b457b3641d
+
+--
+
+*`tls.server.not_after`*::
++
+--
+Timestamp indicating when server certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.not_before`*::
++
+--
+Timestamp indicating when server certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.subject`*::
++
+--
+Subject of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.version`*::
++
+--
+Numeric part of the version parsed from the original string.
+
+type: keyword
+
+example: 1.2
+
+--
+
+*`tls.version_protocol`*::
++
+--
+Normalized lowercase protocol name parsed from original string.
+
+type: keyword
+
+example: tls
+
+--
+
+[float]
+=== tracing
+
+Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
+
+
+*`tracing.trace.id`*::
++
+--
+Unique identifier of the trace.
+A trace groups multiple events like transactions that belong together. For example, a user request handled by multiple inter-connected services.
+
+type: keyword
+
+example: 4bf92f3577b34da6a3ce929d0e0e4736
+
+--
+
+*`tracing.transaction.id`*::
++
+--
+Unique identifier of the transaction.
+A transaction is the highest level of work measured within a service, such as a request to a server.
+
+type: keyword
+
+example: 00f067aa0ba902b7
+
+--
+
 [float]
 === url
 
@@ -8637,6 +12620,19 @@ In some cases a URL may refer to an IP and/or port directly, without a domain na
 type: keyword
 
 example: www.elastic.co
+
+--
+
+*`url.extension`*::
++
+--
+The field contains the file extension from the original request url.
+The file extension is only set if it exists, as not every url has a file extension.
+The leading period must not be included. For example, the value must be "png", not ".png".
+
+type: keyword
+
+example: png
 
 --
 
@@ -8661,6 +12657,13 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 
 --
 
+*`url.full.text`*::
++
+--
+type: text
+
+--
+
 *`url.original`*::
 +
 --
@@ -8671,6 +12674,13 @@ This field is meant to represent the URL as it was observed, complete or not.
 type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+--
+
+*`url.original.text`*::
++
+--
+type: text
 
 --
 
@@ -8715,6 +12725,19 @@ type: keyword
 
 --
 
+*`url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
 *`url.scheme`*::
 +
 --
@@ -8724,6 +12747,18 @@ Note: The `:` is not part of the scheme.
 type: keyword
 
 example: https
+
+--
+
+*`url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for google.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
 
 --
 
@@ -8743,6 +12778,16 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`user.email`*::
 +
 --
@@ -8760,6 +12805,23 @@ User's full name, if available.
 type: keyword
 
 example: Albert Einstein
+
+--
+
+*`user.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -8811,6 +12873,13 @@ example: albert
 
 --
 
+*`user.name.text`*::
++
+--
+type: text
+
+--
+
 [float]
 === user_agent
 
@@ -8843,11 +12912,18 @@ example: Safari
 *`user_agent.original`*::
 +
 --
-Unparsed version of the user_agent.
+Unparsed user_agent string.
 
 type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+--
+
+*`user_agent.original.text`*::
++
+--
+type: text
 
 --
 
@@ -8873,6 +12949,13 @@ example: Mac OS Mojave
 
 --
 
+*`user_agent.os.full.text`*::
++
+--
+type: text
+
+--
+
 *`user_agent.os.kernel`*::
 +
 --
@@ -8892,6 +12975,13 @@ Operating system name, without the version.
 type: keyword
 
 example: Mac OS X
+
+--
+
+*`user_agent.os.name.text`*::
++
+--
+type: text
 
 --
 
@@ -8925,6 +13015,165 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vulnerability
+
+The vulnerability fields describe information about a vulnerability that is relevant to an event.
+
+
+*`vulnerability.category`*::
++
+--
+The type of system or architecture that the vulnerability affects. These may be platform-specific (for example, Debian or SUSE) or general (for example, Database or Firewall). For example (https://qualysguard.qualys.com/qwebhelp/fo_portal/knowledgebase/vulnerability_categories.htm[Qualys vulnerability categories])
+This field must be an array.
+
+type: keyword
+
+example: ["Firewall"]
+
+--
+
+*`vulnerability.classification`*::
++
+--
+The classification of the vulnerability scoring system. For example (https://www.first.org/cvss/)
+
+type: keyword
+
+example: CVSS
+
+--
+
+*`vulnerability.description`*::
++
+--
+The description of the vulnerability that provides additional context of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created[Common Vulnerabilities and Exposure CVE description])
+
+type: keyword
+
+example: In macOS before 2.12.6, there is a vulnerability in the RPC...
+
+--
+
+*`vulnerability.description.text`*::
++
+--
+type: text
+
+--
+
+*`vulnerability.enumeration`*::
++
+--
+The type of identifier used for this vulnerability. For example (https://cve.mitre.org/about/)
+
+type: keyword
+
+example: CVE
+
+--
+
+*`vulnerability.id`*::
++
+--
+The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)[Common Vulnerabilities and Exposure CVE ID]
+
+type: keyword
+
+example: CVE-2019-00001
+
+--
+
+*`vulnerability.reference`*::
++
+--
+A resource that provides additional information, context, and mitigations for the identified vulnerability.
+
+type: keyword
+
+example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-6111
+
+--
+
+*`vulnerability.report_id`*::
++
+--
+The report or scan identification number.
+
+type: keyword
+
+example: 20191018.0001
+
+--
+
+*`vulnerability.scanner.vendor`*::
++
+--
+The name of the vulnerability scanner vendor.
+
+type: keyword
+
+example: Tenable
+
+--
+
+*`vulnerability.score.base`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Base scores cover an assessment for exploitability metrics (attack vector, complexity, privileges, and user interaction), impact metrics (confidentiality, integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.environmental`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Environmental scores cover an assessment for any modified Base metrics, confidentiality, integrity, and availability requirements. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.temporal`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Temporal scores cover an assessment for code maturity, remediation level, and confidence. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+--
+
+*`vulnerability.score.version`*::
++
+--
+The National Vulnerability Database (NVD) provides qualitative severity rankings of "Low", "Medium", and "High" for CVSS v2.0 base score ranges in addition to the severity ratings for CVSS v3.0 as they are defined in the CVSS v3.0 specification.
+CVSS is owned and managed by FIRST.Org, Inc. (FIRST), a US-based non-profit organization, whose mission is to help computer security incident response teams across the world. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: 2.0
+
+--
+
+*`vulnerability.severity`*::
++
+--
+The severity of the vulnerability can help with metrics and internal prioritization regarding remediation. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: Critical
 
 --
 
@@ -9172,6 +13421,54 @@ type: long
 +
 --
 Memory used for fielddata.
+
+
+type: long
+
+--
+
+[float]
+=== enrich
+
+Enrich stats
+
+
+
+*`elasticsearch.enrich.queue.size`*::
++
+--
+Number of search requests in the queue.
+
+
+type: long
+
+--
+
+
+*`elasticsearch.enrich.remote_requests.current`*::
++
+--
+Current number of outstanding remote requests.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.remote_requests.total`*::
++
+--
+Number of outstanding remote requests executed since node startup.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -10101,6 +14398,46 @@ type: integer
 
 --
 
+*`envoyproxy.server.cluster_manager.cluster_updated`*::
++
+--
+Total cluster updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_updated_via_merge`*::
++
+--
+Total cluster updates applied as merged updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_merge_cancelled`*::
++
+--
+Total merged updates that got cancelled and delivered early
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_out_of_merge_window`*::
++
+--
+Total updates which arrived out of a merge window
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.filesystem.flushed_by_timer`*::
 +
@@ -10152,11 +14489,21 @@ type: integer
 
 --
 
+*`envoyproxy.server.filesystem.write_failed`*::
++
+--
+Total number of times an error occurred during a file write operation
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.runtime.load_error`*::
 +
 --
-Total number of load attempts that resulted in an error
+Total number of load attempts that resulted in an error in any layer
 
 
 type: integer
@@ -10166,7 +14513,7 @@ type: integer
 *`envoyproxy.server.runtime.load_success`*::
 +
 --
-Total number of load attempts that were successful
+Total number of load attempts that were successful at all layers
 
 
 type: integer
@@ -10206,6 +14553,29 @@ type: integer
 *`envoyproxy.server.runtime.admin_overrides_active`*::
 +
 --
+1 if any admin overrides are active otherwise 0
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.deprecated_feature_use`*::
++
+--
+Total number of times deprecated features were used.
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.num_layers`*::
++
+--
+Number of layers currently active (without loading errors)
+
+
 type: integer
 
 --
@@ -10285,6 +14655,16 @@ type: integer
 +
 --
 Number of currently warming listeners
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.listener_manager.listener_stopped`*::
++
+--
+Total listeners stopped
 
 
 type: integer
@@ -10403,6 +14783,60 @@ type: integer
 Current hot restart epoch
 
 
+type: integer
+
+--
+
+*`envoyproxy.server.server.concurrency`*::
++
+--
+Number of worker threads
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.debug_assertion_failures`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.dynamic_unknown_fields`*::
++
+--
+Number of messages in dynamic configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.state`*::
++
+--
+Current state of the Server
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.static_unknown_fields`*::
++
+--
+Number of messages in static configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.stats_recent_lookups`*::
++
+--
 type: integer
 
 --
@@ -11358,6 +15792,20 @@ format: bytes
 
 --
 
+[[exported-fields-googlecloud]]
+== Google Cloud Platform fields
+
+GCP module
+
+
+
+*`googlecloud.labels`*::
++
+--
+type: object
+
+--
+
 [[exported-fields-graphite]]
 == Graphite fields
 
@@ -11987,7 +16435,7 @@ Current throttle percentage for the server when slowstart is active, or no value
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -12698,6 +17146,1278 @@ json metricset
 server
 
 
+[[exported-fields-ibmmq]]
+== IBM MQ fields
+
+IBM MQ module
+
+
+
+
+[[exported-fields-iis]]
+== iis fields
+
+iis module
+
+
+
+[float]
+=== iis
+
+
+
+
+[float]
+=== application_pool
+
+application_pool
+
+
+
+*`iis.application_pool.name`*::
++
+--
+application pool name
+
+
+type: keyword
+
+--
+
+*`iis.webserver.*.*`*::
++
+--
+webserver
+
+
+type: object
+
+--
+
+[float]
+=== website
+
+website
+
+
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
+
+[[exported-fields-istio]]
+== istio fields
+
+istio Module
+
+
+
+[float]
+=== istio
+
+`istio` contains statistics that were read from Istio
+
+
+
+[float]
+=== citadel
+
+Contains statistics related to the Istio Citadel service
+
+
+
+*`istio.citadel.grpc.method`*::
++
+--
+The grpc method
+
+
+type: keyword
+
+--
+
+*`istio.citadel.grpc.service`*::
++
+--
+The grpc service
+
+
+type: keyword
+
+--
+
+*`istio.citadel.grpc.type`*::
++
+--
+The type of the respective grpc service
+
+
+type: keyword
+
+--
+
+*`istio.citadel.secret_controller_svc_acc_created_cert.count`*::
++
+--
+The number of certificates created due to service account creation.
+
+
+type: long
+
+--
+
+*`istio.citadel.server_root_cert_expiry_seconds`*::
++
+--
+The unix timestamp, in seconds, when Citadel root cert will expire. We set it to negative in case of internal error.
+
+
+type: float
+
+--
+
+*`istio.citadel.grpc.server.handled`*::
++
+--
+Total number of RPCs completed on the server, regardless of success or failure.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.msg.received`*::
++
+--
+Total number of RPC stream messages received on the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.msg.sent`*::
++
+--
+Total number of gRPC stream messages sent by the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.started`*::
++
+--
+Total number of RPCs started on the server.
+
+
+type: long
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.bucket.*`*::
++
+--
+The response latency (milliseconds) of gRPC that had been application-level handled by the server.
+
+
+type: object
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.sum`*::
++
+--
+The response latency of gRPC, sum of latencies in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.citadel.grpc.server.handling.latency.ms.count`*::
++
+--
+The response latency of gRPC, number of metrics
+
+
+type: long
+
+--
+
+[float]
+=== galley
+
+Contains statistics related to the Istio galley service
+
+
+
+*`istio.galley.name`*::
++
+--
+The name of the resource the metric is related to
+
+
+type: keyword
+
+--
+
+*`istio.galley.namespace`*::
++
+--
+The Kubernetes namespace of the resource
+
+
+type: keyword
+
+--
+
+*`istio.galley.version`*::
++
+--
+The version of the object
+
+
+type: keyword
+
+--
+
+*`istio.galley.collection`*::
++
+--
+The collection of the instance
+
+
+type: keyword
+
+--
+
+*`istio.galley.istio.authentication.meshpolicies`*::
++
+--
+The number of valid istio/authentication/meshpolicies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.authentication.policies`*::
++
+--
+The number of valid istio/authentication/policies known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.mesh.MeshConfig`*::
++
+--
+The number of valid istio/mesh/MeshConfig known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.destinationrules`*::
++
+--
+The number of valid istio/networking/destinationrules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.envoyfilters`*::
++
+--
+The number of valid istio/networking/envoyfilters known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.gateways`*::
++
+--
+The number of valid istio/networking/gateways known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.sidecars`*::
++
+--
+The number of valid istio/networking/sidecars known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.networking.virtualservices`*::
++
+--
+The number of valid istio/networking/virtualservices known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.attributemanifests`*::
++
+--
+The number of valid istio/policy/attributemanifests known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.handlers`*::
++
+--
+The number of valid istio/policy/handlers known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.instances`*::
++
+--
+The number of valid istio/policy/instances known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.istio.policy.rules`*::
++
+--
+The number of valid istio/policy/rules known to galley at a point in time
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.bucket.*`*::
++
+--
+The duration between each incoming event as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.sum`*::
++
+--
+The duration between each incoming event, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.event_span.duration.ms.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.bucket.*`*::
++
+--
+The number of events that have been processed as histogram buckets
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.sum`*::
++
+--
+The number of events that have been processed, sum of events
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_events.count`*::
++
+--
+The duration between each incoming event, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.bucket.*`*::
++
+--
+The duration of each snapshot as histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.sum`*::
++
+--
+The duration of each snapshot, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.galley.runtime.processor.snapshot_lifetime.duration.ms.count`*::
++
+--
+The duration of each snapshot, number of metrics
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.state_type_instances`*::
++
+--
+The number of type instances per type URL
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.on_change`*::
++
+--
+The number of times the strategy's onChange has been called
+
+
+type: long
+
+--
+
+*`istio.galley.runtime.strategy.timer_quiesce_reached`*::
++
+--
+The number of times a quiesce has been reached
+
+
+type: long
+
+--
+
+*`istio.galley.source_kube_event_success_total`*::
++
+--
+The number of times a kubernetes source successfully handled an event
+
+
+type: long
+
+--
+
+*`istio.galley.validation.cert_key.updates`*::
++
+--
+Galley validation webhook certificate updates
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.load`*::
++
+--
+k8s webhook configuration (re)loads
+
+
+type: long
+
+--
+
+*`istio.galley.validation.config.updates`*::
++
+--
+k8s webhook configuration updates
+
+
+type: long
+
+--
+
+[float]
+=== mesh
+
+Contains statistics related to the Istio mesh service
+
+
+
+*`istio.mesh.instance`*::
++
+--
+The prometheus instance
+
+
+type: text
+
+--
+
+*`istio.mesh.job`*::
++
+--
+The prometheus job
+
+
+type: keyword
+
+--
+
+*`istio.mesh.requests`*::
++
+--
+Total requests handled by an Istio proxy
+
+
+type: long
+
+--
+
+*`istio.mesh.request.duration.ms.bucket.*`*::
++
+--
+Request duration histogram buckets in milliseconds
+
+
+type: object
+
+--
+
+*`istio.mesh.request.duration.ms.sum`*::
++
+--
+Requests duration, sum of durations in milliseconds
+
+
+type: long
+
+format: duration
+
+--
+
+*`istio.mesh.request.duration.ms.count`*::
++
+--
+Requests duration, number of requests
+
+
+type: long
+
+--
+
+*`istio.mesh.request.size.bytes.bucket.*`*::
++
+--
+Request Size histogram buckets
+
+
+type: object
+
+--
+
+*`istio.mesh.request.size.bytes.sum`*::
++
+--
+Request Size histogram sum
+
+
+type: long
+
+--
+
+*`istio.mesh.request.size.bytes.count`*::
++
+--
+Request Size histogram count
+
+
+type: long
+
+--
+
+*`istio.mesh.response.size.bytes.bucket.*`*::
++
+--
+Request Size histogram buckets
+
+
+type: object
+
+--
+
+*`istio.mesh.response.size.bytes.sum`*::
++
+--
+Request Size histogram sum
+
+
+type: long
+
+--
+
+*`istio.mesh.response.size.bytes.count`*::
++
+--
+Request Size histogram count
+
+
+type: long
+
+--
+
+*`istio.mesh.reporter`*::
++
+--
+Reporter identifies the reporter of the request. It is set to destination if report is from a server Istio proxy and source if report is from a client Istio proxy.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.workload.name`*::
++
+--
+This identifies the name of source workload which controls the source.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.workload.namespace`*::
++
+--
+This identifies the namespace of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.principal`*::
++
+--
+This identifies the peer principal of the traffic source. It is set when peer authentication is used.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.app`*::
++
+--
+This identifies the source app based on app label of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.source.version`*::
++
+--
+This identifies the version of the source workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.workload.name`*::
++
+--
+This identifies the name of destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.workload.namespace`*::
++
+--
+This identifies the namespace of the destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.principal`*::
++
+--
+This identifies the peer principal of the traffic destination. It is set when peer authentication is used.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.app`*::
++
+--
+This identifies the destination app based on app label of the destination workload..
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.version`*::
++
+--
+This identifies the version of the destination workload.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.host`*::
++
+--
+This identifies destination service host responsible for an incoming request.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.name`*::
++
+--
+This identifies the destination service name.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.destination.service.namespace`*::
++
+--
+This identifies the namespace of destination service.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.request.protocol`*::
++
+--
+This identifies the protocol of the request. It is set to API protocol if provided, otherwise request or connection protocol.
+
+
+type: keyword
+
+--
+
+*`istio.mesh.response.code`*::
++
+--
+This identifies the response code of the request. This label is present only on HTTP metrics.
+
+
+type: long
+
+--
+
+*`istio.mesh.connection.security.policy`*::
++
+--
+This identifies the service authentication policy of the request. It is set to mutual_tls when Istio is used to make communication secure and report is from destination. It is set to unknown when report is from source since security policy cannot be properly populated.
+
+
+type: keyword
+
+--
+
+[float]
+=== mixer
+
+Contains statistics related to the Istio mixer service
+
+
+
+*`istio.mixer.istio.mcp.request.acks`*::
++
+--
+The number of request acks received by the source.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.errors.config`*::
++
+--
+The number of errors encountered during processing of the adapter info configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.adapter.info.configs`*::
++
+--
+The number of known adapters in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.attributes`*::
++
+--
+The number of known attributes in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.configs`*::
++
+--
+The number of known handlers in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.handler.errors.validation`*::
++
+--
+The number of errors encountered because handler validation returned error.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.errors.config`*::
++
+--
+The number of errors encountered during processing of the instance configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.instance.configs`*::
++
+--
+The number of known instances in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.config`*::
++
+--
+The number of errors encountered during processing of the rule configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.errors.match`*::
++
+--
+The number of rule conditions that was not parseable.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.rule.configs`*::
++
+--
+The number of known rules in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.errors.config`*::
++
+--
+The number of errors encountered during processing of the template configuration.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.template.configs`*::
++
+--
+The number of known templates in the current config.
+
+
+type: long
+
+--
+
+*`istio.mixer.config.unsatisfied.action_handler`*::
++
+--
+The number of actions that failed due to handlers being unavailable.
+
+
+type: long
+
+--
+
+*`istio.mixer.dispatcher_destinations_per_variety_total`*::
++
+--
+The number of Mixer adapter destinations by template variety type.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.closed`*::
++
+--
+The number of handlers that were closed during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.daemons`*::
++
+--
+The current number of active daemon routines in a given adapter environment.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.build`*::
++
+--
+The number of handlers that failed creation during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.failures.close`*::
++
+--
+The number of errors encountered while closing handlers during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.new`*::
++
+--
+The number of handlers that were newly created during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler.handlers.reused`*::
++
+--
+The number of handlers that were re-used during config transition.
+
+
+type: long
+
+--
+
+*`istio.mixer.handler`*::
++
+--
+The name of the daemon  handler
+
+
+type: long
+
+--
+
+*`istio.mixer.variety`*::
++
+--
+The name of the variety
+
+
+type: long
+
+--
+
+[float]
+=== pilot
+
+Contains statistics related to the Istio pilot service
+
+
+
+*`istio.pilot.xds.count`*::
++
+--
+Count of concurrent xDS client connections for Pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.pushes`*::
++
+--
+Count of xDS messages sent, as well as errors building or sending xDS messages for lds, rds, cds and eds.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.push.time.sec`*::
++
+--
+Total time in seconds Pilot takes to push lds, rds, cds and eds.
+
+
+type: long
+
+--
+
+*`istio.pilot.xds.eds.instances`*::
++
+--
+Instances for each cluster, as of last push. Zero instances is an error.
+
+
+type: object
+
+--
+
+*`istio.pilot.xds.push.context.errors`*::
++
+--
+Number of errors (timeouts) initiating push context.
+
+
+type: integer
+
+--
+
+*`istio.pilot.xds.internal.errors`*::
++
+--
+Total number of internal XDS errors in pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.inbound`*::
++
+--
+Number of conflicting inbound listeners.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.current.tcp`*::
++
+--
+Number of conflicting wildcard http listeners with current wildcard tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.http.over.https`*::
++
+--
+Number of conflicting HTTP listeners with well known HTTPS ports.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.http`*::
++
+--
+Number of conflicting wildcard tcp listeners with current wildcard http listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.conflict.listener.outbound.tcp.over.current.tcp`*::
++
+--
+Number of conflicting tcp listeners with current tcp listener.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.bucket.*`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram buckets in milliseconds.
+
+
+type: object
+
+--
+
+*`istio.pilot.proxy.conv.ms.sum`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram sum of times in milliseconds.
+
+
+type: long
+
+--
+
+*`istio.pilot.services`*::
++
+--
+Total services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.virt.services`*::
++
+--
+Total virtual services known to pilot.
+
+
+type: integer
+
+--
+
+*`istio.pilot.proxy.conv.ms.count`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram count of times.
+
+
+type: long
+
+--
+
+*`istio.pilot.no.ip`*::
++
+--
+Pods not found in the endpoint table, possibly invalid.
+
+
+type: object
+
+--
+
+*`istio.pilot.cluster`*::
++
+--
+The instance FQDN.
+
+
+type: text
+
+--
+
+*`istio.pilot.type`*::
++
+--
+The Envoy proxy configuration type.
+
+
+type: text
+
+--
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
@@ -12878,6 +18598,288 @@ type: keyword
 --
 
 [float]
+=== broker
+
+Broker metrics from Kafka Broker JMX
+
+
+*`kafka.broker.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.broker.request.channel.queue.size`*::
++
+--
+The size of the request queue
+
+type: long
+
+--
+
+*`kafka.broker.request.produce.failed_per_second`*::
++
+--
+The rate of failed produce requests per second
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed_per_second`*::
++
+--
+The rate of client fetch request failures per second
+
+type: float
+
+--
+
+*`kafka.broker.request.produce.failed`*::
++
+--
+The number of failed produce requests
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed`*::
++
+--
+The number of client fetch request failures
+
+type: float
+
+--
+
+*`kafka.broker.replication.leader_elections`*::
++
+--
+The leader election rate
+
+type: float
+
+--
+
+*`kafka.broker.replication.unclean_leader_elections`*::
++
+--
+The unclean leader election rate
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.disconnect`*::
++
+--
+The ZooKeeper closed sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.expire`*::
++
+--
+The ZooKeeper expired sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.readonly`*::
++
+--
+The ZooKeeper readonly sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.sync`*::
++
+--
+The ZooKeeper client connections per second
+
+type: float
+
+--
+
+*`kafka.broker.log.flush_rate`*::
++
+--
+The log flush rate
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.messages_in`*::
++
+--
+The incoming message rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate
+
+type: float
+
+--
+
+*`kafka.broker.messages_in`*::
++
+--
+The incoming message rate
+
+type: float
+
+--
+
+[float]
+=== consumer
+
+Consumer metrics from Kafka Consumer JMX
+
+
+*`kafka.consumer.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.consumer.fetch_rate`*::
++
+--
+The minimum rate at which the consumer sends fetch requests to a broker
+
+type: float
+
+--
+
+*`kafka.consumer.bytes_consumed`*::
++
+--
+The average number of bytes consumed for a specific topic per second
+
+type: float
+
+--
+
+*`kafka.consumer.records_consumed`*::
++
+--
+The average number of records consumed per second for a specific topic
+
+type: float
+
+--
+
+*`kafka.consumer.in.bytes_per_sec`*::
++
+--
+The rate of bytes coming in to the consumer
+
+type: float
+
+--
+
+*`kafka.consumer.max_lag`*::
++
+--
+The maximum consumer lag
+
+type: float
+
+--
+
+*`kafka.consumer.zookeeper_commits`*::
++
+--
+The rate of offset commits to ZooKeeper
+
+type: float
+
+--
+
+*`kafka.consumer.kafka_commits`*::
++
+--
+The rate of offset commits to Kafka
+
+type: float
+
+--
+
+*`kafka.consumer.messages_in`*::
++
+--
+The rate of consumer message consumption
+
+type: float
+
+--
+
+[float]
 === consumergroup
 
 consumergroup
@@ -12924,7 +18926,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -12936,7 +18938,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition ID
 
@@ -12959,6 +18961,15 @@ type: long
 custom consumer meta data string
 
 type: keyword
+
+--
+
+*`kafka.consumergroup.consumer_lag`*::
++
+--
+consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
+type: long
 
 --
 
@@ -13051,7 +19062,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition id.
 
@@ -13124,7 +19135,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 topic error code.
 
@@ -13137,7 +19148,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13150,7 +19161,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker id
 
@@ -13163,12 +19174,153 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker address
 
 
 type: keyword
+
+--
+
+[float]
+=== producer
+
+Producer metrics from Kafka Producer JMX
+
+
+*`kafka.producer.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.producer.available_buffer_bytes`*::
++
+--
+The total amount of buffer memory
+
+type: float
+
+--
+
+*`kafka.producer.batch_size_avg`*::
++
+--
+The average number of bytes sent
+
+type: float
+
+--
+
+*`kafka.producer.batch_size_max`*::
++
+--
+The maximum number of bytes sent
+
+type: long
+
+--
+
+*`kafka.producer.record_send_rate`*::
++
+--
+The average number of records sent per second
+
+type: float
+
+--
+
+*`kafka.producer.record_retry_rate`*::
++
+--
+The average number of retried record sends per second
+
+type: float
+
+--
+
+*`kafka.producer.record_error_rate`*::
++
+--
+The average number of retried record sends per second
+
+type: float
+
+--
+
+*`kafka.producer.records_per_request`*::
++
+--
+The average number of records sent per second
+
+type: float
+
+--
+
+*`kafka.producer.record_size_avg`*::
++
+--
+The average record size
+
+type: float
+
+--
+
+*`kafka.producer.record_size_max`*::
++
+--
+The maximum record size
+
+type: long
+
+--
+
+*`kafka.producer.request_rate`*::
++
+--
+The number of producer requests per second
+
+type: float
+
+--
+
+*`kafka.producer.response_rate`*::
++
+--
+The number of producer responses per second
+
+type: float
+
+--
+
+*`kafka.producer.io_wait`*::
++
+--
+The producer I/O wait time
+
+type: float
+
+--
+
+*`kafka.producer.out.bytes_per_sec`*::
++
+--
+The rate of bytes going out for the producer
+
+type: float
+
+--
+
+*`kafka.producer.message_rate`*::
++
+--
+The producer message rate
+
+type: float
 
 --
 
@@ -13555,7 +19707,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -13565,7 +19717,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map
@@ -13649,7 +19801,7 @@ Kubernetes API server metrics
 *`kubernetes.apiserver.request.client`*::
 +
 --
-Client doing the requests
+Client executing requests
 
 
 type: keyword
@@ -13689,18 +19841,272 @@ type: keyword
 *`kubernetes.apiserver.request.verb`*::
 +
 --
-Request HTTP verb
+HTTP verb
 
 
 type: keyword
 
 --
 
+*`kubernetes.apiserver.request.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.content_type`*::
++
+--
+Request HTTP content type
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.dry_run`*::
++
+--
+Wether the request uses dry run
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.kind`*::
++
+--
+Kind of request
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.component`*::
++
+--
+Component handling the request
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.group`*::
++
+--
+API group for the resource
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.version`*::
++
+--
+version for the group
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.request.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.apiserver.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.apiserver.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.apiserver.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.apiserver.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.apiserver.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.apiserver.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.apiserver.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.apiserver.http.request.count`*::
++
+--
+Request count for response
+
+type: long
+
+--
+
+*`kubernetes.apiserver.client.request.count`*::
++
+--
+Number of requests as client
+
+type: long
+
+--
+
+
 *`kubernetes.apiserver.request.count`*::
 +
 --
-Total number of requests
-
+Number of requests
 
 type: long
 
@@ -13711,7 +20117,6 @@ type: long
 --
 Requests latency, sum of latencies in microseconds
 
-
 type: long
 
 --
@@ -13720,7 +20125,6 @@ type: long
 +
 --
 Request latency, number of requests
-
 
 type: long
 
@@ -13731,8 +20135,79 @@ type: long
 --
 Request latency histogram buckets
 
+type: object
+
+--
+
+*`kubernetes.apiserver.request.duration.us.sum`*::
++
+--
+Request duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.apiserver.request.duration.us.count`*::
++
+--
+Request duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.apiserver.request.duration.us.bucket.*`*::
++
+--
+Request duration, histogram buckets
 
 type: object
+
+--
+
+*`kubernetes.apiserver.request.current.count`*::
++
+--
+Inflight requests
+
+type: long
+
+--
+
+*`kubernetes.apiserver.request.longrunning.count`*::
++
+--
+Number of requests active long running requests
+
+type: long
+
+--
+
+*`kubernetes.apiserver.etcd.object.count`*::
++
+--
+Number of kubernetes objects at etcd
+
+type: long
+
+--
+
+*`kubernetes.apiserver.audit.event.count`*::
++
+--
+Number of audit events
+
+type: long
+
+--
+
+*`kubernetes.apiserver.audit.rejected.count`*::
++
+--
+Number of audit rejected events
+
+type: long
 
 --
 
@@ -13790,7 +20265,7 @@ CPU usage as a percentage of the total node allocatable CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -13802,7 +20277,7 @@ CPU usage as a percentage of the defined limit for the container (or total node 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -13918,7 +20393,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -13930,7 +20405,7 @@ Memory usage as a percentage of the defined limit for the container (or total no
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14390,7 +20865,7 @@ type: date
 Message recorded for the given event
 
 
-type: keyword
+type: text
 
 --
 
@@ -14907,19 +21382,19 @@ CPU usage as a percentage of the total node CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14945,7 +21420,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14957,7 +21432,7 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15526,7 +22001,7 @@ type: boolean
 --
 
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.bucket.*`*::
 +
 --
 End to end scheduling duration microseconds
@@ -15535,7 +22010,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.sum`*::
 +
 --
 End to end scheduling duration microseconds sum
@@ -15544,7 +22019,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.count`*::
 +
 --
 End to end scheduling count
@@ -15553,7 +22028,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
 +
 --
 Pod preemption victims
@@ -15562,7 +22037,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
+*`kubernetes.scheduler.scheduling.pod.attempts.count`*::
 +
 --
 Pod attempts count
@@ -15571,7 +22046,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.percentile.*`*::
 +
 --
 Scheduling duration percentiles
@@ -15580,7 +22055,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.sum`*::
 +
 --
 Scheduling duration cumulative sum
@@ -15589,7 +22064,7 @@ type: double
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.count`*::
 +
 --
 Scheduling count
@@ -15680,7 +22155,7 @@ type: float
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU nanocores limit
 
@@ -15693,7 +22168,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU requested nanocores
 
@@ -15724,6 +22199,94 @@ Container requested memory in bytes
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== cronjob
+
+kubernetes cronjob metrics
+
+
+
+*`kubernetes.cronjob.name`*::
++
+--
+Cronjob name
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.schedule`*::
++
+--
+Cronjob schedule
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.concurrency`*::
++
+--
+Concurrency policy
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.active.count`*::
++
+--
+Number of active pods for the cronjob
+
+type: long
+
+--
+
+*`kubernetes.cronjob.is_suspended`*::
++
+--
+Whether the cronjob is suspended
+
+type: boolean
+
+--
+
+*`kubernetes.cronjob.created.sec`*::
++
+--
+Epoch seconds since the cronjob was created
+
+type: double
+
+--
+
+*`kubernetes.cronjob.last_schedule.sec`*::
++
+--
+Epoch seconds for last cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.next_schedule.sec`*::
++
+--
+Epoch seconds for next cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.deadline.sec`*::
++
+--
+Deadline seconds after schedule for considering failed
+
+type: long
 
 --
 
@@ -15887,6 +22450,110 @@ type: long
 --
 
 [float]
+=== persistentvolume
+
+kubernetes persistent volume metrics from kube-state-metrics
+
+
+
+*`kubernetes.persistentvolume.name`*::
++
+--
+Volume name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.capacity.bytes`*::
++
+--
+Volume capacity
+
+type: long
+
+--
+
+*`kubernetes.persistentvolume.phase`*::
++
+--
+Volume phase according to kubernetes
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.storage_class`*::
++
+--
+Storage class for the volume
+
+type: keyword
+
+--
+
+[float]
+=== persistentvolumeclaim
+
+kubernetes persistent volume clame metrics from kube-state-metrics
+
+
+
+*`kubernetes.persistentvolumeclaim.name`*::
++
+--
+PVC name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.volume_name`*::
++
+--
+Binded volume name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.request_storage.bytes`*::
++
+--
+Requested capacity.
+
+type: long
+
+--
+
+*`kubernetes.persistentvolumeclaim.phase`*::
++
+--
+PVC phase.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.access_mode`*::
++
+--
+Access mode.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.storage_class`*::
++
+--
+Storage class for the PVC.
+
+type: keyword
+
+--
+
+[float]
 === pod
 
 kubernetes pod metrics
@@ -16015,6 +22682,146 @@ type: long
 --
 
 [float]
+=== resourcequota
+
+kubernetes resourcequota metrics
+
+
+
+*`kubernetes.resourcequota.created.sec`*::
++
+--
+Epoch seconds since the ResourceQuota was created
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.quota`*::
++
+--
+Quota informed (hard or used) for the resource
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.name`*::
++
+--
+ResourceQuota name
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.type`*::
++
+--
+Quota information type, `hard` or `used`
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.resource`*::
++
+--
+Resource name the quota applies to
+
+type: keyword
+
+--
+
+[float]
+=== service
+
+kubernetes service metrics
+
+
+
+*`kubernetes.service.name`*::
++
+--
+Service name.
+
+type: keyword
+
+--
+
+*`kubernetes.service.cluster_ip`*::
++
+--
+Internal IP for the service.
+
+type: ip
+
+--
+
+*`kubernetes.service.external_name`*::
++
+--
+Service external DNS name
+
+type: keyword
+
+--
+
+*`kubernetes.service.external_ip`*::
++
+--
+Service external IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.load_balancer_ip`*::
++
+--
+Load Balancer service IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.type`*::
++
+--
+Service type
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_ip`*::
++
+--
+Ingress IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_hostname`*::
++
+--
+Ingress Hostname
+
+type: ip
+
+--
+
+*`kubernetes.service.created`*::
++
+--
+Service creation date
+
+type: date
+
+--
+
+[float]
 === statefulset
 
 kubernetes stateful set metrics
@@ -16082,6 +22889,58 @@ The desired generation per StatefulSet
 
 
 type: long
+
+--
+
+[float]
+=== storageclass
+
+kubernetes storage class metrics
+
+
+
+*`kubernetes.storageclass.name`*::
++
+--
+Storage class name.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.provisioner`*::
++
+--
+Volume provisioner for the storage class.
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.reclaim_policy`*::
++
+--
+Reclaim policy for dynamically created volumes
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.volume_binding_mode`*::
++
+--
+Mode for default provisioning and binding
+
+type: keyword
+
+--
+
+*`kubernetes.storageclass.created`*::
++
+--
+Storage class creation date
+
+type: date
 
 --
 
@@ -17648,7 +24507,7 @@ Reports data from the query execution system.
 
 
 
-*`mongodb.metrics.query_executor.scanned_indexes`*::
+*`mongodb.metrics.query_executor.scanned_indexes.count`*::
 +
 --
 The total number of index items scanned during queries and query-plan evaluation.
@@ -17658,7 +24517,7 @@ type: long
 
 --
 
-*`mongodb.metrics.query_executor.scanned_documents`*::
+*`mongodb.metrics.query_executor.scanned_documents.count`*::
 +
 --
 The total number of documents scanned during queries and query-plan evaluation.
@@ -18102,7 +24961,7 @@ Reports on the operation of the resource use of the ttl index process.
 
 
 
-*`mongodb.metrics.ttl.deleted_documents`*::
+*`mongodb.metrics.ttl.deleted_documents.count`*::
 +
 --
 The total number of documents deleted from collections with a ttl index.
@@ -18112,7 +24971,7 @@ type: long
 
 --
 
-*`mongodb.metrics.ttl.passes`*::
+*`mongodb.metrics.ttl.passes.count`*::
 +
 --
 The number of times the background process removes documents from collections with a ttl index.
@@ -22202,6 +29061,213 @@ Oracle module
 
 
 [float]
+=== performance
+
+Performance related metrics on a single database instance
+
+
+*`oracle.performance.machine`*::
++
+--
+Operating system machine name
+
+type: keyword
+
+--
+
+*`oracle.performance.buffer_pool`*::
++
+--
+Name of the buffer pool in the instance
+
+type: keyword
+
+--
+
+*`oracle.performance.username`*::
++
+--
+Oracle username
+
+type: keyword
+
+--
+
+*`oracle.performance.io_reloads`*::
++
+--
+Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are the number of times a PIN was requested for objects of this namespace
+
+type: double
+
+--
+
+*`oracle.performance.lock_requests`*::
++
+--
+Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
+
+type: long
+
+--
+
+*`oracle.performance.pin_requests`*::
++
+--
+Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
+
+type: double
+
+--
+
+[float]
+=== cache
+
+Statistics about all buffer pools available for the instance
+
+
+*`oracle.performance.cache.buffer.hit.pct`*::
++
+--
+The cache hit ratio of the specified buffer pool.
+
+type: double
+
+--
+
+*`oracle.performance.cache.physical_reads`*::
++
+--
+Physical reads
+
+type: long
+
+--
+
+[float]
+=== get
+
+Buffer pool 'get' statistics
+
+
+*`oracle.performance.cache.get.consistent`*::
++
+--
+Consistent gets statistic
+
+type: long
+
+--
+
+*`oracle.performance.cache.get.db_blocks`*::
++
+--
+Database blocks gotten
+
+type: long
+
+--
+
+[float]
+=== cursors
+
+Cursors information
+
+
+*`oracle.performance.cursors.avg`*::
++
+--
+Average cursors opened by username and machine
+
+type: double
+
+--
+
+*`oracle.performance.cursors.max`*::
++
+--
+Max cursors opened by username and machine
+
+type: double
+
+--
+
+*`oracle.performance.cursors.total`*::
++
+--
+Total opened cursors by username and machine
+
+type: double
+
+--
+
+[float]
+=== opened
+
+Opened cursors statistic
+
+
+*`oracle.performance.cursors.opened.current`*::
++
+--
+Total number of current open cursors
+
+type: long
+
+--
+
+*`oracle.performance.cursors.opened.total`*::
++
+--
+Total number of cursors opened since the instance started
+
+type: long
+
+--
+
+[float]
+=== parse
+
+Parses statistic information that occured in the current session
+
+
+*`oracle.performance.cursors.parse.real`*::
++
+--
+Real number of parses that occurred: session cursor cache hits - parse count (total)
+
+type: long
+
+--
+
+*`oracle.performance.cursors.parse.total`*::
++
+--
+Total number of parse calls (hard and soft). A soft parse is a check on an object already in the shared pool, to verify that the permissions on the underlying object have not changed.
+
+type: long
+
+--
+
+*`oracle.performance.cursors.session.cache_hits`*::
++
+--
+Number of hits in the session cursor cache. A hit means that the SQL statement did not have to be reparsed.
+
+type: long
+
+--
+
+*`oracle.performance.cursors.cache_hit.pct`*::
++
+--
+Ratio of session cursor cache hits from total number of cursors
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
@@ -22251,7 +29317,9 @@ Size information about the file
 --
 Maximum file size in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22260,7 +29328,9 @@ type: bytes
 --
 Size of the file in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22270,7 +29340,9 @@ type: bytes
 The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
 
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22304,7 +29376,9 @@ Tablespace space usage information
 --
 Tablespace total free space available, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22313,7 +29387,9 @@ type: bytes
 --
 Tablespace used space, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22322,7 +29398,9 @@ type: bytes
 --
 Tablespace total size, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22506,8 +29584,6 @@ The date and time FPM has started.
 
 type: date
 
-format: epoch_second
-
 --
 
 [float]
@@ -22546,8 +29622,6 @@ The date and time the process has started
 
 
 type: date
-
-format: epoch_second
 
 --
 
@@ -23391,6 +30465,7 @@ Stats scraped from a Prometheus endpoint.
 
 
 
+
 *`prometheus.labels.*`*::
 +
 --
@@ -23404,7 +30479,7 @@ type: object
 *`prometheus.metrics.*`*::
 +
 --
-Prometheus metric - release: ga
+Prometheus metric
 
 
 type: object
@@ -23484,6 +30559,16 @@ Node name.
 type: alias
 
 alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.connection.state`*::
++
+--
+Connection state.
+
+
+type: keyword
 
 --
 
@@ -23616,6 +30701,16 @@ Number of octets received on the connection.
 
 
 type: long
+
+--
+
+*`rabbitmq.connection.client_provided.name`*::
++
+--
+User specified connection name.
+
+
+type: keyword
 
 --
 
@@ -24227,7 +31322,7 @@ Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately
 
 type: long
 
-format: percentage
+format: percent
 
 --
 
@@ -24375,7 +31470,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Longest output list among current client connections (replaced by max_output_buffer).
 
@@ -24398,7 +31493,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Biggest input buffer among current client connections (replaced by max_input_buffer).
 
@@ -24501,11 +31596,12 @@ Redis memory stats.
 *`redis.info.memory.used.value`*::
 +
 --
+Total number of bytes allocated by Redis.
 
 
 type: long
 
-format: bytes Total number of bytes allocated by Redis.
+format: bytes
 
 --
 
@@ -24994,7 +32090,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 The server's current replication offset
 
@@ -25660,6 +32756,351 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-redisenterprise]]
+== Redis Enterprise fields
+
+Redis metrics collected from Redis Enterprise Server.
+
+
+
+[float]
+=== redisenterprise
+
+`redisenterprise` contains the information and statistics from Redis Enterprise Server.
+
+
+
+[[exported-fields-sql]]
+== sql fields
+
+SQL module fetches metrics from a SQL database
+
+
+
+
+*`sql.driver`*::
++
+--
+Driver used to execute the query.
+
+
+type: keyword
+
+--
+
+*`sql.query`*::
++
+--
+Query executed to collect metrics.
+
+
+type: keyword
+
+--
+
+*`sql.metrics.numeric.*`*::
++
+--
+Numeric metrics collected.
+
+
+type: object
+
+--
+
+*`sql.metrics.string.*`*::
++
+--
+Non-numeric values collected.
+
+
+type: object
+
+--
+
+[[exported-fields-stan]]
+== Stan fields
+
+stan Module
+
+
+
+[float]
+=== stan
+
+`stan` contains statistics that were read from Nats Streaming server (STAN)
+
+
+
+*`stan.server.id`*::
++
+--
+The server ID
+
+
+type: keyword
+
+--
+
+*`stan.cluster.id`*::
++
+--
+The cluster ID
+
+
+type: keyword
+
+--
+
+[float]
+=== channels
+
+Contains stan / nats streaming/serverz endpoint metrics
+
+
+
+*`stan.channels.name`*::
++
+--
+The name of the STAN streaming channel
+
+
+type: keyword
+
+--
+
+*`stan.channels.messages`*::
++
+--
+The number of STAN streaming messages
+
+
+type: long
+
+--
+
+*`stan.channels.bytes`*::
++
+--
+The number of STAN bytes in the channel
+
+
+type: long
+
+--
+
+*`stan.channels.first_seq`*::
++
+--
+First sequence number stored in the channel. If first_seq > min([seq in subscriptions]) data loss has possibly occurred
+
+
+type: long
+
+--
+
+*`stan.channels.last_seq`*::
++
+--
+Last sequence number stored in the channel
+
+
+type: long
+
+--
+
+*`stan.channels.depth`*::
++
+--
+Queue depth based upon current sequence number and highest reported subscriber sequence number
+
+
+type: long
+
+--
+
+[float]
+=== stats
+
+Contains only high-level stan / nats streaming server related metrics
+
+
+
+*`stan.stats.state`*::
++
+--
+The cluster / streaming configuration state (STANDALONE, CLUSTERED)
+
+
+type: keyword
+
+--
+
+*`stan.stats.role`*::
++
+--
+If clustered, role of this node in the cluster (Leader, Follower, Candidate)
+
+
+type: keyword
+
+--
+
+*`stan.stats.clients`*::
++
+--
+The number of STAN clients
+
+
+type: integer
+
+--
+
+*`stan.stats.subscriptions`*::
++
+--
+The number of STAN streaming subscriptions
+
+
+type: integer
+
+--
+
+*`stan.stats.channels`*::
++
+--
+The number of STAN channels
+
+
+type: integer
+
+--
+
+*`stan.stats.messages`*::
++
+--
+Number of messages across all STAN queues
+
+
+type: long
+
+--
+
+*`stan.stats.bytes`*::
++
+--
+Number of bytes consumed across all STAN queues
+
+
+type: long
+
+--
+
+[float]
+=== subscriptions
+
+Contains stan / nats streaming/serverz endpoint subscription metrics
+
+
+
+*`stan.subscriptions.id`*::
++
+--
+The name of the STAN channel subscription (client_id)
+
+
+type: keyword
+
+--
+
+*`stan.subscriptions.channel`*::
++
+--
+The name of the STAN channel the subscription is associated with
+
+
+type: keyword
+
+--
+
+*`stan.subscriptions.queue`*::
++
+--
+The name of the NATS queue that the STAN channel subscription is associated with, if any
+
+
+type: keyword
+
+--
+
+*`stan.subscriptions.last_sent`*::
++
+--
+Last known sequence number of the subscription that was acked
+
+
+type: long
+
+--
+
+*`stan.subscriptions.pending`*::
++
+--
+Number of pending messages from / to the subscriber
+
+
+type: long
+
+--
+
+*`stan.subscriptions.offline`*::
++
+--
+Is the subscriber marked as offline?
+
+
+type: boolean
+
+--
+
+*`stan.subscriptions.stalled`*::
++
+--
+Is the subscriber known to be stalled?
+
+
+type: boolean
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics
+
+
+type: object
 
 --
 
@@ -26373,7 +33814,7 @@ type: float
 *`system.diskio.iostat.request.avg_size`*::
 +
 --
-The average size (in sectors) of the requests that were issued to the device.
+The average size (in bytes) of the requests that were issued to the device.
 
 
 type: float
@@ -26787,7 +34228,7 @@ format: bytes
 *`system.memory.actual.free`*::
 +
 --
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
 
 type: long
@@ -26850,11 +34291,130 @@ format: bytes
 
 --
 
+*`system.memory.swap.out.pages`*::
++
+--
+count of pages swapped out
+
+type: long
+
+--
+
+*`system.memory.swap.in.pages`*::
++
+--
+count of pages swapped in
+
+type: long
+
+--
+
+*`system.memory.swap.readahead.pages`*::
++
+--
+swap readahead pages
+
+type: long
+
+--
+
+*`system.memory.swap.readahead.cached`*::
++
+--
+swap readahead cache hits
+
+type: long
+
+--
+
 *`system.memory.swap.used.pct`*::
 +
 --
 The percentage of used swap memory.
 
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== page_stats
+
+memory page statistics
+
+
+*`system.memory.page_stats.pgscan_kswapd.pages`*::
++
+--
+pages scanned by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgscan_direct.pages`*::
++
+--
+pages scanned directly
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgfree.pages`*::
++
+--
+pages freed by the system
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgsteal_kswapd.pages`*::
++
+--
+number of pages reclaimed by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.pgsteal_direct.pages`*::
++
+--
+number of pages reclaimed directly
+
+type: long
+
+format: number
+
+--
+
+*`system.memory.page_stats.direct_efficiency.pct`*::
++
+--
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`system.memory.page_stats.kswapd_efficiency.pct`*::
++
+--
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
 
 type: scaled_float
 
@@ -26949,6 +34509,30 @@ Default size for huge pages.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== swap.out
+
+huge pages swapped out
+
+
+*`system.memory.hugepages.swap.out.pages`*::
++
+--
+pages swapped out
+
+type: long
+
+--
+
+*`system.memory.hugepages.swap.out.fallback`*::
++
+--
+Count of huge pages that must be split before swapout
+
+type: long
 
 --
 
@@ -27052,6 +34636,63 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 
 
 type: long
+
+--
+
+[float]
+=== network_summary
+
+Metrics relating to global network activity
+
+
+
+*`system.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`system.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
 
 --
 
@@ -28155,6 +35796,146 @@ type: long
 --
 
 [float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
+
+type: long
+
+--
+
+[float]
 === socket
 
 TCP sockets that are active.
@@ -28436,6 +36217,66 @@ type: integer
 
 --
 
+*`system.socket.summary.tcp.all.syn_sent`*::
++
+--
+Number of TCP connections in _syn_sent_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_recv`*::
++
+--
+Number of TCP connections in _syn_recv_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait1`*::
++
+--
+Number of TCP connections in _fin_wait1_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait2`*::
++
+--
+Number of TCP connections in _fin_wait2_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.last_ack`*::
++
+--
+Number of TCP connections in _last_ack_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.closing`*::
++
+--
+Number of TCP connections in _closing_ state
+
+
+type: integer
+
+--
+
 [float]
 === udp
 
@@ -28488,6 +36329,317 @@ The OS uptime in milliseconds.
 type: long
 
 format: duration
+
+--
+
+[[exported-fields-tomcat]]
+== Tomcat fields
+
+Tomcat module
+
+
+
+
+[float]
+=== cache
+
+Catalina Cache metrics from the WebResourceRoot
+
+
+*`tomcat.cache.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.cache.hit.total`*::
++
+--
+The number of requests for resources that were served from the cache
+
+type: long
+
+--
+
+*`tomcat.cache.size.total.kb`*::
++
+--
+The current estimate of the cache size in kilobytes
+
+type: long
+
+--
+
+*`tomcat.cache.size.max.kb`*::
++
+--
+The maximum permitted size of the cache in kilobytes
+
+type: long
+
+--
+
+*`tomcat.cache.lookup.total`*::
++
+--
+The number of requests for resources
+
+type: long
+
+--
+
+*`tomcat.cache.ttl.ms`*::
++
+--
+The time-to-live for cache entries in milliseconds
+
+type: long
+
+--
+
+[float]
+=== memory
+
+Memory metrics from java.lang JMX
+
+
+*`tomcat.memory.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.memory.heap.usage.committed`*::
++
+--
+Committed heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.max`*::
++
+--
+Max heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.used`*::
++
+--
+Used heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.init`*::
++
+--
+Initial heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.committed`*::
++
+--
+Committed non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.max`*::
++
+--
+Max non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.used`*::
++
+--
+Used non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.init`*::
++
+--
+Initial non-heap memory usage
+
+type: long
+
+--
+
+[float]
+=== requests
+
+Requests processor metrics from GlobalRequestProcessor JMX
+
+
+*`tomcat.requests.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.requests.total`*::
++
+--
+Number of requests processed
+
+type: long
+
+--
+
+*`tomcat.requests.bytes.received`*::
++
+--
+Amount of data received, in bytes
+
+type: long
+
+--
+
+*`tomcat.requests.bytes.sent`*::
++
+--
+Amount of data sent, in bytes
+
+type: long
+
+--
+
+*`tomcat.requests.processing.ms`*::
++
+--
+Total time to process the requests
+
+type: long
+
+--
+
+*`tomcat.requests.errors.total`*::
++
+--
+Number of errors
+
+type: long
+
+--
+
+[float]
+=== threading
+
+Threading metrics from the Catalina's ThreadPool JMX
+
+
+*`tomcat.threading.busy`*::
++
+--
+Current busy threads from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.max`*::
++
+--
+Max threads from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.current`*::
++
+--
+Current number of threads, taken from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.keep_alive.total`*::
++
+--
+Total keep alive on the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.keep_alive.timeout.ms`*::
++
+--
+Keep alive timeout on the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.started.total`*::
++
+--
+Current started threads at JVM level (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.user.time.ms`*::
++
+--
+User time in milliseconds (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.cpu.time.ms`*::
++
+--
+CPU time in milliseconds (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.total`*::
++
+--
+Total threads at the JVM level (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.peak`*::
++
+--
+Peak number of threads at JVM level (from java.lang:type=Threading)
+
+type: long
 
 --
 
@@ -29057,10 +37209,20 @@ virtualmachine
 
 
 
-*`vsphere.virtualmachine.host`*::
+*`vsphere.virtualmachine.host.id`*::
 +
 --
-Host name
+Host id
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.host.hostname`*::
++
+--
+Host name of the host
 
 
 type: keyword

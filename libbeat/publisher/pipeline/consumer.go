@@ -18,9 +18,9 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
@@ -170,10 +170,12 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 				consumer = nil
 				continue
 			}
+			if queueBatch != nil {
+				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
+			}
 
-			batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			paused = c.paused()
-			if paused {
+			if paused || batch == nil {
 				out = nil
 			}
 		}

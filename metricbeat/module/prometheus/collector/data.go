@@ -21,7 +21,8 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -34,7 +35,7 @@ type PromEvent struct {
 
 // LabelsHash returns a repeatable string that is unique for the set of labels in this event
 func (p *PromEvent) LabelsHash() string {
-	return p.labels.String()
+	return prometheus.LabelHash(p.labels)
 }
 
 func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
@@ -136,12 +137,14 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		untyped := metric.GetUntyped()
 		if untyped != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name: untyped.GetValue(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name: untyped.GetValue(),
+					},
+					labels: labels,
+				})
+			}
 		}
 	}
 	return events

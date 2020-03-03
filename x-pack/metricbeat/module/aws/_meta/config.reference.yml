@@ -1,0 +1,45 @@
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - sqs
+  regions:
+    - us-west-1
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_request
+    - s3_daily_storage
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: AWS/EC2
+      name: ["CPUUtilization"]
+      dimensions:
+        - name: InstanceId
+          value: i-0686946e22cf9494a
+    - namespace: AWS/EBS
+    - namespace: AWS/ELB
+      tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
+- module: aws
+  period: 60s
+  credential_profile_name: test-mb
+  metricsets:
+    - rds

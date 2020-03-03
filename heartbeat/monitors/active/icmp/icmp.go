@@ -22,14 +22,14 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -47,12 +47,6 @@ func create(
 		return nil, 0, err
 	}
 
-	// TODO: check icmp is support by OS + check we've
-	// got required credentials (implementation uses RAW socket, requires root +
-	// not supported on all OSes)
-	// TODO: replace icmp package base reader/sender using raw sockets with
-	//       OS specific solution
-
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
@@ -61,13 +55,14 @@ func create(
 
 	var loopErr error
 	loopInit.Do(func() {
-		debugf("initialize icmp handler")
+		debugf("initializing ICMP loop")
 		loop, loopErr = newICMPLoop()
 	})
 	if loopErr != nil {
-		debugf("Failed to initialize ICMP loop %v", loopErr)
+		logp.Warn("Failed to initialize ICMP loop %v", loopErr)
 		return nil, 0, loopErr
 	}
+	debugf("ICMP loop successfully initialized")
 
 	if err := loop.checkNetworkMode(ipVersion); err != nil {
 		return nil, 0, err

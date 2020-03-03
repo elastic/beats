@@ -5,18 +5,22 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 
 	// register central management
-	"github.com/elastic/beats/x-pack/libbeat/licenser"
-	_ "github.com/elastic/beats/x-pack/libbeat/management"
-)
+	"github.com/elastic/beats/v7/x-pack/libbeat/licenser"
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 
-const licenseDebugK = "license"
+	// register processors
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/processors/add_cloudfoundry_metadata"
+
+	// register autodiscover providers
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/ec2"
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/elb"
+)
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
-	licenser.Enforce(logp.NewLogger(licenseDebugK), licenser.BasicAndAboveOrTrial)
+	licenser.Enforce(name, licenser.BasicAndAboveOrTrial)
 	root.AddCommand(genEnrollCmd(name, ""))
 }

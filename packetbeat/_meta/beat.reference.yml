@@ -40,6 +40,13 @@ packetbeat.interfaces.device: {{ call .device .GOOS }}
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
+# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# This option does not work with `any` interface device.
+# The default option is false and requires manual set-up of promiscuous mode.
+# Warning: under some circumstances (e.g beat crash) promiscuous mode
+# can stay enabled even after beat is shut down.
+#packetbeat.interfaces.auto_promisc_mode: true
+
 #================================== Flows =====================================
 
 packetbeat.flows:
@@ -53,12 +60,18 @@ packetbeat.flows:
   # Configure reporting period. If set to -1, only killed flows will be reported
   period: 10s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 #========================== Transaction protocols =============================
 
 packetbeat.protocols:
 - type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   #enabled: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: amqp
   # Enable AMQP monitoring. Default: true
@@ -93,6 +106,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -117,6 +133,9 @@ packetbeat.protocols:
   # is included in published events. The default is true. enable `send_response` first before enable this option.
   #send_response_header: true
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Configures the default compression algorithm being used to uncompress compressed frames by name. Currently only `snappy` is can be configured.
   # By default no compressor is configured.
   #compressor: "snappy"
@@ -127,6 +146,9 @@ packetbeat.protocols:
 - type: dhcpv4
   # Configure the DHCP for IPv4 ports.
   ports: [67, 68]
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: dns
   # Enable DNS monitoring. Default: true
@@ -153,6 +175,9 @@ packetbeat.protocols:
   # Default: false
   # send_request:  true
   # send_response: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -181,6 +206,11 @@ packetbeat.protocols:
   # Instead of sending a white list of headers to Elasticsearch, you can send
   # all headers by setting this option to true. The default is false.
   #send_all_headers: false
+
+  # A list of headers to redact if present in the HTTP request. This will keep
+  # the header field present, but will redact it's value to show the headers
+  # presence.
+  #redact_headers: []
 
   # The list of content types for which Packetbeat includes the full HTTP
   # payload. If the request's or response's Content-Type matches any on this
@@ -215,6 +245,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -269,6 +302,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -288,6 +324,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -309,6 +348,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -329,9 +371,21 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -384,6 +438,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -414,6 +471,9 @@ packetbeat.protocols:
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
@@ -433,6 +493,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
@@ -464,6 +527,9 @@ packetbeat.protocols:
   # If this option is enabled, the raw certificates will be stored
   # in PEM format under the `raw` key. The default is false.
   #include_raw_certificates: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 #=========================== Monitored processes ==============================
 

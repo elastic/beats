@@ -25,12 +25,12 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 func init() {
@@ -166,7 +166,7 @@ func makeES(
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err := parseProxyURL(config.ProxyURL)
+		proxyURL, err = parseProxyURL(config.ProxyURL)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -198,6 +198,7 @@ func makeES(
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,
+			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,
@@ -290,7 +291,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
-		proxyURL, err := parseProxyURL(config.ProxyURL)
+		proxyURL, err = parseProxyURL(config.ProxyURL)
 		if err != nil {
 			return nil, err
 		}
@@ -319,6 +320,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,
+			APIKey:           config.APIKey,
 			Parameters:       params,
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,

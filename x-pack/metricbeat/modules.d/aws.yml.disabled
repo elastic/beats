@@ -2,59 +2,40 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws.html
 
 - module: aws
-  period: 300s
+  period: 1m
   metricsets:
-    - ec2
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
+    - elb
+    - usage
 - module: aws
-  period: 300s
-  metricsets:
-    - sqs
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
-- module: aws
-  period: 86400s
-  metricsets:
-    - s3_request
-    - s3_daily_storage
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
-- module: aws
-  period: 300s
+  period: 5m
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EC2
-      metricname: CPUUtilization
-      dimensions:
-        - name: InstanceId
-          value: i-0686946e22cf9494a
-    - namespace: AWS/EBS
-    - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
-  #regions:
-  #  - us-east-1
-  #  - us-east-2
+      #name: ["CPUUtilization", "DiskWriteOps"]
+      tags.resource_type_filter: ec2:instance
+      #dimensions:
+      #  - name: InstanceId
+      #    value: i-0686946e22cf9494a
+      #statistic: ["Average", "Maximum"]
 - module: aws
-  period: 60s
+  period: 5m
   metricsets:
+    - dynamodb
+    - ebs
+    - ec2
+    - lambda
     - rds
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
+    - sns
+    - sqs
+- module: aws
+  period: 12h
+  metricsets:
+    - billing
+  regions:
+    - us-east-1
+- module: aws
+  period: 24h
+  metricsets:
+    - s3_daily_storage
+    - s3_request

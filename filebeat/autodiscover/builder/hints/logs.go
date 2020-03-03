@@ -21,13 +21,14 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -39,6 +40,7 @@ const (
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
 	processors   = "processors"
+	json         = "json"
 )
 
 // validModuleNames to sanitize user input
@@ -125,6 +127,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		tempCfg.Put(processors, procs)
 	}
 
+	if jsonOpts := l.getJSONOptions(hints); len(jsonOpts) != 0 {
+		tempCfg.Put(json, jsonOpts)
+	}
 	// Merge config template with the configs from the annotations
 	if err := config.Merge(tempCfg); err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
@@ -140,7 +145,12 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		filesets := l.getFilesets(hints, module)
 		for fileset, conf := range filesets {
 			filesetConf, _ := common.NewConfigFrom(config)
-			filesetConf.SetString("containers.stream", -1, conf.Stream)
+
+			if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
+				filesetConf.SetString("stream", -1, conf.Stream)
+			} else {
+				filesetConf.SetString("containers.stream", -1, conf.Stream)
+			}
 
 			moduleConf[fileset+".enabled"] = conf.Enabled
 			moduleConf[fileset+".input"] = filesetConf
@@ -179,6 +189,10 @@ func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
 
 func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, l.config.Key)
+}
+
+func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
+	return builder.GetHintMapStr(hints, l.config.Key, json)
 }
 
 type filesetConfig struct {

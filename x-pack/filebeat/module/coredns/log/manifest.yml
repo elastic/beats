@@ -8,8 +8,8 @@ var:
   - name: tags
     default: [coredns]
 
-ingest_pipeline: 
-  - ingest/pipeline-entry.json
-  - ingest/pipeline-json.json
-  - ingest/pipeline-plaintext.json
+ingest_pipeline:
+  - ingest/pipeline-entry.yml
+  - ingest/pipeline-json.yml
+  - ingest/pipeline-plaintext.yml
 input: config/coredns.yml

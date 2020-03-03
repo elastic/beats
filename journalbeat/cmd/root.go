@@ -18,17 +18,18 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/journalbeat/beater"
+	"github.com/elastic/beats/v7/journalbeat/beater"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
-	// Import the script processor.
-	_ "github.com/elastic/beats/libbeat/processors/script"
+	// Import processors.
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
 // Name of this beat
 var Name = "journalbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: false})

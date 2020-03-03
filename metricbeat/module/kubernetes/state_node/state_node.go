@@ -18,11 +18,13 @@
 package state_node
 
 import (
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	p "github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -96,23 +98,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
 	}
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-			Namespace:       "kubernetes.node",
-		})
+		event[mb.NamespaceKey] = "node"
+		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
+		if !reported {
+			return nil
+		}
 	}
+
+	return nil
 }
 
 // Close stops this metricset

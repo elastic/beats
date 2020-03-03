@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestConvert(t *testing.T) {
@@ -276,8 +276,16 @@ var testCases = []testCase{
 
 	{Long, nil, nil, true},
 	{Long, "x", nil, true},
+	{Long, "0x", nil, true},
+	{Long, "0b1", nil, true},
+	{Long, "1x2", nil, true},
 	{Long, true, nil, true},
 	{Long, "1", int64(1), false},
+	{Long, "-1", int64(-1), false},
+	{Long, "017", int64(17), false},
+	{Long, "08", int64(8), false},
+	{Long, "0X0A", int64(10), false},
+	{Long, "-0x12", int64(-18), false},
 	{Long, int(1), int64(1), false},
 	{Long, int8(1), int64(1), false},
 	{Long, int16(1), int64(1), false},
@@ -294,6 +302,17 @@ var testCases = []testCase{
 	{Integer, nil, nil, true},
 	{Integer, "x", nil, true},
 	{Integer, true, nil, true},
+	{Integer, "x", nil, true},
+	{Integer, "0x", nil, true},
+	{Integer, "0b1", nil, true},
+	{Integer, "1x2", nil, true},
+	{Integer, true, nil, true},
+	{Integer, "1", int32(1), false},
+	{Integer, "-1", int32(-1), false},
+	{Integer, "017", int32(17), false},
+	{Integer, "08", int32(8), false},
+	{Integer, "0X0A", int32(10), false},
+	{Integer, "-0x12", int32(-18), false},
 	{Integer, "1", int32(1), false},
 	{Integer, int(1), int32(1), false},
 	{Integer, int8(1), int32(1), false},

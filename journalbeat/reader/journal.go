@@ -28,16 +28,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/cmd/instance"
-	"github.com/elastic/beats/journalbeat/config"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/cmd/instance"
+	"github.com/elastic/beats/v7/journalbeat/config"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Reader reads entries from journal(s).
@@ -257,6 +257,15 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		fields.Put("journald.custom", custom)
 	}
 
+	// if entry is coming from a remote journal, add_host_metadata overwrites the source hostname, so it
+	// has to be copied to a different field
+	if r.config.SaveRemoteHostname {
+		remoteHostname, err := fields.GetValue("host.hostname")
+		if err == nil {
+			fields.Put("log.source.address", remoteHostname)
+		}
+	}
+
 	state := checkpoint.JournalState{
 		Path:               r.config.Path,
 		Cursor:             entry.Cursor,
@@ -279,8 +288,16 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 	if fc.isInteger {
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
-			return value
+			// On some versions of systemd the 'syslog.pid' can contain the username
+			// appended to the end of the pid. In most cases this does not occur
+			// but in the cases that it does, this tries to strip ',\w*' from the
+			// value and then perform the conversion.
+			s := strings.Split(value, ",")
+			v, err = strconv.ParseInt(s[0], 10, 64)
+			if err != nil {
+				r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+				return value
+			}
 		}
 		return v
 	}

@@ -1,0 +1,58 @@
+{
+    "@timestamp":"2019-08-20T13:52:00.000Z",
+    "service":{
+        "type":"azure"
+    },
+    "azure":{
+        "timegrain" : "PT1M",
+        "subscriptionID":"123456-qwer-1234-5678-12345678",
+        "metrics":{
+            "percentage_cpu":{
+                "min":1.86,
+                "max":2.8,
+                "avg":2.535
+            }
+        },
+        "resource":{
+            "name":"vmwindows",
+            "type":"Microsoft.Compute/virtualMachines"
+        },
+        "namespace":"Microsoft.Compute/virtualMachines"
+    },
+    "cloud":{
+        "provider":"azure",
+        "region":"westeurope"
+    },
+    "metricset":{
+        "name":"monitor"
+    },
+    "event":{
+        "module":"azure",
+        "duration":40189255100,
+        "dataset":"azure.monitor"
+    },
+    "ecs":{
+        "version":"1.0.1"
+    },
+    "host":{
+        "name":"DESKTOP-RFOOE09",
+        "architecture":"x86_64",
+        "os":{
+            "family":"windows",
+            "name":"Windows 10 Pro",
+            "kernel":"10.0.17134.950 (WinBuild.160101.0800)",
+            "build":"17134.950",
+            "platform":"windows",
+            "version":"10.0"
+        },
+        "id":"123456-qwer-1234-5678-12345678",
+        "hostname":"DESKTOP-RFOOE09"
+    },
+    "agent":{
+        "ephemeral_id":"123456-qwer-1234-5678-12345678",
+        "hostname":"DESKTOP-RFOOE09",
+        "id":"123456-qwer-1234-5678-12345678",
+        "version":"8.0.0",
+        "type":"metricbeat"
+    }
+}

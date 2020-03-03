@@ -97,19 +97,6 @@ Version: '5.5.53-0ubuntu0.12.04.1'  socket: '/var/run/mysqld/mysqld.sock'  port:
 161209 14:37:58 [Note] Event Scheduler: Loaded 0 events
 161209 14:37:58 [Note] /usr/sbin/mysqld: ready for connections.
 Version: '5.5.53-0ubuntu0.12.04.1-log'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)
-vagrant@precise32:~$ cat /var/log/mysql.log | grep phisically
-vagrant@precise32:~$ cat /var/log/mysql.log | grep physi
-vagrant@precise32:~$ cat /var/log/mysql.log | physically
-physically: command not found
-vagrant@precise32:~$ cat /var/log/mysql.log | grep physically
-vagrant@precise32:~$ less /var/log/mysql.
-mysql.err  mysql.log
-vagrant@precise32:~$ less /var/log/mysql.err
-vagrant@precise32:~$ less /var/log/mysql.log
-vagrant@precise32:~$ less /var/log/mysql/
-error.log       mysql-slow.log
-vagrant@precise32:~$ less /var/log/mysql/error.log
-vagrant@precise32:~$ cat /var/log/mysql/error.log
 161209 14:18:50 [Warning] Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.
 161209 14:18:50 [Note] Plugin 'FEDERATED' is disabled.
 161209 14:18:50 InnoDB: The InnoDB memory heap is disabled

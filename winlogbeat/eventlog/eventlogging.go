@@ -26,11 +26,11 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys"
-	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/eventlogging"
 )
 
 const (
@@ -39,8 +39,8 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
-var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
-	"read_buffer_size", "format_buffer_size")
+var eventLoggingConfigKeys = common.MakeStringSet(append(commonConfigKeys,
+	"ignore_older", "read_buffer_size", "format_buffer_size")...)
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`

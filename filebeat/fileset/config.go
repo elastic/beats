@@ -19,9 +19,11 @@ package fileset
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 // ModuleConfig contains the configuration file options for a module
@@ -53,4 +55,22 @@ func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
 	}
 
 	return &fcfg, nil
+}
+
+// mergePathDefaults returns a copy of c containing the path variables that must
+// be available for variable expansion in module configuration (e.g. it enables
+// the use of ${path.config} in module config).
+func mergePathDefaults(c *common.Config) (*common.Config, error) {
+	defaults := common.MustNewConfigFrom(map[string]interface{}{
+		"path": map[string]interface{}{
+			"home":   paths.Paths.Home,
+			"config": "${path.home}",
+			"data":   filepath.Join("${path.home}", "data"),
+			"logs":   filepath.Join("${path.home}", "logs"),
+		},
+	})
+	if err := defaults.Merge(c); err != nil {
+		return nil, err
+	}
+	return defaults, nil
 }

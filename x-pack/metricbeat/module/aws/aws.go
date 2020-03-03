@@ -5,35 +5,44 @@
 package aws
 
 import (
+	"context"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period          time.Duration `config:"period" validate:"nonzero,required"`
-	AccessKeyID     string        `config:"access_key_id" validate:"nonzero,required"`
-	SecretAccessKey string        `config:"secret_access_key" validate:"nonzero,required"`
-	SessionToken    string        `config:"session_token"`
-	DefaultRegion   string        `config:"default_region"`
-	Regions         []string      `config:"regions"`
+	Period    time.Duration       `config:"period" validate:"nonzero,required"`
+	Regions   []string            `config:"regions"`
+	AWSConfig awscommon.ConfigAWS `config:",inline"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
 type MetricSet struct {
 	mb.BaseMetricSet
 	RegionsList []string
+	Endpoint    string
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
+	AccountName string
+	AccountID   string
+}
+
+// Tag holds a configuration specific for ec2 and cloudwatch metricset.
+type Tag struct {
+	Key   string `config:"key"`
+	Value string `config:"value"`
 }
 
 // ModuleName is the name of this module.
@@ -61,20 +70,15 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	awsConfig := defaults.Config()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     config.AccessKeyID,
-		SecretAccessKey: config.SecretAccessKey,
-	}
-	if config.SessionToken != "" {
-		awsCredentials.SessionToken = config.SessionToken
+	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get aws credentials, please check AWS credential in config")
 	}
 
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCredentials,
+	_, err = awsConfig.Credentials.Retrieve()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve aws credentials, please check AWS credential in config")
 	}
-
-	awsConfig.Region = config.DefaultRegion
 
 	metricSet := MetricSet{
 		BaseMetricSet: base,
@@ -82,9 +86,37 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		AwsConfig:     &awsConfig,
 	}
 
+	// Get IAM account name
+	awsConfig.Region = "us-east-1"
+	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "iam", "", awsConfig))
+	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
+	output, err := req.Send(context.TODO())
+	if err != nil {
+		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
+	} else {
+		// There can be more than one aliases for each account, for now we are only
+		// collecting the first one.
+		if output.AccountAliases != nil {
+			metricSet.AccountName = output.AccountAliases[0]
+		}
+	}
+
+	// Get IAM account id
+	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "sts", "", awsConfig))
+	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
+	outputIdentity, err := reqIdentity.Send(context.TODO())
+	if err != nil {
+		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
+	} else {
+		metricSet.AccountID = *outputIdentity.Account
+	}
+
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		svcEC2 := ec2.New(awsConfig)
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			config.AWSConfig.Endpoint, "ec2", "", awsConfig))
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
@@ -99,10 +131,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &metricSet, nil
 }
 
-func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
+func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
 	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		err = errors.Wrap(err, "Failed DescribeRegions")
 		return
@@ -113,27 +145,61 @@ func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
 	return
 }
 
-// StringInSlice checks if a string is already exists in list
-func StringInSlice(str string, list []string) bool {
-	for _, v := range list {
+// StringInSlice checks if a string is already exists in list and its location
+func StringInSlice(str string, list []string) (bool, int) {
+	for idx, v := range list {
 		if v == str {
-			return true
+			return true, idx
 		}
 	}
-	return false
+	// If this string doesn't exist in given list, then return location to be -1
+	return false, -1
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
-func InitEvent(metricsetName string, regionName string) mb.Event {
+func InitEvent(regionName string, accountName string, accountID string) mb.Event {
 	event := mb.Event{}
-	event.Service = metricsetName
 	event.MetricSetFields = common.MapStr{}
 	event.ModuleFields = common.MapStr{}
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
 		event.RootFields.Put("cloud.region", regionName)
 	}
+	if accountName != "" {
+		event.RootFields.Put("cloud.account.name", accountName)
+	}
+	if accountID != "" {
+		event.RootFields.Put("cloud.account.id", accountID)
+	}
 	return event
+}
+
+// CheckTagFiltersExist compare tags filter with a set of tags to see if tags
+// filter is a subset of tags
+func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
+	var tagKeys []string
+	var tagValues []string
+
+	switch tags.(type) {
+	case []resourcegroupstaggingapi.Tag:
+		tagsResource := tags.([]resourcegroupstaggingapi.Tag)
+		for _, tag := range tagsResource {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+	case []ec2.Tag:
+		tagsEC2 := tags.([]ec2.Tag)
+		for _, tag := range tagsEC2 {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+	}
+
+	for _, tagFilter := range tagsFilter {
+		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+			return false
+		}
+	}
+	return true
 }

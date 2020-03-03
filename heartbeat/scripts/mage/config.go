@@ -18,7 +18,7 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // ConfigFileParams returns the default ConfigFileParams for generating
@@ -39,6 +39,7 @@ func ConfigFileParams() devtools.ConfigFileParams {
 		},
 		ExtraVars: map[string]interface{}{
 			"UseObserverProcessor": true,
+			"ExcludeDashboards":    true,
 		},
 	}
 }

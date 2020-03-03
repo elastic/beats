@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func NetDialer(timeout time.Duration) Dialer {
@@ -45,7 +45,6 @@ func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
 		if err != nil {
 			return nil, err
 		}
-
 		addresses, err := net.LookupHost(host)
 		d.Fatal("dns lookup", err)
 		d.Info("addresses", strings.Join(addresses, ", "))
@@ -57,5 +56,18 @@ func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
 		// dial via host IP by randomized iteration of known IPs
 		dialer := &net.Dialer{Timeout: timeout}
 		return DialWith(dialer, network, host, addresses, port)
+	})
+}
+
+// UnixDialer creates a Unix Dialer when using unix domain socket.
+func UnixDialer(timeout time.Duration, sockFile string) Dialer {
+	return TestUnixDialer(testing.NullDriver, timeout, sockFile)
+}
+
+// TestUnixDialer creates a Test Unix Dialer when using domain socket.
+func TestUnixDialer(d testing.Driver, timeout time.Duration, sockFile string) Dialer {
+	return DialerFunc(func(network, address string) (net.Conn, error) {
+		d.Info("connecting using unix domain socket", sockFile)
+		return net.DialTimeout("unix", sockFile, timeout)
 	})
 }

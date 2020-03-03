@@ -18,9 +18,10 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 type OutletFactory struct {
@@ -28,6 +29,7 @@ type OutletFactory struct {
 
 	eventer  beat.ClientEventer
 	wgEvents eventCounter
+	beatInfo beat.Info
 }
 
 type eventCounter interface {
@@ -46,6 +48,7 @@ type inputOutletConfig struct {
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
+	KeepNull             bool                    `config:"keep_null"`
 
 	// implicit event fields
 	Type        string `config:"type"`         // input.type
@@ -56,8 +59,8 @@ type inputOutletConfig struct {
 	Fileset string `config:"_fileset_name"` // hidden setting
 
 	// Output meta data settings
-	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
-
+	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
+	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 }
 
 // NewOutletFactory creates a new outlet factory for
@@ -65,10 +68,12 @@ type inputOutletConfig struct {
 func NewOutletFactory(
 	done <-chan struct{},
 	wgEvents eventCounter,
+	beatInfo beat.Info,
 ) *OutletFactory {
 	o := &OutletFactory{
 		done:     done,
 		wgEvents: wgEvents,
+		beatInfo: beatInfo,
 	}
 
 	if wgEvents != nil {
@@ -82,75 +87,12 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
-	config := inputOutletConfig{}
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, err
-	}
-
-	setMeta := func(to common.MapStr, key, value string) {
-		if value != "" {
-			to[key] = value
-		}
-	}
-
-	meta := common.MapStr{}
-	setMeta(meta, "pipeline", config.Pipeline)
-
-	fields := common.MapStr{}
-	setMeta(fields, "module", config.Module)
-	if config.Module != "" && config.Fileset != "" {
-		setMeta(fields, "dataset", config.Module+"."+config.Fileset)
-	}
-	if len(fields) > 0 {
-		fields = common.MapStr{
-			"event": fields,
-		}
-	}
-	if config.Fileset != "" {
-		fields.Put("fileset.name", config.Fileset)
-	}
-	if config.ServiceType != "" {
-		fields.Put("service.type", config.ServiceType)
-	} else if config.Module != "" {
-		fields.Put("service.type", config.Module)
-	}
-	if config.Type != "" {
-		fields.Put("input.type", config.Type)
-	}
-
-	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode: beat.GuaranteedSend,
-		Processing: beat.ProcessingConfig{
-			EventMetadata: config.EventMetadata,
-			DynamicFields: dynFields,
-			Meta:          meta,
-			Fields:        fields,
-			Processor:     processors,
-		},
-		Events: f.eventer,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	outlet := newOutlet(client, f.wgEvents)
-	if f.done != nil {
-		return CloseOnSignal(outlet, f.done), nil
-	}
-	return outlet, nil
+func (f *OutletFactory) Create(p beat.Pipeline) Connector {
+	return &pipelineConnector{parent: f, pipeline: p}
 }
 
-func (*clientEventer) Closing()   {}
-func (*clientEventer) Closed()    {}
-func (*clientEventer) Published() {}
-
-func (c *clientEventer) FilteredOut(_ beat.Event) {}
-func (c *clientEventer) DroppedOnPublish(_ beat.Event) {
-	c.wgEvents.Done()
-}
+func (e *clientEventer) Closing()                        {}
+func (e *clientEventer) Closed()                         {}
+func (e *clientEventer) Published()                      {}
+func (e *clientEventer) FilteredOut(evt beat.Event)      {}
+func (e *clientEventer) DroppedOnPublish(evt beat.Event) { e.wgEvents.Done() }

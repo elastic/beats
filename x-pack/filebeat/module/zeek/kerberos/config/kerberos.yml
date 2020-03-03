@@ -1,0 +1,81 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: kerberos
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.kerberos"
+
+        - from: "zeek.kerberos.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.kerberos.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.kerberos.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.kerberos.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.kerberos.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.kerberos.till"
+          to: "zeek.kerberos.valid.until"
+
+        - from: "zeek.kerberos.from"
+          to: "zeek.kerberos.valid.from"
+
+        - from: "zeek.kerberos.error_code"
+          to: "zeek.kerberos.error.code"
+
+        - from: "zeek.kerberos.error_msg"
+          to: "zeek.kerberos.error.msg"
+
+        - from: "zeek.kerberos.cert.client"
+          to: "zeek.kerberos.cert.client.value"
+
+        - from: "zeek.kerberos.cert.client_subject"
+          to: "zeek.kerberos.cert.client.subject"
+
+        - from: "zeek.kerberos.cert.client_fuid"
+          to: "zeek.kerberos.cert.client.fuid"
+
+        - from: "zeek.kerberos.cert.server"
+          to: "zeek.kerberos.cert.server.value"
+
+        - from: "zeek.kerberos.cert.server_subject"
+          to: "zeek.kerberos.cert.server.subject"
+
+        - from: "zeek.kerberos.cert.server_fuid"
+          to: "zeek.kerberos.cert.server.fuid"
+
+        - from: "zeek.kerberos.auth_ticket"
+          to: "zeek.kerberos.ticket.auth"
+
+        - from: "zeek.kerberos.new_ticket"
+          to: "zeek.kerberos.ticket.new"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

@@ -7,8 +7,11 @@
 package ec2
 
 import (
+	"net/http"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -16,14 +19,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.EC2API
+	ec2iface.ClientAPI
 }
 
 var (
@@ -33,19 +35,19 @@ var (
 
 	id1         = "cpu1"
 	metricName1 = "CPUUtilization"
-	label1      = instanceID + " " + metricName1
+	label1      = instanceID + labelSeparator + metricName1
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = instanceID + " " + metricName2
+	label2      = instanceID + labelSeparator + metricName2
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = instanceID + " " + metricName3
+	label3      = instanceID + labelSeparator + metricName3
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = instanceID + " " + metricName4
+	label4      = instanceID + labelSeparator + metricName4
 )
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
@@ -71,6 +73,17 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	privateDNSName := "ip-5-6-7-8.us-west-1.compute.internal"
 	privateIP := "5.6.7.8"
 
+	tags := []ec2.Tag{
+		{
+			Key:   awssdk.String("app.kubernetes.io/name"),
+			Value: awssdk.String("foo"),
+		},
+		{
+			Key:   awssdk.String("helm.sh/chart"),
+			Value: awssdk.String("foo-chart"),
+		},
+	}
+
 	instance := ec2.Instance{
 		InstanceId:   awssdk.String(instanceID),
 		InstanceType: ec2.InstanceTypeT2Medium,
@@ -93,14 +106,18 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 		PublicIpAddress:  &publicIP,
 		PrivateDnsName:   &privateDNSName,
 		PrivateIpAddress: &privateIP,
+		Tags:             tags,
 	}
+
+	httpReq, _ := http.NewRequest("", "", nil)
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
-				Reservations: []ec2.RunInstancesOutput{
+				Reservations: []ec2.Reservation{
 					{Instances: []ec2.Instance{instance}},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -121,15 +138,9 @@ func TestGetInstanceIDs(t *testing.T) {
 	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceID].Placement.AvailabilityZone)
 }
 
-func TestCreateCloudWatchEvents(t *testing.T) {
-	mockModuleConfig := aws.Config{
-		Period:        300 * time.Second,
-		DefaultRegion: regionName,
-	}
-
+func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 	expectedEvent := mb.Event{
 		RootFields: common.MapStr{
-			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
@@ -156,6 +167,10 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 					"dns_name": "ip-5-6-7-8.us-west-1.compute.internal",
 					"ip":       "5.6.7.8",
 				},
+			},
+			"tags": common.MapStr{
+				"app_kubernetes_io/name": "foo",
+				"helm_sh/chart":          "foo-chart",
 			},
 		},
 	}
@@ -194,13 +209,17 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	metricSet := MetricSet{}
-	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+		nil,
+	}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
 	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
+	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
 }
 
 func TestConstructMetricQueries(t *testing.T) {
@@ -219,8 +238,82 @@ func TestConstructMetricQueries(t *testing.T) {
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
 	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 5*time.Minute)
 	assert.Equal(t, 1, len(metricDataQuery))
-	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
+	assert.Equal(t, "i-123|CPUUtilization", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
 	assert.Equal(t, metricName1, *metricDataQuery[0].MetricStat.Metric.MetricName)
 	assert.Equal(t, namespace, *metricDataQuery[0].MetricStat.Metric.Namespace)
+}
+
+func TestCalculateRate(t *testing.T) {
+	resultMetricsetFields := common.MapStr{
+		"network.in.bytes":    1367316.0,
+		"network.out.bytes":   427380.0,
+		"network.in.packets":  2895.0,
+		"network.out.packets": 2700.0,
+		"diskio.read.bytes":   300.0,
+		"diskio.write.bytes":  600.0,
+		"diskio.read.count":   30.0,
+		"diskio.write.count":  60.0,
+	}
+
+	cases := []struct {
+		rateMetricName          string
+		rateMetricValue         float64
+		rateMetricValueDetailed float64
+	}{
+		{
+			"network.in.bytes_per_sec",
+			4557.72,
+			22788.6,
+		},
+		{
+			"network.out.bytes_per_sec",
+			1424.6,
+			7123.0,
+		},
+		{
+			"network.in.packets_per_sec",
+			9.65,
+			48.25,
+		},
+		{
+			"network.out.packets_per_sec",
+			9.0,
+			45.0,
+		},
+		{
+			"diskio.read.bytes_per_sec",
+			1.0,
+			5.0,
+		},
+		{
+			"diskio.write.bytes_per_sec",
+			2.0,
+			10.0,
+		},
+		{
+			"diskio.read.count_per_sec",
+			0.1,
+			0.5,
+		},
+		{
+			"diskio.write.count_per_sec",
+			0.2,
+			1.0,
+		},
+	}
+
+	calculateRate(resultMetricsetFields, "disabled")
+	for _, c := range cases {
+		output, err := resultMetricsetFields.GetValue(c.rateMetricName)
+		assert.NoError(t, err)
+		assert.Equal(t, c.rateMetricValue, output)
+	}
+
+	calculateRate(resultMetricsetFields, "enabled")
+	for _, c := range cases {
+		output, err := resultMetricsetFields.GetValue(c.rateMetricName)
+		assert.NoError(t, err)
+		assert.Equal(t, c.rateMetricValueDetailed, output)
+	}
 }

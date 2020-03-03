@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-seccomp-bpf"
 )
 
@@ -155,15 +155,20 @@ func ModifyDefaultPolicy(changeType PolicyChangeType, syscalls ...string) error 
 	case AddSyscall:
 		list := defaultPolicy.Syscalls[0].Names
 		for _, newSyscall := range syscalls {
+			found := false
 			for _, existingSyscall := range list {
-				if newSyscall == existingSyscall {
+				if found = newSyscall == existingSyscall; found {
 					break
 				}
-
+			}
+			if !found {
 				list = append(list, newSyscall)
 			}
 		}
 		defaultPolicy.Syscalls[0].Names = list
+
+	default:
+		return errors.New("unsupported PolicyChangeType value")
 	}
 
 	return nil

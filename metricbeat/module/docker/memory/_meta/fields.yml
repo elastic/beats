@@ -4,6 +4,12 @@
     Memory metrics.
   release: ga
   fields:
+    - name: stats.*
+      type: object
+      object_type: long
+      object_type_mapping_type: "*"
+      description: >
+        Raw memory stats from the cgroups memory.stat interface
     - name: commit
       type: group
       description: >
@@ -45,7 +51,7 @@
             Total memory resident set size.
         - name: pct
           type: scaled_float
-          format: percentage
+          format: percent
           description: >
             Memory resident set size percentage.
     - name: usage
@@ -60,7 +66,7 @@
             Max memory usage.
         - name: pct
           type: scaled_float
-          format: percentage
+          format: percent
           description: >
             Memory usage percentage.
         - name: total

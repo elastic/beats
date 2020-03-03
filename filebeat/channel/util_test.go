@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 type dummyOutletter struct {
@@ -31,7 +31,7 @@ type dummyOutletter struct {
 	c      chan struct{}
 }
 
-func (o *dummyOutletter) OnEvent(event *util.Data) bool {
+func (o *dummyOutletter) OnEvent(event beat.Event) bool {
 	return true
 }
 

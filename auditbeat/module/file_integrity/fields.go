@@ -20,7 +20,7 @@
 package file_integrity
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -32,5 +32,5 @@ func init() {
 // AssetFileIntegrity returns asset data.
 // This is the base64 encoded gzipped contents of module/file_integrity.
 func AssetFileIntegrity() string {
-	return "eJyUkkFvozAUhO/8ivkDyQonoIjDSqy2FVXbU3rIDZn4BVsxEGGnDf++wqJNIkXCPvI0fJ438xY40pDhoDSVqrVU98oOEWCV1ZThWWnCy81ckNn36mRV12b4kGQIvCdYSTgo0sKgppZ6bkmgGqb5LRtNJ86alhGmH7IIWKDlDWWQ3MgIAOxwogx1351P7vvu2b9uBBTcSDLoDr/PLEdL40bGueK67nplZePwBrwVTvrJ9ZmcZCKNQ0kXULvvBAkIVZOxk24ZOdXV7dVvpfmRWFWyJP0hOeNHGr66XkyzO/P/3vLXJ1YtWJK6de/sRw/pq806lL7arH3pScxC6UnM5uiNSHyp7/+TOZqRPPbFbYs89uAx5h3qtsgZm81zZPqfwcicvwAjeUD52yL36H1klmHbO70fNygBp/fiBqZQ+uYQcPyO63H5RvIwqjczsLUkZn/8enPsoOYce767y0Wm3pZ3u/SR2e8AAAD//7nP8bw="
+	return "eJykk81u6jAQhfd5inkBuIohEcriSqnaKlXbFV2wQw4eYgsnRrYD5O2ruCk/ElJsusxo8p3jmTMT2GGXwVZIXIvGYqWF7SIAK6zEDF6FRHi7qjM0Gy32Vqgmgy+OBoFqBMsRtgIlM1Bhg5paZFB2Q/2aDbVircRpBMMPWQQwgYbWmAGnhkcAALbbYwaVVu3efd/I/nclgIIajgbU9iwz7S31LzLOFZWV0sLy2uEN0Ia51gOVLbqWgdQXOZ4Am41iyICJCo0d+qaR67q4vfgtJd0hKdckSX9JzvgOu6PSbKjdmH/6yN9fSDkhSeqee2M/ukufLeah9Nli7ktPYhJKT2IyRq9ZMhDUAfVRC4sZWN2ir9bnczKmYTiN/yayLPLYQ4UQ7wUsi5yQ0dn3zHNkHvfukSHDaUB8lkXukZyeuQ6biev34/qf0g/XbwYhR+S4vnMIOB/H9bgdw+mF+ng6vJUCd5nE5J/fNh07aJ+OPb7R04mn3pZXq/Se2e8AAAD//yR/DPc="
 }

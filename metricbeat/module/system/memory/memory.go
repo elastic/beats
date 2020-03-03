@@ -20,10 +20,10 @@
 package memory
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	mem "github.com/elastic/beats/libbeat/metric/system/memory"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mem "github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )
@@ -75,6 +75,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 	}
 
+	vmstat, err := mem.GetVMStat()
+	if err != nil {
+		return errors.Wrap(err, "VMStat")
+	}
+
 	swap := common.MapStr{
 		"total": swapStat.Total,
 		"used": common.MapStr{
@@ -83,6 +88,55 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 		"free": swapStat.Free,
 	}
+
+	if vmstat != nil {
+		// Swap in and swap out numbers
+		swap["in"] = common.MapStr{
+			"pages": vmstat.Pswpin,
+		}
+		swap["out"] = common.MapStr{
+			"pages": vmstat.Pswpout,
+		}
+		//Swap readahead
+		//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
+		swap["readahead"] = common.MapStr{
+			"pages":  vmstat.SwapRa,
+			"cached": vmstat.SwapRaHit,
+		}
+		pageStats := common.MapStr{
+			"pgscan_kswapd": common.MapStr{
+				"pages": vmstat.PgscanKswapd,
+			},
+			"pgscan_direct": common.MapStr{
+				"pages": vmstat.PgscanDirect,
+			},
+			"pgfree": common.MapStr{
+				"pages": vmstat.Pgfree,
+			},
+			"pgsteal_kswapd": common.MapStr{
+				"pages": vmstat.PgstealKswapd,
+			},
+			"pgsteal_direct": common.MapStr{
+				"pages": vmstat.PgstealDirect,
+			},
+		}
+		// This is similar to the vmeff stat gathered by sar
+		// these ratios calculate thhe efficiency of page reclaim
+		if vmstat.PgscanDirect != 0 {
+			pageStats["direct_efficiency"] = common.MapStr{
+				"pct": common.Round(float64(vmstat.PgstealDirect)/float64(vmstat.PgscanDirect), common.DefaultDecimalPlacesCount),
+			}
+		}
+
+		if vmstat.PgscanKswapd != 0 {
+			pageStats["kswapd_efficiency"] = common.MapStr{
+				"pct": common.Round(float64(vmstat.PgstealKswapd)/float64(vmstat.PgscanKswapd), common.DefaultDecimalPlacesCount),
+			}
+		}
+
+		memory["page_stats"] = pageStats
+	}
+
 	memory["swap"] = swap
 
 	hugePagesStat, err := mem.GetHugeTLBPages()
@@ -91,7 +145,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 	if hugePagesStat != nil {
 		mem.AddHugeTLBPagesPercentage(hugePagesStat)
-		memory["hugepages"] = common.MapStr{
+		thp := common.MapStr{
 			"total": hugePagesStat.Total,
 			"used": common.MapStr{
 				"bytes": hugePagesStat.TotalAllocatedSize,
@@ -102,6 +156,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"surplus":      hugePagesStat.Surplus,
 			"default_size": hugePagesStat.DefaultSize,
 		}
+		if vmstat != nil {
+			thp["swap"] = common.MapStr{
+				"out": common.MapStr{
+					"pages":    vmstat.ThpSwpout,
+					"fallback": vmstat.ThpSwpoutFallback,
+				},
+			}
+		}
+		memory["hugepages"] = thp
 	}
 
 	r.Event(mb.Event{

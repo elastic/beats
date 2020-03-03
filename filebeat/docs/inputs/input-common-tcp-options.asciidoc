@@ -23,6 +23,12 @@ The host and TCP port to listen on for event streams.
 Specify the characters used to split the incoming events. The default is '\n'.
 
 [float]
+[id="{beatname_lc}-input-{type}-tcp-max-connections"]
+==== `max_connections`
+
+The at most number of connections to accept at any given point in time.
+
+[float]
 [id="{beatname_lc}-input-{type}-tcp-timeout"]
 ==== `timeout`
 

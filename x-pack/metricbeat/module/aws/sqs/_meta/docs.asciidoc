@@ -10,6 +10,8 @@ cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 ec2:DescribeRegions
 sqs:ListQueues
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
@@ -18,3 +20,16 @@ sqs:ListQueues
 The aws sqs metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-sqs-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - sqs
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+----

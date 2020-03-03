@@ -6,14 +6,17 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "client_id": "consumer4"
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "listener_name": "http"
             },
             "metrics": {
-                "kafka_consumer_records_lag_records": 5
+                "net_conntrack_listener_conn_accepted_total": 1568652315554
             }
         },
         "service": {
@@ -28,97 +31,14 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "method": "GET"
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus"
             },
-            "metrics": {
-                "http_failures": 2
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
-                "le": "5"
-            },
-            "metrics": {
-                "http_request_duration_seconds_bucket": 3
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
-                "le": "+Inf"
-            },
-            "metrics": {
-                "http_request_duration_seconds_bucket": 3
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
-                "le": "3"
-            },
-            "metrics": {
-                "http_request_duration_seconds_bucket": 3
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
             "metrics": {
                 "go_gc_duration_seconds_count": 13118,
                 "go_gc_duration_seconds_sum": 3.451780079,
@@ -138,14 +58,17 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "le": "2"
+                "client_id": "consumer4",
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus"
             },
             "metrics": {
-                "http_request_duration_seconds_bucket": 2
+                "kafka_consumer_records_lag_records": 5
             }
         },
         "service": {
@@ -160,32 +83,13 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "le": "1"
-            },
-            "metrics": {
-                "http_request_duration_seconds_bucket": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
                 "quantile": "1"
             },
             "metrics": {
@@ -204,14 +108,191 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "le": "5"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "le": "1"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "le": "2"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "le": "+Inf"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "method": "GET"
+            },
+            "metrics": {
+                "http_failures": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
                 "quantile": "0.75"
             },
             "metrics": {
                 "go_gc_duration_seconds": 0.000098154
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55926",
+                "job": "prometheus",
+                "le": "3"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
             }
         },
         "service": {

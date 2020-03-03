@@ -4,7 +4,7 @@
 The best way to understand the value of a network packet analytics system like
 Packetbeat is to try it on your own traffic.
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<packetbeat-installation>>
 * <<packetbeat-configuration>>
@@ -17,14 +17,14 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 [[packetbeat-installation]]
 === Step 1: Install Packetbeat
 
-include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -44,7 +44,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -69,7 +69,7 @@ See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -83,14 +83,14 @@ tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+include::{libbeat-dir}/shared-brew-install.asciidoc[]
 
 [[linux]]
 *linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -109,7 +109,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -151,7 +151,7 @@ more information about these options, see <<configuring-howto-packetbeat>>.
 [[packetbeat-configuration]]
 === Step 2: Configure Packetbeat
 
-include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 To configure Packetbeat:
 
@@ -233,28 +233,25 @@ packetbeat.protocols:
 
 ----------------------------------------------------------------------
 +
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-:requires-sudo: yes
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
 
-include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [[packetbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:requires-sudo: yes
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:requires-sudo: yes
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/dashboards.asciidoc[]
 
 [[packetbeat-starting]]
 === Step 5: Start Packetbeat
@@ -289,6 +286,8 @@ sudo ./packetbeat -e
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
+
+include::{libbeat-dir}/shared-brew-run.asciidoc[]
 
 *win:*
 
@@ -326,7 +325,7 @@ To make it easier for you to get application performance insights
 from packet data, we have created example {beatname_uc} dashboards. You loaded
 the dashboards earlier when you ran the `setup` command.
 
-include::{libbeat-dir}/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

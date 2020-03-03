@@ -16,12 +16,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *elasticsearch.Client) {
 	mux := http.NewServeMux()
-	mux.Handle("/_xpack/", http.HandlerFunc(handler))
+	mux.Handle("/_license/", http.HandlerFunc(handler))
 
 	server := httptest.NewServer(mux)
 
@@ -135,29 +135,7 @@ func TestParseJSON(t *testing.T) {
 				assert.True(t, len(license.UUID) > 0)
 
 				assert.NotNil(t, license.Type)
-				assert.NotNil(t, license.Mode)
 				assert.NotNil(t, license.Status)
-
-				assert.False(t, license.Features.Graph.Available)
-				assert.True(t, license.Features.Graph.Enabled)
-
-				assert.False(t, license.Features.Logstash.Available)
-				assert.True(t, license.Features.Logstash.Enabled)
-
-				assert.False(t, license.Features.ML.Available)
-				assert.True(t, license.Features.ML.Enabled)
-
-				assert.True(t, license.Features.Monitoring.Available)
-				assert.True(t, license.Features.Monitoring.Enabled)
-
-				assert.True(t, license.Features.Rollup.Available)
-				assert.True(t, license.Features.Rollup.Enabled)
-
-				assert.False(t, license.Features.Security.Available)
-				assert.True(t, license.Features.Security.Enabled)
-
-				assert.False(t, license.Features.Watcher.Available)
-				assert.True(t, license.Features.Watcher.Enabled)
 			})
 
 			return nil

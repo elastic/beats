@@ -71,6 +71,39 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
+// VMStat reports data from /proc/vmstat on linux.
+func (h *host) VMStat() (*types.VMStatInfo, error) {
+	content, err := ioutil.ReadFile(h.procFS.path("vmstat"))
+	if err != nil {
+		return nil, err
+	}
+
+	return parseVMStat(content)
+}
+
+// NetworkCounters reports data from /proc/net on linux
+func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
+	snmpRaw, err := ioutil.ReadFile(h.procFS.path("net/snmp"))
+	if err != nil {
+		return nil, err
+	}
+	snmp, err := getNetSnmpStats(snmpRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	netstatRaw, err := ioutil.ReadFile(h.procFS.path("net/netstat"))
+	if err != nil {
+		return nil, err
+	}
+	netstat, err := getNetstatStats(netstatRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.NetworkCountersInfo{SNMP: snmp, Netstat: netstat}, nil
+}
+
 func (h *host) CPUTime() (types.CPUTimes, error) {
 	stat, err := h.procFS.NewStat()
 	if err != nil {

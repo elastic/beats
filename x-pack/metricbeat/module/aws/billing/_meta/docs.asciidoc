@@ -1,0 +1,50 @@
+You can monitor your estimated AWS charges by using Amazon CloudWatch. When you
+enable the monitoring of estimated charges for your AWS account, the estimated
+charges are calculated and sent several times daily to CloudWatch as metric data.
+
+Billing metric data is stored in the US East (N. Virginia) Region and represents
+worldwide charges. This data includes the estimated charges for every service in
+AWS that you use, in addition to the estimated overall total of your AWS charges.
+
+This aws `billing` metricset collects these Cloudwatch metrics for monitoring
+purposes.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect estimated
+billing metrics.
+----
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Dashboard
+
+The aws billing metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-billing-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 12h
+  metricsets:
+    - billing
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics
+|===
+|Metric Name|Statistic Method
+|EstimatedCharges | Maximum
+|===
+
+Supported dimensions for billing metrics: Currency and ServiceName.

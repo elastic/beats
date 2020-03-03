@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -86,4 +86,57 @@ func TestReportErrorForMissingField(t *testing.T) {
 	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch stats API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
+}
+
+func TestFixTimestampField(t *testing.T) {
+	tests := []struct {
+		Name          string
+		OriginalValue map[string]interface{}
+		ExpectedValue map[string]interface{}
+	}{
+		{
+			"converts float64s in scientific notation to ints",
+			map[string]interface{}{
+				"foo": 1.571284349E12,
+			},
+			map[string]interface{}{
+				"foo": 1571284349000,
+			},
+		},
+		{
+			"converts regular notation float64s to ints",
+			map[string]interface{}{
+				"foo": float64(1234),
+			},
+			map[string]interface{}{
+				"foo": 1234,
+			},
+		},
+		{
+			"ignores missing fields",
+			map[string]interface{}{
+				"bar": 12345,
+			},
+			map[string]interface{}{
+				"bar": 12345,
+			},
+		},
+		{
+			"leaves strings untouched",
+			map[string]interface{}{
+				"foo": "bar",
+			},
+			map[string]interface{}{
+				"foo": "bar",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			err := FixTimestampField(test.OriginalValue, "foo")
+			assert.NoError(t, err)
+			assert.Equal(t, test.ExpectedValue, test.OriginalValue)
+		})
+	}
 }

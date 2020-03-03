@@ -34,8 +34,8 @@ import (
 
 	"golang.org/x/crypto/pbkdf2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -413,6 +413,11 @@ func (k *FileKeystore) Package() ([]byte, error) {
 	k.Lock()
 	defer k.Unlock()
 	return k.loadRaw()
+}
+
+// ConfiguredPath returns the path to the keystore.
+func (k *FileKeystore) ConfiguredPath() string {
+	return k.Path
 }
 
 func (k *FileKeystore) hashPassword(password, salt []byte) []byte {

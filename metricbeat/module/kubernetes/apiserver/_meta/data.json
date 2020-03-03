@@ -7,17 +7,19 @@
     },
     "kubernetes": {
         "apiserver": {
+            "etcd": {
+                "object": {
+                    "count": 0
+                }
+            },
             "request": {
-                "client": "kubectl/v1.6.1 (linux/amd64) kubernetes/b0b7a32",
-                "count": 4,
-                "resource": "configmaps",
-                "scope": "namespace",
-                "verb": "DELETE"
+                "resource": "certificatesigningrequests.certificates.k8s.io"
             }
         }
     },
     "metricset": {
-        "name": "apiserver"
+        "name": "apiserver",
+        "period": 10000
     },
     "service": {
         "address": "127.0.0.1:55555",

@@ -22,9 +22,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
 // Config is used for unpacking a common.Config.
@@ -32,7 +32,7 @@ type Config struct {
 	Mode          Mode                     `config:"enabled"`
 	PolicyName    fmtstr.EventFormatString `config:"policy_name"`
 	PolicyFile    string                   `config:"policy_file"`
-	RolloverAlias string                   `config:"rollover_alias"`
+	RolloverAlias fmtstr.EventFormatString `config:"rollover_alias"`
 	Pattern       string                   `config:"pattern"`
 
 	// CheckExists can disable the check for an existing policy. Check required
@@ -103,20 +103,21 @@ func (m *Mode) Unpack(in string) error {
 
 //Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
-	if cfg.RolloverAlias == "" && cfg.Mode != ModeDisabled {
+	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
 		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
 	}
 	return nil
 }
 
 func defaultConfig(info beat.Info) Config {
-	name := fmt.Sprintf("%s-%s", info.Beat, info.Version)
-	nameFmt := fmtstr.MustCompileEvent(name)
+	name := info.Beat + "-%{[agent.version]}"
+	aliasFmt := fmtstr.MustCompileEvent(name)
+	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
 		Mode:          ModeAuto,
-		PolicyName:    *nameFmt,
-		RolloverAlias: name,
+		PolicyName:    *policyFmt,
+		RolloverAlias: *aliasFmt,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",
 		CheckExists:   true,

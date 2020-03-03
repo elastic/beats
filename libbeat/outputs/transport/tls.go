@@ -25,8 +25,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
@@ -34,20 +34,6 @@ type TLSConfig = tlscommon.TLSConfig
 
 // TLSVersion type for TLS version.
 type TLSVersion = tlscommon.TLSVersion
-
-// Define all the possible TLS version.
-const (
-	TLSVersionSSL30 = tlscommon.TLSVersionSSL30
-	TLSVersion10    = tlscommon.TLSVersion10
-	TLSVersion11    = tlscommon.TLSVersion11
-	TLSVersion12    = tlscommon.TLSVersion12
-)
-
-// Constants of the supported verification mode.
-const (
-	VerifyFull = tlscommon.VerifyFull
-	VerifyNone = tlscommon.VerifyNone
-)
 
 func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) (Dialer, error) {
 	return TestTLSDialer(testing.NullDriver, forward, config, timeout)

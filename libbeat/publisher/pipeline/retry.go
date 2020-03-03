@@ -18,7 +18,9 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
+	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // retryer is responsible for accepting and managing failed send attempts. It
@@ -36,9 +38,10 @@ type retryer struct {
 
 	consumer *eventConsumer
 
-	sig chan retryerSignal
-	out workQueue
-	in  retryQueue
+	sig        chan retryerSignal
+	out        workQueue
+	in         retryQueue
+	doneWaiter sync.WaitGroup
 }
 
 type retryQueue chan batchEvent
@@ -75,20 +78,24 @@ func newRetryer(
 	c *eventConsumer,
 ) *retryer {
 	r := &retryer{
-		logger:   log,
-		observer: observer,
-		done:     make(chan struct{}),
-		sig:      make(chan retryerSignal, 3),
-		in:       retryQueue(make(chan batchEvent, 3)),
-		out:      out,
-		consumer: c,
+		logger:     log,
+		observer:   observer,
+		done:       make(chan struct{}),
+		sig:        make(chan retryerSignal, 3),
+		in:         retryQueue(make(chan batchEvent, 3)),
+		out:        out,
+		consumer:   c,
+		doneWaiter: sync.WaitGroup{},
 	}
+	r.doneWaiter.Add(1)
 	go r.loop()
 	return r
 }
 
 func (r *retryer) close() {
 	close(r.done)
+	//Block until loop() is properly closed
+	r.doneWaiter.Wait()
 }
 
 func (r *retryer) sigOutputAdded() {
@@ -115,6 +122,7 @@ func (r *retryer) cancelled(b *Batch) {
 }
 
 func (r *retryer) loop() {
+	defer r.doneWaiter.Done()
 	var (
 		out             workQueue
 		consumerBlocked bool
@@ -131,7 +139,6 @@ func (r *retryer) loop() {
 		select {
 		case <-r.done:
 			return
-
 		case evt := <-r.in:
 			var (
 				countFailed  int

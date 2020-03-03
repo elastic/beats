@@ -26,16 +26,18 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.convert"
 
 func init() {
 	processors.RegisterPlugin("convert", New)
+	jsprocessor.RegisterPlugin("Convert", New)
 }
 
 type processor struct {
@@ -203,7 +205,7 @@ func toString(value interface{}) (string, error) {
 func toLong(value interface{}) (int64, error) {
 	switch v := value.(type) {
 	case string:
-		return strconv.ParseInt(v, 0, 64)
+		return strToInt(v, 64)
 	case int:
 		return int64(v), nil
 	case int8:
@@ -236,7 +238,7 @@ func toLong(value interface{}) (int64, error) {
 func toInteger(value interface{}) (int32, error) {
 	switch v := value.(type) {
 	case string:
-		i, err := strconv.ParseInt(v, 0, 32)
+		i, err := strToInt(v, 32)
 		return int32(i), err
 	case int:
 		return int32(v), nil
@@ -400,4 +402,25 @@ func cloneValue(value interface{}) interface{} {
 	default:
 		return value
 	}
+}
+
+// strToInt is a helper to interpret a string as either base 10 or base 16.
+func strToInt(s string, bitSize int) (int64, error) {
+	base := 10
+	if hasHexPrefix(s) {
+		// strconv.ParseInt will accept the '0x' or '0X` prefix only when base is 0.
+		base = 0
+	}
+	return strconv.ParseInt(s, base, bitSize)
+}
+
+func hasHexPrefix(s string) bool {
+	if len(s) < 3 {
+		return false
+	}
+	a, b := s[0], s[1]
+	if a == '+' || a == '-' {
+		a, b = b, s[2]
+	}
+	return a == '0' && (b == 'x' || b == 'X')
 }

@@ -2,7 +2,7 @@
 [role="xpack"]
 == Getting Started With {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -12,10 +12,11 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 [id="{beatname_lc}-installation"]
 [role="xpack"]
-=== Step 1: Download the {beatname_uc} package
+=== Step 1: Download {beatname_uc}
 
-The {beatname_uc} package contains the command line tools, configuration file,
-and binary code required to run {beatname_uc} in your serverless environment. 
+The {beatname_uc} distribution contains the command line tools, configuration
+file, and binary code required to run {beatname_uc} in your serverless
+environment. 
 
 To download and extract the package, use the commands that work with your
 system.
@@ -80,10 +81,10 @@ endif::[]
 [role="xpack"]
 === Step 2: Configure {beatname_uc}
 
-Before deploying {beatname_uc} to your serverless environment, you need to
-specify details about the functions that you want to deploy, including the
-function name, type, and triggers that will cause the function to execute.
-You also need to specify connection details for your {es} cluster. 
+Before deploying {beatname_uc} to your cloud provider, you need to specify
+details about the cloud functions that you want to deploy, including the
+function name and type, and the triggers that will cause the function to
+execute. You also need to specify connection details for your {es} cluster. 
 
 You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
 is located in the archive that you extracted earlier.
@@ -92,129 +93,196 @@ TIP: See the
 {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
-The following example configures a function called `cloudwatch` that collects
-events from CloudWatch Logs and forwards the events to {es}.
-
+. Configure the functions that you want to deploy. The configuration settings
+vary depending on the type of function and cloud provider you're using. This
+section provides a couple of example configurations.
++
+--
+* *AWS example*: This example configures a function called `cloudwatch` that
+collects events from CloudWatch Logs. When a message is sent to the specified
+log group, the cloud function executes and sends message events to the
+configured output:
++
 ["source","sh",subs="attributes"]
 -------------------------------------------------------------------------------------
 {beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
-{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy" <1>
 {beatname_lc}.provider.aws.functions:
-  - name: cloudwatch
+  - name: cloudwatch <2>
     enabled: true
     type: cloudwatch_logs
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
 -------------------------------------------------------------------------------------
+<1> A unique name for the S3 bucket to which the functions will be
+uploaded.
+<2> Details about the function you want to deploy, including the name of the
+function, the type of service to monitor, and the log groups that trigger the
+function.
++
+See <<configuration-{beatname_lc}-options>> for more examples.
 
-To configure {beatname_uc}:
-
-. Specify a unique name for the S3 bucket to which the functions will be
-uploaded. For example:
+* *Google cloud example*: This example configures a function called
+`storage` that collects log events from Google Cloud Storage. When the specified
+event type occurs on the Cloud Storage bucket, the cloud function executes and
+sends events to the configured output:
 +
 ["source","sh",subs="attributes"]
 ----
-{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+functionbeat.provider.gcp.location_id: "europe-west2"
+functionbeat.provider.gcp.project_id: "my-project-123456"
+functionbeat.provider.gcp.storage_name: "functionbeat-deploy" <1>
+functionbeat.provider.gcp.functions:
+  - name: storage <2>
+    enabled: true
+    type: storage
+    description: "Google Cloud Function for Cloud Storage"
+    trigger:
+      resource: "projects/my-project/buckets/my-storage"
+      event_type: "google.storage.object.finalize"
 ----
-
-. Define the functions that you want to deploy. For each function, you must
-specify:
+<1> The name of the GCP storage bucket where the function artifacts will be
+deployed.
+<2> Details about the function you want to deploy, including the name of the
+function, the type of resource to monitor, and the resource event that triggers
+the function.
 +
-[horizontal]
-`name`:: A unique name for the Lambda function.  
-`type`:: The type of service to monitor. For this release, the supported types
-are:
-* `cloudwatch_logs` to collect data from CloudWatch logs
-* `sqs` to collect messages from Amazon Simple Queue Service (SQS)
-`triggers`:: The triggers that will cause the function to execute. If `type`
-is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
-specify a list of Amazon Resource Names (ARNs). 
-+
-When a message is sent to the specified log group or queue, the Lambda function
-executes and sends message events to the output configured for {beatname_uc}.
-+
-The following example configures a function called `sqs` that collects data
-from Amazon SQS:
-+
-["source","sh",subs="attributes"]
-----
-- name: sqs
-  enabled: true
-  type: sqs
-  triggers:
-    - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
-----
+See <<configuration-{beatname_lc}-gcp-options>> for more examples.
 
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+--
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
+
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 [role="xpack"]
 === Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [id="{beatname_lc}-deploying"]
 [role="xpack"]
-=== Step 4: Deploy {beatname_uc} code to your serverless environment
+=== Step 4: Deploy {beatname_uc}
 
-Before deploying functions to your serverless environment, make sure your user
-has the credentials required by your cloud service provider. For example, if you
-are deploying an AWS Lambda function, you can set environment variables that
-contain your credentials:
+To deploy {beatname_uc} functions to your cloud provider, either use the
+{beatname_uc} manager, as described here, or <<own-deployment,use your own
+deployment infrastructure>>.
 
+TIP: If you change the configuration after deploying the function, use
+the <<update-command,`update` command>> to update your deployment.
+
+[[deploy-to-aws]]
+==== Deploy to AWS
+
+. Make sure you have the credentials required to authenticate with AWS. You can
+set environment variables that contain your credentials:
++
 *linux and mac*:
-
++
 [source, shell]
 ----
 export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
 export AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 export AWS_DEFAULT_REGION=us-east-1
 ----
-
++
 *win*:
-
++
 [source, shell]
 ----
 set AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
 set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 set AWS_DEFAULT_REGION=us-east-1
 ----
-
++
 Set `AWS_DEFAULT_REGION` to the region where your services are running.
 
-After setting credentials, run the `deploy` command to deploy the function.
-The following command deploys a function called `cloudwatch`: 
+. Make sure the user has the permissions required to deploy and run the
+function. For more information, see <<iam-permissions>>.
 
+. Deploy the cloud functions.
++
+For example, the following command deploys a function called `cloudwatch`: 
++
 *linux and mac:*
-
++
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 ./{beatname_lc} -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
-
++
 *win:*
-
++
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 .{backslash}{beatname_lc}.exe -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
++
+The function is deployed to AWS and ready to send log events to the configured
+output.
++
+If deployment fails, see <<faq>> for help troubleshooting.
 
-{beatname_uc} is now deployed in your serverless environment and ready to send
-log events to the configured output.
+[[deploy-to-gcp]]
+==== Deploy to Google Cloud Platform
 
-TIP: If you change the configuration after deploying the function, use
-the <<update-command,`update` command>> to update your deployment.
+beta[]
+
+. In Google Cloud, create a service account that has these required roles:
++
+--
+include::iam-permissions.asciidoc[tag=gcp-roles-deployment]
+--
++
+See the https://cloud.google.com/docs/authentication/getting-started[Google
+Cloud documentation] for more information about creating a service account.
+
+. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to
+the JSON file that contains your service account key. For example:
++
+*linux and mac*:
++
+[source, shell]
+----
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/myproject-5a90ee91d102.json"
+----
++
+*win*:
++
+[source, shell]
+----
+set GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\myproject-5a90ee91d102.json"
+----
+
+. Deploy the cloud functions.
++
+For example, the following command deploys a function called `storage`: 
++
+*linux and mac:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} -v -e -d "*" deploy storage
+----------------------------------------------------------------------
++
+*win:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+.{backslash}{beatname_lc}.exe -v -e -d "*" deploy storage
+----------------------------------------------------------------------
++
+The function is deployed to Google Cloud Platform and ready to send events
+to the configured output.
++
+If deployment fails, see <<faq>> for help troubleshooting.
 
 [[view-kibana-dashboards]]
 [role="xpack"]

@@ -37,7 +37,7 @@ import (
 	"testing"
 
 	"github.com/blakesmith/ar"
-	"github.com/cavaliercoder/go-rpm"
+	rpm "github.com/cavaliercoder/go-rpm"
 )
 
 const (
@@ -123,6 +123,7 @@ func checkRPM(t *testing.T, file string) {
 	checkModulesDPresent(t, "/etc/", p)
 	checkMonitorsDPresent(t, "/etc", p)
 	checkSystemdUnitPermissions(t, p)
+	ensureNoBuildIDLinks(t, p)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -178,7 +179,7 @@ func checkZip(t *testing.T, file string) {
 func checkDocker(t *testing.T, file string) {
 	p, info, err := readDocker(file)
 	if err != nil {
-		t.Error(err)
+		t.Errorf("error reading file %v: %v", file, err)
 		return
 	}
 
@@ -421,6 +422,18 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
 		if expectRoot != (info.Config.User == "root") {
 			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
+}
+
+// ensureNoBuildIDLinks checks for regressions related to
+// https://github.com/elastic/beats/issues/12956.
+func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
+	t.Run(fmt.Sprintf("%s no build_id links", p.Name), func(t *testing.T) {
+		for name := range p.Contents {
+			if strings.Contains(name, "/usr/lib/.build-id") {
+				t.Error("found unexpected /usr/lib/.build-id in package")
+			}
 		}
 	})
 }

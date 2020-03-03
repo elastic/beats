@@ -18,29 +18,34 @@
 package actions
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/checks"
+	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 )
 
 type dropFields struct {
-	Fields []string
+	Fields        []string
+	IgnoreMissing bool
 }
 
 func init() {
 	processors.RegisterPlugin("drop_fields",
 		checks.ConfigChecked(newDropFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when")))
+			checks.AllowedFields("fields", "when", "ignore_missing")))
 }
 
 func newDropFields(c *common.Config) (processors.Processor, error) {
 	config := struct {
-		Fields []string `config:"fields"`
+		Fields        []string `config:"fields"`
+		IgnoreMissing bool     `config:"ignore_missing"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -56,27 +61,26 @@ func newDropFields(c *common.Config) (processors.Processor, error) {
 		}
 	}
 
-	f := &dropFields{Fields: config.Fields}
+	f := &dropFields{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing}
 	return f, nil
 }
 
 func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
-	var errors []string
+	var errs []error
 
 	for _, field := range f.Fields {
-		err := event.Delete(field)
-		if err != nil {
-			errors = append(errors, err.Error())
+		if err := event.Delete(field); err != nil {
+			if f.IgnoreMissing && err == common.ErrKeyNotFound {
+				continue
+			}
+			errs = append(errs, errors.Wrapf(err, "failed to drop field [%v]", field))
 		}
-
 	}
 
-	if len(errors) > 0 {
-		return event, fmt.Errorf(strings.Join(errors, ", "))
-	}
-	return event, nil
+	return event, multierr.Combine(errs...)
 }
 
 func (f *dropFields) String() string {
-	return "drop_fields=" + strings.Join(f.Fields, ", ")
+	json, _ := json.Marshal(f)
+	return "drop_fields=" + string(json)
 }

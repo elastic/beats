@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // ClientHandler defines the interface between a remote service and the Manager.
@@ -150,15 +150,29 @@ func (h *ESClientHandler) HasILMPolicy(name string) (bool, error) {
 	return status == 200, nil
 }
 
-// HasAlias queries Elasticsearch to see if alias exists.
+// HasAlias queries Elasticsearch to see if alias exists. If other resource
+// with the same name exists, it returns an error.
 func (h *ESClientHandler) HasAlias(name string) (bool, error) {
-	path := path.Join(esAliasPath, name)
-	status, b, err := h.client.Request("HEAD", path, "", nil, nil)
+	status, b, err := h.client.Request("GET", esAliasPath+"/"+name, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for alias '%v': (status=%v) %s", name, status, b)
 	}
-	return status == 200, nil
+	if status == 200 {
+		return true, nil
+	}
+
+	// Alias doesn't exist, check if there is an index with the same name
+	status, b, err = h.client.Request("HEAD", "/"+name, "", nil, nil)
+	if err != nil && status != 404 {
+		return false, wrapErrf(err, ErrRequestFailed,
+			"failed to check for alias '%v': (status=%v) %s", name, status, b)
+	}
+	if status == 200 {
+		return false, errf(ErrInvalidAlias,
+			"resource '%v' exists, but it is not an alias", name)
+	}
+	return false, nil
 }
 
 // CreateAlias sends request to Elasticsearch for creating alias.
@@ -179,6 +193,12 @@ func (h *ESClientHandler) CreateAlias(alias Alias) error {
 	// Note: actual aliases are accessible via the index
 	status, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body)
 	if status == 400 {
+		// HasAlias fails if there is an index with the same name, that is
+		// what we want to check here.
+		_, err := h.HasAlias(alias.Name)
+		if err != nil {
+			return err
+		}
 		return errOf(ErrAliasAlreadyExists)
 	} else if err != nil {
 		return wrapErrf(err, ErrAliasCreateFailed, "failed to create alias: %s", res)

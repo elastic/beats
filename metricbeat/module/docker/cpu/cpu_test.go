@@ -23,8 +23,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 var cpuService CPUService
@@ -34,9 +34,6 @@ func cpuUsageFor(stats types.StatsJSON) *cpuUsage {
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
 	}
-	if len(stats.CPUStats.CPUUsage.PercpuUsage) == 0 {
-		u.cpus = 1
-	}
 	return &u
 }
 
@@ -44,31 +41,33 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 	oldPerCpuValuesTest := [][]uint64{{1, 9, 9, 5}, {1, 2, 3, 4}, {0, 0, 0, 0}}
 	newPerCpuValuesTest := [][]uint64{{100000001, 900000009, 900000009, 500000005}, {101, 202, 303, 404}, {0, 0, 0, 0}}
 	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.PercpuUsage = oldPerCpuValuesTest[index]
 		statsList[index].CPUStats.CPUUsage.PercpuUsage = newPerCpuValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
 		given    types.StatsJSON
 		expected common.MapStr
 	}{
 		{statsList[0], common.MapStr{
-			"0": common.MapStr{"pct": float64(0.40)},
-			"1": common.MapStr{"pct": float64(3.60)},
-			"2": common.MapStr{"pct": float64(3.60)},
-			"3": common.MapStr{"pct": float64(2.00)},
+			"0": common.MapStr{"pct": float64(0.40), "norm": common.MapStr{"pct": float64(0.40) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(2.00), "norm": common.MapStr{"pct": float64(2.00) / float64(onlineCPUS)}},
 		}},
 		{statsList[1], common.MapStr{
-			"0": common.MapStr{"pct": float64(0.0000004)},
-			"1": common.MapStr{"pct": float64(0.0000008)},
-			"2": common.MapStr{"pct": float64(0.0000012)},
-			"3": common.MapStr{"pct": float64(0.0000016)},
+			"0": common.MapStr{"pct": float64(0.0000004), "norm": common.MapStr{"pct": float64(0.0000004) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(0.0000008), "norm": common.MapStr{"pct": float64(0.0000008) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(0.0000012), "norm": common.MapStr{"pct": float64(0.0000012) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(0.0000016), "norm": common.MapStr{"pct": float64(0.0000016) / float64(onlineCPUS)}},
 		}},
 		{statsList[2], common.MapStr{
-			"0": common.MapStr{"pct": float64(0)},
-			"1": common.MapStr{"pct": float64(0)},
-			"2": common.MapStr{"pct": float64(0)},
-			"3": common.MapStr{"pct": float64(0)},
+			"0": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
 		}},
 	}
 	for _, tt := range testCase {
@@ -79,7 +78,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 			s.(common.MapStr).Delete("ticks")
 		}
 		if !equalEvent(tt.expected, out) {
-			t.Errorf("PerCpuUsage(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
+			t.Errorf("PerCPUUsage(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
 		}
 	}
 }
@@ -88,16 +87,18 @@ func TestCPUService_TotalUsage(t *testing.T) {
 	oldTotalValuesTest := []uint64{100, 50, 10}
 	totalValuesTest := []uint64{2, 500000050, 10}
 	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
 		statsList[index].CPUStats.CPUUsage.TotalUsage = totalValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
 		given    types.StatsJSON
 		expected float64
 	}{
 		{statsList[0], -1},
-		{statsList[1], 0.50},
+		{statsList[1], 2},
 		{statsList[2], 0},
 	}
 	for _, tt := range testCase {
@@ -109,20 +110,49 @@ func TestCPUService_TotalUsage(t *testing.T) {
 	}
 }
 
-func TestCPUService_UsageInKernelmode(t *testing.T) {
-	usageOldValuesTest := []uint64{100, 10, 500000050}
-	usageValuesTest := []uint64{3, 500000010, 500000050}
+func TestCPUService_TotalUsageNormalized(t *testing.T) {
+	oldTotalValuesTest := []uint64{100, 50, 10}
+	totalValuesTest := []uint64{2, 500000050, 10}
 	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
 	for index := range statsList {
-		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
-		statsList[index].CPUStats.CPUUsage.UsageInKernelmode = usageValuesTest[index]
+		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.TotalUsage = totalValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
 		given    types.StatsJSON
 		expected float64
 	}{
 		{statsList[0], -1},
-		{statsList[1], 0.50},
+		{statsList[1], 0.5},
+		{statsList[2], 0},
+	}
+	for _, tt := range testCase {
+		usage := cpuUsageFor(tt.given)
+		out := usage.TotalNormalized()
+		if tt.expected != out {
+			t.Errorf("totalUsageNormalized(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.TotalUsage, out, tt.expected)
+		}
+	}
+}
+
+func TestCPUService_UsageInKernelmode(t *testing.T) {
+	usageOldValuesTest := []uint64{100, 10, 500000050}
+	usageValuesTest := []uint64{3, 500000010, 500000050}
+	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInKernelmode = usageValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
+	}
+	testCase := []struct {
+		given    types.StatsJSON
+		expected float64
+	}{
+		{statsList[0], -1},
+		{statsList[1], 2},
 		{statsList[2], 0},
 	}
 	for _, tt := range testCase {
@@ -134,27 +164,83 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 	}
 }
 
-func TestCPUService_UsageInUsermode(t *testing.T) {
-	usageOldValuesTest := []uint64{0, 1965, 500}
-	usageValuesTest := []uint64{500000000, 325, 1000000500}
+func TestCPUService_UsageInKernelmodeNormalized(t *testing.T) {
+	usageOldValuesTest := []uint64{100, 10, 500000050}
+	usageValuesTest := []uint64{3, 500000010, 500000050}
 	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
 	for index := range statsList {
-		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
-		statsList[index].CPUStats.CPUUsage.UsageInUsermode = usageValuesTest[index]
+		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInKernelmode = usageValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
 		given    types.StatsJSON
 		expected float64
 	}{
-		{statsList[0], 0.50},
+		{statsList[0], -1},
+		{statsList[1], 0.5},
+		{statsList[2], 0},
+	}
+	for _, tt := range testCase {
+		usage := cpuUsageFor(tt.given)
+		out := usage.InKernelModeNormalized()
+		if out != tt.expected {
+			t.Errorf("usageInKernelmodeNormalized(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.UsageInKernelmode, out, tt.expected)
+		}
+	}
+}
+
+func TestCPUService_UsageInUsermode(t *testing.T) {
+	usageOldValuesTest := []uint64{0, 1965, 500}
+	usageValuesTest := []uint64{500000000, 325, 1000000500}
+	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInUsermode = usageValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
+	}
+	testCase := []struct {
+		given    types.StatsJSON
+		expected float64
+	}{
+		{statsList[0], 2},
 		{statsList[1], -1},
-		{statsList[2], 1},
+		{statsList[2], 4},
 	}
 	for _, tt := range testCase {
 		usage := cpuUsageFor(tt.given)
 		out := usage.InUserMode()
 		if out != tt.expected {
 			t.Errorf("usageInUsermode(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.UsageInUsermode, out, tt.expected)
+		}
+	}
+}
+
+func TestCPUService_UsageInUsermodeNormalized(t *testing.T) {
+	usageOldValuesTest := []uint64{0, 1965, 500}
+	usageValuesTest := []uint64{500000000, 325, 1000000500}
+	var statsList = make([]types.StatsJSON, 3)
+	var onlineCPUS = uint32(4)
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInUsermode = usageValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
+	}
+	testCase := []struct {
+		given    types.StatsJSON
+		expected float64
+	}{
+		{statsList[0], 0.5},
+		{statsList[1], -1},
+		{statsList[2], 1},
+	}
+	for _, tt := range testCase {
+		usage := cpuUsageFor(tt.given)
+		out := usage.InUserModeNormalized()
+		if out != tt.expected {
+			t.Errorf("usageInUsermodeNormalized(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.UsageInUsermode, out, tt.expected)
 		}
 	}
 }

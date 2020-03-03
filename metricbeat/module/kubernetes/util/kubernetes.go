@@ -22,12 +22,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kubernetes/apimachinery/pkg/api/resource"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -46,7 +49,6 @@ type Enricher interface {
 type kubernetesConfig struct {
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata bool          `config:"add_metadata"`
-	InCluster   bool          `config:"in_cluster"`
 	KubeConfig  string        `config:"kube_config"`
 	Host        string        `config:"host"`
 	SyncPeriod  time.Duration `config:"sync_period"`
@@ -62,12 +64,14 @@ type enricher struct {
 	isPod              bool
 }
 
+const selector = "kubernetes"
+
 // GetWatcher initializes a kubernetes watcher with the given
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
 	config := kubernetesConfig{
 		AddMetadata: true,
-		InCluster:   true,
+		SyncPeriod:  time.Minute * 10,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -78,7 +82,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		return nil, nil
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +91,16 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		SyncTimeout: config.SyncPeriod,
 	}
 
+	log := logp.NewLogger(selector)
+
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+		options.Node = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
-	return kubernetes.NewWatcher(client, resource, options)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+
+	return kubernetes.NewWatcher(client, resource, options, nil)
 }
 
 // NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
@@ -112,44 +120,58 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.MetaGeneratorConfig{}
+	metaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
-	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
+	cfg, _ := common.NewConfigFrom(&metaConfig)
+
+	metaGen := metadata.NewResourceMetadataGenerator(cfg)
+	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
+			accessor, _ := meta.Accessor(r)
+			id := join(accessor.GetNamespace(), accessor.GetName())
+
 			switch r := r.(type) {
 			case *kubernetes.Pod:
-				m[id] = metaGen.PodMetadata(r)
+				m[id] = podMetaGen.Generate(r)
 
 			case *kubernetes.Node:
 				// Report node allocatable resources to PerfMetrics cache
-				name := r.GetMetadata().GetName()
-				if cpu, ok := r.GetStatus().GetCapacity()["cpu"]; ok {
-					if q, err := resource.ParseQuantity(cpu.GetString_()); err == nil {
+				name := r.GetObjectMeta().GetName()
+				if cpu, ok := r.Status.Capacity["cpu"]; ok {
+					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
 						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
-				if memory, ok := r.GetStatus().GetCapacity()["memory"]; ok {
-					if q, err := resource.ParseQuantity(memory.GetString_()); err == nil {
+				if memory, ok := r.Status.Capacity["memory"]; ok {
+					if q, err := resource.ParseQuantity(memory.String()); err == nil {
 						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
-				m[id] = metaGen.ResourceMetadata(r)
+				m[id] = metaGen.Generate("node", r)
 
+			case *kubernetes.Deployment:
+				m[id] = metaGen.Generate("deployment", r)
+			case *kubernetes.StatefulSet:
+				m[id] = metaGen.Generate("statefulset", r)
+			case *kubernetes.Namespace:
+				m[id] = metaGen.Generate("namespace", r)
+			case *kubernetes.ReplicaSet:
+				m[id] = metaGen.Generate("replicaset", r)
 			default:
-				m[id] = metaGen.ResourceMetadata(r)
+				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
+			accessor, _ := meta.Accessor(r)
+			id := join(accessor.GetNamespace(), accessor.GetName())
 			delete(m, id)
 		},
 		// index
@@ -183,43 +205,45 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.MetaGeneratorConfig{}
+	metaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
-	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
+	cfg, _ := common.NewConfigFrom(&metaConfig)
+
+	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
-			meta := metaGen.PodMetadata(pod)
+			meta := metaGen.Generate(pod)
 
-			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
-				cuid := ContainerUID(pod.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
+				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 
 				// Report container limits to PerfMetrics cache
-				if cpu, ok := container.GetResources().GetLimits()["cpu"]; ok {
-					if q, err := resource.ParseQuantity(cpu.GetString_()); err == nil {
+				if cpu, ok := container.Resources.Limits["cpu"]; ok {
+					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
 						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
-				if memory, ok := container.GetResources().GetLimits()["memory"]; ok {
-					if q, err := resource.ParseQuantity(memory.GetString_()); err == nil {
+				if memory, ok := container.Resources.Limits["memory"]; ok {
+					if q, err := resource.ParseQuantity(memory.String()); err == nil {
 						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
-				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
-			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
-				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
+				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
 			}
 		},
@@ -259,20 +283,20 @@ func buildMetadataEnricher(
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj kubernetes.Resource) {
+		AddFunc: func(obj interface{}) {
 			enricher.Lock()
 			defer enricher.Unlock()
-			update(enricher.metadata, obj)
+			update(enricher.metadata, obj.(kubernetes.Resource))
 		},
-		UpdateFunc: func(obj kubernetes.Resource) {
+		UpdateFunc: func(obj interface{}) {
 			enricher.Lock()
 			defer enricher.Unlock()
-			update(enricher.metadata, obj)
+			update(enricher.metadata, obj.(kubernetes.Resource))
 		},
-		DeleteFunc: func(obj kubernetes.Resource) {
+		DeleteFunc: func(obj interface{}) {
 			enricher.Lock()
 			defer enricher.Unlock()
-			delete(enricher.metadata, obj)
+			delete(enricher.metadata, obj.(kubernetes.Resource))
 		},
 	})
 

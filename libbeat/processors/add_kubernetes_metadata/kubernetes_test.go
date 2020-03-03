@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Test metadata updates don't replace existing pod metrics
@@ -42,6 +42,7 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		kubernetesAvailable: true,
 	}
 
 	processor.cache.set("foo", common.MapStr{
@@ -85,4 +86,43 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 			},
 		},
 	}, event.Fields)
+}
+
+// Test metadata are not included in the event
+func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"lookup_fields": []string{"kubernetes.pod.name"},
+	})
+	matcher, err := NewFieldMatcher(*cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	processor := kubernetesAnnotator{
+		cache: newCache(10 * time.Second),
+		matchers: &Matchers{
+			matchers: []Matcher{matcher},
+		},
+		kubernetesAvailable: false,
+	}
+
+	intialEventMap := common.MapStr{
+		"kubernetes": common.MapStr{
+			"pod": common.MapStr{
+				"name": "foo",
+				"id":   "pod_id",
+				"metrics": common.MapStr{
+					"a": 1,
+					"b": 2,
+				},
+			},
+		},
+	}
+
+	event, err := processor.Run(&beat.Event{
+		Fields: intialEventMap.Clone(),
+	})
+	assert.NoError(t, err)
+
+	assert.Equal(t, intialEventMap, event.Fields)
 }

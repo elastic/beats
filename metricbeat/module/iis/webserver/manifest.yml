@@ -1,0 +1,163 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  defaults:
+    perfmon.group_measurements_by_instance: true
+    perfmon.ignore_non_existent_counters: true
+    perfmon.group_all_counter: "worker_process_count"
+    perfmon.counters:
+    #network
+    - instance_label: ''
+      measurement_label: network.total_bytes_received
+      query: '\Web Service(_Total)\Total Bytes Received'
+    - instance_label: ''
+      measurement_label: network.total_bytes_sent
+      query: '\Web Service(_Total)\Total Bytes Sent'
+    - instance_label: ''
+      measurement_label: network.bytes_sent_per_sec
+      query: '\Web Service(_Total)\Bytes Sent/sec'
+    - instance_label: ''
+      measurement_label: network.bytes_received_per_sec
+      query: '\Web Service(_Total)\Bytes Received/sec'
+    - instance_label: ''
+      measurement_label: network.current_connections
+      query: '\Web Service(_Total)\Current Connections'
+    - instance_label: ''
+      measurement_label: network.maximum_connections
+      query: '\Web Service(_Total)\Maximum Connections'
+    - instance_label: ''
+      measurement_label: network.total_connection_attempts
+      query: '\Web Service(_Total)\Total Connection Attempts (all instances)'
+    - instance_label: ''
+      measurement_label: network.total_get_requests
+      query: '\Web Service(_Total)\Total Get Requests'
+    - instance_label: ''
+      measurement_label: network.get_requests_per_sec
+      query: '\Web Service(_Total)\Get Requests/sec'
+    - instance_label: ''
+      measurement_label: network.total_post_requests
+      query: '\Web Service(_Total)\Total Post Requests'
+    - instance_label: ''
+      measurement_label: network.post_requests_per_sec
+      query: '\Web Service(_Total)\Post Requests/sec'
+    - instance_label: ''
+      measurement_label: network.total_delete_requests
+      query: '\Web Service(_Total)\Total Delete Requests'
+    - instance_label: ''
+      measurement_label: network.delete_requests_per_sec
+      query: '\Web Service(_Total)\Delete Requests/sec'
+    - instance_label: ''
+      measurement_label: network.service_uptime
+      query: '\Web Service(_Total)\Service Uptime'
+    - instance_label: ''
+      measurement_label: network.current_anonymous_users
+      query: '\Web Service(_Total)\Current Anonymous Users'
+    - instance_label: ''
+      measurement_label: network.current_nonanonymous_users
+      query: '\Web Service(_Total)\Current NonAnonymous Users'
+    - instance_label: ''
+      measurement_label: network.total_anonymous_users
+      query: '\Web Service(_Total)\Total Anonymous Users'
+    - instance_label: ''
+      measurement_label: network.anonymous_users_per_sec
+      query: '\Web Service(_Total)\Anonymous Users/sec'
+    - instance_label: ''
+      measurement_label: network.total_nonanonymous_users
+      query: '\Web Service(_Total)\Total NonAnonymous Users'
+
+    #asp.net
+    - instance_label: ''
+      measurement_label: asp_net_application.errors_per_sec
+      query: '\ASP.NET Applications(__Total__)\Errors Total/Sec'
+    - instance_label: ''
+      measurement_label: asp_net_application.pipeline_instance_count
+      query: '\ASP.NET Applications(__Total__)\Pipeline Instance Count'
+    - instance_label: ''
+      measurement_label: asp_net_application.requests_executing
+      query: '\ASP.NET Applications(__Total__)\Requests Executing'
+    - instance_label: ''
+      measurement_label: asp_net_application.requests_in_application_queue
+      query: '\ASP.NET Applications(__Total__)\Requests in Application Queue'
+      format: 'large'
+    - instance_label: ''
+      measurement_label: asp_net_application.requests_per_sec
+      query: '\ASP.NET Applications(__Total__)\Requests/Sec'
+    - instance_label: ''
+      measurement_label: asp_net.application_restarts
+      query: '\ASP.NET\Application Restarts'
+    - instance_label: ''
+      measurement_label: asp_net.request_wait_time
+      query: '\ASP.NET\Request Wait Time'
+
+    #cache
+    - instance_label: ''
+      measurement_label: cache.current_files_cached
+      query: '\Web Service Cache\Current Files Cached'
+    - instance_label: ''
+      measurement_label: cache.total_files_cached
+      query: '\Web Service Cache\Total Files Cached'
+    - instance_label: ''
+      measurement_label: cache.file_cache_hits
+      query: '\Web Service Cache\File Cache Hits'
+    - instance_label: ''
+      measurement_label: cache.file_cache_misses
+      query: '\Web Service Cache\File Cache Misses'
+    - instance_label: ''
+      measurement_label: cache.current_file_cache_memory_usage
+      query: '\Web Service Cache\Current File Cache Memory Usage'
+    - instance_label: ''
+      measurement_label: cache.maximum_file_cache_memory_usage
+      query: '\Web Service Cache\Maximum File Cache Memory Usage'
+    - instance_label: ''
+      measurement_label: cache.current_uris_cached
+      query: '\Web Service Cache\Current URIs Cached'
+    - instance_label: ''
+      measurement_label: cache.total_uris_cached
+      query: '\Web Service Cache\Total URIs Cached'
+    - instance_label: ''
+      measurement_label: cache.uri_cache_hits
+      query: '\Web Service Cache\URI Cache Hits'
+    - instance_label: ''
+      measurement_label: cache.uri_cache_misses
+      query: '\Web Service Cache\URI Cache Misses'
+    - instance_label: ''
+      measurement_label: cache.output_cache_current_memory_usage
+      query: '\Web Service Cache\Output Cache Current Memory Usage'
+    - instance_label: ''
+      measurement_label: cache.output_cache_current_items
+      query: '\Web Service Cache\Output Cache Current Items'
+    - instance_label: ''
+      measurement_label: cache.output_cache_total_hits
+      query: '\Web Service Cache\Output Cache Total Hits'
+    - instance_label: ''
+      measurement_label: cache.output_cache_total_misses
+      query: '\Web Service Cache\Output Cache Total Misses'
+    #process
+    - instance_label: ''
+      measurement_label: process.cpu_usage_perc
+      query: '\Process(w3wp*)\% Processor Time'
+    - instance_label: ''
+      measurement_label: process.handle_count
+      query: '\Process(w3wp*)\Handle Count'
+    - instance_label: ''
+      measurement_label: process.thread_count
+      query: '\Process(w3wp*)\Thread Count'
+    - instance_label: ''
+      measurement_label: process.working_set
+      query: '\Process(w3wp*)\Working Set'
+    - instance_label: ''
+      measurement_label: process.private_byte
+      query: '\Process(w3wp*)\Private Bytes'
+    - instance_label: ''
+      measurement_label: process.virtual_bytes
+      query: '\Process(w3wp*)\Virtual Bytes'
+    - instance_label: ''
+      measurement_label: process.page_faults_per_Sec
+      query: '\Process(w3wp*)\Page Faults/sec'
+    - instance_label: ''
+      measurement_label: process.io_read_operations_per_sec
+      query: '\Process(w3wp*)\IO Read Operations/sec'
+    - instance_label: ''
+      measurement_label: process.io_write_operations_per_sec
+      query: '\Process(w3wp*)\IO Write Operations/sec'

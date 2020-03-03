@@ -8,6 +8,8 @@ https://httpd.apache.org/[Apache HTTP] server.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
@@ -15,16 +17,6 @@ The +{modulename}+ module was tested with logs from versions 2.2.22 and 2.4.23.
 
 On Windows, the module was tested with Apache HTTP Server installed from the Chocolatey
 repository.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-apache.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -65,6 +57,29 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Virtual Host
+
+See customlog documentation  https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html
+Add %v config in httpd.conf in log section
+["source","sh",subs="attributes"]
+-----
+    # Replace
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    # By
+    LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+-----
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-apache.png[]
 
 :has-dashboards!:
 

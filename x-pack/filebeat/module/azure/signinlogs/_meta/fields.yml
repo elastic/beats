@@ -1,0 +1,157 @@
+- name: signinlogs
+  type: group
+  description: >
+    Fields for Azure sign-in logs.
+  fields:
+    - name: operation_name
+      type: keyword
+      description: >
+        The operation name
+    - name: operation_version
+      type: keyword
+      description: >
+        The operation version
+    - name: tenant_id
+      type: keyword
+      description: >
+        Tenant ID
+    - name: result_signature
+      type: keyword
+      description: >
+        Result signature
+    - name: result_description
+      type: keyword
+      description: >
+        Result description
+    - name: identity
+      type: keyword
+      description: >
+        Identity
+    - name: properties
+      type: group
+      description: >
+        The signin log properties
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ID
+        - name: created_at
+          type: date
+          description: >
+            Created date time
+        - name: user_display_name
+          type: keyword
+          description: >
+            User display name
+        - name: correlation_id
+          type: keyword
+          description: >
+            Correlation ID
+        - name: user_principal_name
+          type: keyword
+          description: >
+            User principal name
+        - name: user_id
+          type: keyword
+          description: >
+            User ID
+        - name: app_id
+          type: keyword
+          description: >
+            App ID
+        - name: app_display_name
+          type: keyword
+          description: >
+            App display name
+        - name: ip_address
+          type: keyword
+          description: >
+            Ip address
+        - name: client_app_used
+          type: keyword
+          description: >
+            Client app used
+        - name: conditional_access_status
+          type: keyword
+          description: >
+            Conditional access status
+        - name: original_request_id
+          type: keyword
+          description: >
+            Original request ID
+        - name: is_interactive
+          type: keyword
+          description: >
+            Is interactive
+        - name: token_issuer_name
+          type: keyword
+          description: >
+            Token issuer name
+        - name: token_issuer_type
+          type: keyword
+          description: >
+            Token issuer type
+        - name: processing_time_ms
+          type: float
+          description: >
+            Processing time in milliseconds
+        - name: risk_detail
+          type: keyword
+          description: >
+            Risk detail
+        - name: risk_level_aggregated
+          type: keyword
+          description: >
+            Risk level aggregated
+        - name: risk_level_during_signin
+          type: keyword
+          description: >
+            Risk level during signIn
+        - name: risk_state
+          type: keyword
+          description: >
+            Risk state
+        - name: resource_display_name
+          type: keyword
+          description: >
+            Resource display name
+        - name: status
+          type: group
+          description: >
+            Status
+          fields:
+            - name: error_code
+              type: keyword
+              description: >
+                Error code
+        - name: device_detail
+          type: group
+          description: >
+            Status
+          fields:
+            - name: device_id
+              type: keyword
+              description: >
+                Device ID
+            - name: operating_system
+              type: keyword
+              description: >
+                Operating system
+            - name: browser
+              type: keyword
+              description: >
+                Browser
+            - name: display_name
+              type: keyword
+              description: >
+                Display name
+            - name: trust_type
+              type: keyword
+              description: >
+                Trust type
+        - name: service_principal_id
+          type: keyword
+          description: >
+            Status
+

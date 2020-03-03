@@ -18,12 +18,15 @@
 package collector
 
 import (
-	"fmt"
+	"regexp"
 
-	"github.com/elastic/beats/libbeat/common"
-	p "github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/pkg/errors"
+	dto "github.com/prometheus/client_model/go"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 const (
@@ -46,34 +49,60 @@ func init() {
 	)
 }
 
+// MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus p.Prometheus
+	prometheus     p.Prometheus
+	includeMetrics []*regexp.Regexp
+	excludeMetrics []*regexp.Regexp
 }
 
+// New creates a new metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := defaultConfig
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
 	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-	}, nil
-}
-
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
-	families, err := m.prometheus.GetFamilies()
-
+	}
+	ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 	if err != nil {
-		reporter.Error(fmt.Errorf("Unable to decode response from prometheus endpoint"))
-		return
+		return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+	}
+	ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to compile include patterns")
 	}
 
+	return ms, nil
+}
+
+// Fetch fetches data and reports it
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	families, err := m.prometheus.GetFamilies()
+
 	eventList := map[string]common.MapStr{}
+	if err != nil {
+		m.addUpEvent(eventList, 0)
+		for _, evt := range eventList {
+			reporter.Event(mb.Event{
+				RootFields: common.MapStr{"prometheus": evt},
+			})
+		}
+		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
+	}
 
 	for _, family := range families {
+		if m.skipFamily(family) {
+			continue
+		}
 		promEvents := getPromEventsFromMetricFamily(family)
 
 		for _, promEvent := range promEvents {
@@ -83,6 +112,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 					"metrics": common.MapStr{},
 				}
 
+				// Add default instance label if not already there
+				if exists, _ := promEvent.labels.HasKey("instance"); !exists {
+					promEvent.labels.Put("instance", m.Host())
+				}
+				// Add default job label if not already there
+				if exists, _ := promEvent.labels.HasKey("job"); !exists {
+					promEvent.labels.Put("job", m.Module().Name())
+				}
 				// Add labels
 				if len(promEvent.labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.labels
@@ -95,10 +132,95 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
+	m.addUpEvent(eventList, 1)
+
 	// Converts hash list to slice
 	for _, e := range eventList {
-		reporter.Event(mb.Event{
+		isOpen := reporter.Event(mb.Event{
 			RootFields: common.MapStr{"prometheus": e},
 		})
+		if !isOpen {
+			break
+		}
 	}
+
+	return nil
+}
+
+func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
+	metricName := "up"
+	if m.skipFamilyName(metricName) {
+		return
+	}
+	upPromEvent := PromEvent{
+		labels: common.MapStr{
+			"instance": m.Host(),
+			"job":      "prometheus",
+		},
+	}
+	eventList[upPromEvent.LabelsHash()] = common.MapStr{
+		"metrics": common.MapStr{
+			"up": up,
+		},
+		"labels": upPromEvent.labels,
+	}
+
+}
+
+func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+	if family == nil {
+		return false
+	}
+	return m.skipFamilyName(*family.Name)
+}
+
+func (m *MetricSet) skipFamilyName(family string) bool {
+	// example:
+	//	include_metrics:
+	//		- node_*
+	//	exclude_metrics:
+	//		- node_disk_*
+	//
+	// This would mean that we want to keep only the metrics that start with node_ prefix but
+	// are not related to disk so we exclude node_disk_* metrics from them.
+
+	// if include_metrics are defined, check if this metric should be included
+	if len(m.includeMetrics) > 0 {
+		if !matchMetricFamily(family, m.includeMetrics) {
+			return true
+		}
+	}
+	// now exclude the metric if it matches any of the given patterns
+	if len(m.excludeMetrics) > 0 {
+		if matchMetricFamily(family, m.excludeMetrics) {
+			return true
+		}
+	}
+	return false
+}
+
+func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
+	var compiledPatterns []*regexp.Regexp
+	compiledPatterns = []*regexp.Regexp{}
+	if patterns != nil {
+		for _, pattern := range *patterns {
+			r, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+			}
+			compiledPatterns = append(compiledPatterns, r)
+		}
+		return compiledPatterns, nil
+	}
+	return []*regexp.Regexp{}, nil
+}
+
+func matchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
+	for _, checkMetric := range matchMetrics {
+		matched := checkMetric.MatchString(family)
+		if matched {
+			return true
+		}
+	}
+	return false
 }

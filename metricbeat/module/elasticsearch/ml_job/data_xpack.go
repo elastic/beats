@@ -25,10 +25,10 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
@@ -49,10 +49,19 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	var errs multierror.Errors
-	for _, job := range jobsArr {
-		job, ok = job.(map[string]interface{})
+	for _, j := range jobsArr {
+		job, ok := j.(map[string]interface{})
 		if !ok {
 			errs = append(errs, fmt.Errorf("job is not a map"))
+			continue
+		}
+
+		if err := elastic.FixTimestampField(job, "data_counts.earliest_record_timestamp"); err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if err := elastic.FixTimestampField(job, "data_counts.latest_record_timestamp"); err != nil {
+			errs = append(errs, err)
 			continue
 		}
 

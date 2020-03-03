@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Format encodes the type of format to report monitoring data in. This
@@ -50,6 +50,7 @@ type config struct {
 type Settings struct {
 	DefaultUsername string
 	Format          Format
+	ClusterUUID     string
 }
 
 type Reporter interface {

@@ -20,7 +20,7 @@ package datastore
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/simulator"
@@ -35,8 +35,8 @@ func TestFetchEventContents(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
-	events, errs := mbtest.ReportingFetchV2Error(f)
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
@@ -85,9 +85,9 @@ func TestData(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

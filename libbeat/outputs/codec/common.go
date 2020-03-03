@@ -20,20 +20,39 @@ package codec
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/dtfmt"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
 	"github.com/elastic/go-structform"
 )
 
+// MakeTimestampEncoder creates encoder function that formats time
+// into RFC3339 representation with UTC timezone in the output.
 func MakeTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {
-	formatter, err := dtfmt.NewFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+	return MakeUTCOrLocalTimestampEncoder(false)
+}
+
+// MakeUTCOrLocalTimestampEncoder creates encoder function that formats time into RFC3339 representation
+// with UTC or local timezone in the output (based on localTime boolean parameter).
+func MakeUTCOrLocalTimestampEncoder(localTime bool) func(*time.Time, structform.ExtVisitor) error {
+	var dtPattern string
+	if localTime {
+		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+	} else {
+		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+	}
+
+	formatter, err := dtfmt.NewFormatter(dtPattern)
 	if err != nil {
 		panic(err)
 	}
 
 	buf := make([]byte, 0, formatter.EstimateSize())
 	return func(t *time.Time, v structform.ExtVisitor) error {
-		tmp, err := formatter.AppendTo(buf, (*t).UTC())
+		outTime := *t
+		if !localTime {
+			outTime = outTime.UTC()
+		}
+		tmp, err := formatter.AppendTo(buf, outTime)
 		if err != nil {
 			return err
 		}
@@ -43,6 +62,8 @@ func MakeTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {
 	}
 }
 
+// MakeBCTimestampEncoder creates encoder function that formats beats common time
+// into RFC3339 representation with UTC timezone in the output.
 func MakeBCTimestampEncoder() func(*common.Time, structform.ExtVisitor) error {
 	enc := MakeTimestampEncoder()
 	return func(t *common.Time, v structform.ExtVisitor) error {

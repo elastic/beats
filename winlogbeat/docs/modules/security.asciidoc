@@ -8,9 +8,66 @@ The security module processes event log records from the Security log.
 
 The module has transformations for the following event IDs:
 
+* 1100 - The event logging service has shut down.
+* 1102 - The audit log was cleared.
+* 1104 - The security log is now full.
+* 1105 - Event log automatic backup.
+* 1108 - The event logging service encountered an error while processing an incoming event published from %1
 * 4624 - An account was successfully logged on.
 * 4625 - An account failed to log on.
+* 4634 - An account was logged off.
+* 4647 - User initiated logoff (interactive logon types).
 * 4648 - A logon was attempted using explicit credentials.
+* 4672 - Special privileges assigned to new logon.
+* 4688 - A new process has been created.
+* 4689 - A process has exited.
+* 4719 - System audit policy was changed.
+* 4720 - A user account was created.
+* 4722 - A user account was enabled.
+* 4723 - An attempt was made to change an account's password.
+* 4724 - An attempt was made to reset an account's password.
+* 4725 - An user account was disabled.
+* 4726 - An user account was deleted.
+* 4727 - A security-enabled global group was created.
+* 4728 - A member was added to a security-enabled global group.
+* 4729 - A member was removed from a security-enabled global group.
+* 4730 - A security-enabled global group was deleted.
+* 4731 - A security-enabled local group was created
+* 4732 - A member was added to a security-enabled local group.
+* 4733 - A member was removed from a security-enabled local group.
+* 4734 - A security-enabled local group was deleted.
+* 4735 - A security-enabled local group was changed.
+* 4737 - A security-enabled global group was changed.
+* 4738 - An user account was changed.
+* 4740 - An user account was locked out.
+* 4741 - A computer account was created.
+* 4742 - A computer account was changed.
+* 4743 - A computer account was deleted.
+* 4744 - A security-disabled local group was created.
+* 4745 - A security-disabled local group was changed.
+* 4746 - A member was added to a security-disabled local group.
+* 4747 - A member was removed from a security-disabled local group.
+* 4748 - A security-disabled local group was deleted.
+* 4749 - A security-disabled global group was created.
+* 4750 - A security-disabled global group was changed.
+* 4751 - A member was added to a security-disabled global group.
+* 4752 - A member was removed from a security-disabled global group.
+* 4753 - A security-disabled global group was deleted.
+* 4754 - A security-enabled universal group was created.
+* 4755 - A security-enabled universal group was changed.
+* 4756 - A member was added to a security-enabled universal group.
+* 4757 - A member was removed from a security-enabled universal group.
+* 4758 - A security-enabled universal group was deleted.
+* 4759 - A security-disabled universal group was created.
+* 4760 - A security-disabled universal group was changed.
+* 4761 - A member was added to a security-disabled universal group.
+* 4762 - A member was removed from a security-disabled universal group.
+* 4763 - A security-disabled global group was deleted.
+* 4764 - A group's type was changed.
+* 4767 - An account was unlocked.
+* 4781 - The name of an account was changed.
+* 4798 - A user's local group membership was enumerated.
+* 4799 - A security-enabled local group membership was enumerated.
 
 More event IDs will be added.
 

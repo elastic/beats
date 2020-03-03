@@ -18,12 +18,14 @@
 package javascript
 
 import (
+	"context"
+	"sync"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -183,4 +185,42 @@ func TestSessionTimeout(t *testing.T) {
 	evt.PutValue("stop", true)
 	_, err = p.Run(evt)
 	assert.NoError(t, err)
+}
+
+func TestSessionParallel(t *testing.T) {
+	const script = `
+		evt.Put("host.name", "workstation");			
+    `
+
+	p, err := NewFromConfig(Config{
+		Source:         header + script + footer,
+		TagOnException: "_js_exception",
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const goroutines = 10
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			defer wg.Done()
+			for ctx.Err() == nil {
+				evt := &beat.Event{
+					Fields: common.MapStr{
+						"host": common.MapStr{"name": "computer"},
+					},
+				}
+				_, err := p.Run(evt)
+				assert.NoError(t, err)
+			}
+		}()
+	}
+
+	time.AfterFunc(time.Second, cancel)
+	wg.Wait()
 }

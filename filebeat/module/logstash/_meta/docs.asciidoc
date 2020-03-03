@@ -8,6 +8,8 @@ and the JSON format (--log.format json). The default is the plain text format.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 The +{modulename}+ module has two filesets:
 
 * The `log` fileset collects and parses the logs that Logstash writes to disk.
@@ -23,19 +25,6 @@ For the `slowlog` fileset, make sure to configure the
 The Logstash `log` fileset was tested with logs from Logstash 5.6 and 6.0.
 
 The Logstash `slowlog` fileset was tested with logs from Logstash 5.6 and 6.0
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-===  Example dashboards
-
-This module comes with two sample dashboards.
-
-[role="screenshot"]
-image::./images/kibana-logstash-log.png[]
-
-[role="screenshot"]
-image::./images/kibana-logstash-slowlog.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -88,6 +77,19 @@ include::../include/var-paths.asciidoc[]
 
 The configured Logstash log format. Possible values are: `json` or `plain`. The
 default is `plain`.
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+===  Example dashboards
+
+This module comes with two sample dashboards.
+
+[role="screenshot"]
+image::./images/kibana-logstash-log.png[]
+
+[role="screenshot"]
+image::./images/kibana-logstash-slowlog.png[]
 
 :has-dashboards!:
 

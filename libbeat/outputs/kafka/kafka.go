@@ -19,18 +19,16 @@ package kafka
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
-	gometrics "github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 const (
@@ -39,12 +37,11 @@ const (
 	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
 	// not return ErrTempBulkFailure
 	defaultMaxWaitRetry = 60 * time.Second
+
+	debugSelector = "kafka"
 )
 
-var kafkaMetricsOnce sync.Once
-var kafkaMetricsRegistryInstance gometrics.Registry
-
-var debugf = logp.MakeDebug("kafka")
+var debugf = logp.MakeDebug(debugSelector)
 
 var (
 	errNoTopicSet = errors.New("No topic configured")
@@ -54,19 +51,7 @@ var (
 func init() {
 	sarama.Logger = kafkaLogger{}
 
-	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
-
-	// Note: registers /debug/metrics handler for displaying all expvar counters
-	// TODO: enable
-	//exp.Exp(reg)
-
-	kafkaMetricsRegistryInstance = reg
-
 	outputs.RegisterType("kafka", makeKafka)
-}
-
-func kafkaMetricsRegistry() gometrics.Registry {
-	return kafkaMetricsRegistryInstance
 }
 
 func makeKafka(

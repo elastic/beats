@@ -7,10 +7,10 @@ The +{modulename}+ module parses error logs created by MSSQL.
 
 include::../include/what-happens.asciidoc[]
 
-[float]
-=== Compatibility
+include::../include/gs-link.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
+//[float]
+//=== Compatibility
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -42,6 +42,8 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

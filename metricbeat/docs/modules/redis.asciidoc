@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-redis]]
@@ -33,8 +33,8 @@ redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
 [float]
 === Compatibility
 
-The Redis metricsets were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4,  and are expected
-to work with all versions >= 3.0.
+The redis metricsets `info`, `key` and `keyspace` are compatible with all distributions of Redis (OSS and enterprise).
+They were tested with Redis 3.2.12, 4.0.11 and 5.0-rc4, and are expected to work with all versions >= 3.0.
 
 
 [float]

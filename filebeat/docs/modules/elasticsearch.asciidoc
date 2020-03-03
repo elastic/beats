@@ -14,14 +14,12 @@ This is the elasticsearch module.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The Elasticsearch module is compatible with Elasticsearch 6.2 and newer.
-
-
-include::../include/running-modules.asciidoc[]
-
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -122,6 +120,8 @@ Example config:
 NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
 `var.paths` setting to point to JSON logs. Otherwise, configure it
 to point to plain text logs.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

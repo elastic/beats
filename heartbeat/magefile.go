@@ -27,14 +27,29 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/generator/common/beatgen"
+	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
 	devtools.BeatServiceName = "heartbeat-elastic"
+}
+
+// VendorUpdate updates elastic/beats/v7 in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
 // Build builds the Beat binary.
@@ -68,11 +83,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -104,18 +114,21 @@ func Fields() error {
 	return devtools.GenerateFieldsYAML("monitors/active")
 }
 
+// Imports generates an include/list.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	options := devtools.DefaultIncludeListOptions()
+	options.ModuleDirs = []string{"monitors"}
+	options.Outfile = "monitors/defaults/default.go"
+	options.Pkg = "defaults"
+	return devtools.GenerateIncludeListGo(options)
+}
+
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 func customizePackaging() {

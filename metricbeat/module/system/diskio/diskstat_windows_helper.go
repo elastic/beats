@@ -20,15 +20,16 @@
 package diskio
 
 import (
+	"strings"
 	"syscall"
 	"unsafe"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/disk"
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/shirou/gopsutil/disk"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -38,10 +39,9 @@ const (
 )
 
 var (
-	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
+	modkernel32                 = windows.NewLazySystemDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
 	procGetDriveTypeW           = modkernel32.NewProc("GetDriveTypeW")
-	logger                      = logp.NewLogger("diskio")
 )
 
 type logicalDrive struct {
@@ -50,10 +50,13 @@ type logicalDrive struct {
 }
 
 type diskPerformance struct {
-	BytesRead           int64
-	BytesWritten        int64
-	ReadTime            int64
-	WriteTime           int64
+	BytesRead    int64
+	BytesWritten int64
+	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
+	ReadTime int64
+	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
+	WriteTime int64
+	//Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
 	IdleTime            int64
 	ReadCount           uint32
 	WriteCount          uint32
@@ -86,7 +89,8 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 		var counter diskPerformance
 		err = ioCounter(drive.UNCPath, &counter)
 		if err != nil {
-			return nil, err
+			logp.Err("Could not return any performance counter values for %s .Error: %v", drive.UNCPath, err)
+			continue
 		}
 		ret[drive.Name] = disk.IOCountersStat{
 			Name:       drive.Name,
@@ -94,8 +98,9 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 			WriteCount: uint64(counter.WriteCount),
 			ReadBytes:  uint64(counter.BytesRead),
 			WriteBytes: uint64(counter.BytesWritten),
-			ReadTime:   uint64(counter.ReadTime),
-			WriteTime:  uint64(counter.WriteTime),
+			// Ticks (which is equal to 100 nanoseconds) will be converted to milliseconds for consistency reasons for both ReadTime and WriteTime (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.ticks?redirectedfrom=MSDN&view=netframework-4.8#remarks)
+			ReadTime:  uint64(counter.ReadTime / 10000),
+			WriteTime: uint64(counter.WriteTime / 10000),
 		}
 	}
 	return ret, nil
@@ -133,6 +138,16 @@ func ioCounter(path string, diskPerformance *diskPerformance) error {
 // enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
 func enablePerformanceCounters() error {
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\partmgr", registry.READ|registry.WRITE)
+	// closing handler for the registry key. If the key is not one of the predefined registry keys (which is the case here), a call the RegCloseKey function should be executed after using the handle.
+	defer func() {
+		if key != 0 {
+			clErr := key.Close()
+			if clErr != nil {
+				logp.L().Named("diskio").Errorf("cannot close handler for HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry: %s", clErr)
+			}
+		}
+	}()
+
 	if err != nil {
 		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
 	}
@@ -141,8 +156,9 @@ func enablePerformanceCounters() error {
 		if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
 			return errors.Errorf("cannot create HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
 		}
-		logger.Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
+		logp.L().Named("diskio").Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
+
 	return nil
 }
 
@@ -220,9 +236,40 @@ func isValidLogicalDrive(path string) bool {
 	}
 	ret, _, err := syscall.Syscall(procGetDriveTypeW.Addr(), 1, uintptr(unsafe.Pointer(utfPath)), 0, 0)
 
-	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5
-	if ret == 1 || ret == 5 || err != errorSuccess {
+	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5 DRIVE_UNKNOWN = 0 DRIVE_RAMDISK = 6
+	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess {
+		return false
+	}
+
+	//check for ramdisk label as the drive type is fixed in this case
+	volumeLabel, err := GetVolumeLabel(utfPath)
+	if err != nil {
+		return false
+	}
+	if strings.ToLower(volumeLabel) == "ramdisk" {
 		return false
 	}
 	return true
+}
+
+// GetVolumeLabel function will retrieve the volume label
+func GetVolumeLabel(path *uint16) (string, error) {
+	lpVolumeNameBuffer := make([]uint16, 256)
+	lpVolumeSerialNumber := uint32(0)
+	lpMaximumComponentLength := uint32(0)
+	lpFileSystemFlags := uint32(0)
+	lpFileSystemNameBuffer := make([]uint16, 256)
+	err := windows.GetVolumeInformation(
+		path,
+		&lpVolumeNameBuffer[0],
+		uint32(len(lpVolumeNameBuffer)),
+		&lpVolumeSerialNumber,
+		&lpMaximumComponentLength,
+		&lpFileSystemFlags,
+		&lpFileSystemNameBuffer[0],
+		uint32(len(lpFileSystemNameBuffer)))
+	if err != nil {
+		return "", err
+	}
+	return syscall.UTF16ToString(lpVolumeNameBuffer), nil
 }

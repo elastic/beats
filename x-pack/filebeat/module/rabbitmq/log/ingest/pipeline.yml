@@ -11,16 +11,18 @@ processors:
       %{GREEDYMULTILINE:message}"
     ignore_missing: true
 - date:
+    if: "ctx.event.timezone == null"
     field: timestamp
     target_field: "@timestamp"
     formats:
     - yy-MM-dd HH:mm:ss.SSS
-    ignore_failure: true
 - date:
     if: "ctx.event.timezone != null"
-    field: "@timestamp"
-    formats: ["ISO8601"]
+    field: "timestamp"
+    target_field: "@timestamp"
     timezone: "{{ event.timezone }}"
+    formats:
+    - yy-MM-dd HH:mm:ss.SSS
 - remove:
     field:
     - timestamp

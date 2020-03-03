@@ -2,6 +2,8 @@
 from filebeat import BaseTest
 import io
 import os
+import unittest
+import sys
 
 """
 Contains tests for filtering.
@@ -210,17 +212,17 @@ class Test(BaseTest):
         )
 
         self._init_and_read_test_input([
-            u"This is my super long line\n",
-            u"This is an even longer long line\n",
-            u"A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
-            u"This is OK\n",
+            "This is my super long line\n",
+            "This is an even longer long line\n",
+            "A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
+            "This is OK\n",
         ])
 
         self._assert_expected_lines([
-            u"This is my",
-            u"This is an",
-            u"A végreha",
-            u"This is OK",
+            "This is my",
+            "This is an",
+            "A végreha",
+            "This is OK",
         ])
 
     def test_truncate_characters(self):
@@ -238,15 +240,15 @@ class Test(BaseTest):
         )
 
         self._init_and_read_test_input([
-            u"This is my super long line\n",
-            u"A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
-            u"This is OK\n",
+            "This is my super long line\n",
+            "A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
+            "This is OK\n",
         ])
 
         self._assert_expected_lines([
-            u"This is my",
-            u"A végrehaj",
-            u"This is OK",
+            "This is my",
+            "A végrehaj",
+            "This is OK",
         ])
 
     def test_decode_csv_fields_defaults(self):
@@ -265,8 +267,8 @@ class Test(BaseTest):
         )
 
         self._init_and_read_test_input([
-            u"42,\"string with \"\"quotes\"\"\"\n",
-            u",\n"
+            "42,\"string with \"\"quotes\"\"\"\n",
+            ",\n"
         ])
 
         self._assert_expected_lines([
@@ -293,11 +295,47 @@ class Test(BaseTest):
         )
 
         self._init_and_read_test_input([
-            u" 42\t hello world\t  \"string\twith tabs and \"broken\" quotes\"\n",
+            " 42\t hello world\t  \"string\twith tabs and \"broken\" quotes\"\n",
         ])
 
         self._assert_expected_lines([
             ["42", "hello world", "string\twith tabs and \"broken\" quotes"],
+        ])
+
+    def test_javascript_processor_add_host_metadata(self):
+        """
+        Check JS processor with add_host_metadata
+        """
+
+        self._test_javascript_processor_with_source("""\'var processor = require("processor");
+var addHostMetadata = new processor.AddHostMetadata({"netinfo.enabled": true});
+
+function process(evt) {
+    addHostMetadata.Run(evt);
+}\'
+""")
+
+        output = self.read_output()
+        for evt in output:
+            assert "host.hostname" in evt
+
+    def _test_javascript_processor_with_source(self, script_source):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[
+                {
+                    "script": {
+                        "lang": "javascript",
+                        "source": script_source,
+                    },
+                },
+            ]
+        )
+
+        self._init_and_read_test_input([
+            "test line 1\n",
+            "test line 2\n",
+            "test line 3\n",
         ])
 
     def _init_and_read_test_input(self, input_lines):

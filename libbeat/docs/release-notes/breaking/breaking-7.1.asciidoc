@@ -1,0 +1,14 @@
+[[breaking-changes-7.1]]
+
+=== Breaking changes in 7.1
+++++
+<titleabbrev>7.1</titleabbrev>
+++++
+{see-relnotes}
+
+//NOTE: The notable-breaking-changes tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+//tag::notable-breaking-changes[]
+
+// end::notable-breaking-changes[]

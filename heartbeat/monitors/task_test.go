@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"testing"
 
 	"github.com/elastic/go-lookslike/validator"
@@ -27,10 +28,10 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func Test_runPublishJob(t *testing.T) {
@@ -102,7 +103,7 @@ func Test_runPublishJob(t *testing.T) {
 				}
 				tf := queue[0]
 				queue = queue[1:]
-				conts := tf()
+				conts := tf(context.Background())
 				for _, cont := range conts {
 					queue = append(queue, cont)
 				}

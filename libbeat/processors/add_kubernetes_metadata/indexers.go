@@ -21,9 +21,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -58,10 +60,10 @@ type Indexers struct {
 }
 
 // IndexerConstructor builds a new indexer from its settings
-type IndexerConstructor func(config common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error)
+type IndexerConstructor func(config common.Config, metaGen metadata.MetaGen) (Indexer, error)
 
 // NewIndexers builds indexers object
-func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexers {
+func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
@@ -125,20 +127,20 @@ func (i *Indexers) Empty() bool {
 
 // PodNameIndexer implements default indexer based on pod name
 type PodNameIndexer struct {
-	metaGen kubernetes.MetaGenerator
+	metaGen metadata.MetaGen
 }
 
 // NewPodNameIndexer initializes and returns a PodNameIndexer
-func NewPodNameIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error) {
+func NewPodNameIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
 	return &PodNameIndexer{metaGen: metaGen}, nil
 }
 
 // GetMetadata returns metadata for the given pod, if it matches the index
 func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	data := p.metaGen.PodMetadata(pod)
+	data := p.metaGen.Generate(pod)
 	return []MetadataIndex{
 		{
-			Index: fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName()),
+			Index: fmt.Sprintf("%s/%s", pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName()),
 			Data:  data,
 		},
 	}
@@ -146,25 +148,25 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodNameIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName())}
+	return []string{fmt.Sprintf("%s/%s", pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName())}
 }
 
 // PodUIDIndexer indexes pods based on the pod UID
 type PodUIDIndexer struct {
-	metaGen kubernetes.MetaGenerator
+	metaGen metadata.MetaGen
 }
 
 // NewPodUIDIndexer initializes and returns a PodUIDIndexer
-func NewPodUIDIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error) {
+func NewPodUIDIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
 	return &PodUIDIndexer{metaGen: metaGen}, nil
 }
 
 // GetMetadata returns the composed metadata from PodNameIndexer and the pod UID
 func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	data := p.metaGen.PodMetadata(pod)
+	data := p.metaGen.Generate(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.GetUid(),
+			Index: string(pod.GetObjectMeta().GetUID()),
 			Data:  data,
 		},
 	}
@@ -172,34 +174,35 @@ func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodUIDIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{pod.Metadata.GetUid()}
+	return []string{string(pod.GetObjectMeta().GetUID())}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
 type ContainerIndexer struct {
-	metaGen kubernetes.MetaGenerator
+	metaGen metadata.MetaGen
 }
 
 // NewContainerIndexer initializes and returns a ContainerIndexer
-func NewContainerIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error) {
+func NewContainerIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
 	return &ContainerIndexer{metaGen: metaGen}, nil
 }
 
 // GetMetadata returns the composed metadata list from all registered indexers
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	var metadata []MetadataIndex
+	var m []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
 		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
 		}
-		metadata = append(metadata, MetadataIndex{
+		m = append(m, MetadataIndex{
 			Index: cID,
-			Data:  c.metaGen.ContainerMetadata(pod, status.GetName()),
+			Data: c.metaGen.Generate(pod, metadata.WithFields("container.name", status.Name),
+				metadata.WithFields("container.image", status.Image)),
 		})
 	}
 
-	return metadata
+	return m
 }
 
 // GetIndexes returns the indexes for the given Pod
@@ -217,60 +220,61 @@ func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 
 // IPPortIndexer indexes pods based on all their host:port combinations
 type IPPortIndexer struct {
-	metaGen kubernetes.MetaGenerator
+	metaGen metadata.MetaGen
 }
 
 // NewIPPortIndexer creates and returns a new indexer for pod IP & ports
-func NewIPPortIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error) {
+func NewIPPortIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
 	return &IPPortIndexer{metaGen: metaGen}, nil
 }
 
 // GetMetadata returns metadata for the given pod, if it matches the index
 func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	var metadata []MetadataIndex
+	var m []MetadataIndex
 
-	if pod.Status.GetPodIP() == "" {
-		return metadata
+	if pod.Status.PodIP == "" {
+		return m
 	}
 
 	// Add pod IP
-	metadata = append(metadata, MetadataIndex{
-		Index: pod.Status.GetPodIP(),
-		Data:  h.metaGen.PodMetadata(pod),
+	m = append(m, MetadataIndex{
+		Index: pod.Status.PodIP,
+		Data:  h.metaGen.Generate(pod),
 	})
 
 	for _, container := range pod.Spec.Containers {
 		for _, port := range container.Ports {
-			if port.GetContainerPort() != 0 {
+			if port.ContainerPort != 0 {
 
-				metadata = append(metadata, MetadataIndex{
-					Index: fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()),
-					Data:  h.metaGen.ContainerMetadata(pod, container.GetName()),
+				m = append(m, MetadataIndex{
+					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
+					Data: h.metaGen.Generate(pod, metadata.WithFields("container.name", container.Name),
+						metadata.WithFields("container.image", container.Image)),
 				})
 			}
 		}
 	}
 
-	return metadata
+	return m
 }
 
 // GetIndexes returns the indexes for the given Pod
 func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var hostPorts []string
 
-	if pod.Status.GetPodIP() == "" {
+	if pod.Status.PodIP == "" {
 		return hostPorts
 	}
 
 	// Add pod IP
-	hostPorts = append(hostPorts, pod.Status.GetPodIP())
+	hostPorts = append(hostPorts, pod.Status.PodIP)
 
 	for _, container := range pod.Spec.Containers {
 		ports := container.Ports
 
 		for _, port := range ports {
-			if port.GetContainerPort() != 0 {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()))
+			if port.ContainerPort != 0 {
+				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort))
 			}
 		}
 	}

@@ -19,11 +19,11 @@ package metrics
 
 import (
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
-
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 )
 
 func init() {
@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to retrieve serverStatus")
 	}
 
-	data, err := schema.Apply(result)
+	data, err := schemaMetrics.Apply(result, schema.FailOnRequired)
 	if err != nil {
 		return errors.Wrap(err, "failed to apply schema")
 	}

@@ -18,8 +18,8 @@
 package scheduler
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -36,11 +36,11 @@ func init() {
 			"http_requests_total":                prometheus.Metric("http.request.count"),
 			"rest_client_requests_total":         prometheus.Metric("client.request.count"),
 			"leader_election_master_status":      prometheus.BooleanMetric("leader.is_master"),
-			"scheduler_e2e_scheduling_duration_seconds": prometheus.Metric("scheduler.e2e.duration.us",
+			"scheduler_e2e_scheduling_duration_seconds": prometheus.Metric("scheduling.e2e.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
-			"scheduler_pod_preemption_victims":      prometheus.Metric("scheduler.pod.preemption.victims.count"),
-			"scheduler_schedule_attempts_total":     prometheus.Metric("scheduler.pod.attempts.count"),
-			"scheduler_scheduling_duration_seconds": prometheus.Metric("scheduler.duration.seconds"),
+			"scheduler_pod_preemption_victims":      prometheus.Metric("scheduling.pod.preemption.victims.count"),
+			"scheduler_schedule_attempts_total":     prometheus.Metric("scheduling.pod.attempts.count"),
+			"scheduler_scheduling_duration_seconds": prometheus.Metric("scheduling.duration.seconds"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{

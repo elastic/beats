@@ -18,8 +18,10 @@
 package logstash
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 )
 
 func makeLogstashEventEncoder(info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
@@ -27,6 +29,7 @@ func makeLogstashEventEncoder(info beat.Info, escapeHTML bool, index string) fun
 		Pretty:     false,
 		EscapeHTML: escapeHTML,
 	})
+	index = strings.ToLower(index)
 	return func(event interface{}) (d []byte, err error) {
 		d, err = enc.Encode(index, event.(*beat.Event))
 		if err != nil {

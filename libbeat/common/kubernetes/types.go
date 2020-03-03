@@ -21,20 +21,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ericchiang/k8s"
-	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
-	"github.com/ericchiang/k8s/apis/core/v1"
-	extv1 "github.com/ericchiang/k8s/apis/extensions/v1beta1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func init() {
-	k8s.Register("", "v1", "events", true, &v1.Event{})
-	k8s.RegisterList("", "v1", "events", true, &v1.EventList{})
-}
-
 // Resource data
-type Resource = k8s.Resource
+type Resource = runtime.Object
 
 // ObjectMeta data
 type ObjectMeta = metav1.ObjectMeta
@@ -50,6 +44,9 @@ type PodStatus = v1.PodStatus
 
 // Node data
 type Node = v1.Node
+
+// Namespace data
+type Namespace = v1.Namespace
 
 // Container data
 type Container = v1.Container
@@ -67,25 +64,28 @@ type PodContainerStatus = v1.ContainerStatus
 type Deployment = appsv1.Deployment
 
 // ReplicaSet data
-type ReplicaSet = extv1.ReplicaSet
+type ReplicaSet = appsv1.ReplicaSet
 
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
 
+// Service data
+type Service = v1.Service
+
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {
-	return time.Unix(t.GetSeconds(), int64(t.GetNanos()))
+	return t.Time
 }
 
 // ContainerID parses the container ID to get the actual ID string
-func ContainerID(s *PodContainerStatus) string {
+func ContainerID(s PodContainerStatus) string {
 	cID, _ := ContainerIDWithRuntime(s)
 	return cID
 }
 
 // ContainerIDWithRuntime parses the container ID to get the actual ID string
-func ContainerIDWithRuntime(s *PodContainerStatus) (string, string) {
-	cID := s.GetContainerID()
+func ContainerIDWithRuntime(s PodContainerStatus) (string, string) {
+	cID := s.ContainerID
 	if cID != "" {
 		parts := strings.Split(cID, "://")
 		if len(parts) == 2 {

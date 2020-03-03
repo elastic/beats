@@ -4,10 +4,14 @@
     virtualmachine
   release: beta
   fields:
-    - name: host
+    - name: host.id
       type: keyword
       description: >
-        Host name
+        Host id
+    - name: host.hostname
+      type: keyword
+      description: >
+        Host name of the host
     - name: name
       type: keyword
       description: >

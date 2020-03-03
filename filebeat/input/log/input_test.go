@@ -29,13 +29,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 func TestInputFileExclude(t *testing.T) {
@@ -147,13 +147,13 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 		"close_eof": true,
 	})
 
-	events := make(chan *util.Data, 100)
+	events := make(chan beat.Event, 100)
 	defer close(events)
 	capturer := NewEventCapturer(events)
 	defer capturer.Close()
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(capturer), nil
-	}
+	})
 
 	input, err := NewInput(config, connector, context)
 	if err != nil {
@@ -169,7 +169,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	for {
 		select {
 		case event := <-events:
-			if state := event.GetState(); state.Finished {
+			if state, ok := event.Private.(file.State); ok && state.Finished {
 				assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
 				go func() {
 					closer(context, input.(*Input))
@@ -192,9 +192,9 @@ func TestNewInputDone(t *testing.T) {
 		"paths": path.Join(os.TempDir(), "logs", "*.log"),
 	})
 
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return TestOutlet{}, nil
-	}
+	})
 
 	context := input.Context{
 		Done: make(chan struct{}),
@@ -212,9 +212,9 @@ func TestNewInputError(t *testing.T) {
 
 	config := common.NewConfig()
 
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return TestOutlet{}, nil
-	}
+	})
 
 	context := input.Context{}
 
@@ -292,17 +292,17 @@ type eventCapturer struct {
 	closed    bool
 	c         chan struct{}
 	closeOnce sync.Once
-	events    chan *util.Data
+	events    chan beat.Event
 }
 
-func NewEventCapturer(events chan *util.Data) channel.Outleter {
+func NewEventCapturer(events chan beat.Event) channel.Outleter {
 	return &eventCapturer{
 		c:      make(chan struct{}),
 		events: events,
 	}
 }
 
-func (o *eventCapturer) OnEvent(event *util.Data) bool {
+func (o *eventCapturer) OnEvent(event beat.Event) bool {
 	o.events <- event
 	return true
 }
@@ -322,6 +322,6 @@ func (o *eventCapturer) Done() <-chan struct{} {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
+func (o TestOutlet) OnEvent(event beat.Event) bool { return true }
 func (o TestOutlet) Close() error                  { return nil }
 func (o TestOutlet) Done() <-chan struct{}         { return nil }

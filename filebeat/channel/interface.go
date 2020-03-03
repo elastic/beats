@@ -18,20 +18,23 @@
 package channel
 
 import (
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Factory is used to create a new Outlet instance
-type Factory func(beat.Pipeline, *common.Config, *common.MapStrPointer) (Outleter, error)
+type Factory func(beat.Pipeline) Connector
 
 // Connector creates an Outlet connecting the event publishing with some internal pipeline.
-type Connector func(*common.Config, *common.MapStrPointer) (Outleter, error)
+// type Connector func(*common.Config, *common.MapStrPointer) (Outleter, error)
+type Connector interface {
+	Connect(*common.Config) (Outleter, error)
+	ConnectWith(*common.Config, beat.ClientConfig) (Outleter, error)
+}
 
 // Outleter is the outlet for an input
 type Outleter interface {
 	Close() error
 	Done() <-chan struct{}
-	OnEvent(data *util.Data) bool
+	OnEvent(beat.Event) bool
 }

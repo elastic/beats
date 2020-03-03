@@ -4,4 +4,14 @@ the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The de
 [float]
 === Compatibility
 
-The Ceph module is tested with Ceph Jewel (10.2.10).
+The Ceph module is tested with Ceph Jewel (10.2.10) and Ceph Nautilus (14.2.7).
+
+Metricsets with the `mgr_` prefix are compatible with Ceph releases using the Ceph Manager Daemon.
+
+[float]
+=== Dashboard
+
+The Ceph module comes with a predefined dashboard showing Ceph cluster related metrics. For example:
+
+image::./images/ceph-overview-dashboard.png[]
+

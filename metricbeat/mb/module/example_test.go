@@ -25,12 +25,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/module"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 )
 
 // ExampleWrapper demonstrates how to create a single Wrapper
@@ -101,7 +101,8 @@ func ExampleWrapper() {
 	//     }
 	//   },
 	//   "metricset": {
-	//     "name": "eventfetcher"
+	//     "name": "eventfetcher",
+	//     "period": 10000
 	//   },
 	//   "service": {
 	//     "type": "fake"
@@ -131,7 +132,7 @@ func ExampleRunner() {
 		return
 	}
 
-	connector, err := module.NewConnector(b.Publisher, config, nil)
+	connector, err := module.NewConnector(b.Info, b.Publisher, config, nil)
 	if err != nil {
 		return
 	}

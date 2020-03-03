@@ -5,9 +5,12 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/packetbeat/cmd"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+	"github.com/elastic/beats/v7/packetbeat/cmd"
+	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 )
+
+// Name of this beat.
+var Name = cmd.Name
 
 // RootCmd to handle beats cli
 var RootCmd = cmd.RootCmd

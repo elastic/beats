@@ -28,8 +28,8 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type partitionBuilder func(*common.Config) (func() partitioner, error)
@@ -127,11 +127,11 @@ func (p *messagePartitioner) Partition(
 	}
 
 	msg.partition = partition
-	event := &msg.data.Content
-	if event.Meta == nil {
-		event.Meta = map[string]interface{}{}
+
+	if _, err := msg.data.Cache.Put("partition", partition); err != nil {
+		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %v", err)
 	}
-	event.Meta["partition"] = partition
+
 	p.partitions = numPartitions
 	return msg.partition, nil
 }

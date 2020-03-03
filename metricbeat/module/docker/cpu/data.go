@@ -18,8 +18,8 @@
 package cpu
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
@@ -30,21 +30,33 @@ func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 
 func eventMapping(r mb.ReporterV2, stats *CPUStats) {
 	fields := common.MapStr{
-		"core": stats.PerCpuUsage,
+		"core": stats.PerCPUUsage,
 		"total": common.MapStr{
 			"pct": stats.TotalUsage,
+			"norm": common.MapStr{
+				"pct": stats.TotalUsageNormalized,
+			},
 		},
 		"kernel": common.MapStr{
 			"ticks": stats.UsageInKernelmode,
 			"pct":   stats.UsageInKernelmodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInKernelmodePercentageNormalized,
+			},
 		},
 		"user": common.MapStr{
 			"ticks": stats.UsageInUsermode,
 			"pct":   stats.UsageInUsermodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInUsermodePercentageNormalized,
+			},
 		},
 		"system": common.MapStr{
 			"ticks": stats.SystemUsage,
 			"pct":   stats.SystemUsagePercentage,
+			"norm": common.MapStr{
+				"pct": stats.SystemUsagePercentageNormalized,
+			},
 		},
 	}
 

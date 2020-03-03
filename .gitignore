@@ -10,6 +10,7 @@
 *beat/build
 *beat/logs
 *beat/data
+x-pack/functionbeat/pkg
 
 # Files
 .DS_Store
@@ -21,6 +22,9 @@ coverage.out
 beat.db
 *.keystore
 mage_output_file.go
+x-pack/functionbeat/*/fields.yml
+x-pack/functionbeat/provider/*/functionbeat-*
+x-pack/dockerlogbeat/temproot.tar
 
 # Editor swap files
 *.swp

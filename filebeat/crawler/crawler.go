@@ -21,17 +21,17 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/registrar"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	_ "github.com/elastic/beats/filebeat/include"
+	_ "github.com/elastic/beats/v7/filebeat/include"
 )
 
 type Crawler struct {
@@ -117,7 +117,7 @@ func (c *Crawler) startInput(
 		return nil
 	}
 
-	connector := channel.ConnectTo(pipeline, c.out)
+	connector := c.out(pipeline)
 	p, err := input.New(config, connector, c.beatDone, states, nil)
 	if err != nil {
 		return fmt.Errorf("Error while initializing input: %s", err)

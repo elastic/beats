@@ -20,26 +20,63 @@
 package elasticsearch
 
 import (
+	"context"
+	"io/ioutil"
 	"math/rand"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/internal"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 func TestClientConnect(t *testing.T) {
 	client := getTestingElasticsearch(t)
 	err := client.Connect()
 	assert.NoError(t, err)
+}
+
+func TestClientConnectWithProxy(t *testing.T) {
+	wrongPort, err := net.Listen("tcp", "localhost:0")
+	require.NoError(t, err)
+	go func() {
+		c, err := wrongPort.Accept()
+		if err == nil {
+			// Provoke an early-EOF error on client
+			c.Close()
+		}
+	}()
+	defer wrongPort.Close()
+
+	proxy := startTestProxy(t, internal.GetURL())
+	defer proxy.Close()
+
+	// Use connectTestEs instead of getTestingElasticsearch to make use of makeES
+	_, client := connectTestEs(t, map[string]interface{}{
+		"hosts":   "http://" + wrongPort.Addr().String(),
+		"timeout": 5, // seconds
+	})
+	assert.Error(t, client.Connect(), "it should fail without proxy")
+
+	_, client = connectTestEs(t, map[string]interface{}{
+		"hosts":     "http://" + wrongPort.Addr().String(),
+		"proxy_url": proxy.URL,
+		"timeout":   5, // seconds
+	})
+	assert.NoError(t, client.Connect())
 }
 
 func TestClientPublishEvent(t *testing.T) {
@@ -304,4 +341,33 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 
 	client := grp.Clients[rand.Intn(L)]
 	return client.(outputs.NetworkClient)
+}
+
+// startTestProxy starts a proxy that redirects all connections to the specified URL
+func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
+	t.Helper()
+
+	realURL, err := url.Parse(redirectURL)
+	require.NoError(t, err)
+
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := r.Clone(context.Background())
+		req.RequestURI = ""
+		req.URL.Scheme = realURL.Scheme
+		req.URL.Host = realURL.Host
+
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+
+		for _, header := range []string{"Content-Encoding", "Content-Type"} {
+			w.Header().Set(header, resp.Header.Get(header))
+		}
+		w.WriteHeader(resp.StatusCode)
+		w.Write(body)
+	}))
+	return proxy
 }

@@ -1,32 +1,29 @@
 [[faq]]
-== Frequently asked questions
+== Common problems
 
-This section contains frequently asked questions about Winlogbeat. Also check
-out the https://discuss.elastic.co/c/beats/winlogbeat[Winlogbeat discussion
-forum].
+This section describes common problems you might encounter with
+{beatname_uc}. Also check out the
+https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
-[float]
 [[dashboard-fields-incorrect]]
-=== Dashboard in Kibana is breaking up data fields incorrectly?
+=== Dashboard in {kib} is breaking up data fields incorrectly
 
 The index template might not be loaded correctly. See <<winlogbeat-template>>.
 
-[float]
 [[bogus-computer-name-fields]]
-=== Bogus computer_name fields are reported in some events?
+=== Bogus computer_name fields are reported in some events
 
 Prior to the hostname configuration stage, during OS installation any event log
 records generated may have a randomly assigned hostname.
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]
 
-[float]
 [[reading-from-evtx]]
-=== Can Winlogbeat read from .evtx files?
+=== Not sure how to read from .evtx files
 
-Yes, Winlogbeat can ingest archived .evtx files. When you set the `name`
+Yes, {beatname_uc} can ingest archived .evtx files. When you set the `name`
 parameter as the absolute path to an event log file it will read from that file.
-Here's an example. First create a new config file for Winlogbeat.
+Here's an example. First create a new config file for {beatname_uc}.
 
 winlogbeat-evtx.yml
 [source,yaml]
@@ -41,16 +38,16 @@ winlogbeat.registry_file: evtx-registry.yml <4>
 output.elasticsearch.hosts: ['http://localhost:9200']
 ----
 1. `name` will be set to the value of the `EVTX_FILE` environment variable.
-2. `no_more_events` sets the behavior of Winlogbeat when Windows reports that
-   there are no more events to read. We want Winlogbeat to _stop_ rather than
+2. `no_more_events` sets the behavior of {beatname_uc} when Windows reports that
+   there are no more events to read. We want {beatname_uc} to _stop_ rather than
    _wait_ since this is an archived file that will not receive any more events.
-3. `shutdown_timeout` controls the maximum amount of time Winlogbeat will wait
-   to finish publishing the events to Elasticsearch after stopping because it
+3. `shutdown_timeout` controls the maximum amount of time {beatname_uc} will wait
+   to finish publishing the events to {es} after stopping because it
    reached the end of the log.
 4. A separate registry file is used to avoid overwriting the default registry
    file. You can delete this file after you're done ingesting the .evtx data.
 
-Now execute Winlogbeat and wait for it to complete. It will exit when it's done.
+Now execute {beatname_uc} and wait for it to complete. It will exit when it's done.
 
 [source,sh]
 ----

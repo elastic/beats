@@ -14,7 +14,7 @@
 #fields:
 #  env: staging
 
-
+{{if not .ExcludeDashboards }}
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
@@ -26,7 +26,7 @@
 # versions, this URL points to the dashboard archive on the artifacts.elastic.co
 # website.
 #setup.dashboards.url:
-
+{{end}}
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -66,8 +66,11 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 {{if not .ExcludeLogstash}}
@@ -93,11 +96,18 @@ output.elasticsearch:
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
+{{- if .UseDockerMetadataProcessor }}
+  - add_docker_metadata: ~{{ end }}
+
+{{- if .UseKubernetesMetadataProcessor }}
+  - add_kubernetes_metadata: ~
+{{- else -}}
+{{ end }}
 {{else}}
 processors:
-  - add_observer_metadata: 
+  - add_observer_metadata:
   # Optional, but recommended geo settings for the location {{ .BeatName | title }} is running in
-  #geo: 
+  #geo:
     # Token describing this location
     #name: us-east-1a
 
@@ -115,13 +125,18 @@ processors:
 # "publish", "service".
 #logging.selectors: ["*"]
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # beatname can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# {{ .BeatName | title }} instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.

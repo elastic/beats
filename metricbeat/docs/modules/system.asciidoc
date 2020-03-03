@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-system]]
@@ -8,10 +8,17 @@ This file is generated! See scripts/docs_collector.py
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 
-The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
-`process_summary`.
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process`, and
+`process_summary`. To disable a default metricset, comment it out in the
+`modules.d/system.yml` configuration file. If _all_ metricsets are commented out
+and the System module is enabled, {beatname_uc} uses the default metricsets.
 
-Note that certain metricsets may access `/proc` to gather process information, and the resulting `ptrace_may_access()` call by the kernel to check for permissions can be blocked by https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor and other LSM software], even though the system module doesn't use `ptrace` directly.
+Note that certain metricsets may access `/proc` to gather process information,
+and the resulting `ptrace_may_access()` call by the kernel to check for
+permissions can be blocked by
+https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor
+and other LSM software], even though the System module doesn't use `ptrace`
+directly.
 
 [float]
 === Dashboard
@@ -19,6 +26,125 @@ Note that certain metricsets may access `/proc` to gather process information, a
 The System module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_system_dashboard.png[]
+
+[float]
+=== Required permissions
+
+The System metricsets collect different kinds of metric data, which may require dedicated permissions
+to be fetched. For security reasons it's advised to grant the lowest possible permissions. This section
+justifies which permissions must be present for particular metricsets.
+
+Please notice that modern Linux implementations divide the privileges traditionally associated with superuser
+into distinct units, known as capabilities, which can be independently enabled and disabled.
+Capabilities are a per-thread attribute.
+
+[float]
+==== cpu
+
+CPU statistics (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+elevated permissions.
+
+[float]
+==== load
+
+CPU load data (1 min, 5 min, 15 min, cores) should be available without elevated permissions.
+
+[float]
+==== memory
+
+Memory statistics (swap, total, used, free, actual) should be available without elevated permissions.
+
+[float]
+==== network
+
+Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without elevated
+permissions.
+
+[float]
+==== process
+
+Process execution data (state, memory, cpu, cmdline) should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+["source"]
+----
+2019-12-23T13:32:06.457+0100    DEBUG   [processes]     process/process.go:475  Skip process pid=235: error getting process state for pid=235: Could not read process info for pid 23
+----
+
+[float]
+==== process_summary
+
+General process summary (unknown, dead, total, sleeping, running, idle, stopped, zombie) should be available without
+elevated permissions. Please notice that if the process data belongs to the other users, it will be counted as unknown
+value (no error will be reported in application logs).
+
+[float]
+==== socket_summary
+
+Used sockets summary (TCP, UDP, count, listening, established, wait, etc.) should be available without elevated
+permissions.
+
+[float]
+==== entropy
+
+Entropy data (available, pool size) requires access to the `/proc/sys/kernel/random` path.
+Otherwise an error will be reported.
+
+[float]
+==== core
+
+Usage statistics for each CPU core (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without
+elevated permissions.
+
+[float]
+==== diskio
+
+Disk IO metrics (io, read, write) should be available without elevated permissions.
+
+[float]
+==== socket
+
+Events for each new TCP socket should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to view socket data belonging to
+other users.
+
+[float]
+==== service
+
+Systemd service data (memory, tasks, states) should be available for an authorized user.
+
+If the beats process is running as less privileged user, it may not be able to read process data belonging to
+other users. The issue should be reported in application logs:
+
+["source"]
+----
+2020-01-02T08:19:50.635Z	INFO	module/wrapper.go:252	Error fetching data for metricset system.service: error getting list of running units: Rejected send message, 2 matched rules; type="method_call", sender=":1.35" (uid=1000 pid=4429 comm="./metricbeat -d * -e ") interface="org.freedesktop.systemd1.Manager" member="ListUnitsByPatterns" error name="(unset)" requested_reply="0" destination="org.freedesktop.systemd1" (uid=0 pid=1 comm="/usr/lib/systemd/systemd --switched-root --system ")
+----
+
+[float]
+==== filesystem
+
+Filesystem metrics data (total, available, type, mount point, files, free, used) should be available without elevated
+permissions.
+
+[float]
+==== fsstat
+
+Fsstat metrics data (total size, free, total, used count) should be available without elevated permissions.
+
+[float]
+==== uptime
+
+Uptime metrics data (duration) should be available without elevated permissions.
+
+[float]
+==== raid
+
+RAID metrics data (block, disks) requires access to the `/sys/block` mount point and all referenced devices.
+Otherwise an error will be reported.
 
 
 [float]
@@ -46,12 +172,13 @@ metricbeat.modules:
     #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
   enabled: true
   period: 10s
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
@@ -103,6 +230,9 @@ metricbeat.modules:
 
   # Diskio configurations
   #diskio.include_devices: []
+
+  # Filter systemd services by status or sub-status
+  #service.state_filter: []
 ----
 
 [float]
@@ -128,11 +258,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-network,network>>
 
+* <<metricbeat-metricset-system-network_summary,network_summary>>
+
 * <<metricbeat-metricset-system-process,process>>
 
 * <<metricbeat-metricset-system-process_summary,process_summary>>
 
 * <<metricbeat-metricset-system-raid,raid>>
+
+* <<metricbeat-metricset-system-service,service>>
 
 * <<metricbeat-metricset-system-socket,socket>>
 
@@ -158,11 +292,15 @@ include::system/memory.asciidoc[]
 
 include::system/network.asciidoc[]
 
+include::system/network_summary.asciidoc[]
+
 include::system/process.asciidoc[]
 
 include::system/process_summary.asciidoc[]
 
 include::system/raid.asciidoc[]
+
+include::system/service.asciidoc[]
 
 include::system/socket.asciidoc[]
 

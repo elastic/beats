@@ -1,0 +1,207 @@
+description: "Pipeline for ELB logs"
+
+processors:
+  - grok:
+      field: message
+      # Classic ELB patterns documented in https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html
+      # ELB v2 Application load balancers https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+      # ELB v2 Netwwork load balancers https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-access-logs.html
+      #
+      patterns:
+        # HTTP (Classic ELB)
+        - >-
+          %{ELBHTTPLOG}
+
+        # TCP (Classic ELB)
+        - >-
+          %{ELBTCPLOG}
+
+        # HTTP from Application Load Balancers (v2 Load Balancers)
+        - >-
+          %{ELBV2TYPE}
+          %{ELBHTTPLOG}
+          %{NOTSPACE:aws.elb.target_group.arn}
+          \"%{DATA:aws.elb.trace_id}\"
+          \"(?:-|%{DATA:destination.domain})\"
+          \"(?:-|%{DATA:aws.elb.chosen_cert.arn})\"
+          (?:-1|%{NUMBER:aws.elb.matched_rule_priority})
+          %{TIMESTAMP_ISO8601:event.start}
+          \"(?:-|%{DATA:_tmp.actions_executed})\"
+          \"(?:-|%{DATA:aws.elb.redirect_url})\"
+          \"(?:-|%{DATA:aws.elb.error.reason})\"
+
+        # TCP from Network Load Balancers (v2 Load Balancers)
+        - >-
+          %{ELBV2TYPE}
+          %{ELBV2LOGVERSION}
+          %{ELBTIMESTAMP}
+          %{ELBNAME}
+          %{NOTSPACE:aws.elb.listener}
+          %{ELBSOURCE}
+          %{ELBBACKEND}
+          %{NUMBER:aws.elb.connection_time.ms:float}
+          %{NUMBER:aws.elb.tls_handshake_time.ms:float}
+          %{NUMBER:source.bytes:long}
+          %{NUMBER:destination.bytes:long}
+          (?:-|%{NUMBER:aws.elb.incoming_tls_alert})
+          (?:-|%{NOTSPACE:aws.elb.chosen_cert.arn})
+          (?:-|%{NOTSPACE:aws.elb.chosen_cert.serial})
+          %{ELBSSL}
+          (?:-|%{NOTSPACE:aws.elb.ssl_named_group})
+          (?:-|%{NOTSPACE:destination.domain})
+
+      pattern_definitions:
+        ELBTIMESTAMP: '%{TIMESTAMP_ISO8601:_tmp.timestamp}'
+        ELBNAME: '%{NOTSPACE:aws.elb.name}'
+        ELBSOURCE: '%{IP:source.ip}:%{POSINT:source.port}'
+        ELBBACKEND: '(?:-|%{IP:aws.elb.backend.ip}:%{POSINT:aws.elb.backend.port})'
+        ELBPROCESSINGTIME: >-
+          (?:-1|%{NUMBER:aws.elb.request_processing_time.sec:float})
+          (?:-1|%{NUMBER:aws.elb.backend_processing_time.sec:float})
+          (?:-1|%{NUMBER:aws.elb.response_processing_time.sec:float})
+        ELBSSL: >-
+          (?:-|%{NOTSPACE:aws.elb.ssl_cipher})
+          (?:-|%{NOTSPACE:aws.elb.ssl_protocol})
+        ELBCOMMON: >-
+          %{ELBTIMESTAMP}
+          %{ELBNAME}
+          %{ELBSOURCE}
+          %{ELBBACKEND}
+          %{ELBPROCESSINGTIME}
+        ELBHTTPLOG: >-
+          %{ELBCOMMON}
+          %{NUMBER:http.response.status_code:long}
+          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code:long})
+          %{NUMBER:http.request.body.bytes:long}
+          %{NUMBER:http.response.body.bytes:long}
+          \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|HTTP/%{NOTSPACE:http.version})\"
+          \"%{DATA:user_agent.original}\"
+          %{ELBSSL}
+        ELBTCPLOG: >-
+          %{ELBCOMMON}
+          -
+          -
+          %{NUMBER:source.bytes:long}
+          %{NUMBER:destination.bytes:long}
+          \"- - - \"
+          \"-\"
+          %{ELBSSL}
+        ELBV2TYPE: '%{WORD:aws.elb.type}'
+        ELBV2LOGVERSION: '%{NOTSPACE}'  # Could be used to support different log versions, only 1.0 exists now
+
+  - set:
+      field: event.kind
+      value: event
+
+  - set:
+      field: cloud.provider
+      value: aws
+
+  - set:
+      if: 'ctx.http != null'
+      field: 'aws.elb.protocol'
+      value: 'http'
+
+  - set:
+      if: 'ctx.http != null'
+      field: event.category
+      value: web
+
+  - set:
+      if: 'ctx.http == null'
+      field: 'aws.elb.protocol'
+      value: 'tcp'
+
+  - set:
+      if: 'ctx.http == null'
+      field: event.category
+      value: network
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+      field: event.outcome
+      value: success
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+      field: event.outcome
+      value: failure
+
+  - lowercase:
+      field: http.request.method
+      ignore_missing: true
+
+  - set:
+      if: "ctx?.aws?.elb?.trace_id != null"
+      field: tracing.trace.id
+      value: "{{aws.elb.trace_id}}"
+
+  - split:
+      field: '_tmp.actions_executed'
+      target_field: 'aws.elb.action_executed'
+      separator: ','
+      ignore_missing: true
+
+  - date:
+      field: '_tmp.timestamp'
+      formats:
+        - 'ISO8601'
+
+  - set:
+      field: 'event.end'
+      value: '{{ @timestamp }}'
+
+  - geoip:
+      field: 'source.ip'
+      target_field: 'source.geo'
+      ignore_missing: true
+
+  - geoip:
+      database_file: 'GeoLite2-ASN.mmdb'
+      field: 'source.ip'
+      target_field: 'source.as'
+      properties:
+        - 'asn'
+        - 'organization_name'
+      ignore_missing: true
+
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+
+  - set:
+      field: tls.cipher
+      value: '{{aws.elb.ssl_cipher}}'
+      if: ctx.aws?.elb?.ssl_cipher != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.elb?.ssl_protocol != null
+      source: >-
+        def parts = ctx.aws.elb.ssl_protocol.splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        if (parts[1].contains(".")) {
+          ctx.tls.version = parts[1];
+        } else {
+          ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
+        }
+        ctx.tls.version_protocol = parts[0].toLowerCase();
+
+  - remove:
+      field:
+        - message
+        - _tmp
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

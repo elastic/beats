@@ -23,10 +23,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/kibana"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 )
 
 // init registers the MetricSet with the central registry.
@@ -67,60 +67,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	statsHTTP, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
-	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
-	if err != nil {
-		return nil, err
-	}
-
-	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
-	if err != nil {
-		return nil, err
-	}
-
-	if !isStatsAPIAvailable {
-		const errorMsg = "The %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
-	}
-
-	if ms.XPackEnabled {
-		// Use legacy API response so we can passthru usage as-is
-		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
-	}
-
-	var settingsHTTP *helper.HTTP
-	if ms.XPackEnabled {
-		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
-		if err != nil {
-			return nil, err
-		}
-
-		if !isSettingsAPIAvailable {
-			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
-		}
-
-		settingsHTTP, err = helper.NewHTTP(base)
-		if err != nil {
-			return nil, err
-		}
-
-		// HACK! We need to do this because there might be a basepath involved, so we
-		// only search/replace the actual API paths
-		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
-		settingsHTTP.SetURI(settingsURI)
-	}
-
 	return &MetricSet{
-		ms,
-		statsHTTP,
-		settingsHTTP,
-		time.Time{},
-		kibana.IsUsageExcludable(kibanaVersion),
+		MetricSet: ms,
 	}, nil
 }
 
@@ -128,9 +76,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	err := m.init()
+	if err != nil {
+		if m.XPackEnabled {
+			m.Logger().Error(err)
+			return nil
+		}
+		return err
+	}
+
 	now := time.Now()
 
-	err := m.fetchStats(r, now)
+	err = m.fetchStats(r, now)
 	if err != nil {
 		if m.XPackEnabled {
 			m.Logger().Error(err)
@@ -146,22 +103,79 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
+func (m *MetricSet) init() error {
+	statsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
+	}
+
+	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
+	if err != nil {
+		return err
+	}
+
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
+	if !isStatsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
+	}
+	if m.XPackEnabled {
+		// Use legacy API response so we can passthru usage as-is
+		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
+	}
+
+	var settingsHTTP *helper.HTTP
+	if m.XPackEnabled {
+		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+		if !isSettingsAPIAvailable {
+			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
+			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
+		}
+
+		settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
+		if err != nil {
+			return err
+		}
+
+		// HACK! We need to do this because there might be a basepath involved, so we
+		// only search/replace the actual API paths
+		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
+		settingsHTTP.SetURI(settingsURI)
+	}
+
+	m.statsHTTP = statsHTTP
+	m.settingsHTTP = settingsHTTP
+	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
+
+	return nil
+}
+
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
+
+	var content []byte
+	var err error
+
 	// Collect usage stats only once every usageCollectionPeriod
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
 		defer m.statsHTTP.SetURI(origURI)
 
 		shouldCollectUsage := m.shouldCollectUsage(now)
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
+
+		content, err = m.statsHTTP.FetchContent()
+		if err != nil {
+			return err
+		}
+
 		if shouldCollectUsage {
 			m.usageLastCollectedOn = now
 		}
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
-	}
-
-	content, err := m.statsHTTP.FetchContent()
-	if err != nil {
-		return err
+	} else {
+		content, err = m.statsHTTP.FetchContent()
+		if err != nil {
+			return err
+		}
 	}
 
 	if m.XPackEnabled {

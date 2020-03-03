@@ -18,11 +18,11 @@
 package input
 
 import (
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/registrar"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // RunnerFactory is a factory for registrars
@@ -47,7 +47,7 @@ func (r *RunnerFactory) Create(
 	c *common.Config,
 	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
-	connector := channel.ConnectTo(pipeline, r.outlet)
+	connector := r.outlet(pipeline)
 	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
 	if err != nil {
 		// In case of error with loading state, input is still returned

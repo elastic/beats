@@ -36,6 +36,9 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
 
@@ -46,6 +49,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -62,6 +69,9 @@ functionbeat.provider.aws.functions:
     #processors:
     #  - dissect:
     #      tokenizer: "%{key1} %{key2}"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
 
   # Create a function that accepts events from SQS queues.
   - name: sqs
@@ -81,6 +91,9 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
 
@@ -91,6 +104,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -113,6 +130,9 @@ functionbeat.provider.aws.functions:
     #      overwrite_keys: false
     #
 
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
   # Create a function that accepts events from Kinesis streams.
   - name: kinesis
     enabled: false
@@ -131,6 +151,9 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
 
@@ -141,6 +164,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -178,6 +205,184 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+  # Create a function that accepts Cloudwatch logs from Kinesis streams.
+  - name: cloudwatch-logs-kinesis
+    enabled: false
+    type: cloudwatch_logs_kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Cloudwatch logs in Kinesis events"
+
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
+    #compressed: true
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+    #
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+# Configure functions to run on Google Cloud Platform, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure which region your project is located in.
+functionbeat.provider.gcp.location_id: "europe-west2"
+# Configure which Google Cloud project to deploy your functions.
+functionbeat.provider.gcp.project_id: "my-project-123456"
+# Configure the Google Cloud Storage we should upload the function artifact.
+functionbeat.provider.gcp.storage_name: "functionbeat-deploy"
+
+functionbeat.provider.gcp.functions:
+  # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from Google Pub/Sub.
+  - name: pubsub
+    enabled: false
+    type: pubsub
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Pub/Sub"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    trigger:
+      resource: "projects/_/pubsub/myPubSub"
+      #service: "pubsub.googleapis.com"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
+
+  # Create a function that accepts events coming from Google Cloud Storage.
+  - name: storage
+    enabled: false
+    type: storage
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Cloud Storage"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    trigger:
+      resource: "projects/my-project/buckets/my-storage"
+      #event_type: "google.storage.object.finalize"
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
 
 #================================ General ======================================
 
@@ -220,7 +425,7 @@ functionbeat.provider.aws.functions:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -376,8 +581,7 @@ functionbeat.provider.aws.functions:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -475,8 +679,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -543,9 +750,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -568,6 +775,126 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
+#----------------------------- Logstash output ---------------------------------
+#output.logstash:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
+  # The Logstash hosts
+  #hosts: ["localhost:5044"]
+
+  # Number of workers per Logstash host.
+  #worker: 1
+
+  # Set gzip compression level.
+  #compression_level: 3
+
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
+
+  # Optional maximum time to live for a connection to Logstash, after which the
+  # connection will be re-established.  A value of `0s` (the default) will
+  # disable this feature.
+  #
+  # Not yet supported for async connections (i.e. with the "pipelining" option set)
+  #ttl: 30s
+
+  # Optionally load-balance events between Logstash hosts. Default is false.
+  #loadbalance: false
+
+  # Number of batches to be sent asynchronously to Logstash while processing
+  # new batches.
+  #pipelining: 2
+
+  # If enabled only a subset of events in a batch of events is transferred per
+  # transaction.  The number of events to be sent increases up to `bulk_max_size`
+  # if no error is encountered.
+  #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Optional index name. The default index name is set to functionbeat
+  # in all lowercase.
+  #index: 'functionbeat'
+
+  # SOCKS5 proxy server URL
+  #proxy_url: socks5://user:password@socks5-server:2233
+
+  # Resolve names locally when using a proxy server. Defaults to false.
+  #proxy_use_local_resolver: false
+
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
+  #ssl.enabled: true
+
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
+
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client certificate key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
+
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
+
+  # Configure curve types for ECDHE-based cipher suites
+  #ssl.curve_types: []
+
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
+  # The number of times to retry publishing an event after a publishing failure.
+  # After the specified number of retries, the events are typically dropped.
+  # Some Beats, such as Filebeat and Winlogbeat, ignore the max_retries setting
+  # and retry until all events are published.  Set max_retries to a value less
+  # than 0 to retry until all events are published. The default is 3.
+  #max_retries: 3
+
+  # The maximum number of events to bulk in a single Logstash request. The
+  # default is 2048.
+  #bulk_max_size: 2048
+
+  # The number of seconds to wait for responses from the Logstash server before
+  # timing out. The default is 30s.
+  #timeout: 30s
 
 #================================= Paths ======================================
 
@@ -667,7 +994,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -693,7 +1019,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -702,22 +1027,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'functionbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "functionbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'functionbeat'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is true. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: true
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -739,6 +1080,9 @@ setup.kibana:
   # Optional HTTP path
   #path: ""
 
+  # Optional Kibana space ID.
+  #space.id: ""
+
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
@@ -748,9 +1092,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -841,13 +1185,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Functionbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Functionbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
@@ -867,8 +1216,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
@@ -916,9 +1268,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -946,6 +1298,14 @@ logging.files:
   #metrics.period: 10s
   #state.period: 1m
 
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
+
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
@@ -955,11 +1315,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

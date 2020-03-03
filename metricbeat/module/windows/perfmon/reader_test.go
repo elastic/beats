@@ -25,6 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var validQuery = `\Processor Information(_Total)\% Processor Time`
+
 // TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
 func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
@@ -48,13 +50,14 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 		CounterConfig:     []CounterConfig{counter},
 	}
 	reader, err := NewReader(config)
+	defer reader.Close()
 	assert.Nil(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
-	assert.NotNil(t, reader.query.handle)
-	assert.NotNil(t, reader.query.counters)
-	assert.NotZero(t, len(reader.query.counters))
-	defer reader.Close()
+	assert.NotNil(t, reader.query.Handle)
+	assert.NotNil(t, reader.query.Counters)
+	assert.NotZero(t, len(reader.query.Counters))
+
 }
 
 // TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.

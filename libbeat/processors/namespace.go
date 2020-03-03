@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type Namespace struct {
@@ -119,6 +119,15 @@ func (ns *Namespace) Plugin() Constructor {
 		constructor := backend.Plugin()
 		return constructor(config)
 	})
+}
+
+// Constructors returns all registered processor constructors and its names.
+func (ns *Namespace) Constructors() map[string]Constructor {
+	c := make(map[string]Constructor, len(ns.reg))
+	for name, p := range ns.reg {
+		c[name] = p.Plugin()
+	}
+	return c
 }
 
 func (p plugin) Plugin() Constructor { return p.c }

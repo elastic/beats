@@ -1,0 +1,102 @@
+- name: http
+  type: group
+  description: >
+    Fields exported by the Zeek HTTP log
+  fields:
+    - name: trans_depth
+      type: integer
+      description: >
+        Represents the pipelined depth into the connection of this request/response transaction.
+
+    - name: status_msg
+      type: keyword
+      description: >
+        Status message returned by the server.
+
+    - name: info_code
+      type: integer
+      description: >
+        Last seen 1xx informational reply code returned by the server.
+
+    - name: info_msg
+      type: keyword
+      description: >
+        Last seen 1xx informational reply message returned by the server.
+
+    - name: tags
+      type: keyword
+      description: |
+        A set of indicators of various attributes discovered and related to a particular
+        request/response pair.
+
+    - name: password
+      type: keyword
+      description: >
+        Password if basic-auth is performed for the request.
+
+    - name: captured_password
+      type: boolean
+      description: >
+        Determines if the password will be captured for this request.
+
+    - name: proxied
+      type: keyword
+      description: >
+        All of the headers that may indicate if the HTTP request was proxied.
+
+    - name: range_request
+      type: boolean
+      description: >
+        Indicates if this request can assume 206 partial content in response.
+
+    - name: client_header_names
+      type: keyword
+      description: |
+        The vector of HTTP header names sent by the client. No header values
+        are included here, just the header names.
+
+    - name: server_header_names
+      type: keyword
+      description: |
+        The vector of HTTP header names sent by the server. No header values
+        are included here, just the header names.
+
+    - name: orig_fuids
+      type: keyword
+      description: >
+        An ordered vector of file unique IDs from the originator.
+
+    - name: orig_mime_types
+      type: keyword
+      description: >
+        An ordered vector of mime types from the originator.
+
+    - name: orig_filenames
+      type: keyword
+      description: >
+        An ordered vector of filenames from the originator.
+
+    - name: resp_fuids
+      type: keyword
+      description: >
+        An ordered vector of file unique IDs from the responder.
+
+    - name: resp_mime_types
+      type: keyword
+      description: >
+        An ordered vector of mime types from the responder.
+
+    - name: resp_filenames
+      type: keyword
+      description: >
+        An ordered vector of filenames from the responder.
+
+    - name: orig_mime_depth
+      type: integer
+      description: >
+        Current number of MIME entities in the HTTP request message body.
+
+    - name: resp_mime_depth
+      type: integer
+      description: >
+        Current number of MIME entities in the HTTP response message body.

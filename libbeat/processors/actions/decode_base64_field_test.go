@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestDecodeBase64Run(t *testing.T) {
@@ -38,7 +38,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field1", To: "field2",
 				},
 				IgnoreMissing: false,
@@ -56,7 +56,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode To empty",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field1", To: "",
 				},
 				IgnoreMissing: false,
@@ -73,7 +73,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode from and to equals",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field1", To: "field1",
 				},
 				IgnoreMissing: false,
@@ -90,7 +90,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field bad data - fail on error",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field1", To: "field1",
 				},
 				IgnoreMissing: false,
@@ -102,7 +102,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			Output: common.MapStr{
 				"field1": "bad data",
 				"error": common.MapStr{
-					"message": "failed to decode base64 fields in processor: error trying to unmarshal bad data: illegal base64 data at input byte 3",
+					"message": "failed to decode base64 fields in processor: error trying to decode bad data: illegal base64 data at input byte 3",
 				},
 			},
 			error: true,
@@ -110,7 +110,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field bad data fail on error false",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field1", To: "field2",
 				},
 				IgnoreMissing: false,
@@ -127,7 +127,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "missing field",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field2", To: "field3",
 				},
 				IgnoreMissing: false,
@@ -139,7 +139,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			Output: common.MapStr{
 				"field1": "Y29ycmVjdCBkYXRh",
 				"error": common.MapStr{
-					"message": "failed to decode base64 fields in processor: could not fetch value for key: field2, Error: key not found",
+					"message": "failed to decode base64 fields in processor: could not fetch base64 value for key: field2, Error: key not found",
 				},
 			},
 			error: true,
@@ -147,7 +147,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "missing field ignore",
 			config: base64Config{
-				fromTo: fromTo{
+				Field: fromTo{
 					From: "field2", To: "field3",
 				},
 				IgnoreMissing: true,

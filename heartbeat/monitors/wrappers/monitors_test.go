@@ -20,22 +20,23 @@ package wrappers
 import (
 	"fmt"
 	"net/url"
+	"reflect"
 	"testing"
-
-	"github.com/elastic/go-lookslike/isdef"
-
-	"github.com/elastic/go-lookslike/validator"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
-
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 type fields struct {
@@ -54,7 +55,8 @@ type testDef struct {
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ)
+		schedule, _ := schedule.Parse("@every 1s")
+		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ, schedule, time.Duration(0))
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
@@ -93,6 +95,7 @@ func TestSimpleJob(t *testing.T) {
 						"check_group": isdef.IsString,
 					},
 				}),
+				hbtestllext.MonitorTimespanValidator,
 				summaryValidator(1, 0),
 			)},
 		nil,
@@ -127,6 +130,7 @@ func TestErrorJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Compose(
 				errorJobValidator,
+				hbtestllext.MonitorTimespanValidator,
 				summaryValidator(0, 1),
 			)},
 		nil,
@@ -151,6 +155,7 @@ func TestMultiJobNoConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
+			hbtestllext.MonitorTimespanValidator,
 			summaryValidator(1, 0),
 		)
 	}
@@ -199,6 +204,7 @@ func TestMultiJobConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
+			hbtestllext.MonitorTimespanValidator,
 		)
 	}
 
@@ -258,6 +264,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
+			hbtestllext.MonitorTimespanValidator,
 		)
 	}
 
@@ -315,4 +322,45 @@ func summaryValidator(up int, down int) validator.Validator {
 			"down": uint16(down),
 		},
 	})
+}
+
+func TestTimespan(t *testing.T) {
+	now := time.Now()
+	sched10s, err := schedule.Parse("@every 10s")
+	require.NoError(t, err)
+
+	type args struct {
+		started time.Time
+		sched   *schedule.Schedule
+		timeout time.Duration
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.MapStr
+	}{
+		{
+			"interval longer than timeout",
+			args{now, sched10s, time.Second},
+			common.MapStr{
+				"gte": now,
+				"lt":  now.Add(time.Second * 10),
+			},
+		},
+		{
+			"timeout longer than interval",
+			args{now, sched10s, time.Second * 20},
+			common.MapStr{
+				"gte": now,
+				"lt":  now.Add(time.Second * 20),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := timespan(tt.args.started, tt.args.sched, tt.args.timeout); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("timespan() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

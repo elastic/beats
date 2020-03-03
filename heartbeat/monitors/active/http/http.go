@@ -22,13 +22,13 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 func init() {
@@ -80,7 +80,10 @@ func create(
 	// Determine whether we're using a proxy or not and then use that to figure out how to
 	// run the job
 	var makeJob func(string) (jobs.Job, error)
-	if config.ProxyURL != "" {
+	// In the event that a ProxyURL is present, or redirect support is enabled
+	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
+	// separate DNS rtt data.
+	if config.ProxyURL != "" || config.MaxRedirects > 0 {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
 			return nil, 0, err
@@ -95,8 +98,8 @@ func create(
 		}
 	}
 
-	js = make([]jobs.Job, len(config.URLs))
-	for i, urlStr := range config.URLs {
+	js = make([]jobs.Job, len(config.Hosts))
+	for i, urlStr := range config.Hosts {
 		u, _ := url.Parse(urlStr)
 		if err != nil {
 			return nil, 0, err
@@ -112,7 +115,7 @@ func create(
 		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return js, len(config.URLs), nil
+	return js, len(config.Hosts), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {
@@ -135,6 +138,7 @@ func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport,
 		Proxy:             proxy,
 		Dial:              dialer.Dial,
 		DialTLS:           tlsDialer.Dial,
+		TLSClientConfig:   tls.ToConfig(),
 		DisableKeepAlives: true,
 	}, nil
 }

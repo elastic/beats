@@ -8,22 +8,29 @@ The following topics provide information about securing the {beatname_uc}
 process and securing communication between {beatname_uc} and other products in
 the Elastic stack:
 
+ifdef::apm-server[]
+* <<secure-communication-agents>>
+endif::[]
 * <<securing-communication-elasticsearch>>
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 * <<configuring-ssl-logstash>>
-endif::only-elasticsearch[]
+endif::[]
 * <<securing-beats>>
-ifndef::only-elasticsearch[]
+ifndef::serverless[]
 * <<linux-seccomp>>
-endif::only-elasticsearch[]
+endif::[]
 
 ifdef::beat-specific-security[]
 include::{beat-specific-security}[]
 endif::[]
 
-//sets block macro for https.asciidoc included in next section
-
 --
+
+ifdef::apm-server[]
+include::{docdir}/secure-communication-agents.asciidoc[]
+endif::[]
+
+//sets block macro for https.asciidoc included in next section
 
 [[securing-communication-elasticsearch]]
 == Secure communication with Elasticsearch
@@ -32,15 +39,15 @@ include::./https.asciidoc[]
 
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 [[configuring-ssl-logstash]]
-== Secure communication with Logstash by using SSL
+== Secure communication with Logstash
 
 include::./shared-ssl-logstash-config.asciidoc[]
-endif::only-elasticsearch[]
+endif::[]
 
 include::./security/securing-beats.asciidoc[]
 
-ifndef::only-elasticsearch[]
+ifndef::serverless[]
 include::./security/linux-seccomp.asciidoc[]
-endif::only-elasticsearch[]
+endif::[]

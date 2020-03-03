@@ -22,7 +22,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 type BlkioStats struct {
@@ -174,5 +174,11 @@ func calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 
 	if value < 0 {
 		value = 0
 	}
-	return value / duration.Seconds()
+
+	timeSec := duration.Seconds()
+	if timeSec == 0 {
+		return 0
+	}
+
+	return value / timeSec
 }

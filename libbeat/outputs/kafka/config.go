@@ -25,15 +25,15 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
 
 type kafkaConfig struct {
@@ -58,6 +58,13 @@ type kafkaConfig struct {
 	Username           string                    `config:"username"`
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
+	Sasl               saslConfig                `config:"sasl"`
+}
+
+type saslConfig struct {
+	SaslMechanism string `config:"mechanism"`
+	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
+	//SaslPassword  string `config:"password"`
 }
 
 type metaConfig struct {
@@ -72,6 +79,9 @@ type metaRetryConfig struct {
 }
 
 var compressionModes = map[string]sarama.CompressionCodec{
+	// As of sarama 1.24.1, zstd support is broken
+	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
+	// addressed before we add support here.
 	"none":   sarama.CompressionNone,
 	"no":     sarama.CompressionNone,
 	"off":    sarama.CompressionNone,
@@ -79,6 +89,12 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
 }
+
+const (
+	saslTypePlaintext   = sarama.SASLTypePlaintext
+	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
+	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -93,7 +109,7 @@ func defaultConfig() kafkaConfig {
 				Backoff: 250 * time.Millisecond,
 			},
 			RefreshFreq: 10 * time.Minute,
-			Full:        true,
+			Full:        false,
 		},
 		KeepAlive:        0,
 		MaxMessageBytes:  nil, // use library default
@@ -108,6 +124,32 @@ func defaultConfig() kafkaConfig {
 		Username:         "",
 		Password:         "",
 	}
+}
+
+func (c *saslConfig) configureSarama(config *sarama.Config) error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "":
+		// SASL is not enabled
+		return nil
+	case saslTypePlaintext:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
+	case saslTypeSCRAMSHA256:
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
+		}
+	case saslTypeSCRAMSHA512:
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
+		}
+	default:
+		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+	}
+
+	return nil
 }
 
 func readConfig(cfg *common.Config) (*kafkaConfig, error) {
@@ -141,7 +183,6 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
-
 	return nil
 }
 
@@ -166,6 +207,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
@@ -175,6 +217,11 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
+		err = config.Sasl.configureSarama(k)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// configure metadata update properties
@@ -225,8 +272,6 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		return nil, fmt.Errorf("Unknown/unsupported kafka version: %v", config.Version)
 	}
 	k.Version = version
-
-	k.MetricRegistry = kafkaMetricsRegistry()
 
 	k.Producer.Partitioner = partitioner
 	k.MetricRegistry = adapter.GetGoMetrics(

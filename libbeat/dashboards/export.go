@@ -27,8 +27,8 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 const (
@@ -64,6 +64,9 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, L
 	err = yaml.Unmarshal(b, &list)
 	if err != nil {
 		return nil, ListYML{}, errors.Wrap(err, "error reading the list of dashboards")
+	}
+	if len(list.Dashboards) == 0 {
+		return nil, ListYML{}, errors.Errorf("dashboards list is empty in file %v", ymlPath)
 	}
 
 	results, err := ExportAll(client, list)
