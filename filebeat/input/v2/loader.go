@@ -28,9 +28,14 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// Loader is used to create an Input instance. The input created
+// Loader creates an Input instance. The input created
 // only represents a configured object. The input MUST NOT start any
 // processing yet.
+// While the Registry describes the capabilities of an extension point, the loader
+// interface is used to create a concrete configuration based on *common.Config.
+// The combination of Loader and Registry makes an extension point.
+// Implementations are free to have separate loaders and registries, or to
+// combine these into one common type.
 type Loader interface {
 	Configure(*common.Config) (Input, error)
 }
