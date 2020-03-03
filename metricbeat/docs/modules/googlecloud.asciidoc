@@ -104,15 +104,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
-* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
-
-* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
-
 include::googlecloud/compute.asciidoc[]
 
 include::googlecloud/loadbalancing.asciidoc[]
 
 include::googlecloud/pubsub.asciidoc[]
-
-include::googlecloud/loadbalancing.asciidoc[]
 
