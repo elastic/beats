@@ -60,22 +60,22 @@ const (
 type (
 	// EventProcessorHost provides functionality for coordinating and balancing load across multiple Event Hub partitions
 	EventProcessorHost struct {
-		namespace           string
-		hubName             string
-		name                string
-		consumerGroup       string
-		tokenProvider       auth.TokenProvider
-		client              *eventhub.Hub
-		leaser              Leaser
-		checkpointer        Checkpointer
-		scheduler           *scheduler
-		handlers            map[string]eventhub.Handler
-		hostMu              sync.Mutex
-		handlersMu          sync.Mutex
-		partitionIDs        []string
-		noBanner            bool
+		namespace     string
+		hubName       string
+		name          string
+		consumerGroup string
+		tokenProvider auth.TokenProvider
+		client        *eventhub.Hub
+		leaser        Leaser
+		checkpointer  Checkpointer
+		scheduler     *scheduler
+		handlers      map[string]eventhub.Handler
+		hostMu        sync.Mutex
+		handlersMu    sync.Mutex
+		partitionIDs  []string
+		noBanner      bool
 		webSocketConnection bool
-		env                 *azure.Environment
+		env           *azure.Environment
 	}
 
 	// EventProcessorHostOption provides configuration options for an EventProcessorHost
@@ -428,24 +428,18 @@ func (h *EventProcessorHost) compositeHandlers() eventhub.Handler {
 		h.handlersMu.Lock()
 		defer h.handlersMu.Unlock()
 
-		// we accept that this will contain any of the possible len(h.handlers) errors
-		// as it will be used to later decide of delivery is considered a failure
-		// and NOT further inspected
-		var lastError error
-
-		wg := &sync.WaitGroup{}
-		for _, handler := range h.handlers {
+		var wg sync.WaitGroup
+		for _, handle := range h.handlers {
 			wg.Add(1)
-			go func(boundHandler eventhub.Handler) {
-				defer wg.Done() // consider if panics should be cought here, too. Currently would crash process
-				if err := boundHandler(ctx, event); err != nil {
-					lastError = err
+			go func(boundHandle eventhub.Handler) {
+				if err := boundHandle(ctx, event); err != nil {
 					tab.For(ctx).Error(err)
 				}
-			}(handler)
+				wg.Done()
+			}(handle)
 		}
 		wg.Wait()
-		return lastError
+		return nil
 	}
 }
 

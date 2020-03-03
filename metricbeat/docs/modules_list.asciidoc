@@ -16,7 +16,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.13+| .13+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+.14+| .14+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
 |<<metricbeat-metricset-aws-ebs,ebs>>   
@@ -29,22 +29,37 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-sns,sns>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>>   
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
+|<<metricbeat-metricset-aws-vpc,vpc>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
+.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
+|<<metricbeat-metricset-azure-container_instance,container_instance>> beta[]  
+|<<metricbeat-metricset-azure-container_registry,container_registry>> beta[]  
+|<<metricbeat-metricset-azure-container_service,container_service>> beta[]  
+|<<metricbeat-metricset-azure-database_account,database_account>> beta[]  
 |<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
 |<<metricbeat-metricset-azure-storage,storage>> beta[]  
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
+.13+| .13+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
 |<<metricbeat-metricset-ceph-cluster_status,cluster_status>>   
+|<<metricbeat-metricset-ceph-mgr_cluster_disk,mgr_cluster_disk>> beta[]  
+|<<metricbeat-metricset-ceph-mgr_cluster_health,mgr_cluster_health>> beta[]  
+|<<metricbeat-metricset-ceph-mgr_osd_perf,mgr_osd_perf>> beta[]  
+|<<metricbeat-metricset-ceph-mgr_osd_pool_stats,mgr_osd_pool_stats>> beta[]  
+|<<metricbeat-metricset-ceph-mgr_osd_tree,mgr_osd_tree>> beta[]  
+|<<metricbeat-metricset-ceph-mgr_pool_disk,mgr_pool_disk>> beta[]  
 |<<metricbeat-metricset-ceph-monitor_health,monitor_health>>   
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
+|<<metricbeat-module-cloudfoundry,cloudfoundry>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> experimental[]  
+|<<metricbeat-metricset-cloudfoundry-counter,counter>> experimental[]  
+|<<metricbeat-metricset-cloudfoundry-value,value>> experimental[]  
 |<<metricbeat-module-cockroachdb,CockroachDB>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -104,6 +119,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-http-server,server>>   
 |<<metricbeat-module-ibmmq,IBM MQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-ibmmq-qmgr,qmgr>> beta[]  
+|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-iis-application_pool,application_pool>> beta[]  
+|<<metricbeat-metricset-iis-webserver,webserver>> beta[]  
+|<<metricbeat-metricset-iis-website,website>> beta[]  
 |<<metricbeat-module-istio,istio>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .5+| .5+|  |<<metricbeat-metricset-istio-citadel,citadel>> beta[]  
 |<<metricbeat-metricset-istio-galley,galley>> beta[]  
@@ -193,14 +212,17 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
+|<<metricbeat-module-redisenterprise,Redis Enterprise>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-redisenterprise-node,node>> beta[]  
+|<<metricbeat-metricset-redisenterprise-proxy,proxy>> beta[]  
 |<<metricbeat-module-sql,sql>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-sql-query,query>> beta[]  
 |<<metricbeat-module-stan,Stan>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>> beta[]  
 |<<metricbeat-metricset-stan-stats,stats>> beta[]  
 |<<metricbeat-metricset-stan-subscriptions,subscriptions>> beta[]  
-|<<metricbeat-module-statsd,Statsd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-statsd-server,server>> beta[]  
+|<<metricbeat-module-statsd,Statsd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-statsd-server,server>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .17+| .17+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
@@ -251,6 +273,7 @@ include::modules/aws.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]
 include::modules/ceph.asciidoc[]
+include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
 include::modules/consul.asciidoc[]
 include::modules/coredns.asciidoc[]
@@ -267,6 +290,7 @@ include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/http.asciidoc[]
 include::modules/ibmmq.asciidoc[]
+include::modules/iis.asciidoc[]
 include::modules/istio.asciidoc[]
 include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
@@ -287,6 +311,7 @@ include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
+include::modules/redisenterprise.asciidoc[]
 include::modules/sql.asciidoc[]
 include::modules/stan.asciidoc[]
 include::modules/statsd.asciidoc[]

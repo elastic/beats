@@ -25,13 +25,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const inputName = "s3"
@@ -181,8 +181,9 @@ func (p *s3Input) Run() {
 
 		awsConfig := p.awsConfig.Copy()
 		awsConfig.Region = regionName
-		svcSQS := sqs.New(awsConfig)
-		svcS3 := s3.New(awsConfig)
+
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
@@ -426,17 +427,6 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
-	// Check content-type
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrap(err, "gzip.NewReader failed")
-			p.logger.Error(err)
-			return err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
-	}
 
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
@@ -448,6 +438,18 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			return err
 		}
 		return nil
+	}
+
+	// Check content-type
+	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrap(err, "gzip.NewReader failed")
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
 	}
 
 	// handle s3 objects that are not json content-type

@@ -20,9 +20,9 @@ package management
 import (
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/feature"
 )
 
 // Namespace is the feature namespace for queue definition.
@@ -52,7 +52,7 @@ type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManage
 
 // Register a config manager
 func Register(name string, fn FactoryFunc, stability feature.Stability) {
-	f := feature.New(Namespace, name, fn, feature.NewDetails(name, "", stability))
+	f := feature.New(Namespace, name, fn, feature.MakeDetails(name, "", stability))
 	feature.MustRegister(f)
 }
 

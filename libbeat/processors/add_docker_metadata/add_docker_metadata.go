@@ -30,14 +30,13 @@ import (
 
 	"github.com/elastic/gosigar/cgroup"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/actions"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 const (
@@ -52,7 +51,6 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsprocessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {

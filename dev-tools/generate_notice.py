@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import glob
 import os
 import datetime
@@ -15,13 +16,73 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    try:
-        with open(filename, 'r') as f:
-            return f.read()
-    except UnicodeDecodeError:
-        # try latin-1
-        with open(filename, 'r', encoding="ISO-8859-1") as f:
-            return f.read()
+    with open(filename, 'r', encoding='utf_8') as f:
+        return f.read()
+
+
+def read_go_mod(vendor_dir):
+    lines = []
+    with open(os.path.join(vendor_dir, "modules.txt"), encoding="utf_8") as f:
+        lines = f.readlines()
+
+    deps = []
+    for line in lines:
+        if line.startswith("# "):
+            line = line[2:]
+            elems = line.split(" ")
+            if len(elems) == 2:
+                data = _get_version_info(elems)
+                deps.append(data)
+                continue
+
+            if " => " in line:
+                data = _get_replaced_dep_data(line)
+                deps.append(data)
+
+    return deps
+
+
+def _get_version_info(elems):
+    data = {}
+    data["path"] = elems[0]
+
+    version_info = elems[1].rstrip("\n")
+    if version_info.endswith("+incompatible"):
+        version_info = version_info[:-len("+incompatible")]
+
+    if len(version_info) < 30:
+        data["version"] = version_info
+        return data
+
+    revision_elems = version_info.split("-")
+    if len(revision_elems) != 3:
+        raise ValueError("unexpected number of elements")
+
+    if revision_elems[0] != "v0.0.0":
+        data["version"] = revision_elems[0]
+    data["revision"] = revision_elems[2]
+
+    return data
+
+
+def _get_replaced_dep_data(line):
+    original, fork = line.split(" => ")
+    elems = fork.split(" ")
+    fork_data = _get_version_info(elems)
+    elems = original.split(" ")
+    data = _get_version_info(elems)
+
+    if "path" in fork_data:
+        data["overwrite-path"] = fork_data["path"]
+    if "version" in fork_data:
+        data["overwrite-version"] = fork_data["version"]
+    if "revision" in fork_data:
+        data["overwrite-revision"] = fork_data["revision"]
+
+    if "revision" in data and data["revision"] == "000000000000":
+        del(data["revision"])
+
+    return data
 
 
 def get_library_path(license):
@@ -35,51 +96,41 @@ def get_library_path(license):
     return "/".join(split)
 
 
-def read_versions(vendor):
-    libs = []
-    with open(os.path.join(vendor, "vendor.json")) as f:
-        govendor = json.load(f)
-        for package in govendor["package"]:
-            libs.append(package)
-    return libs
-
-
-def gather_dependencies(vendor_dirs, overrides=None):
+def gather_dependencies(vendor_dir, overrides=None):
     dependencies = {}   # lib_path -> [array of lib]
-    for vendor in vendor_dirs:
-        libs = read_versions(vendor)
+    libs = read_go_mod(vendor_dir)
 
-        # walk looking for LICENSE files
-        for root, dirs, filenames in os.walk(vendor):
-            licenses = get_licenses(root)
-            for filename in licenses:
-                lib_path = get_library_path(root)
-                lib_search = [l for l in libs if l["path"].startswith(lib_path)]
-                if len(lib_search) == 0:
-                    print("WARNING: No version information found for: {}".format(lib_path))
-                    lib = {"path": lib_path}
-                else:
-                    lib = copy.deepcopy(lib_search[0])
+    # walk looking for LICENSE files
+    for root, dirs, filenames in os.walk("./vendor"):
+        licenses = get_licenses(root)
+        for filename in licenses:
+            lib_path = get_library_path(root)
+            lib_search = [l for l in libs if l["path"].startswith(lib_path)]
+            if len(lib_search) == 0:
+                print("WARNING: No version information found for: {}".format(lib_path))
+                lib = {"path": lib_path}
+            else:
+                lib = copy.deepcopy(lib_search[0])
 
-                lib["license_file"] = os.path.join(root, filename)
+            lib["license_file"] = os.path.join(root, filename)
 
-                lib["license_contents"] = read_file(lib["license_file"])
-                lib["license_summary"] = detect_license_summary(lib["license_contents"])
-                if lib["license_summary"] == "UNKNOWN":
-                    print("WARNING: Unknown license for: {}".format(lib_path))
+            lib["license_contents"] = read_file(lib["license_file"])
+            lib["license_summary"] = detect_license_summary(lib["license_contents"])
+            if lib["license_summary"] == "UNKNOWN":
+                print("WARNING: Unknown license for: {}".format(lib_path))
 
-                revision = overrides.get(lib_path, {}).get("revision")
-                if revision:
-                    lib["revision"] = revision
+            revision = overrides.get(lib_path, {}).get("revision")
+            if revision:
+                lib["revision"] = revision
 
-                if lib_path not in dependencies:
-                    dependencies[lib_path] = [lib]
-                else:
-                    dependencies[lib_path].append(lib)
+            if lib_path not in dependencies:
+                dependencies[lib_path] = [lib]
+            else:
+                dependencies[lib_path].append(lib)
 
-            # don't walk down into another vendor dir
-            if "vendor" in dirs:
-                dirs.remove("vendor")
+        # don't walk down into another vendor dir
+        if "vendor" in dirs:
+            dirs.remove("vendor")
 
     return dependencies
 
@@ -138,7 +189,7 @@ def has_license(folder):
     return True, ""
 
 
-def check_all_have_license_files(vendor_dirs):
+def check_all_have_license_files(vendor_dir):
     """
     Checks that everything in the vendor folders has a license one way
     or the other. This doesn't collect the licenses, because the code that
@@ -146,15 +197,19 @@ def check_all_have_license_files(vendor_dirs):
     that every folder in the `vendor` directories has at least one license.
     """
     issues = []
-    for vendor in vendor_dirs:
-        for root, dirs, filenames in os.walk(vendor):
-            if root.count(os.sep) - vendor.count(os.sep) == 2:  # two levels deep
-                # Two level deep means folders like `github.com/elastic`.
-                # look for the license in root but also one level up
-                ok, issue = has_license(root)
-                if not ok:
+    for root, dirs, filenames in os.walk(vendor_dir):
+        depth = 2
+        if root.count(os.sep) - vendor_dir.count(os.sep) == depth:  # two levels deep
+            # Two level deep means folders like `github.com/elastic`.
+            # look for the license in root but also one level up
+            ok, issue = has_license(root)
+            if not ok:
+                depth += 1
+
+                if depth > 5:
                     print("No license in: {}".format(issue))
                     issues.append(issue)
+
     if len(issues) > 0:
         raise Exception("I have found licensing issues in the following folders: {}"
                         .format(issues))
@@ -185,6 +240,12 @@ def write_notice_file(f, beat, copyright, dependencies):
                 f.write("Version: {}\n".format(lib["version"]))
             if "revision" in lib:
                 f.write("Revision: {}\n".format(lib["revision"]))
+            if "overwrite-path" in lib:
+                f.write("Overwrite: {}\n".format(lib["overwrite-path"]))
+            if "overwrite-version" in lib:
+                f.write("Overwrite-Version: {}\n".format(lib["overwrite-version"]))
+            if "overwrite-revision" in lib:
+                f.write("Overwrite-Revision: {}\n".format(lib["overwrite-revision"]))
             f.write("License type (autodetected): {}\n".format(lib["license_summary"]))
             f.write("{}:\n".format(lib["license_file"]))
             f.write("--------------------------------------------------------------------\n")
@@ -219,14 +280,14 @@ def get_url(repo):
     return "https://github.com/{}/{}".format(words[1], words[2])
 
 
-def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=None):
-    dependencies = gather_dependencies(vendor_dirs, overrides=overrides)
+def create_notice(filename, beat, copyright, vendor_dir, csvfile, overrides=None):
+    dependencies = gather_dependencies(vendor_dir, overrides=overrides)
     if not csvfile:
-        with open(filename, "w+") as f:
+        with open(filename, "w+", encoding='utf_8') as f:
             write_notice_file(f, beat, copyright, dependencies)
             print("Available at {}".format(filename))
     else:
-        with open(csvfile, "wb") as f:
+        with open(csvfile, "w") as f:
             csvwriter = csv.writer(f)
             write_csv_file(csvwriter, dependencies)
             print("Available at {}".format(csvfile))
@@ -324,6 +385,10 @@ UNIVERSAL_PERMISSIVE_LICENSE_TITLES = [
     "The Universal Permissive License (UPL), Version 1.0"
 ]
 
+ISC_LICENSE_TITLE = [
+    "ISC License",
+]
+
 
 # return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
@@ -352,6 +417,10 @@ def detect_license_summary(content):
         return "UPL-1.0"
     if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
         return "EPL-1.0"
+    if any(sentence in content[0:1500] for sentence in ISC_LICENSE_TITLE):
+        return "ISC"
+    if any(sentence in content[0:1500] for sentence in ECLIPSE_PUBLIC_LICENSE_TITLES):
+        return "EPL-1.0"
     return "UNKNOWN"
 
 
@@ -364,6 +433,7 @@ ACCEPTED_LICENSES = [
     "MIT",
     "MPL-2.0",
     "UPL-1.0",
+    "ISC",
 ]
 SKIP_NOTICE = []
 
@@ -390,35 +460,21 @@ if __name__ == "__main__":
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE.txt")
-    vendor_dirs = []
+    vendor_dir = "./vendor"
 
     excludes = args.excludes
     if not isinstance(excludes, list):
         excludes = [excludes]
     SKIP_NOTICE = args.skip_notice
 
-    for root, dirs, files in os.walk(args.vendor):
-
-        # Skips all hidden paths like ".git"
-        if '/.' in root:
-            continue
-
-        if 'vendor' in dirs:
-            vendor_dirs.append(os.path.join(root, 'vendor'))
-            dirs.remove('vendor')   # don't walk down into sub-vendors
-
-        for exclude in excludes:
-            if exclude in dirs:
-                dirs.remove(exclude)
-
     overrides = {}  # revision overrides only for now
     if args.beats_origin:
         govendor = json.load(args.beats_origin)
         overrides = {package['path']: package for package in govendor["package"]}
 
-    print("Get the licenses available from {}".format(vendor_dirs))
-    check_all_have_license_files(vendor_dirs)
-    dependencies = create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile, overrides=overrides)
+    print("Get the licenses available from {}".format(vendor_dir))
+    check_all_have_license_files(vendor_dir)
+    dependencies = create_notice(notice, args.beat, args.copyright, vendor_dir, args.csvfile, overrides=overrides)
 
     # check that all licenses are accepted
     for _, deps in dependencies.items():

@@ -32,7 +32,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // moduleData provides module-level data that will be used to populate the module list
@@ -146,8 +146,12 @@ func getDefaultMetricsets() (map[string][]string, error) {
 		return masterMap, nil
 	}
 
+	cmd := []string{"run"}
+	if mage.UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", "run", dir)()
+		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
 		if err != nil {
 			return nil, errors.Wrap(err, "Error running subcommand to get metricsets")
 		}

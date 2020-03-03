@@ -22,6 +22,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cloudfoundry>>
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
@@ -42,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-ibmmq>>
+* <<exported-fields-iis>>
 * <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
@@ -65,6 +67,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-redisenterprise>>
 * <<exported-fields-sql>>
 * <<exported-fields-stan>>
 * <<exported-fields-statsd>>
@@ -3084,6 +3087,12 @@ type: keyword
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
 
+[float]
+=== vpc
+
+`vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
+
+
 [[exported-fields-azure]]
 == azure fields
 
@@ -3096,6 +3105,16 @@ azure module
 
 
 
+
+*`azure.timegrain`*::
++
+--
+The Azure metric timegrain
+
+
+type: keyword
+
+--
 
 [float]
 === resource
@@ -3188,6 +3207,46 @@ type: object
 +
 --
 compute_vm_scaleset
+
+
+type: object
+
+--
+
+*`azure.container_instance.*.*`*::
++
+--
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
+
+
+type: object
+
+--
+
+*`azure.database_account.*.*`*::
++
+--
+database account
 
 
 type: object
@@ -3933,6 +3992,116 @@ type: long
 --
 
 [float]
+=== mgr_cluster_disk
+
+see: cluster_disk
+
+
+[float]
+=== mgr_cluster_health
+
+see: cluster_health
+
+
+[float]
+=== mgr_osd_perf
+
+OSD performance metrics of Ceph cluster
+
+
+
+*`ceph.mgr_osd_perf.id`*::
++
+--
+OSD ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ms`*::
++
+--
+Commit latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ms`*::
++
+--
+Apply latency in ms
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.commit_latency_ns`*::
++
+--
+Commit latency in ns
+
+type: long
+
+--
+
+*`ceph.mgr_osd_perf.stats.apply_latency_ns`*::
++
+--
+Apply latency in ns
+
+type: long
+
+--
+
+[float]
+=== mgr_osd_pool_stats
+
+OSD pool stats of Ceph cluster
+
+
+
+*`ceph.mgr_osd_pool_stats.pool_name`*::
++
+--
+Pool name
+
+type: keyword
+
+--
+
+*`ceph.mgr_osd_pool_stats.pool_id`*::
++
+--
+Pool ID
+
+type: long
+
+--
+
+*`ceph.mgr_osd_pool_stats.client_io_rate`*::
++
+--
+Client I/O rates
+
+type: object
+
+--
+
+[float]
+=== mgr_osd_tree
+
+see: osd_tree
+
+
+[float]
+=== mgr_pool_disk
+
+see: pool_disk
+
+
+[float]
 === monitor_health
 
 monitor_health stats data
@@ -4457,6 +4626,177 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+[[exported-fields-cloudfoundry]]
+== cloudfoundry fields
+
+Cloud Foundry module
+
+
+
+[float]
+=== cloudfoundry
+
+
+
+
+[float]
+=== app
+
+The application the metric is associated with.
+
+
+
+*`cloudfoundry.app.id`*::
++
+--
+The ID of the application.
+
+
+type: keyword
+
+--
+
+[float]
+=== container
+
+`container` contains container metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.container.instance_index`*::
++
+--
+Index of the instance the metric belongs to.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.cpu.pct`*::
++
+--
+CPU usage percentage.
+
+
+type: float
+
+--
+
+*`cloudfoundry.container.memory.bytes`*::
++
+--
+Bytes of used memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.memory.quota.bytes`*::
++
+--
+Bytes of available memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.bytes`*::
++
+--
+Bytes of used storage.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.quota.bytes`*::
++
+--
+Bytes of available storage.
+
+
+type: long
+
+--
+
+[float]
+=== counter
+
+`counter` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.counter.name`*::
++
+--
+The name of the counter.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.counter.delta`*::
++
+--
+The difference between the last time the counter event occurred.
+
+
+type: long
+
+--
+
+*`cloudfoundry.counter.total`*::
++
+--
+The total value for the counter.
+
+
+type: long
+
+--
+
+[float]
+=== value
+
+`value` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.value.name`*::
++
+--
+The name of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.unit`*::
++
+--
+The unit of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.value`*::
++
+--
+The value of the value.
+
+
+type: float
 
 --
 
@@ -16813,6 +17153,63 @@ IBM MQ module
 
 
 
+
+[[exported-fields-iis]]
+== iis fields
+
+iis module
+
+
+
+[float]
+=== iis
+
+
+
+
+[float]
+=== application_pool
+
+application_pool
+
+
+
+*`iis.application_pool.name`*::
++
+--
+application pool name
+
+
+type: keyword
+
+--
+
+*`iis.webserver.*.*`*::
++
+--
+webserver
+
+
+type: object
+
+--
+
+[float]
+=== website
+
+website
+
+
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
 
 [[exported-fields-istio]]
 == istio fields
@@ -32361,6 +32758,20 @@ type: long
 type: long
 
 --
+
+[[exported-fields-redisenterprise]]
+== Redis Enterprise fields
+
+Redis metrics collected from Redis Enterprise Server.
+
+
+
+[float]
+=== redisenterprise
+
+`redisenterprise` contains the information and statistics from Redis Enterprise Server.
+
+
 
 [[exported-fields-sql]]
 == sql fields

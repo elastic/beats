@@ -196,6 +196,19 @@ pipeline {
             makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
           }
         }
+        stage('Auditbeat x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
+          }
+        }
         stage('Libbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -459,44 +472,45 @@ pipeline {
             }
           }
         }
-        stage('Generators'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_GENERATOR != "false"
-            }
-          }
-          stages {
-            stage('Generators Metricbeat Linux'){
-              steps {
-                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test")
-                makeTarget("Generators Metricbeat Linux", "-C generator/metricbeat test-package")
-              }
-            }
-            stage('Generators Beat Linux'){
-              steps {
-                makeTarget("Generators Beat Linux", "-C generator/beat test")
-                makeTarget("Generators Beat Linux", "-C generator/beat test-package")
-              }
-            }
-            stage('Generators Metricbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              steps {
-                makeTarget("Generators Metricbeat Mac OS X", "-C generator/metricbeat test")
-              }
-            }
-            stage('Generators Beat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              steps {
-                makeTarget("Generators Beat Mac OS X", "-C generator/beat test")
-              }
-            }
-          }
-        }
+        // Temporarily disable generator jobs
+        //stage('Generators'){
+        //  agent { label 'ubuntu && immutable' }
+        //  options { skipDefaultCheckout() }
+        //  when {
+        //    beforeAgent true
+        //    expression {
+        //      return env.BUILD_GENERATOR != "false"
+        //    }
+        //  }
+        //  stages {
+        //    stage('Generators Metricbeat Linux'){
+        //      steps {
+        //        makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
+        //        makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
+        //      }
+        //    }
+        //    stage('Generators Beat Linux'){
+        //      steps {
+        //        makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
+        //        makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
+        //      }
+        //    }
+        //    stage('Generators Metricbeat Mac OS X'){
+        //      agent { label 'macosx' }
+        //      options { skipDefaultCheckout() }
+        //      steps {
+        //        makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+        //      }
+        //    }
+        //    stage('Generators Beat Mac OS X'){
+        //      agent { label 'macosx' }
+        //      options { skipDefaultCheckout() }
+        //      steps {
+        //        makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+        //      }
+        //    }
+        //  }
+        //}
         stage('Kubernetes'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -559,6 +573,7 @@ def withBeatsEnv(Closure body){
     "MAGEFILE_CACHE=${WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
+    "PYTHON_ENV=${WORKSPACE}/python-env",
   ]){
     deleteDir()
     unstash 'source'
@@ -671,7 +686,7 @@ def loadConfigEnvVars(){
     "^x-pack/functionbeat/.*",
     "^x-pack/libbeat/.*",
   ])
-  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
+  //env.BUILD_GENERATOR = isChanged(["^generator/.*"])
   env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
   env.BUILD_HEARTBEAT_XPACK = isChanged([
     "^heartbeat/.*",
