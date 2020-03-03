@@ -106,8 +106,8 @@ type AlertPolicy struct {
 	// to true, then an incident is created. A policy can have from one to six
 	// conditions.
 	Conditions []*AlertPolicy_Condition `protobuf:"bytes,12,rep,name=conditions,proto3" json:"conditions,omitempty"`
-	// How to combine the results of multiple conditions
-	// to determine if an incident should be opened.
+	// How to combine the results of multiple conditions to determine if an
+	// incident should be opened.
 	Combiner AlertPolicy_ConditionCombinerType `protobuf:"varint,6,opt,name=combiner,proto3,enum=google.monitoring.v3.AlertPolicy_ConditionCombinerType" json:"combiner,omitempty"`
 	// Whether or not the policy is enabled. On write, the default interpretation
 	// if unset is that the policy is enabled. On read, clients should not make

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 const (
@@ -122,6 +122,7 @@ func managePropertyName(metric string) string {
 func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) (mb.Event, common.MapStr) {
 	event := mb.Event{
 		ModuleFields: common.MapStr{
+			"timegrain": metric.TimeGrain,
 			"resource": common.MapStr{
 				"name":  metric.Resource.Name,
 				"type":  metric.Resource.Type,

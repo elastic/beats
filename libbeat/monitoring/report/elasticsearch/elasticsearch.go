@@ -27,20 +27,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/outputs"
-	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
-	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 )
 
 type reporter struct {
@@ -172,7 +172,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	}
 
 	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return memqueue.NewBroker(log,
+		return memqueue.NewQueue(log,
 			memqueue.Settings{
 				Eventer: e,
 				Events:  20,

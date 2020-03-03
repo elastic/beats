@@ -5,13 +5,14 @@
 package azure
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Config options
@@ -23,6 +24,7 @@ type Config struct {
 	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
+	DefaultResourceType string           `config:"default_resource_type"`
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -101,7 +103,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 				return nil, errors.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
 			}
 		}
-
+		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
+		var resources []ResourceConfig
+		for _, resource := range config.Resources {
+			if len(resource.Group) != 0 || len(resource.ID) != 0 {
+				resources = append(resources, resource)
+			}
+		}
+		if len(resources) == 0 && len(config.Resources) != 0 {
+			res := config.Resources[0]
+			res.Query = fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType)
+			resources = append(resources, res)
+		}
+		config.Resources = resources
 	}
 	// instantiate monitor client
 	monitorClient, err := NewClient(config)

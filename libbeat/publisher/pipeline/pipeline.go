@@ -26,15 +26,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // Pipeline implementation providint all beats publisher functionality.

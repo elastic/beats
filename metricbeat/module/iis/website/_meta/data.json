@@ -1,0 +1,33 @@
+{
+        "@timestamp" : "2020-02-05T12:47:14.651Z",
+        "metricset" : {
+            "name" : "website",
+            "period" : 10000
+        },
+        "service" : {
+            "type" : "iis"
+        },
+        "iis" : {
+            "website" : {
+                "name" : "Default Web Site",
+                "total_bytes_received" : 23122,
+                "current_connections" : 0,
+                "service_uptime" : 1195668.0,
+                "maximum_connections" : 1,
+                "total_post_requests" : 0,
+                "total_bytes_sent" : 11350,
+                "total_connection_attempts" : 33,
+                "bytes_sent_per_sec" : 0,
+                "post_requests_per_sec" : 0,
+                "delete_requests_per_sec" : 0,
+                "get_requests_per_sec" : 0,
+                "total_delete_requests" : 0,
+                "bytes_received_per_sec" : 0,
+                "total_get_requests" : 39
+            }
+        },
+        "event" : {
+            "dataset" : "iis.website",
+            "module" : "iis"
+        }
+}

@@ -21,15 +21,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
@@ -257,7 +257,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	assert.Equal(t, ok, true)
 	assert.Equal(t, len(labelMap), 2)
 
-	rawAnnotations, _ := indexers[0].Data.GetValue("pod.annotations")
+	rawAnnotations, _ := indexers[0].Data.GetValue("annotations")
 	assert.Nil(t, rawAnnotations)
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -284,7 +284,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	ok, _ = labelMap.HasKey("foo")
 	assert.Equal(t, ok, true)
 
-	rawAnnotations, _ = indexers[0].Data.GetValue("pod.annotations")
+	rawAnnotations, _ = indexers[0].Data.GetValue("annotations")
 	assert.NotNil(t, rawAnnotations)
 	annotationsMap, ok := rawAnnotations.(common.MapStr)
 

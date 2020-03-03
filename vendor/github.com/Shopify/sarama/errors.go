@@ -188,6 +188,7 @@ const (
 	ErrMemberIdRequired                   KError = 79
 	ErrPreferredLeaderNotAvailable        KError = 80
 	ErrGroupMaxSizeReached                KError = 81
+	ErrFencedInstancedId                  KError = 82
 )
 
 func (err KError) Error() string {
@@ -360,6 +361,8 @@ func (err KError) Error() string {
 		return "kafka server: The preferred leader was not available"
 	case ErrGroupMaxSizeReached:
 		return "kafka server: Consumer group The consumer group has reached its max size. already has the configured maximum number of members."
+	case ErrFencedInstancedId:
+		return "kafka server: The broker rejected this static consumer since another consumer with the same group.instance.id has registered with a different member.id."
 	}
 
 	return fmt.Sprintf("Unknown error, how did this happen? Error code = %d", err)

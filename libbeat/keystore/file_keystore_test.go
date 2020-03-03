@@ -27,7 +27,7 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var keyValue = "output.elasticsearch.password"
