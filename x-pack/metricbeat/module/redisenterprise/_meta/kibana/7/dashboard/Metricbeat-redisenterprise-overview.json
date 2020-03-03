@@ -23,7 +23,7 @@
               "title": ""
             },
             "gridData": {
-              "h": 5,
+              "h": 8,
               "i": "bdd26554-0293-4928-9751-f7304d9fbc74",
               "w": 9,
               "x": 0,
@@ -38,7 +38,7 @@
               "title": "System CPU time"
             },
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "4aa7a92c-1705-40ee-9f53-478610ea34f0",
               "w": 8,
               "x": 9,
@@ -54,7 +54,7 @@
               "title": "User CPU time"
             },
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "431e4d28-f8be-46a3-8079-d562e644bae1",
               "w": 8,
               "x": 17,
@@ -70,7 +70,7 @@
               "title": "Node free memory"
             },
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "192540d9-3c81-495d-ba22-2b1d96841ba7",
               "w": 7,
               "x": 25,
@@ -86,7 +86,7 @@
               "title": "Free persistent disk space"
             },
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "666f6222-3542-42b0-9085-7e93224c3998",
               "w": 8,
               "x": 32,
@@ -102,7 +102,7 @@
               "title": "Free ephemeral disk space"
             },
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "9d84abb9-cc6d-4d78-b2a4-ca77b942cf5c",
               "w": 8,
               "x": 40,
@@ -115,32 +115,17 @@
           },
           {
             "embeddableConfig": {
-              "title": ""
-            },
-            "gridData": {
-              "h": 5,
-              "i": "18e2ff53-97e7-4f4d-b3c7-840af7de2587",
-              "w": 9,
-              "x": 0,
-              "y": 5
-            },
-            "panelIndex": "18e2ff53-97e7-4f4d-b3c7-840af7de2587",
-            "panelRefName": "panel_6",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {
               "title": "Rate of incoming/outgoing network traffic"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "86afca72-c2a2-4d20-af63-7e74220df79c",
               "w": 16,
               "x": 0,
-              "y": 10
+              "y": 8
             },
             "panelIndex": "86afca72-c2a2-4d20-af63-7e74220df79c",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_6",
             "title": "Rate of incoming/outgoing network traffic",
             "version": "7.1.0"
           },
@@ -149,14 +134,14 @@
               "title": "Total requests"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "aab5878f-0105-4be9-aaea-1951de591ec8",
               "w": 16,
               "x": 16,
-              "y": 10
+              "y": 8
             },
             "panelIndex": "aab5878f-0105-4be9-aaea-1951de591ec8",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_7",
             "title": "Total requests",
             "version": "7.1.0"
           },
@@ -165,14 +150,14 @@
               "title": "Connections"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "c520c103-f16f-4490-ab07-3fbd38681c94",
               "w": 16,
               "x": 32,
-              "y": 10
+              "y": 8
             },
             "panelIndex": "c520c103-f16f-4490-ab07-3fbd38681c94",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_8",
             "title": "Connections",
             "version": "7.1.0"
           },
@@ -181,14 +166,14 @@
               "title": "GET/SET commands"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "52d5e0f2-8c7d-42a0-b0d7-3bff758034bd",
               "w": 16,
               "x": 0,
-              "y": 26
+              "y": 25
             },
             "panelIndex": "52d5e0f2-8c7d-42a0-b0d7-3bff758034bd",
-            "panelRefName": "panel_10",
+            "panelRefName": "panel_9",
             "title": "GET/SET commands",
             "version": "7.1.0"
           },
@@ -197,14 +182,14 @@
               "title": "Other commands"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "8d97e4fa-7929-42b6-bcd1-c73a0ec6ceea",
               "w": 16,
               "x": 16,
-              "y": 26
+              "y": 25
             },
             "panelIndex": "8d97e4fa-7929-42b6-bcd1-c73a0ec6ceea",
-            "panelRefName": "panel_11",
+            "panelRefName": "panel_10",
             "title": "Other commands",
             "version": "7.1.0"
           },
@@ -213,14 +198,14 @@
               "title": "Listener latency"
             },
             "gridData": {
-              "h": 16,
+              "h": 17,
               "i": "0f739671-dfbe-4ec9-8468-d5b2b9aad001",
               "w": 16,
               "x": 32,
-              "y": 26
+              "y": 25
             },
             "panelIndex": "0f739671-dfbe-4ec9-8468-d5b2b9aad001",
-            "panelRefName": "panel_12",
+            "panelRefName": "panel_11",
             "title": "Listener latency",
             "version": "7.1.0"
           }
@@ -265,48 +250,43 @@
           "type": "visualization"
         },
         {
-          "id": "eda70cb0-5c92-11ea-b0b5-8133f1152545",
+          "id": "f6c6d0e0-5a36-11ea-bc69-cdcc68092a57",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "f6c6d0e0-5a36-11ea-bc69-cdcc68092a57",
+          "id": "6c861200-5c7b-11ea-b0b5-8133f1152545",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "6c861200-5c7b-11ea-b0b5-8133f1152545",
+          "id": "b5621150-5c7a-11ea-b0b5-8133f1152545",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "b5621150-5c7a-11ea-b0b5-8133f1152545",
+          "id": "3c776b90-5c80-11ea-b0b5-8133f1152545",
           "name": "panel_9",
           "type": "visualization"
         },
         {
-          "id": "3c776b90-5c80-11ea-b0b5-8133f1152545",
+          "id": "837f9fd0-5c80-11ea-b0b5-8133f1152545",
           "name": "panel_10",
           "type": "visualization"
         },
         {
-          "id": "837f9fd0-5c80-11ea-b0b5-8133f1152545",
-          "name": "panel_11",
-          "type": "visualization"
-        },
-        {
           "id": "a452c8c0-5c96-11ea-b0b5-8133f1152545",
-          "name": "panel_12",
+          "name": "panel_11",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-03-03T09:02:48.441Z",
-      "version": "Wzc5OSwzXQ=="
+      "updated_at": "2020-03-03T15:48:26.671Z",
+      "version": "WzgwNCw0XQ=="
     },
     {
       "attributes": {
-        "description": "Select cluster based on its name",
+        "description": "Select cluster/node based on its name",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
@@ -316,7 +296,7 @@
             }
           }
         },
-        "title": "Cluster selector [Metricbeat Redis Enterprise]",
+        "title": "Cluster/node selector [Metricbeat Redis Enterprise]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -337,13 +317,28 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "prometheus.labels.node",
+                "id": "1583250395046",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "node name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
               }
             ],
             "pinFilters": false,
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Cluster selector [Metricbeat Redis Enterprise]",
+          "title": "Cluster/node selector [Metricbeat Redis Enterprise]",
           "type": "input_control_vis"
         }
       },
@@ -356,11 +351,16 @@
           "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-03-02T14:33:03.408Z",
-      "version": "Wzc3MSwzXQ=="
+      "updated_at": "2020-03-03T15:47:18.669Z",
+      "version": "WzgwMyw0XQ=="
     },
     {
       "attributes": {
@@ -866,64 +866,6 @@
       "type": "visualization",
       "updated_at": "2020-03-02T14:28:19.864Z",
       "version": "Wzc2NiwzXQ=="
-    },
-    {
-      "attributes": {
-        "description": "Select node based on its ID",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Node selector [Metricbeat Redis Enterprise]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "prometheus.labels.node",
-                "id": "1583159394252",
-                "indexPatternRefName": "control_0_index_pattern",
-                "label": "node name",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": false,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "Node selector [Metricbeat Redis Enterprise]",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "eda70cb0-5c92-11ea-b0b5-8133f1152545",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-02T14:34:39.845Z",
-      "version": "Wzc3NiwzXQ=="
     },
     {
       "attributes": {
