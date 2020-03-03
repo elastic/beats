@@ -8,7 +8,7 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 
 	"github.com/gofrs/uuid"
 )

@@ -24,12 +24,12 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
 type kafkaInputConfig struct {

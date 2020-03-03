@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/metricbeat/module/windows"
-	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
+	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
+	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
 )
 
 func TestData(t *testing.T) {
