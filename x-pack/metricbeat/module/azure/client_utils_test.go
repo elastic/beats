@@ -142,3 +142,29 @@ func TestCompareMetricValues(t *testing.T) {
 	result = compareMetricValues(val1, val2)
 	assert.True(t, result)
 }
+
+func TestContainsDimension(t *testing.T) {
+	dimension := "VMName"
+	dim1 := "SlotID"
+	dim2 := "VNU"
+	dim3 := "VMName"
+	dimensionList := []insights.LocalizableString{
+		{
+			Value:          &dim1,
+			LocalizedValue: &dim1,
+		},
+		{
+			Value:          &dim2,
+			LocalizedValue: &dim2,
+		},
+		{
+			Value:          &dim3,
+			LocalizedValue: &dim3,
+		},
+	}
+	result := ContainsDimension(dimension, dimensionList)
+	assert.True(t, result)
+	dimension = "VirtualMachine"
+	result = ContainsDimension(dimension, dimensionList)
+	assert.False(t, result)
+}

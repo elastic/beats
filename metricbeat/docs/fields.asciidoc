@@ -22,6 +22,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cloudfoundry>>
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
@@ -3212,6 +3213,36 @@ type: object
 
 --
 
+*`azure.container_instance.*.*`*::
++
+--
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
+
+
+type: object
+
+--
+
 *`azure.database_account.*.*`*::
 +
 --
@@ -4595,6 +4626,177 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+[[exported-fields-cloudfoundry]]
+== cloudfoundry fields
+
+Cloud Foundry module
+
+
+
+[float]
+=== cloudfoundry
+
+
+
+
+[float]
+=== app
+
+The application the metric is associated with.
+
+
+
+*`cloudfoundry.app.id`*::
++
+--
+The ID of the application.
+
+
+type: keyword
+
+--
+
+[float]
+=== container
+
+`container` contains container metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.container.instance_index`*::
++
+--
+Index of the instance the metric belongs to.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.cpu.pct`*::
++
+--
+CPU usage percentage.
+
+
+type: float
+
+--
+
+*`cloudfoundry.container.memory.bytes`*::
++
+--
+Bytes of used memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.memory.quota.bytes`*::
++
+--
+Bytes of available memory.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.bytes`*::
++
+--
+Bytes of used storage.
+
+
+type: long
+
+--
+
+*`cloudfoundry.container.disk.quota.bytes`*::
++
+--
+Bytes of available storage.
+
+
+type: long
+
+--
+
+[float]
+=== counter
+
+`counter` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.counter.name`*::
++
+--
+The name of the counter.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.counter.delta`*::
++
+--
+The difference between the last time the counter event occurred.
+
+
+type: long
+
+--
+
+*`cloudfoundry.counter.total`*::
++
+--
+The total value for the counter.
+
+
+type: long
+
+--
+
+[float]
+=== value
+
+`value` contains counter metrics from Cloud Foundry.
+
+
+
+*`cloudfoundry.value.name`*::
++
+--
+The name of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.unit`*::
++
+--
+The unit of the value.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.value.value`*::
++
+--
+The value of the value.
+
+
+type: float
 
 --
 

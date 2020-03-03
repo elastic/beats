@@ -31,8 +31,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpc,vpc>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
+.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
+|<<metricbeat-metricset-azure-container_instance,container_instance>> beta[]  
+|<<metricbeat-metricset-azure-container_registry,container_registry>> beta[]  
+|<<metricbeat-metricset-azure-container_service,container_service>> beta[]  
 |<<metricbeat-metricset-azure-database_account,database_account>> beta[]  
 |<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
 |<<metricbeat-metricset-azure-storage,storage>> beta[]  
@@ -53,6 +56,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
+|<<metricbeat-module-cloudfoundry,cloudfoundry>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> experimental[]  
+|<<metricbeat-metricset-cloudfoundry-counter,counter>> experimental[]  
+|<<metricbeat-metricset-cloudfoundry-value,value>> experimental[]  
 |<<metricbeat-module-cockroachdb,CockroachDB>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -205,7 +212,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
-|<<metricbeat-module-redisenterprise,Redis Enterprise>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-redisenterprise,Redis Enterprise>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-redisenterprise-node,node>> beta[]  
 |<<metricbeat-metricset-redisenterprise-proxy,proxy>> beta[]  
 |<<metricbeat-module-sql,sql>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -266,6 +273,7 @@ include::modules/aws.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]
 include::modules/ceph.asciidoc[]
+include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
 include::modules/consul.asciidoc[]
 include::modules/coredns.asciidoc[]

@@ -27,16 +27,16 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/generator/common/beatgen"
-	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/generator/common/beatgen"
+	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 func init() {
@@ -47,7 +47,7 @@ func init() {
 	devtools.BeatServiceName = "heartbeat-elastic"
 }
 
-// VendorUpdate updates elastic/beats in the vendor dir
+// VendorUpdate updates elastic/beats/v7 in the vendor dir
 func VendorUpdate() error {
 	return beatgen.VendorUpdate()
 }

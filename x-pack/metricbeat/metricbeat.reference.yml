@@ -184,6 +184,9 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
 - module: aws
   period: 300s
   credential_profile_name: test-mb
@@ -213,6 +216,9 @@ metricbeat.modules:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
 - module: aws
   period: 60s
   credential_profile_name: test-mb
@@ -267,6 +273,37 @@ metricbeat.modules:
 
 - module: azure
   metricsets:
+  - container_instance
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_service
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_registry
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+
+- module: azure
+  metricsets:
   - database_account
   enabled: true
   period: 300s
@@ -295,6 +332,20 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+#----------------------------- Cloudfoundry Module -----------------------------
+- module: cloudfoundry
+  metricsets:
+    - container
+    - counter
+    - value
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  doppler_address: '${CLOUDFOUNDRY_DOPPLER_ADDRESS:""}'
+  uaa_address: '${CLOUDFOUNDRY_UAA_ADDRESS:""}'
+  rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
 
 #----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
@@ -457,6 +508,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
