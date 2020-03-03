@@ -8,7 +8,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/coreos/go-systemd/activation"
+	"github.com/coreos/go-systemd/v22/activation"
 )
 
 // isRunningSystemd checks whether the host was booted with systemd as its init
