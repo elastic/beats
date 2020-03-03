@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	"github.com/hashicorp/nomad/api"
-	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/hashicorp/nomad/helper"
 	"github.com/hashicorp/nomad/helper/uuid"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
 
 func newJob(jobID string) *Job {
@@ -22,8 +22,8 @@ func newJob(jobID string) *Job {
 		ID:          helper.StringToPtr(jobID),
 		Region:      helper.StringToPtr(api.GlobalRegion),
 		Name:        helper.StringToPtr("my-job"),
-		Type:        helper.StringToPtr(structs.JobTypeService),
-		Status:      helper.StringToPtr(structs.TaskStateRunning),
+		Type:        helper.StringToPtr(nomad.JobTypeService),
+		Status:      helper.StringToPtr(nomad.TaskStateRunning),
 		Datacenters: []string{"europe-west4"},
 		Meta: map[string]string{
 			"key1":    "job-value",
@@ -47,7 +47,7 @@ func newJob(jobID string) *Job {
 							{
 								Id:   "service-a",
 								Name: "web",
-								Tags: []string{"tag-a", "tag-b"},
+								Tags: []string{"tag-a", "tag-b", "${NOMAD_JOB_NAME}"},
 							},
 							{
 								Id:   "service-b",
@@ -125,8 +125,8 @@ func TestCronJob(t *testing.T) {
 		ID:          helper.StringToPtr(jobID),
 		Region:      helper.StringToPtr("global"),
 		Name:        helper.StringToPtr("my-job"),
-		Type:        helper.StringToPtr(structs.JobTypeBatch),
-		Status:      helper.StringToPtr(structs.TaskStateRunning),
+		Type:        helper.StringToPtr(nomad.JobTypeBatch),
+		Status:      helper.StringToPtr(nomad.TaskStateRunning),
 		Datacenters: []string{"europe-west4"},
 		TaskGroups: []*TaskGroup{
 			{
@@ -167,6 +167,6 @@ func TestCronJob(t *testing.T) {
 	tasks := metaGen.GroupMeta(alloc.Job)
 
 	assert.Equal(t, meta["alloc_id"], allocID)
-	assert.Equal(t, meta["type"], structs.JobTypeBatch)
+	assert.Equal(t, meta["type"], nomad.JobTypeBatch)
 	assert.Len(t, tasks, 2)
 }
