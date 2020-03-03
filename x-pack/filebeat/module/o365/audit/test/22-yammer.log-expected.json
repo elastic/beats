@@ -50,7 +50,6 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "user.email": "alice@testsiem2.onmicrosoft.com",
-        "user.hash": "100320009d6edf94",
         "user.id": 36787265537
     },
     {
@@ -104,7 +103,6 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "100320009d292e16",
         "user.id": 36085768193
     }
 ]

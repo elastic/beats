@@ -143,7 +143,6 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "DlpAgent"
     },
     {
@@ -290,7 +289,6 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "DlpAgent"
     },
     {
@@ -438,7 +436,6 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "DlpAgent"
     },
     {
@@ -586,7 +583,6 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "DlpAgent"
     },
     {
@@ -684,7 +680,6 @@
         "rule.name": "Low volume of content detected test",
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "DlpAgent"
     },
     {
@@ -775,7 +770,6 @@
         "service.type": "o365",
         "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
         "user.domain": "testsiem2.onmicrosoft.com",
-        "user.hash": "1153801116545789462",
         "user.id": "alice@testsiem2.onmicrosoft.com",
         "user.name": "alice"
     }

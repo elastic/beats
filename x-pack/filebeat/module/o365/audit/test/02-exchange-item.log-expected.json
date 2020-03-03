@@ -56,7 +56,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -116,7 +115,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -176,7 +174,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -236,7 +233,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -296,7 +292,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -356,7 +351,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -416,7 +410,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -476,7 +469,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     },
     {
@@ -536,7 +528,6 @@
         "service.type": "o365",
         "source.ip": "::1",
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
-        "user.hash": "S-1-5-18",
         "user.id": "S-1-5-18"
     }
 ]

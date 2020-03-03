@@ -386,7 +386,7 @@ function dataLossPreventionSchema(debug) {
         if (maxSeverity > -1) {
             evt.Put("event.severity", maxSeverity);
         }
-        evt.Put("event.outcome", allowed ||  isBlockOverride(evt)? "success" : "failure");
+        evt.Put("event.outcome", (allowed || isBlockOverride(evt))? "success" : "failure");
     });
     return builder.Build();
 }
@@ -544,7 +544,6 @@ function AuditProcessor(tenant_names, debug) {
             {from: "o365audit.ClientIP", to: "client.address"},
             {from: "o365audit.ClientIPAddress", to: "client.address"},
             {from: "o365audit.ActorIpAddress", to: "client.address"},
-            {from: "o365audit.UserKey", to: "user.hash"},
             {from: "o365audit.UserId", to: "user.id"},
             {from: "o365audit.Workload", to: "event.provider"},
             {from: "o365audit.Operation", to: "event.action"},

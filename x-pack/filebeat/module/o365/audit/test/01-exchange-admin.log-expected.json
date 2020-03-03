@@ -38,7 +38,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -93,7 +92,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -148,7 +146,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -190,7 +187,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -232,7 +228,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -275,7 +270,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -319,7 +313,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -361,7 +354,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -416,7 +408,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -471,7 +462,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -514,7 +504,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -569,7 +558,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -624,7 +612,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -679,7 +666,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -734,7 +720,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -789,7 +774,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -844,7 +828,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -886,7 +869,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -929,7 +911,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -972,7 +953,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1014,7 +994,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1057,7 +1036,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1112,7 +1090,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1167,7 +1144,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1222,7 +1198,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1277,7 +1252,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1332,7 +1306,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1387,7 +1360,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1442,7 +1414,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1497,7 +1468,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1554,7 +1524,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1609,7 +1578,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1664,7 +1632,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1719,7 +1686,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1774,7 +1740,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1829,7 +1794,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1884,7 +1848,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1939,7 +1902,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1994,7 +1956,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2049,7 +2010,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2101,7 +2061,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2145,7 +2104,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2188,7 +2146,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2231,7 +2188,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2274,7 +2230,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2331,7 +2286,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2386,7 +2340,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2441,7 +2394,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2496,7 +2448,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2551,7 +2502,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2606,7 +2556,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2661,7 +2610,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2716,7 +2664,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2771,7 +2718,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2826,7 +2772,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2881,7 +2826,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2936,7 +2880,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2980,7 +2923,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3024,7 +2966,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3079,7 +3020,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3134,7 +3074,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3178,7 +3117,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3220,7 +3158,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3277,7 +3214,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3332,7 +3268,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3387,7 +3322,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3442,7 +3376,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3497,7 +3430,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3552,7 +3484,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3607,7 +3538,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3662,7 +3592,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3705,7 +3634,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3749,7 +3677,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3792,7 +3719,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3836,7 +3762,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3878,7 +3803,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3922,7 +3846,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3964,7 +3887,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4008,7 +3930,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4063,7 +3984,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4118,7 +4038,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4173,7 +4092,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4228,7 +4146,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4283,7 +4200,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4338,7 +4254,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4393,7 +4308,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4448,7 +4362,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4492,7 +4405,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4547,7 +4459,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4602,7 +4513,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4645,7 +4555,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4700,7 +4609,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4742,7 +4650,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4786,7 +4693,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4838,7 +4744,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4893,7 +4798,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4937,7 +4841,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4992,7 +4895,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -5049,7 +4951,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -5104,7 +5005,6 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
-        "user.hash": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)",
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     }
 ]

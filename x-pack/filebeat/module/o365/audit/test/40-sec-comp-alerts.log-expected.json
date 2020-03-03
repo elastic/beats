@@ -57,7 +57,6 @@
         "rule.ruleset": "User",
         "service.type": "o365",
         "user.domain": "testsiem.onmicrosoft.com",
-        "user.hash": "SecurityComplianceAlerts",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -108,7 +107,6 @@
         "rule.name": "Elevation of Exchange admin privilege",
         "rule.reference": "http://example.net/single",
         "service.type": "o365",
-        "user.hash": "SecurityComplianceAlerts",
         "user.id": "SecurityComplianceAlerts"
     },
     {
@@ -161,7 +159,6 @@
         "rule.ruleset": "MalwareFamily",
         "service.type": "o365",
         "threat.technique.id": "Malware/Evil.Malware.B",
-        "user.hash": "SecurityComplianceAlerts",
         "user.id": "SecurityComplianceAlerts"
     }
 ]
