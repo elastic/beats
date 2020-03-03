@@ -49,7 +49,7 @@ func (p *Pagination) IsEnabled() bool {
 
 // HTTP Header information for pagination
 type Header struct {
-	FieldName    string `config:"field_name" validate:"required"`
+	FieldName    string         `config:"field_name" validate:"required"`
 	RegexPattern *regexp.Regexp `config:"regex_pattern" validate:"required"`
 }
 
