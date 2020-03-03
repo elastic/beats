@@ -1,6 +1,10 @@
 [[processor-registered-domain]]
 === Registered Domain
 
+++++
+<titleabbrev>registered_domain</titleabbrev>
+++++
+
 The `registered_domain` processor reads a field containing a hostname and then
 writes the "registered domain" contained in the hostname to the target field.
 For example, given `www.google.co.uk` the processor would output `google.co.uk`.

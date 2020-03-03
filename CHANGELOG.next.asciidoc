@@ -152,6 +152,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
 - Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
+- Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
+- Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
 
 *Heartbeat*
 
@@ -190,10 +192,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS 2.1. {pull}16317[16317]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
+- Add azure container metricset in order to monitor containers. {issue}15751[15751] {pull}16421[16421]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 - Add filtering option for prometheus collector. {pull}16420[16420]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
+- Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
+- Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
 
 *Packetbeat*
 

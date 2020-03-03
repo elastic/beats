@@ -14,8 +14,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -114,13 +114,13 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			client.Log.Error(err)
 			report.Error(err)
 		} else {
-			if metric.TimeGrain == "" {
-				metric.TimeGrain = timegrain
-			}
 			for i, currentMetric := range client.Resources.Metrics {
 				if matchMetrics(currentMetric, metric) {
 					current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
 					client.Resources.Metrics[i].Values = current
+					if client.Resources.Metrics[i].TimeGrain == "" {
+						client.Resources.Metrics[i].TimeGrain = timegrain
+					}
 					resultedMetrics = append(resultedMetrics, client.Resources.Metrics[i])
 				}
 			}
