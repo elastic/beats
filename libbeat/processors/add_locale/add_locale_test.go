@@ -85,11 +85,10 @@ func TestTimezoneFormat(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
-	logp.TestingSetup()
-
+	log := logp.NewLogger("add_locale_test")
 	p, err := New(config)
 	if err != nil {
-		logp.Err("Error initializing add_locale")
+		log.Error("Error initializing add_locale")
 		t.Fatal(err)
 	}
 

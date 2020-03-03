@@ -122,31 +122,31 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 // hosting providers supported by this processor. It wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
-func fetchMetadata(metadataFetchers []metadataFetcher, timeout time.Duration) *result {
-	debugf("add_cloud_metadata: starting to fetch metadata, timeout=%v", timeout)
+func (p *addCloudMetadata) fetchMetadata() *result {
+	p.logger.Debugf("add_cloud_metadata: starting to fetch metadata, timeout=%v", p.initData.timeout)
 	start := time.Now()
 	defer func() {
-		debugf("add_cloud_metadata: fetchMetadata ran for %v", time.Since(start))
+		p.logger.Debugf("add_cloud_metadata: fetchMetadata ran for %v", time.Since(start))
 	}()
 
 	// Create HTTP client with our timeouts and keep-alive disabled.
 	client := http.Client{
-		Timeout: timeout,
+		Timeout: p.initData.timeout,
 		Transport: &http.Transport{
 			DisableKeepAlives: true,
 			DialContext: (&net.Dialer{
-				Timeout:   timeout,
+				Timeout:   p.initData.timeout,
 				KeepAlive: 0,
 			}).DialContext,
 		},
 	}
 
 	// Create context to enable explicit cancellation of the http requests.
-	ctx, cancel := context.WithTimeout(context.TODO(), timeout)
+	ctx, cancel := context.WithTimeout(context.TODO(), p.initData.timeout)
 	defer cancel()
 
 	results := make(chan result)
-	for _, fetcher := range metadataFetchers {
+	for _, fetcher := range p.initData.fetchers {
 		fetcher := fetcher
 		go func() {
 			select {
@@ -156,17 +156,17 @@ func fetchMetadata(metadataFetchers []metadataFetcher, timeout time.Duration) *r
 		}()
 	}
 
-	for i := 0; i < len(metadataFetchers); i++ {
+	for i := 0; i < len(p.initData.fetchers); i++ {
 		select {
 		case result := <-results:
-			debugf("add_cloud_metadata: received disposition for %v after %v. %v",
+			p.logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
 				result.provider, time.Since(start), result)
 			// Bail out on first success.
 			if result.err == nil && result.metadata != nil {
 				return &result
 			}
 		case <-ctx.Done():
-			debugf("add_cloud_metadata: timed-out waiting for all responses")
+			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")
 			return nil
 		}
 	}
