@@ -4,7 +4,6 @@
 
 package nomad
 
-// "github.com/hashicorp/nomad/nomad/mock"
 import (
 	"encoding/json"
 	"fmt"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	api "github.com/hashicorp/nomad/api"
-	"github.com/hashicorp/nomad/nomad/mock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,8 +24,8 @@ const (
 )
 
 func TestWatcherAddAllocation(t *testing.T) {
-	node := mock.Node()
-	alloc := mock.Alloc()
+	node := api.Node{}
+	alloc := api.Allocation{}
 	alloc.ModifyIndex = 20
 	alloc.CreateIndex = 20
 	alloc.AllocModifyIndex = 20
@@ -110,8 +108,8 @@ func TestWatcherAddAllocation(t *testing.T) {
 }
 
 func TestWatcherUnchangedIndex(t *testing.T) {
-	node := mock.Node()
-	alloc := mock.Alloc()
+	node := api.Node{}
+	alloc := api.Allocation{}
 
 	mux := http.NewServeMux()
 
@@ -190,14 +188,15 @@ func TestWatcherUnchangedIndex(t *testing.T) {
 }
 
 func TestWatcherIgnoreOldAllocations(t *testing.T) {
-	node := mock.Node()
+	node := api.Node{}
 
 	// The Watcher is initialized with an initial WaitIndex of 1
 	// this allocation should be ignored
-	alloc := mock.Alloc()
+	alloc := api.Allocation{}
+	alloc.ID = "sample-id"
 	alloc.ModifyIndex = 0
 
-	alloc1 := mock.Alloc()
+	alloc1 := api.Allocation{}
 	alloc1.ModifyIndex = 1
 	alloc1.ClientStatus = AllocClientStatusRunning
 
@@ -280,8 +279,8 @@ func TestWatcherIgnoreOldAllocations(t *testing.T) {
 }
 
 func TestWatcherAddAllocationOnFirstRun(t *testing.T) {
-	node := mock.Node()
-	alloc := mock.Alloc()
+	node := api.Node{}
+	alloc := api.Allocation{}
 	alloc.ModifyIndex = 72975148
 	alloc.CreateIndex = 72636274
 	alloc.AllocModifyIndex = 72975148
@@ -364,8 +363,8 @@ func TestWatcherAddAllocationOnFirstRun(t *testing.T) {
 }
 
 func TestWatcherUpdateAllocation(t *testing.T) {
-	node := mock.Node()
-	alloc := mock.Alloc()
+	node := api.Node{}
+	alloc := api.Allocation{}
 	alloc.ModifyIndex = 20
 	alloc.CreateIndex = 18
 	alloc.AllocModifyIndex = 20

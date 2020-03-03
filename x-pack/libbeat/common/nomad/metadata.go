@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	envRe = regexp.MustCompile(`\${[a-zA-Z0-9_\-\.]+}`)
+	envRegex = regexp.MustCompile(`\${[a-zA-Z0-9_\-\.]+}`)
 )
 
 // MetaGenerator builds metadata objects for allocations
@@ -92,6 +92,8 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 			meta[k] = v
 		}
 
+		group.Meta = meta
+
 		tasks := g.tasksMeta(group)
 		tasksMeta = append(tasksMeta, tasks...)
 	}
@@ -141,7 +143,7 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 				service.CanaryTags...)
 		}
 
-		joinMeta := make(map[string]string, len(group.Meta)+len(task.Meta))
+		joinMeta := make(map[string]string, len(group.Meta))
 
 		for k, v := range group.Meta {
 			joinMeta[k] = v

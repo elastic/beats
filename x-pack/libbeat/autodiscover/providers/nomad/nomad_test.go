@@ -12,13 +12,13 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/hashicorp/nomad/api"
-	"github.com/hashicorp/nomad/helper"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
@@ -108,11 +108,11 @@ func TestEmitEvent(t *testing.T) {
 				NodeName:      host,
 				NodeID:        "nomad1",
 				Job: &nomad.Job{
-					ID:          helper.StringToPtr(UUID.String()),
-					Region:      helper.StringToPtr("global"),
-					Name:        helper.StringToPtr("my-job"),
-					Type:        helper.StringToPtr(nomad.JobTypeService),
-					Status:      helper.StringToPtr(nomad.JobStatusRunning),
+					ID:          nomad.StringToPtr(UUID.String()),
+					Region:      nomad.StringToPtr("global"),
+					Name:        nomad.StringToPtr("my-job"),
+					Type:        nomad.StringToPtr(nomad.JobTypeService),
+					Status:      nomad.StringToPtr(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -120,7 +120,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					TaskGroups: []*nomad.TaskGroup{
 						{
-							Name: helper.StringToPtr("web"),
+							Name: nomad.StringToPtr("web"),
 							Meta: map[string]string{
 								"key1":      "group-value",
 								"group-key": "group.value",
@@ -191,11 +191,11 @@ func TestEmitEvent(t *testing.T) {
 				NodeName:      "",
 				NodeID:        "5456bd7a",
 				Job: &nomad.Job{
-					ID:          helper.StringToPtr(UUID.String()),
-					Region:      helper.StringToPtr("global"),
-					Name:        helper.StringToPtr("my-job"),
-					Type:        helper.StringToPtr(nomad.JobTypeService),
-					Status:      helper.StringToPtr(nomad.JobStatusRunning),
+					ID:          nomad.StringToPtr(UUID.String()),
+					Region:      nomad.StringToPtr("global"),
+					Name:        nomad.StringToPtr("my-job"),
+					Type:        nomad.StringToPtr(nomad.JobTypeService),
+					Status:      nomad.StringToPtr(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -203,7 +203,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					TaskGroups: []*nomad.TaskGroup{
 						{
-							Name: helper.StringToPtr("web"),
+							Name: nomad.StringToPtr("web"),
 							Meta: map[string]string{
 								"key1":      "group-value",
 								"group-key": "group.value",
@@ -273,14 +273,13 @@ func TestEmitEvent(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				metagen:   metaGen,
 				templates: mapper,
 				uuid:      UUID,
 			}
 
 			listener := p.bus.Subscribe()
-
 			p.emit(&test.Allocation, test.Status)
 
 			select {

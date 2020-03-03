@@ -52,3 +52,14 @@ const (
 	// DefaultNamespace is the default namespace.
 	DefaultNamespace = api.DefaultNamespace
 )
+
+const (
+	// JobStatusPending Pending means the job is waiting on scheduling
+	JobStatusPending = "pending"
+
+	// JobStatusRunning Running means the job has non-terminal allocations
+	JobStatusRunning = "running"
+
+	// JobStatusDead Dead means all evaluation's and allocations are terminal
+	JobStatusDead = "dead"
+)

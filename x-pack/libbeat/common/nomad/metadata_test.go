@@ -7,23 +7,20 @@ package nomad
 import (
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/hashicorp/nomad/helper"
-	"github.com/hashicorp/nomad/helper/uuid"
-
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
 
 func newJob(jobID string) *Job {
 	return &Job{
-		ID:          helper.StringToPtr(jobID),
-		Region:      helper.StringToPtr(api.GlobalRegion),
-		Name:        helper.StringToPtr("my-job"),
-		Type:        helper.StringToPtr(nomad.JobTypeService),
-		Status:      helper.StringToPtr(nomad.TaskStateRunning),
+		ID:          StringToPtr(jobID),
+		Region:      StringToPtr(api.GlobalRegion),
+		Name:        StringToPtr("my-job"),
+		Type:        StringToPtr(JobTypeService),
+		Status:      StringToPtr(JobStatusRunning),
 		Datacenters: []string{"europe-west4"},
 		Meta: map[string]string{
 			"key1":    "job-value",
@@ -31,7 +28,7 @@ func newJob(jobID string) *Job {
 		},
 		TaskGroups: []*TaskGroup{
 			{
-				Name: helper.StringToPtr("web"),
+				Name: StringToPtr("web"),
 				Meta: map[string]string{
 					"key1":      "group-value",
 					"group-key": "group.value",
@@ -63,10 +60,10 @@ func newJob(jobID string) *Job {
 }
 
 func TestAllocationMetadata(t *testing.T) {
-	jobID := uuid.Generate()
+	jobID := newUUID()
 
 	alloc := Resource{
-		ID:        uuid.Generate(),
+		ID:        newUUID(),
 		Job:       newJob(jobID),
 		Name:      "job.task",
 		Namespace: api.DefaultNamespace,
@@ -92,10 +89,10 @@ func TestAllocationMetadata(t *testing.T) {
 }
 
 func TestExcludeMetadata(t *testing.T) {
-	jobID := uuid.Generate()
+	jobID := newUUID()
 
 	alloc := Resource{
-		ID:        uuid.Generate(),
+		ID:        newUUID(),
 		Job:       newJob(jobID),
 		Name:      "job.task",
 		Namespace: "default",
@@ -119,18 +116,18 @@ func TestExcludeMetadata(t *testing.T) {
 }
 
 func TestCronJob(t *testing.T) {
-	jobID, allocID := uuid.Generate(), uuid.Generate()
+	jobID, allocID := newUUID(), newUUID()
 
 	cron := &api.Job{
-		ID:          helper.StringToPtr(jobID),
-		Region:      helper.StringToPtr("global"),
-		Name:        helper.StringToPtr("my-job"),
-		Type:        helper.StringToPtr(nomad.JobTypeBatch),
-		Status:      helper.StringToPtr(nomad.TaskStateRunning),
+		ID:          StringToPtr(jobID),
+		Region:      StringToPtr("global"),
+		Name:        StringToPtr("my-job"),
+		Type:        StringToPtr(JobTypeBatch),
+		Status:      StringToPtr(JobStatusRunning),
 		Datacenters: []string{"europe-west4"},
 		TaskGroups: []*TaskGroup{
 			{
-				Name: helper.StringToPtr("group"),
+				Name: StringToPtr("group"),
 				Tasks: []*api.Task{
 					{
 						Name:   "web",
@@ -144,8 +141,8 @@ func TestCronJob(t *testing.T) {
 			},
 		},
 		Periodic: &api.PeriodicConfig{
-			SpecType: helper.StringToPtr(api.PeriodicSpecCron),
-			Enabled:  helper.BoolToPtr(true),
+			SpecType: StringToPtr(api.PeriodicSpecCron),
+			Enabled:  BoolToPtr(true),
 		},
 	}
 
@@ -167,6 +164,16 @@ func TestCronJob(t *testing.T) {
 	tasks := metaGen.GroupMeta(alloc.Job)
 
 	assert.Equal(t, meta["alloc_id"], allocID)
-	assert.Equal(t, meta["type"], nomad.JobTypeBatch)
+	assert.Equal(t, meta["type"], JobTypeBatch)
 	assert.Len(t, tasks, 2)
+}
+
+func newUUID() string {
+	id, err := uuid.NewV4()
+
+	if err != nil {
+		return "b87daa1c-b091-4355-a2d2-60f9f3bff1b0"
+	}
+
+	return id.String()
 }
