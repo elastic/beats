@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !netbsd
+//+build linux
 
 package users
 
@@ -53,11 +53,6 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system users metricset is beta.")
 
-	config := struct{}{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
 	conn, err := initDbusConnection()
 	if err != nil {
 		return nil, errors.Wrap(err, "error connecting to dbus")
@@ -74,7 +69,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-
 	sessions, err := listSessions(m.conn)
 	if err != nil {
 		return errors.Wrap(err, "error listing sessions")

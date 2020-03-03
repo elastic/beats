@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !netbsd
+//+build linux
 
 package users
 
@@ -50,7 +50,7 @@ func TestFormatSession(t *testing.T) {
 		Leader:     17459,
 	}
 
-	output, err := formatSessonProps(testIn)
+	output, err := formatSessionProps(testIn)
 	assert.NoError(t, err)
 	assert.Equal(t, goodOut, output)
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !netbsd
+//+build linux
 
 package users
 
@@ -88,10 +88,10 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 		return sessionInfo{}, errors.Wrap(err, "error calling DBus")
 	}
 
-	return formatSessonProps(props)
+	return formatSessionProps(props)
 }
 
-func formatSessonProps(props map[string]dbus.Variant) (sessionInfo, error) {
+func formatSessionProps(props map[string]dbus.Variant) (sessionInfo, error) {
 	if len(props) < 8 {
 		return sessionInfo{}, fmt.Errorf("wrong number of fields in  info: %v", props)
 	}
