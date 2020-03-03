@@ -341,6 +341,9 @@ metricbeat.modules:
     - value
   enabled: true
   api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  doppler_address: '${CLOUDFOUNDRY_DOPPLER_ADDRESS:""}'
+  uaa_address: '${CLOUDFOUNDRY_UAA_ADDRESS:""}'
+  rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
 
