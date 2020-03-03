@@ -9,23 +9,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
-)
-
-const (
-	dirModulesGenerated = "build/package/module"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {
@@ -78,7 +72,6 @@ func Package() {
 	devtools.UseElasticBeatXPackPackaging()
 	metricbeat.CustomizePackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
-	packageLightModules()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -92,7 +85,8 @@ func TestPackages() error {
 		devtools.WithModules(),
 
 		// To be increased or removed when more light modules are added
-		devtools.MinModules(3))
+		devtools.MinModules(5),
+	)
 }
 
 // Fields generates a fields.yml and fields.go for each module.
@@ -146,78 +140,6 @@ func GoUnitTest(ctx context.Context) error {
 func PythonUnitTest() error {
 	mg.Deps(devtools.BuildSystemTestBinary)
 	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
-// prepareLightModules generates light modules
-func prepareLightModules(path string) error {
-	err := devtools.Clean([]string{dirModulesGenerated})
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(dirModulesGenerated, 0755); err != nil {
-		return err
-	}
-
-	filePatterns := []string{
-		"*/module.yml",
-		"*/*/manifest.yml",
-	}
-
-	var files []string
-	for _, pattern := range filePatterns {
-		matches, err := filepath.Glob(filepath.Join(path, pattern))
-		if err != nil {
-			return err
-		}
-		files = append(files, matches...)
-	}
-
-	if len(files) == 0 {
-		return fmt.Errorf("no light modules found")
-	}
-
-	for _, file := range files {
-		rel, _ := filepath.Rel(path, file)
-		dest := filepath.Join(dirModulesGenerated, rel)
-		err := (&devtools.CopyTask{
-			Source:  file,
-			Dest:    dest,
-			Mode:    0644,
-			DirMode: 0755,
-		}).Execute()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// packageLightModules customizes packaging to add light modules
-func packageLightModules() error {
-	prepareLightModules("module")
-
-	var (
-		moduleTarget = "module"
-		module       = devtools.PackageFile{
-			Mode:   0644,
-			Source: dirModulesGenerated,
-		}
-	)
-
-	for _, args := range devtools.Packages {
-		pkgType := args.Types[0]
-		switch pkgType {
-		case devtools.TarGz, devtools.Zip, devtools.Docker:
-			args.Spec.Files[moduleTarget] = module
-		case devtools.Deb, devtools.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-		case devtools.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
-		default:
-			return fmt.Errorf("unhandled package type: %v", pkgType)
-		}
-	}
-	return nil
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

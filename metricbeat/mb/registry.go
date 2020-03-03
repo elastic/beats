@@ -25,7 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.
@@ -121,6 +122,7 @@ type ModulesSource interface {
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	ModulesInfo(r *Register) string
+	ProcessorsForMetricSet(r *Register, module, name string) (*processors.Processors, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -360,6 +362,28 @@ func (r *Register) MetricSets(module string) []string {
 	}
 
 	return metricsets
+}
+
+// ProcessorsForMetricSet returns a list of processors defined in manifest of the registered metricset.
+func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Processors, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	module = strings.ToLower(module)
+	name = strings.ToLower(name)
+
+	metricSets, exists := r.metricSets[module]
+	if exists {
+		_, exists := metricSets[name]
+		if exists {
+			return processors.NewList(nil), nil // Standard metricsets don't have processor definitions.
+		}
+	}
+
+	if source := r.secondarySource; source != nil {
+		return source.ProcessorsForMetricSet(r, module, name)
+	}
+	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, name, module)
 }
 
 // SetSecondarySource sets an additional source of modules

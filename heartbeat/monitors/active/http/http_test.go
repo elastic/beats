@@ -33,13 +33,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
-	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	schedule "github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -478,23 +479,55 @@ func TestRedirect(t *testing.T) {
 	sched, _ := schedule.Parse("@every 1s")
 	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
-	event := &beat.Event{}
-	_, err = job(event)
-	require.NoError(t, err)
+	// Run this test multiple times since in the past we had an issue where the redirects
+	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
+	for i := 0; i < 10; i++ {
+		event := &beat.Event{}
+		_, err = job(event)
+		require.NoError(t, err)
 
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks("", "up", "http"),
-			hbtest.SummaryChecks(1, 0),
-			minimalRespondingHTTPChecks(testURL, 200),
-			lookslike.MustCompile(map[string]interface{}{
-				"http.redirects": []string{
-					server.URL + redirectingPaths["/redirect_one"],
-					server.URL + redirectingPaths["/redirect_two"],
-				},
-			}),
-		)),
-		event.Fields,
-	)
+		testslike.Test(
+			t,
+			lookslike.Strict(lookslike.Compose(
+				hbtest.BaseChecks("", "up", "http"),
+				hbtest.SummaryChecks(1, 0),
+				minimalRespondingHTTPChecks(testURL, 200),
+				lookslike.MustCompile(map[string]interface{}{
+					"http.response.redirects": []string{
+						server.URL + redirectingPaths["/redirect_one"],
+						server.URL + redirectingPaths["/redirect_two"],
+					},
+				}),
+			)),
+			event.Fields,
+		)
+	}
+}
+
+func TestNewRoundTripper(t *testing.T) {
+	configs := map[string]Config{
+		"Plain":      {Timeout: time.Second},
+		"With Proxy": {Timeout: time.Second, ProxyURL: "http://localhost:1234"},
+	}
+
+	for name, config := range configs {
+		t.Run(name, func(t *testing.T) {
+			transp, err := newRoundTripper(&config, &transport.TLSConfig{})
+			require.NoError(t, err)
+
+			if config.ProxyURL == "" {
+				require.Nil(t, transp.Proxy)
+			} else {
+				require.NotNil(t, transp.Proxy)
+			}
+
+			// It's hard to compare func types in tests
+			require.NotNil(t, transp.Dial)
+			require.NotNil(t, transport.TLSDialer)
+
+			require.Equal(t, (&transport.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			require.True(t, transp.DisableKeepAlives)
+		})
+	}
+
 }

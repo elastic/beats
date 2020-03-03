@@ -20,14 +20,14 @@ package cmd
 import (
 	"fmt"
 
-	_ "github.com/elastic/beats/heartbeat/autodiscover"
-	"github.com/elastic/beats/heartbeat/beater"
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover"
+	"github.com/elastic/beats/v7/heartbeat/beater"
 
 	// register default heartbeat monitors
-	_ "github.com/elastic/beats/heartbeat/monitors/defaults"
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/publisher/processing"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 )
 
 // Name of this beat
@@ -38,8 +38,9 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := instance.Settings{
-		Name:       Name,
-		Processing: processing.MakeDefaultSupport(true, processing.WithECS, processing.WithBeatMeta("agent")),
+		Name:          Name,
+		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithBeatMeta("agent")),
+		HasDashboards: false,
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
 

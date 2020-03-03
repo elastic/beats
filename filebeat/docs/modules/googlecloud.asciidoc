@@ -18,7 +18,7 @@ Google Pub/Sub topic sink.
 
 include::../include/what-happens.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 

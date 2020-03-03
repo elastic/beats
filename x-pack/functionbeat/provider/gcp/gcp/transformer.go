@@ -10,8 +10,8 @@ import (
 	"cloud.google.com/go/functions/metadata"
 	"cloud.google.com/go/pubsub"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // StorageEvent is the event from Google Cloud Storage
@@ -56,11 +56,14 @@ func transformStorage(mData *metadata.Metadata, evt StorageEvent) (beat.Event, e
 				"event_type": mData.Resource.Type,
 				"state":      evt.ResourceState,
 			},
-			"bucket":         evt.Bucket,
-			"file":           evt.Name,
-			"metageneration": evt.Metageneration,
-			"updated":        evt.Updated,
-			"created":        evt.Created,
+			"storage_bucket": evt.Bucket,
+			"file": common.MapStr{
+				"name":    evt.Name,
+				"mtime":   evt.Updated,
+				"ctime":   evt.Updated,
+				"created": evt.Created,
+			},
+			"meta-generation": evt.Metageneration,
 		},
 	}, nil
 }

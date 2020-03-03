@@ -17,6 +17,7 @@ Note: extra GCP charges on Stackdriver Monitoring API requests will be generated
 This is a list of the possible module parameters you can tune:
 
 * *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
+* *region*: A single string with the region you want to monitor like "us-central1". This will enable monitoring for all zones under this region.
 * *project_id*: A single string with your GCP Project ID
 * *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
 * *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
@@ -59,7 +60,7 @@ You can play in IAM pretty much with your service accounts and Instance level ac
 
 Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics_gcp[Stackdriver Monitoring API] to fetch metrics from its services. *Those metrics are retrieved one by one*.
 
-If you also want to *extract service metadata and labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
+If you also want to *extract service labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
 
 A recommended `period` value between fetches is between 5 and 10 minutes, depending on how granular you want your metrics. GCP restricts information for less than 5 minutes.
 
@@ -96,5 +97,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
+* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
+
 include::googlecloud/compute.asciidoc[]
+
+include::googlecloud/loadbalancing.asciidoc[]
 

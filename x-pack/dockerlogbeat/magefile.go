@@ -18,17 +18,17 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/pkg/errors"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -76,12 +76,6 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
 	}
 
-	// change back to the root beats dir so we can send the proper build context to docker
-	err = os.Chdir("../..")
-	if err != nil {
-		return errors.Wrap(err, "error changing directory")
-	}
-
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
@@ -103,39 +97,33 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 
 	buildOpts := types.ImageBuildOptions{
 		BuildArgs:  map[string]*string{"versionString": &goVersion},
-		Target:     "final",
 		Tags:       []string{rootImageName},
-		Dockerfile: "x-pack/dockerlogbeat/Dockerfile",
+		Dockerfile: "Dockerfile",
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
+	if err != nil {
+		return errors.Wrap(err, "error building final container image")
+	}
 	defer buildResp.Body.Close()
-	buf, errBufRead := ioutil.ReadAll(buildResp.Body)
+	// This blocks until the build operation completes
+	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return errors.Wrap(err, "error reading from docker output")
 	}
-	if err != nil {
-		fmt.Printf("Docker response: \n %s\n", string(buf))
-		return errors.Wrap(err, "error building final container image")
-	}
-
-	// move back to the x-pack dir
-	err = os.Chdir(dockerLogBeatDir)
-	if err != nil {
-		return errors.Wrap(err, "error returning to dockerlogbeat dir")
-	}
+	fmt.Printf("%s\n", string(buildStr))
 
 	return nil
 }
 
-// Build builds docker rootfs container root
+// BuildContainer builds docker rootfs container root
 // There's a somewhat complicated process for this:
 // * Create a container to build the plugin itself
 // * Copy that to a bare-bones container that will become the runc container used by docker
 // * Export that container
 // * Unpack the tar from the exported container
 // * send this to the plugin create API endpoint
-func Build(ctx context.Context) error {
+func BuildContainer(ctx context.Context) error {
 	// setup
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -323,6 +311,27 @@ func Export() error {
 	}
 
 	return nil
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return devtools.CrossBuild(devtools.ForPlatforms("linux/amd64"))
+}
+
+// Build builds the base container used by the docker plugin
+func Build() {
+	mg.SerialDeps(CrossBuild, BuildContainer)
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.CGO = false
+	buildArgs.Static = true
+	buildArgs.OutputDir = "build/plugin"
+	return devtools.GolangCrossBuild(buildArgs)
 }
 
 // Package builds a "release" tarball that can be used later with `docker plugin create`

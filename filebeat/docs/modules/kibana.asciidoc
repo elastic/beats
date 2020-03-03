@@ -14,13 +14,12 @@ This is the Kibana module.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The Kibana modules is compatible with Kibana 6.3 and newer.
-
-include::../include/running-modules.asciidoc[]
-
 
 include::../include/configuring-intro.asciidoc[]
 

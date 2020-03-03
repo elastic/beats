@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type MockClient struct {
@@ -459,7 +459,7 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 		done:       make(chan interface{}),
 	}
 
-	w, err := NewWatcherWithClient(client, 200*time.Millisecond, enable)
+	w, err := NewWatcherWithClient(logp.L(), client, 200*time.Millisecond, enable)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
@@ -698,6 +698,12 @@ func TestGenerateFieldName(t *testing.T) {
 			"ec2",
 			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
+		},
+		{
+			"test metric name with dot",
+			"cloudwatch",
+			[]string{"DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
+			"aws.firehose.metrics.DeliveryToS3_Records.avg",
 		},
 	}
 

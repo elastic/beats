@@ -5,13 +5,14 @@
 package mage
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Update target namespace.
@@ -55,17 +56,26 @@ func (Update) IncludeFields() error {
 func (Update) VendorBeats() error {
 	for _, f := range []string{"pubsub", "storage"} {
 		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
+		err := os.RemoveAll(gcpVendorPath)
+		if err != nil {
+			return err
+		}
 
-		deps, err := gotool.ListDeps("github.com/elastic/beats/x-pack/functionbeat/provider/gcp/" + f)
+		deps, err := gotool.ListDeps("github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/" + f)
 		if err != nil {
 			return err
 		}
 
 		for _, d := range deps {
-			in := strings.ReplaceAll(d, "github.com/elastic/beats/", "")
-			in = filepath.Join("..", "..", in)
+			var in string
+			if strings.HasPrefix(d, "github.com/elastic/beats/v7") {
+				in = strings.ReplaceAll(d, "github.com/elastic/beats/v7/", "")
+				in = filepath.Join("..", "..", in)
+			} else {
+				in = filepath.Join("..", "..", "vendor", d)
+			}
 
-			out := strings.ReplaceAll(d, "github.com/elastic/beats/vendor", "")
+			out := strings.ReplaceAll(d, "github.com/elastic/beats/v7/vendor", "")
 
 			cp := &devtools.CopyTask{
 				Source: in,

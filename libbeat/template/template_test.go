@@ -20,75 +20,163 @@
 package template
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
-func TestNumberOfRoutingShards(t *testing.T) {
-
-	beatVersion := "6.1.0"
-	beatName := "testbeat"
-	config := TemplateConfig{}
-
-	// Test it exists in 6.1
-	ver := common.MustNewVersion("6.1.0")
-	template, err := New(beatVersion, beatName, *ver, config, false)
-	assert.NoError(t, err)
-
-	data := template.Generate(nil, nil)
-	shards, err := data.GetValue("settings.index.number_of_routing_shards")
-	assert.NoError(t, err)
-
-	assert.Equal(t, 30, shards.(int))
-
-	// Test it does not exist in 6.0
-	ver = common.MustNewVersion("6.0.0")
-	template, err = New(beatVersion, beatName, *ver, config, false)
-	assert.NoError(t, err)
-
-	data = template.Generate(nil, nil)
-	shards, err = data.GetValue("settings.index.number_of_routing_shards")
-	assert.Error(t, err)
-	assert.Equal(t, nil, shards)
+type testTemplate struct {
+	t    *testing.T
+	tmpl *Template
+	data common.MapStr
 }
 
-func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
+func TestNumberOfRoutingShards(t *testing.T) {
+	const notPresent = 0 // setting missing indicator
+	const settingKey = "number_of_routing_shards"
+	const fullKey = "settings.index." + settingKey
 
-	beatVersion := "6.1.0"
-	beatName := "testbeat"
-	config := TemplateConfig{
-		Settings: TemplateSettings{
-			Index: map[string]interface{}{"number_of_routing_shards": 5},
+	cases := map[string]struct {
+		esVersion string
+		set       int
+		want      int
+	}{
+		"Do not set default for older version than 6.1": {
+			esVersion: "6.0.0",
+			want:      notPresent,
+		},
+		"Default present if ES 6.1.0 is used": {
+			esVersion: "6.1.0",
+			want:      30,
+		},
+		"Default present for newer ES 6.x version": {
+			esVersion: "6.8.2",
+			want:      30,
+		},
+		"Can overwrite default for ES 6.x": {
+			esVersion: "6.1.0",
+			set:       1024,
+			want:      1024,
+		},
+		"Do not set by default for ES 7.x": {
+			esVersion: "7.0.0",
+			want:      notPresent,
+		},
+		"Still configurable for ES 7.x": {
+			esVersion: "7.0.0",
+			set:       1024,
+			want:      1024,
+		},
+		"Do not set with current version": {
+			want: notPresent,
+		},
+		"Still configurable with current version": {
+			set:  1024,
+			want: 1024,
 		},
 	}
 
-	// Test it exists in 6.1
-	ver := common.MustNewVersion("6.1.0")
-	template, err := New(beatVersion, beatName, *ver, config, false)
-	assert.NoError(t, err)
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			beatVersion := getVersion("")
+			esVersion := getVersion(test.esVersion)
 
-	data := template.Generate(nil, nil)
-	shards, err := data.GetValue("settings.index.number_of_routing_shards")
-	assert.NoError(t, err)
+			indexSettings := map[string]interface{}{}
+			if test.set > 0 {
+				indexSettings[settingKey] = test.set
+			}
 
-	assert.Equal(t, 5, shards.(int))
+			template := createTestTemplate(t, beatVersion, esVersion, TemplateConfig{
+				Settings: TemplateSettings{
+					Index: indexSettings,
+				},
+			})
+
+			if test.want == notPresent {
+				template.AssertMissing(fullKey)
+			} else {
+				template.Assert(fullKey, test.want)
+			}
+		})
+	}
 }
 
 func TestTemplate(t *testing.T) {
-	beatVersion := "6.6.0"
-	beatName := "testbeat"
-	ver := common.MustNewVersion("6.6.0")
-	template, err := New(beatVersion, beatName, *ver, DefaultConfig(), false)
-	require.NoError(t, err)
+	currentVersion := getVersion("")
 
-	data := template.Generate(common.MapStr{}, nil)
-	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
-	assert.Equal(t, 1, data["order"])
-	meta, err := data.GetValue("mappings.doc._meta")
-	require.NoError(t, err)
-	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
+	t.Run("for ES 6.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "6.4.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
+
+	t.Run("for ES 7.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "7.2.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
+
+	t.Run("for ES 8.x", func(t *testing.T) {
+		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig())
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
+		template.Assert("order", 1)
+		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+	})
+}
+
+func createTestTemplate(t *testing.T, beatVersion, esVersion string, config TemplateConfig) *testTemplate {
+	beatVersion = getVersion(beatVersion)
+	esVersion = getVersion(esVersion)
+	ver := common.MustNewVersion(esVersion)
+	template, err := New(beatVersion, "testbeat", *ver, config, false)
+	if err != nil {
+		t.Fatalf("Failed to create the template: %+v", err)
+	}
+
+	return &testTemplate{t: t, tmpl: template, data: template.Generate(nil, nil)}
+}
+
+func (t *testTemplate) Has(path string) bool {
+	t.t.Helper()
+	has, err := t.data.HasKey(path)
+	if err != nil && err != common.ErrKeyNotFound {
+		serialized, _ := json.MarshalIndent(t.data, "", "    ")
+		t.t.Fatalf("error accessing '%v': %v\ntemplate: %s", path, err, serialized)
+	}
+	return has
+}
+
+func (t *testTemplate) Get(path string) interface{} {
+	t.t.Helper()
+	val, err := t.data.GetValue(path)
+	if err != nil {
+		serialized, _ := json.MarshalIndent(t.data, "", "    ")
+		t.t.Fatalf("error accessing '%v': %v\ntemplate: %s", path, err, serialized)
+	}
+	return val
+}
+
+func (t *testTemplate) AssertMissing(path string) {
+	t.t.Helper()
+	if t.Has(path) {
+		t.t.Fatalf("Expected '%v' to be missing", path)
+	}
+}
+
+func (t *testTemplate) Assert(path string, val interface{}) {
+	t.t.Helper()
+	assert.Equal(t.t, val, t.Get(path))
+}
+
+func getVersion(in string) string {
+	if in == "" {
+		return version.GetDefaultVersion()
+	}
+	return in
 }

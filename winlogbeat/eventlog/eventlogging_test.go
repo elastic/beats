@@ -31,9 +31,9 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys/eventlogging"
 )
 
 // Names that are registered by the test for logging events.

@@ -15,18 +15,18 @@ import (
 	"github.com/magefile/mage/mg"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
 )
 
 func init() {
@@ -161,10 +161,7 @@ func GoTestUnit() {
 func BuildPkgForFunctions() error {
 	mg.Deps(Update, Build)
 
-	err := os.MkdirAll("pkg", 700)
-	if err != nil {
-		return err
-	}
+	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
 		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),

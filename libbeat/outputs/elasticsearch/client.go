@@ -29,14 +29,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -213,9 +213,10 @@ func NewClient(
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
-					Proxy:   proxy,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: s.TLS.ToConfig(),
+					Proxy:           proxy,
 				},
 				Timeout: s.Timeout,
 			},
@@ -436,7 +437,7 @@ func createEventBulkMeta(
 
 	var id string
 	if m := event.Meta; m != nil {
-		if tmp := m["id"]; tmp != nil {
+		if tmp := m["_id"]; tmp != nil {
 			if s, ok := tmp.(string); ok {
 				id = s
 			} else {

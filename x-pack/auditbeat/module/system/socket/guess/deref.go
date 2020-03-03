@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 /*
@@ -73,6 +73,7 @@ func (g *guessDeref) Provides() []string {
 func (g *guessDeref) Requires() []string {
 	return []string{
 		"SYS_UNAME",
+		"SYS_P1",
 	}
 }
 
@@ -85,7 +86,7 @@ func (g *guessDeref) Probes() ([]helper.ProbeDef, error) {
 				Type:      tracing.TypeKProbe,
 				Name:      "guess_null_ptr_deref",
 				Address:   "{{.SYS_UNAME}}",
-				Fetchargs: helper.MakeMemoryDump("{{.P1}}", 0, credDumpBytes),
+				Fetchargs: helper.MakeMemoryDump("{{.SYS_P1}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},

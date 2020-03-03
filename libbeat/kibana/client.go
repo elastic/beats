@@ -19,6 +19,7 @@ package kibana
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,10 +31,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 type Connection struct {
@@ -78,7 +79,7 @@ func extractError(result []byte) error {
 
 // NewKibanaClient builds and returns a new Kibana client
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
-	config := defaultClientConfig
+	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -136,8 +137,9 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			Password: password,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: tlsConfig.ToConfig(),
 				},
 				Timeout: config.Timeout,
 			},
@@ -180,9 +182,16 @@ func (conn *Connection) Request(method, extraPath string,
 func (conn *Connection) Send(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 
+	return conn.SendWithContext(context.Background(), method, extraPath, params, headers, body)
+}
+
+// SendWithContext sends an application/json request to Kibana with appropriate kbn headers and the given context.
+func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath string,
+	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
+
 	reqURL := addToURL(conn.URL, extraPath, params)
 
-	req, err := http.NewRequest(method, reqURL, body)
+	req, err := http.NewRequestWithContext(ctx, method, reqURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("fail to create the HTTP %s request: %+v", method, err)
 	}

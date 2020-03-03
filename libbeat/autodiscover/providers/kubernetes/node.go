@@ -25,13 +25,13 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type node struct {
@@ -56,7 +56,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		config.Node = kubernetes.DiscoverKubernetesNode(config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 	} else {
 		config.Node = ""
 	}
@@ -188,12 +188,17 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		},
 	}
 	n.publish(event)
-
 }
 
 func getAddress(node *kubernetes.Node) string {
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeExternalIP && address.Address != "" {
+			return address.Address
+		}
+	}
+
+	for _, address := range node.Status.Addresses {
+		if address.Type == v1.NodeInternalIP && address.Address != "" {
 			return address.Address
 		}
 	}

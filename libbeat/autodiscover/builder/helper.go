@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // GetContainerID returns the id of a container
@@ -86,7 +86,20 @@ func GetHintAsList(hints common.MapStr, key, config string) []string {
 
 // GetProcessors gets processor definitions from the hints and returns a list of configs as a MapStr
 func GetProcessors(hints common.MapStr, key string) []common.MapStr {
-	return GetConfigs(hints, key, "processors")
+	processors := GetConfigs(hints, key, "processors")
+	for _, proc := range processors {
+		for key, value := range proc {
+			if str, ok := value.(string); ok {
+				cfg := common.MapStr{}
+				if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+					logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+					continue
+				}
+				proc[key] = cfg
+			}
+		}
+	}
+	return processors
 }
 
 // GetConfigs takes in a key and returns a list of configs as a slice of MapStr

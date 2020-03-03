@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestBuilder(t *testing.T) {
@@ -26,12 +26,12 @@ func TestBuilder(t *testing.T) {
 	b := MustCreate(
 		provider,
 		providerFactory,
-		feature.NewDetails("myprovider", "myprovider", feature.Experimental),
+		feature.MakeDetails("myprovider", "myprovider", feature.Experimental),
 	).MustAddFunction(
 		"f1",
 		fnFactory1,
-		feature.NewDetails("fn1 description", "fn1", feature.Experimental),
-	).MustAddFunction("f2", fnFactory2, feature.NewDetails(
+		feature.MakeDetails("fn1 description", "fn1", feature.Experimental),
+	).MustAddFunction("f2", fnFactory2, feature.MakeDetails(
 		"fn1 description",
 		"fn1",
 		feature.Experimental,

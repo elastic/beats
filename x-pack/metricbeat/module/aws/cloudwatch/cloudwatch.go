@@ -17,8 +17,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
@@ -135,8 +137,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		for _, regionName := range m.MetricSet.RegionsList {
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
-			svcCloudwatch := cloudwatch.New(awsConfig)
-			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+
+			svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "monitoring", regionName, awsConfig))
+
+			svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+				m.Endpoint, "tagging", regionName, awsConfig))
 
 			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
@@ -153,8 +159,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(awsConfig)
-		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
+		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "tagging", regionName, awsConfig))
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {
@@ -390,7 +400,8 @@ func generateFieldName(namespace string, labels []string) string {
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
 	statMethod, _ := statisticLookup(stat)
-	return "aws." + stripNamespace(namespace) + ".metrics." + labels[metricNameIdx] + "." + statMethod
+	// By default, replace dot "." using under bar "_" for metric names
+	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
 }
 
 // stripNamespace converts Cloudwatch namespace into the root field we will use for metrics
@@ -514,10 +525,11 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
-					for _, tag := range tags {
-						events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
-					}
 
+					// By default, replace dot "." using under bar "_" for tag keys and values
+					for _, tag := range tags {
+						events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+					}
 				}
 			}
 		}

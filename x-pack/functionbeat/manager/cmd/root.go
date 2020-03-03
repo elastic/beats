@@ -9,10 +9,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/x-pack/functionbeat/config"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/beater"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/beater"
 )
 
 // Name of this beat
@@ -24,6 +24,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
 		Name:            Name,
+		HasDashboards:   false,
 		ConfigOverrides: config.Overrides,
 	})
 
