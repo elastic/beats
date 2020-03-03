@@ -2,101 +2,46 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
         "compute_vm_scaleset": {
-            "data_disk_queue_depth": {
+            "cpu_credits_consumed": {
+                "avg": 0.019
+            },
+            "cpu_credits_remaining": {
+                "avg": 97.99
+            },
+            "os_per_disk_qd": {
                 "avg": 0
             },
-            "data_disk_read_bytes_per_sec": {
+            "os_per_disk_read_bytes_per_sec": {
                 "avg": 0
             },
-            "data_disk_read_operations_per_sec": {
+            "os_per_disk_read_operations_per_sec": {
                 "avg": 0
             },
-            "data_disk_write_bytes_per_sec": {
-                "avg": 0
+            "os_per_disk_write_bytes_per_sec": {
+                "avg": 19201.653
             },
-            "data_disk_write_operations_per_sec": {
-                "avg": 0
-            },
-            "disk_read_bytes": {
-                "total": 0
-            },
-            "disk_read_operations_per_sec": {
-                "avg": 0
-            },
-            "disk_write_bytes": {
-                "total": 1180450.5
-            },
-            "disk_write_operations_per_sec": {
-                "avg": 0.6839999999999999
-            },
-            "inbound_flows": {
-                "avg": 36.8
-            },
-            "inbound_flows_maximum_creation_rate": {
-                "avg": 6.6
-            },
-            "network_in": {
-                "total": 1158350
-            },
-            "network_in_total": {
-                "total": 1737301
-            },
-            "network_out": {
-                "total": 175875
-            },
-            "network_out_total": {
-                "total": 646949
-            },
-            "os_disk_queue_depth": {
-                "avg": 0
-            },
-            "os_disk_read_bytes_per_sec": {
-                "avg": 0
-            },
-            "os_disk_read_operations_per_sec": {
-                "avg": 0
-            },
-            "os_disk_write_bytes_per_sec": {
-                "avg": 3934.8300000000004
-            },
-            "os_disk_write_operations_per_sec": {
-                "avg": 0.6839999999999999
-            },
-            "outbound_flows": {
-                "avg": 37
-            },
-            "outbound_flows_maximum_creation_rate": {
-                "avg": 7.6
-            },
-            "percentage_cpu": {
-                "avg": 0.30125
+            "os_per_disk_write_operations_per_sec": {
+                "avg": 1.0366666666666666
             }
-        },
-        "dimensions": {
-            "vmname": "ecescaletest_3"
         },
         "namespace": "Microsoft.Compute/virtualMachineScaleSets",
         "resource": {
             "group": "obs-infrastructure",
-            "tags": {
-                "environment": "staging",
-                "role": "allocator"
-            },
             "type": "Microsoft.Compute/virtualMachineScaleSets"
         },
-        "subscription_id": "271dc764-105f-4af9-b324-d8190e40e5eb",
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/271dc764-105f-4af9-b324-d8190e40e5eb/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/ecescaletest",
-            "name": "ecescaletest"
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/obslinuxvmss",
+            "name": "obslinuxvmss"
         },
         "machine": {
-            "type": "Standard_D4s_v3"
+            "type": "Standard_B1ls"
         },
         "provider": "azure",
-        "region": "eastus2"
+        "region": "westeurope"
     },
     "event": {
         "dataset": "azure.compute_vm_scaleset",

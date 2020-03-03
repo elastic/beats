@@ -3123,16 +3123,6 @@ The resource specified
 
 
 
-*`azure.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
 *`azure.resource.type`*::
 +
 --

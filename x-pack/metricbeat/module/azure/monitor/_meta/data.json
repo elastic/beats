@@ -2,13 +2,13 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
         "metrics": {
-            "datausage": {
+            "data_usage": {
                 "total": 0
             },
-            "documentcount": {
+            "document_count": {
                 "total": 0
             },
-            "documentquota": {
+            "document_quota": {
                 "total": 53687091200
             }
         },
@@ -20,12 +20,12 @@
             },
             "type": "Microsoft.DocumentDb/databaseAccounts"
         },
-        "subscription_id": "271dc764-105f-4af9-b324-d8190e40e5eb",
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/271dc764-105f-4af9-b324-d8190e40e5eb/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
             "name": "obsaccount"
         },
         "provider": "azure",

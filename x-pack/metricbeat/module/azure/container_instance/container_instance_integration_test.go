@@ -2,50 +2,38 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+
 package container_instance
 
 import (
-	"errors"
-	"os"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/test"
+
+	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	config, err := getConfig()
+func TestFetchMetricset(t *testing.T) {
+	config, err := test.GetConfig("container_instance")
 	if err != nil {
-		t.Skip("Skipping TestData: " + err.Error())
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-
-	metricSet := mbtest.NewFetcher(t, config)
-	metricSet.WriteEvents(t, "/")
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 }
 
-func getConfig() (map[string]interface{}, error) {
-	clientId, ok := os.LookupEnv("AZURE_CLIENT_ID")
-	if !ok {
-		return nil, errors.New("missing AZURE_CLIENT_ID key")
+func TestData(t *testing.T) {
+	config, err := test.GetConfig("container_instance")
+	if err != nil {
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-	clientSecret, ok := os.LookupEnv("AZURE_CLIENT_SECRET")
-	if !ok {
-		return nil, errors.New("missing AZURE_CLIENT_SECRET key")
-	}
-	tenantId, ok := os.LookupEnv("AZURE_TENANT_ID")
-	if !ok {
-		return nil, errors.New("missing AZURE_TENANT_ID key")
-	}
-	subscriptionId, ok := os.LookupEnv("AZURE_SUBSCRIPTION_ID")
-	if !ok {
-		return nil, errors.New("missing AZURE_SUBSCRIPTION_ID key")
-	}
-	config := map[string]interface{}{
-		"module":          "azure",
-		"metricsets":      []string{"container_instance"},
-		"client_id":       clientId,
-		"client_secret":   clientSecret,
-		"tenant_id":       tenantId,
-		"subscription_id": subscriptionId,
-	}
-	return config, nil
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

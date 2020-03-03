@@ -3,33 +3,30 @@
     "azure": {
         "namespace": "Microsoft.Storage/storageAccounts/queueServices",
         "resource": {
-            "group": "cloud-shell-storage-westus",
-            "tags": {
-                "ms-resource-usage": "azure-cloud-shell"
-            },
+            "group": "obs-infrastructure",
             "type": "Microsoft.Storage/storageAccounts"
         },
         "storage": {
-            "queuecapacity": {
+            "queue_capacity": {
                 "avg": 0
             },
-            "queuecount": {
+            "queue_count": {
                 "avg": 0
             },
-            "queuemessagecount": {
+            "queue_message_count": {
                 "avg": 0
             }
         },
-        "subscription_id": "271dc764-105f-4af9-b324-d8190e40e5eb",
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT1H"
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/271dc764-105f-4af9-b324-d8190e40e5eb/resourceGroups/cloud-shell-storage-westus/providers/Microsoft.Storage/storageAccounts/strAc/queueServices/default",
-            "name": "strAc"
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Storage/storageAccounts/urcbyscmrkbygsawinvm/queueServices/default",
+            "name": "urcbyscmrkbygsawinvm"
         },
         "provider": "azure",
-        "region": "westus"
+        "region": "westeurope"
     },
     "event": {
         "dataset": "azure.storage",

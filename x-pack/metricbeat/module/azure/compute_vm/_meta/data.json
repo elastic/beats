@@ -2,133 +2,557 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
         "compute_vm": {
-            "data_disk_queue_depth": {
+            "asp_net_application_restarts": {
                 "avg": 0
             },
-            "data_disk_read_bytes_per_sec": {
+            "asp_net_applications_anonymous_requests": {
                 "avg": 0
             },
-            "data_disk_read_operations_per_sec": {
+            "asp_net_applications_anonymous_requests_per_sec": {
                 "avg": 0
             },
-            "data_disk_write_bytes_per_sec": {
+            "asp_net_applications_cache_api_entries": {
                 "avg": 0
             },
-            "data_disk_write_operations_per_sec": {
+            "asp_net_applications_cache_api_hit_ratio": {
                 "avg": 0
             },
-            "disk_read_bytes": {
-                "total": 32768.02
-            },
-            "disk_read_operations_per_sec": {
-                "avg": 0.008
-            },
-            "disk_write_bytes": {
-                "total": 19635551.44
-            },
-            "disk_write_operations_per_sec": {
-                "avg": 2.8600000000000003
-            },
-            "inbound_flows": {
-                "avg": 52.2
-            },
-            "inbound_flows_maximum_creation_rate": {
-                "avg": 11.6
-            },
-            "network_in": {
-                "total": 161463
-            },
-            "network_in_total": {
-                "total": 17721837
-            },
-            "network_out": {
-                "total": 129547
-            },
-            "network_out_total": {
-                "total": 1740212
-            },
-            "os_disk_queue_depth": {
-                "avg": 0.01
-            },
-            "os_disk_read_bytes_per_sec": {
-                "avg": 109.226
-            },
-            "os_disk_read_operations_per_sec": {
-                "avg": 0.008
-            },
-            "os_disk_write_bytes_per_sec": {
-                "avg": 65451.831999999995
-            },
-            "os_disk_write_operations_per_sec": {
-                "avg": 2.8600000000000003
-            },
-            "os_per_disk_qd": {
-                "avg": 0.01
-            },
-            "os_per_disk_read_bytes_per_sec": {
-                "avg": 109.226
-            },
-            "os_per_disk_read_operations_per_sec": {
-                "avg": 0.008
-            },
-            "os_per_disk_write_bytes_per_sec": {
-                "avg": 65451.831999999995
-            },
-            "os_per_disk_write_operations_per_sec": {
-                "avg": 2.8600000000000003
-            },
-            "outbound_flows": {
-                "avg": 52.2
-            },
-            "outbound_flows_maximum_creation_rate": {
-                "avg": 11.6
-            },
-            "per_disk_qd": {
+            "asp_net_applications_cache_api_hits": {
                 "avg": 0
             },
-            "per_disk_read_bytes_per_sec": {
+            "asp_net_applications_cache_api_misses": {
                 "avg": 0
             },
-            "per_disk_read_operations_per_sec": {
+            "asp_net_applications_cache_api_turnover_rate": {
                 "avg": 0
             },
-            "per_disk_write_bytes_per_sec": {
+            "asp_net_applications_cache_total_entries": {
                 "avg": 0
             },
-            "per_disk_write_operations_per_sec": {
+            "asp_net_applications_cache_total_hit_ratio": {
                 "avg": 0
             },
-            "percentage_cpu": {
-                "avg": 2.489
+            "asp_net_applications_cache_total_hits": {
+                "avg": 0
             },
-            "premium_os_disk_cache_read_hit": {
+            "asp_net_applications_cache_total_misses": {
+                "avg": 0
+            },
+            "asp_net_applications_cache_total_turnover_rate": {
+                "avg": 0
+            },
+            "asp_net_applications_compilations_total": {
+                "avg": 0
+            },
+            "asp_net_applications_debugging_requests": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_during_compilation": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_during_execution": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_during_preprocessing": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_total": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_total_per_sec": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_unhandled_during_execution": {
+                "avg": 0
+            },
+            "asp_net_applications_errors_unhandled_during_execution_per_sec": {
+                "avg": 0
+            },
+            "asp_net_applications_output_cache_entries": {
+                "avg": 0
+            },
+            "asp_net_applications_output_cache_hit_ratio": {
+                "avg": 0
+            },
+            "asp_net_applications_output_cache_hits": {
+                "avg": 0
+            },
+            "asp_net_applications_output_cache_misses": {
+                "avg": 0
+            },
+            "asp_net_applications_output_cache_turnover_rate": {
+                "avg": 0
+            },
+            "asp_net_applications_pipeline_instance_count": {
+                "avg": 0
+            },
+            "asp_net_applications_request_bytes_in_total": {
+                "avg": 0
+            },
+            "asp_net_applications_request_bytes_out_total": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_executing": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_failed": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_in_application_queue": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_not_authorized": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_not_found": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_per_sec": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_succeeded": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_timed_out": {
+                "avg": 0
+            },
+            "asp_net_applications_requests_total": {
+                "avg": 0
+            },
+            "asp_net_applications_running": {
+                "avg": 0
+            },
+            "asp_net_applications_sessions_abandoned": {
+                "avg": 0
+            },
+            "asp_net_applications_sessions_active": {
+                "avg": 0
+            },
+            "asp_net_applications_sessions_timed_out": {
+                "avg": 0
+            },
+            "asp_net_applications_sessions_total": {
+                "avg": 0
+            },
+            "asp_net_applications_transactions_aborted": {
+                "avg": 0
+            },
+            "asp_net_applications_transactions_committed": {
+                "avg": 0
+            },
+            "asp_net_applications_transactions_pending": {
+                "avg": 0
+            },
+            "asp_net_applications_transactions_per_sec": {
+                "avg": 0
+            },
+            "asp_net_applications_transactions_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_anonymous_requests": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_anonymous_requests_per_sec": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_api_entries": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_api_hit_ratio": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_api_hits": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_api_misses": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_api_turnover_rate": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_total_entries": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_total_hit_ratio": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_total_hits": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_total_misses": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_cache_total_turnover_rate": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_compilations_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_debugging_requests": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_during_compilation": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_during_execution": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_during_preprocessing": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_total_per_sec": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_unhandled_during_execution": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_errors_unhandled_during_execution_per_sec": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_output_cache_entries": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_output_cache_hit_ratio": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_output_cache_hits": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_output_cache_misses": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_output_cache_turnover_rate": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_pipeline_instance_count": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_request_bytes_in_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_request_bytes_out_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_executing": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_failed": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_in_application_queue": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_not_authorized": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_not_found": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_per_sec": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_succeeded": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_timed_out": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_requests_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_sessions_abandoned": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_sessions_active": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_sessions_timed_out": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_sessions_total": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_transactions_aborted": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_transactions_committed": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_transactions_pending": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_transactions_per_sec": {
+                "avg": 0
+            },
+            "asp_net_apps_v4_0_30319_transactions_total": {
+                "avg": 0
+            },
+            "asp_net_request_execution_time": {
+                "avg": 0
+            },
+            "asp_net_request_wait_time": {
+                "avg": 0
+            },
+            "asp_net_requests_current": {
+                "avg": 0
+            },
+            "asp_net_requests_disconnected": {
+                "avg": 0
+            },
+            "asp_net_requests_queued": {
+                "avg": 0
+            },
+            "asp_net_requests_rejected": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_application_restarts": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_applications_running": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_request_execution_time": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_request_wait_time": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_requests_current": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_requests_disconnected": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_requests_queued": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_requests_rejected": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_worker_process_restarts": {
+                "avg": 0
+            },
+            "asp_net_v4_0_30319_worker_processes_running": {
+                "avg": 0
+            },
+            "asp_net_worker_process_restarts": {
+                "avg": 0
+            },
+            "asp_net_worker_processes_running": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_queue_length": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_read_queue_length": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_sec_per_read": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_sec_per_transfer": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_sec_per_write": {
+                "avg": 0
+            },
+            "logical_disk_avg_disk_write_queue_length": {
+                "avg": 0
+            },
+            "logical_disk_disk_bytes_per_sec": {
+                "avg": 449380
+            },
+            "logical_disk_disk_read_bytes_per_sec": {
+                "avg": 4783
+            },
+            "logical_disk_disk_reads_per_sec": {
+                "avg": 0
+            },
+            "logical_disk_disk_transfers_per_sec": {
+                "avg": 6.6
+            },
+            "logical_disk_disk_write_bytes_per_sec": {
+                "avg": 444596.8
+            },
+            "logical_disk_disk_writes_per_sec": {
+                "avg": 6.4
+            },
+            "logical_disk_free_megabytes": {
+                "avg": 10433
+            },
+            "logical_disk_pct_disk_read_time": {
+                "avg": 0
+            },
+            "logical_disk_pct_disk_time": {
+                "avg": 1.6
+            },
+            "logical_disk_pct_disk_write_time": {
+                "avg": 1.6
+            },
+            "logical_disk_pct_free_space": {
+                "avg": 22
+            },
+            "logical_disk_pct_idle_time": {
+                "avg": 98.6
+            },
+            "memory_available_bytes": {
+                "avg": 2951829094.4
+            },
+            "memory_cache_bytes": {
+                "avg": 60126003.2
+            },
+            "memory_committed_bytes": {
+                "avg": 8922399539.2
+            },
+            "memory_page_faults_per_sec": {
+                "avg": 1484.2
+            },
+            "memory_pages_per_sec": {
+                "avg": 6
+            },
+            "memory_pct_committed_bytes_in_use": {
+                "avg": 82.4
+            },
+            "memory_pool_nonpaged_bytes": {
+                "avg": 204028313.6
+            },
+            "memory_pool_paged_bytes": {
+                "avg": 359613235.2
+            },
+            "network_interface_bytes_received_per_sec": {
+                "avg": 7922.333333333333
+            },
+            "network_interface_bytes_sent_per_sec": {
+                "avg": 60510.666666666664
+            },
+            "network_interface_bytes_total_per_sec": {
+                "avg": 68433.26666666666
+            },
+            "network_interface_packets_outbound_errors": {
+                "avg": 0
+            },
+            "network_interface_packets_per_sec": {
+                "avg": 43.4
+            },
+            "network_interface_packets_received_errors": {
+                "avg": 0
+            },
+            "network_interface_packets_received_per_sec": {
+                "avg": 27.533333333333335
+            },
+            "network_interface_packets_sent_per_sec": {
+                "avg": 15.733333333333333
+            },
+            "process_handle_count": {
+                "avg": 119553
+            },
+            "process_thread_count": {
+                "avg": 1705.8
+            },
+            "process_working_set": {
+                "avg": 5566961254.4
+            },
+            "process_working_set_private": {
+                "avg": 4168472985.6
+            },
+            "processor_information_pct_privileged_time": {
+                "avg": 2.6
+            },
+            "processor_information_pct_processor_time": {
+                "avg": 6.4
+            },
+            "processor_information_pct_user_time": {
+                "avg": 3.4
+            },
+            "processor_information_processor_frequency": {
+                "avg": 2295
+            },
+            "sqlserver_buffer_manager_buffer_cache_hit_ratio": {
                 "avg": 100
             },
-            "premium_os_disk_cache_read_miss": {
+            "sqlserver_buffer_manager_checkpoint_pages_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_buffer_manager_database_pages": {
+                "avg": 1483
+            },
+            "sqlserver_buffer_manager_lazy_writes_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_buffer_manager_page_reads_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_buffer_manager_page_writes_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_general_statistics_user_connections": {
+                "avg": 1
+            },
+            "sqlserver_memory_manager_memory_grants_pending": {
+                "avg": 0
+            },
+            "sqlserver_memory_manager_total_server_memory": {
+                "avg": 317976
+            },
+            "sqlserver_sql_statistics_batch_requests_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_sql_statistics_sql_compilations_per_sec": {
+                "avg": 0
+            },
+            "sqlserver_sql_statistics_sql_re-compilations_per_sec": {
+                "avg": 0
+            },
+            "system_context_switches_per_sec": {
+                "avg": 7782.6
+            },
+            "system_processes": {
+                "avg": 114
+            },
+            "system_processor_queue_length": {
+                "avg": 0.2
+            },
+            "system_system_up_time": {
+                "avg": 12530764
+            },
+            "web_service_bytes_total_per_sec": {
+                "avg": 0
+            },
+            "web_service_current_connections": {
+                "avg": 0
+            },
+            "web_service_isapi_extension_requests_per_sec": {
+                "avg": 0
+            },
+            "web_service_total_method_requests_per_sec": {
                 "avg": 0
             }
         },
-        "namespace": "Microsoft.Compute/virtualMachines",
+        "namespace": "Azure.VM.Windows.GuestMetrics",
         "resource": {
             "group": "obs-infrastructure",
             "tags": {
-                "provider": "648D2193-0CE0-4EFB-8A82-AF9792184FD9"
+                "vmtest": "value1, value 2",
+                "vmtest1": "value3"
             },
             "type": "Microsoft.Compute/virtualMachines"
         },
-        "subscription_id": "271dc764-105f-4af9-b324-d8190e40e5eb",
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/271dc764-105f-4af9-b324-d8190e40e5eb/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/elkdata-0",
-            "name": "elkdata-0"
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak",
+            "name": "obstestmemleak"
         },
         "machine": {
-            "type": "Standard_DS1_v2"
+            "type": "Standard_B2ms"
         },
         "provider": "azure",
-        "region": "eastus"
+        "region": "westeurope"
     },
     "event": {
         "dataset": "azure.compute_vm",
