@@ -26,7 +26,11 @@ import (
 	"github.com/urso/sderr"
 )
 
-// Registry that store a number of plugins
+// Registry that store a number of plugins.
+// The Registry and Plugin interfaces are used to describe the capabilities of
+// an extension point.  Registry and Plugin are not necessarily required to
+// create an actual input. It is up to the loader implementation if inputs are
+// created via Plugins or not.
 type Registry interface {
 	Each(func(Plugin) bool)
 	Find(name string) (Plugin, bool)
@@ -43,10 +47,13 @@ type RegistryTree struct {
 	registries []Registry
 }
 
-// Plugin to be stored in a registry. The plugin reports
-// common per plugin details and is used by a loader to create an input.
+// Plugin information. The plugin reports common per plugin details. A plugin
+// describes one possible configuration for an extension point. The registry is
+// used to provide information about all possible configuration variants of an
+// extension point.
 type Plugin interface {
 	Details() feature.Details
+	// TODO: configuration schema
 }
 
 var _ Registry = (RegistryList)(nil)
@@ -86,7 +93,7 @@ func (l RegistryList) Validate() error {
 	return sderr.WrapAll(errs, "registry has multiple duplicate plugins")
 }
 
-// Names returns asorted list of known plugin names
+// Names returns a sorted list of known plugin names
 func (l RegistryList) Names() []string {
 	var names []string
 	l.Each(func(p Plugin) bool {
