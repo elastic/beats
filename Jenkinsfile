@@ -607,7 +607,7 @@ def withBeatsEnvWin(Closure body){
   }
 }
 
-def dumpFilteredEnivronment(){
+def dumpFilteredEnvironment(){
   echo "BUILD_DIR: ${env.BUILD_DIR}"
   echo "COVERAGE_DIR: ${env.COVERAGE_DIR}"
   echo "BEATS: ${env.BEATS}"
