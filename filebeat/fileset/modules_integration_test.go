@@ -26,14 +26,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
-=======
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
->>>>>>> Make fileset package independent of filebeat.input
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
 )
 
 func TestLoadPipeline(t *testing.T) {
