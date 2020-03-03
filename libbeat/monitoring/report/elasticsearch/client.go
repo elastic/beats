@@ -36,6 +36,7 @@ import (
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
+	log *logp.Logger
 	es     *esout.Client
 	params map[string]string
 	format report.Format
@@ -47,6 +48,7 @@ func newPublishClient(
 	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
+		log: logp.NewLogger(selector),
 		es:     es,
 		params: params,
 		format: format,
@@ -55,7 +57,7 @@ func newPublishClient(
 }
 
 func (c *publishClient) Connect() error {
-	debugf("Monitoring client: connect.")
+	c.log.Debug("Monitoring client: connect.")
 
 	err := c.es.Connect()
 	if err != nil {
@@ -86,11 +88,11 @@ func (c *publishClient) Connect() error {
 	}
 
 	if !resp.Features.Monitoring.Enabled {
-		debugf("XPack monitoring is disabled.")
+		c.log.Debug("XPack monitoring is disabled.")
 		return errNoMonitoring
 	}
 
-	debugf("XPack monitoring is enabled")
+	c.log.Debug("XPack monitoring is enabled")
 
 	return nil
 }
@@ -108,13 +110,13 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
-			logp.Err("Type not available in monitoring reported. Please report this error: %s", err)
+			c.log.Errorf("Type not available in monitoring reported. Please report this error: %s", err)
 			continue
 		}
 
 		typ, ok := t.(string)
 		if !ok {
-			logp.Err("monitoring type is not a string")
+			c.log.Error("monitoring type is not a string")
 		}
 
 		var params = map[string]string{}
@@ -235,7 +237,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		return err
 	}
 
-	logBulkFailures(result, []report.Event{document})
+	logBulkFailures(c.log, result, []report.Event{document})
 	return err
 }
 
@@ -245,25 +247,25 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(result esout.BulkResult, events []report.Event) {
+func logBulkFailures(log *logp.Logger, result esout.BulkResult, events []report.Event) {
 	reader := esout.NewJSONReader(result)
 	err := esout.BulkReadToItems(reader)
 	if err != nil {
-		logp.Err("failed to parse monitoring bulk items: %v", err)
+		log.Errorf("failed to parse monitoring bulk items: %v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := esout.BulkReadItemStatus(reader)
+		status, msg, err := esout.BulkReadItemStatus(log, reader)
 		if err != nil {
-			logp.Err("failed to parse monitoring bulk item status: %v", err)
+			log.Errorf("failed to parse monitoring bulk item status: %v", err)
 			return
 		}
 		switch {
 		case status < 300, status == http.StatusConflict:
 			continue
 		default:
-			logp.Warn("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+			log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		}
 	}
 }

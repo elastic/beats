@@ -49,7 +49,7 @@ func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
 		d.Fatal("dns lookup", err)
 		d.Info("addresses", strings.Join(addresses, ", "))
 		if err != nil {
-			logp.Warn(`DNS lookup failure "%s": %v`, host, err)
+			logp.NewLogger(logSelector).Warnf(`DNS lookup failure "%s": %v`, host, err)
 			return nil, err
 		}
 

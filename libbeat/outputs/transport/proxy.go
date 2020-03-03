@@ -53,7 +53,7 @@ func (c *ProxyConfig) Validate() error {
 	return nil
 }
 
-func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
+func ProxyDialer(log *logp.Logger, config *ProxyConfig, forward Dialer) (Dialer, error) {
 	if config == nil || config.URL == "" {
 		return forward, nil
 	}
@@ -67,7 +67,7 @@ func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
 		return nil, err
 	}
 
-	logp.Info("proxy host: '%s'", url.Host)
+	log.Infof("proxy host: '%s'", url.Host)
 	return DialerFunc(func(network, address string) (net.Conn, error) {
 		var err error
 		var addresses []string
@@ -80,7 +80,7 @@ func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
 		if config.LocalResolve {
 			addresses, err = net.LookupHost(host)
 			if err != nil {
-				logp.Warn(`DNS lookup failure "%s": %v`, host, err)
+				log.Warnf(`DNS lookup failure "%s": %v`, host, err)
 				return nil, err
 			}
 		} else {

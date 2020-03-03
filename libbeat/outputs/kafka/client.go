@@ -37,6 +37,7 @@ import (
 )
 
 type client struct {
+	log *logp.Logger
 	observer outputs.Observer
 	hosts    []string
 	topic    outil.Selector
@@ -75,6 +76,7 @@ func newKafkaClient(
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
+		log: logp.NewLogger(logSelector),
 		observer: observer,
 		hosts:    hosts,
 		topic:    topic,
@@ -90,12 +92,12 @@ func (c *client) Connect() error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
-	debugf("connect: %v", c.hosts)
+	c.log.Debugf("connect: %v", c.hosts)
 
 	// try to connect
 	producer, err := sarama.NewAsyncProducer(c.hosts, &c.config)
 	if err != nil {
-		logp.Err("Kafka connect fails with: %v", err)
+		c.log.Errorf("Kafka connect fails with: %v", err)
 		return err
 	}
 
@@ -111,7 +113,7 @@ func (c *client) Connect() error {
 func (c *client) Close() error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
-	debugf("closed kafka client")
+	c.log.Debug("closed kafka client")
 
 	// producer was not created before the close() was called.
 	if c.producer == nil {
@@ -141,7 +143,7 @@ func (c *client) Publish(batch publisher.Batch) error {
 		d := &events[i]
 		msg, err := c.getEventMessage(d)
 		if err != nil {
-			logp.Err("Dropping event: %v", err)
+			c.log.Errorf("Dropping event: %v", err)
 			ref.done()
 			c.observer.Dropped(1)
 			continue
@@ -165,8 +167,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err := data.Cache.GetValue("partition")
 	if err == nil {
-		if logp.IsDebug(debugSelector) {
-			debugf("got event.Meta[\"partition\"] = %v", value)
+		if c.log.IsDebug(){
+			c.log.Debugf("got event.Meta[\"partition\"] = %v", value)
 		}
 		if partition, ok := value.(int32); ok {
 			msg.partition = partition
@@ -175,8 +177,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err = data.Cache.GetValue("topic")
 	if err == nil {
-		if logp.IsDebug(debugSelector) {
-			debugf("got event.Meta[\"topic\"] = %v", value)
+		if c.log.IsDebug(){
+			c.log.Debugf("got event.Meta[\"topic\"] = %v", value)
 		}
 		if topic, ok := value.(string); ok {
 			msg.topic = topic
@@ -199,8 +201,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
-		if logp.IsDebug(debugSelector) {
-			debugf("failed event: %v", event)
+		if c.log.IsDebug(){
+			c.log.Debugf("failed event: %v", event)
 		}
 		return nil, err
 	}
@@ -225,7 +227,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.wg.Done()
-	defer debugf("Stop kafka ack worker")
+	defer c.log.Debug("Stop kafka ack worker")
 
 	for libMsg := range ch {
 		msg := libMsg.Metadata.(*message)
@@ -235,7 +237,7 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 
 func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer c.wg.Done()
-	defer debugf("Stop kafka error handler")
+	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
 		msg := errMsg.Msg.Metadata.(*message)
@@ -250,11 +252,11 @@ func (r *msgRef) done() {
 func (r *msgRef) fail(msg *message, err error) {
 	switch err {
 	case sarama.ErrInvalidMessage:
-		logp.Err("Kafka (topic=%v): dropping invalid message", msg.topic)
+		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
 		r.client.observer.Dropped(1)
 
 	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
-		logp.Err("Kafka (topic=%v): dropping too large message of size %v.",
+		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
 		r.client.observer.Dropped(1)
@@ -272,7 +274,7 @@ func (r *msgRef) dec() {
 		return
 	}
 
-	debugf("finished kafka batch")
+	r.client.log.Debug("finished kafka batch")
 	stats := r.client.observer
 
 	err := r.err
@@ -286,7 +288,7 @@ func (r *msgRef) dec() {
 			stats.Acked(success)
 		}
 
-		debugf("Kafka publish failed with: %v", err)
+		r.client.log.Debugf("Kafka publish failed with: %v", err)
 	} else {
 		r.batch.ACK()
 		stats.Acked(r.total)

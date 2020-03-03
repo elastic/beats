@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -38,8 +37,6 @@ import (
 type redisOut struct {
 	beat beat.Info
 }
-
-var debugf = logp.MakeDebug("redis")
 
 const (
 	defaultWaitRetry    = 1 * time.Second

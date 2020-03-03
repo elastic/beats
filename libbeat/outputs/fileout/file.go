@@ -35,6 +35,7 @@ func init() {
 }
 
 type fileOutput struct {
+	log *logp.Logger
 	filePath string
 	beat     beat.Info
 	observer outputs.Observer
@@ -58,6 +59,7 @@ func makeFileout(
 	cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
+		log: logp.NewLogger("file"),
 		beat:     beat,
 		observer: observer,
 	}
@@ -95,7 +97,7 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 		return err
 	}
 
-	logp.Info("Initialized file output. "+
+	out.log.Infof("Initialized file output. "+
 		"path=%v max_size_bytes=%v max_backups=%v permissions=%v",
 		path, c.RotateEveryKb*1024, c.NumberOfFiles, os.FileMode(c.Permissions))
 
@@ -123,11 +125,11 @@ func (out *fileOutput) Publish(
 		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
 		if err != nil {
 			if event.Guaranteed() {
-				logp.Critical("Failed to serialize the event: %v", err)
+				out.log.Errorf("Failed to serialize the event: %v", err)
 			} else {
-				logp.Warn("Failed to serialize the event: %v", err)
+				out.log.Warnf("Failed to serialize the event: %v", err)
 			}
-			logp.Debug("file", "Failed event: %v", event)
+			out.log.Debugf( "Failed event: %v", event)
 
 			dropped++
 			continue
@@ -137,9 +139,9 @@ func (out *fileOutput) Publish(
 			st.WriteError(err)
 
 			if event.Guaranteed() {
-				logp.Critical("Writing event to file failed with: %v", err)
+				out.log.Errorf("Writing event to file failed with: %v", err)
 			} else {
-				logp.Warn("Writing event to file failed with: %v", err)
+				out.log.Warnf("Writing event to file failed with: %v", err)
 			}
 
 			dropped++

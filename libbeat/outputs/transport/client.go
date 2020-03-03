@@ -23,10 +23,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 type Client struct {
+	log *logp.Logger
 	dialer  Dialer
 	network string
 	host    string
@@ -46,7 +48,7 @@ type Config struct {
 func MakeDialer(c *Config) (Dialer, error) {
 	var err error
 	dialer := NetDialer(c.Timeout)
-	dialer, err = ProxyDialer(c.Proxy, dialer)
+	dialer, err = ProxyDialer(logp.NewLogger(logSelector), c.Proxy, dialer)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +93,7 @@ func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort 
 	}
 
 	client := &Client{
+		log: logp.NewLogger(logSelector),
 		dialer:  d,
 		network: network,
 		host:    host,
@@ -128,7 +131,7 @@ func (c *Client) Close() error {
 	defer c.mutex.Unlock()
 
 	if c.conn != nil {
-		debugf("closing")
+		c.log.Debug("closing")
 		err := c.conn.Close()
 		c.conn = nil
 		return err
@@ -215,7 +218,8 @@ func (c *Client) SetWriteDeadline(t time.Time) error {
 
 func (c *Client) handleError(err error) error {
 	if err != nil {
-		debugf("handle error: %v", err)
+
+		c.log.Debugf("handle error: %v", err)
 
 		if nerr, ok := err.(net.Error); !(ok && (nerr.Temporary() || nerr.Timeout())) {
 			_ = c.Close()

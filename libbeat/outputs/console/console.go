@@ -34,6 +34,7 @@ import (
 )
 
 type console struct {
+	log      *logp.Logger
 	out      *os.File
 	observer outputs.Observer
 	writer   *bufio.Writer
@@ -95,7 +96,7 @@ func makeConsole(
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*console, error) {
-	c := &console{out: os.Stdout, codec: codec, observer: observer, index: index}
+	c := &console{log: logp.NewLogger("console"), out: os.Stdout, codec: codec, observer: observer, index: index}
 	c.writer = bufio.NewWriterSize(c.out, 8*1024)
 	return c, nil
 }
@@ -132,20 +133,20 @@ func (c *console) publishEvent(event *publisher.Event) bool {
 			return false
 		}
 
-		logp.Critical("Unable to encode event: %v", err)
-		logp.Debug("console", "Failed event: %v", event)
+		c.log.Errorf("Unable to encode event: %v", err)
+		c.log.Debugf("Failed event: %v", event)
 		return false
 	}
 
 	if err := c.writeBuffer(serializedEvent); err != nil {
 		c.observer.WriteError(err)
-		logp.Critical("Unable to publish events to console: %v", err)
+		c.log.Errorf("Unable to publish events to console: %v", err)
 		return false
 	}
 
 	if err := c.writeBuffer(nl); err != nil {
 		c.observer.WriteError(err)
-		logp.Critical("Error when appending newline to event: %v", err)
+		c.log.Errorf("Error when appending newline to event: %v", err)
 		return false
 	}
 

@@ -23,7 +23,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type kafkaLogger struct{}
+type kafkaLogger struct{
+	log *logp.Logger
+}
 
 func (kl kafkaLogger) Print(v ...interface{}) {
 	kl.Log("kafka message: %v", v...)
@@ -37,7 +39,7 @@ func (kl kafkaLogger) Println(v ...interface{}) {
 	kl.Log("kafka message: %v", v...)
 }
 
-func (kafkaLogger) Log(format string, v ...interface{}) {
+func (kl kafkaLogger) Log(format string, v ...interface{}) {
 	warn := false
 	for _, val := range v {
 		if err, ok := val.(sarama.KError); ok {
@@ -47,9 +49,12 @@ func (kafkaLogger) Log(format string, v ...interface{}) {
 			}
 		}
 	}
+	if kl.log == nil{
+		kl.log = logp.NewLogger(logSelector)
+	}
 	if warn {
-		logp.Warn(format, v...)
+		kl.log.Warnf(format, v...)
 	} else {
-		logp.Info(format, v...)
+		kl.log.Infof(format, v...)
 	}
 }

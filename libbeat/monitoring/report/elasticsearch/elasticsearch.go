@@ -59,10 +59,7 @@ type reporter struct {
 
 	out []outputs.NetworkClient
 }
-
 const selector = "monitoring"
-
-var debugf = logp.MakeDebug(selector)
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
@@ -115,7 +112,7 @@ func defaultConfig(settings report.Settings) config {
 }
 
 func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) (report.Reporter, error) {
-	log := logp.L().Named(selector)
+	log := logp.NewLogger(selector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -237,8 +234,8 @@ func (r *reporter) Stop() {
 }
 
 func (r *reporter) initLoop(c config) {
-	debugf("Start monitoring endpoint init loop.")
-	defer debugf("Finish monitoring endpoint init loop.")
+	r.logger.Debug("Start monitoring endpoint init loop.")
+	defer r.logger.Debug("Finish monitoring endpoint init loop.")
 
 	log := r.logger
 
@@ -256,7 +253,7 @@ func (r *reporter) initLoop(c config) {
 				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying. Error: ", err)
 				logged = true
 			}
-			debugf("Monitoring could not connect to Elasticsearch, failed with %v", err)
+			r.logger.Debugf("Monitoring could not connect to Elasticsearch, failed with %v", err)
 		}
 
 		select {
@@ -294,7 +291,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 
 		snapshot := makeSnapshot(monitoring.GetNamespace(namespace).GetRegistry())
 		if snapshot == nil {
-			debugf("Empty snapshot.")
+			log.Debug("Empty snapshot.")
 			continue
 		}
 

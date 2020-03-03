@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
@@ -31,8 +30,6 @@ const (
 	defaultStartMaxWindowSize int = 10
 	defaultPort                   = 5044
 )
-
-var debugf = logp.MakeDebug("logstash")
 
 func init() {
 	outputs.RegisterType("logstash", makeLogstash)

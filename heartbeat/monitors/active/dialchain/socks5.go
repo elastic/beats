@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
@@ -38,7 +39,7 @@ func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
-		dialer, err := transport.ProxyDialer(config, startTimerAfterDial(&timer, next))
+		dialer, err := transport.ProxyDialer(logp.NewLogger("socks5Layer"), config, startTimerAfterDial(&timer, next))
 		if err != nil {
 			return nil, err
 		}

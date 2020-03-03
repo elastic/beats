@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // MetaBuilder creates meta data for bulk requests
@@ -63,7 +64,7 @@ func (conn *Connection) BulkWith(
 
 	enc := conn.encoder
 	enc.Reset()
-	if err := bulkEncode(enc, metaBuilder, body); err != nil {
+	if err := bulkEncode(conn.log, enc, metaBuilder, body); err != nil {
 		return nil, err
 	}
 
@@ -92,7 +93,7 @@ func (conn *Connection) SendMonitoringBulk(
 
 	enc := conn.encoder
 	enc.Reset()
-	if err := bulkEncode(enc, nil, body); err != nil {
+	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
 		return nil, err
 	}
 
@@ -204,11 +205,11 @@ func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, err
 	return status, BulkResult(resp), err
 }
 
-func bulkEncode(out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
+func bulkEncode(log *logp.Logger, out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
 	if metaBuilder == nil {
 		for _, obj := range body {
 			if err := out.AddRaw(obj); err != nil {
-				debugf("Failed to encode message: %s", err)
+				log.Debugf("Failed to encode message: %s", err)
 				return err
 			}
 		}
@@ -216,7 +217,7 @@ func bulkEncode(out bulkWriter, metaBuilder MetaBuilder, body []interface{}) err
 		for _, obj := range body {
 			meta := metaBuilder(obj)
 			if err := out.Add(meta, obj); err != nil {
-				debugf("Failed to encode event (dropping event): %s", err)
+				log.Debugf("Failed to encode event (dropping event): %s", err)
 			}
 		}
 	}

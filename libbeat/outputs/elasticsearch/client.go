@@ -85,6 +85,8 @@ type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {
+	log *logp.Logger
+
 	URL      string
 	Username string
 	Password string
@@ -171,7 +173,8 @@ func NewClient(
 		s.URL = u.String()
 	}
 
-	logp.Info("Elasticsearch url: %s", s.URL)
+	log := logp.NewLogger(logSelector)
+	log.Infof("Elasticsearch url: %s", s.URL)
 
 	// TODO: add socks5 proxy support
 	var dialer, tlsDialer transport.Dialer
@@ -206,6 +209,7 @@ func NewClient(
 
 	client := &Client{
 		Connection: Connection{
+			log:      log,
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
@@ -334,7 +338,7 @@ func (client *Client) publishEvents(
 	}
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data)
+	data = bulkEncodePublishRequest(client.Connection.log, client.GetVersion(), body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -347,11 +351,11 @@ func (client *Client) publishEvents(
 	requ.Reset(body)
 	status, result, sendErr := client.sendBulkRequest(requ)
 	if sendErr != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
+		client.Connection.log.Error("Failed to perform any bulk index operations: %s", sendErr)
 		return data, sendErr
 	}
 
-	debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
+	client.Connection.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		len(data),
 		time.Now().Sub(begin))
 
@@ -363,7 +367,7 @@ func (client *Client) publishEvents(
 		stats.fails = len(failedEvents)
 	} else {
 		client.json.init(result)
-		failedEvents, stats = bulkCollectPublishFails(&client.json, data)
+		failedEvents, stats = bulkCollectPublishFails(client.Connection.log, &client.json, data)
 	}
 
 	failed := len(failedEvents)
@@ -391,6 +395,7 @@ func (client *Client) publishEvents(
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
+	log *logp.Logger,
 	version common.Version,
 	body bulkWriter,
 	index outputs.IndexSelector,
@@ -401,14 +406,14 @@ func bulkEncodePublishRequest(
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(version, index, pipeline, eventType, event)
+		meta, err := createEventBulkMeta(log, version, index, pipeline, eventType, event)
 		if err != nil {
-			logp.Err("Failed to encode event meta data: %s", err)
+			log.Errorf("Failed to encode event meta data: %s", err)
 			continue
 		}
 		if err := body.Add(meta, event); err != nil {
-			logp.Err("Failed to encode event: %s", err)
-			logp.Debug("elasticsearch", "Failed event: %v", event)
+			log.Errorf("Failed to encode event: %s", err)
+			log.Debugf("Failed event: %v", event)
 			continue
 		}
 		okEvents = append(okEvents, data[i])
@@ -417,6 +422,7 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
+	log *logp.Logger,
 	version common.Version,
 	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
@@ -441,7 +447,7 @@ func createEventBulkMeta(
 			if s, ok := tmp.(string); ok {
 				id = s
 			} else {
-				logp.Err("Event ID '%v' is no string value", id)
+				log.Errorf("Event ID '%v' is no string value", id)
 			}
 		}
 	}
@@ -480,11 +486,12 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // event failed due to some error in the event itself (e.g. does not respect mapping),
 // the event will be dropped.
 func bulkCollectPublishFails(
+	log *logp.Logger,
 	reader *JSONReader,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
 	if err := BulkReadToItems(reader); err != nil {
-		logp.Err("failed to parse bulk response: %v", err.Error())
+		log.Errorf("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
 
@@ -492,7 +499,7 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := BulkReadItemStatus(reader)
+		status, msg, err := BulkReadItemStatus(log, reader)
 		if err != nil {
 			return nil, bulkResultStats{}
 		}
@@ -514,13 +521,13 @@ func bulkCollectPublishFails(
 				stats.tooMany++
 			} else {
 				// hard failure, don't collect
-				logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
+				log.Warnf("Cannot index event %#v (status=%v): %s", data[i], status, msg)
 				stats.nonIndexable++
 				continue
 			}
 		}
 
-		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		stats.fails++
 		failed = append(failed, data[i])
 	}
@@ -562,7 +569,7 @@ func BulkReadToItems(reader *JSONReader) error {
 }
 
 // BulkReadItemStatus reads the status and error fields from the bulk item
-func BulkReadItemStatus(reader *JSONReader) (int, []byte, error) {
+func BulkReadItemStatus(log *logp.Logger, reader *JSONReader) (int, []byte, error) {
 	// skip outer dictionary
 	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject
@@ -571,38 +578,38 @@ func BulkReadItemStatus(reader *JSONReader) (int, []byte, error) {
 	// find first field in outer dictionary (e.g. 'create')
 	kind, _, err := reader.nextFieldName()
 	if err != nil {
-		logp.Err("Failed to parse bulk response item: %s", err)
+		log.Errorf("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
 	if kind == dictEnd {
 		err = errUnexpectedEmptyObject
-		logp.Err("Failed to parse bulk response item: %s", err)
+		log.Errorf("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
 
 	// parse actual item response code and error message
-	status, msg, err := itemStatusInner(reader)
+	status, msg, err := itemStatusInner(log, reader)
 	if err != nil {
-		logp.Err("Failed to parse bulk response item: %s", err)
+		log.Errorf("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
 	if err != nil {
-		logp.Err("Failed to parse bulk response item: %s", err)
+		log.Errorf("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
 	if kind != dictEnd {
 		err = errExpectedObjectEnd
-		logp.Err("Failed to parse bulk response item: %s", err)
+		log.Errorf("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
 
 	return status, msg, nil
 }
 
-func itemStatusInner(reader *JSONReader) (int, []byte, error) {
+func itemStatusInner(log *logp.Logger, reader *JSONReader) (int, []byte, error) {
 	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject
 	}
@@ -612,7 +619,7 @@ func itemStatusInner(reader *JSONReader) (int, []byte, error) {
 	for {
 		kind, name, err := reader.nextFieldName()
 		if err != nil {
-			logp.Err("Failed to parse bulk response item: %s", err)
+			log.Errorf("Failed to parse bulk response item: %s", err)
 		}
 		if kind == dictEnd {
 			break
@@ -622,7 +629,7 @@ func itemStatusInner(reader *JSONReader) (int, []byte, error) {
 		case bytes.Equal(name, nameStatus): // name == "status"
 			status, err = reader.nextInt()
 			if err != nil {
-				logp.Err("Failed to parse bulk response item: %s", err)
+				log.Errorf("Failed to parse bulk response item: %s", err)
 				return 0, nil, err
 			}
 
@@ -715,7 +722,7 @@ func (conn *Connection) Connect() error {
 	}
 
 	if version, err := common.NewVersion(versionString); err != nil {
-		logp.Err("Invalid version from Elasticsearch: %v", versionString)
+		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
 		conn.version = common.Version{}
 	} else {
 		conn.version = *version
@@ -730,11 +737,11 @@ func (conn *Connection) Connect() error {
 
 // Ping sends a GET request to the Elasticsearch.
 func (conn *Connection) Ping() (string, error) {
-	debugf("ES Ping(url=%v)", conn.URL)
+	conn.log.Debugf("ES Ping(url=%v)", conn.URL)
 
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
-		debugf("Ping request failed with: %v", err)
+		conn.log.Debugf("Ping request failed with: %v", err)
 		return "", err
 	}
 
@@ -753,8 +760,8 @@ func (conn *Connection) Ping() (string, error) {
 		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
 	}
 
-	debugf("Ping status code: %v", status)
-	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
+	conn.log.Debugf("Ping status code: %v", status)
+	conn.log.Infof("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 
@@ -772,7 +779,7 @@ func (conn *Connection) Request(
 ) (int, []byte, error) {
 
 	url := addToURL(conn.URL, path, pipeline, params)
-	debugf("%s %s %s %v", method, url, pipeline, body)
+	conn.log.Debugf("%s %s %s %v", method, url, pipeline, body)
 
 	return conn.RequestURL(method, url, body)
 }
@@ -788,7 +795,7 @@ func (conn *Connection) RequestURL(
 	}
 
 	if err := conn.encoder.Marshal(body); err != nil {
-		logp.Warn("Failed to json encode body (%v): %#v", err, body)
+		conn.log.Warnf("Failed to json encode body (%v): %#v", err, body)
 		return 0, nil, ErrJSONEncodeFailed
 	}
 	return conn.execRequest(method, url, conn.encoder.Reader())
@@ -800,7 +807,7 @@ func (conn *Connection) execRequest(
 ) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		logp.Warn("Failed to create request %+v", err)
+		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
 	}
 	if body != nil {
@@ -836,7 +843,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	if err != nil {
 		return 0, nil, err
 	}
-	defer closing(resp.Body)
+	defer closing(conn.log, resp.Body)
 
 	status := resp.StatusCode
 	obj, err := ioutil.ReadAll(resp.Body)
@@ -858,9 +865,9 @@ func (conn *Connection) GetVersion() common.Version {
 	return conn.version
 }
 
-func closing(c io.Closer) {
+func closing(log *logp.Logger, c io.Closer) {
 	err := c.Close()
 	if err != nil {
-		logp.Warn("Close failed with: %v", err)
+		log.Warnf("Close failed with: %v", err)
 	}
 }
