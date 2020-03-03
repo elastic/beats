@@ -69,6 +69,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "OneDrive",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "ASR",
+            "Alan Smithee"
+        ],
         "rule.id": "c5981414-9f1f-4275-a2df-2fbfb1d03795",
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
@@ -156,6 +160,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "OneDrive",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "ASR",
+            "Alan Smithee"
+        ],
         "rule.id": "7503b92a-67c2-494b-8a46-57ef0d738886",
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
@@ -239,6 +247,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "OneDrive",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "ASR",
+            "Alan Smithee"
+        ],
         "rule.id": "c5981414-9f1f-4275-a2df-2fbfb1d03795",
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
@@ -326,6 +338,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "OneDrive",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "ASR",
+            "Alan Smithee"
+        ],
         "rule.id": "7503b92a-67c2-494b-8a46-57ef0d738886",
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
@@ -413,6 +429,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "OneDrive",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "ASR",
+            "Alan Smithee"
+        ],
         "rule.id": "bc4d376f-b038-4695-9362-609d32f963cf",
         "rule.name": "High volume of content detected France Financial",
         "service.type": "o365",
@@ -500,6 +520,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "SharePoint",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "alice",
+            "alice@testsiem2.onmicrosoft.com"
+        ],
         "rule.id": "121c85c3-b2b2-4d5b-af11-b1d1bc0b36fd",
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",
@@ -587,6 +611,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "SharePoint",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "alice",
+            "alice@testsiem2.onmicrosoft.com"
+        ],
         "rule.id": "121c85c3-b2b2-4d5b-af11-b1d1bc0b36fd",
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",

@@ -5,7 +5,6 @@
 var processor = require("processor");
 var console   = require("console");
 
-
 // PipelineBuilder to aid debugging of pipelines during development.
 function PipelineBuilder(pipelineName, debug) {
     this.pipeline = new processor.Chain();
@@ -26,6 +25,15 @@ function PipelineBuilder(pipelineName, debug) {
     };
     if (debug) {
         this.add(makeLogEvent(pipelineName + ": begin processing event"));
+    }
+}
+
+function appendFields(options) {
+    return function(evt) {
+        options.fields.forEach(function (key) {
+            var value = evt.Get(key);
+            if (value != null) evt.AppendTo(options.to, value);
+        });
     }
 }
 
@@ -717,14 +725,21 @@ function AuditProcessor(tenant_names, debug) {
         event.Put("network.type", ip.indexOf(".") !== -1? "ipv4" : "ipv6");
     });
 
-    builder.Add("setRelatedIP", function(event) {
-        ["client.ip", "server.ip"].forEach(function(field) {
-            var val = event.Get(field);
-            if (val) {
-                event.AppendTo("related.ip", val);
-            }
-        });
-    });
+    builder.Add("setRelatedIP", appendFields({
+        fields: [
+            "client.ip",
+            "server.ip",
+        ],
+        to: 'related.ip'
+    }));
+
+    builder.Add("setRelatedUser", appendFields({
+        fields: [
+            "user.name",
+            "file.owner",
+        ],
+        to: 'related.user'
+    }));
 
     // Set user-agent from an alternative location.
     builder.Add("altUserAgent", function(evt) {

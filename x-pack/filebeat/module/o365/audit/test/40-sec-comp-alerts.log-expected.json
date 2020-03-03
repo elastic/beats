@@ -46,6 +46,7 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "SecurityComplianceCenter",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "related.user": "asr",
         "rule.category": "AccessGovernance",
         "rule.description": "asr@testsiem.onmicrosoft.com",
         "rule.id": "17d51759-88e1-40c1-8df3-20bcf2e43057",

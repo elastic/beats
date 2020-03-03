@@ -765,6 +765,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "Exchange",
         "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "alice",
+            "alice@testsiem2.onmicrosoft.com"
+        ],
         "rule.id": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
         "rule.name": "Low volume of content detected test",
         "service.type": "o365",
