@@ -769,6 +769,10 @@ github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
 # github.com/xanzy/go-gitlab v0.22.3
 github.com/xanzy/go-gitlab
+# github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
+github.com/xdg/scram
+# github.com/xdg/stringprep v1.0.0
+github.com/xdg/stringprep
 # github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7
 github.com/yuin/gopher-lua
 github.com/yuin/gopher-lua/ast
