@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
 
 const (

@@ -12,7 +12,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register fleet
-	_ "github.com/elastic/beats/x-pack/libbeat/management/fleet"
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/management/fleet"
 	// register processors
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/processors/add_cloudfoundry_metadata"
 
