@@ -184,6 +184,9 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
 - module: aws
   period: 300s
   credential_profile_name: test-mb
@@ -213,6 +216,9 @@ metricbeat.modules:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
 - module: aws
   period: 60s
   credential_profile_name: test-mb
@@ -264,6 +270,37 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_instance
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_service
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_registry
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
 
 - module: azure
   metricsets:
