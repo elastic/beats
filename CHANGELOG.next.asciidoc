@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
+- Add dashboard for `redisenterprise` module. {pull}16752[16752]
 
 *Packetbeat*
 
