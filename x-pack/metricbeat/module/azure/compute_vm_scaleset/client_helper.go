@@ -18,7 +18,6 @@ const (
 	defaultVMDimension     = "VMName"
 	customVMDimension      = "VirtualMachine"
 	defaultSlotIDDimension = "SlotId"
-	defaultTimeGrain       = "PT5M"
 )
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
@@ -61,9 +60,9 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 			for _, metricName := range supportedMetricNames {
 				if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
 					groupedMetrics[azure.NoDimension] = append(groupedMetrics[azure.NoDimension], metricName)
-				} else if containsDimension(vmdim, *metricName.Dimensions) {
+				} else if azure.ContainsDimension(vmdim, *metricName.Dimensions) {
 					groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
-				} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
+				} else if azure.ContainsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
 					groupedMetrics[defaultSlotIDDimension] = append(groupedMetrics[defaultSlotIDDimension], metricName)
 				}
 			}
@@ -76,19 +75,9 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				if key != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 				}
-				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, defaultTimeGrain)...)
+				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
 			}
 		}
 	}
 	return metrics, nil
-}
-
-// containsDimension will check if the dimension value is found in the list
-func containsDimension(dimension string, dimensions []insights.LocalizableString) bool {
-	for _, dim := range dimensions {
-		if *dim.Value == dimension {
-			return true
-		}
-	}
-	return false
 }
