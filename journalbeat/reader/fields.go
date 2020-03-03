@@ -19,7 +19,7 @@
 
 package reader
 
-import "github.com/coreos/go-systemd/sdjournal"
+import "github.com/coreos/go-systemd/v22/sdjournal"
 
 type fieldConversion struct {
 	name      string
