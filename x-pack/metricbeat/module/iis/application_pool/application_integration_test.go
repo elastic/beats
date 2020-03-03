@@ -21,8 +21,9 @@
 package application_pool
 
 import (
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"testing"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
