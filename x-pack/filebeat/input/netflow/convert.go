@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/flowhash"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
 var (

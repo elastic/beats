@@ -5,9 +5,9 @@
 package gcp
 
 import (
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/gcp"
 )
 
 // Bundle exposes the trigger supported by the gcp provider.

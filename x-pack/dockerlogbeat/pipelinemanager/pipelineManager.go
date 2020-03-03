@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 
 	"github.com/docker/docker/daemon/logger"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // containerConfig is the common.Config unpacking type

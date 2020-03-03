@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/auditbeat/core"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
