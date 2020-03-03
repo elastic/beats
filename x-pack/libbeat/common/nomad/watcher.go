@@ -168,7 +168,7 @@ func (w *watcher) sync() error {
 			alloc.DesiredStatus, alloc.ClientStatus)
 
 		switch alloc.ClientStatus {
-		case AllocClientStatusComplete, AllocClientStatusFailed, api.AllocClientStatusLost:
+		case AllocClientStatusComplete, AllocClientStatusFailed, AllocClientStatusLost:
 			w.handler.OnDelete(*alloc)
 		case AllocClientStatusRunning:
 			// Handle in-place allocation updates (like adding tags to a service definition) that
