@@ -27,12 +27,12 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
@@ -64,8 +64,19 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if err := sh.Run("go", "get", GoImportsImportPath); err != nil {
-		return err
+	if UseVendor {
+		if err := gotool.Install(
+			gotool.Install.Vendored(),
+			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+		); err != nil {
+			return err
+		}
+	} else {
+		if err := gotool.Get(
+			gotool.Get.Package(filepath.Join(GoImportsImportPath)),
+		); err != nil {
+			return err
+		}
 	}
 
 	args := append(

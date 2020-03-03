@@ -29,8 +29,8 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/generator/common/beatgen/setup"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/generator/common/beatgen/setup"
 )
 
 // ConfigItem represents a value that must be configured for the custom beat

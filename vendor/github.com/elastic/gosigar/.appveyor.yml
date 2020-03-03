@@ -1,0 +1,84 @@
+# Version format
+version: "{build}"
+
+# Operating system (build VM template)
+os: Windows Server 2012 R2
+
+# Environment variables
+environment:
+  GOPATH: c:\gopath
+  GVM_GO_VERSION: 1.8.3
+  GVM_DL: https://github.com/andrewkroh/gvm/releases/download/v0.0.1/gvm-windows-amd64.exe
+
+# Custom clone folder (variables are not expanded here).
+clone_folder: c:\gopath\src\github.com\elastic\gosigar
+
+# Cache mingw install until appveyor.yml is modified.
+cache:
+- C:\ProgramData\chocolatey\bin -> .appveyor.yml
+- C:\ProgramData\chocolatey\lib -> .appveyor.yml
+- C:\Users\appveyor\.gvm -> .appveyor.yml
+- C:\Windows\System32\gvm.exe -> .appveyor.yml
+- C:\tools\mingw64 -> .appveyor.yml
+
+# Scripts that run after cloning repository
+install:
+  - ps: >-
+      if(!(Test-Path "C:\Windows\System32\gvm.exe")) {
+        wget "$env:GVM_DL" -Outfile C:\Windows\System32\gvm.exe
+      }
+  - ps: gvm --format=powershell "$env:GVM_GO_VERSION" | Invoke-Expression
+  # AppVeyor installed mingw is 32-bit only so install 64-bit version.
+  - ps: >-
+      if(!(Test-Path "C:\tools\mingw64\bin\gcc.exe")) {
+        cinst mingw > mingw-install.txt
+        Push-AppveyorArtifact mingw-install.txt
+      }
+  - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
+  - set PATH=%GOPATH%\bin;%PATH%
+  - go version
+  - go env
+  - python --version
+  - go get github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
+
+# To run your custom scripts instead of automatic MSBuild
+build_script:
+  # Compile
+  - appveyor AddCompilationMessage "Starting Compile"
+  - cd c:\gopath\src\github.com\elastic\gosigar
+  - go get -v -t -d ./...
+  - go build
+  - go build -o examples/df/df.exe ./examples/df
+  - go build -o examples/free/free.exe ./examples/free
+  - go build -o examples/ps/ps.exe ./examples/ps
+  - go build -o examples/uptime/uptime.exe ./examples/uptime
+  - appveyor AddCompilationMessage "Compile Success"
+
+# To run your custom scripts instead of automatic tests
+test_script:
+  # Unit tests
+  - ps: Add-AppveyorTest "Unit Tests" -Outcome Running
+  - mkdir build\coverage
+  - gotestcover -v -coverprofile=build/coverage/unit.cov github.com/elastic/gosigar/...
+  - ps: Update-AppveyorTest "Unit Tests" -Outcome Passed
+  - ps: Add-AppveyorTest "Running Examples" -Outcome Running
+  - .\examples\df\df.exe
+  - .\examples\free\free.exe
+  - .\examples\ps\ps.exe
+  - .\examples\uptime\uptime.exe
+  - ps: Update-AppveyorTest "Running Examples" -Outcome Passed
+
+after_test:
+  - go tool cover -html=build\coverage\unit.cov -o build\coverage\unit.html
+  - ps: Push-AppveyorArtifact build\coverage\unit.cov
+  - ps: Push-AppveyorArtifact build\coverage\unit.html
+  # Upload coverage report.
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -X gcov -f "build\coverage\unit.cov"
+
+# To disable deployment
+deploy: off
+
+# Notifications should only be setup using the AppVeyor UI so that
+# forks can be created without inheriting the settings.
