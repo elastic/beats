@@ -1,6 +1,10 @@
 [[convert]]
 === Convert
 
+++++
+<titleabbrev>convert</titleabbrev>
+++++
+
 The `convert` processor converts a field in the event to a different type, such
 as converting a string to an integer.
 

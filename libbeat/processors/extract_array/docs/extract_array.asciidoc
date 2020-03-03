@@ -1,6 +1,10 @@
 [[extract-array]]
 === Extract array
 
+++++
+<titleabbrev>extract_array</titleabbrev>
+++++
+
 experimental[]
 
 The `extract_array` processor populates fields with values read from an array

@@ -723,6 +723,14 @@ func OSSBeatDir(path ...string) string {
 // XPackBeatDir returns the X-Pack beat directory. You can pass paths and they
 // will be joined and appended to the X-Pack beat dir.
 func XPackBeatDir(path ...string) string {
+	// Check if we have an X-Pack only beats
+	cur := CWD()
+
+	if parentDir := filepath.Base(filepath.Dir(cur)); parentDir == "x-pack" {
+		tmp := filepath.Join(filepath.Dir(cur), BeatName)
+		return filepath.Join(append([]string{tmp}, path...)...)
+	}
+
 	return OSSBeatDir(append([]string{XPackDir, BeatName}, path...)...)
 }
 

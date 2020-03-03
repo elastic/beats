@@ -1,6 +1,10 @@
 [[add-observer-metadata]]
 === Add Observer metadata
 
+++++
+<titleabbrev>add_observer_metadata</titleabbrev>
+++++
+
 beta[]
 
 [source,yaml]
