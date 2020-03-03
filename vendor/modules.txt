@@ -733,7 +733,7 @@ github.com/sirupsen/logrus
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.3
 github.com/spf13/pflag
-# github.com/stretchr/objx v0.1.2-0.20180702103455-b8b73a35e983
+# github.com/stretchr/objx v0.2.0
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
@@ -758,7 +758,7 @@ github.com/urso/ecslog/backend/appender
 github.com/urso/ecslog/backend/layout
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
-# github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b
+# github.com/urso/magetools v0.0.0-20200125210132-c2e338f92f3a
 github.com/urso/magetools/clitool
 github.com/urso/magetools/ctrl
 github.com/urso/magetools/fs
