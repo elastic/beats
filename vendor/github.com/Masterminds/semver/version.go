@@ -13,22 +13,12 @@ import (
 // The compiled version of the regex created at init() is cached here so it
 // only needs to be created once.
 var versionRegex *regexp.Regexp
+var validPrereleaseRegex *regexp.Regexp
 
 var (
 	// ErrInvalidSemVer is returned a version is found to be invalid when
 	// being parsed.
 	ErrInvalidSemVer = errors.New("Invalid Semantic Version")
-
-	// ErrEmptyString is returned when an empty string is passed in for parsing.
-	ErrEmptyString = errors.New("Version string empty")
-
-	// ErrInvalidCharacters is returned when invalid characters are found as
-	// part of a version
-	ErrInvalidCharacters = errors.New("Invalid characters in version")
-
-	// ErrSegmentStartsZero is returned when a version segment starts with 0.
-	// This is invalid in SemVer.
-	ErrSegmentStartsZero = errors.New("Version segment starts with 0")
 
 	// ErrInvalidMetadata is returned when the metadata is an invalid format
 	ErrInvalidMetadata = errors.New("Invalid Metadata string")
@@ -37,121 +27,30 @@ var (
 	ErrInvalidPrerelease = errors.New("Invalid Prerelease string")
 )
 
-// semVerRegex is the regular expression used to parse a semantic version.
-const semVerRegex string = `v?([0-9]+)(\.[0-9]+)?(\.[0-9]+)?` +
+// SemVerRegex is the regular expression used to parse a semantic version.
+const SemVerRegex string = `v?([0-9]+)(\.[0-9]+)?(\.[0-9]+)?` +
 	`(-([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?` +
 	`(\+([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?`
 
+// ValidPrerelease is the regular expression which validates
+// both prerelease and metadata values.
+const ValidPrerelease string = `^([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*)`
+
 // Version represents a single semantic version.
 type Version struct {
-	major, minor, patch uint64
+	major, minor, patch int64
 	pre                 string
 	metadata            string
 	original            string
 }
 
 func init() {
-	versionRegex = regexp.MustCompile("^" + semVerRegex + "$")
-}
-
-const num string = "0123456789"
-const allowed string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-" + num
-
-// StrictNewVersion parses a given version and returns an instance of Version or
-// an error if unable to parse the version. Only parses valid semantic versions.
-// Performs checking that can find errors within the version.
-// If you want to coerce a version, such as 1 or 1.2, and perse that as the 1.x
-// releases of semver provided use the NewSemver() function.
-func StrictNewVersion(v string) (*Version, error) {
-	// Parsing here does not use RegEx in order to increase performance and reduce
-	// allocations.
-
-	if len(v) == 0 {
-		return nil, ErrEmptyString
-	}
-
-	// Split the parts into [0]major, [1]minor, and [2]patch,prerelease,build
-	parts := strings.SplitN(v, ".", 3)
-	if len(parts) != 3 {
-		return nil, ErrInvalidSemVer
-	}
-
-	sv := &Version{
-		original: v,
-	}
-
-	// check for prerelease or build metadata
-	var extra []string
-	if strings.ContainsAny(parts[2], "-+") {
-		// Start with the build metadata first as it needs to be on the right
-		extra = strings.SplitN(parts[2], "+", 2)
-		if len(extra) > 1 {
-			// build metadata found
-			sv.metadata = extra[1]
-			parts[2] = extra[0]
-		}
-
-		extra = strings.SplitN(parts[2], "-", 2)
-		if len(extra) > 1 {
-			// prerelease found
-			sv.pre = extra[1]
-			parts[2] = extra[0]
-		}
-	}
-
-	// Validate the number segments are valid. This includes only having positive
-	// numbers and no leading 0's.
-	for _, p := range parts {
-		if !containsOnly(p, num) {
-			return nil, ErrInvalidCharacters
-		}
-
-		if len(p) > 1 && p[0] == '0' {
-			return nil, ErrSegmentStartsZero
-		}
-	}
-
-	// Extract the major, minor, and patch elements onto the returned Version
-	var err error
-	sv.major, err = strconv.ParseUint(parts[0], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	sv.minor, err = strconv.ParseUint(parts[1], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	sv.patch, err = strconv.ParseUint(parts[2], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	// No prerelease or build metadata found so returning now as a fastpath.
-	if sv.pre == "" && sv.metadata == "" {
-		return sv, nil
-	}
-
-	if sv.pre != "" {
-		if err = validatePrerelease(sv.pre); err != nil {
-			return nil, err
-		}
-	}
-
-	if sv.metadata != "" {
-		if err = validateMetadata(sv.metadata); err != nil {
-			return nil, err
-		}
-	}
-
-	return sv, nil
+	versionRegex = regexp.MustCompile("^" + SemVerRegex + "$")
+	validPrereleaseRegex = regexp.MustCompile(ValidPrerelease)
 }
 
 // NewVersion parses a given version and returns an instance of Version or
-// an error if unable to parse the version. If the version is SemVer-ish it
-// attempts to convert it to SemVer. If you want  to validate it was a strict
-// semantic version at parse time see StrictNewVersion().
+// an error if unable to parse the version.
 func NewVersion(v string) (*Version, error) {
 	m := versionRegex.FindStringSubmatch(v)
 	if m == nil {
@@ -164,43 +63,31 @@ func NewVersion(v string) (*Version, error) {
 		original: v,
 	}
 
-	var err error
-	sv.major, err = strconv.ParseUint(m[1], 10, 64)
+	var temp int64
+	temp, err := strconv.ParseInt(m[1], 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("Error parsing version segment: %s", err)
 	}
+	sv.major = temp
 
 	if m[2] != "" {
-		sv.minor, err = strconv.ParseUint(strings.TrimPrefix(m[2], "."), 10, 64)
+		temp, err = strconv.ParseInt(strings.TrimPrefix(m[2], "."), 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("Error parsing version segment: %s", err)
 		}
+		sv.minor = temp
 	} else {
 		sv.minor = 0
 	}
 
 	if m[3] != "" {
-		sv.patch, err = strconv.ParseUint(strings.TrimPrefix(m[3], "."), 10, 64)
+		temp, err = strconv.ParseInt(strings.TrimPrefix(m[3], "."), 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("Error parsing version segment: %s", err)
 		}
+		sv.patch = temp
 	} else {
 		sv.patch = 0
-	}
-
-	// Perform some basic due diligence on the extra parts to ensure they are
-	// valid.
-
-	if sv.pre != "" {
-		if err = validatePrerelease(sv.pre); err != nil {
-			return nil, err
-		}
-	}
-
-	if sv.metadata != "" {
-		if err = validateMetadata(sv.metadata); err != nil {
-			return nil, err
-		}
 	}
 
 	return sv, nil
@@ -219,8 +106,8 @@ func MustParse(v string) *Version {
 // Note, if the original version contained a leading v this version will not.
 // See the Original() method to retrieve the original value. Semantic Versions
 // don't contain a leading v per the spec. Instead it's optional on
-// implementation.
-func (v Version) String() string {
+// impelementation.
+func (v *Version) String() string {
 	var buf bytes.Buffer
 
 	fmt.Fprintf(&buf, "%d.%d.%d", v.major, v.minor, v.patch)
@@ -240,32 +127,32 @@ func (v *Version) Original() string {
 }
 
 // Major returns the major version.
-func (v Version) Major() uint64 {
+func (v *Version) Major() int64 {
 	return v.major
 }
 
 // Minor returns the minor version.
-func (v Version) Minor() uint64 {
+func (v *Version) Minor() int64 {
 	return v.minor
 }
 
 // Patch returns the patch version.
-func (v Version) Patch() uint64 {
+func (v *Version) Patch() int64 {
 	return v.patch
 }
 
 // Prerelease returns the pre-release version.
-func (v Version) Prerelease() string {
+func (v *Version) Prerelease() string {
 	return v.pre
 }
 
 // Metadata returns the metadata on the version.
-func (v Version) Metadata() string {
+func (v *Version) Metadata() string {
 	return v.metadata
 }
 
 // originalVPrefix returns the original 'v' prefix if any.
-func (v Version) originalVPrefix() string {
+func (v *Version) originalVPrefix() string {
 
 	// Note, only lowercase v is supported as a prefix by the parser.
 	if v.original != "" && v.original[:1] == "v" {
@@ -278,7 +165,7 @@ func (v Version) originalVPrefix() string {
 // If the current version does not have prerelease/metadata information,
 // it unsets metadata and prerelease values, increments patch number.
 // If the current version has any of prerelease or metadata information,
-// it unsets both values and keeps current patch value
+// it unsets both values and keeps curent patch value
 func (v Version) IncPatch() Version {
 	vNext := v
 	// according to http://semver.org/#spec-item-9
@@ -330,13 +217,11 @@ func (v Version) IncMajor() Version {
 }
 
 // SetPrerelease defines the prerelease value.
-// Value must not include the required 'hyphen' prefix.
+// Value must not include the required 'hypen' prefix.
 func (v Version) SetPrerelease(prerelease string) (Version, error) {
 	vNext := v
-	if len(prerelease) > 0 {
-		if err := validatePrerelease(prerelease); err != nil {
-			return vNext, err
-		}
+	if len(prerelease) > 0 && !validPrereleaseRegex.MatchString(prerelease) {
+		return vNext, ErrInvalidPrerelease
 	}
 	vNext.pre = prerelease
 	vNext.original = v.originalVPrefix() + "" + vNext.String()
@@ -347,10 +232,8 @@ func (v Version) SetPrerelease(prerelease string) (Version, error) {
 // Value must not include the required 'plus' prefix.
 func (v Version) SetMetadata(metadata string) (Version, error) {
 	vNext := v
-	if len(metadata) > 0 {
-		if err := validateMetadata(metadata); err != nil {
-			return vNext, err
-		}
+	if len(metadata) > 0 && !validPrereleaseRegex.MatchString(metadata) {
+		return vNext, ErrInvalidMetadata
 	}
 	vNext.metadata = metadata
 	vNext.original = v.originalVPrefix() + "" + vNext.String()
@@ -378,9 +261,7 @@ func (v *Version) Equal(o *Version) bool {
 // the version smaller, equal, or larger than the other version.
 //
 // Versions are compared by X.Y.Z. Build metadata is ignored. Prerelease is
-// lower than the version without a prerelease. Compare always takes into account
-// prereleases. If you want to work with ranges using typical range syntaxes that
-// skip prereleases if the range is not looking for them use constraints.
+// lower than the version without a prerelease.
 func (v *Version) Compare(o *Version) int {
 	// Compare the major, minor, and patch version for differences. If a
 	// difference is found return the comparison.
@@ -427,15 +308,16 @@ func (v *Version) UnmarshalJSON(b []byte) error {
 	v.pre = temp.pre
 	v.metadata = temp.metadata
 	v.original = temp.original
+	temp = nil
 	return nil
 }
 
 // MarshalJSON implements JSON.Marshaler interface.
-func (v Version) MarshalJSON() ([]byte, error) {
+func (v *Version) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.String())
 }
 
-func compareSegment(v, o uint64) int {
+func compareSegment(v, o int64) int {
 	if v < o {
 		return -1
 	}
@@ -512,14 +394,10 @@ func comparePrePart(s, o string) int {
 	}
 
 	// When comparing strings "99" is greater than "103". To handle
-	// cases like this we need to detect numbers and compare them. According
-	// to the semver spec, numbers are always positive. If there is a - at the
-	// start like -99 this is to be evaluated as an alphanum. numbers always
-	// have precedence over alphanum. Parsing as Uints because negative numbers
-	// are ignored.
+	// cases like this we need to detect numbers and compare them.
 
-	oi, n1 := strconv.ParseUint(o, 10, 64)
-	si, n2 := strconv.ParseUint(s, 10, 64)
+	oi, n1 := strconv.ParseInt(o, 10, 64)
+	si, n2 := strconv.ParseInt(s, 10, 64)
 
 	// The case where both are strings compare the strings
 	if n1 != nil && n2 != nil {
@@ -540,44 +418,4 @@ func comparePrePart(s, o string) int {
 	}
 	return -1
 
-}
-
-// Like strings.ContainsAny but does an only instead of any.
-func containsOnly(s string, comp string) bool {
-	return strings.IndexFunc(s, func(r rune) bool {
-		return !strings.ContainsRune(comp, r)
-	}) == -1
-}
-
-// From the spec, "Identifiers MUST comprise only
-// ASCII alphanumerics and hyphen [0-9A-Za-z-]. Identifiers MUST NOT be empty.
-// Numeric identifiers MUST NOT include leading zeroes.". These segments can
-// be dot separated.
-func validatePrerelease(p string) error {
-	eparts := strings.Split(p, ".")
-	for _, p := range eparts {
-		if containsOnly(p, num) {
-			if len(p) > 1 && p[0] == '0' {
-				return ErrSegmentStartsZero
-			}
-		} else if !containsOnly(p, allowed) {
-			return ErrInvalidPrerelease
-		}
-	}
-
-	return nil
-}
-
-// From the spec, "Build metadata MAY be denoted by
-// appending a plus sign and a series of dot separated identifiers immediately
-// following the patch or pre-release version. Identifiers MUST comprise only
-// ASCII alphanumerics and hyphen [0-9A-Za-z-]. Identifiers MUST NOT be empty."
-func validateMetadata(m string) error {
-	eparts := strings.Split(m, ".")
-	for _, p := range eparts {
-		if !containsOnly(p, allowed) {
-			return ErrInvalidMetadata
-		}
-	}
-	return nil
 }

@@ -1,0 +1,54 @@
+# Document: http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - env:
+    - CGO_ENABLED=0
+    main: ./cmd/reviewdog/
+    ldflags: -s -w -X github.com/reviewdog/reviewdog/commands.Version={{.Version}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+ 
+archives:
+  - id: main
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    files:
+      - LICENSE
+      - README.md
+
+brews:
+  - github:
+      owner: reviewdog
+      name: homebrew-tap
+    folder: Formula
+    homepage:  https://github.com/reviewdog/reviewdog
+    description: Automated code review tool integrated with any code analysis tools regardless of programming language.
+    test: |
+      system "#{bin}/reviewdog -version"
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'

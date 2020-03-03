@@ -29,8 +29,8 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // The value of EventID element contains the low-order 16 bits of the event
@@ -413,11 +413,10 @@ func parseSID(record eventLogRecord, buffer []byte) (*sys.SID, error) {
 	}
 
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[record.userSidOffset]))
-	identifier, err := sid.String()
-	if err != nil {
-		return nil, err
+	identifier := sid.String()
+	if identifier == "" {
+		return nil, fmt.Errorf("unable to convert SID to string: %v", sid)
 	}
-
 	return &sys.SID{Identifier: identifier}, nil
 }
 
