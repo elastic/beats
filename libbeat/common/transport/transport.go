@@ -47,3 +47,20 @@ func Dial(c Config, network, address string) (net.Conn, error) {
 	}
 	return d.Dial(network, address)
 }
+
+func MakeDialer(c Config) (Dialer, error) {
+	var err error
+	dialer := NetDialer(c.Timeout)
+	dialer, err = ProxyDialer(c.Proxy, dialer)
+	if err != nil {
+		return nil, err
+	}
+	if c.Stats != nil {
+		dialer = StatsDialer(dialer, c.Stats)
+	}
+
+	if c.TLS != nil {
+		return TLSDialer(dialer, c.TLS, c.Timeout)
+	}
+	return dialer, nil
+}
