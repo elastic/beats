@@ -407,6 +407,9 @@ github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
 # github.com/elastic/ecs v1.4.0
 github.com/elastic/ecs/code/go/ecs
+# github.com/elastic/go-concert v0.0.0-20200228180355-799bc08efe32
+github.com/elastic/go-concert
+github.com/elastic/go-concert/atomic
 # github.com/elastic/go-libaudit v0.4.0
 github.com/elastic/go-libaudit
 github.com/elastic/go-libaudit/aucoalesce
@@ -656,6 +659,8 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/morikuni/aec v1.0.0
 github.com/morikuni/aec
+# github.com/oklog/ulid v1.3.1
+github.com/oklog/ulid
 # github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483
 github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
@@ -828,9 +833,12 @@ golang.org/x/crypto/ssh/terminal
 # golang.org/x/exp v0.0.0-20191227195350-da58074b4299
 golang.org/x/exp/apidiff
 golang.org/x/exp/cmd/apidiff
-# golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
+# golang.org/x/lint v0.0.0-20200130185559-910be7a94367
 golang.org/x/lint
 golang.org/x/lint/golint
+# golang.org/x/mod v0.1.1-0.20191105210325-c90efee705ee
+golang.org/x/mod/module
+golang.org/x/mod/semver
 # golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 golang.org/x/net/bpf
 golang.org/x/net/context
@@ -897,7 +905,7 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 golang.org/x/time/rate
-# golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4
+# golang.org/x/tools v0.0.0-20200216192241-b320d3a0f5a2
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer
 golang.org/x/tools/go/analysis
@@ -915,8 +923,7 @@ golang.org/x/tools/go/vcs
 golang.org/x/tools/internal/fastwalk
 golang.org/x/tools/internal/gopathwalk
 golang.org/x/tools/internal/imports
-golang.org/x/tools/internal/module
-golang.org/x/tools/internal/semver
+golang.org/x/tools/internal/packagesinternal
 # golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
