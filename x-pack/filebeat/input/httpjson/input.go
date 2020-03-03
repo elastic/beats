@@ -305,7 +305,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 		if mm != nil && in.config.Pagination != nil && in.config.Pagination.IsEnabled() {
 			if in.config.Pagination.Header != nil {
 				// Pagination control using HTTP Header
-				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.re)
+				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
 				if err != nil {
 					return errors.Wrapf(err, "failed to retrieve the next URL for pagination")
 				}
