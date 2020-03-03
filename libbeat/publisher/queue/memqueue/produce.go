@@ -18,19 +18,19 @@
 package memqueue
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type forgetfulProducer struct {
-	broker    *Broker
+	broker    *broker
 	openState openState
 }
 
 type ackProducer struct {
-	broker    *Broker
+	broker    *broker
 	cancel    bool
 	seq       uint32
 	state     produceState
@@ -53,7 +53,7 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		isOpen: atomic.MakeBool(true),
