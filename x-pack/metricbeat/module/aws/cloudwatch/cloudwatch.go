@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
@@ -283,6 +284,11 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
+		tagsFilter := config.Tags
+		if config.TagsFilter != nil {
+			tagsFilter = config.TagsFilter
+		}
+
 		// If there is no statistic method specified, then use the default.
 		if config.Statistic == nil {
 			config.Statistic = defaultStatistics
@@ -314,17 +320,9 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 			if config.ResourceTypeFilter != "" {
 				if _, ok := resourceTypesWithTags[config.ResourceTypeFilter]; ok {
-					if config.TagsFilter != nil {
-						resourceTypesWithTags[config.ResourceTypeFilter] = config.TagsFilter
-					} else {
-						resourceTypesWithTags[config.ResourceTypeFilter] = config.Tags
-					}
+					resourceTypesWithTags[config.ResourceTypeFilter] = tagsFilter
 				} else {
-					if config.TagsFilter != nil {
-						resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.TagsFilter...)
-					} else {
-						resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.Tags...)
-					}
+					resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], tagsFilter...)
 				}
 			}
 			continue
@@ -332,14 +330,10 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
+			tags:               tagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceTypeFilter,
 			dimensions:         cloudwatchDimensions,
-		}
-		if config.TagsFilter != nil {
-			configPerNamespace.tags = config.TagsFilter
-		} else {
-			configPerNamespace.tags = config.Tags
 		}
 
 		if _, ok := namespaceDetailTotal[config.Namespace]; ok {
