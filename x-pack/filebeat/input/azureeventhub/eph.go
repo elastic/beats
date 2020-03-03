@@ -57,8 +57,6 @@ func (a *azureInput) runWithEPH() error {
 				a.log.Debug(onEventErr.Error())
 				a.Stop()
 			}
-			x := <-a.ackChannel
-			_= x
 			return onEventErr
 		})
 	if err != nil {

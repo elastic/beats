@@ -92,17 +92,6 @@ func NewInput(
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
 		},
-		ACKEvents: func(privates []interface{}) {
-			for _, priv := range privates {
-				if msg, ok := priv.(*[]byte); ok {
-					input.ackChannel <- 0
-					_= msg
-					//msg.Ack()
-				} else {
-					input.log.Error("Failed ACKing azure-eventhub event")
-				}
-			}
-		},
 	})
 	if err != nil {
 		return nil, err
