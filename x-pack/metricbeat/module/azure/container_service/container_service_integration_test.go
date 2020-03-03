@@ -14,6 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	// Register input module and metricset
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
 )
 
 func TestFetchMetricset(t *testing.T) {
