@@ -24,11 +24,11 @@ const stdinName = "stdin"
 var Bundle = provider.MustCreate(
 	"local",
 	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
-	feature.NewDetails("local events", "allows to trigger events locally.", feature.Experimental),
+	feature.MakeDetails("local events", "allows to trigger events locally.", feature.Experimental),
 ).MustAddFunction(
 	stdinName,
 	NewStdinFunction,
-	feature.NewDetails(stdinName, "read events from stdin", feature.Experimental),
+	feature.MakeDetails(stdinName, "read events from stdin", feature.Experimental),
 ).Bundle()
 
 // StdinFunction reads events from STIN and terminates when stdin is completed.

@@ -330,6 +330,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-usage,usage>>
 
+* <<metricbeat-metricset-aws-vpc,vpc>>
+
 include::aws/billing.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
@@ -355,4 +357,6 @@ include::aws/sns.asciidoc[]
 include::aws/sqs.asciidoc[]
 
 include::aws/usage.asciidoc[]
+
+include::aws/vpc.asciidoc[]
 

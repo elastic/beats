@@ -32,6 +32,7 @@ import (
 
 type copyFields struct {
 	config copyFieldsConfig
+	logger *logp.Logger
 }
 
 type copyFieldsConfig struct {
@@ -62,6 +63,7 @@ func NewCopyFields(c *common.Config) (processors.Processor, error) {
 
 	f := &copyFields{
 		config: config,
+		logger: logp.NewLogger("copy_fields"),
 	}
 	return f, nil
 }
@@ -76,7 +78,7 @@ func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.copyField(field.From, field.To, event.Fields)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %s", err)
-			logp.Debug("copy_fields", errMsg.Error())
+			f.logger.Debug(errMsg.Error())
 			if f.config.FailOnError {
 				event.Fields = backup
 				event.PutValue("error.message", errMsg.Error())

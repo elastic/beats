@@ -136,7 +136,7 @@ type waitCloser struct {
 	events sync.WaitGroup
 }
 
-type queueFactory func(queue.Eventer) (queue.Queue, error)
+type queueFactory func(queue.ACKListener) (queue.Queue, error)
 
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the

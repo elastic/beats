@@ -1,6 +1,10 @@
 [[drop-fields]]
 === Drop fields from events
 
+++++
+<titleabbrev>drop_fields</titleabbrev>
+++++
+
 The `drop_fields` processor specifies which fields to drop if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
 specified fields are always dropped. The `@timestamp` and `type` fields cannot
