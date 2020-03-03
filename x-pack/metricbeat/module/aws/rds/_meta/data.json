@@ -3,8 +3,8 @@
     "aws": {
         "rds": {
             "aurora_bin_log_replica_lag": 0,
-            "aurora_replica.lag_max.ms": 9.630999565124512,
-            "aurora_replica.lag_min.ms": 9.630999565124512,
+            "aurora_replica.lag_max.ms": 19.108999252319336,
+            "aurora_replica.lag_min.ms": 19.108999252319336,
             "cache_hit_ratio.buffer": 100,
             "cache_hit_ratio.result_set": 0,
             "cpu": {
@@ -17,47 +17,47 @@
                 "arn": "arn:aws:rds:us-east-1:428152502467:db:database-1-instance-1",
                 "class": "db.r5.large",
                 "identifier": "database-1-instance-1",
-                "status": "available",
-                "tags": {
-                    "created-by": "ks",
-                    "dept": "engr"
-                }
+                "status": "available"
             },
             "db_instance.identifier": "database-1-instance-1",
             "deadlocks": 0,
             "disk_usage": {
                 "bin_log.bytes": 0
             },
-            "engine_uptime.sec": 2240297,
-            "free_local_storage.bytes": 31996100608,
-            "freeable_memory.bytes": 4659970048,
+            "engine_uptime.sec": 2704277,
+            "free_local_storage.bytes": 31745863680,
+            "freeable_memory.bytes": 4634234880,
             "latency": {
-                "commit": 6.052133333333333,
+                "commit": 5.270933333333333,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.1599,
-                "insert": 0.1599,
-                "select": 0.1762108108108108,
+                "dml": 0.1624,
+                "insert": 0.1624,
+                "select": 0.17333862433862435,
                 "update": 0
             },
             "login_failures": 0,
-            "queries": 8.868736038408963,
+            "queries": 9.11833836203304,
             "throughput": {
-                "commit": 0.5002668089647812,
+                "commit": 0.5000916834753039,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.5002668089647812,
-                "insert": 0.5002668089647812,
-                "network": 1.3996267661956812,
-                "network_receive": 0.6998133830978406,
-                "network_transmit": 0.6998133830978406,
-                "select": 3.0849786552828173,
+                "dml": 0.5000916834753039,
+                "insert": 0.5000916834753039,
+                "network": 1.4,
+                "network_receive": 0.7,
+                "network_transmit": 0.7,
+                "select": 3.150577605894414,
                 "update": 0
             },
             "transactions": {
                 "active": 0,
                 "blocked": 0
             }
+        },
+        "tags": {
+            "created-by": "ks",
+            "dept": "engr"
         }
     },
     "cloud": {

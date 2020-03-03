@@ -35,5 +35,8 @@
 - module: aws
   period: 60s
   credential_profile_name: test-mb
+  tags_filter:
+    - key: "dept"
+      value: "eng"
   metricsets:
     - rds
