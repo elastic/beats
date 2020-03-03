@@ -119,26 +119,37 @@ func TestURLParamsEncode(t *testing.T) {
 func TestParseURL(t *testing.T) {
 	tests := map[string]struct {
 		input           string
+		hints           []ParseHint
 		expected        string
 		errorAssertFunc require.ErrorAssertionFunc
 	}{
 		"http": {
 			"http://host:1234/path",
+			nil,
 			"http://host:1234/path",
 			require.NoError,
 		},
 		"https": {
 			"https://host:1234/path",
+			nil,
 			"https://host:1234/path",
 			require.NoError,
 		},
 		"no_scheme": {
 			"host:1234/path",
+			nil,
 			"http://host:1234/path",
+			require.NoError,
+		},
+		"default_scheme_https": {
+			"host:1234/path",
+			[]ParseHint{WithDefaultScheme("https")},
+			"https://host:1234/path",
 			require.NoError,
 		},
 		"invalid": {
 			"foobar:port",
+			nil,
 			"",
 			require.Error,
 		},
@@ -146,12 +157,12 @@ func TestParseURL(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			url, err := ParseURL(test.input)
+			u, err := ParseURL(test.input, test.hints...)
 			test.errorAssertFunc(t, err)
 			if test.expected != "" {
-				require.Equal(t, test.expected, url.String())
+				require.Equal(t, test.expected, u.String())
 			} else {
-				require.Nil(t, url)
+				require.Nil(t, u)
 			}
 		})
 	}

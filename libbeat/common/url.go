@@ -84,18 +84,36 @@ func EncodeURLParams(url string, params url.Values) string {
 	return strings.Join([]string{url, "?", params.Encode()}, "")
 }
 
+type ParseHint func(raw string) string
+
 // ParseURL tries to parse a URL and return the parsed result.
-func ParseURL(raw string) (*url.URL, error) {
+func ParseURL(raw string, hints ...ParseHint) (*url.URL, error) {
 	if raw == "" {
 		return nil, nil
 	}
 
-	url, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(url.Scheme, "http") {
-		return url, err
+	u, err := url.Parse(raw)
+	if err == nil && strings.HasPrefix(u.Scheme, "http") {
+		return u, err
 	}
 
-	// Proxy was bogus. Try prepending "http://" to it and
-	// see if that parses correctly.
-	return url.Parse("http://" + raw)
+	// Parsing failed. Try applying hints and parsing again.
+	if len(hints) == 0 {
+		hints = append(hints, WithDefaultScheme("http"))
+	}
+
+	for _, hint := range hints {
+		raw = hint(raw)
+	}
+
+	return u.Parse(raw)
+}
+
+func WithDefaultScheme(scheme string) ParseHint {
+	return func(raw string) string {
+		if !strings.Contains(raw, "://") {
+			return scheme + "://" + raw
+		}
+		return raw
+	}
 }
