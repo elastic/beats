@@ -4,7 +4,7 @@
 
 // +build integration
 
-package database_account
+package monitor
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("database_account")
+	config, err := test.GetConfig("monitor")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}
@@ -30,10 +30,14 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("database_account")
+	config, err := test.GetConfig("monitor")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}
+	config["resources"] = []map[string]interface{}{{
+		"resource_query": "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'",
+		"metrics": []map[string]interface{}{{"namespace": "Microsoft.DocumentDb/databaseAccounts",
+			"name": []string{"DataUsage", "DocumentCount", "DocumentQuota"}}}}}
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

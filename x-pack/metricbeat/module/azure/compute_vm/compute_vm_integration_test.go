@@ -4,7 +4,7 @@
 
 // +build integration
 
-package database_account
+package compute_vm
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("database_account")
+	config, err := test.GetConfig("compute_vm")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}
@@ -30,7 +30,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("database_account")
+	config, err := test.GetConfig("compute_vm")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}

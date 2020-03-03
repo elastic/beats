@@ -61,7 +61,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 					if dimension != azure.NoDimension {
 						dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 					}
-					metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, mets, resource, resourceID, namespace, dimensions, time)...)
+					metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resource, resourceID, "", namespace, dimensions, time)...)
 				}
 			}
 		}

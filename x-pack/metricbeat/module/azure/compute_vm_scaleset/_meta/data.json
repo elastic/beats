@@ -1,121 +1,113 @@
 {
-    "@timestamp" : "2019-09-20T11:13:00.000Z",
-    "azure" : {
-        "timegrain" : "PT5M",
-        "resource" : {
-            "name" : "winvmss",
-            "type" : "Microsoft.Compute/virtualMachineScaleSets",
-            "group" : "resource-group"
-        },
-        "subscription_id" : "123456-qwer-1234-5678-12345678",
-        "namespace" : "Microsoft.Compute/virtualMachineScaleSets",
-        "dimensions" : {
-            "vmname" : "winvmss_3"
-        },
-        "compute_vm_scaleset" : {
-            "outbound_flows" : {
-                "avg" : 10.6
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "compute_vm_scaleset": {
+            "data_disk_queue_depth": {
+                "avg": 0
             },
-            "disk_write_bytes" : {
-                "total" : 2.838777151E7
+            "data_disk_read_bytes_per_sec": {
+                "avg": 0
             },
-            "disk_read_operations_per_sec" : {
-                "avg" : 3.53
+            "data_disk_read_operations_per_sec": {
+                "avg": 0
             },
-            "outbound_flows_maximum_creation_rate" : {
-                "avg" : 0.2
+            "data_disk_write_bytes_per_sec": {
+                "avg": 0
             },
-            "data_disk_read_bytes_per_sec" : {
-                "avg" : 5051.38125
+            "data_disk_write_operations_per_sec": {
+                "avg": 0
             },
-            "os_disk_read_bytes_per_sec" : {
-                "avg" : 122285.5025
+            "disk_read_bytes": {
+                "total": 0
             },
-            "data_disk_write_bytes_per_sec" : {
-                "avg" : 0
+            "disk_read_operations_per_sec": {
+                "avg": 0
             },
-            "data_disk_read_operations_per_sec" : {
-                "avg" : 0.495
+            "disk_write_bytes": {
+                "total": 1180450.5
             },
-            "disk_read_bytes" : {
-                "total" : 4.081481671E7
+            "disk_write_operations_per_sec": {
+                "avg": 0.6839999999999999
             },
-            "disk_write_operations_per_sec" : {
-                "avg" : 3.132
+            "inbound_flows": {
+                "avg": 36.8
             },
-            "network_out_total" : {
-                "total" : 1509069.0
+            "inbound_flows_maximum_creation_rate": {
+                "avg": 6.6
             },
-            "inbound_flows" : {
-                "avg" : 10.6
+            "network_in": {
+                "total": 1158350
             },
-            "os_disk_read_operations_per_sec" : {
-                "avg" : 1.805
+            "network_in_total": {
+                "total": 1737301
             },
-            "data_disk_queue_depth" : {
-                "avg" : 0
+            "network_out": {
+                "total": 175875
             },
-            "inbound_flows_maximum_creation_rate" : {
-                "avg" : 0.2
+            "network_out_total": {
+                "total": 646949
             },
-            "data_disk_write_operations_per_sec" : {
-                "avg" : 0
+            "os_disk_queue_depth": {
+                "avg": 0
             },
-            "os_disk_write_bytes_per_sec" : {
-                "avg" : 95619.85625
+            "os_disk_read_bytes_per_sec": {
+                "avg": 0
             },
-            "percentage_cpu" : {
-                "avg" : 1.592
+            "os_disk_read_operations_per_sec": {
+                "avg": 0
             },
-            "os_disk_write_operations_per_sec" : {
-                "avg" : 3.045
+            "os_disk_write_bytes_per_sec": {
+                "avg": 3934.8300000000004
             },
-            "network_in_total" : {
-                "total" : 794397
+            "os_disk_write_operations_per_sec": {
+                "avg": 0.6839999999999999
             },
-            "os_disk_queue_depth" : {
-                "avg" : 0.005
+            "outbound_flows": {
+                "avg": 37
+            },
+            "outbound_flows_maximum_creation_rate": {
+                "avg": 7.6
+            },
+            "percentage_cpu": {
+                "avg": 0.30125
             }
-        }
-    },
-    "service" : {
-        "type" : "azure"
-    },
-    "ecs" : {
-        "version" : "1.1.0"
-    },
-    "host" : {
-        "architecture" : "x86_64",
-        "os" : {
-            "build" : "17134.1006",
-            "platform" : "windows",
-            "version" : "10.0",
-            "family" : "windows",
-            "name" : "Windows 10 Pro",
-            "kernel" : "10.0.17134.1006 (WinBuild.160101.0800)"
         },
-        "id" : "123456-qwer-1234-5678-12345678",
-        "hostname" : "DESKTOP-RFOOE09",
-        "name" : "DESKTOP-RFOOE09"
+        "dimensions": {
+            "vmname": "ecescaletest_3"
+        },
+        "namespace": "Microsoft.Compute/virtualMachineScaleSets",
+        "resource": {
+            "group": "obs-infrastructure",
+            "tags": {
+                "environment": "staging",
+                "role": "allocator"
+            },
+            "type": "Microsoft.Compute/virtualMachineScaleSets"
+        },
+        "subscription_id": "271dc764-105f-4af9-b324-d8190e40e5eb",
+        "timegrain": "PT5M"
     },
-    "agent" : {
-        "version" : "8.0.0",
-        "type" : "metricbeat",
-        "ephemeral_id" : "123456-qwer-1234-5678-12345678",
-        "hostname" : "DESKTOP-RFOOE09",
-        "id" : "123456-qwer-1234-5678-12345678"
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/271dc764-105f-4af9-b324-d8190e40e5eb/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/ecescaletest",
+            "name": "ecescaletest"
+        },
+        "machine": {
+            "type": "Standard_D4s_v3"
+        },
+        "provider": "azure",
+        "region": "eastus2"
     },
-    "cloud" : {
-        "provider" : "azure",
-        "region" : "westeurope"
+    "event": {
+        "dataset": "azure.compute_vm_scaleset",
+        "duration": 115000,
+        "module": "azure"
     },
-    "event" : {
-        "dataset" : "azure.compute_vm_scaleset",
-        "module" : "azure",
-        "duration" : 69629063400
+    "metricset": {
+        "name": "compute_vm_scaleset",
+        "period": 10000
     },
-    "metricset" : {
-        "name" : "compute_vm_scaleset",
-        "period" : 300000
+    "service": {
+        "type": "azure"
     }
 }

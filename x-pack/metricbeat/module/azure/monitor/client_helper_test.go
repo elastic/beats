@@ -79,7 +79,7 @@ func TestMapMetric(t *testing.T) {
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
@@ -100,7 +100,7 @@ func TestMapMetric(t *testing.T) {
 		assert.Nil(t, err)
 
 		assert.True(t, len(metrics) > 0)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
