@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 // This program is free software: you can modify it and/or redistribute it
 // under the terms of:
 //
@@ -17,45 +17,40 @@
 #include "dpiImpl.h"
 
 //-----------------------------------------------------------------------------
-// dpiMsgProps__create() [INTERNAL]
-//   Create a new subscription structure and return it. In case of error NULL
-// is returned.
+// dpiMsgProps__allocate() [INTERNAL]
+//   Create a new message properties structure and return it. In case of error
+// NULL is returned.
 //-----------------------------------------------------------------------------
-int dpiMsgProps__create(dpiMsgProps *options, dpiConn *conn, dpiError *error)
+int dpiMsgProps__allocate(dpiConn *conn, dpiMsgProps **props, dpiError *error)
 {
+    dpiMsgProps *tempProps;
+
+    if (dpiGen__allocate(DPI_HTYPE_MSG_PROPS, conn->env, (void**) &tempProps,
+            error) < 0)
+        return DPI_FAILURE;
     dpiGen__setRefCount(conn, error, 1);
-    options->conn = conn;
-    return dpiOci__descriptorAlloc(conn->env->handle, &options->handle,
-            DPI_OCI_DTYPE_AQMSG_PROPERTIES, "allocate descriptor", error);
+    tempProps->conn = conn;
+    if (dpiOci__descriptorAlloc(conn->env->handle, &tempProps->handle,
+            DPI_OCI_DTYPE_AQMSG_PROPERTIES, "allocate descriptor",
+            error) < 0) {
+        dpiMsgProps__free(tempProps, error);
+        return DPI_FAILURE;
+    }
+
+    *props = tempProps;
+    return DPI_SUCCESS;
 }
 
 
 //-----------------------------------------------------------------------------
 // dpiMsgProps__extractMsgId() [INTERNAL]
-//   Extract bytes from the OCIRaw value containing the message id and store
-// them in allocated memory on the message properties instance. Then resize the
-// OCIRaw value so the memory can be reclaimed.
+//   Extract bytes from the OCIRaw value containing the message id.
 //-----------------------------------------------------------------------------
-int dpiMsgProps__extractMsgId(dpiMsgProps *props, void *ociRaw,
-        const char **msgId, uint32_t *msgIdLength, dpiError *error)
+void dpiMsgProps__extractMsgId(dpiMsgProps *props, const char **msgId,
+        uint32_t *msgIdLength)
 {
-    const char *rawPtr;
-
-    dpiOci__rawPtr(props->env->handle, ociRaw, (void**) &rawPtr);
-    dpiOci__rawSize(props->env->handle, ociRaw, msgIdLength);
-    if (*msgIdLength > props->bufferLength) {
-        if (props->buffer) {
-            dpiUtils__freeMemory(props->buffer);
-            props->buffer = NULL;
-        }
-        if (dpiUtils__allocateMemory(1, *msgIdLength, 0,
-                "allocate msgid buffer", (void**) &props->buffer, error) < 0)
-            return DPI_FAILURE;
-    }
-    memcpy(props->buffer, rawPtr, *msgIdLength);
-    *msgId = props->buffer;
-    dpiOci__rawResize(props->env->handle, &ociRaw, 0, error);
-    return DPI_SUCCESS;
+    dpiOci__rawPtr(props->env->handle, props->msgIdRaw, (void**) msgId);
+    dpiOci__rawSize(props->env->handle, props->msgIdRaw, msgIdLength);
 }
 
 
@@ -69,13 +64,21 @@ void dpiMsgProps__free(dpiMsgProps *props, dpiError *error)
         dpiOci__descriptorFree(props->handle, DPI_OCI_DTYPE_AQMSG_PROPERTIES);
         props->handle = NULL;
     }
+    if (props->payloadObj) {
+        dpiGen__setRefCount(props->payloadObj, error, -1);
+        props->payloadObj = NULL;
+    }
+    if (props->payloadRaw) {
+        dpiOci__rawResize(props->env->handle, &props->payloadRaw, 0, error);
+        props->payloadRaw = NULL;
+    }
+    if (props->msgIdRaw) {
+        dpiOci__rawResize(props->env->handle, &props->msgIdRaw, 0, error);
+        props->msgIdRaw = NULL;
+    }
     if (props->conn) {
         dpiGen__setRefCount(props->conn, error, -1);
         props->conn = NULL;
-    }
-    if (props->buffer) {
-        dpiUtils__freeMemory(props->buffer);
-        props->buffer = NULL;
     }
     dpiUtils__freeMemory(props);
 }
@@ -91,8 +94,7 @@ static int dpiMsgProps__getAttrValue(dpiMsgProps *props, uint32_t attribute,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, fnName, 1,
-            &error) < 0)
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, fnName, &error) < 0)
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(props, value)
     DPI_CHECK_PTR_NOT_NULL(props, valueLength)
@@ -112,8 +114,7 @@ static int dpiMsgProps__setAttrValue(dpiMsgProps *props, uint32_t attribute,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, fnName, 1,
-            &error) < 0)
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, fnName, &error) < 0)
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(props, value)
     status = dpiOci__attrSet(props->handle, DPI_OCI_DTYPE_AQMSG_PROPERTIES,
@@ -181,7 +182,7 @@ int dpiMsgProps_getEnqTime(dpiMsgProps *props, dpiTimestamp *value)
     dpiOciDate ociValue;
     dpiError error;
 
-    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__, 1,
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(props, value)
@@ -241,6 +242,32 @@ int dpiMsgProps_getNumAttempts(dpiMsgProps *props, int32_t *value)
 
 
 //-----------------------------------------------------------------------------
+// dpiMsgProps_getMsgId() [PUBLIC]
+//   Return the message id for the message (available after enqueuing or
+// dequeuing a message).
+//-----------------------------------------------------------------------------
+int dpiMsgProps_getMsgId(dpiMsgProps *props, const char **value,
+        uint32_t *valueLength)
+{
+    dpiError error;
+
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
+            &error) < 0)
+        return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
+    DPI_CHECK_PTR_NOT_NULL(props, value)
+    DPI_CHECK_PTR_NOT_NULL(props, valueLength)
+    if (!props->msgIdRaw) {
+        *value = NULL;
+        *valueLength = 0;
+    } else {
+        dpiOci__rawPtr(props->env->handle, props->msgIdRaw, (void**) value);
+        dpiOci__rawSize(props->env->handle, props->msgIdRaw, valueLength);
+    }
+    return dpiGen__endPublicFn(props, DPI_SUCCESS, &error);
+}
+
+
+//-----------------------------------------------------------------------------
 // dpiMsgProps_getOriginalMsgId() [PUBLIC]
 //   Return the original message id for the message.
 //-----------------------------------------------------------------------------
@@ -250,7 +277,7 @@ int dpiMsgProps_getOriginalMsgId(dpiMsgProps *props, const char **value,
     dpiError error;
     void *rawValue;
 
-    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__, 1,
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(props, value)
@@ -261,6 +288,36 @@ int dpiMsgProps_getOriginalMsgId(dpiMsgProps *props, const char **value,
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     dpiOci__rawPtr(props->env->handle, rawValue, (void**) value);
     dpiOci__rawSize(props->env->handle, rawValue, valueLength);
+    return dpiGen__endPublicFn(props, DPI_SUCCESS, &error);
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiMsgProps_getPayload() [PUBLIC]
+//   Get the payload for the message (as an object or a series of bytes).
+//-----------------------------------------------------------------------------
+int dpiMsgProps_getPayload(dpiMsgProps *props, dpiObject **obj,
+        const char **value, uint32_t *valueLength)
+{
+    dpiError error;
+
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
+            &error) < 0)
+        return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
+    if (obj)
+        *obj = props->payloadObj;
+    if (value && valueLength) {
+        if (props->payloadRaw) {
+            dpiOci__rawPtr(props->env->handle, props->payloadRaw,
+                    (void**) value);
+            dpiOci__rawSize(props->env->handle, props->payloadRaw,
+                    valueLength);
+        } else {
+            *value = NULL;
+            *valueLength = 0;
+        }
+    }
+
     return dpiGen__endPublicFn(props, DPI_SUCCESS, &error);
 }
 
@@ -359,7 +416,7 @@ int dpiMsgProps_setOriginalMsgId(dpiMsgProps *props, const char *value,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__, 1,
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(props, value)
@@ -375,6 +432,51 @@ int dpiMsgProps_setOriginalMsgId(dpiMsgProps *props, const char *value,
 
 
 //-----------------------------------------------------------------------------
+// dpiMsgProps_setPayloadBytes() [PUBLIC]
+//   Set the payload for the message (as a series of bytes).
+//-----------------------------------------------------------------------------
+int dpiMsgProps_setPayloadBytes(dpiMsgProps *props, const char *value,
+        uint32_t valueLength)
+{
+    dpiError error;
+    int status;
+
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
+            &error) < 0)
+        return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
+    DPI_CHECK_PTR_NOT_NULL(props, value)
+    if (props->payloadRaw) {
+        dpiOci__rawResize(props->env->handle, &props->payloadRaw, 0, &error);
+        props->payloadRaw = NULL;
+    }
+    status = dpiOci__rawAssignBytes(props->env->handle, value, valueLength,
+            &props->payloadRaw, &error);
+    return dpiGen__endPublicFn(props, status, &error);
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiMsgProps_setPayloadObject() [PUBLIC]
+//   Set the payload for the message (as an object).
+//-----------------------------------------------------------------------------
+int dpiMsgProps_setPayloadObject(dpiMsgProps *props, dpiObject *obj)
+{
+    dpiError error;
+
+    if (dpiGen__startPublicFn(props, DPI_HTYPE_MSG_PROPS, __func__,
+            &error) < 0)
+        return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
+    if (dpiGen__checkHandle(obj, DPI_HTYPE_OBJECT, "check object", &error) < 0)
+        return dpiGen__endPublicFn(props, DPI_FAILURE, &error);
+    if (props->payloadObj)
+        dpiGen__setRefCount(props->payloadObj, &error, -1);
+    dpiGen__setRefCount(obj, &error, 1);
+    props->payloadObj = obj;
+    return dpiGen__endPublicFn(props, DPI_SUCCESS, &error);
+}
+
+
+//-----------------------------------------------------------------------------
 // dpiMsgProps_setPriority() [PUBLIC]
 //   Set the priority of the message.
 //-----------------------------------------------------------------------------
@@ -383,4 +485,3 @@ int dpiMsgProps_setPriority(dpiMsgProps *props, int32_t value)
     return dpiMsgProps__setAttrValue(props, DPI_OCI_ATTR_PRIORITY, __func__,
             &value, 0);
 }
-

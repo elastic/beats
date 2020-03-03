@@ -23,9 +23,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestEventMapping(t *testing.T) {

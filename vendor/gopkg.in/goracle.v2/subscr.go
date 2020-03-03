@@ -1,17 +1,7 @@
 // Copyright 2017 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -30,7 +20,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 // CallbackSubscr is the callback for C code on subscription event.
@@ -171,9 +161,9 @@ func (c *conn) NewSubscription(name string, cb func(Event)) (*Subscription, erro
 	) == C.DPI_FAILURE {
 		C.free(unsafe.Pointer(params))
 		C.free(unsafe.Pointer(dpiSubscr))
-		err := errors.Wrap(c.getError(), "newSubscription")
-		if strings.Contains(errors.Cause(err).Error(), "DPI-1065:") {
-			err = errors.WithMessage(err, "specify \"enableEvents=1\" connection parameter on connection to be able to use subscriptions")
+		err := errors.Errorf("newSubscription: %w", c.getError())
+		if strings.Contains(errors.Unwrap(err).Error(), "DPI-1065:") {
+			err = errors.Errorf("specify \"enableEvents=1\" connection parameter on connection to be able to use subscriptions: %w", err)
 		}
 		return nil, err
 	}
@@ -190,18 +180,18 @@ func (s *Subscription) Register(qry string, params ...interface{}) error {
 
 	var dpiStmt *C.dpiStmt
 	if C.dpiSubscr_prepareStmt(s.dpiSubscr, cQry, C.uint32_t(len(qry)), &dpiStmt) == C.DPI_FAILURE {
-		return errors.Wrapf(s.getError(), "prepareStmt[%p]", s.dpiSubscr)
+		return errors.Errorf("prepareStmt[%p]: %w", s.dpiSubscr, s.getError())
 	}
 	defer func() { C.dpiStmt_release(dpiStmt) }()
 
 	mode := C.dpiExecMode(C.DPI_MODE_EXEC_DEFAULT)
 	var qCols C.uint32_t
 	if C.dpiStmt_execute(dpiStmt, mode, &qCols) == C.DPI_FAILURE {
-		return errors.Wrap(s.getError(), "executeStmt")
+		return errors.Errorf("executeStmt: %w", s.getError())
 	}
 	var queryID C.uint64_t
 	if C.dpiStmt_getSubscrQueryId(dpiStmt, &queryID) == C.DPI_FAILURE {
-		return errors.Wrap(s.getError(), "getSubscrQueryId")
+		return errors.Errorf("getSubscrQueryId: %w", s.getError())
 	}
 	if Log != nil {
 		Log("msg", "subscribed", "query", qry, "id", queryID)
@@ -223,7 +213,7 @@ func (s *Subscription) Close() error {
 		return nil
 	}
 	if C.dpiConn_unsubscribe(conn.dpiConn, dpiSubscr) == C.DPI_FAILURE {
-		return errors.Wrap(s.getError(), "close")
+		return errors.Errorf("close: %w", s.getError())
 	}
 	return nil
 }
@@ -236,10 +226,10 @@ const (
 	EvtStartup     = EventType(C.DPI_EVENT_STARTUP)
 	EvtShutdown    = EventType(C.DPI_EVENT_SHUTDOWN)
 	EvtShutdownAny = EventType(C.DPI_EVENT_SHUTDOWN_ANY)
-	EvtDropDB      = EventType(C.DPI_EVENT_DROP_DB)
 	EvtDereg       = EventType(C.DPI_EVENT_DEREG)
 	EvtObjChange   = EventType(C.DPI_EVENT_OBJCHANGE)
 	EvtQueryChange = EventType(C.DPI_EVENT_QUERYCHANGE)
+	EvtAQ          = EventType(C.DPI_EVENT_AQ)
 )
 
 // Operation in the DB.

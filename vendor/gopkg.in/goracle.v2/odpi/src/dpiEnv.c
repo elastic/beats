@@ -24,7 +24,7 @@ void dpiEnv__free(dpiEnv *env, dpiError *error)
 {
     if (env->threaded)
         dpiMutex__destroy(env->mutex);
-    if (env->handle) {
+    if (env->handle && !env->externalHandle) {
         dpiOci__handleFree(env->handle, DPI_OCI_HTYPE_ENV);
         env->handle = NULL;
     }
@@ -67,52 +67,68 @@ int dpiEnv__getEncodingInfo(dpiEnv *env, dpiEncodingInfo *info)
 
 //-----------------------------------------------------------------------------
 // dpiEnv__init() [INTERNAL]
-//   Initialize the environment structure by creating the OCI environment and
-// populating information about the environment.
+//   Initialize the environment structure. If an external handle is provided it
+// is used directly; otherwise, a new OCI environment handle is created. In
+// either case, information about the environment is stored for later use.
 //-----------------------------------------------------------------------------
 int dpiEnv__init(dpiEnv *env, const dpiContext *context,
-        const dpiCommonCreateParams *params, dpiError *error)
+        const dpiCommonCreateParams *params, void *externalHandle,
+        dpiError *error)
 {
     char timezoneBuffer[20];
     size_t timezoneLength;
 
-    // lookup encoding
-    if (params->encoding && dpiGlobal__lookupCharSet(params->encoding,
-            &env->charsetId, error) < 0)
-        return DPI_FAILURE;
-
-    // check for identical encoding before performing lookup
-    if (params->nencoding && params->encoding &&
-            strcmp(params->nencoding, params->encoding) == 0)
-        env->ncharsetId = env->charsetId;
-    else if (params->nencoding && dpiGlobal__lookupCharSet(params->nencoding,
-            &env->ncharsetId, error) < 0)
-        return DPI_FAILURE;
-
-    // both charsetId and ncharsetId must be zero or both must be non-zero
-    // use NLS routine to look up missing value, if needed
-    if (env->charsetId && !env->ncharsetId) {
-        if (dpiOci__nlsEnvironmentVariableGet(DPI_OCI_NLS_NCHARSET_ID,
-                &env->ncharsetId, error) < 0)
-            return DPI_FAILURE;
-    } else if (!env->charsetId && env->ncharsetId) {
-        if (dpiOci__nlsEnvironmentVariableGet(DPI_OCI_NLS_CHARSET_ID,
-                &env->charsetId, error) < 0)
-            return DPI_FAILURE;
-    }
-
-    // create the new environment handle
+    // store context and version information
     env->context = context;
     env->versionInfo = context->versionInfo;
-    if (dpiOci__envNlsCreate(&env->handle, params->createMode | DPI_OCI_OBJECT,
-            env->charsetId, env->ncharsetId, error) < 0)
-        return DPI_FAILURE;
 
-    // create the error handle pool and acquire the first error handle
+    // an external handle is available, use it directly
+    if (externalHandle) {
+        env->handle = externalHandle;
+        env->externalHandle = 1;
+
+    // otherwise, lookup encodings
+    } else {
+
+        // lookup encoding
+        if (params->encoding && dpiGlobal__lookupCharSet(params->encoding,
+                &env->charsetId, error) < 0)
+            return DPI_FAILURE;
+
+        // check for identical encoding before performing lookup of national
+        // character set encoding
+        if (params->nencoding && params->encoding &&
+                strcmp(params->nencoding, params->encoding) == 0)
+            env->ncharsetId = env->charsetId;
+        else if (params->nencoding &&
+                dpiGlobal__lookupCharSet(params->nencoding,
+                        &env->ncharsetId, error) < 0)
+            return DPI_FAILURE;
+
+        // both charsetId and ncharsetId must be zero or both must be non-zero
+        // use NLS routine to look up missing value, if needed
+        if (env->charsetId && !env->ncharsetId) {
+            if (dpiOci__nlsEnvironmentVariableGet(DPI_OCI_NLS_NCHARSET_ID,
+                    &env->ncharsetId, error) < 0)
+                return DPI_FAILURE;
+        } else if (!env->charsetId && env->ncharsetId) {
+            if (dpiOci__nlsEnvironmentVariableGet(DPI_OCI_NLS_CHARSET_ID,
+                    &env->charsetId, error) < 0)
+                return DPI_FAILURE;
+        }
+
+        // create new environment handle
+        if (dpiOci__envNlsCreate(&env->handle,
+                params->createMode | DPI_OCI_OBJECT,
+                env->charsetId, env->ncharsetId, error) < 0)
+            return DPI_FAILURE;
+
+    }
+
+    // create the error handle pool
     if (dpiHandlePool__create(&env->errorHandles, error) < 0)
         return DPI_FAILURE;
-    if (dpiEnv__initError(env, error) < 0)
-        return DPI_FAILURE;
+    error->env = env;
 
     // if threaded, create mutex for reference counts
     if (params->createMode & DPI_OCI_THREADED)
@@ -162,28 +178,3 @@ int dpiEnv__init(dpiEnv *env, const dpiContext *context,
 
     return DPI_SUCCESS;
 }
-
-
-//-----------------------------------------------------------------------------
-// dpiEnv__initError() [INTERNAL]
-//   Retrieve the OCI error handle to use for error handling, from a pool of
-// error handles common to the environment handle. The environment that was
-// used to create the error handle is stored in the error structure so that
-// the encoding and character set can be retrieved in the event of an OCI
-// error (which uses the CHAR encoding of the environment).
-//-----------------------------------------------------------------------------
-int dpiEnv__initError(dpiEnv *env, dpiError *error)
-{
-    error->env = env;
-    if (dpiHandlePool__acquire(env->errorHandles, &error->handle, error) < 0)
-        return DPI_FAILURE;
-
-    if (!error->handle) {
-        if (dpiOci__handleAlloc(env->handle, &error->handle,
-                DPI_OCI_HTYPE_ERROR, "allocate OCI error", error) < 0)
-            return DPI_FAILURE;
-    }
-
-    return DPI_SUCCESS;
-}
-

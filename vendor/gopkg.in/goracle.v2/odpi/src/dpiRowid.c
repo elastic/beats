@@ -78,8 +78,7 @@ int dpiRowid_getStringValue(dpiRowid *rowid, const char **value,
     dpiError error;
     uint16_t i;
 
-    if (dpiGen__startPublicFn(rowid, DPI_HTYPE_ROWID, __func__, 1,
-            &error) < 0)
+    if (dpiGen__startPublicFn(rowid, DPI_HTYPE_ROWID, __func__, &error) < 0)
         return dpiGen__endPublicFn(rowid, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(rowid, value)
     DPI_CHECK_PTR_NOT_NULL(rowid, valueLength)
@@ -133,4 +132,3 @@ int dpiRowid_release(dpiRowid *rowid)
 {
     return dpiGen__release(rowid, DPI_HTYPE_ROWID, __func__);
 }
-

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 // This program is free software: you can modify it and/or redistribute it
 // under the terms of:
 //
@@ -18,20 +18,124 @@
 #include "dpiErrorMessages.h"
 
 //-----------------------------------------------------------------------------
-// dpiError__check() [INTERNAL]
-//   Checks to see if the status of the last call resulted in an error
-// condition. If so, the error is populated. Note that trailing newlines and
-// spaces are truncated from the message if they exist. If the connection is
-// not NULL a check is made to see if the connection is no longer viable.
+// dpiError__getInfo() [INTERNAL]
+//   Get the error state from the error structure. Returns DPI_FAILURE as a
+// convenience to the caller.
 //-----------------------------------------------------------------------------
-int dpiError__check(dpiError *error, int status, dpiConn *conn,
+int dpiError__getInfo(dpiError *error, dpiErrorInfo *info)
+{
+    if (!info)
+        return DPI_FAILURE;
+    info->code = error->buffer->code;
+    info->offset = error->buffer->offset;
+    info->message = error->buffer->message;
+    info->messageLength = error->buffer->messageLength;
+    info->fnName = error->buffer->fnName;
+    info->action = error->buffer->action;
+    info->isRecoverable = error->buffer->isRecoverable;
+    info->encoding = error->buffer->encoding;
+    switch(info->code) {
+        case 12154: // TNS:could not resolve the connect identifier specified
+            info->sqlState = "42S02";
+            break;
+        case    22: // invalid session ID; access denied
+        case   378: // buffer pools cannot be created as specified
+        case   602: // Internal programming exception
+        case   603: // ORACLE server session terminated by fatal error
+        case   604: // error occurred at recursive SQL level
+        case   609: // could not attach to incoming connection
+        case  1012: // not logged on
+        case  1033: // ORACLE initialization or shutdown in progress
+        case  1041: // internal error. hostdef extension doesn't exist
+        case  1043: // user side memory corruption
+        case  1089: // immediate shutdown or close in progress
+        case  1090: // shutdown in progress
+        case  1092: // ORACLE instance terminated. Disconnection forced
+        case  3113: // end-of-file on communication channel
+        case  3114: // not connected to ORACLE
+        case  3122: // attempt to close ORACLE-side window on user side
+        case  3135: // connection lost contact
+        case 12153: // TNS:not connected
+        case 27146: // post/wait initialization failed
+        case 28511: // lost RPC connection to heterogeneous remote agent
+            info->sqlState = "01002";
+            break;
+        default:
+            if (error->buffer->code == 0 &&
+                    error->buffer->errorNum == (dpiErrorNum) 0)
+                info->sqlState = "00000";
+            else info->sqlState = "HY000";
+            break;
+    }
+    return DPI_FAILURE;
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiError__initHandle() [INTERNAL]
+//   Retrieve the OCI error handle to use for error handling, from a pool of
+// error handles common to the environment handle stored on the error. This
+// environment also controls the encoding of OCI errors (which uses the CHAR
+// encoding of the environment).
+//-----------------------------------------------------------------------------
+int dpiError__initHandle(dpiError *error)
+{
+    if (dpiHandlePool__acquire(error->env->errorHandles, &error->handle,
+            error) < 0)
+        return DPI_FAILURE;
+    if (!error->handle) {
+        if (dpiOci__handleAlloc(error->env->handle, &error->handle,
+                DPI_OCI_HTYPE_ERROR, "allocate OCI error", error) < 0)
+            return DPI_FAILURE;
+    }
+    return DPI_SUCCESS;
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiError__set() [INTERNAL]
+//   Set the error buffer to the specified DPI error. Returns DPI_FAILURE as a
+// convenience to the caller.
+//-----------------------------------------------------------------------------
+int dpiError__set(dpiError *error, const char *action, dpiErrorNum errorNum,
+        ...)
+{
+    va_list varArgs;
+
+    if (error) {
+        error->buffer->code = 0;
+        error->buffer->isRecoverable = 0;
+        error->buffer->offset = 0;
+        strcpy(error->buffer->encoding, DPI_CHARSET_NAME_UTF8);
+        error->buffer->action = action;
+        error->buffer->errorNum = errorNum;
+        va_start(varArgs, errorNum);
+        error->buffer->messageLength =
+                (uint32_t) vsnprintf(error->buffer->message,
+                sizeof(error->buffer->message),
+                dpiErrorMessages[errorNum - DPI_ERR_NO_ERR], varArgs);
+        va_end(varArgs);
+        if (dpiDebugLevel & DPI_DEBUG_LEVEL_ERRORS)
+            dpiDebug__print("internal error %.*s (%s / %s)\n",
+                    error->buffer->messageLength, error->buffer->message,
+                    error->buffer->fnName, action);
+    }
+    return DPI_FAILURE;
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiError__setFromOCI() [INTERNAL]
+//   Called when an OCI error has occurred and sets the error structure with
+// the contents of that error. Note that trailing newlines and spaces are
+// truncated from the message if they exist. If the connection is not NULL a
+// check is made to see if the connection is no longer viable. The value
+// DPI_FAILURE is returned as a convenience to the caller.
+//-----------------------------------------------------------------------------
+int dpiError__setFromOCI(dpiError *error, int status, dpiConn *conn,
         const char *action)
 {
     uint32_t callTimeout;
-
-    // no error has taken place
-    if (status == DPI_OCI_SUCCESS || status == DPI_OCI_SUCCESS_WITH_INFO)
-        return DPI_SUCCESS;
 
     // special error cases
     if (status == DPI_OCI_INVALID_HANDLE)
@@ -98,6 +202,7 @@ int dpiError__check(dpiError *error, int status, dpiConn *conn,
                 conn->deadSession = 1;
                 break;
             case  3136: // inbound connection timed out
+            case  3156: // OCI call timed out
             case 12161: // TNS:internal error: partial data received
                 callTimeout = 0;
                 if (conn->env->versionInfo->versionNum >= 18)
@@ -115,90 +220,3 @@ int dpiError__check(dpiError *error, int status, dpiConn *conn,
 
     return DPI_FAILURE;
 }
-
-
-//-----------------------------------------------------------------------------
-// dpiError__getInfo() [INTERNAL]
-//   Get the error state from the error structure. Returns DPI_FAILURE as a
-// convenience to the caller.
-//-----------------------------------------------------------------------------
-int dpiError__getInfo(dpiError *error, dpiErrorInfo *info)
-{
-    if (!info)
-        return DPI_FAILURE;
-    info->code = error->buffer->code;
-    info->offset = error->buffer->offset;
-    info->message = error->buffer->message;
-    info->messageLength = error->buffer->messageLength;
-    info->fnName = error->buffer->fnName;
-    info->action = error->buffer->action;
-    info->isRecoverable = error->buffer->isRecoverable;
-    info->encoding = error->buffer->encoding;
-    switch(info->code) {
-        case 12154: // TNS:could not resolve the connect identifier specified
-            info->sqlState = "42S02";
-            break;
-        case    22: // invalid session ID; access denied
-        case   378: // buffer pools cannot be created as specified
-        case   602: // Internal programming exception
-        case   603: // ORACLE server session terminated by fatal error
-        case   604: // error occurred at recursive SQL level
-        case   609: // could not attach to incoming connection
-        case  1012: // not logged on
-        case  1033: // ORACLE initialization or shutdown in progress
-        case  1041: // internal error. hostdef extension doesn't exist
-        case  1043: // user side memory corruption
-        case  1089: // immediate shutdown or close in progress
-        case  1090: // shutdown in progress
-        case  1092: // ORACLE instance terminated. Disconnection forced
-        case  3113: // end-of-file on communication channel
-        case  3114: // not connected to ORACLE
-        case  3122: // attempt to close ORACLE-side window on user side
-        case  3135: // connection lost contact
-        case 12153: // TNS:not connected
-        case 27146: // post/wait initialization failed
-        case 28511: // lost RPC connection to heterogeneous remote agent
-            info->sqlState = "01002";
-            break;
-        default:
-            if (error->buffer->code == 0 &&
-                    error->buffer->errorNum == (dpiErrorNum) 0)
-                info->sqlState = "00000";
-            else info->sqlState = "HY000";
-            break;
-    }
-    return DPI_FAILURE;
-}
-
-
-//-----------------------------------------------------------------------------
-// dpiError__set() [INTERNAL]
-//   Set the error buffer to the specified DPI error. Returns DPI_FAILURE as a
-// convenience to the caller.
-//-----------------------------------------------------------------------------
-int dpiError__set(dpiError *error, const char *action, dpiErrorNum errorNum,
-        ...)
-{
-    va_list varArgs;
-
-    if (error) {
-        error->buffer->code = 0;
-        error->buffer->isRecoverable = 0;
-        error->buffer->offset = 0;
-        strcpy(error->buffer->encoding, DPI_CHARSET_NAME_UTF8);
-        error->buffer->action = action;
-        error->buffer->errorNum = errorNum;
-        va_start(varArgs, errorNum);
-        error->buffer->messageLength =
-                (uint32_t) vsnprintf(error->buffer->message,
-                sizeof(error->buffer->message),
-                dpiErrorMessages[errorNum - DPI_ERR_NO_ERR], varArgs);
-        va_end(varArgs);
-        if (dpiDebugLevel & DPI_DEBUG_LEVEL_ERRORS)
-            dpiDebug__print("internal error %.*s (%s / %s)\n",
-                    error->buffer->messageLength, error->buffer->message,
-                    error->buffer->fnName, action);
-    }
-    return DPI_FAILURE;
-}
-

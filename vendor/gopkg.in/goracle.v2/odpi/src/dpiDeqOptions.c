@@ -60,7 +60,7 @@ static int dpiDeqOptions__getAttrValue(dpiDeqOptions *options,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, fnName, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, fnName,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -82,7 +82,7 @@ static int dpiDeqOptions__setAttrValue(dpiDeqOptions *options,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, fnName, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, fnName,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -162,7 +162,7 @@ int dpiDeqOptions_getMsgId(dpiDeqOptions *options, const char **value,
     dpiError error;
     void *rawValue;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, __func__, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -309,7 +309,7 @@ int dpiDeqOptions_setMsgId(dpiDeqOptions *options, const char *value,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, __func__, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_DEQ_OPTIONS, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -367,4 +367,3 @@ int dpiDeqOptions_setWait(dpiDeqOptions *options, uint32_t value)
     return dpiDeqOptions__setAttrValue(options, DPI_OCI_ATTR_WAIT, __func__,
             &value, 0);
 }
-

@@ -226,10 +226,9 @@ static void dpiVar__assignCallbackBuffer(dpiVar *var, dpiVarBuffer *buffer,
 //   Verifies that the array size has not been exceeded.
 //-----------------------------------------------------------------------------
 static int dpiVar__checkArraySize(dpiVar *var, uint32_t pos,
-        const char *fnName, int needErrorHandle, dpiError *error)
+        const char *fnName, dpiError *error)
 {
-    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, fnName, needErrorHandle,
-            error) < 0)
+    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, fnName, error) < 0)
         return DPI_FAILURE;
     if (pos >= var->buffer.maxArraySize)
         return dpiError__set(error, "check array size",
@@ -629,7 +628,6 @@ int dpiVar__getValue(dpiVar *var, dpiVarBuffer *buffer, uint32_t pos,
         return DPI_SUCCESS;
     }
 
-
     // check for a NULL value; for objects the indicator is elsewhere
     data = &buffer->externalData[pos];
     if (!buffer->objectIndicator)
@@ -638,8 +636,17 @@ int dpiVar__getValue(dpiVar *var, dpiVarBuffer *buffer, uint32_t pos,
         data->isNull = (*((int16_t*) buffer->objectIndicator[pos]) ==
                 DPI_OCI_IND_NULL);
     else data->isNull = 1;
-    if (data->isNull)
+    if (data->isNull) {
+        if (inFetch && var->objectType && var->objectType->isCollection) {
+            if (dpiOci__objectFree(var->env->handle,
+                    buffer->data.asObject[pos], 1, error) < 0)
+                return DPI_FAILURE;
+            if (dpiOci__objectFree(var->env->handle,
+                    buffer->objectIndicator[pos], 1, error) < 0)
+                return DPI_FAILURE;
+        }
         return DPI_SUCCESS;
+    }
 
     // check return code for variable length data
     if (buffer->returnCode) {
@@ -781,8 +788,8 @@ int dpiVar__getValue(dpiVar *var, dpiVarBuffer *buffer, uint32_t pos,
 // does nothing useful except satisfy OCI requirements.
 //-----------------------------------------------------------------------------
 int32_t dpiVar__inBindCallback(dpiVar *var, UNUSED void *bindp,
-        UNUSED uint32_t iter, uint32_t index, void **bufpp, uint32_t *alenp,
-        uint8_t *piecep, void **indpp)
+        UNUSED uint32_t iter, UNUSED uint32_t index, void **bufpp,
+        uint32_t *alenp, uint8_t *piecep, void **indpp)
 {
     dpiDynamicBytes *dynBytes;
 
@@ -1208,7 +1215,8 @@ static int dpiVar__setFromBytes(dpiVar *var, uint32_t pos, const char *value,
         dynBytes = &var->buffer.dynamicBytes[pos];
         if (dpiVar__allocateDynamicBytes(dynBytes, valueLength, error) < 0)
             return DPI_FAILURE;
-        memcpy(dynBytes->chunks->ptr, value, valueLength);
+        if (valueLength > 0)
+            memcpy(dynBytes->chunks->ptr, value, valueLength);
         dynBytes->numChunks = 1;
         dynBytes->chunks->length = valueLength;
         bytes->ptr = dynBytes->chunks->ptr;
@@ -1461,6 +1469,10 @@ int dpiVar__setValue(dpiVar *var, dpiVarBuffer *buffer, uint32_t pos,
                 case DPI_ORACLE_TYPE_NUMBER:
                     return dpiDataBuffer__toOracleNumberFromDouble(
                             &data->value, error, &buffer->data.asNumber[pos]);
+                case DPI_ORACLE_TYPE_DATE:
+                    return dpiDataBuffer__toOracleDateFromDouble(
+                            &data->value, var->env, error,
+                            &buffer->data.asDate[pos]);
                 case DPI_ORACLE_TYPE_TIMESTAMP:
                 case DPI_ORACLE_TYPE_TIMESTAMP_TZ:
                 case DPI_ORACLE_TYPE_TIMESTAMP_LTZ:
@@ -1520,6 +1532,7 @@ static int dpiVar__validateTypes(const dpiOracleType *oracleType,
         dpiNativeTypeNum nativeTypeNum, dpiError *error)
 {
     switch (oracleType->oracleTypeNum) {
+        case DPI_ORACLE_TYPE_DATE:
         case DPI_ORACLE_TYPE_TIMESTAMP:
         case DPI_ORACLE_TYPE_TIMESTAMP_TZ:
         case DPI_ORACLE_TYPE_TIMESTAMP_LTZ:
@@ -1564,7 +1577,7 @@ int dpiVar_copyData(dpiVar *var, uint32_t pos, dpiVar *sourceVar,
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (dpiGen__checkHandle(sourceVar, DPI_HTYPE_VAR, "check source var",
             &error) < 0)
@@ -1594,7 +1607,7 @@ int dpiVar_getNumElementsInArray(dpiVar *var, uint32_t *numElements)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, 0, &error) < 0)
+    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(var, numElements)
     if (var->dynBindBuffers)
@@ -1618,7 +1631,7 @@ int dpiVar_getReturnedData(dpiVar *var, uint32_t pos, uint32_t *numElements,
 {
     dpiError error;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(var, numElements)
     DPI_CHECK_PTR_NOT_NULL(var, data)
@@ -1642,7 +1655,7 @@ int dpiVar_getSizeInBytes(dpiVar *var, uint32_t *sizeInBytes)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, 0, &error) < 0)
+    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(var, sizeInBytes)
     *sizeInBytes = var->sizeInBytes;
@@ -1673,9 +1686,9 @@ int dpiVar_setFromBytes(dpiVar *var, uint32_t pos, const char *value,
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
-    DPI_CHECK_PTR_NOT_NULL(var, value)
+    DPI_CHECK_PTR_AND_LENGTH(var, value)
     if (var->nativeTypeNum != DPI_NATIVE_TYPE_BYTES &&
             var->nativeTypeNum != DPI_NATIVE_TYPE_LOB) {
         dpiError__set(&error, "native type", DPI_ERR_NOT_SUPPORTED);
@@ -1702,7 +1715,7 @@ int dpiVar_setFromLob(dpiVar *var, uint32_t pos, dpiLob *lob)
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (var->nativeTypeNum != DPI_NATIVE_TYPE_LOB) {
         dpiError__set(&error, "native type", DPI_ERR_NOT_SUPPORTED);
@@ -1724,7 +1737,7 @@ int dpiVar_setFromObject(dpiVar *var, uint32_t pos, dpiObject *obj)
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (var->nativeTypeNum != DPI_NATIVE_TYPE_OBJECT) {
         dpiError__set(&error, "native type", DPI_ERR_NOT_SUPPORTED);
@@ -1746,7 +1759,7 @@ int dpiVar_setFromRowid(dpiVar *var, uint32_t pos, dpiRowid *rowid)
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (var->nativeTypeNum != DPI_NATIVE_TYPE_ROWID) {
         dpiError__set(&error, "native type", DPI_ERR_NOT_SUPPORTED);
@@ -1768,7 +1781,7 @@ int dpiVar_setFromStmt(dpiVar *var, uint32_t pos, dpiStmt *stmt)
     dpiError error;
     int status;
 
-    if (dpiVar__checkArraySize(var, pos, __func__, 1, &error) < 0)
+    if (dpiVar__checkArraySize(var, pos, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (var->nativeTypeNum != DPI_NATIVE_TYPE_STMT) {
         dpiError__set(&error, "native type", DPI_ERR_NOT_SUPPORTED);
@@ -1788,7 +1801,7 @@ int dpiVar_setNumElementsInArray(dpiVar *var, uint32_t numElements)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, 0, &error) < 0)
+    if (dpiGen__startPublicFn(var, DPI_HTYPE_VAR, __func__, &error) < 0)
         return dpiGen__endPublicFn(var, DPI_FAILURE, &error);
     if (numElements > var->buffer.maxArraySize) {
         dpiError__set(&error, "check num elements",
@@ -1798,4 +1811,3 @@ int dpiVar_setNumElementsInArray(dpiVar *var, uint32_t numElements)
     var->buffer.actualArraySize = numElements;
     return dpiGen__endPublicFn(var, DPI_SUCCESS, &error);
 }
-

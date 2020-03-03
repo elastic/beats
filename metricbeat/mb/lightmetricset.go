@@ -20,7 +20,7 @@ package mb
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // LightMetricSet contains the definition of a non-registered metric set

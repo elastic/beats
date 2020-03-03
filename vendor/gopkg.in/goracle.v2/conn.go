@@ -1,17 +1,7 @@
 // Copyright 2019 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -26,12 +16,13 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"io"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 const getConnection = "--GET_CONNECTION--"
@@ -41,12 +32,14 @@ const wrapResultset = "--WRAP_RESULTSET--"
 // with 32-bit platforms. The size of a `C.dpiData` is 32 Byte on a 64-bit system, `C.dpiSubscrMessageTable` is 40 bytes.
 // So this is 2^25.
 // See https://github.com/go-goracle/goracle/issues/73#issuecomment-401281714
-const maxArraySize = (1<<30)/C.sizeof_dpiSubscrMessageTable - 1
+const maxArraySize = (1<<32)/C.sizeof_dpiSubscrMessageTable - 1
 
 var _ = driver.Conn((*conn)(nil))
 var _ = driver.ConnBeginTx((*conn)(nil))
 var _ = driver.ConnPrepareContext((*conn)(nil))
 var _ = driver.Pinger((*conn)(nil))
+
+//var _ = driver.ExecerContext((*conn)(nil))
 
 type conn struct {
 	connParams     ConnectionParams
@@ -61,6 +54,7 @@ type conn struct {
 	newSession    bool
 	timeZone      *time.Location
 	tzOffSecs     int
+	objTypes      map[string]ObjectType
 }
 
 func (c *conn) getError() error {
@@ -77,7 +71,7 @@ func (c *conn) Break() error {
 		Log("msg", "Break", "dpiConn", c.dpiConn)
 	}
 	if C.dpiConn_breakExecution(c.dpiConn) == C.DPI_FAILURE {
-		return maybeBadConn(errors.Wrap(c.getError(), "Break"))
+		return maybeBadConn(errors.Errorf("Break: %w", c.getError()), c)
 	}
 	return nil
 }
@@ -102,7 +96,7 @@ func (c *conn) Ping(ctx context.Context) error {
 		defer close(done)
 		failure := C.dpiConn_ping(c.dpiConn) == C.DPI_FAILURE
 		if failure {
-			done <- maybeBadConn(errors.Wrap(c.getError(), "Ping"))
+			done <- maybeBadConn(errors.Errorf("Ping: %w", c.getError()), c)
 			return
 		}
 		done <- nil
@@ -118,6 +112,7 @@ func (c *conn) Ping(ctx context.Context) error {
 			return err
 		default:
 			_ = c.Break()
+			c.close(true)
 			return driver.ErrBadConn
 		}
 	}
@@ -142,28 +137,49 @@ func (c *conn) Close() error {
 	}
 	c.Lock()
 	defer c.Unlock()
+	return c.close(true)
+}
+
+func (c *conn) close(doNotReuse bool) error {
+	if c == nil {
+		return nil
+	}
 	c.setTraceTag(TraceTag{})
-	dpiConn := c.dpiConn
-	c.dpiConn = nil
+	dpiConn, objTypes := c.dpiConn, c.objTypes
+	c.dpiConn, c.objTypes = nil, nil
 	if dpiConn == nil {
 		return nil
 	}
+	defer C.dpiConn_release(dpiConn)
+
+	seen := make(map[string]struct{}, len(objTypes))
+	for _, o := range objTypes {
+		nm := o.FullName()
+		if _, seen := seen[nm]; seen {
+			continue
+		}
+		seen[nm] = struct{}{}
+		o.close()
+	}
+	if !doNotReuse {
+		return nil
+	}
+
 	// Just to be sure, break anything in progress.
 	done := make(chan struct{})
 	go func() {
 		select {
 		case <-done:
 		case <-time.After(10 * time.Second):
+			if Log != nil {
+				Log("msg", "TIMEOUT releasing connection")
+			}
 			C.dpiConn_breakExecution(dpiConn)
 		}
 	}()
-	rc := C.dpiConn_release(dpiConn)
+	C.dpiConn_close(dpiConn, C.DPI_MODE_CONN_CLOSE_DROP, nil, 0)
 	close(done)
-	var err error
-	if rc == C.DPI_FAILURE {
-		err = maybeBadConn(errors.Wrap(c.getError(), "Close"))
-	}
-	return err
+	return nil
 }
 
 // Begin starts and returns a new transaction.
@@ -210,7 +226,7 @@ func (c *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, e
 	case sql.LevelSerializable:
 		todo.Level = trLS
 	default:
-		return nil, errors.Errorf("%v isolation level is not supported", sql.IsolationLevel(opts.Isolation))
+		return nil, errors.Errorf("isolation level is not supported: %s", sql.IsolationLevel(opts.Isolation))
 	}
 
 	if todo != c.tranParams {
@@ -229,7 +245,7 @@ func (c *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, e
 				stmt.Close()
 			}
 			if err != nil {
-				return nil, maybeBadConn(errors.Wrap(err, qry))
+				return nil, maybeBadConn(errors.Errorf("%s: %w", qry, err), c)
 			}
 		}
 		c.tranParams = todo
@@ -288,7 +304,7 @@ func (c *conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, e
 	if C.dpiConn_prepareStmt(c.dpiConn, 0, cSQL, C.uint32_t(len(query)), nil, 0,
 		(**C.dpiStmt)(unsafe.Pointer(&dpiStmt)),
 	) == C.DPI_FAILURE {
-		return nil, maybeBadConn(errors.Wrap(c.getError(), "Prepare: "+query))
+		return nil, maybeBadConn(errors.Errorf("Prepare: %s: %w", query, c.getError()), c)
 	}
 	return &statement{conn: c, dpiStmt: dpiStmt, query: query}, nil
 }
@@ -307,12 +323,12 @@ func (c *conn) endTran(isCommit bool) error {
 	//msg := "Commit"
 	if isCommit {
 		if C.dpiConn_commit(c.dpiConn) == C.DPI_FAILURE {
-			err = maybeBadConn(errors.Wrap(c.getError(), "Commit"))
+			err = maybeBadConn(errors.Errorf("Commit: %w", c.getError()), c)
 		}
 	} else {
 		//msg = "Rollback"
 		if C.dpiConn_rollback(c.dpiConn) == C.DPI_FAILURE {
-			err = maybeBadConn(errors.Wrap(c.getError(), "Rollback"))
+			err = maybeBadConn(errors.Errorf("Rollback: %w", c.getError()), c)
 		}
 	}
 	c.Unlock()
@@ -350,7 +366,7 @@ func (c *conn) newVar(vi varInfo) (*C.dpiVar, []C.dpiData, error) {
 		isArray, vi.ObjectType,
 		&v, &dataArr,
 	) == C.DPI_FAILURE {
-		return nil, nil, errors.Wrapf(c.getError(), "newVar(typ=%d, natTyp=%d, sliceLen=%d, bufSize=%d)", vi.Typ, vi.NatTyp, vi.SliceLen, vi.BufSize)
+		return nil, nil, errors.Errorf("newVar(typ=%d, natTyp=%d, sliceLen=%d, bufSize=%d): %w", vi.Typ, vi.NatTyp, vi.SliceLen, vi.BufSize, c.getError())
 	}
 	// https://github.com/golang/go/wiki/cgo#Turning_C_arrays_into_Go_slices
 	/*
@@ -380,59 +396,142 @@ func (c *conn) init() error {
 		var release *C.char
 		var releaseLen C.uint32_t
 		if C.dpiConn_getServerVersion(c.dpiConn, &release, &releaseLen, &v) == C.DPI_FAILURE {
-			return errors.Wrap(c.getError(), "getServerVersion")
+			if c.connParams.IsPrelim {
+				return nil
+			}
+			return errors.Errorf("getServerVersion: %w", c.getError())
 		}
 		c.Server.set(&v)
-		c.Server.ServerRelease = C.GoStringN(release, C.int(releaseLen))
+		c.Server.ServerRelease = string(bytesReplaceAll(
+			((*[maxArraySize]byte)(unsafe.Pointer(release)))[:releaseLen:releaseLen],
+			[]byte{'\n'}, []byte{';', ' '}))
 	}
 
-	if c.timeZone != nil {
+	if c.timeZone != nil && (c.timeZone != time.Local || c.tzOffSecs != 0) {
 		return nil
 	}
 	c.timeZone = time.Local
-	_, c.tzOffSecs = (time.Time{}).In(c.timeZone).Zone()
+	_, c.tzOffSecs = time.Now().In(c.timeZone).Zone()
+	if Log != nil {
+		Log("tz", c.timeZone, "offSecs", c.tzOffSecs)
+	}
 
-	const qry = "SELECT DBTIMEZONE FROM DUAL"
+	// DBTIMEZONE is useless, false, and misdirecting!
+	// https://stackoverflow.com/questions/52531137/sysdate-and-dbtimezone-different-in-oracle-database
+	const qry = "SELECT DBTIMEZONE, LTRIM(REGEXP_SUBSTR(TO_CHAR(SYSTIMESTAMP), ' [^ ]+$')) FROM DUAL"
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	st, err := c.PrepareContext(ctx, qry)
 	if err != nil {
-		return errors.Wrap(err, qry)
+		return errors.Errorf("%s: %w", qry, err)
 	}
 	defer st.Close()
-	rows, err := st.Query([]driver.Value{})
+	rows, err := st.Query(nil) //lint:ignore SA1019 - it's hard to use QueryContext here
 	if err != nil {
-		return errors.Wrap(err, qry)
+		if Log != nil {
+			Log("qry", qry, "error", err)
+		}
+		return nil
 	}
 	defer rows.Close()
-	var timezone string
-	vals := []driver.Value{timezone}
-	for {
-		if err = rows.Next(vals); err != nil {
-			if err == io.EOF {
-				break
-			}
-			return errors.Wrap(err, qry)
-		}
-		timezone = strings.TrimSpace(vals[0].(string))
-		if timezone != "" {
-			break
-		}
+	var dbTZ, timezone string
+	vals := []driver.Value{dbTZ, timezone}
+	if err = rows.Next(vals); err != nil && err != io.EOF {
+		return errors.Errorf("%s: %w", qry, err)
 	}
-	if timezone == "" {
-		return errors.New("empty DBTIMEZONE")
+	dbTZ = vals[0].(string)
+	timezone = vals[1].(string)
+
+	tz, off, err := calculateTZ(dbTZ, timezone)
+	if Log != nil {
+		Log("timezone", timezone, "tz", tz, "offSecs", off)
 	}
-	if off, err := parseTZ(timezone); err != nil {
-		return errors.Wrap(err, timezone)
-	} else {
-		// This is dangerous, but I just cannot get whether the DB time zone
-		// setting has DST or not - DBTIMEZONE returns just a fixed offset.
-		if _, localOff := time.Now().Local().Zone(); localOff != off {
-			c.tzOffSecs = off
-			c.timeZone = time.FixedZone(timezone, c.tzOffSecs)
-		}
+	if err != nil || tz == nil {
+		return err
 	}
+	c.timeZone, c.tzOffSecs = tz, off
+
 	return nil
+}
+
+func calculateTZ(dbTZ, timezone string) (*time.Location, int, error) {
+	if Log != nil {
+		Log("dbTZ", dbTZ, "timezone", timezone)
+	}
+	var tz *time.Location
+	now := time.Now()
+	_, localOff := time.Now().Local().Zone()
+	off := localOff
+	var ok bool
+	var err error
+	if dbTZ != "" && strings.Contains(dbTZ, "/") {
+		tz, err = time.LoadLocation(dbTZ)
+		if ok = err == nil; ok {
+			if tz == time.Local {
+				return tz, off, nil
+			}
+			_, off = now.In(tz).Zone()
+		} else if Log != nil {
+			Log("LoadLocation", dbTZ, "error", err)
+		}
+	}
+	if !ok {
+		if timezone != "" {
+			if off, err = parseTZ(timezone); err != nil {
+				return tz, off, errors.Errorf("%s: %w", timezone, err)
+			}
+		} else if off, err = parseTZ(dbTZ); err != nil {
+			return tz, off, errors.Errorf("%s: %w", dbTZ, err)
+		}
+	}
+	// This is dangerous, but I just cannot get whether the DB time zone
+	// setting has DST or not - DBTIMEZONE returns just a fixed offset.
+	if off != localOff && tz == nil {
+		tz = time.FixedZone(timezone, off)
+	}
+	return tz, off, nil
+}
+func parseTZ(s string) (int, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0, io.EOF
+	}
+	if s == "Z" || s == "UTC" {
+		return 0, nil
+	}
+	var tz int
+	var ok bool
+	if i := strings.IndexByte(s, ':'); i >= 0 {
+		if i64, err := strconv.ParseInt(s[i+1:], 10, 6); err != nil {
+			return tz, errors.Errorf("%s: %w", s, err)
+		} else {
+			tz = int(i64 * 60)
+		}
+		s = s[:i]
+		ok = true
+	}
+	if !ok {
+		if i := strings.IndexByte(s, '/'); i >= 0 {
+			targetLoc, err := time.LoadLocation(s)
+			if err != nil {
+				return tz, errors.Errorf("%s: %w", s, err)
+			}
+
+			_, localOffset := time.Now().In(targetLoc).Zone()
+
+			tz = localOffset
+			return tz, nil
+		}
+	}
+	if i64, err := strconv.ParseInt(s, 10, 5); err != nil {
+		return tz, errors.Errorf("%s: %w", s, err)
+	} else {
+		if i64 < 0 {
+			tz = -tz
+		}
+		tz += int(i64 * 3600)
+	}
+	return tz, nil
 }
 
 func (c *conn) setCallTimeout(ctx context.Context) {
@@ -447,21 +546,34 @@ func (c *conn) setCallTimeout(ctx context.Context) {
 	C.dpiConn_setCallTimeout(c.dpiConn, ms)
 }
 
-func maybeBadConn(err error) error {
+// maybeBadConn checks whether the error is because of a bad connection, and returns driver.ErrBadConn,
+// as database/sql requires.
+//
+// Also in this case, iff c != nil, closes it.
+func maybeBadConn(err error, c *conn) error {
 	if err == nil {
 		return nil
 	}
-	root := errors.Cause(err)
-	if root == driver.ErrBadConn {
-		return root
+	cl := func() {}
+	if c != nil {
+		cl = func() {
+			if Log != nil {
+				Log("msg", "maybeBadConn close", "conn", c)
+			}
+			c.close(true)
+		}
 	}
-	if cd, ok := root.(interface {
-		Code() int
-	}); ok {
+	if errors.Is(err, driver.ErrBadConn) {
+		cl()
+		return driver.ErrBadConn
+	}
+	var cd interface{ Code() int }
+	if errors.As(err, &cd) {
 		// Yes, this is copied from rana/ora, but I've put it there, so it's mine. @tgulacsi
 		switch cd.Code() {
 		case 0:
 			if strings.Contains(err.Error(), " DPI-1002: ") {
+				cl()
 				return driver.ErrBadConn
 			}
 			// cases by experience:
@@ -500,6 +612,7 @@ func maybeBadConn(err error) error {
 			27146, // post/wait initialization failed
 			28511, // lost RPC connection
 			56600: // an illegal OCI function call was issued
+			cl()
 			return driver.ErrBadConn
 		}
 	}
@@ -542,7 +655,7 @@ func (c *conn) setTraceTag(tt TraceTag) error {
 			C.free(unsafe.Pointer(s))
 		}
 		if rc == C.DPI_FAILURE {
-			return errors.Wrap(c.getError(), nm)
+			return errors.Errorf("%s: %w", nm, c.getError())
 		}
 	}
 	c.currentTT = tt
@@ -592,7 +705,7 @@ func (c *conn) ensureContextUser(ctx context.Context) error {
 	}
 
 	if c.dpiConn != nil {
-		if err := c.Close(); err != nil {
+		if err := c.close(false); err != nil {
 			return driver.ErrBadConn
 		}
 	}
@@ -625,7 +738,7 @@ const (
 // See https://docs.oracle.com/en/database/oracle/oracle-database/18/lnoci/database-startup-and-shutdown.html#GUID-44B24F65-8C24-4DF3-8FBF-B896A4D6F3F3
 func (c *conn) Startup(mode StartupMode) error {
 	if C.dpiConn_startupDatabase(c.dpiConn, C.dpiStartupMode(mode)) == C.DPI_FAILURE {
-		return errors.Wrapf(c.getError(), "startup(%v)", mode)
+		return errors.Errorf("startup(%v): %w", mode, c.getError())
 	}
 	return nil
 }
@@ -654,7 +767,12 @@ const (
 // See https://docs.oracle.com/en/database/oracle/oracle-database/18/lnoci/database-startup-and-shutdown.html#GUID-44B24F65-8C24-4DF3-8FBF-B896A4D6F3F3
 func (c *conn) Shutdown(mode ShutdownMode) error {
 	if C.dpiConn_shutdownDatabase(c.dpiConn, C.dpiShutdownMode(mode)) == C.DPI_FAILURE {
-		return errors.Wrapf(c.getError(), "shutdown(%v)", mode)
+		return errors.Errorf("shutdown(%v): %w", mode, c.getError())
 	}
 	return nil
+}
+
+// Timezone returns the connection's timezone.
+func (c *conn) Timezone() *time.Location {
+	return c.timeZone
 }

@@ -23,7 +23,7 @@
 static int dpiSodaDb__checkConnected(dpiSodaDb *db, const char *fnName,
         dpiError *error)
 {
-    if (dpiGen__startPublicFn(db, DPI_HTYPE_SODA_DB, fnName, 1, error) < 0)
+    if (dpiGen__startPublicFn(db, DPI_HTYPE_SODA_DB, fnName, error) < 0)
         return DPI_FAILURE;
     if (!db->conn->handle || db->conn->closing)
         return dpiError__set(error, "check connection", DPI_ERR_NOT_CONNECTED);
@@ -201,7 +201,7 @@ int dpiSodaDb_createCollection(dpiSodaDb *db, const char *name,
 //-----------------------------------------------------------------------------
 int dpiSodaDb_createDocument(dpiSodaDb *db, const char *key,
         uint32_t keyLength, const char *content, uint32_t contentLength,
-        const char *mediaType, uint32_t mediaTypeLength, uint32_t flags,
+        const char *mediaType, uint32_t mediaTypeLength, UNUSED uint32_t flags,
         dpiSodaDoc **doc)
 {
     int detectEncoding;
@@ -429,4 +429,3 @@ int dpiSodaDb_release(dpiSodaDb *db)
 {
     return dpiGen__release(db, DPI_HTYPE_SODA_DB, __func__);
 }
-

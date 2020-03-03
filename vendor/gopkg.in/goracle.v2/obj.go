@@ -1,17 +1,7 @@
 // Copyright 2017 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -21,23 +11,25 @@ package goracle
 */
 import "C"
 import (
+	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"unsafe"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 var _ = fmt.Printf
 
 // Object represents a dpiObject.
 type Object struct {
-	scratch Data
 	ObjectType
+	scratch   Data
 	dpiObject *C.dpiObject
 }
 
-func (O *Object) getError() error { return O.drv.getError() }
+func (O *Object) getError() error { return O.conn.getError() }
 
 // ErrNoSuchKey is the error for missing key in lookup.
 var ErrNoSuchKey = errors.New("no such key")
@@ -49,33 +41,35 @@ func (O *Object) GetAttribute(data *Data, name string) error {
 	}
 	attr, ok := O.Attributes[name]
 	if !ok {
-		return errors.Wrap(ErrNoSuchKey, name)
+		return errors.Errorf("%s: %w", name, ErrNoSuchKey)
 	}
 
 	data.reset()
+	if data.dpiData == nil {
+		data.dpiData = &C.dpiData{isNull: 0}
+	}
 	data.NativeTypeNum = attr.NativeTypeNum
 	data.ObjectType = attr.ObjectType
-	wasNull := data.dpiData == nil
 	// the maximum length of that buffer must be supplied
 	// in the value.asBytes.length attribute before calling this function.
 	if attr.NativeTypeNum == C.DPI_NATIVE_TYPE_BYTES && attr.OracleTypeNum == C.DPI_ORACLE_TYPE_NUMBER {
-		var a [22]byte
-		C.dpiData_setBytes(data.dpiData, (*C.char)(unsafe.Pointer(&a[0])), 22)
+		var a [39]byte
+		C.dpiData_setBytes(data.dpiData, (*C.char)(unsafe.Pointer(&a[0])), C.uint32_t(len(a)))
 	}
+
 	//fmt.Printf("getAttributeValue(%p, %p, %d, %+v)\n", O.dpiObject, attr.dpiObjectAttr, data.NativeTypeNum, data.dpiData)
 	if C.dpiObject_getAttributeValue(O.dpiObject, attr.dpiObjectAttr, data.NativeTypeNum, data.dpiData) == C.DPI_FAILURE {
-		if wasNull {
-			C.free(unsafe.Pointer(data.dpiData))
-			data.dpiData = nil
-		}
-		return errors.Wrapf(O.getError(), "getAttributeValue(obj=%+v, attr=%+v, typ=%d)", O, attr.dpiObjectAttr, data.NativeTypeNum)
+		return errors.Errorf("getAttributeValue(%q, obj=%+v, attr=%+v, typ=%d): %w", name, O, attr.dpiObjectAttr, data.NativeTypeNum, O.getError())
 	}
 	//fmt.Printf("getAttributeValue(%p, %q=%p, %d, %+v)\n", O.dpiObject, attr.Name, attr.dpiObjectAttr, data.NativeTypeNum, data.dpiData)
 	return nil
 }
 
-// SetAttribute sets the i-th attribute with data.
+// SetAttribute sets the named attribute with data.
 func (O *Object) SetAttribute(name string, data *Data) error {
+	if !strings.Contains(name, `"`) {
+		name = strings.ToUpper(name)
+	}
 	attr := O.Attributes[name]
 	if data.NativeTypeNum == 0 {
 		data.NativeTypeNum = attr.NativeTypeNum
@@ -87,7 +81,18 @@ func (O *Object) SetAttribute(name string, data *Data) error {
 	return nil
 }
 
-// ResetAttributes prepare all atributes for use the object as IN parameter
+// Set is a convenience function to set the named attribute with the given value.
+func (O *Object) Set(name string, v interface{}) error {
+	if data, ok := v.(*Data); ok {
+		return O.SetAttribute(name, data)
+	}
+	if err := O.scratch.Set(v); err != nil {
+		return err
+	}
+	return O.SetAttribute(name, &O.scratch)
+}
+
+// ResetAttributes prepare all attributes for use the object as IN parameter
 func (O *Object) ResetAttributes() error {
 	var data Data
 	for _, attr := range O.Attributes {
@@ -95,8 +100,8 @@ func (O *Object) ResetAttributes() error {
 		data.NativeTypeNum = attr.NativeTypeNum
 		data.ObjectType = attr.ObjectType
 		if attr.NativeTypeNum == C.DPI_NATIVE_TYPE_BYTES && attr.OracleTypeNum == C.DPI_ORACLE_TYPE_NUMBER {
-			var a [22]byte
-			C.dpiData_setBytes(data.dpiData, (*C.char)(unsafe.Pointer(&a[0])), 22)
+			a := make([]byte, attr.Precision)
+			C.dpiData_setBytes(data.dpiData, (*C.char)(unsafe.Pointer(&a[0])), C.uint32_t(attr.Precision))
 		}
 		if C.dpiObject_setAttributeValue(O.dpiObject, attr.dpiObjectAttr, data.NativeTypeNum, data.dpiData) == C.DPI_FAILURE {
 			return O.getError()
@@ -131,15 +136,25 @@ func (O *Object) ObjectRef() *Object {
 	return O
 }
 
-// Close releases a reference to the object.
-func (O *Object) Close() error {
-	if O.dpiObject == nil {
+// Collection returns &ObjectCollection{Object: O} iff the Object is a collection.
+// Otherwise it returns nil.
+func (O *Object) Collection() *ObjectCollection {
+	if O.ObjectType.CollectionOf == nil {
 		return nil
 	}
-	if rc := C.dpiObject_release(O.dpiObject); rc == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "error on close object")
-	}
+	return &ObjectCollection{Object: O}
+}
+
+// Close releases a reference to the object.
+func (O *Object) Close() error {
+	obj := O.dpiObject
 	O.dpiObject = nil
+	if obj == nil {
+		return nil
+	}
+	if C.dpiObject_release(obj) == C.DPI_FAILURE {
+		return errors.Errorf("error on close object: %w", O.getError())
+	}
 
 	return nil
 }
@@ -157,7 +172,6 @@ var ErrNotExist = errors.New("not exist")
 
 // AsSlice retrieves the collection into a slice.
 func (O *ObjectCollection) AsSlice(dest interface{}) (interface{}, error) {
-	var data Data
 	var dr reflect.Value
 	needsInit := dest == nil
 	if !needsInit {
@@ -165,12 +179,12 @@ func (O *ObjectCollection) AsSlice(dest interface{}) (interface{}, error) {
 	}
 	for i, err := O.First(); err == nil; i, err = O.Next(i) {
 		if O.CollectionOf.NativeTypeNum == C.DPI_NATIVE_TYPE_OBJECT {
-			data.ObjectType = *O.CollectionOf
+			O.scratch.ObjectType = *O.CollectionOf
 		}
-		if err = O.Get(&data, i); err != nil {
+		if err = O.GetItem(&O.scratch, i); err != nil {
 			return dest, err
 		}
-		vr := reflect.ValueOf(data.Get())
+		vr := reflect.ValueOf(O.scratch.Get())
 		if needsInit {
 			needsInit = false
 			length, lengthErr := O.Len()
@@ -184,31 +198,53 @@ func (O *ObjectCollection) AsSlice(dest interface{}) (interface{}, error) {
 	return dr.Interface(), nil
 }
 
-// Append data to the collection.
-func (O *ObjectCollection) Append(data *Data) error {
+// AppendData to the collection.
+func (O *ObjectCollection) AppendData(data *Data) error {
 	if C.dpiObject_appendElement(O.dpiObject, data.NativeTypeNum, data.dpiData) == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "append(%d)", data.NativeTypeNum)
+		return errors.Errorf("append(%d): %w", data.NativeTypeNum, O.getError())
 	}
 	return nil
+}
+
+// Append v to the collection.
+func (O *ObjectCollection) Append(v interface{}) error {
+	if data, ok := v.(*Data); ok {
+		return O.AppendData(data)
+	}
+	if err := O.scratch.Set(v); err != nil {
+		return err
+	}
+	return O.AppendData(&O.scratch)
+}
+
+// AppendObject adds an Object to the collection.
+func (O *ObjectCollection) AppendObject(obj *Object) error {
+	O.scratch = Data{
+		ObjectType:    obj.ObjectType,
+		NativeTypeNum: C.DPI_NATIVE_TYPE_OBJECT,
+		dpiData:       &C.dpiData{isNull: 1},
+	}
+	O.scratch.SetObject(obj)
+	return O.Append(&O.scratch)
 }
 
 // Delete i-th element of the collection.
 func (O *ObjectCollection) Delete(i int) error {
 	if C.dpiObject_deleteElementByIndex(O.dpiObject, C.int32_t(i)) == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "delete(%d)", i)
+		return errors.Errorf("delete(%d): %w", i, O.getError())
 	}
 	return nil
 }
 
-// Get the i-th element of the collection into data.
-func (O *ObjectCollection) Get(data *Data, i int) error {
+// GetItem gets the i-th element of the collection into data.
+func (O *ObjectCollection) GetItem(data *Data, i int) error {
 	if data == nil {
 		panic("data cannot be nil")
 	}
 	idx := C.int32_t(i)
 	var exists C.int
 	if C.dpiObject_getElementExistsByIndex(O.dpiObject, idx, &exists) == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "exists(%d)", idx)
+		return errors.Errorf("exists(%d): %w", idx, O.getError())
 	}
 	if exists == 0 {
 		return ErrNotExist
@@ -217,17 +253,35 @@ func (O *ObjectCollection) Get(data *Data, i int) error {
 	data.NativeTypeNum = O.CollectionOf.NativeTypeNum
 	data.ObjectType = *O.CollectionOf
 	if C.dpiObject_getElementValueByIndex(O.dpiObject, idx, data.NativeTypeNum, data.dpiData) == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "get(%d[%d])", idx, data.NativeTypeNum)
+		return errors.Errorf("get(%d[%d]): %w", idx, data.NativeTypeNum, O.getError())
 	}
 	return nil
 }
 
-// Set the i-th element of the collection with data.
-func (O *ObjectCollection) Set(i int, data *Data) error {
+// Get the i-th element of the collection.
+func (O *ObjectCollection) Get(i int) (interface{}, error) {
+	var data Data
+	err := O.GetItem(&data, i)
+	return data.Get(), err
+}
+
+// SetItem sets the i-th element of the collection with data.
+func (O *ObjectCollection) SetItem(i int, data *Data) error {
 	if C.dpiObject_setElementValueByIndex(O.dpiObject, C.int32_t(i), data.NativeTypeNum, data.dpiData) == C.DPI_FAILURE {
-		return errors.Wrapf(O.getError(), "set(%d[%d])", i, data.NativeTypeNum)
+		return errors.Errorf("set(%d[%d]): %w", i, data.NativeTypeNum, O.getError())
 	}
 	return nil
+}
+
+// Set the i-th element of the collection with value.
+func (O *ObjectCollection) Set(i int, v interface{}) error {
+	if data, ok := v.(*Data); ok {
+		return O.SetItem(i, data)
+	}
+	if err := O.scratch.Set(v); err != nil {
+		return err
+	}
+	return O.SetItem(i, &O.scratch)
 }
 
 // First returns the first element's index of the collection.
@@ -235,7 +289,7 @@ func (O *ObjectCollection) First() (int, error) {
 	var exists C.int
 	var idx C.int32_t
 	if C.dpiObject_getFirstIndex(O.dpiObject, &idx, &exists) == C.DPI_FAILURE {
-		return 0, errors.Wrap(O.getError(), "first")
+		return 0, errors.Errorf("first: %w", O.getError())
 	}
 	if exists == 1 {
 		return int(idx), nil
@@ -248,7 +302,7 @@ func (O *ObjectCollection) Last() (int, error) {
 	var exists C.int
 	var idx C.int32_t
 	if C.dpiObject_getLastIndex(O.dpiObject, &idx, &exists) == C.DPI_FAILURE {
-		return 0, errors.Wrap(O.getError(), "last")
+		return 0, errors.Errorf("last: %w", O.getError())
 	}
 	if exists == 1 {
 		return int(idx), nil
@@ -261,7 +315,7 @@ func (O *ObjectCollection) Next(i int) (int, error) {
 	var exists C.int
 	var idx C.int32_t
 	if C.dpiObject_getNextIndex(O.dpiObject, C.int32_t(i), &idx, &exists) == C.DPI_FAILURE {
-		return 0, errors.Wrapf(O.getError(), "next(%d)", i)
+		return 0, errors.Errorf("next(%d): %w", i, O.getError())
 	}
 	if exists == 1 {
 		return int(idx), nil
@@ -273,7 +327,7 @@ func (O *ObjectCollection) Next(i int) (int, error) {
 func (O *ObjectCollection) Len() (int, error) {
 	var size C.int32_t
 	if C.dpiObject_getSize(O.dpiObject, &size) == C.DPI_FAILURE {
-		return 0, errors.Wrap(O.getError(), "len")
+		return 0, errors.Errorf("len: %w", O.getError())
 	}
 	return int(size), nil
 }
@@ -288,12 +342,13 @@ func (O *ObjectCollection) Trim(n int) error {
 
 // ObjectType holds type info of an Object.
 type ObjectType struct {
+	dpiObjectType *C.dpiObjectType
+	conn          *conn
+
 	Schema, Name                        string
 	DBSize, ClientSizeInBytes, CharSize int
 	CollectionOf                        *ObjectType
 	Attributes                          map[string]ObjectAttribute
-	dpiObjectType                       *C.dpiObjectType
-	drv                                 *drv
 	OracleTypeNum                       C.dpiOracleTypeNum
 	NativeTypeNum                       C.dpiNativeTypeNum
 	Precision                           int16
@@ -301,7 +356,14 @@ type ObjectType struct {
 	FsPrecision                         uint8
 }
 
-func (t ObjectType) getError() error { return t.drv.getError() }
+func (t ObjectType) getError() error { return t.conn.getError() }
+
+func (t ObjectType) String() string {
+	if t.Schema == "" {
+		return t.Name
+	}
+	return t.Schema + "." + t.Name
+}
 
 // FullName returns the object's name with the schame prepended.
 func (t ObjectType) FullName() string {
@@ -312,66 +374,103 @@ func (t ObjectType) FullName() string {
 }
 
 // GetObjectType returns the ObjectType of a name.
+//
+// The name is uppercased! Because here Oracle seems to be case-sensitive.
+// To leave it as is, enclose it in "-s!
 func (c *conn) GetObjectType(name string) (ObjectType, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if !strings.Contains(name, "\"") {
+		name = strings.ToUpper(name)
+	}
+	if o, ok := c.objTypes[name]; ok {
+		return o, nil
+	}
 	cName := C.CString(name)
 	defer func() { C.free(unsafe.Pointer(cName)) }()
 	objType := (*C.dpiObjectType)(C.malloc(C.sizeof_void))
 	if C.dpiConn_getObjectType(c.dpiConn, cName, C.uint32_t(len(name)), &objType) == C.DPI_FAILURE {
 		C.free(unsafe.Pointer(objType))
-		return ObjectType{}, errors.Wrapf(c.getError(), "getObjectType(%q) conn=%p", name, c.dpiConn)
+		return ObjectType{}, errors.Errorf("getObjectType(%q) conn=%p: %w", name, c.dpiConn, c.getError())
 	}
-	t := ObjectType{drv: c.drv, dpiObjectType: objType}
-	return t, t.init()
+	t := ObjectType{conn: c, dpiObjectType: objType}
+	err := t.init()
+	if err == nil {
+		c.objTypes[name] = t
+	}
+	return t, err
 }
 
 // NewObject returns a new Object with ObjectType type.
+//
+// As with all Objects, you MUST call Close on it when not needed anymore!
 func (t ObjectType) NewObject() (*Object, error) {
 	obj := (*C.dpiObject)(C.malloc(C.sizeof_void))
 	if C.dpiObjectType_createObject(t.dpiObjectType, &obj) == C.DPI_FAILURE {
 		C.free(unsafe.Pointer(obj))
 		return nil, t.getError()
 	}
-	return &Object{ObjectType: t, dpiObject: obj}, nil
+	O := &Object{ObjectType: t, dpiObject: obj}
+	// https://github.com/oracle/odpi/issues/112#issuecomment-524479532
+	return O, O.ResetAttributes()
+}
+
+// NewCollection returns a new Collection object with ObjectType type.
+// If the ObjectType is not a Collection, it returns ErrNotCollection error.
+func (t ObjectType) NewCollection() (*ObjectCollection, error) {
+	if t.CollectionOf == nil {
+		return nil, ErrNotCollection
+	}
+	O, err := t.NewObject()
+	if err != nil {
+		return nil, err
+	}
+	return &ObjectCollection{Object: O}, nil
 }
 
 // Close releases a reference to the object type.
-func (t *ObjectType) Close() error {
+func (t *ObjectType) close() error {
+	if t == nil {
+		return nil
+	}
+	attributes, d := t.Attributes, t.dpiObjectType
+	t.Attributes, t.dpiObjectType = nil, nil
 
-	for _, attr := range t.Attributes {
+	for _, attr := range attributes {
 		err := attr.Close()
 		if err != nil {
 			return err
 		}
 	}
 
-	t.Attributes = nil
-	d := t.dpiObjectType
-	t.dpiObjectType = nil
 	if d == nil {
 		return nil
 	}
 
-	if rc := C.dpiObjectType_release(d); rc == C.DPI_FAILURE {
-		return errors.Wrapf(t.getError(), "error on close object type")
+	if C.dpiObjectType_release(d) == C.DPI_FAILURE {
+		return errors.Errorf("error on close object type: %w", t.getError())
 	}
 
 	return nil
 }
 
-func wrapObject(d *drv, objectType *C.dpiObjectType, object *C.dpiObject) (*Object, error) {
+func wrapObject(c *conn, objectType *C.dpiObjectType, object *C.dpiObject) (*Object, error) {
 	if objectType == nil {
 		return nil, errors.New("objectType is nil")
 	}
+	if C.dpiObject_addRef(object) == C.DPI_FAILURE {
+		return nil, c.getError()
+	}
 	o := &Object{
-		ObjectType: ObjectType{dpiObjectType: objectType, drv: d},
+		ObjectType: ObjectType{dpiObjectType: objectType, conn: c},
 		dpiObject:  object,
 	}
 	return o, o.init()
 }
 
 func (t *ObjectType) init() error {
-	if t.drv == nil {
-		panic("drv is nil")
+	if t.conn == nil {
+		panic("conn is nil")
 	}
 	if t.Name != "" && t.Attributes != nil {
 		return nil
@@ -381,15 +480,18 @@ func (t *ObjectType) init() error {
 	}
 	var info C.dpiObjectTypeInfo
 	if C.dpiObjectType_getInfo(t.dpiObjectType, &info) == C.DPI_FAILURE {
-		return errors.Wrapf(t.getError(), "%v.getInfo", t)
+		return errors.Errorf("%v.getInfo: %w", t, t.getError())
 	}
 	t.Schema = C.GoStringN(info.schema, C.int(info.schemaLength))
 	t.Name = C.GoStringN(info.name, C.int(info.nameLength))
 	t.CollectionOf = nil
-	numAttributes := int(info.numAttributes)
+	if t.conn.objTypes == nil {
+		t.conn.objTypes = make(map[string]ObjectType)
+	}
 
+	numAttributes := int(info.numAttributes)
 	if info.isCollection == 1 {
-		t.CollectionOf = &ObjectType{drv: t.drv}
+		t.CollectionOf = &ObjectType{conn: t.conn}
 		if err := t.CollectionOf.fromDataTypeInfo(info.elementTypeInfo); err != nil {
 			return err
 		}
@@ -400,6 +502,7 @@ func (t *ObjectType) init() error {
 	}
 	if numAttributes == 0 {
 		t.Attributes = map[string]ObjectAttribute{}
+		t.conn.objTypes[t.FullName()] = *t
 		return nil
 	}
 	t.Attributes = make(map[string]ObjectAttribute, numAttributes)
@@ -408,18 +511,18 @@ func (t *ObjectType) init() error {
 		C.uint16_t(len(attrs)),
 		(**C.dpiObjectAttr)(unsafe.Pointer(&attrs[0])),
 	) == C.DPI_FAILURE {
-		return errors.Wrapf(t.getError(), "%v.getAttributes", t)
+		return errors.Errorf("%v.getAttributes: %w", t, t.getError())
 	}
 	for i, attr := range attrs {
 		var attrInfo C.dpiObjectAttrInfo
 		if C.dpiObjectAttr_getInfo(attr, &attrInfo) == C.DPI_FAILURE {
-			return errors.Wrapf(t.getError(), "%v.attr_getInfo", attr)
+			return errors.Errorf("%v.attr_getInfo: %w", attr, t.getError())
 		}
 		if Log != nil {
 			Log("i", i, "attrInfo", attrInfo)
 		}
 		typ := attrInfo.typeInfo
-		sub, err := objectTypeFromDataTypeInfo(t.drv, typ)
+		sub, err := objectTypeFromDataTypeInfo(t.conn, typ)
 		if err != nil {
 			return err
 		}
@@ -431,6 +534,7 @@ func (t *ObjectType) init() error {
 		//fmt.Printf("%d=%q. typ=%+v sub=%+v\n", i, objAttr.Name, typ, sub)
 		t.Attributes[objAttr.Name] = objAttr
 	}
+	t.conn.objTypes[t.FullName()] = *t
 	return nil
 }
 
@@ -447,14 +551,14 @@ func (t *ObjectType) fromDataTypeInfo(typ C.dpiDataTypeInfo) error {
 	t.FsPrecision = uint8(typ.fsPrecision)
 	return t.init()
 }
-func objectTypeFromDataTypeInfo(drv *drv, typ C.dpiDataTypeInfo) (ObjectType, error) {
-	if drv == nil {
-		panic("drv nil")
+func objectTypeFromDataTypeInfo(conn *conn, typ C.dpiDataTypeInfo) (ObjectType, error) {
+	if conn == nil {
+		panic("conn is nil")
 	}
 	if typ.oracleTypeNum == 0 {
 		panic("typ is nil")
 	}
-	t := ObjectType{drv: drv}
+	t := ObjectType{conn: conn}
 	err := t.fromDataTypeInfo(typ)
 	return t, err
 }
@@ -469,11 +573,11 @@ type ObjectAttribute struct {
 // Close the ObjectAttribute.
 func (A ObjectAttribute) Close() error {
 	attr := A.dpiObjectAttr
+	A.dpiObjectAttr = nil
+
 	if attr == nil {
 		return nil
 	}
-
-	A.dpiObjectAttr = nil
 	if C.dpiObjectAttr_release(attr) == C.DPI_FAILURE {
 		return A.getError()
 	}
@@ -481,10 +585,10 @@ func (A ObjectAttribute) Close() error {
 }
 
 // GetObjectType returns the ObjectType for the name.
-func GetObjectType(ex Execer, typeName string) (ObjectType, error) {
-	c, err := getConn(ex)
+func GetObjectType(ctx context.Context, ex Execer, typeName string) (ObjectType, error) {
+	c, err := getConn(ctx, ex)
 	if err != nil {
-		return ObjectType{}, errors.WithMessage(err, "getConn for "+typeName)
+		return ObjectType{}, errors.Errorf("getConn for %s: %w", typeName, err)
 	}
 	return c.GetObjectType(typeName)
 }

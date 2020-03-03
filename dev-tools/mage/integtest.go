@@ -181,7 +181,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	if err != nil {
 		return err
 	}
-	magePath := filepath.Join("/go/src", repo.ImportPath, "build/mage-linux-amd64")
+	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
 
 	// Build docker-compose args.
 	args := []string{"-p", dockerComposeProjectName(), "run",
@@ -192,6 +192,9 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// compose.EnsureUp needs to know the environment type.
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
+	}
+	if UseVendor {
+		args = append(args, "-e", "GOFLAGS=-mod=vendor")
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {

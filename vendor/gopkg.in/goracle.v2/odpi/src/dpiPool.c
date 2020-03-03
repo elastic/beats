@@ -30,6 +30,7 @@ int dpiPool__acquireConnection(dpiPool *pool, const char *userName,
     if (dpiGen__allocate(DPI_HTYPE_CONN, pool->env, (void**) &tempConn,
             error) < 0)
         return DPI_FAILURE;
+    error->env = pool->env;
 
     // create the connection
     if (dpiConn__create(tempConn, pool->env->context, userName, userNameLength,
@@ -52,7 +53,7 @@ int dpiPool__acquireConnection(dpiPool *pool, const char *userName,
 static int dpiPool__checkConnected(dpiPool *pool, const char *fnName,
         dpiError *error)
 {
-    if (dpiGen__startPublicFn(pool, DPI_HTYPE_POOL, fnName, 1, error) < 0)
+    if (dpiGen__startPublicFn(pool, DPI_HTYPE_POOL, fnName, error) < 0)
         return DPI_FAILURE;
     if (!pool->handle)
         return dpiError__set(error, "check pool", DPI_ERR_NOT_CONNECTED);
@@ -155,6 +156,17 @@ static int dpiPool__create(dpiPool *pool, const char *userName,
                 &createParams->maxLifetimeSession, 0,
                 DPI_OCI_ATTR_SPOOL_MAX_LIFETIME_SESSION,
                 "set max lifetime session", error) < 0)
+            return DPI_FAILURE;
+    }
+
+    // set the maximum number of sessions per shard (valid in 18.3 and higher)
+    if (pool->env->versionInfo->versionNum > 18 ||
+            (pool->env->versionInfo->versionNum == 18 &&
+             pool->env->versionInfo->releaseNum >= 3)) {
+        if (dpiOci__attrSet(pool->handle, DPI_OCI_HTYPE_SPOOL, (void*)
+                &createParams->maxSessionsPerShard, 0,
+                DPI_OCI_ATTR_SPOOL_MAX_PER_SHARD,
+                "set max sessions per shard", error) < 0)
             return DPI_FAILURE;
     }
 
@@ -359,7 +371,7 @@ int dpiPool_create(const dpiContext *context, const char *userName,
     dpiError error;
 
     // validate parameters
-    if (dpiGen__startPublicFn(context, DPI_HTYPE_CONTEXT, __func__, 0,
+    if (dpiGen__startPublicFn(context, DPI_HTYPE_CONTEXT, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(context, DPI_FAILURE, &error);
     DPI_CHECK_PTR_AND_LENGTH(context, userName)
@@ -387,7 +399,7 @@ int dpiPool_create(const dpiContext *context, const char *userName,
         return dpiGen__endPublicFn(context, DPI_FAILURE, &error);
 
     // initialize environment
-    if (dpiEnv__init(tempPool->env, context, commonParams, &error) < 0) {
+    if (dpiEnv__init(tempPool->env, context, commonParams, NULL, &error) < 0) {
         dpiPool__free(tempPool, &error);
         return dpiGen__endPublicFn(context, DPI_FAILURE, &error);
     }
@@ -403,8 +415,7 @@ int dpiPool_create(const dpiContext *context, const char *userName,
     createParams->outPoolName = tempPool->name;
     createParams->outPoolNameLength = tempPool->nameLength;
     *pool = tempPool;
-    dpiHandlePool__release(tempPool->env->errorHandles, error.handle, &error);
-    error.handle = NULL;
+    dpiHandlePool__release(tempPool->env->errorHandles, &error.handle);
     return dpiGen__endPublicFn(context, DPI_SUCCESS, &error);
 }
 
@@ -573,4 +584,3 @@ int dpiPool_setWaitTimeout(dpiPool *pool, uint32_t value)
     return dpiPool__setAttributeUint(pool, DPI_OCI_ATTR_SPOOL_WAIT_TIMEOUT,
             value, __func__);
 }
-

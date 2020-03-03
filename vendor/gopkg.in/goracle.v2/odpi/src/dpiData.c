@@ -47,6 +47,36 @@ int dpiDataBuffer__fromOracleDate(dpiDataBuffer *data,
 
 
 //-----------------------------------------------------------------------------
+// dpiDataBuffer__fromOracleDateAsDouble() [INTERNAL]
+//   Populate the data from an dpiOciDate structure as a double value (number
+// of milliseconds since January 1, 1970).
+//-----------------------------------------------------------------------------
+int dpiDataBuffer__fromOracleDateAsDouble(dpiDataBuffer *data,
+        dpiEnv *env, dpiError *error, dpiOciDate *oracleValue)
+{
+    void *timestamp;
+    int status;
+
+    // allocate and populate a timestamp with the value of the date
+    if (dpiOci__descriptorAlloc(env->handle, &timestamp,
+            DPI_OCI_DTYPE_TIMESTAMP_LTZ, "alloc timestamp", error) < 0)
+        return DPI_FAILURE;
+    if (dpiOci__dateTimeConstruct(env->handle, timestamp, oracleValue->year,
+            oracleValue->month, oracleValue->day, oracleValue->hour,
+            oracleValue->minute, oracleValue->second, 0, NULL, 0, error) < 0) {
+        dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+        return DPI_FAILURE;
+    }
+
+    // now calculate the number of milliseconds since January 1, 1970
+    status = dpiDataBuffer__fromOracleTimestampAsDouble(data, env, error,
+            timestamp);
+    dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+    return status;
+}
+
+
+//-----------------------------------------------------------------------------
 // dpiDataBuffer__fromOracleIntervalDS() [INTERNAL]
 //   Populate the data from an OCIInterval structure (days/seconds).
 //-----------------------------------------------------------------------------
@@ -301,6 +331,58 @@ int dpiDataBuffer__toOracleDate(dpiDataBuffer *data, dpiOciDate *oracleValue)
     oracleValue->hour = timestamp->hour;
     oracleValue->minute = timestamp->minute;
     oracleValue->second = timestamp->second;
+    return DPI_SUCCESS;
+}
+
+
+//-----------------------------------------------------------------------------
+// dpiDataBuffer__toOracleDateFromDouble() [INTERNAL]
+//   Populate the data in an dpiOciDate structure given a double (number of
+// milliseconds since January 1, 1970).
+//-----------------------------------------------------------------------------
+int dpiDataBuffer__toOracleDateFromDouble(dpiDataBuffer *data, dpiEnv *env,
+        dpiError *error, dpiOciDate *oracleValue)
+{
+    void *timestamp, *timestampLTZ;
+    uint32_t fsecond;
+
+    // allocate a descriptor to acquire a timestamp
+    if (dpiOci__descriptorAlloc(env->handle, &timestampLTZ,
+            DPI_OCI_DTYPE_TIMESTAMP_LTZ, "alloc timestamp", error) < 0)
+        return DPI_FAILURE;
+    if (dpiDataBuffer__toOracleTimestampFromDouble(data, env, error,
+            timestampLTZ) < 0) {
+        dpiOci__descriptorFree(timestampLTZ, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+        return DPI_FAILURE;
+    }
+
+    // allocate a plain timestamp and convert to it
+    if (dpiOci__descriptorAlloc(env->handle, &timestamp,
+            DPI_OCI_DTYPE_TIMESTAMP, "alloc plain timestamp", error) < 0) {
+        dpiOci__descriptorFree(timestampLTZ, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+        return DPI_FAILURE;
+    }
+    if (dpiOci__dateTimeConvert(env->handle, timestampLTZ, timestamp,
+            error) < 0) {
+        dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP);
+        dpiOci__descriptorFree(timestampLTZ, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+        return DPI_FAILURE;
+    }
+    dpiOci__descriptorFree(timestampLTZ, DPI_OCI_DTYPE_TIMESTAMP_LTZ);
+
+    // populate date structure
+    if (dpiOci__dateTimeGetDate(env->handle, timestamp, &oracleValue->year,
+            &oracleValue->month, &oracleValue->day, error) < 0) {
+        dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP);
+        return DPI_FAILURE;
+    }
+    if (dpiOci__dateTimeGetTime(env->handle, timestamp, &oracleValue->hour,
+            &oracleValue->minute, &oracleValue->second, &fsecond, error) < 0) {
+        dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP);
+        return DPI_FAILURE;
+    }
+
+    dpiOci__descriptorFree(timestamp, DPI_OCI_DTYPE_TIMESTAMP);
     return DPI_SUCCESS;
 }
 
@@ -815,4 +897,3 @@ void dpiData_setUint64(dpiData *data, uint64_t value)
     data->isNull = 0;
     data->value.asUint64 = value;
 }
-

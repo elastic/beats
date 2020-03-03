@@ -1,17 +1,7 @@
 // Copyright 2017 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -30,7 +20,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 var _ = driver.Rows((*rows)(nil))
@@ -72,17 +62,16 @@ func (r *rows) Close() error {
 	if r == nil {
 		return nil
 	}
-	r.columns = nil
-	r.data = nil
-	for _, v := range r.vars {
-		C.dpiVar_release(v)
+	vars, st := r.vars, r.statement
+	r.columns, r.vars, r.data, r.statement, r.nextRs = nil, nil, nil, nil, nil
+	for _, v := range vars[:cap(vars)] {
+		if v != nil {
+			C.dpiVar_release(v)
+		}
 	}
-	r.vars = nil
-	if r.statement == nil {
+	if st == nil {
 		return nil
 	}
-	st := r.statement
-	r.statement = nil
 
 	st.Lock()
 	defer st.Unlock()
@@ -91,7 +80,7 @@ func (r *rows) Close() error {
 	}
 	var err error
 	if C.dpiStmt_release(st.dpiStmt) == C.DPI_FAILURE {
-		err = errors.Wrap(r.getError(), "rows/dpiStmt_release")
+		err = errors.Errorf("rows/dpiStmt_release: %w", r.getError())
 	}
 	return err
 }
@@ -266,6 +255,8 @@ func (r *rows) ColumnTypeScanType(index int) reflect.Type {
 // size as the Columns() are wide.
 //
 // Next should return io.EOF when there are no more rows.
+//
+// As with all Objects, you MUST call Close on the returned Object instances when they're not needed anymore!
 func (r *rows) Next(dest []driver.Value) error {
 	if r.err != nil {
 		return r.err
@@ -280,7 +271,7 @@ func (r *rows) Next(dest []driver.Value) error {
 	if r.fetched == 0 {
 		var moreRows C.int
 		if C.dpiStmt_fetchRows(r.dpiStmt, C.uint32_t(r.statement.FetchRowCount()), &r.bufferRowIndex, &r.fetched, &moreRows) == C.DPI_FAILURE {
-			return errors.Wrap(r.getError(), "Next")
+			return errors.Errorf("Next: %w", r.getError())
 		}
 		if Log != nil {
 			Log("msg", "fetched", "bri", r.bufferRowIndex, "fetched", r.fetched, "moreRows", moreRows, "len(data)", len(r.data), "cols", len(r.columns))
@@ -296,7 +287,7 @@ func (r *rows) Next(dest []driver.Value) error {
 				var n C.uint32_t
 				var data *C.dpiData
 				if C.dpiVar_getReturnedData(r.vars[i], 0, &n, &data) == C.DPI_FAILURE {
-					return errors.Wrapf(r.getError(), "getReturnedData[%d]", i)
+					return errors.Errorf("getReturnedData[%d]: %w", i, r.getError())
 				}
 				r.data[i] = (*[maxArraySize]C.dpiData)(unsafe.Pointer(data))[:n:n]
 				//fmt.Printf("data %d=%+v\n%+v\n", n, data, r.data[i][0])
@@ -313,7 +304,7 @@ func (r *rows) Next(dest []driver.Value) error {
 		typ := col.OracleType
 		d := &r.data[i][r.bufferRowIndex]
 		isNull := d.isNull == 1
-		if Log != nil {
+		if false && Log != nil {
 			Log("msg", "Next", "i", i, "row", r.bufferRowIndex, "typ", typ, "null", isNull) //, "data", fmt.Sprintf("%+v", d), "typ", typ)
 		}
 
@@ -352,7 +343,12 @@ func (r *rows) Next(dest []driver.Value) error {
 				dest[i] = printFloat(float64(C.dpiData_getDouble(d)))
 			default:
 				b := C.dpiData_getBytes(d)
-				dest[i] = Number(C.GoStringN(b.ptr, C.int(b.length)))
+				s := C.GoStringN(b.ptr, C.int(b.length))
+				if r.NumberAsString() {
+					dest[i] = s
+				} else {
+					dest[i] = Number(s)
+				}
 				if Log != nil {
 					Log("msg", "b", "i", i, "ptr", b.ptr, "length", b.length, "typ", col.NativeType, "int64", C.dpiData_getInt64(d), "dest", dest[i])
 				}
@@ -436,7 +432,7 @@ func (r *rows) Next(dest []driver.Value) error {
 			C.DPI_NATIVE_TYPE_LOB:
 			isClob := typ == C.DPI_ORACLE_TYPE_CLOB || typ == C.DPI_ORACLE_TYPE_NCLOB
 			if isNull {
-				if isClob && r.ClobAsString() {
+				if isClob && (r.ClobAsString() || !r.LobAsReader()) {
 					dest[i] = ""
 				} else {
 					dest[i] = nil
@@ -444,9 +440,11 @@ func (r *rows) Next(dest []driver.Value) error {
 				continue
 			}
 			rdr := &dpiLobReader{dpiLob: C.dpiData_getLOB(d), conn: r.conn, IsClob: isClob}
-			if isClob && r.ClobAsString() {
+			if isClob && (r.ClobAsString() || !r.LobAsReader()) {
 				sb := stringBuilders.Get()
-				if _, err := io.Copy(sb, rdr); err != nil {
+				_, err := io.Copy(sb, rdr)
+				C.dpiLob_close(rdr.dpiLob)
+				if err != nil {
 					stringBuilders.Put(sb)
 					return err
 				}
@@ -466,7 +464,7 @@ func (r *rows) Next(dest []driver.Value) error {
 			}
 			var colCount C.uint32_t
 			if C.dpiStmt_getNumQueryColumns(st.dpiStmt, &colCount) == C.DPI_FAILURE {
-				return errors.Wrap(r.getError(), "getNumQueryColumns")
+				return errors.Errorf("getNumQueryColumns: %w", r.getError())
 			}
 			st.Lock()
 			r2, err := st.openRows(int(colCount))
@@ -488,7 +486,7 @@ func (r *rows) Next(dest []driver.Value) error {
 				dest[i] = nil
 				continue
 			}
-			o, err := wrapObject(r.drv, col.ObjectType, C.dpiData_getObject(d))
+			o, err := wrapObject(r.conn, col.ObjectType, C.dpiData_getObject(d))
 			if err != nil {
 				return err
 			}
@@ -502,6 +500,10 @@ func (r *rows) Next(dest []driver.Value) error {
 	}
 	r.bufferRowIndex++
 	r.fetched--
+
+	if Log != nil {
+		Log("msg", "scanned", "row", r.bufferRowIndex, "dest", dest)
+	}
 
 	return nil
 }
@@ -562,7 +564,7 @@ func (r *rows) getImplicitResult() {
 		r.origSt = st
 	}
 	if C.dpiStmt_getImplicitResult(st.dpiStmt, &r.nextRs) == C.DPI_FAILURE {
-		r.nextRsErr = errors.Wrap(r.getError(), "getImplicitResult")
+		r.nextRsErr = errors.Errorf("getImplicitResult: %w", r.getError())
 	}
 }
 func (r *rows) HasNextResultSet() bool {
@@ -586,14 +588,14 @@ func (r *rows) NextResultSet() error {
 			return r.nextRsErr
 		}
 		if r.nextRs == nil {
-			return errors.Wrap(io.EOF, "getImplicitResult")
+			return errors.Errorf("getImplicitResult: %w", io.EOF)
 		}
 	}
 	st := &statement{conn: r.conn, dpiStmt: r.nextRs}
 
 	var n C.uint32_t
 	if C.dpiStmt_getNumQueryColumns(st.dpiStmt, &n) == C.DPI_FAILURE {
-		return errors.Wrapf(io.EOF, "getNumQueryColumns: %v", r.getError())
+		return errors.Errorf("getNumQueryColumns: %w: %w", r.getError(), io.EOF)
 	}
 	// keep the originam statement for the succeeding NextResultSet calls.
 	nr, err := st.openRows(int(n))

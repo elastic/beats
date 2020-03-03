@@ -181,4 +181,3 @@ void dpiDebug__print(const char *format, ...)
     (void) vfprintf(dpiDebugStream, formatWithPrefix, varArgs);
     va_end(varArgs);
 }
-

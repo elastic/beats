@@ -5,6 +5,102 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+
+## [2.24.0]
+### Changed
+- License: SPDX-License-Identifier: UPL-1.0 OR APL-2.0
+
+## [2.23.5]
+### Changed
+- ODPI-C v3.3.0
+
+## [2.23.2]
+### Changed
+- Close statement (and dpiStmt) on Break/bad conn.
+
+## [2.23.0]
+### Added
+- Conn.Timezone() returns the connection's timezone
+- allow setting the timezone with Timezone ConnectionParam.
+- Support to change password with NewPassword ConnectionParams.
+
+### Changed
+- set DefaultEnqOptions and DefaultDeqOptions in NewQueue.
+- make ConnectionParams.WaitTimeout, SessionMaxLifeTime, SessionTimeout be time.Duration.
+
+## [2.21.3] - 2019-10-03
+### Added
+- Export Queue.PayloadObjectType
+- Queue.SetEnqOptions, Queue.SetDeqOptions, Queue.SetDeqCorrelation
+
+## [2.21.1] - 2019-10-02
+### Changed
+- Really close the connection if it's bad. For #194.
+- ODPI-C v3.2.2
+- de-embed conn from Queue.
+
+## [2.20.1] - 2019-09-05
+### Added
+- AsOraErr function
+
+### Changed
+- Object.reset set attributes to null.
+- Use golang.org/x/xerrors instead of github.com/pkg/errors.
+- ObjectType.Close became unexported.
+
+## [2.20.0] - 2019-09-04
+### Added
+- ObjectType cache in connection.
+- Queue support with Objects.
+
+### Changed
+- ObjectType.Close became unexported.
+- Change Object Set/Get
+- use golang.org/x/xerrors instead of github.com/pkg/errors.
+
+## [2.19.0] - 2019-08-15
+### Changed
+- Require Context for getConn and thus in ClientVersion, ServerVersion, GetObjectType, DriverConn functions.
+
+## [2.18.5] - 2019-08-14
+### Changed
+- Remove log.Println left in...
+
+## [2.18.4] - 2019-08-14
+### Changed
+- Timezone detection: DBTIMEZONE is plain wrong, parse from SYSTIMESTAMP.
+
+## [2.18.3] - 2019-08-13
+### Changed
+- GetObjectType uppercases the name by default.
+- Upgrade to ODPI-C v3.2.1
+
+## [2.18.2] - 2019-07-23
+### Changed
+- Force copying of bytes (garbage appears Out with RAW).
+
+## [2.18.0] - 2019-07-16
+### Added
+- Setable pool session timeouts.
+
+## [2.16.4] - 2019-06-26
+### Changed
+- Fix bool input (#166).
+- Allow region name from DBTIMEZONE, not just offset.
+
+## [2.16.2] - 2019-05-27
+### Changed
+- Make Query AUTOCOMMIT like Exec - it's needed to release Rows for "FOR UPDATE".
+
+## [2.16.1] - 2019-05-27
+### Added
+- Data.SetNull
+- Expose dpiConn_newVar
+
+## [2.16.0] - 2019-05-17
+### Changed
+- NumberAsString new option for #159.
 
 ## [2.15.3] - 2019-05-16
 ### Changed
@@ -212,5 +308,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - update ODPI-C to v2.4.0
 - initialize context / load lib only on first Open, to allow import without Oracle Client installed
 - use golangci-lint
-
 

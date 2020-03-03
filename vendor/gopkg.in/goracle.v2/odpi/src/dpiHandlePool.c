@@ -105,14 +105,15 @@ void dpiHandlePool__free(dpiHandlePool *pool)
 // dpiHandlePool__release() [INTERNAL]
 //   Release a handle back to the pool. No checks are performed on the handle
 // that is being returned to the pool; It will simply be placed back in the
-// pool.
+// pool. The handle is then NULLed in order to avoid multiple attempts to
+// release the handle back to the pool.
 //-----------------------------------------------------------------------------
-void dpiHandlePool__release(dpiHandlePool *pool, void *handle, dpiError *error)
+void dpiHandlePool__release(dpiHandlePool *pool, void **handle)
 {
     dpiMutex__acquire(pool->mutex);
-    pool->handles[pool->releasePos++] = handle;
+    pool->handles[pool->releasePos++] = *handle;
+    *handle = NULL;
     if (pool->releasePos == pool->numSlots)
         pool->releasePos = 0;
     dpiMutex__release(pool->mutex);
 }
-

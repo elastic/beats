@@ -26,21 +26,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// maxPayload is the maximum number of bytes to devote to actual ids in
-// acknowledgement or modifyAckDeadline requests. A serialized
-// AcknowledgeRequest proto has a small constant overhead, plus the size of the
-// subscription name, plus 3 bytes per ID (a tag byte and two size bytes). A
-// ModifyAckDeadlineRequest has an additional few bytes for the deadline. We
-// don't know the subscription name here, so we just assume the size exclusive
-// of ids is 100 bytes.
+// maxPayload is the maximum number of bytes to devote to the
+// encoded AcknowledgementRequest / ModifyAckDeadline proto message.
 //
 // With gRPC there is no way for the client to know the server's max message size (it is
 // configurable on the server). We know from experience that it
 // it 512K.
 const (
 	maxPayload       = 512 * 1024
-	reqFixedOverhead = 100
-	overheadPerID    = 3
 	maxSendRecvBytes = 20 * 1024 * 1024 // 20M
 )
 

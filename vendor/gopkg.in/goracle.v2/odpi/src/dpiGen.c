@@ -133,6 +133,12 @@ static const dpiTypeDef dpiAllTypeDefs[DPI_HTYPE_MAX - DPI_HTYPE_NONE - 1] = {
         sizeof(dpiSodaDocCursor),       // size of structure
         0x80ceb83b,                     // check integer
         (dpiTypeFreeProc) dpiSodaDocCursor__free
+    },
+    {
+        "dpiQueue",                     // name
+        sizeof(dpiQueue),               // size of structure
+        0x54904ba2,                     // check integer
+        (dpiTypeFreeProc) dpiQueue__free
     }
 };
 
@@ -145,7 +151,7 @@ int dpiGen__addRef(void *ptr, dpiHandleTypeNum typeNum, const char *fnName)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(ptr, typeNum, fnName, 0, &error) < 0)
+    if (dpiGen__startPublicFn(ptr, typeNum, fnName, &error) < 0)
         return dpiGen__endPublicFn(ptr, DPI_FAILURE, &error);
     dpiGen__setRefCount(ptr, &error, 1);
     return dpiGen__endPublicFn(ptr, DPI_SUCCESS, &error);
@@ -218,7 +224,7 @@ int dpiGen__endPublicFn(const void *ptr, int returnValue, dpiError *error)
         dpiDebug__print("fn end %s(%p) -> %d\n", error->buffer->fnName, ptr,
                 returnValue);
     if (error->handle)
-        dpiHandlePool__release(error->env->errorHandles, error->handle, error);
+        dpiHandlePool__release(error->env->errorHandles, &error->handle);
 
     return returnValue;
 }
@@ -235,7 +241,7 @@ int dpiGen__release(void *ptr, dpiHandleTypeNum typeNum, const char *fnName)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(ptr, typeNum, fnName, 1, &error) < 0)
+    if (dpiGen__startPublicFn(ptr, typeNum, fnName, &error) < 0)
         return dpiGen__endPublicFn(ptr, DPI_FAILURE, &error);
     dpiGen__setRefCount(ptr, &error, -1);
     return dpiGen__endPublicFn(ptr, DPI_SUCCESS, &error);
@@ -286,7 +292,7 @@ void dpiGen__setRefCount(void *ptr, dpiError *error, int increment)
 // all subsequent calls.
 //-----------------------------------------------------------------------------
 int dpiGen__startPublicFn(const void *ptr, dpiHandleTypeNum typeNum,
-        const char *fnName, int needErrorHandle, dpiError *error)
+        const char *fnName, dpiError *error)
 {
     dpiBaseType *value = (dpiBaseType*) ptr;
 
@@ -296,8 +302,6 @@ int dpiGen__startPublicFn(const void *ptr, dpiHandleTypeNum typeNum,
         return DPI_FAILURE;
     if (dpiGen__checkHandle(ptr, typeNum, "check main handle", error) < 0)
         return DPI_FAILURE;
-    if (needErrorHandle && dpiEnv__initError(value->env, error) < 0)
-        return DPI_FAILURE;
+    error->env = value->env;
     return DPI_SUCCESS;
 }
-

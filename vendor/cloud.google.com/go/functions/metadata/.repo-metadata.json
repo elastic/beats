@@ -1,0 +1,12 @@
+{
+  "name": "metadata",
+  "name_pretty": "Cloud Functions",
+  "product_documentation": "http://cloud.google.com/functions",
+  "client_documentation": "https://godoc.org/cloud.google.com/go/functions/metadata",
+  "release_level": "alpha",
+  "language": "go",
+  "repo": "googleapis/google-cloud-go",
+  "distribution_name": "cloud.google.com/go/functions/metadata",
+  "api_id": "functions:metadata",
+  "requires_billing": true
+}

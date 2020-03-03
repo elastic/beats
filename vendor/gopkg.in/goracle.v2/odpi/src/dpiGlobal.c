@@ -289,4 +289,3 @@ int dpiGlobal__lookupEncoding(uint16_t charsetId, char *encoding,
 
     return DPI_SUCCESS;
 }
-

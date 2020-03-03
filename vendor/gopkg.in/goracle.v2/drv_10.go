@@ -3,17 +3,7 @@
 // Copyright 2019 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -23,7 +13,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 var _ = driver.Connector((*connector)(nil))
@@ -62,7 +52,7 @@ func (c connector) Connect(context.Context) (driver.Conn, error) {
 		return conn, err
 	}
 	if err = c.onInit(conn); err != nil {
-		conn.Close()
+		conn.close(true)
 		return nil, err
 	}
 	return conn, nil
@@ -90,12 +80,12 @@ func NewConnector(name string, onInit func(driver.Conn) error) (driver.Connector
 func NewSessionIniter(m map[string]string) func(driver.Conn) error {
 	return func(cx driver.Conn) error {
 		for k, v := range m {
-			qry := fmt.Sprintf("ALTER SESSION SET %s = '%s'", k, strings.ReplaceAll(v, "'", "''"))
+			qry := fmt.Sprintf("ALTER SESSION SET %s = '%s'", k, strings.Replace(v, "'", "''", -1))
 			st, err := cx.Prepare(qry)
 			if err != nil {
-				return errors.Wrap(err, qry)
+				return errors.Errorf("%s: %w", qry, err)
 			}
-			_, err = st.Exec(nil) //nolint:SA1019
+			_, err = st.Exec(nil) //lint:ignore SA1019 it's hard to use ExecContext here
 			st.Close()
 			if err != nil {
 				return err

@@ -93,7 +93,7 @@ int dpiObjectAttr_getInfo(dpiObjectAttr *attr, dpiObjectAttrInfo *info)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(attr, DPI_HTYPE_OBJECT_ATTR, __func__, 0,
+    if (dpiGen__startPublicFn(attr, DPI_HTYPE_OBJECT_ATTR, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(attr, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(attr, info)
@@ -112,4 +112,3 @@ int dpiObjectAttr_release(dpiObjectAttr *attr)
 {
     return dpiGen__release(attr, DPI_HTYPE_OBJECT_ATTR, __func__);
 }
-

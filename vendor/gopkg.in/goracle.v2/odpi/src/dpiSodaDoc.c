@@ -43,7 +43,7 @@ int dpiSodaDoc__allocate(dpiSodaDb *db, void *handle, dpiSodaDoc **doc,
 static int dpiSodaDoc__check(dpiSodaDoc *doc, const char *fnName,
         dpiError *error)
 {
-    if (dpiGen__startPublicFn(doc, DPI_HTYPE_SODA_DOC, fnName, 1, error) < 0)
+    if (dpiGen__startPublicFn(doc, DPI_HTYPE_SODA_DOC, fnName, error) < 0)
         return DPI_FAILURE;
     if (!doc->db->conn->handle || doc->db->conn->closing)
         return dpiError__set(error, "check connection", DPI_ERR_NOT_CONNECTED);
@@ -229,4 +229,3 @@ int dpiSodaDoc_release(dpiSodaDoc *doc)
 {
     return dpiGen__release(doc, DPI_HTYPE_SODA_DOC, __func__);
 }
-

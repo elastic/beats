@@ -7,7 +7,7 @@ package elb
 import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // lbListener is a tuple type representing an elasticloadbalancingv2.Listener and its associated elasticloadbalancingv2.LoadBalancer.

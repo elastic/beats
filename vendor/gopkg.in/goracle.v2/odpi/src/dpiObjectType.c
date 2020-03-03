@@ -57,7 +57,7 @@ int dpiObjectType__allocate(dpiConn *conn, void *param,
 static int dpiObjectType__check(dpiObjectType *objType, const char *fnName,
         dpiError *error)
 {
-    if (dpiGen__startPublicFn(objType, DPI_HTYPE_OBJECT_TYPE, fnName, 1,
+    if (dpiGen__startPublicFn(objType, DPI_HTYPE_OBJECT_TYPE, fnName,
             error) < 0)
         return DPI_FAILURE;
     return dpiConn__checkConnected(objType->conn, error);
@@ -319,7 +319,7 @@ int dpiObjectType_getInfo(dpiObjectType *objType, dpiObjectTypeInfo *info)
 {
     dpiError error;
 
-    if (dpiGen__startPublicFn(objType, DPI_HTYPE_OBJECT_TYPE, __func__, 0,
+    if (dpiGen__startPublicFn(objType, DPI_HTYPE_OBJECT_TYPE, __func__,
             &error) < 0)
         return dpiGen__endPublicFn(objType, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(objType, info)
@@ -342,4 +342,3 @@ int dpiObjectType_release(dpiObjectType *objType)
 {
     return dpiGen__release(objType, DPI_HTYPE_OBJECT_TYPE, __func__);
 }
-

@@ -37,6 +37,7 @@
 #include "../src/dpiOci.c"
 #include "../src/dpiOracleType.c"
 #include "../src/dpiPool.c"
+#include "../src/dpiQueue.c"
 #include "../src/dpiRowid.c"
 #include "../src/dpiSodaColl.c"
 #include "../src/dpiSodaCollCursor.c"
@@ -47,4 +48,3 @@
 #include "../src/dpiSubscr.c"
 #include "../src/dpiUtils.c"
 #include "../src/dpiVar.c"
-

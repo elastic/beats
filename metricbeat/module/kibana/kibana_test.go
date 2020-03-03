@@ -20,9 +20,9 @@ package kibana
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestIsStatsAPIAvailable(t *testing.T) {

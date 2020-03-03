@@ -43,7 +43,7 @@ int dpiSodaDocCursor__allocate(dpiSodaColl *coll, void *handle,
 static int dpiSodaDocCursor__check(dpiSodaDocCursor *cursor,
         const char *fnName, dpiError *error)
 {
-    if (dpiGen__startPublicFn(cursor, DPI_HTYPE_SODA_DOC_CURSOR, fnName, 1,
+    if (dpiGen__startPublicFn(cursor, DPI_HTYPE_SODA_DOC_CURSOR, fnName,
             error) < 0)
         return DPI_FAILURE;
     if (!cursor->handle)
@@ -142,4 +142,3 @@ int dpiSodaDocCursor_release(dpiSodaDocCursor *cursor)
 {
     return dpiGen__release(cursor, DPI_HTYPE_SODA_DOC_CURSOR, __func__);
 }
-

@@ -60,7 +60,7 @@ static int dpiEnqOptions__getAttrValue(dpiEnqOptions *options,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_ENQ_OPTIONS, fnName, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_ENQ_OPTIONS, fnName,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -82,7 +82,7 @@ static int dpiEnqOptions__setAttrValue(dpiEnqOptions *options,
     dpiError error;
     int status;
 
-    if (dpiGen__startPublicFn(options, DPI_HTYPE_ENQ_OPTIONS, fnName, 1,
+    if (dpiGen__startPublicFn(options, DPI_HTYPE_ENQ_OPTIONS, fnName,
             &error) < 0)
         return dpiGen__endPublicFn(options, DPI_FAILURE, &error);
     DPI_CHECK_PTR_NOT_NULL(options, value)
@@ -171,4 +171,3 @@ int dpiEnqOptions_setVisibility(dpiEnqOptions *options, dpiVisibility value)
     return dpiEnqOptions__setAttrValue(options, DPI_OCI_ATTR_VISIBILITY,
             __func__, &value, 0);
 }
-

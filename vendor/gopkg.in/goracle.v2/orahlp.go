@@ -1,17 +1,7 @@
 // Copyright 2017 Tamás Gulácsi
 //
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// SPDX-License-Identifier: UPL-1.0 OR Apache-2.0
 
 package goracle
 
@@ -24,8 +14,9 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
-	"github.com/pkg/errors"
+	errors "golang.org/x/xerrors"
 )
 
 // QueryColumn is the described column.
@@ -52,10 +43,11 @@ type Querier interface {
 // This can help using unknown-at-compile-time, a.k.a.
 // dynamic queries.
 func DescribeQuery(ctx context.Context, db Execer, qry string) ([]QueryColumn, error) {
-	c, err := getConn(db)
+	c, err := getConn(ctx, db)
 	if err != nil {
 		return nil, err
 	}
+	defer c.close(false)
 
 	stmt, err := c.PrepareContext(ctx, qry)
 	if err != nil {
@@ -213,7 +205,10 @@ func MapToSlice(qry string, metParam func(string) interface{}) (string, []interf
 func EnableDbmsOutput(ctx context.Context, conn Execer) error {
 	qry := "BEGIN DBMS_OUTPUT.enable(1000000); END;"
 	_, err := conn.ExecContext(ctx, qry)
-	return errors.Wrap(err, qry)
+	if err != nil {
+		return errors.Errorf("%s: %w", qry, err)
+	}
+	return nil
 }
 
 // ReadDbmsOutput copies the DBMS_OUTPUT buffer into the given io.Writer.
@@ -224,7 +219,7 @@ func ReadDbmsOutput(ctx context.Context, w io.Writer, conn preparer) error {
 	const qry = `BEGIN DBMS_OUTPUT.get_lines(:1, :2); END;`
 	stmt, err := conn.PrepareContext(ctx, qry)
 	if err != nil {
-		return errors.Wrap(err, qry)
+		return errors.Errorf("%s: %w", qry, err)
 	}
 
 	lines := make([]string, maxNumLines)
@@ -237,7 +232,7 @@ func ReadDbmsOutput(ctx context.Context, w io.Writer, conn preparer) error {
 		numLines = int64(len(lines))
 		if _, err = stmt.ExecContext(ctx, params...); err != nil {
 			_ = bw.Flush()
-			return errors.Wrap(err, qry)
+			return errors.Errorf("%s: %w", qry, err)
 		}
 		for i := 0; i < int(numLines); i++ {
 			_, _ = bw.WriteString(lines[i])
@@ -253,8 +248,8 @@ func ReadDbmsOutput(ctx context.Context, w io.Writer, conn preparer) error {
 }
 
 // ClientVersion returns the VersionInfo from the DB.
-func ClientVersion(ex Execer) (VersionInfo, error) {
-	c, err := getConn(ex)
+func ClientVersion(ctx context.Context, ex Execer) (VersionInfo, error) {
+	c, err := getConn(ctx, ex)
 	if err != nil {
 		return VersionInfo{}, err
 	}
@@ -262,8 +257,8 @@ func ClientVersion(ex Execer) (VersionInfo, error) {
 }
 
 // ServerVersion returns the VersionInfo of the client.
-func ServerVersion(ex Execer) (VersionInfo, error) {
-	c, err := getConn(ex)
+func ServerVersion(ctx context.Context, ex Execer) (VersionInfo, error) {
+	c, err := getConn(ctx, ex)
 	if err != nil {
 		return VersionInfo{}, err
 	}
@@ -273,32 +268,37 @@ func ServerVersion(ex Execer) (VersionInfo, error) {
 // Conn is the interface for a connection, to be returned by DriverConn.
 type Conn interface {
 	driver.Conn
+	driver.ConnBeginTx
+	driver.ConnPrepareContext
 	driver.Pinger
+
 	Break() error
-	BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, error)
-	PrepareContext(ctx context.Context, query string) (driver.Stmt, error)
 	Commit() error
 	Rollback() error
+	ClientVersion() (VersionInfo, error)
 	ServerVersion() (VersionInfo, error)
 	GetObjectType(name string) (ObjectType, error)
 	NewSubscription(string, func(Event)) (*Subscription, error)
 	Startup(StartupMode) error
 	Shutdown(ShutdownMode) error
+	NewData(baseType interface{}, SliceLen, BufSize int) ([]*Data, error)
+
+	Timezone() *time.Location
 }
 
 // DriverConn returns the *goracle.conn of the database/sql.Conn
-func DriverConn(ex Execer) (Conn, error) {
-	return getConn(ex)
+func DriverConn(ctx context.Context, ex Execer) (Conn, error) {
+	return getConn(ctx, ex)
 }
 
 var getConnMu sync.Mutex
 
-func getConn(ex Execer) (*conn, error) {
+func getConn(ctx context.Context, ex Execer) (*conn, error) {
 	getConnMu.Lock()
 	defer getConnMu.Unlock()
 	var c interface{}
-	if _, err := ex.ExecContext(context.Background(), getConnection, sql.Out{Dest: &c}); err != nil {
-		return nil, errors.Wrap(err, "getConnection")
+	if _, err := ex.ExecContext(ctx, getConnection, sql.Out{Dest: &c}); err != nil {
+		return nil, errors.Errorf("getConnection: %w", err)
 	}
 	return c.(*conn), nil
 }
@@ -306,4 +306,12 @@ func getConn(ex Execer) (*conn, error) {
 // WrapRows transforms a driver.Rows into an *sql.Rows.
 func WrapRows(ctx context.Context, q Querier, rset driver.Rows) (*sql.Rows, error) {
 	return q.QueryContext(ctx, wrapResultset, rset)
+}
+
+func Timezone(ctx context.Context, ex Execer) (*time.Location, error) {
+	c, err := getConn(ctx, ex)
+	if err != nil {
+		return nil, err
+	}
+	return c.Timezone(), nil
 }

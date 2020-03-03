@@ -40,9 +40,19 @@ static void dpiSubscr__callback(dpiSubscr *subscr, UNUSED void *handle,
     dpiError error;
 
     // ensure that the subscription handle is still valid
-    if (dpiGen__startPublicFn(subscr, DPI_HTYPE_SUBSCR, __func__, 1,
-            &error) < 0)
+    if (dpiGen__startPublicFn(subscr, DPI_HTYPE_SUBSCR, __func__,
+            &error) < 0) {
         dpiGen__endPublicFn(subscr, DPI_FAILURE, &error);
+        return;
+    }
+
+    // if the subscription is no longer registered, nothing further to do
+    dpiMutex__acquire(subscr->mutex);
+    if (!subscr->registered) {
+        dpiMutex__release(subscr->mutex);
+        dpiGen__endPublicFn(subscr, DPI_SUCCESS, &error);
+        return;
+    }
 
     // populate message
     memset(&message, 0, sizeof(message));
@@ -52,11 +62,13 @@ static void dpiSubscr__callback(dpiSubscr *subscr, UNUSED void *handle,
     }
     message.registered = subscr->registered;
 
-    // invoke user callback
+    // invoke user callback; temporarily increase reference count to ensure
+    // that the subscription is not freed during the callback
+    dpiGen__setRefCount(subscr, &error, 1);
     (*subscr->callback)(subscr->callbackContext, &message);
-
-    // clean up message
     dpiSubscr__freeMessage(&message);
+    dpiMutex__release(subscr->mutex);
+    dpiGen__setRefCount(subscr, &error, -1);
     dpiGen__endPublicFn(subscr, DPI_SUCCESS, &error);
 }
 
@@ -68,7 +80,7 @@ static void dpiSubscr__callback(dpiSubscr *subscr, UNUSED void *handle,
 static int dpiSubscr__check(dpiSubscr *subscr, const char *fnName,
         dpiError *error)
 {
-    if (dpiGen__startPublicFn(subscr, DPI_HTYPE_SUBSCR, fnName, 1, error) < 0)
+    if (dpiGen__startPublicFn(subscr, DPI_HTYPE_SUBSCR, fnName, error) < 0)
         return DPI_FAILURE;
     if (!subscr->handle)
         return dpiError__set(error, "check closed", DPI_ERR_SUBSCR_CLOSED);
@@ -84,7 +96,7 @@ static int dpiSubscr__check(dpiSubscr *subscr, const char *fnName,
 int dpiSubscr__create(dpiSubscr *subscr, dpiConn *conn,
         dpiSubscrCreateParams *params, dpiError *error)
 {
-    uint32_t qosFlags;
+    uint32_t qosFlags, mode;
     int32_t int32Val;
     int rowids;
 
@@ -95,6 +107,8 @@ int dpiSubscr__create(dpiSubscr *subscr, dpiConn *conn,
     subscr->callbackContext = params->callbackContext;
     subscr->subscrNamespace = params->subscrNamespace;
     subscr->qos = params->qos;
+    subscr->clientInitiated = params->clientInitiated;
+    dpiMutex__initialize(subscr->mutex);
 
     // create the subscription handle
     if (dpiOci__handleAlloc(conn->env->handle, &subscr->handle,
@@ -222,10 +236,26 @@ int dpiSubscr__create(dpiSubscr *subscr, dpiConn *conn,
 
     }
 
-    // register the subscription
-    if (dpiOci__subscriptionRegister(conn, &subscr->handle, error) < 0)
+    // register the subscription; client initiated subscriptions are only valid
+    // with 19.4 client and database
+    mode = DPI_OCI_DEFAULT;
+    if (params->clientInitiated) {
+        if (dpiUtils__checkClientVersion(conn->env->versionInfo, 19, 4,
+                error) < 0)
+            return DPI_FAILURE;
+        if (dpiUtils__checkDatabaseVersion(conn, 19, 4, error) < 0)
+            return DPI_FAILURE;
+        mode = DPI_OCI_SECURE_NOTIFICATION;
+    }
+    if (dpiOci__subscriptionRegister(conn, &subscr->handle, mode, error) < 0)
         return DPI_FAILURE;
     subscr->registered = 1;
+
+    // acquire the registration id
+    if (dpiOci__attrGet(subscr->handle, DPI_OCI_HTYPE_SUBSCRIPTION,
+            &params->outRegId, NULL, DPI_OCI_ATTR_SUBSCR_CQ_REGID,
+            "get registration id", error) < 0)
+        return DPI_FAILURE;
 
     return DPI_SUCCESS;
 }
@@ -237,6 +267,7 @@ int dpiSubscr__create(dpiSubscr *subscr, dpiConn *conn,
 //-----------------------------------------------------------------------------
 void dpiSubscr__free(dpiSubscr *subscr, dpiError *error)
 {
+    dpiMutex__acquire(subscr->mutex);
     if (subscr->handle) {
         if (subscr->registered)
             dpiOci__subscriptionUnRegister(subscr->conn, subscr, error);
@@ -247,6 +278,8 @@ void dpiSubscr__free(dpiSubscr *subscr, dpiError *error)
         dpiGen__setRefCount(subscr->conn, error, -1);
         subscr->conn = NULL;
     }
+    dpiMutex__release(subscr->mutex);
+    dpiMutex__destroy(subscr->mutex);
     dpiUtils__freeMemory(subscr);
 }
 
@@ -615,9 +648,12 @@ static int dpiSubscr__populateQueryChangeMessage(dpiSubscr *subscr,
 static int dpiSubscr__prepareStmt(dpiSubscr *subscr, dpiStmt *stmt,
         const char *sql, uint32_t sqlLength, dpiError *error)
 {
-    // prepare statement for execution
+    // prepare statement for execution; only SELECT statements are supported
     if (dpiStmt__prepare(stmt, sql, sqlLength, NULL, 0, error) < 0)
         return DPI_FAILURE;
+    if (stmt->statementType != DPI_STMT_TYPE_SELECT)
+        return dpiError__set(error, "subscr prepare statement",
+                DPI_ERR_NOT_SUPPORTED);
 
     // fetch array size is set to 1 in order to avoid over allocation since
     // the query is not really going to be used for fetching rows, just for
@@ -675,4 +711,3 @@ int dpiSubscr_release(dpiSubscr *subscr)
 {
     return dpiGen__release(subscr, DPI_HTYPE_SUBSCR, __func__);
 }
-
