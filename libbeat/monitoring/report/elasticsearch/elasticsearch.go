@@ -59,6 +59,7 @@ type reporter struct {
 
 	out []outputs.NetworkClient
 }
+
 const selector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")

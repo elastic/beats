@@ -41,14 +41,13 @@ const (
 	logSelector = "kafka"
 )
 
-
 var (
 	errNoTopicSet = errors.New("No topic configured")
 	errNoHosts    = errors.New("No hosts configured")
 )
 
 func init() {
-	sarama.Logger = kafkaLogger{log:logp.NewLogger(logSelector)}
+	sarama.Logger = kafkaLogger{log: logp.NewLogger(logSelector)}
 
 	outputs.RegisterType("kafka", makeKafka)
 }

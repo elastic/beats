@@ -28,7 +28,7 @@ import (
 )
 
 type Client struct {
-	log *logp.Logger
+	log     *logp.Logger
 	dialer  Dialer
 	network string
 	host    string
@@ -93,7 +93,7 @@ func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort 
 	}
 
 	client := &Client{
-		log: logp.NewLogger(logSelector),
+		log:     logp.NewLogger(logSelector),
 		dialer:  d,
 		network: network,
 		host:    host,

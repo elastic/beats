@@ -75,7 +75,7 @@ func newClient(
 	index string, codec codec.Codec,
 ) *client {
 	return &client{
-		log: logp.NewLogger("redis"),
+		log:      logp.NewLogger("redis"),
 		Client:   tc,
 		observer: observer,
 		timeout:  timeout,

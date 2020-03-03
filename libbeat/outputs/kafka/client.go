@@ -37,7 +37,7 @@ import (
 )
 
 type client struct {
-	log *logp.Logger
+	log      *logp.Logger
 	observer outputs.Observer
 	hosts    []string
 	topic    outil.Selector
@@ -76,7 +76,7 @@ func newKafkaClient(
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
-		log: logp.NewLogger(logSelector),
+		log:      logp.NewLogger(logSelector),
 		observer: observer,
 		hosts:    hosts,
 		topic:    topic,
@@ -167,7 +167,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err := data.Cache.GetValue("partition")
 	if err == nil {
-		if c.log.IsDebug(){
+		if c.log.IsDebug() {
 			c.log.Debugf("got event.Meta[\"partition\"] = %v", value)
 		}
 		if partition, ok := value.(int32); ok {
@@ -177,7 +177,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err = data.Cache.GetValue("topic")
 	if err == nil {
-		if c.log.IsDebug(){
+		if c.log.IsDebug() {
 			c.log.Debugf("got event.Meta[\"topic\"] = %v", value)
 		}
 		if topic, ok := value.(string); ok {
@@ -201,7 +201,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
-		if c.log.IsDebug(){
+		if c.log.IsDebug() {
 			c.log.Debugf("failed event: %v", event)
 		}
 		return nil, err

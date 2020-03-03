@@ -36,7 +36,7 @@ import (
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
-	log *logp.Logger
+	log    *logp.Logger
 	es     *esout.Client
 	params map[string]string
 	format report.Format
@@ -48,7 +48,7 @@ func newPublishClient(
 	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
-		log: logp.NewLogger(selector),
+		log:    logp.NewLogger(selector),
 		es:     es,
 		params: params,
 		format: format,

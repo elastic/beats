@@ -193,7 +193,7 @@ func cfgRoundRobinPartitioner(_ *logp.Logger, config *common.Config) (func() par
 	}, nil
 }
 
-func cfgHashPartitioner(log *logp.Logger,config *common.Config) (func() partitioner, error) {
+func cfgHashPartitioner(log *logp.Logger, config *common.Config) (func() partitioner, error) {
 	cfg := struct {
 		Hash   []string `config:"hash"`
 		Random bool     `config:"random"`

@@ -37,7 +37,6 @@ func init() {
 	outputs.RegisterType("elasticsearch", makeES)
 }
 
-
 var (
 	// ErrNotConnected indicates failure due to client having no valid connection
 	ErrNotConnected = errors.New("not connected")

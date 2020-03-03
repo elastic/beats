@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type kafkaLogger struct{
+type kafkaLogger struct {
 	log *logp.Logger
 }
 
@@ -49,7 +49,7 @@ func (kl kafkaLogger) Log(format string, v ...interface{}) {
 			}
 		}
 	}
-	if kl.log == nil{
+	if kl.log == nil {
 		kl.log = logp.NewLogger(logSelector)
 	}
 	if warn {

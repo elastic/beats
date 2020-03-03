@@ -35,7 +35,7 @@ func init() {
 }
 
 type fileOutput struct {
-	log *logp.Logger
+	log      *logp.Logger
 	filePath string
 	beat     beat.Info
 	observer outputs.Observer
@@ -59,7 +59,7 @@ func makeFileout(
 	cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
-		log: logp.NewLogger("file"),
+		log:      logp.NewLogger("file"),
 		beat:     beat,
 		observer: observer,
 	}
@@ -129,7 +129,7 @@ func (out *fileOutput) Publish(
 			} else {
 				out.log.Warnf("Failed to serialize the event: %v", err)
 			}
-			out.log.Debugf( "Failed event: %v", event)
+			out.log.Debugf("Failed event: %v", event)
 
 			dropped++
 			continue

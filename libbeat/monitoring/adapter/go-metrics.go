@@ -42,7 +42,7 @@ import (
 type GoMetricsRegistry struct {
 	mutex sync.Mutex
 
-	log *logp.Logger
+	log     *logp.Logger
 	reg     *monitoring.Registry
 	filters *metricFilters
 
@@ -67,12 +67,12 @@ func GetGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFil
 // NewGoMetrics creates and registers a new GoMetricsRegistry with the parent
 // registry.
 func NewGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFilter) *GoMetricsRegistry {
-	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar),filters...)
+	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar), filters...)
 }
 
-func newGoMetrics(reg *monitoring.Registry, filters ...MetricFilter) *GoMetricsRegistry{
+func newGoMetrics(reg *monitoring.Registry, filters ...MetricFilter) *GoMetricsRegistry {
 	return &GoMetricsRegistry{
-		log: logp.NewLogger("monitoring"),
+		log:     logp.NewLogger("monitoring"),
 		reg:     reg,
 		shadow:  metrics.NewRegistry(),
 		filters: makeFilters(filters...),
