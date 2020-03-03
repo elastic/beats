@@ -13,28 +13,13 @@ https://www.postgresql.org/[PostgreSQL].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from versions 9.5 on Ubuntu and 9.6
 on Debian.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboards
-
-This module comes with two sample dashboards.
-
-The first dashboard is for regular logs.
-
-[role="screenshot"]
-image::./images/filebeat-postgresql-overview.png[]
-
-The second one shows the slowlogs of PostgreSQL.
-
-[role="screenshot"]
-image::./images/filebeat-postgresql-slowlog-overview.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -69,6 +54,20 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+[float]
+=== Example dashboards
+
+This module comes with two sample dashboards.
+
+The first dashboard is for regular logs.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-overview.png[]
+
+The second one shows the slowlogs of PostgreSQL.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-slowlog-overview.png[]
 
 :has-dashboards!:
 

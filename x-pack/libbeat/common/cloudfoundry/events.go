@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/cloudfoundry/sonde-go/events"
 )
@@ -199,7 +199,7 @@ func (e *EventLog) SourceID() string                 { return e.sourceID }
 func (e *EventLog) ToFields() common.MapStr {
 	fields := baseMapWithApp(e)
 	fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			e.String(): common.MapStr{
 				"source": common.MapStr{
 					"instance": e.SourceID(),
@@ -208,6 +208,7 @@ func (e *EventLog) ToFields() common.MapStr {
 			},
 		},
 		"message": e.Message(),
+		"stream":  e.MessageType().String(),
 	})
 	return fields
 }
@@ -236,7 +237,7 @@ func (e *EventCounter) Total() uint64           { return e.total }
 func (e *EventCounter) ToFields() common.MapStr {
 	fields := baseMap(e)
 	fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			e.String(): common.MapStr{
 				"name":  e.Name(),
 				"delta": e.Delta(),
@@ -271,7 +272,7 @@ func (e *EventValueMetric) Unit() string            { return e.unit }
 func (e *EventValueMetric) ToFields() common.MapStr {
 	fields := baseMap(e)
 	fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			e.String(): common.MapStr{
 				"name":  e.Name(),
 				"unit":  e.Unit(),
@@ -313,7 +314,7 @@ func (e *EventContainerMetric) DiskBytesQuota() uint64   { return e.diskBytesQuo
 func (e *EventContainerMetric) ToFields() common.MapStr {
 	fields := baseMapWithApp(e)
 	fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			e.String(): common.MapStr{
 				"instance_index":     e.InstanceIndex(),
 				"cpu.pct":            e.CPUPercentage(),
@@ -351,7 +352,7 @@ func (e *EventError) Source() string          { return e.source }
 func (e *EventError) ToFields() common.MapStr {
 	fields := baseMap(e)
 	fields.DeepUpdate(common.MapStr{
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			e.String(): common.MapStr{
 				"source": e.Source(),
 			},
@@ -472,6 +473,8 @@ func envelopeToEvent(env *events.Envelope) Event {
 		return newEventValueMetric(env)
 	case events.Envelope_ContainerMetric:
 		return newEventContainerMetric(env)
+	case events.Envelope_Error:
+		return newEventError(env)
 	}
 	return nil
 }
@@ -488,9 +491,7 @@ func envelopMap(evt Event) common.MapStr {
 
 func baseMap(evt Event) common.MapStr {
 	return common.MapStr{
-		"module":  "cf",
-		"dataset": fmt.Sprintf("cf.%s", evt),
-		"cf": common.MapStr{
+		"cloudfoundry": common.MapStr{
 			evt.String(): common.MapStr{
 				"timestamp": evt.Timestamp(),
 				"type":      evt.String(),
@@ -504,7 +505,7 @@ func baseMapWithApp(evt EventWithAppID) common.MapStr {
 	base := baseMap(evt)
 	appID := evt.AppGuid()
 	if appID != "" {
-		base.Put("cf.app.id", appID)
+		base.Put("cloudfoundry.app.id", appID)
 	}
 	return base
 }

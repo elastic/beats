@@ -1,6 +1,10 @@
 [[decode-base64-field]]
 === Decode Base64 fields
 
+++++
+<titleabbrev>decode_base64_field</titleabbrev>
+++++
+
 The `decode_base64_field` processor specifies a field to base64 decode.
 The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
 the origin and `to` the target name of the field.
