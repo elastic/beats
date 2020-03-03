@@ -20,8 +20,8 @@ package statestore
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/registry"
 )
 
 // Connector is used to connect to a store backed by a registry.

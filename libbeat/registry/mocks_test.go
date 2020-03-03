@@ -20,7 +20,7 @@ package registry
 import (
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 type mockRegistry struct {

@@ -26,7 +26,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 var errno0 = syscall.Errno(0)

@@ -21,8 +21,8 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/elastic/beats/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/registry"
 )
 
 // Resource is used to lock and modify a resource its registry contents in a
