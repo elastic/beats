@@ -30,12 +30,11 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/esleg/eslegclient"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 

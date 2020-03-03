@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/heartbeat/cmd"
-
 	_ "github.com/elastic/beats/v7/heartbeat/include"
 )
 
