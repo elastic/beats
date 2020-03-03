@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/pq"
 )
@@ -64,7 +64,7 @@ type settings struct {
 	// buffer be flushed and reset to its original size.
 	WriteBuffer uint
 
-	Eventer queue.Eventer
+	ACKListener queue.ACKListener
 
 	WriteFlushTimeout time.Duration
 	WriteFlushEvents  uint
@@ -134,7 +134,8 @@ func newDiskSpool(logger logger, path string, settings settings) (*diskSpool, er
 	if inFlushTimeout < minInFlushTimeout {
 		inFlushTimeout = minInFlushTimeout
 	}
-	inBroker, err := newInBroker(inCtx, settings.Eventer, queue, settings.Codec,
+	inBroker, err := newInBroker(
+		inCtx, settings.ACKListener, queue, settings.Codec,
 		inFlushTimeout, settings.WriteFlushEvents)
 	if err != nil {
 		return nil, err

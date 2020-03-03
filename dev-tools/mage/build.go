@@ -59,26 +59,9 @@ func DefaultBuildArgs() BuildArgs {
 		},
 		WinMetadata: true,
 	}
-
 	if versionQualified {
 		args.Vars["github.com/elastic/beats/libbeat/version.qualifier"] = "{{ .Qualifier }}"
 	}
-
-	repo, err := GetProjectRepoInfo()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to determine project repo info"))
-	}
-
-	if !repo.IsElasticBeats() {
-		// Assume libbeat is vendored and prefix the variables.
-		prefix := repo.RootImportPath + "/vendor/"
-		prefixedVars := map[string]string{}
-		for k, v := range args.Vars {
-			prefixedVars[prefix+k] = v
-		}
-		args.Vars = prefixedVars
-	}
-
 	return args
 }
 
@@ -134,6 +117,16 @@ func Build(params BuildArgs) error {
 		cgoEnabled = "1"
 	}
 	env["CGO_ENABLED"] = cgoEnabled
+
+	if UseVendor {
+		var goFlags string
+		goFlags, ok := env["GOFLAGS"]
+		if !ok {
+			env["GOFLAGS"] = "-mod=vendor"
+		} else {
+			env["GOFLAGS"] = strings.Join([]string{goFlags, "-mod=vendor"}, " ")
+		}
+	}
 
 	// Spec
 	args := []string{
