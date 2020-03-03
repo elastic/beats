@@ -1,4 +1,4 @@
-# OKTA module
+# Okta module
 
 ## Caveats
 
@@ -8,10 +8,10 @@
 
 
 ```
-./filebeat setup --modules=okta -e --dashboards
+./filebeat setup --modules=okta -e
 ```
 
-Enable the OKTA module
+Enable the Okta module
 
 ```
 ./filebeat modules enable okta
@@ -22,5 +22,3 @@ Start Filebeat
 ```
 ./filebeat -e
 ```
-
-You can see the OKTA Overview dashboard in Kibana.
