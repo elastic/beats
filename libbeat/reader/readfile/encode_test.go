@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 func TestEncodeLines(t *testing.T) {

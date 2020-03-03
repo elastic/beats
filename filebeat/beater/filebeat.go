@@ -22,29 +22,30 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/management"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
-	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
-	"github.com/elastic/beats/filebeat/channel"
-	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/crawler"
-	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/filebeat/registrar"
+	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	cfg "github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/filebeat/crawler"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/registrar"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
+	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
