@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
 // +build windows
 
 package application_pool
