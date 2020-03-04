@@ -4,7 +4,7 @@
 
 // +build integration
 
-package container_registry
+package compute_vm_scaleset
 
 import (
 	"testing"
@@ -14,13 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-
-	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("container_registry")
+	config, err := test.GetConfig("compute_vm_scaleset")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}
@@ -33,7 +30,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("container_registry")
+	config, err := test.GetConfig("compute_vm_scaleset")
 	if err != nil {
 		t.Skip("Skipping TestFetch: " + err.Error())
 	}
