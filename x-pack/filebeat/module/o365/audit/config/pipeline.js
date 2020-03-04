@@ -255,7 +255,7 @@ function exchangeMailboxSchema(debug) {
     builder.Add("saveFields", new processor.Convert({
         fields: [
             {from: 'o365audit.MailboxOwnerUPN', to: 'user.email'},
-            {from: 'o365audit.LogonUserSid', to: 'user.id'},
+            {from: 'o365audit.LogonUserSid', to: 'user.id', type: 'string'},
             {from: 'o365audit.LogonUserDisplayName', to: 'user.full_name'},
             {from: 'o365audit.OrganizationName', to: 'organization.name'},
             {from: 'o365audit.OriginatingServer', to: 'server.address'},
@@ -431,7 +431,7 @@ function yammerSchema(debug) {
     builder.Add("saveFields", new processor.Convert({
         fields: [
             {from: 'o365audit.ActorUserId', to: 'user.email'},
-            {from: 'o365audit.ActorYammerUserId', to: 'user.id'},
+            {from: 'o365audit.ActorYammerUserId', to: 'user.id', type: 'string'},
             {from: 'o365audit.FileId', to:'file.inode'},
             {from: 'o365audit.FileName', to: 'file.name'},
             {from: 'o365audit.GroupName', to: 'group.name'},
@@ -534,7 +534,7 @@ function securityComplianceAlertsSchema(debug) {
         },
         'User': new processor.Convert({
             fields: [
-                {from: "o365audit.AlertEntityId", to: "user.id"},
+                {from: "o365audit.AlertEntityId", to: "user.id", type: 'string'},
             ],
             ignore_missing: true,
             fail_on_error: false
@@ -584,7 +584,7 @@ function AuditProcessor(tenant_names, debug) {
             {from: "o365audit.ClientIP", to: "client.address"},
             {from: "o365audit.ClientIPAddress", to: "client.address"},
             {from: "o365audit.ActorIpAddress", to: "client.address"},
-            {from: "o365audit.UserId", to: "user.id"},
+            {from: "o365audit.UserId", to: "user.id", type: "string"},
             {from: "o365audit.Workload", to: "event.provider"},
             {from: "o365audit.Operation", to: "event.action"},
             {from: "o365audit.OrganizationId", to: "organization.id"},
