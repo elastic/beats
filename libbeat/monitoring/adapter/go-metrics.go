@@ -193,7 +193,7 @@ func (r *GoMetricsRegistry) UnregisterAll() {
 	r.shadow.UnregisterAll()
 	err := r.reg.Clear()
 	if err != nil {
-		r.log.Errorf("Failed to clear registry: %v", err)
+		r.log.Errorf("Failed to clear registry: %+v", err)
 	}
 }
 

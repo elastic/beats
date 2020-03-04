@@ -183,7 +183,7 @@ func makeES(
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			log.Errorf("Invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("Invalid host param set: %s, Error: %+v", host, err)
 			return outputs.Fail(err)
 		}
 
@@ -257,7 +257,7 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
-			client.Connection.log.Errorf("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
+			client.Connection.log.Errorf("Error connecting to Elasticsearch at %v: %+v", client.Connection.URL, err)
 			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
 			errors = append(errors, err.Error())
 			continue
@@ -309,7 +309,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 	for _, host := range hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			log.Errorf("Invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("Invalid host param set: %s, Error: %+v", host, err)
 			return nil, err
 		}
 

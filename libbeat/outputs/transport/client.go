@@ -219,7 +219,7 @@ func (c *Client) SetWriteDeadline(t time.Time) error {
 func (c *Client) handleError(err error) error {
 	if err != nil {
 
-		c.log.Debugf("handle error: %v", err)
+		c.log.Debugf("handle error: %+v", err)
 
 		if nerr, ok := err.(net.Error); !(ok && (nerr.Temporary() || nerr.Timeout())) {
 			_ = c.Close()

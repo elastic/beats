@@ -97,7 +97,7 @@ func (c *client) Connect() error {
 	// try to connect
 	producer, err := sarama.NewAsyncProducer(c.hosts, &c.config)
 	if err != nil {
-		c.log.Errorf("Kafka connect fails with: %v", err)
+		c.log.Errorf("Kafka connect fails with: %+v", err)
 		return err
 	}
 
@@ -143,7 +143,7 @@ func (c *client) Publish(batch publisher.Batch) error {
 		d := &events[i]
 		msg, err := c.getEventMessage(d)
 		if err != nil {
-			c.log.Errorf("Dropping event: %v", err)
+			c.log.Errorf("Dropping event: %+v", err)
 			ref.done()
 			c.observer.Dropped(1)
 			continue
@@ -288,7 +288,7 @@ func (r *msgRef) dec() {
 			stats.Acked(success)
 		}
 
-		r.client.log.Debugf("Kafka publish failed with: %v", err)
+		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
 		stats.Acked(r.total)

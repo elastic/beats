@@ -96,7 +96,7 @@ func (c *syncClient) Close() error {
 
 func (c *syncClient) reconnect() error {
 	if err := c.Client.Close(); err != nil {
-		c.log.Errorf("error closing connection to logstash host %s: %s, reconnecting...", c.Host(), err)
+		c.log.Errorf("error closing connection to logstash host %s: %+v, reconnecting...", c.Host(), err)
 	}
 	return c.Client.Connect()
 }
@@ -155,7 +155,7 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 			}
 			_ = c.Close()
 
-			c.log.Errorf("Failed to publish events caused by: %v", err)
+			c.log.Errorf("Failed to publish events caused by: %+v", err)
 
 			rest := len(events)
 			st.Failed(rest)

@@ -110,7 +110,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
-			c.log.Errorf("Type not available in monitoring reported. Please report this error: %s", err)
+			c.log.Errorf("Type not available in monitoring reported. Please report this error: %+v", err)
 			continue
 		}
 
@@ -251,14 +251,14 @@ func logBulkFailures(log *logp.Logger, result esout.BulkResult, events []report.
 	reader := esout.NewJSONReader(result)
 	err := esout.BulkReadToItems(reader)
 	if err != nil {
-		log.Errorf("failed to parse monitoring bulk items: %v", err)
+		log.Errorf("failed to parse monitoring bulk items: %+v", err)
 		return
 	}
 
 	for i := range events {
 		status, msg, err := esout.BulkReadItemStatus(log, reader)
 		if err != nil {
-			log.Errorf("failed to parse monitoring bulk item status: %v", err)
+			log.Errorf("failed to parse monitoring bulk item status: %+v", err)
 			return
 		}
 		switch {

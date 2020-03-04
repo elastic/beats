@@ -283,7 +283,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	)
 
 	if err := k.Validate(); err != nil {
-		log.Errorf("Invalid kafka configuration: %v", err)
+		log.Errorf("Invalid kafka configuration: %+v", err)
 		return nil, err
 	}
 	return k, nil

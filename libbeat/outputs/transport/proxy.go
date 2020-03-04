@@ -80,7 +80,7 @@ func ProxyDialer(log *logp.Logger, config *ProxyConfig, forward Dialer) (Dialer,
 		if config.LocalResolve {
 			addresses, err = net.LookupHost(host)
 			if err != nil {
-				log.Warnf(`DNS lookup failure "%s": %v`, host, err)
+				log.Warnf(`DNS lookup failure "%s": %+v`, host, err)
 				return nil, err
 			}
 		} else {

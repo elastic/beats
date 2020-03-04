@@ -254,7 +254,7 @@ func (r *reporter) initLoop(c config) {
 				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying. Error: ", err)
 				logged = true
 			}
-			r.logger.Debugf("Monitoring could not connect to Elasticsearch, failed with %v", err)
+			r.logger.Debugf("Monitoring could not connect to Elasticsearch, failed with %+v", err)
 		}
 
 		select {

@@ -256,7 +256,7 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 
 			if err != nil {
 				if dropFail {
-					log.Errorf("Hashing partition key failed: %v", err)
+					log.Errorf("Hashing partition key failed: %+v", err)
 					return -1, err
 				}
 

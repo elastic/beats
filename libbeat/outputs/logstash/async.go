@@ -276,5 +276,5 @@ func (r *msgRef) dec() {
 	}
 
 	r.batch.RetryEvents(r.slice)
-	r.client.log.Errorf("Failed to publish events caused by: %v", err)
+	r.client.log.Errorf("Failed to publish events caused by: %+v", err)
 }

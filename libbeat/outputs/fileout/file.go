@@ -125,9 +125,9 @@ func (out *fileOutput) Publish(
 		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
 		if err != nil {
 			if event.Guaranteed() {
-				out.log.Errorf("Failed to serialize the event: %v", err)
+				out.log.Errorf("Failed to serialize the event: %+v", err)
 			} else {
-				out.log.Warnf("Failed to serialize the event: %v", err)
+				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
 			out.log.Debugf("Failed event: %v", event)
 
@@ -139,9 +139,9 @@ func (out *fileOutput) Publish(
 			st.WriteError(err)
 
 			if event.Guaranteed() {
-				out.log.Errorf("Writing event to file failed with: %v", err)
+				out.log.Errorf("Writing event to file failed with: %+v", err)
 			} else {
-				out.log.Warnf("Writing event to file failed with: %v", err)
+				out.log.Warnf("Writing event to file failed with: %+v", err)
 			}
 
 			dropped++

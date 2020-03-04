@@ -133,20 +133,20 @@ func (c *console) publishEvent(event *publisher.Event) bool {
 			return false
 		}
 
-		c.log.Errorf("Unable to encode event: %v", err)
+		c.log.Errorf("Unable to encode event: %+v", err)
 		c.log.Debugf("Failed event: %v", event)
 		return false
 	}
 
 	if err := c.writeBuffer(serializedEvent); err != nil {
 		c.observer.WriteError(err)
-		c.log.Errorf("Unable to publish events to console: %v", err)
+		c.log.Errorf("Unable to publish events to console: %+v", err)
 		return false
 	}
 
 	if err := c.writeBuffer(nl); err != nil {
 		c.observer.WriteError(err)
-		c.log.Errorf("Error when appending newline to event: %v", err)
+		c.log.Errorf("Error when appending newline to event: %+v", err)
 		return false
 	}
 

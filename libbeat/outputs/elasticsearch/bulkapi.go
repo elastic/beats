@@ -209,7 +209,7 @@ func bulkEncode(log *logp.Logger, out bulkWriter, metaBuilder MetaBuilder, body 
 	if metaBuilder == nil {
 		for _, obj := range body {
 			if err := out.AddRaw(obj); err != nil {
-				log.Debugf("Failed to encode message: %s", err)
+				log.Debugf("Failed to encode message: %+v", err)
 				return err
 			}
 		}
@@ -217,7 +217,7 @@ func bulkEncode(log *logp.Logger, out bulkWriter, metaBuilder MetaBuilder, body 
 		for _, obj := range body {
 			meta := metaBuilder(obj)
 			if err := out.Add(meta, obj); err != nil {
-				log.Debugf("Failed to encode event (dropping event): %s", err)
+				log.Debugf("Failed to encode event (dropping event): %+v", err)
 			}
 		}
 	}

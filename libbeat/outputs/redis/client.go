@@ -235,7 +235,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		// RPUSH returns total length of list -> fail and retry all on error
 		_, err := conn.Do(command, args...)
 		if err != nil {
-			c.log.Errorf("Failed to %v to redis list with: %v", command, err)
+			c.log.Errorf("Failed to %v to redis list with: %+v", command, err)
 			return okEvents, err
 
 		}
@@ -260,14 +260,14 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 		for i, serializedEvent := range serialized {
 			eventKey, err := key.Select(&okEvents[i].Content)
 			if err != nil {
-				c.log.Errorf("Failed to set redis key: %v", err)
+				c.log.Errorf("Failed to set redis key: %+v", err)
 				dropped++
 				continue
 			}
 
 			data = append(data, okEvents[i])
 			if err := conn.Send(command, eventKey, serializedEvent); err != nil {
-				c.log.Errorf("Failed to execute %v: %v", command, err)
+				c.log.Errorf("Failed to execute %v: %+v", command, err)
 				return okEvents, err
 			}
 		}
@@ -283,12 +283,12 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 			_, err := conn.Receive()
 			if err != nil {
 				if _, ok := err.(redis.Error); ok {
-					c.log.Errorf("Failed to %v event to list with %v",
+					c.log.Errorf("Failed to %v event to list with %+v",
 						command, err)
 					failed = append(failed, data[i])
 					lastErr = err
 				} else {
-					c.log.Errorf("Failed to %v multiple events to list with %v",
+					c.log.Errorf("Failed to %v multiple events to list with %+v",
 						command, err)
 					failed = append(failed, data[i:]...)
 					lastErr = err
@@ -315,7 +315,7 @@ func serializeEvents(
 	for _, d := range data {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %v", err)
+			log.Errorf("Encoding event failed with error: %+v", err)
 			log.Debugf("Failed event: %v", d.Content)
 			goto failLoop
 		}
@@ -333,7 +333,7 @@ failLoop:
 	for _, d := range rest {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %v", err)
+			log.Errorf("Encoding event failed with error: %+v", err)
 			log.Debugf("Failed event: %v", d.Content)
 			i++
 			continue

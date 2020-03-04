@@ -21,13 +21,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -351,7 +352,7 @@ func (client *Client) publishEvents(
 	requ.Reset(body)
 	status, result, sendErr := client.sendBulkRequest(requ)
 	if sendErr != nil {
-		client.Connection.log.Error("Failed to perform any bulk index operations: %s", sendErr)
+		client.Connection.log.Error("Failed to perform any bulk index operations: %+v", sendErr)
 		return data, sendErr
 	}
 
@@ -408,11 +409,11 @@ func bulkEncodePublishRequest(
 		event := &data[i].Content
 		meta, err := createEventBulkMeta(log, version, index, pipeline, eventType, event)
 		if err != nil {
-			log.Errorf("Failed to encode event meta data: %s", err)
+			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
 		if err := body.Add(meta, event); err != nil {
-			log.Errorf("Failed to encode event: %s", err)
+			log.Errorf("Failed to encode event: %+v", err)
 			log.Debugf("Failed event: %v", event)
 			continue
 		}
@@ -491,7 +492,7 @@ func bulkCollectPublishFails(
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
 	if err := BulkReadToItems(reader); err != nil {
-		log.Errorf("failed to parse bulk response: %v", err.Error())
+		log.Errorf("failed to parse bulk response: %+v", err)
 		return nil, bulkResultStats{}
 	}
 
@@ -501,6 +502,7 @@ func bulkCollectPublishFails(
 	for i := 0; i < count; i++ {
 		status, msg, err := BulkReadItemStatus(log, reader)
 		if err != nil {
+			log.Error(err)
 			return nil, bulkResultStats{}
 		}
 
@@ -577,33 +579,31 @@ func BulkReadItemStatus(log *logp.Logger, reader *JSONReader) (int, []byte, erro
 
 	// find first field in outer dictionary (e.g. 'create')
 	kind, _, err := reader.nextFieldName()
+	parserErr := func(err error) error {
+		return errors.Wrapf(err, "Failed to parse bulk response item")
+	}
 	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, parserErr(err)
 	}
 	if kind == dictEnd {
 		err = errUnexpectedEmptyObject
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, parserErr(err)
 	}
 
 	// parse actual item response code and error message
 	status, msg, err := itemStatusInner(log, reader)
 	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, parserErr(err)
 	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
 	if err != nil {
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, parserErr(err)
 	}
 	if kind != dictEnd {
 		err = errExpectedObjectEnd
-		log.Errorf("Failed to parse bulk response item: %s", err)
-		return 0, nil, err
+		return 0, nil, parserErr(err)
 	}
 
 	return status, msg, nil
@@ -619,7 +619,7 @@ func itemStatusInner(log *logp.Logger, reader *JSONReader) (int, []byte, error) 
 	for {
 		kind, name, err := reader.nextFieldName()
 		if err != nil {
-			log.Errorf("Failed to parse bulk response item: %s", err)
+			log.Errorf("Failed to parse bulk response item: %+v", err)
 		}
 		if kind == dictEnd {
 			break
@@ -629,7 +629,6 @@ func itemStatusInner(log *logp.Logger, reader *JSONReader) (int, []byte, error) 
 		case bytes.Equal(name, nameStatus): // name == "status"
 			status, err = reader.nextInt()
 			if err != nil {
-				log.Errorf("Failed to parse bulk response item: %s", err)
 				return 0, nil, err
 			}
 
@@ -722,7 +721,7 @@ func (conn *Connection) Connect() error {
 	}
 
 	if version, err := common.NewVersion(versionString); err != nil {
-		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
+		conn.log.Errorf("Invalid version from Elasticsearch: %s", versionString)
 		conn.version = common.Version{}
 	} else {
 		conn.version = *version
@@ -741,7 +740,7 @@ func (conn *Connection) Ping() (string, error) {
 
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
-		conn.log.Debugf("Ping request failed with: %v", err)
+		conn.log.Debugf("Ping request failed with: %+v", err)
 		return "", err
 	}
 
@@ -795,7 +794,7 @@ func (conn *Connection) RequestURL(
 	}
 
 	if err := conn.encoder.Marshal(body); err != nil {
-		conn.log.Warnf("Failed to json encode body (%v): %#v", err, body)
+		conn.log.Warnf("Failed to json encode body (%+v): %#v", err, body)
 		return 0, nil, ErrJSONEncodeFailed
 	}
 	return conn.execRequest(method, url, conn.encoder.Reader())
@@ -868,6 +867,6 @@ func (conn *Connection) GetVersion() common.Version {
 func closing(log *logp.Logger, c io.Closer) {
 	err := c.Close()
 	if err != nil {
-		log.Warnf("Close failed with: %v", err)
+		log.Warnf("Close failed with: %+v", err)
 	}
 }
