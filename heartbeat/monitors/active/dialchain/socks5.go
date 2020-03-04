@@ -22,7 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 )
 
 // SOCKS5Layer configures a SOCKS5 proxy layer in a DialerChain.

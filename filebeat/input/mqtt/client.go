@@ -20,7 +20,7 @@ package mqtt
 import (
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 
-	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 func createClientOptions(config mqttInputConfig, onConnectHandler func(client libmqtt.Client)) (*libmqtt.ClientOptions, error) {
@@ -36,7 +36,7 @@ func createClientOptions(config mqttInputConfig, onConnectHandler func(client li
 	}
 
 	if config.TLS != nil {
-		tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return nil, err
 		}

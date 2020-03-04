@@ -18,13 +18,14 @@ const (
 	defaultVMDimension     = "VMName"
 	customVMDimension      = "VirtualMachine"
 	defaultSlotIDDimension = "SlotId"
-	defaultTimeGrain       = "PT5M"
 )
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	for _, resource := range resources {
+		// return resource size
+		resourceSize := mapResourceSize(resource)
 		for _, metric := range resourceConfig.Metrics {
 			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
 			if err != nil {
@@ -61,9 +62,9 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 			for _, metricName := range supportedMetricNames {
 				if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
 					groupedMetrics[azure.NoDimension] = append(groupedMetrics[azure.NoDimension], metricName)
-				} else if containsDimension(vmdim, *metricName.Dimensions) {
+				} else if azure.ContainsDimension(vmdim, *metricName.Dimensions) {
 					groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
-				} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
+				} else if azure.ContainsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
 					groupedMetrics[defaultSlotIDDimension] = append(groupedMetrics[defaultSlotIDDimension], metricName)
 				}
 			}
@@ -76,19 +77,17 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				if key != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 				}
-				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, defaultTimeGrain)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(metricGroup, resource, "", resourceSize, metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
 			}
 		}
 	}
 	return metrics, nil
 }
 
-// containsDimension will check if the dimension value is found in the list
-func containsDimension(dimension string, dimensions []insights.LocalizableString) bool {
-	for _, dim := range dimensions {
-		if *dim.Value == dimension {
-			return true
-		}
+// mapResourceSize func will try to map if existing the resource size, for the vmss it seems that SKU is populated and resource size is mapped in the name
+func mapResourceSize(resource resources.GenericResource) string {
+	if resource.Sku != nil && resource.Sku.Name != nil {
+		return *resource.Sku.Name
 	}
-	return false
+	return ""
 }
