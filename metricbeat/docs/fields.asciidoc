@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-nginx>>
+* <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
@@ -3123,16 +3124,6 @@ The resource specified
 
 
 
-*`azure.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
 *`azure.resource.type`*::
 +
 --
@@ -3207,6 +3198,36 @@ type: object
 +
 --
 compute_vm_scaleset
+
+
+type: object
+
+--
+
+*`azure.container_instance.*.*`*::
++
+--
+container instance
+
+
+type: object
+
+--
+
+*`azure.container_registry.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
+*`azure.container_service.*.*`*::
++
+--
+container service
 
 
 type: object
@@ -29015,6 +29036,40 @@ The current number of idle client connections waiting for a request.
 
 
 type: long
+
+--
+
+[[exported-fields-openmetrics]]
+== Openmetrics fields
+
+Openmetrics module
+
+
+
+[float]
+=== openmetrics
+
+`openmetrics` contains metrics from endpoints that are following Openmetrics format.
+
+
+
+*`openmetrics.labels.*`*::
++
+--
+Prometheus metric labels
+
+
+type: object
+
+--
+
+*`openmetrics.metrics.*`*::
++
+--
+Prometheus metric
+
+
+type: object
 
 --
 

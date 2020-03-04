@@ -22,7 +22,7 @@ package webserver
 import (
 	"os"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
