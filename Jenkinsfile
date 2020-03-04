@@ -39,10 +39,9 @@ pipeline {
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
-        script {
-          if(${params.debug}){
-            dumpFilteredEnvironment()
-          }
+        whenTrue(${params.debug}){
+          dumpFilteredEnvironment()
+        }
         }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
