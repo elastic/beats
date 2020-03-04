@@ -751,7 +751,7 @@ github.com/urso/diag
 github.com/urso/diag/ctxfmt
 # github.com/urso/diag-ecs v0.0.0-20200210114345-ab085841dcb9
 github.com/urso/diag-ecs/ecs
-# github.com/urso/ecslog v0.0.0-20200210125449-b79160ce24a2
+# github.com/urso/ecslog v0.0.1
 github.com/urso/ecslog
 github.com/urso/ecslog/backend
 github.com/urso/ecslog/backend/appender

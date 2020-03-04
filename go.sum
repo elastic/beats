@@ -628,8 +628,8 @@ github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 h1:OHNw/6pXODJAB32NujjdQ
 github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797/go.mod h1:pNWFTeQ+V1OYT/TzWpnWb6eQBdoXpdx+H+lrH97/Oyo=
 github.com/urso/diag-ecs v0.0.0-20200210114345-ab085841dcb9 h1:GzsakegdLNhw0mF2fcFd+BgdY8owV+4Y+6MvbgRXIWg=
 github.com/urso/diag-ecs v0.0.0-20200210114345-ab085841dcb9/go.mod h1:+1Ug5A104KCMD8ZZ4YarKGNSt8ANJWA7nWqji37BmrQ=
-github.com/urso/ecslog v0.0.0-20200210125449-b79160ce24a2 h1:rwJZHCBl7k2Sw89uP4sKk2VSlN1MpIPCPlS/3pioqXc=
-github.com/urso/ecslog v0.0.0-20200210125449-b79160ce24a2/go.mod h1:wky/kxUyw0VJw/HlXal+7oTT2YDU1KAWrxbuKRFblEI=
+github.com/urso/ecslog v0.0.1 h1:Candk+au3CbAT5SpVMhTE3VIq0r09UJely7vUzVAfF0=
+github.com/urso/ecslog v0.0.1/go.mod h1:wky/kxUyw0VJw/HlXal+7oTT2YDU1KAWrxbuKRFblEI=
 github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e h1:NiofbjIUI5gR+ybDsGSVH1fWyjSeDYiYVJHT1+kcsak=
 github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e/go.mod h1:6GfHrdWBQYjFRIznu7XuQH4lYB2w8nO4bnImVKkzPOM=
 github.com/urso/magetools v0.0.0-20190919040553-290c89e0c230/go.mod h1:DFxTNgS/ExCGmmjVjSOgS2WjtfjKXgCyDzAFgbtovSA=
