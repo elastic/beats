@@ -25,8 +25,8 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // PromEvent stores a set of one or more metrics with the same labels
