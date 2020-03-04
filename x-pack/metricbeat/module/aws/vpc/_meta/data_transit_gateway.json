@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/TransitGateway"
+        },
+        "dimensions": {
+            "TransitGateway": "tgw-0630672a32f12808a"
+        },
+        "transitgateway": {
+            "metrics": {
+                "BytesIn": {
+                    "sum": 0
+                },
+                "BytesOut": {
+                    "sum": 0
+                },
+                "PacketDropCountBlackhole": {
+                    "sum": 0
+                },
+                "PacketDropCountNoRoute": {
+                    "sum": 0
+                },
+                "PacketsIn": {
+                    "sum": 0
+                },
+                "PacketsOut": {
+                    "sum": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-west-2"
+    },
+    "event": {
+        "dataset": "aws.vpc",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "vpc",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
