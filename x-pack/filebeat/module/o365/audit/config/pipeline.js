@@ -725,6 +725,25 @@ function AuditProcessor(tenant_names, debug) {
         'Yammer': yammerSchema(debug).Run,
     }));
 
+    builder.Add("extractClientIPv4Port", new processor.Dissect({
+        tokenizer: '%{ip}:%{port}',
+        field: 'client.address',
+        target_prefix: 'client',
+        'when.and': [
+            {'contains.client.address': '.'},
+            {'contains.client.address': ':'},
+        ],
+    }));
+    builder.Add("extractClientIPv6Port", new processor.Dissect({
+        tokenizer: '[%{ip}]:%{port}',
+        field: 'client.address',
+        target_prefix: 'client',
+        'when.and': [
+            {'contains.client.address': '['},
+            {'contains.client.address': ':'},
+        ],
+    }));
+
     // Copy the client/server.address to .ip fields if they are valid IPs.
     builder.Add("convertIPs", new processor.Convert({
         fields: [
@@ -738,6 +757,7 @@ function AuditProcessor(tenant_names, debug) {
     builder.Add("setSrcDstFields", new processor.Convert({
         fields: [
             {from: "client.ip", to: "source.ip"},
+            {from: "client.port", to: "source.port"},
             {from: "server.ip", to: "destination.ip"},
         ],
         ignore_missing: true,
