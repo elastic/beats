@@ -68,7 +68,7 @@ func TestLoadManifestNginx(t *testing.T) {
 func TestGetBuiltinVars(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 
-	vars, err := fs.getBuiltinVars("filebeat", "6.6.0")
+	vars, err := fs.getBuiltinVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")

@@ -154,7 +154,7 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) {
 	var err error
 	vars := map[string]interface{}{}
-	vars["builtin"], err = fs.getBuiltinVars(info.IndexPrefix, info.Version)
+	vars["builtin"], err = fs.getBuiltinVars(info)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
-func (fs *Fileset) getBuiltinVars(prefix, version string) (map[string]interface{}, error) {
+func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error) {
 	host, err := os.Hostname()
 	if err != nil || len(host) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %v", err)
@@ -317,12 +317,12 @@ func (fs *Fileset) getBuiltinVars(prefix, version string) (map[string]interface{
 	}
 
 	return map[string]interface{}{
-		"prefix":      prefix,
+		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
 		"domain":      domain,
 		"module":      fs.mcfg.Module,
 		"fileset":     fs.name,
-		"beatVersion": version,
+		"beatVersion": info.Version,
 	}, nil
 }
 
