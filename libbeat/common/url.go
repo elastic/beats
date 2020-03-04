@@ -93,7 +93,7 @@ func ParseURL(raw string, hints ...ParseHint) (*url.URL, error) {
 	}
 
 	u, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(u.Scheme, "http") {
+	if err == nil {
 		return u, err
 	}
 
