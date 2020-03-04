@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -80,7 +79,6 @@ func Vendor() error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(path)
 
 		for _, f := range p.filesToCopy {
 			from := filepath.Join(path, f)
