@@ -268,8 +268,7 @@ stress-tests:
 # Run benchmark tests
 .PHONY: benchmark-tests
 benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
-	# No benchmark tests exist so far
-	#go test -bench=. ${GOPACKAGES}
+	go test -bench=. ${GOPACKAGES}
 
 # Run load tests
 .PHONY: load-tests
