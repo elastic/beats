@@ -7051,7 +7051,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/urso/ecslog
-Revision: b79160ce24a2
+Version: v0.0.1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/urso/ecslog/LICENSE:
 --------------------------------------------------------------------
