@@ -65,7 +65,7 @@ func create(
 	}
 
 	return newDiskSpool(log, path, settings{
-		Eventer:           eventer,
+		ACKListener:       ackListener,
 		Mode:              config.File.Permissions,
 		WriteBuffer:       uint(config.Write.BufferSize),
 		WriteFlushTimeout: config.Write.FlushTimeout,
