@@ -29,5 +29,5 @@ func DialWith(
 	addresses []string,
 	port string,
 ) (c net.Conn, err error) {
-	return transport.DialWith(dialer, network, addresses, port)
+	return transport.DialWith(dialer, network, host, addresses, port)
 }
