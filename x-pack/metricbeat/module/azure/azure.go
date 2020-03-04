@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Config options
 type Config struct {
-	ClientID            string           `config:"client_id"    validate:"required"`
+	ClientId            string           `config:"client_id"    validate:"required"`
 	ClientSecret        string           `config:"client_secret" validate:"required"`
-	TenantID            string           `config:"tenant_id" validate:"required"`
-	SubscriptionID      string           `config:"subscription_id" validate:"required"`
+	TenantId            string           `config:"tenant_id" validate:"required"`
+	SubscriptionId      string           `config:"subscription_id" validate:"required"`
 	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
@@ -29,7 +29,7 @@ type Config struct {
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID          []string       `config:"resource_id"`
+	Id          []string       `config:"resource_id"`
 	Group       []string       `config:"resource_group"`
 	Metrics     []MetricConfig `config:"metrics"`
 	Type        string         `config:"resource_type"`
@@ -106,14 +106,16 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
 		var resources []ResourceConfig
 		for _, resource := range config.Resources {
-			if len(resource.Group) != 0 || len(resource.ID) != 0 {
+			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.Id) {
 				resources = append(resources, resource)
 			}
 		}
+		// check if this is a light metricset or not and no resources have been configured
 		if len(resources) == 0 && len(config.Resources) != 0 {
-			res := config.Resources[0]
-			res.Query = fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType)
-			resources = append(resources, res)
+			resources = append(resources, ResourceConfig{
+				Query:   fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType),
+				Metrics: config.Resources[0].Metrics,
+			})
 		}
 		config.Resources = resources
 	}
@@ -151,4 +153,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}
 	return nil
+}
+
+// hasConfigOptions func will check if any resource id or resource group options have been entered in the light metricsets
+func hasConfigOptions(config []string) bool {
+	if config == nil {
+		return false
+	}
+	for _, group := range config {
+		if group == "" {
+			return false
+		}
+	}
+	return true
 }

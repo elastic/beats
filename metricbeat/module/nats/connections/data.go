@@ -20,12 +20,12 @@ package connections
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
 
 var (

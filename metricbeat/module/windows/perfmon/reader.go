@@ -25,13 +25,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)

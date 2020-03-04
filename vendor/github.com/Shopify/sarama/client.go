@@ -803,6 +803,11 @@ func (client *client) tryRefreshMetadata(topics []string, attemptsRemaining int,
 				Logger.Println("client/metadata failed SASL authentication")
 				return err
 			}
+
+			if err.(KError) == ErrTopicAuthorizationFailed {
+				Logger.Println("client is not authorized to access this topic. The topics were: ", topics)
+				return err
+			}
 			// else remove that broker and try again
 			Logger.Printf("client/metadata got error from broker %d while fetching metadata: %v\n", broker.ID(), err)
 			_ = broker.Close()
@@ -966,6 +971,10 @@ func (client *client) getConsumerMetadata(consumerGroup string, attemptsRemainin
 			}
 
 			return retry(ErrConsumerCoordinatorNotAvailable)
+		case ErrGroupAuthorizationFailed:
+			Logger.Printf("client was not authorized to access group %s while attempting to find coordinator", consumerGroup)
+			return retry(ErrGroupAuthorizationFailed)
+
 		default:
 			return nil, response.Err
 		}
