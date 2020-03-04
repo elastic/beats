@@ -292,7 +292,7 @@
       },
       "references": [
         {
-          "id": "99198ae0-5a46-11ea-9dd7-5195965709e4",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
@@ -417,7 +417,7 @@
       },
       "references": [
         {
-          "id": "99198ae0-5a46-11ea-9dd7-5195965709e4",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
@@ -475,7 +475,7 @@
       },
       "references": [
         {
-          "id": "99198ae0-5a46-11ea-9dd7-5195965709e4",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
