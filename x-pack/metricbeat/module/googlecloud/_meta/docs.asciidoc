@@ -59,3 +59,21 @@ A recommended `period` value between fetches is between 5 and 10 minutes, depend
 Google Cloud Platform pricing depends of the number of requests you do to their API's. Here you have some information that you can use to make an estimation of the pricing you should expect. For example, imagine that you have a Compute Metricset activated and you don't want to exclude labels. You have a total of 20 instances running in a particular GCP project, region and zone.
 
 For example, if Compute Metricset fetches 14 metrics (which is the number of metrics fetched in the early beta version). Each of those metrics will attempt an API call to Compute API to retrieve also their metadata. Because you have 20 different instances, the total number of API calls that will be done on each refresh period are: 14 metrics + 20 instances = 34 API requests every 5 minutes if that is your current Period. 9792 API requests per day with one zone. If you add 2 zones more with the same amount of instances you'll have 19584 API requests per day (9792 on each zone) or around 587520 per month for the Compute Metricset. This maths must be done for each different Metricset with slight variations.
+
+[float]
+== Metricsets
+Currently, we have `compute`, `loadbalancing`, and `pubsub` metricset in
+`googlecloud` module.
+
+[float]
+=== `compute`
+Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine]
+Virtual Machines in Google Cloud Platform. The `compute` Metricset contains some of the
+metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API].
+Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
+This is enough to get most of the info associated with a metric like compute
+labels and metadata and metric specific Labels.
+
+The compute metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-compute-overview.png[]
