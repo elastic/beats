@@ -60,3 +60,30 @@ func TestData(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestXPackEnabled(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "metricbeat")
+
+	config := getXPackConfig(service.Host())
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
+
+		event := events[0]
+		require.Equal(t, "beats_"+metricSet.Name(), event.RootFields["type"])
+		require.Equal(t, event.RootFields["cluster_uuid"], "foobar")
+		require.Regexp(t, `^.monitoring-beats-\d-mb`, event.Index)
+	}
+}
+
+func getXPackConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":        beat.ModuleName,
+		"metricsets":    metricSets,
+		"hosts":         []string{host},
+		"xpack.enabled": true,
+	}
+}
