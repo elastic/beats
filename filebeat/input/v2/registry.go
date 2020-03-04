@@ -21,9 +21,10 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/urso/sderr"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/urso/sderr"
 )
 
 // Registry that store a number of plugins.

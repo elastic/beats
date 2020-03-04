@@ -24,8 +24,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/elastic/go-concert/ctxtool"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 // Loader creates an Input instance. The input created
