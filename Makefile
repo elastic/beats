@@ -190,7 +190,7 @@ release-manager-snapshot:
 release-manager-release:
 	./dev-tools/run_with_go_ver $(MAKE) release
 
-## beats-dashboardse : Collects dashboards from all Beats and generates a zip file distribution.
+## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
 beats-dashboards: mage update
 	@mage packageBeatDashboards
