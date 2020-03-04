@@ -6,8 +6,10 @@ package azure
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -15,8 +17,9 @@ import (
 
 const (
 	// NoDimension is used to group metrics in separate api calls in order to reduce the number of executions
-	NoDimension     = "none"
-	nativeMetricset = "monitor"
+	NoDimension           = "none"
+	nativeMetricset       = "monitor"
+	replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
 )
 
 // EventsMapping will map metric values to beats events
@@ -32,7 +35,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 			continue
 		}
 		// build a resource key with unique resource namespace combination
-		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.ID, metric.Namespace)
+		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.Id, metric.Namespace)
 		groupByResourceNamespace[resNamkey] = append(groupByResourceNamespace[resNamkey], metric)
 	}
 	// grouping metrics by the dimensions configured
@@ -106,6 +109,9 @@ func managePropertyName(metric string) string {
 	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	// replace uppercases with underscores
+	resultMetricName = replaceUpperCase(resultMetricName)
+
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
 	obj := strings.Split(resultMetricName, ".")
 	for index := range obj {
@@ -118,13 +124,29 @@ func managePropertyName(metric string) string {
 	return resultMetricName
 }
 
+// replaceUpperCase func will replace upper case with '_'
+func replaceUpperCase(src string) string {
+	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
+	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
+		var newStr string
+		for _, r := range str {
+			// split into fields based on class of unicode character
+			if unicode.IsUpper(r) {
+				newStr += "_" + strings.ToLower(string(r))
+			} else {
+				newStr += string(r)
+			}
+		}
+		return newStr
+	})
+}
+
 // createEvent will create a new base event
 func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) (mb.Event, common.MapStr) {
 	event := mb.Event{
 		ModuleFields: common.MapStr{
 			"timegrain": metric.TimeGrain,
 			"resource": common.MapStr{
-				"name":  metric.Resource.Name,
 				"type":  metric.Resource.Type,
 				"group": metric.Resource.Group,
 			},
@@ -150,7 +172,15 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.RootFields.Put("cloud.region", metric.Resource.Location)
-
+	event.RootFields.Put("cloud.instance.name", metric.Resource.Name)
+	if metric.Resource.SubId != "" {
+		event.RootFields.Put("cloud.instance.id", metric.Resource.SubId)
+	} else {
+		event.RootFields.Put("cloud.instance.id", metric.Resource.Id)
+	}
+	if metric.Resource.Size != "" {
+		event.RootFields.Put("cloud.machine.type", metric.Resource.Size)
+	}
 	metricList := common.MapStr{}
 	for _, value := range metricValues {
 		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
