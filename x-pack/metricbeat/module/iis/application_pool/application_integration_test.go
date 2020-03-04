@@ -10,33 +10,31 @@ package application_pool
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/test"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
-	config := map[string]interface{}{
-		"module":     "iis",
-		"period":     "30s",
-		"metricsets": []string{"application_pool"},
+	if err := test.EnsureIISIsRunning(); err != nil {
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	_, errs := mbtest.ReportingFetchV2Error(metricSet)
+	m := mbtest.NewFetcher(t, test.GetConfig("application_pool"))
+	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
-		// should find a way to first check if iis is running
-		//t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 }
 
 func TestData(t *testing.T) {
-	config := map[string]interface{}{
-		"module":     "iis",
-		"period":     "30s",
-		"metricsets": []string{"application_pool"},
+	if err := test.EnsureIISIsRunning(); err != nil {
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, test.GetConfig("application_pool"))
 	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		// should find a way to first check if iis is running
-		//	t.Fatal("write", err)
+		t.Fatal("write", err)
 	}
 }

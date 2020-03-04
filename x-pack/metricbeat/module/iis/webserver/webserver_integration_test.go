@@ -10,6 +10,10 @@ package webserver
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/test"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
@@ -17,27 +21,24 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
 )
 
-func TestData(t *testing.T) {
-	c := map[string]interface{}{
-		"module":     "iis",
-		"metricsets": []string{"webserver"},
+func TestFetch(t *testing.T) {
+	if err := test.EnsureIISIsRunning(); err != nil {
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, c)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		// should find a way to first check if iis is running
-		//	t.Fatal("write", err)
+	m := mbtest.NewFetcher(t, test.GetConfig("webserver"))
+	events, errs := m.FetchEvents()
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 }
 
-func TestFetch(t *testing.T) {
-	c := map[string]interface{}{
-		"module":     "iis",
-		"metricsets": []string{"webserver"},
+func TestData(t *testing.T) {
+	if err := test.EnsureIISIsRunning(); err != nil {
+		t.Skip("Skipping TestFetch: " + err.Error())
 	}
-	m := mbtest.NewFetcher(t, c)
-	_, errs := m.FetchEvents()
-	if len(errs) > 0 {
-		// should find a way to first check if iis is running
-		//t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, test.GetConfig("webserver"))
+	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
+		t.Fatal("write", err)
 	}
 }
