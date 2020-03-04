@@ -1,6 +1,9 @@
 # agent
 build/
 agent.dev.yml
+cmd/agent/agent
+cmd/agent/agent.yml
+cmd/agent/fleet.yml
 pkg/agent/operation/tests/scripts/short--1.0.yml
 pkg/agent/operation/tests/scripts/configurable-1.0-darwin-x86/configurable
 pkg/agent/operation/tests/scripts/configurablebyfile-1.0-darwin-x86/configurablebyfile

@@ -4,9 +4,9 @@
 outputs:
   default:
     type: elasticsearch
-    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
-    username: elastic
-    password: changeme
+    hosts: '${ELASTICSEARCH_HOSTS:http://elasticsearch:9200}'
+    username: '${ELASTICSEARCH_USERNAME:elastic}'
+    password: '${ELASTICSEARCH_PASSWORD:changeme}'
 
 streams:
   - type: event/file
@@ -14,6 +14,14 @@ streams:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
+  - type: metric/system
+    metricsets:
+      - cpu
+      - memory
+    enabled: true
+    period: 10s
+    processes: ['.*']
+    cpu.metrics:  ["percentages"]
 
 management:
   # Mode of management, the agent support two modes of operation:
