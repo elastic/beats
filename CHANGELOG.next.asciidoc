@@ -276,7 +276,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
 - Add OpenMetrics Metricbeat module {pull}16596[16596]
-- Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 
