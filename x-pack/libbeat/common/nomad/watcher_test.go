@@ -13,9 +13,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	api "github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 const (
