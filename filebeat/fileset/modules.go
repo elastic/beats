@@ -108,7 +108,7 @@ func newModuleRegistry(modulesPath string,
 				}
 			}
 			if !found {
-				return nil, fmt.Errorf("Fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
+				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
 		}
 	}
