@@ -26,14 +26,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
-func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (Dialer, error) {
+type TLSConfig = tlscommon.TLSConfig
+
+type TLSVersion = tlscommon.TLSVersion
+
+func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) (Dialer, error) {
 	return transport.TLSDialer(forward, config, timeout)
 }
 
 func TestTLSDialer(
 	d testing.Driver,
 	forward Dialer,
-	config *tlscommon.TLSConfig,
+	config *TLSConfig,
 	timeout time.Duration,
 ) (Dialer, error) {
 	return transport.TestTLSDialer(d, forward, config, timeout)
