@@ -31,6 +31,6 @@ var (
 	ErrNotConnected = transport.ErrNotConnected
 )
 
-func Dial(c Config, network, address string) (net.Conn, error) {
-	return transport.Dial(c, network, address)
+func Dial(c *Config, network, address string) (net.Conn, error) {
+	return transport.Dial(*c, network, address)
 }
