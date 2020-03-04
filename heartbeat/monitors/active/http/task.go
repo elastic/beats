@@ -29,8 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -39,7 +37,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
 var userAgent = useragent.UserAgent("Heartbeat", true)
@@ -79,7 +78,7 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -106,7 +105,7 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator multiValidator,

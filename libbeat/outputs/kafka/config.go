@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
 
@@ -162,7 +161,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
