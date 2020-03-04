@@ -25,6 +25,10 @@ type Client = transport.Client
 
 type Config = transport.Config
 
+func MakeDialer(c *Config) (Dialer, error) {
+	return transport.MakeDialer(c)
+}
+
 func NewClient(c Config, network, host string, defaultPort int) (*Client, error) {
 	return transport.NewClient(c, network, host, defaultPort)
 }

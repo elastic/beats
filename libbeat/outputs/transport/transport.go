@@ -34,7 +34,3 @@ var (
 func Dial(c Config, network, address string) (net.Conn, error) {
 	return transport.Dial(c, network, address)
 }
-
-func MakeDialer(c Config) (Dialer, error) {
-	return transport.MakeDialer(c)
-}
