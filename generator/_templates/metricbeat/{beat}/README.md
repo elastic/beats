@@ -33,14 +33,11 @@ make collect
 
 This updates all fields and docs with the most recent changes.
 
-## Use vendoring
+## Dependency management
 
-We recommend to use vendoring for your beat. This means the dependencies are put into your beat folder. The beats team currently uses [govendor](https://github.com/kardianos/govendor) for vendoring.
+Beats uses go modules for dependency management.
 
-```
-govendor init
-govendor update +e
-```
+In order to maintain your `vendor` folder, run `mage copyVendor`.
 
 This will create a directory `vendor` inside your repository. To make sure all dependencies for the Makefile commands are loaded from the vendor directory, find the following line in your Makefile:
 
@@ -50,7 +47,7 @@ ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 
 Replace it with:
 ```
-ES_BEATS=./vendor/github.com/elastic/beats
+ES_BEATS=./vendor/github.com/elastic/beats/v7
 ```
 
 
