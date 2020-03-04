@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
 - Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
+- Add `o365audit` input type for consuming events from Office 365 Management Activity API. {issue}16196[16196] {pull}16244[16244]
 
 *Heartbeat*
 
