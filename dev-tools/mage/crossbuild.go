@@ -31,7 +31,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const defaultCrossBuildTarget = "golangCrossBuild"
@@ -215,7 +215,7 @@ func (b GolangCrossBuilder) Build() error {
 		return errors.Wrap(err, "failed to determine repo root and package sub dir")
 	}
 
-	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.RootImportPath))
+	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
 	// use custom dir for build if given, subdir if not:
 	cwd := repoInfo.SubDir
 	if b.InDir != "" {
@@ -247,6 +247,10 @@ func (b GolangCrossBuilder) Build() error {
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
+	if UseVendor {
+		args = append(args, "--env", "GOFLAGS=-mod=vendor")
+	}
+
 	args = append(args,
 		"--rm",
 		"--env", "MAGEFILE_VERBOSE="+verbose,

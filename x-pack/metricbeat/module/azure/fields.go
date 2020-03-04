@@ -7,7 +7,7 @@
 package azure
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetAzure returns asset data.
 // This is the base64 encoded gzipped contents of module/azure.
 func AssetAzure() string {
-	return "eJzUVDtPwzAQ3vMrThkrtT8gAxISCwMbe+Tal2AaP+QHqPx65KR1nXcLHcCDpfjO3+Pu4i0c8FgA+fIGMwDHXYMF5O13ngEwtNRw7biSBTxkANDlglDMN+GKwQaJxQL26EgGUHFsmC3a1C1IIvACH5Y7aiygNsrr08kERx8mhTJolTcUY2AKcRa1W69vGHHAaqS84siSlCF5KiDsvcBZwAGPn8qwQWxBxllKQARVgUtkTVIHnvtSh+tXUQ+rewfu2IExdjRMarvbTNKq/TtSNwh1h+WSsCSlFERrLutTfr7JbzPx2P4I0UYrdjSvYbeaTAzsWN/KyEYosNggdcnIntms30eIkrPfc6aA8Pw0ImRcoLRcyX6fZnq00p9re7OgueuJQGc4TcWNhFMltHdYfojdpid9+J7dYqlqFJkJ/tTQReeChdJS0qBF91+8RMExPnInlOROmdV3fs7jgo4x9NKD3w2THZR2oYyrpbylnCtWwnrpBIJB541EtpsvqnXKkBr/9picRAKhVHnpsu8AAAD//wCRS6g="
+	return "eJzUlr+O2zAMxvc8BZExwOUBPBQo0KVDt+6GIjMue7ZkkPQV6dMXjm2d/D/p3ZBoCBBJ/r7fJ9KCX+AVLwmYvzXjDkBJC0xgf/2/3wFkKJapUvIugS87AGj3QumzumgeYSzQCCZwQjU7gDNhkUly3foCzpT4Lt8MvVSYQM6+rrqZGY+hTCylVGLOhlxY6SVf8fLHcxbNzwq34+cvhK9tEFQmO6PbOzKKr9nixDDOcINdrwNSoaUzYYw6jhsDNL+DheXEGxg9SqMI/gwaYc1aNz6fa908fpP1+HQ/wTtUYKodAptcjodZW3/6jVZHS+1kugYWbUlLU1Xk8m7//rC/L0TbsSHGFXbSr82vVGamYe9+Q4IUCBZoNWrZ3k3qU5BIKfu4ZywI379NDDMq0Ql5N6zTQo026nNrbVaYB7dIBDcBt76sasX0rTweBujjG/SeSOfCm4XF/w30zrkSIRVrChTUZ8kSgMP6TDqnhhxySk7UOIuPHq7jhZ53JRJjTqJ8eZZIPe9KJEF+o+cpUoc7vdCMmpMRTI21vnYP/kb1tNDRTuKU3pF63vxaWsq14j2VXvtsaq9kGR3nytFtHt89R7gRpRk/WkBg1JodZsflq0nUs8kfvNU7yNAZ/wIAAP//ilZVQA=="
 }

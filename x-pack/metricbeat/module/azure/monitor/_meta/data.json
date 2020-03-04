@@ -4,6 +4,7 @@
         "type":"azure"
     },
     "azure":{
+        "timegrain" : "PT1M",
         "subscriptionID":"123456-qwer-1234-5678-12345678",
         "metrics":{
             "percentage_cpu":{

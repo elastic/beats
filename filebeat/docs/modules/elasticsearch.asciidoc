@@ -14,14 +14,12 @@ This is the elasticsearch module.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The Elasticsearch module is compatible with Elasticsearch 6.2 and newer.
-
-
-include::../include/running-modules.asciidoc[]
-
 
 include::../include/configuring-intro.asciidoc[]
 

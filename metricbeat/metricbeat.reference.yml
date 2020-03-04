@@ -315,6 +315,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -345,6 +347,18 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -1216,7 +1230,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1315,7 +1329,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1749,7 +1763,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -1835,6 +1848,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true

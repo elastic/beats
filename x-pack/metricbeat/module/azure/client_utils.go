@@ -188,3 +188,13 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	}
 	return grouped
 }
+
+// ContainsDimension will check if the dimension value is found in the list
+func ContainsDimension(dimension string, dimensions []insights.LocalizableString) bool {
+	for _, dim := range dimensions {
+		if *dim.Value == dimension {
+			return true
+		}
+	}
+	return false
+}

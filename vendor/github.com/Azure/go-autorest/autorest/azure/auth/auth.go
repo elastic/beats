@@ -715,7 +715,7 @@ type MSIConfig struct {
 
 // Authorizer gets the authorizer from MSI.
 func (mc MSIConfig) Authorizer() (autorest.Authorizer, error) {
-	msiEndpoint, err := adal.GetMSIVMEndpoint()
+	msiEndpoint, err := adal.GetMSIEndpoint()
 	if err != nil {
 		return nil, err
 	}
