@@ -1,5 +1,5 @@
 # Module: openmetrics
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-openmetrics.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-openmetrics.html
 
 - module: openmetrics
   metricsets: ['collector']
