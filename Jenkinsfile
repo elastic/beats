@@ -42,7 +42,7 @@ pipeline {
         whenTrue(${params.debug}){
           dumpFilteredEnvironment()
         }
-        }
+      }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
@@ -532,6 +532,9 @@ pipeline {
 }
 
 def makeTarget(context, target, clean = true){
+  whenTrue(${params.debug}){
+    dumpFilteredEnvironment()
+  }
   withGithubNotify(context: "${context}") {
     withBeatsEnv(){
       sh(label: "Make ${target}", script: """
@@ -546,6 +549,9 @@ def makeTarget(context, target, clean = true){
 }
 
 def mageTargetWin(context, target){
+  whenTrue(${params.debug}){
+    dumpFilteredEnvironment()
+  }
   withGithubNotify(context: "${context}") {
     withBeatsEnvWin(){
       bat(label: "Mage ${target}", script: """
