@@ -15,14 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package crawler
+package beater
 
 import (
 	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/registrar"
@@ -30,43 +29,45 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
 )
 
-type Crawler struct {
+type crawler struct {
 	inputs          map[uint64]*input.Runner
 	inputConfigs    []*common.Config
 	out             channel.Factory
 	wg              sync.WaitGroup
-	InputsFactory   cfgfile.RunnerFactory
-	ModulesFactory  cfgfile.RunnerFactory
+	inputsFactory   cfgfile.RunnerFactory
+	modulesFactory  cfgfile.RunnerFactory
 	modulesReloader *cfgfile.Reloader
 	inputReloader   *cfgfile.Reloader
 	once            bool
-	beatVersion     string
 	beatDone        chan struct{}
 }
 
-func New(out channel.Factory, inputConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
-	return &Crawler{
-		out:          out,
-		inputs:       map[uint64]*input.Runner{},
-		inputConfigs: inputConfigs,
-		once:         once,
-		beatVersion:  beatVersion,
-		beatDone:     beatDone,
+func newCrawler(
+	inputFactory, module cfgfile.RunnerFactory,
+	out channel.Factory,
+	inputConfigs []*common.Config,
+	beatDone chan struct{},
+	once bool,
+) (*crawler, error) {
+	return &crawler{
+		out:            out,
+		inputs:         map[uint64]*input.Runner{},
+		inputsFactory:  inputFactory,
+		modulesFactory: module,
+		inputConfigs:   inputConfigs,
+		once:           once,
+		beatDone:       beatDone,
 	}, nil
 }
 
 // Start starts the crawler with all inputs
-func (c *Crawler) Start(
+func (c *crawler) Start(
 	pipeline beat.Pipeline,
 	r *registrar.Registrar,
 	configInputs *common.Config,
 	configModules *common.Config,
-	pipelineLoaderFactory fileset.PipelineLoaderFactory,
-	overwritePipelines bool,
 ) error {
 
 	logp.Info("Loading Inputs: %v", len(c.inputConfigs))
@@ -79,27 +80,25 @@ func (c *Crawler) Start(
 		}
 	}
 
-	c.InputsFactory = input.NewRunnerFactory(c.out, r, c.beatDone)
 	if configInputs.Enabled() {
 		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
-		if err := c.inputReloader.Check(c.InputsFactory); err != nil {
+		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return err
 		}
 
 		go func() {
-			c.inputReloader.Run(c.InputsFactory)
+			c.inputReloader.Run(c.inputsFactory)
 		}()
 	}
 
-	c.ModulesFactory = fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, overwritePipelines, c.beatDone)
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
-		if err := c.modulesReloader.Check(c.ModulesFactory); err != nil {
+		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return err
 		}
 
 		go func() {
-			c.modulesReloader.Run(c.ModulesFactory)
+			c.modulesReloader.Run(c.modulesFactory)
 		}()
 	}
 
@@ -108,7 +107,7 @@ func (c *Crawler) Start(
 	return nil
 }
 
-func (c *Crawler) startInput(
+func (c *crawler) startInput(
 	pipeline beat.Pipeline,
 	config *common.Config,
 	states []file.State,
@@ -135,7 +134,7 @@ func (c *Crawler) startInput(
 	return nil
 }
 
-func (c *Crawler) Stop() {
+func (c *crawler) Stop() {
 	logp.Info("Stopping Crawler")
 
 	asyncWaitStop := func(stop func()) {
@@ -165,6 +164,6 @@ func (c *Crawler) Stop() {
 	logp.Info("Crawler stopped")
 }
 
-func (c *Crawler) WaitForCompletion() {
+func (c *crawler) WaitForCompletion() {
 	c.wg.Wait()
 }
