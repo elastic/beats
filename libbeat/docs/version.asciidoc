@@ -1,4 +1,4 @@
-:stack-version: 7.6.0
+:stack-version: 7.6.1
 :doc-branch: 7.6
 :go-version: 1.13.8
 :release-state: released
