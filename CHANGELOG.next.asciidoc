@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 
 *Filebeat*
 
@@ -46,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
@@ -104,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
+- Fix detection and logging of some error cases with light modules. {pull}14706[14706]
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 
@@ -157,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
 - Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
+- Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
 
 *Heartbeat*
 
