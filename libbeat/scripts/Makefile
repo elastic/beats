@@ -1,12 +1,13 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
 BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_FULL_NAME?=${BEAT_NAME}
 LICENSE?=ASL2
 BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEATS_ROOT?=github.com/elastic/beats
 BEATS_ROOT_IMPORT_PATH?=${BEATS_ROOT}/v7
 BEAT_PATH?=${BEATS_ROOT}/${BEAT_NAME}
-BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_NAME}
+BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_FULL_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
 BEAT_INDEX_PREFIX?=${BEAT_NAME}
 BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
