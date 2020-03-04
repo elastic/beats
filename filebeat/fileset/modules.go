@@ -89,7 +89,7 @@ func newModuleRegistry(modulesPath string,
 			if err != nil {
 				return nil, err
 			}
-			err = fileset.Read(beatInfo.Version)
+			err = fileset.Read(beatInfo)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
