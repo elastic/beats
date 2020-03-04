@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of GCP Compute Metrics",
+        "description": "Overview of Googlecloud Compute Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -180,7 +180,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat GCP] Compute Overview",
+        "title": "[Metricbeat Googlecloud] Compute Overview",
         "version": 1
       },
       "id": "f40ee870-5e4a-11ea-a4f6-717338406083",
@@ -240,8 +240,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-03-04T19:49:48.574Z",
-      "version": "WzgyOSwzXQ=="
+      "updated_at": "2020-03-04T21:47:45.006Z",
+      "version": "Wzg0MywzXQ=="
     },
     {
       "attributes": {
@@ -255,7 +255,7 @@
             }
           }
         },
-        "title": "Availability Zone Filter [Metricbeat GCP]",
+        "title": "Availability Zone Filter [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -282,7 +282,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Availability Zone Filter [Metricbeat GCP]",
+          "title": "Availability Zone Filter [Metricbeat Googlecloud]",
           "type": "input_control_vis"
         }
       },
@@ -298,8 +298,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:07:41.980Z",
-      "version": "Wzc4NywzXQ=="
+      "updated_at": "2020-03-04T21:46:31.516Z",
+      "version": "WzgzNCwzXQ=="
     },
     {
       "attributes": {
@@ -307,7 +307,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute CPU Utilization [Metricbeat GCP]",
+        "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -355,7 +355,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute CPU Utilization [Metricbeat GCP]",
+          "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -365,8 +365,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T18:41:36.112Z",
-      "version": "Wzc3MSwzXQ=="
+      "updated_at": "2020-03-04T21:45:39.030Z",
+      "version": "WzgzMCwzXQ=="
     },
     {
       "attributes": {
@@ -380,7 +380,7 @@
             }
           }
         },
-        "title": "Compute Instance Filter [Metricbeat GCP]",
+        "title": "Compute Instance Filter [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -407,7 +407,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Compute Instance Filter [Metricbeat GCP]",
+          "title": "Compute Instance Filter [Metricbeat Googlecloud]",
           "type": "input_control_vis"
         }
       },
@@ -423,8 +423,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:09:08.595Z",
-      "version": "Wzc4OCwzXQ=="
+      "updated_at": "2020-03-04T21:46:02.862Z",
+      "version": "WzgzMywzXQ=="
     },
     {
       "attributes": {
@@ -438,7 +438,7 @@
             }
           }
         },
-        "title": "Compute Account ID Filter [Metricbeat GCP]",
+        "title": "Compute Account ID Filter [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -465,7 +465,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Compute Account ID Filter [Metricbeat GCP]",
+          "title": "Compute Account ID Filter [Metricbeat Googlecloud]",
           "type": "input_control_vis"
         }
       },
@@ -481,8 +481,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:47:27.303Z",
-      "version": "WzgyOCwzXQ=="
+      "updated_at": "2020-03-04T21:47:16.151Z",
+      "version": "Wzg0MiwzXQ=="
     },
     {
       "attributes": {
@@ -490,7 +490,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Read I/O [Metricbeat GCP]",
+        "title": "Compute Read I/O [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -537,7 +537,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Read I/O [Metricbeat GCP]",
+          "title": "Compute Read I/O [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -547,8 +547,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T18:47:02.268Z",
-      "version": "Wzc3NiwzXQ=="
+      "updated_at": "2020-03-04T21:45:54.891Z",
+      "version": "WzgzMiwzXQ=="
     },
     {
       "attributes": {
@@ -556,7 +556,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Write I/O [Metricbeat GCP]",
+        "title": "Compute Write I/O [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -603,7 +603,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Write I/O [Metricbeat GCP]",
+          "title": "Compute Write I/O [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -613,8 +613,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T18:47:23.349Z",
-      "version": "Wzc3NywzXQ=="
+      "updated_at": "2020-03-04T21:45:47.779Z",
+      "version": "WzgzMSwzXQ=="
     },
     {
       "attributes": {
@@ -622,7 +622,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Network Sent Bytes [Metricbeat GCP]",
+        "title": "Compute Network Sent Bytes [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -669,7 +669,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Network Sent Bytes [Metricbeat GCP]",
+          "title": "Compute Network Sent Bytes [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -679,8 +679,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:20:09.279Z",
-      "version": "Wzc5NiwzXQ=="
+      "updated_at": "2020-03-04T21:46:56.383Z",
+      "version": "WzgzOSwzXQ=="
     },
     {
       "attributes": {
@@ -688,7 +688,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Network Received Bytes [Metricbeat GCP]",
+        "title": "Compute Network Received Bytes [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -735,7 +735,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Network Received Bytes [Metricbeat GCP]",
+          "title": "Compute Network Received Bytes [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -745,8 +745,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:20:00.179Z",
-      "version": "Wzc5NSwzXQ=="
+      "updated_at": "2020-03-04T21:46:44.172Z",
+      "version": "WzgzNywzXQ=="
     },
     {
       "attributes": {
@@ -754,7 +754,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Firewall Dropped Bytes [Metricbeat GCP]",
+        "title": "Compute Firewall Dropped Bytes [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -820,7 +820,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Firewall Dropped Bytes [Metricbeat GCP]",
+          "title": "Compute Firewall Dropped Bytes [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -830,8 +830,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:23:23.727Z",
-      "version": "Wzc5OCwzXQ=="
+      "updated_at": "2020-03-04T21:46:50.144Z",
+      "version": "WzgzOCwzXQ=="
     },
     {
       "attributes": {
@@ -839,7 +839,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
+        "title": "Compute Firewall Dropped Packets [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -906,7 +906,7 @@
             "time_range_mode": "entire_time_range",
             "type": "top_n"
           },
-          "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
+          "title": "Compute Firewall Dropped Packets [Metricbeat Googlecloud]",
           "type": "metrics"
         }
       },
@@ -916,8 +916,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T19:41:43.464Z",
-      "version": "WzgyNSwzXQ=="
+      "updated_at": "2020-03-04T21:47:10.017Z",
+      "version": "Wzg0MSwzXQ=="
     }
   ],
   "version": "7.6.0"
