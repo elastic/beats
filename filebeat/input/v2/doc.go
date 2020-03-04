@@ -23,9 +23,36 @@
 // `RegistryList.Validate` to check if the combined registries do not provide
 // similar input names.
 //
+//
+// Self contained InputManager
+//
+// With this setup no actual Plugin or Input variants do exist.
+//
+//    +-------------+     +---------------------+     +------------------+      +-----------+
+//    |  v2.Loader  | <.. |                     | --> | ext.InputManager | <--> | ext.input | <+
+//    +-------------+     |                     |     +------------------+      +-----------+  |
+//                        |                     |                                 ^            |
+//                        | ext.InputConfigurer | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*            |
+//                        |                     |                                              |
+//    +-------------+     |                     |                                              |
+//    | v2.Registry | <.. |                     |                                              |
+//    +-------------+     +---------------------+                                              |
+//                          }                                                                  |
+//                          }                                                                  |
+//                          v                                                                  |
+//                        +---------------------+                                              |
+//                        |      v2.Input       | ---------------------------------------------+
+//                        +---------------------+
+//
+// The InputConfigurer implements the v2.Registry interface, to report the potential capabilities
+// provided by this package. The Loader interface is used create a 'handle' that can be used to
+// dynamically add/remove an workers to the InputManager, based on the users configuration.
+//
+//
 // Input Loader with registry and plugins
 //
-// TODO: document
+// In this scenario the package centers around the Registry. Plugins are added
+// to the registry, and create standalone input instances.
 //
 //                                                                 +-------------+
 //                                                                 |  v2.Plugin  |
@@ -49,26 +76,61 @@
 //                                         | v2.RegistryTree |
 //                                         +-----------------+
 //
+// The input type is defined in the package directly and the Loader wraps the
+// input into a v2.Input. The Loader will use the registry to create Inputs.
+// Registry and Loader each implement the v2.Loader and v2.Registry interfaces
+// and represent the extensions to be used with an extension point. The
+// ext.Registry uses v2.RegistryTree to keep track of the Plugins and
+// sub-registries.
 //
-// Self contained InputManager
+// For example:
+//    type Registry v2.RegistryTree
 //
-// TODO: document
+//    type Extension interface {
+//        addToRegistry(*Registry) error
+//    }
 //
-//    +-------------+     +---------------------+     +------------------+      +-----------+
-//    |  v2.Loader  | <.. |                     | --> | ext.InputManager | <--> | ext.input | <+
-//    +-------------+     |                     |     +------------------+      +-----------+  |
-//                        |                     |                                 ^            |
-//                        | ext.InputConfigurer | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*            |
-//                        |                     |                                              |
-//    +-------------+     |                     |                                              |
-//    | v2.Registry | <.. |                     |                                              |
-//    +-------------+     +---------------------+                                              |
-//                          }                                                                  |
-//                          }                                                                  |
-//                          v                                                                  |
-//                        +---------------------+                                              |
-//                        |      v2.Input       | ---------------------------------------------+
-//                        +---------------------+
+//    func (r *Registry) Each(fn func(v2.Plugin) bool) { (*v2.RegistryTree)(r).Each(fn) }
+//    func (r *Registry) Find(name string) (plugin v2.Plugin, ok bool) { return (*v2.RegistryTree)(r).Find(name) }
+//    func (r *Registry) Add(ext Extension) error { return ext.addToRegistry(r) }
 //
+//    func (r *Registry) addToRegistry(parent *Registry) error {
+//        return (*v2.RegistryTree)(parent).AddRegistry(r)
+//    }
+//
+//    func (p *Plugin) addToRegistry(parent *Registry) error {
+//        return (*v2.RegistryTree)(parent).AddPlugin(p)
+//    }
+//
+// The `Extension` interface allows users to combine registries from multiple sources/packages. For example:
+//
+//    reg := new(Registry
+//    reg.Add(oss.SimpleInputs, xpack.SimpleInputs)
+//
+//
+// Combination of InputManager with Plugins
+//
+// Variations of these two first two implementations might combine an input
+// manager with pluggable input types. The InputManager could transparently
+// handle all communication with the registry, while the Input creates events
+// with corresponding type-safe state updated.
+//
+// For example:
+//
+//    type Input struct {
+//        Run(ctx Context, publisher Publisher, cursor interface{}) error
+//    }
+//
+//    type Publisher interface {
+//        Publish(evt beat.Event, cursor interface{}) error
+//    }
+//
+// The InputManager will pass the cursor (last known state) to the input to
+// continue processing. Each event to be published must be accomodated with a
+// new cursor state.
+//
+// The InputManager will check that no more than 2 inputs of the same type
+// collect the same data (exclusive access), and that state is correctly
+// synchronised after ACK with the registry file.
 //
 package v2
