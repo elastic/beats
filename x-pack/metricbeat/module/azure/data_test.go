@@ -75,7 +75,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	metric := Metric{
 		Resource: Resource{
-			ID:           "resId",
+			Id:           "resId",
 			Name:         "res",
 			Location:     "west_europe",
 			Type:         "resType",
