@@ -196,19 +196,6 @@ pipeline {
             makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
           }
         }
-        stage('Auditbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_AUDITBEAT_XPACK != "false"
-            }
-          }
-          steps {
-            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
-          }
-        }
         stage('Libbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
