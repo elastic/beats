@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 
 *Filebeat*
 
@@ -46,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
@@ -70,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
 - Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
@@ -103,6 +106,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
+- Fix detection and logging of some error cases with light modules. {pull}14706[14706]
+- Fix imports after PR was merged before rebase. {pull}16756[16756]
+- Add dashboard for `redisenterprise` module. {pull}16752[16752]
 
 *Packetbeat*
 
@@ -149,10 +155,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
+- Improve ECS categorization field mappings in kibana module. {issue}16168[16168] {pull}16652[16652]
 - Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
 - Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
+- Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
 
 *Heartbeat*
 
@@ -196,6 +204,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add filtering option for prometheus collector. {pull}16420[16420]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
+- Add OpenMetrics Metricbeat module {pull}16596[16596]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
 
