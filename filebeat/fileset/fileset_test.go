@@ -26,9 +26,11 @@ import (
 	"testing"
 	"text/template"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
@@ -185,33 +187,75 @@ func TestGetInputConfigNginx(t *testing.T) {
 func TestGetInputConfigNginxOverrides(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
-	fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
-		Input: map[string]interface{}{
-			"close_eof": true,
+
+	tests := map[string]struct {
+		input      map[string]interface{}
+		expectedFn require.ValueAssertionFunc
+	}{
+		"close_eof": {
+			map[string]interface{}{
+				"close_eof": true,
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
+
+				require.True(t, c.HasField("close_eof"))
+				v, err := c.Bool("close_eof", -1)
+				require.NoError(t, err)
+				require.True(t, v)
+
+				pipelineID, err := c.String("pipeline", -1)
+				assert.NoError(t, err)
+				assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+			},
 		},
-	})
-	assert.NoError(t, err)
+		"pipeline": {
+			map[string]interface{}{
+				"pipeline": "foobar",
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
 
-	assert.NoError(t, fs.Read("5.2.0"))
+				v, err := c.String("pipeline", -1)
+				require.NoError(t, err)
+				require.Equal(t, "foobar", v)
+			},
+		},
+	}
 
-	cfg, err := fs.getInputConfig()
-	assert.NoError(t, err)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+				Input: test.input,
+			})
+			assert.NoError(t, err)
 
-	assert.True(t, cfg.HasField("paths"))
-	assert.True(t, cfg.HasField("exclude_files"))
-	assert.True(t, cfg.HasField("close_eof"))
-	assert.True(t, cfg.HasField("pipeline"))
-	pipelineID, err := cfg.String("pipeline", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+			assert.NoError(t, fs.Read("5.2.0"))
 
-	moduleName, err := cfg.String("_module_name", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "nginx", moduleName)
+			cfg, err := fs.getInputConfig()
+			assert.NoError(t, err)
 
-	filesetName, err := cfg.String("_fileset_name", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "access", filesetName)
+			assert.True(t, cfg.HasField("paths"))
+			assert.True(t, cfg.HasField("exclude_files"))
+			assert.True(t, cfg.HasField("pipeline"))
+
+			test.expectedFn(t, cfg)
+
+			moduleName, err := cfg.String("_module_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, "nginx", moduleName)
+
+			filesetName, err := cfg.String("_fileset_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, "access", filesetName)
+		})
+	}
 }
 
 func TestGetPipelineNginx(t *testing.T) {

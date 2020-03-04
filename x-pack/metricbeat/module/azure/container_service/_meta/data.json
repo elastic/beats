@@ -1,0 +1,46 @@
+{
+    "@timestamp" : "2020-02-28T14:47:00.000Z",
+    "ecs" : {
+        "version" : "1.4.0"
+    },
+    "cloud" : {
+        "region" : "westeurope",
+        "provider" : "azure"
+    },
+    "event" : {
+        "dataset" : "azure.container_service",
+        "module" : "azure",
+        "duration" : 2730896000
+    },
+    "metricset" : {
+        "name" : "container_service",
+        "period" : 300000
+    },
+    "azure" : {
+        "subscription_id" : "123456-qwer-1234-5678-12345678",
+        "namespace" : "Microsoft.ContainerService/managedClusters",
+        "container_service" : {
+            "kube_pod_status_ready" : {
+                "avg" : 9
+            },
+            "kube_pod_status_phase" : {
+                "avg" : 9
+            },
+            "kube_node_status_allocatable_cpu_cores" : {
+                "avg" : 2
+            },
+            "kube_node_status_allocatable_memory_bytes" : {
+                "avg" : 2.25349632E9
+            }
+        },
+        "timegrain" : "PT5M",
+        "resource" : {
+            "type" : "Microsoft.ContainerService/managedClusters",
+            "group" : "obs-infrastructure",
+            "name" : "obskube"
+        }
+    },
+    "service" : {
+        "type" : "azure"
+    }
+}

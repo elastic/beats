@@ -2645,13 +2645,13 @@ type: keyword
 
 --
 
-*`file.origin.raw`*::
+*`file.origin.text`*::
 +
 --
-This is a non-analyzed field that is useful for aggregations on the origin data.
+This is an analyzed field that is useful for full text search on the origin data.
 
 
-type: keyword
+type: text
 
 --
 
