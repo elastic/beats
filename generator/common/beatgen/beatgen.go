@@ -145,6 +145,7 @@ func getConfiguredBeatsRevision(beatsModule, revision string) error {
 	beatsPkg := beatsModule + "@" + revision
 	return gotool.Get(
 		gotool.Get.Download(),
+		gotool.Get.Update(),
 		gotool.Get.Package(beatsPkg),
 	)
 }
