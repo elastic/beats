@@ -9,9 +9,9 @@ package collector
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/x-pack/metricbeat/module/openmetrics"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/openmetrics"
 )
 
 func TestData(t *testing.T) {
