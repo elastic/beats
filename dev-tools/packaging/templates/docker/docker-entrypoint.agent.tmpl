@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -eo pipefail
+
+function setup(){
+  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
+  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/setup \
+    -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true' \
+    -d '{"admin_username":"elastic","admin_password":"changeme"}' \
+    -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
+}
+
+function enroll(){
+    # enroll agent to kibana
+    local enrollResp
+    enrollResp=$(curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+      -H 'Content-Type: application/json' \
+      -H 'kbn-xsrf: true' \
+      -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} \
+      -d '{"name":"demotoken","config_id":"default"}')
+
+    local exitCode=$?
+    if [ $exitCode -ne 0 ]; then
+      exit $exitCode
+    fi
+
+    apikey=$(echo $enrollResp | jq -r '.item.api_key')
+    ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
+}
+yum install -y epel-release
+yum install -y jq
+
+setup
+enroll
+
+exec {{ .BeatName }} run "$@"
