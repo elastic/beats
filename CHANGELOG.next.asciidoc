@@ -214,7 +214,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
 
-
 *Packetbeat*
 
 *Functionbeat*
