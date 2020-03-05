@@ -158,24 +158,23 @@ jobs:
       stage: test
 
     # Generators
-    # Temporarily disable generator jobs
-    #- os: linux
-    #  env: TARGETS="-C generator/_templates/metricbeat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
-    #- os: linux
-    #  env: TARGETS="-C generator/_templates/beat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
+    - os: linux
+      env: TARGETS="-C generator/_templates/metricbeat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C generator/_templates/beat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
 
-    #- os: osx
-    #  env: TARGETS="-C generator/_templates/metricbeat test"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
-    #- os: osx
-    #  env: TARGETS="-C generator/_templates/beat test"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
+    - os: osx
+      env: TARGETS="-C generator/_templates/metricbeat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="-C generator/_templates/beat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
 
     # Kubernetes
     - os: linux

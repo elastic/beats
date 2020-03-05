@@ -21,11 +21,16 @@ func MockResource() resources.GenericResource {
 	name := "resourceName"
 	location := "resourceLocation"
 	rType := "resourceType"
+	skuName := "standard"
+	sku := resources.Sku{
+		Name: &skuName,
+	}
 	return resources.GenericResource{
 		ID:       &id,
 		Name:     &name,
 		Location: &location,
 		Type:     &rType,
+		Sku:      &sku,
 	}
 }
 
@@ -93,15 +98,16 @@ func TestMapMetric(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, len(metrics), 2)
 
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
-		assert.Equal(t, metrics[1].Resource.ID, "123")
+		assert.Equal(t, metrics[1].Resource.Id, "123")
 		assert.Equal(t, metrics[1].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[1].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[1].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[1].Resource.Size, "standard")
 		assert.Equal(t, metrics[1].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))

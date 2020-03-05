@@ -35,7 +35,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 			continue
 		}
 		// build a resource key with unique resource namespace combination
-		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.ID, metric.Namespace)
+		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.Id, metric.Namespace)
 		groupByResourceNamespace[resNamkey] = append(groupByResourceNamespace[resNamkey], metric)
 	}
 	// grouping metrics by the dimensions configured
@@ -147,7 +147,6 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 		ModuleFields: common.MapStr{
 			"timegrain": metric.TimeGrain,
 			"resource": common.MapStr{
-				"name":  metric.Resource.Name,
 				"type":  metric.Resource.Type,
 				"group": metric.Resource.Group,
 			},
@@ -173,7 +172,15 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.RootFields.Put("cloud.region", metric.Resource.Location)
-
+	event.RootFields.Put("cloud.instance.name", metric.Resource.Name)
+	if metric.Resource.SubId != "" {
+		event.RootFields.Put("cloud.instance.id", metric.Resource.SubId)
+	} else {
+		event.RootFields.Put("cloud.instance.id", metric.Resource.Id)
+	}
+	if metric.Resource.Size != "" {
+		event.RootFields.Put("cloud.machine.type", metric.Resource.Size)
+	}
 	metricList := common.MapStr{}
 	for _, value := range metricValues {
 		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
