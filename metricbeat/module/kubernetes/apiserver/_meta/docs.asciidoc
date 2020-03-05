@@ -16,6 +16,7 @@ Configuration example using https and token based authentication:
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.certificate_authorities:
         - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      period: 30s
 ```
 
 In order to access the `/metrics` path of the API service, the following permission needs to be available by the service account running Metricbeat:
