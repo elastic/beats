@@ -466,3 +466,8 @@ func BuildFleetCfg() error {
 	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
+
+// Fields placeholder methods to fix the windows build.
+func Fields() error {
+	return nil
+}
