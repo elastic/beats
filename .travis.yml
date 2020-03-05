@@ -220,6 +220,7 @@ addons:
       - libxml2-utils
       - libsystemd-journal-dev
       - librpm-dev
+      - libsnappy-dev
       # From deadsnakes PPA
       - python3.6
       - python3.6-venv
