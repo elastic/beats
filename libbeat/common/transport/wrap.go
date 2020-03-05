@@ -17,12 +17,14 @@
 
 package transport
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-)
+import "net"
 
-type ProxyConfig = transport.ProxyConfig
-
-func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
-	return transport.ProxyDialer(config, forward)
+func ConnWrapper(d Dialer, w func(net.Conn) net.Conn) Dialer {
+	return DialerFunc(func(network, addr string) (net.Conn, error) {
+		c, err := d.Dial(network, addr)
+		if err != nil {
+			return nil, err
+		}
+		return w(c), nil
+	})
 }

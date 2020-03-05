@@ -15,14 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+/*
+This package has been deprecated. Please use libbeat/common/transport and
+and packages under it instead.
+*/
+
 package transport
-
-import (
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-)
-
-type ProxyConfig = transport.ProxyConfig
-
-func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
-	return transport.ProxyDialer(config, forward)
-}
