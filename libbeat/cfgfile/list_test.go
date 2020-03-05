@@ -43,7 +43,7 @@ func (r *runner) Stop()  { r.stopped = true }
 
 type runnerFactory struct{ runners []*runner }
 
-func (r *runnerFactory) Create(x beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (Runner, error) {
+func (r *runnerFactory) Create(x beat.PipelineConnector, c *common.Config, meta *common.MapStrPointer) (Runner, error) {
 	config := struct {
 		ID int64 `config:"id"`
 	}{}
