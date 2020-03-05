@@ -344,7 +344,7 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // the event will be dropped.
 func bulkCollectPublishFails(
 	log *logp.Logger,
-	result esclientleg.BulkResult,
+	result eslegclient.BulkResult,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
 	reader := NewJSONReader(result)
