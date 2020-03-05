@@ -35,7 +35,7 @@ import (
 
 // Client is an elasticsearch client.
 type Client struct {
-	eslegclient.Connection
+	conn eslegclient.Connection
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
@@ -119,9 +119,9 @@ func NewClient(
 	}
 
 	client := &Client{
-		Connection: *conn,
-		index:      s.Index,
-		pipeline:   pipeline,
+		conn:     *conn,
+		index:    s.Index,
+		pipeline: pipeline,
 
 		observer: s.Observer,
 
@@ -141,20 +141,20 @@ func (client *Client) Clone() *Client {
 	c, _ := NewClient(
 		ClientSettings{
 			ConnectionSettings: eslegclient.ConnectionSettings{
-				URL:   client.URL,
-				Proxy: client.Proxy,
+				URL:   client.conn.URL,
+				Proxy: client.conn.Proxy,
 				// Without the following nil check on proxyURL, a nil Proxy field will try
 				// reloading proxy settings from the environment instead of leaving them
 				// empty.
-				ProxyDisable:      client.Proxy == nil,
-				TLS:               client.TLS,
-				Username:          client.Username,
-				Password:          client.Password,
-				APIKey:            client.APIKey,
+				ProxyDisable:      client.conn.Proxy == nil,
+				TLS:               client.conn.TLS,
+				Username:          client.conn.Username,
+				Password:          client.conn.Password,
+				APIKey:            client.conn.APIKey,
 				Parameters:        nil, // XXX: do not pass params?
-				Headers:           client.Headers,
-				Timeout:           client.HTTP.Timeout,
-				CompressionLevel:  client.CompressionLevel,
+				Headers:           client.conn.Headers,
+				Timeout:           client.conn.HTTP.Timeout,
+				CompressionLevel:  client.conn.CompressionLevel,
 				OnConnectCallback: nil,
 				Observer:          nil,
 				EscapeHTML:        false,
@@ -198,7 +198,7 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 	origCount := len(data)
-	data, bulkItems := bulkEncodePublishRequest(client.log, client.GetVersion(), client.index, client.pipeline, data)
+	data, bulkItems := bulkEncodePublishRequest(client.log, client.conn.GetVersion(), client.index, client.pipeline, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -207,7 +207,7 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	status, result, sendErr := client.Bulk("", "", nil, bulkItems)
+	status, result, sendErr := client.conn.Bulk("", "", nil, bulkItems)
 	if sendErr != nil {
 		client.log.Errorf("Failed to perform any bulk index operations: %s", sendErr)
 		return data, sendErr
@@ -394,6 +394,18 @@ func bulkCollectPublishFails(
 	return failed, stats
 }
 
+func (client *Client) Connect() error {
+	return client.conn.Connect()
+}
+
+func (client *Client) Close() error {
+	return client.conn.Close()
+}
+
+func (client *Client) Connection() eslegclient.Connection {
+	return client.conn
+}
+
 func (client *Client) String() string {
-	return "elasticsearch(" + client.Connection.URL + ")"
+	return "elasticsearch(" + client.conn.URL + ")"
 }

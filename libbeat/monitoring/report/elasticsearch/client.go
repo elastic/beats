@@ -70,7 +70,8 @@ func (c *publishClient) Connect() error {
 	params := map[string]string{
 		"filter_path": "features.monitoring.enabled",
 	}
-	status, body, err := c.es.Request("GET", "/_xpack", "", params, nil)
+	conn := c.es.Connection()
+	status, body, err := conn.Request("GET", "/_xpack", "", params, nil)
 	if err != nil {
 		return fmt.Errorf("X-Pack capabilities query failed with: %v", err)
 	}
@@ -160,7 +161,8 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 }
 
 func (c *publishClient) Test(d testing.Driver) {
-	c.es.Test(d)
+	conn := c.es.Connection()
+	conn.Test(d)
 }
 
 func (c *publishClient) String() string {
@@ -183,7 +185,8 @@ func (c *publishClient) publishXPackBulk(params map[string]string, event publish
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	_, err := c.es.SendMonitoringBulk(params, bulk[:])
+	conn := c.es.Connection()
+	_, err := conn.SendMonitoringBulk(params, bulk[:])
 	return err
 }
 
@@ -193,7 +196,8 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		"_routing": nil,
 	}
 
-	esVersion := c.es.GetVersion()
+	conn := c.es.Connection()
+	esVersion := conn.GetVersion()
 	if esVersion.Major < 7 {
 		meta["_type"] = "doc"
 	}
@@ -234,8 +238,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	// FIXME: index name (first param below)
-	_, result, err := c.es.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
+	_, result, err := conn.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
 		return err
 	}
