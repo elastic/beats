@@ -4,6 +4,8 @@
 
 package cef
 
+import "strings"
+
 type mappedField struct {
 	Target string
 	Type   DataType
@@ -656,4 +658,12 @@ var extensionMapping = map[string]mappedField{
 		Target: "managerReceiptTime",
 		Type:   TimestampType,
 	},
+}
+
+var extensionMappingLowerCase = map[string]mappedField{}
+
+func init() {
+	for k, v := range extensionMapping {
+		extensionMappingLowerCase[strings.ToLower(k)] = v
+	}
 }
