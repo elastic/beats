@@ -200,7 +200,7 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 	origCount := len(data)
-	data, bulkItems := bulkEncodePublishRequest(client.GetVersion(), client.index, client.pipeline, data, client.log)
+	data, bulkItems := bulkEncodePublishRequest(client.log, client.GetVersion(), client.index, client.pipeline, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
