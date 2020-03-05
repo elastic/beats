@@ -1,0 +1,38 @@
+[[howto-guides]]
+= How-to guides
+
+[partintro]
+--
+Learn how to perform common {beatname_uc} configuration tasks.
+
+* <<configuration-filebeat-options>>
+* <<{beatname_lc}-geoip>>
+* <<{beatname_lc}-deduplication>>
+* <<filebeat-configuration-reloading>>
+* <<using-environ-vars>>
+* <<configuring-ingest-node>>
+* <<yaml-tips>>
+
+
+--
+
+include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
+
+include::{libbeat-dir}/shared-geoip.asciidoc[]
+
+include::{libbeat-dir}/shared-deduplication.asciidoc[]
+
+include::{docdir}/../docs/reload-configuration.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
+
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
+
+
+

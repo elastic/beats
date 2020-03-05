@@ -1,7 +1,7 @@
 :modulename: apache mysql
 
 [id="configuration-{beatname_lc}-modules"]
-== Specify which modules to run
+== Enable and run modules
 
 NOTE: Using {beatname_uc} modules is optional. You may decide to
 <<configuration-{beatname_lc}-options,configure inputs manually>> if you are using

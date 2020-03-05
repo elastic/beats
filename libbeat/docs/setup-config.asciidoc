@@ -1,6 +1,7 @@
 
+include::./template-config.asciidoc[]
+
 ifndef::no_dashboards[]
 include::./dashboardsconfig.asciidoc[]
 endif::no_dashboards[]
 
-include::./template-config.asciidoc[]

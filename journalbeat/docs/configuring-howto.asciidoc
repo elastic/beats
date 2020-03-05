@@ -1,5 +1,5 @@
 [id="configuring-howto-{beatname_lc}"]
-= Configuring {beatname_uc}
+= {beatname_uc} configuration
 
 [partintro]
 --

@@ -13,6 +13,10 @@
 [[configuration-logging]]
 == Configure logging
 
+++++
+<titleabbrev>Logging</titleabbrev>
+++++
+
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
 for configuring the logging output.
 ifndef::serverless[]

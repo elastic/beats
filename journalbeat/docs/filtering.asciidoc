@@ -1,5 +1,9 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance the exported data
+== Filter and enhance data by using processors
+
+++++
+<titleabbrev>Processors</titleabbrev>
+++++
 
 Your use case might require only a subset of the data exported by {beatname_uc},
 or you might need to enhance the exported data (for example, by adding

@@ -2,7 +2,7 @@
 == Configure inputs
 
 ++++
-<titleabbrev>Configure inputs</titleabbrev>
+<titleabbrev>Inputs</titleabbrev>
 ++++
 
 TIP: <<{beatname_lc}-modules-overview,{beatname_uc} modules>> provide the
@@ -58,6 +58,8 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
 
+
+include::multiline.asciidoc[]
 
 include::inputs/input-log.asciidoc[]
 

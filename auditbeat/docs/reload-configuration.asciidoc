@@ -1,6 +1,10 @@
 [id="{beatname_lc}-configuration-reloading"]
 == Reload the configuration dynamically
 
+++++
+<titleabbrev>Config Reloading</titleabbrev>
+++++
+
 beta[]
 
 You can configure {beatname_uc} to dynamically reload configuration files when

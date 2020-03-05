@@ -1,6 +1,6 @@
 [id="configuring-howto-{beatname_lc}"]
 [role="xpack"]
-= Configuring {beatname_uc}
+= {beatname_uc} configuration
 
 [partintro]
 --

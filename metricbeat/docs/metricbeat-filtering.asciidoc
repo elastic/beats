@@ -1,5 +1,9 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance the exported data
+== Filter and enhance data by using processors
+
+++++
+<titleabbrev>Processors</titleabbrev>
+++++
 
 include::{libbeat-dir}/processors.asciidoc[]
 

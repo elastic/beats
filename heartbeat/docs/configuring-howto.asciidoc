@@ -1,5 +1,5 @@
 [[configuring-howto-heartbeat]]
-= Configuring {beatname_uc}
+= {beatname_uc} configuration
 
 [partintro]
 --

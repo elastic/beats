@@ -1,6 +1,10 @@
 [[configuration-ssl]]
 ifndef::apm-server[]
 == Specify SSL settings
+
+++++
+<titleabbrev>SSL</titleabbrev>
+++++
 endif::apm-server[]
 ifdef::apm-server[]
 == SSL output settings

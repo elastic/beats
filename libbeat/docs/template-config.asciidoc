@@ -1,6 +1,10 @@
 [[configuration-template]]
 
-== Load the Elasticsearch index template
+== Set up the Elasticsearch index template
+
+++++
+<titleabbrev>Elasticsearch index template</titleabbrev>
+++++
 
 The `setup.template` section of the +{beatname_lc}.yml+ config file specifies
 the {ref}/indices-templates.html[index template] to use for setting
