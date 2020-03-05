@@ -21,4 +21,4 @@ GO111MODULE=off go get -u github.com/kardianos/govendor
 docker images
 cd metricbeat
 docker tag store/oracle/database-instantclient:12.2.0.1 database-instantclient:12.2.0.1
-TESTING_ENVIRONMENT=snapshot ES_BEATS=.. docker-compose -p metricbeat21e89f892431fca6dc2c9c17fa89dd8a9b03e92a  -f docker-compose.yml build  --pull --force-rm
+TESTING_ENVIRONMENT=snapshot ES_BEATS=.. docker-compose -p metricbeat21e89f892431fca6dc2c9c17fa89dd8a9b03e92a  -f docker-compose.yml build --force-rm
