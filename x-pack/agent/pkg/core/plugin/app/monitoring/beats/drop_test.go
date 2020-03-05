@@ -5,38 +5,46 @@
 package beats
 
 import (
+	"runtime"
 	"testing"
 )
 
 type testCase struct {
-	Endpoint string
-	Drop     string
+	Endpoint    string
+	Drop        string
+	SkipWindows bool
 }
 
 func TestMonitoringDrops(t *testing.T) {
 	cases := []testCase{
-		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`npipe://drop`, ""},
-		testCase{`http+npipe://drop`, ""},
-		testCase{`\\.\pipe\drop`, ""},
-		testCase{`unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`http+unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`file:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`http://localhost/stats`, ""},
-		testCase{`localhost/stats`, ""},
-		testCase{`http://localhost:8080/stats`, ""},
-		testCase{`localhost:8080/stats`, ""},
-		testCase{`http://1.2.3.4/stats`, ""},
-		testCase{`http://1.2.3.4:5678/stats`, ""},
-		testCase{`1.2.3.4:5678/stats`, ""},
-		testCase{`http://hithere.com:5678/stats`, ""},
-		testCase{`hithere.com:5678/stats`, ""},
+		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop", false},
+		testCase{`npipe://drop`, "", false},
+		testCase{`http+npipe://drop`, "", false},
+		testCase{`\\.\pipe\drop`, "", false},
+		testCase{`unix:///var/lib/drop/abc.sock`, "/var/lib/drop", true},
+		testCase{`http+unix:///var/lib/drop/abc.sock`, "/var/lib/drop", true},
+		testCase{`file:///var/lib/drop/abc.sock`, "/var/lib/drop", true},
+		testCase{`http://localhost/stats`, "", false},
+		testCase{`localhost/stats`, "", false},
+		testCase{`http://localhost:8080/stats`, "", false},
+		testCase{`localhost:8080/stats`, "", false},
+		testCase{`http://1.2.3.4/stats`, "", false},
+		testCase{`http://1.2.3.4:5678/stats`, "", false},
+		testCase{`1.2.3.4:5678/stats`, "", false},
+		testCase{`http://hithere.com:5678/stats`, "", false},
+		testCase{`hithere.com:5678/stats`, "", false},
 	}
 
 	for _, c := range cases {
-		drop := monitoringDrop(c.Endpoint)
-		if drop != c.Drop {
-			t.Errorf("Case[%s]: Expected '%s', got '%s'", c.Endpoint, c.Drop, drop)
-		}
+		t.Run(c.Endpoint, func(t *testing.T) {
+			if runtime.GOOS == "windows" && c.SkipWindows {
+				t.Skip("Skipped under windows")
+			}
+
+			drop := monitoringDrop(c.Endpoint)
+			if drop != c.Drop {
+				t.Errorf("Case[%s]: Expected '%s', got '%s'", c.Endpoint, c.Drop, drop)
+			}
+		})
 	}
 }
