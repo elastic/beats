@@ -20,8 +20,8 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 type pod struct {
@@ -49,11 +49,9 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	}
 
 	out := p.resource.Generate("pod", obj, opts...)
-	// TODO: remove this call when moving to 8.0
-	out = p.exportPodLabels(out)
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName)
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {
@@ -64,11 +62,9 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	}
 
 	if p.namespace != nil {
-		meta := p.namespace.GenerateFromName(po.GetNamespace())
+		meta := p.namespace.GenerateFromName(po.GetNamespace(), WithLabels("namespace"))
 		if meta != nil {
-			// Use this in 8.0
-			//out.Put("namespace", meta["namespace"])
-			out.DeepUpdate(meta)
+			out.Put("namespace", meta["namespace"])
 		}
 	}
 	return out
@@ -92,13 +88,3 @@ func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr 
 	return nil
 }
 
-func (p *pod) exportPodLabels(in common.MapStr) common.MapStr {
-	labels, err := in.GetValue("pod.labels")
-	if err != nil {
-		return in
-	}
-	in.Put("labels", labels)
-	in.Delete("pod.labels")
-
-	return in
-}

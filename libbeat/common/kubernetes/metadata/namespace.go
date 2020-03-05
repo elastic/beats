@@ -47,8 +47,6 @@ func (n *namespace) Generate(obj kubernetes.Resource, opts ...FieldOptions) comm
 	}
 
 	meta := n.resource.Generate(resource, obj, opts...)
-	// TODO: remove this call when moving to 8.0
-	meta = flattenMetadata(meta)
 
 	// TODO: Add extra fields in here if need be
 	return meta
@@ -60,38 +58,14 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 		return nil
 	}
 
-	obj, ok, _ := n.store.GetByKey(name)
-	if !ok {
-		return nil
-	}
-
-	no, ok := obj.(*kubernetes.Namespace)
-	if !ok {
-		return nil
-	}
-
-	return n.Generate(no, opts...)
-}
-
-func flattenMetadata(in common.MapStr) common.MapStr {
-	out := common.MapStr{}
-	rawFields, err := in.GetValue(resource)
-	if err != nil {
-		return nil
-	}
-
-	fields, ok := rawFields.(common.MapStr)
-	if !ok {
-		return nil
-	}
-
-	for k, v := range fields {
-		if k == "name" {
-			out[resource] = v
-		} else {
-			out[resource+"_"+k] = v
+	if obj, ok, _ := n.store.GetByKey(name); ok {
+		no, ok := obj.(*kubernetes.Namespace)
+		if !ok {
+			return nil
 		}
+
+		return n.Generate(no, opts...)
 	}
 
-	return out
+	return nil
 }

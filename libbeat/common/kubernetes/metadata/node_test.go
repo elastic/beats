@@ -61,9 +61,9 @@ func TestNode_Generate(t *testing.T) {
 				"node": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -106,9 +106,9 @@ func TestNode_GenerateFromName(t *testing.T) {
 				"node": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},

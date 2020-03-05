@@ -60,9 +60,9 @@ func TestResource_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 				"namespace": "default",
 			},
@@ -97,9 +97,9 @@ func TestResource_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{

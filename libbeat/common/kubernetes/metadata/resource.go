@@ -98,11 +98,11 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...Fie
 	}
 
 	if len(labelMap) != 0 {
-		safemapstr.Put(meta, strings.ToLower(kind)+".labels", labelMap)
+		safemapstr.Put(meta, "labels", labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		safemapstr.Put(meta, strings.ToLower(kind)+".annotations", annotationsMap)
+		safemapstr.Put(meta, "annotations", annotationsMap)
 	}
 
 	for _, option := range options {

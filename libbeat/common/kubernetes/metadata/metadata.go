@@ -18,9 +18,10 @@
 package metadata
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"strings"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
@@ -38,5 +39,13 @@ type FieldOptions func(common.MapStr)
 func WithFields(key string, value interface{}) FieldOptions {
 	return func(meta common.MapStr) {
 		safemapstr.Put(meta, key, value)
+	}
+}
+
+// WithLabels FieldOption allows adding labels under sub-resource(kind)
+// example if kind=namespace namespace.labels key will be added
+func WithLabels(kind string) FieldOptions {
+	return func(meta common.MapStr) {
+		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 	}
 }
