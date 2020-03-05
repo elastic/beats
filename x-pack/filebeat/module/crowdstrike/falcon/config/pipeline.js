@@ -75,7 +75,6 @@ var crowdstrikeFalcon = (function() {
                 break;
 
             case "UserActivityAuditEvent":
-
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
                 evt.Put("message", evt.Get("crowdstrike.event.OperationName"))
                 evt.Put("event.action", convertUnderscore(eventType))
@@ -84,14 +83,22 @@ var crowdstrikeFalcon = (function() {
                 break;
 
             case "AuthActivityAuditEvent":
-
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
                 evt.Put("message", evt.Get("crowdstrike.event.ServiceName"))
                 evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
                 evt.Put("event.type", "change")
  
                 break;
- 
+
+            case "RemoteResponseSessionStartEvent":
+            case "RemoteResponseSessionEndEvent":
+                evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
+                evt.Put("host.name", evt.Get("crowdstrike.event.HostnameField"))
+                evt.Put("event.action", convertUnderscore(eventType))
+                evt.Put("event.type", "info")
+
+                break;
+
             default:
                 break;
         }

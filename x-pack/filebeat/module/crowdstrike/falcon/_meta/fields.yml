@@ -1,0 +1,224 @@
+- name: metadata
+  title: Metadata fields
+  description: >
+    Meta data fields for each event that include type and timestamp.
+  type: group
+  default_field: false
+  fields: 
+    - name: eventType
+      type: text 
+      description: >
+        Type of event, such as DetectionSummaryEvent, UserActivityAuditEvent, AuthActivityAuditEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, or IncidentSummaryEvent
+
+    - name: eventCreationTime
+      type: date
+      description: >
+        The time this event occurred on the endpoint in UTC UNIX_MS format.
+
+    - name: offset
+      type: integer
+      description: >
+        Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
+
+    - name: customerIDString
+      type: text
+      description: >
+        Customer identifier
+
+    - name: version 
+      type: text
+      description: >
+        Schema version
+
+- name: event
+  title: Event fields
+  description: >
+    Event data fields for each event and alert.
+  type: group
+  default_field: false
+  fields: 
+    - name: ProcessStartTime
+      type: date
+      description: >
+        The process start time in UTC UNIX_MS format.
+
+    - name: ProcessEndTime
+      type: date
+      description: >
+        The process termination time in UTC UNIX_MS format.
+
+    - name: ProcessId
+      type: integer
+      description: >
+        Process ID related to the detection.
+
+    - name: ParentProcessId
+      type: integer
+      description: >
+        Parent process ID related to the detection.
+
+    - name: ComputerName
+      type: text
+      description: >
+        Name of the computer where the detection occurred.
+
+    - name: UserName
+      type: text
+      description: >
+        User name associated with the detection.
+
+    - name: DetectName
+      type: text
+      description: >
+        Name of the detection.
+
+    - name: DetectDescription
+      type: text
+      description: >
+        Description of the detection.
+
+    - name: Severity
+      type: integer
+      description: >
+        Severity score of the detection.
+
+    - name: SeverityName
+      type: text
+      description: >
+        Severity score text.
+
+    - name: FileName
+      type: text
+      description: >
+        File name of the associated process for the detection.
+
+    - name: FilePath
+      type: text
+      description: >
+        Path of the executable associated with the detection.
+
+    - name: CommandLine
+      type: text
+      description: >
+        Executable path with comand line arguments.
+
+    - name: MD5String
+      type: text
+      description: >
+        MD5 sum of the executable associated with the detection.
+
+    - name: MachineDomain
+      type: text
+      description: >
+        Domain for the machine associated with the detection.
+
+    - name: FalconHostLink
+      type: text
+      description: >
+        URL to view the detection in Falcon.
+
+    - name: SensorId
+      type: text
+      description: >
+        Unique ID associated with the Falcon sensor.
+
+    - name: DetectId
+      type: text
+      description: >
+        Unique ID associated with the detection.
+
+    - name: LocalIP
+      type: text
+      description: >
+        IP address of the host associated with the detection.
+
+    - name: MACAddress
+      type: text
+      description: >
+        MAC address of the host associated with the detection.
+
+    - name: Tactic
+      type: text
+      description: >
+        MITRE tactic category of the detection.
+
+    - name: Technique
+      type: text
+      description: >
+        MITRE technique category of the detection.
+
+    - name: Objective
+      type: text
+      description: >
+        Method of detection.
+
+    - name: PatternDispositionDescription
+      type: text
+      description: >
+        Action taken by Falcon.
+
+    - name: PatternDispositionValue
+      type: integer
+      description: >
+        Unique ID associated with action taken.
+
+    - name: PatternDispositionFlags
+      type: keyword
+      description: >
+        Flags indicating actions taken.
+
+    - name: UserId
+      type: text
+      description: >
+        Email address or user ID associated with the event.
+
+    - name: UserIp
+      type: text
+      description: >
+        IP address associated with the user.
+
+    - name: OperationName
+      type: text
+      description: >
+        Event subtype.
+
+    - name: ServiceName
+      type: text
+      description: >
+        Service associated with this event.
+
+    - name: Success
+      type: boolean
+      description: >
+        Indicator of whether or not this event was successful.
+
+    - name: UTCTimestamp
+      type: date
+      description: >
+        Timestamp associated with this event in UTC UNIX format.
+
+    - name: AuditKeyValues
+      type: keyword
+      description: >
+        Fields that were changed in this event.
+
+    - name: SessionId
+      type: text
+      description: >
+        Session ID of the remote response session.
+
+    - name: HostnameField
+      type: text
+      description: >
+        Host name of the machine for the remote session.
+
+    - name: UserName
+      type: text
+      description: >
+        User name assoicated with the remote session.
+
+    - name: StartTimestamp
+      type: date
+      description: >
+        Start time for the remote session in UTC UNIX format.
+      

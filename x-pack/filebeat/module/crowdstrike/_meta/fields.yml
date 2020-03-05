@@ -3,9 +3,9 @@
   release: beta
   description: >
     Module for collecting Crowdstrike events.
-
   fields:
     - name: crowdstrike
-      type: keyword
+      type: group
       description: >
         Fields for Crowdstrike Falcon event and alert data.
+      fields:
