@@ -17,7 +17,7 @@ type testCase struct {
 
 func TestMonitoringDrops(t *testing.T) {
 	cases := []testCase{
-		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop", false},
+		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop", true},
 		testCase{`npipe://drop`, "", false},
 		testCase{`http+npipe://drop`, "", false},
 		testCase{`\\.\pipe\drop`, "", false},

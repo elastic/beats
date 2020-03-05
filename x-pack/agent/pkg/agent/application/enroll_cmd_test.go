@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -42,6 +43,10 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Disabled under windows: https://github.com/elastic/beats/issues/16860")
+	}
+
 	log, _ := logger.New()
 
 	t.Run("fail to save is propagated", withTLSServer(
