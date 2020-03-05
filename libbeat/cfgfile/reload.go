@@ -141,7 +141,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	// Load all config objects
 	configs, err := rl.loadConfigs(files)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "loading configs")
 	}
 
 	debugf("Number of module configs found: %v", len(configs))
