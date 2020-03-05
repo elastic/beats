@@ -7,6 +7,7 @@ RUN \
          python3 \
          python3-pip \
          python3-venv \
+         libsnappy-dev \
       && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHON_ENV=/tmp/python-env

@@ -19,9 +19,14 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/server"
+	"io/ioutil"
 
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
-	"github.com/elastic/beats/v7/metricbeat/helper/server/http"
+	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -52,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	svc, err := http.NewHttpServer(base)
+	svc, err := httpserver.NewHttpServer(base, getHandleFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -94,3 +99,46 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		}
 	}
 }
+
+func getHandleFunc(h *httpserver.HttpServer) func(writer http.ResponseWriter, req *http.Request) {
+	return func(writer http.ResponseWriter, req *http.Request) {
+		switch req.Method {
+		case "POST":
+			meta := server.Meta{
+				"path": req.URL.String(),
+			}
+
+			contentType := req.Header.Get("Content-Type")
+			if contentType != "" {
+				meta["Content-Type"] = contentType
+			}
+
+			body, err := ioutil.ReadAll(req.Body)
+			if err != nil {
+				logp.Err("Error reading body: %v", err)
+				http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
+				return
+			}
+
+			payload := common.MapStr{
+				server.EventDataKey: body,
+			}
+
+			event := &httpserver.HttpEvent{}
+			event.SetEvent(payload)
+			event.SetMeta(meta)
+			h.WriteEvents(event)
+			writer.WriteHeader(http.StatusAccepted)
+
+		case "GET":
+			writer.WriteHeader(http.StatusOK)
+			if req.TLS != nil {
+				writer.Write([]byte("HTTPS Server accepts data via POST"))
+			} else {
+				writer.Write([]byte("HTTP Server accepts data via POST"))
+			}
+
+		}
+	}
+}
+

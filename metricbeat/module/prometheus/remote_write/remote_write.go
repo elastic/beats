@@ -18,6 +18,9 @@
 package remote_write
 
 import (
+	"fmt"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper/server"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -29,6 +32,8 @@ import (
 	"github.com/prometheus/prometheus/prompb"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
+	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -39,7 +44,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	server *http.Server
+	server   serverhelper.Server
 	events chan *mb.Event
 }
 
@@ -50,94 +55,78 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	svc, err := httpserver.NewHttpServer(base, getHandleFunc)
 	if err != nil {
 		return nil, err
 	}
 
 	m := MetricSet{
 		BaseMetricSet: base,
-		events:        make(chan *mb.Event),
+		server: svc,
 	}
 
-	httpServer := &http.Server{
-		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			m.Logger().Debug(r.URL.Path)
-			switch r.URL.Path {
-			case "/write":
-				m.handleWrite(w, r)
-			}
-		}),
-	}
-
-	if tlsConfig != nil {
-		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
-	}
-
-	m.server = httpServer
 	return &m, nil
 }
 
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	go func() {
-		if m.server.TLSConfig != nil {
-			logp.Info("Starting HTTPS server on %s", m.server.Addr)
-			//certificate is already loaded. That's why the parameters are empty
-			err := m.server.ListenAndServeTLS("", "")
-			if err != nil && err != http.ErrServerClosed {
-				m.Logger().Errorf("Unable to start HTTPS server due to error: %v", err)
-				return
-			}
-		} else {
-			logp.Info("Starting HTTP server on %s", m.server.Addr)
-			err := m.server.ListenAndServe()
-			if err != nil && err != http.ErrServerClosed {
-				m.Logger().Errorf("Unable to start HTTP server due to error: %v", err)
-				return
-			}
+	// Start event watcher
+	m.server.Start()
+
+	for {
+		select {
+		case <-reporter.Done():
+			m.server.Stop()
+			return
+		case msg := <-m.server.GetEvents():
+			    e, _ := msg.GetEvent().GetValue(server.EventDataKey)
+			    event, _ := e.(mb.Event)
+				reporter.Event(event)
 		}
-	}()
-
-	go func() {
-		<-reporter.Done()
-		m.server.Close()
-		close(m.events)
-	}()
-
-	for e := range m.events {
-		reporter.Event(*e)
 	}
+
+	//for e := range m.events {
+	//	reporter.Event(*e)
+	//}
 }
 
-func (m *MetricSet) handleWrite(w http.ResponseWriter, r *http.Request) {
-	compressed, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		m.Logger().Errorf("Read error %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func getHandleFunc(h *httpserver.HttpServer) func(writer http.ResponseWriter, req *http.Request) {
+	return func(writer http.ResponseWriter, r *http.Request) {
+		compressed, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			//m.Logger().Errorf("Read error %v", err)
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	reqBuf, err := snappy.Decode(nil, compressed)
-	if err != nil {
-		m.Logger().Errorf("Decode error %v", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+		reqBuf, err := snappy.Decode(nil, compressed)
+		if err != nil {
+			//m.Logger().Errorf("Decode error %v", err)
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-	var req prompb.WriteRequest
-	if err := proto.Unmarshal(reqBuf, &req); err != nil {
-		m.Logger().Errorf("Unmarshal error %v", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+		var req prompb.WriteRequest
+		if err := proto.Unmarshal(reqBuf, &req); err != nil {
+			//m.Logger().Errorf("Unmarshal error %v", err)
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-	// refactor, optimize
-	samples := protoToSamples(&req)
-	events := samplesToEvents(samples)
+		// refactor, optimize
+		samples := protoToSamples(&req)
+		events := samplesToEvents(samples)
 
-	for _, e := range events {
-		m.events <- &e
+		for e := range events {
+			payload := common.MapStr{
+				server.EventDataKey: e,
+			}
+			event := &httpserver.HttpEvent{}
+			event.SetEvent(payload)
+			h.WriteEvents(event)
+		}
+		writer.WriteHeader(http.StatusAccepted)
+
+
 	}
 }
 

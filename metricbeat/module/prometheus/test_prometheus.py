@@ -3,15 +3,8 @@ import sys
 import unittest
 
 from datetime import datetime
-from prometheus_pb2 import (
-    TimeSeries,
-    Label,
-    Labels,
-    Sample,
-    WriteRequest
-)
+from prometheus_pb2 import WriteRequest
 import calendar
-import logging
 import requests
 import snappy
 

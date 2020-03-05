@@ -44,6 +44,12 @@ type HttpEvent struct {
 	meta  server.Meta
 }
 
+// MetricSetFactory accepts a BaseMetricSet and returns a MetricSet. If there
+// was an error creating the MetricSet then an error will be returned. The
+// returned MetricSet must also implement either EventFetcher or EventsFetcher
+// (but not both).
+type HandlerFactory func(h *HttpServer) func(writer http.ResponseWriter, req *http.Request)
+
 func (h *HttpEvent) GetEvent() common.MapStr {
 	return h.event
 }
@@ -52,7 +58,15 @@ func (h *HttpEvent) GetMeta() server.Meta {
 	return h.meta
 }
 
-func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
+func (h *HttpEvent) SetEvent(event common.MapStr) {
+	h.event = event
+}
+
+func (h *HttpEvent) SetMeta(meta server.Meta) {
+	h.meta = meta
+}
+
+func NewHttpServer(mb mb.BaseMetricSet, factory HandlerFactory) (server.Server, error) {
 	config := defaultHttpConfig()
 	err := mb.Module().UnpackConfig(&config)
 	if err != nil {
@@ -71,10 +85,9 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 		ctx:        ctx,
 		stop:       cancel,
 	}
-
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
-		Handler: http.HandlerFunc(h.handleFunc),
+		Handler: http.HandlerFunc(factory(h)),
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
@@ -114,6 +127,10 @@ func (h *HttpServer) Stop() {
 
 func (h *HttpServer) GetEvents() chan server.Event {
 	return h.eventQueue
+}
+
+func (h *HttpServer) WriteEvents(event server.Event) {
+	h.eventQueue <- event
 }
 
 func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
