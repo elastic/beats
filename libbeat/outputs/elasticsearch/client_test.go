@@ -42,7 +42,7 @@ import (
 
 func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
-	code, msg, err := BulkReadItemStatus(reader)
+	code, msg, err := BulkReadItemStatus(logp.L(), reader)
 	return code, string(msg), err
 }
 
@@ -103,7 +103,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 	}
 
 	reader := NewJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -121,7 +121,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	events := []publisher.Event{event, eventFail, event}
 
 	reader := NewJSONReader(response)
-	res, stats := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
@@ -142,7 +142,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	events := []publisher.Event{event, event, event}
 
 	reader := NewJSONReader(response)
-	res, stats := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
@@ -184,7 +184,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	events := []publisher.Event{event}
 
 	reader := NewJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
@@ -204,7 +204,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
 		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -227,7 +227,7 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
 		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -249,7 +249,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
 		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
 		if len(res) != 3 {
 			b.Fail()
 		}
@@ -390,7 +390,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 			recorder := &testBulkRecorder{}
 
-			encoded := bulkEncodePublishRequest(common.Version{Major: 7, Minor: 5}, recorder, index, pipeline, test.docType, events)
+			encoded := bulkEncodePublishRequest(logp.L(), common.Version{Major: 7, Minor: 5}, recorder, index, pipeline, test.docType, events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
 			assert.False(t, recorder.inAction, "incomplete bulk")
 
@@ -496,7 +496,7 @@ func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 
 	reader := NewJSONReader(response)
-	code, _, err := BulkReadItemStatus(reader)
+	code, _, err := BulkReadItemStatus(logp.L(), reader)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
