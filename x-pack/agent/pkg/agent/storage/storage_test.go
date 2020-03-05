@@ -183,7 +183,7 @@ func TestEncryptedDiskStore(t *testing.T) {
 		require.Equal(t, msg, content)
 	})
 
-	t.Run("when the target do no exist", func(t *testing.T) {
+	t.Run("when the target do not exist", func(t *testing.T) {
 		dir, err := ioutil.TempDir("", "configs")
 		require.NoError(t, err)
 		defer os.Remove(dir)
@@ -213,11 +213,12 @@ func genFile(b []byte) (string, error) {
 		return "", err
 	}
 	f.Write(b)
+	name := f.Name()
 	if err := f.Close(); err != nil {
 		return "", err
 	}
 
-	return f.Name(), nil
+	return name, nil
 }
 
 func requireFilesCount(t *testing.T, dir string, l int) {

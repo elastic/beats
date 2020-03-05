@@ -159,13 +159,18 @@ func (d *DiskStore) Save(in io.Reader) error {
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, tmpFile))
 	}
-	defer fd.Close()
 
 	// Always clean up the temporary file and ignore errors.
 	defer os.Remove(tmpFile)
 
 	if _, err := io.Copy(fd, in); err != nil {
 		return errors.New(err, "could not save content on disk",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if err := fd.Close(); err != nil {
+		return errors.New(err, "could not close temporary file",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, tmpFile))
 	}
@@ -211,8 +216,6 @@ func (d *EncryptedDiskStore) Save(in io.Reader) error {
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, tmpFile))
 	}
-	defer fd.Close()
-
 	// Always clean up the temporary file and ignore errors.
 	defer os.Remove(tmpFile)
 
@@ -225,6 +228,12 @@ func (d *EncryptedDiskStore) Save(in io.Reader) error {
 
 	if _, err := io.Copy(w, in); err != nil {
 		return errors.New(err, "could not save content on disk",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if err := fd.Close(); err != nil {
+		return errors.New(err, "could not close temporary file",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, tmpFile))
 	}
