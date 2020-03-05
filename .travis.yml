@@ -18,6 +18,11 @@ env:
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
 
+# Only run CI jobs on specific branches.
+branches:
+  only:
+  - master
+
 jobs:
   include:
     # General checks
