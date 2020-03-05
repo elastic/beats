@@ -286,7 +286,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
-		return err
+		return fmt.Errorf("Failed to start crawler: %+v", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
