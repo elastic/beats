@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -115,7 +116,8 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *commo
 }
 
 func (f *Factory) CheckConfig(c *common.Config) error {
-	return nil
+	_, err := f.Create(pubpipeline.NewNilPipeline(), c, nil)
+	return err
 }
 
 func (p *inputsRunner) Start() {

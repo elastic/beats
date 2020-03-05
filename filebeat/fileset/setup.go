@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
@@ -55,7 +56,8 @@ func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config, _ *co
 }
 
 func (sf *SetupFactory) CheckConfig(c *common.Config) error {
-	return nil
+	_, err := sf.Create(pubpipeline.NewNilPipeline(), c, nil)
+	return err
 }
 
 // SetupCfgRunner is for loading assets of modules.

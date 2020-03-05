@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // RunnerFactory is a factory for registrars
@@ -57,6 +58,7 @@ func (r *RunnerFactory) Create(
 	return p, nil
 }
 
-func (r *RunnerFactory) CheckConfig(_ *common.Config) error {
-	return nil
+func (r *RunnerFactory) CheckConfig(cfg *common.Config) error {
+	_, err := r.Create(pipeline.NewNilPipeline(), cfg, nil)
+	return err
 }
