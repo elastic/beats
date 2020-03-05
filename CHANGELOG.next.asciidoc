@@ -190,6 +190,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
 - Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
+- Add support for Histogram type in fields.yml {pull}16570[16570]
+- Windows .exe files now have embedded file version info. {issue}15232[15232]t
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 
