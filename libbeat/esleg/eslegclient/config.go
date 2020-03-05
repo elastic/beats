@@ -46,8 +46,8 @@ type config struct {
 	Timeout          time.Duration `config:"timeout"`
 }
 
-var (
-	defaultConfig = config{
+func defaultConfig() config {
+	return config{
 		Protocol:         "",
 		Path:             "",
 		ProxyURL:         "",
@@ -61,7 +61,7 @@ var (
 		EscapeHTML:       false,
 		TLS:              nil,
 	}
-)
+}
 
 func (c *config) Validate() error {
 	if c.ProxyURL != "" && !c.ProxyDisable {

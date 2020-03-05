@@ -137,7 +137,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
 func NewClients(cfg *common.Config) ([]Connection, error) {
-	config := defaultConfig
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
