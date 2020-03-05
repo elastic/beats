@@ -194,6 +194,21 @@ func (c *Cache) Delete(k Key) Value {
 	return v
 }
 
+// Evict a key from the map and return the value or nil if the key does
+// not exist. The RemovalListener is notified for evictions.
+func (c *Cache) Evict(k Key) Value {
+	c.Lock()
+	defer c.Unlock()
+	v, exists := c.get(k)
+	if exists {
+		if c.listener != nil {
+			c.listener(k, v)
+		}
+		delete(c.elements, k)
+	}
+	return v
+}
+
 // CleanUp performs maintenance on the cache by removing expired elements from
 // the cache. If a RemoveListener is registered it will be invoked for each
 // element that is removed during this clean up operation. The RemovalListener

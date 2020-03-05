@@ -23,8 +23,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
@@ -120,7 +122,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	defer m.log.Infof("%s terminated.", fullName)
 	defer m.Cleanup()
 
-	st := NewState(r,
+	st := state.NewState(r,
 		m.log,
 		m.config.FlowInactiveTimeout,
 		m.config.SocketInactiveTimeout,
@@ -154,27 +156,17 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	} else {
 		for _, p := range procs {
 			if i, err := p.Info(); err == nil {
-				process := process{
-					name:        i.Name,
-					pid:         uint32(i.PID),
-					args:        i.Args,
-					createdTime: i.StartTime,
-					path:        i.Exe,
-				}
+				process := state.CreateProcess(uint32(i.PID), i.Exe, i.Name, 0, i.Args).SetCreated(i.StartTime)
 
 				if user, err := p.User(); err == nil {
 					toUint32 := func(id string) uint32 {
 						num, _ := strconv.Atoi(id)
 						return uint32(num)
 					}
-					process.uid = toUint32(user.UID)
-					process.euid = toUint32(user.EUID)
-					process.gid = toUint32(user.GID)
-					process.egid = toUint32(user.EGID)
-					process.hasCreds = true
+					process.SetCreds(toUint32(user.UID), toUint32(user.GID), toUint32(user.EUID), toUint32(user.EGID))
 				}
 
-				st.CreateProcess(process)
+				st.ProcessStart(process)
 			}
 		}
 		m.log.Info("Bootstrapped process table using /proc")
@@ -192,7 +184,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 				running = false
 				break
 			}
-			v, ok := iface.(event)
+			v, ok := iface.(events.Event)
 			if !ok {
 				m.log.Errorf("Received an event of wrong type: %T", iface)
 				continue
@@ -200,12 +192,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			if m.isDetailed {
 				m.detailLog.Debug(v.String())
 			}
-			if err := v.Update(st); err != nil && m.isDetailed {
-				// These errors are seldom interesting, as the flow state engine
-				// doesn't have many error conditions and all benign enough to
-				// not be worth logging them by default.
-				m.detailLog.Warnf("Issue while processing event '%s': %v", v.String(), err)
-			}
+			v.Update(st)
 			atomic.AddUint64(&eventCount, 1)
 
 		case err := <-m.perfChannel.ErrC():

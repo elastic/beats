@@ -15,14 +15,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	socket_common "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
-
-// This is how many data we dump from sk_buff->data to read full packet headers
-// (IP + UDP header). This has been observed to include up to 100 bytes of
-// padding.
-const skBuffDataDumpBytes = 256
 
 // ProbeTransform transforms a probe before its installed.
 type ProbeTransform func(helper.ProbeDef) helper.ProbeDef
@@ -146,43 +143,43 @@ var sharedKProbes = []helper.ProbeDef{
 			Name:    "sys_execve_call",
 			Address: "{{.SYS_EXECVE}}",
 			Fetchargs: fmt.Sprintf("path=%s argptrs=%s param0=%s param1=%s param2=%s param3=%s param4=%s",
-				helper.MakeMemoryDump("{{.SYS_P1}}", 0, maxProgArgLen),                                  // path
-				helper.MakeMemoryDump("{{.SYS_P2}}", 0, int((maxProgArgs+1)*unsafe.Sizeof(uintptr(0)))), // argptrs
-				helper.MakeMemoryDump("+{{call .POINTER_INDEX 0}}({{.SYS_P2}})", 0, maxProgArgLen),      // param0
-				helper.MakeMemoryDump("+{{call .POINTER_INDEX 1}}({{.SYS_P2}})", 0, maxProgArgLen),      // param1
-				helper.MakeMemoryDump("+{{call .POINTER_INDEX 2}}({{.SYS_P2}})", 0, maxProgArgLen),      // param2
-				helper.MakeMemoryDump("+{{call .POINTER_INDEX 3}}({{.SYS_P2}})", 0, maxProgArgLen),      // param3
-				helper.MakeMemoryDump("+{{call .POINTER_INDEX 4}}({{.SYS_P2}})", 0, maxProgArgLen),      // param4
+				helper.MakeMemoryDump("{{.SYS_P1}}", 0, socket_common.MaxProgArgLen),                                  // path
+				helper.MakeMemoryDump("{{.SYS_P2}}", 0, int((socket_common.MaxProgArgs+1)*unsafe.Sizeof(uintptr(0)))), // argptrs
+				helper.MakeMemoryDump("+{{call .POINTER_INDEX 0}}({{.SYS_P2}})", 0, socket_common.MaxProgArgLen),      // param0
+				helper.MakeMemoryDump("+{{call .POINTER_INDEX 1}}({{.SYS_P2}})", 0, socket_common.MaxProgArgLen),      // param1
+				helper.MakeMemoryDump("+{{call .POINTER_INDEX 2}}({{.SYS_P2}})", 0, socket_common.MaxProgArgLen),      // param2
+				helper.MakeMemoryDump("+{{call .POINTER_INDEX 3}}({{.SYS_P2}})", 0, socket_common.MaxProgArgLen),      // param3
+				helper.MakeMemoryDump("+{{call .POINTER_INDEX 4}}({{.SYS_P2}})", 0, socket_common.MaxProgArgLen),      // param4
 			),
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(execveCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.ExecveCall) }),
 	},
 
 	{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
-			Name:      "sys_execve_ret",
+			Name:      "sys_execve_return",
 			Address:   "{{.SYS_EXECVE}}",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(execveRet) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.ExecveReturn) }),
 	},
 
 	{
 		Probe: tracing.Probe{
-			Name:    "do_exit",
+			Name:    "do_exit_call",
 			Address: "do_exit",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(doExit) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.DoExitCall) }),
 	},
 
 	{
 		Probe: tracing.Probe{
-			Name:      "commit_creds",
+			Name:      "commit_creds_call",
 			Address:   "commit_creds",
 			Fetchargs: "uid=+{{.STRUCT_CRED_UID}}({{.P1}}):u32 gid=+{{.STRUCT_CRED_GID}}({{.P1}}):u32 euid=+{{.STRUCT_CRED_EUID}}({{.P1}}):u32 egid=+{{.STRUCT_CRED_EGID}}({{.P1}}):u32",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(commitCreds) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.CommitCredsCall) }),
 	},
 
 	/***************************************************************************
@@ -191,11 +188,11 @@ var sharedKProbes = []helper.ProbeDef{
 
 	{
 		Probe: tracing.Probe{
-			Name:      "sock_init_data",
+			Name:      "sock_init_data_call",
 			Address:   "sock_init_data",
 			Fetchargs: "socket={{.P1}} sock={{.P2}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(sockInitData) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.SockInitDataCall) }),
 	},
 
 	// IPv4/TCP/UDP socket created. Good for associating sockets with pids.
@@ -204,23 +201,23 @@ var sharedKProbes = []helper.ProbeDef{
 	//  " inet_create(socket=0xffff9f1ddadb8080, proto=17) "
 	{
 		Probe: tracing.Probe{
-			Name:      "inet_create",
+			Name:      "inet_create_call",
 			Address:   "inet_create",
 			Fetchargs: "proto={{.P3}}:s32",
 			// proto=0 will select the protocol by looking at socket type (STREAM|DGRAM)
 			Filter: "proto==0 || proto=={{.IPPROTO_TCP}} || proto=={{.IPPROTO_UDP}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(inetCreate) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.InetCreateCall) }),
 	},
 
 	// IPv4/TCP/UDP socket released. Good for associating sockets with pids.
 	{
 		Probe: tracing.Probe{
-			Name:      "inet_release",
+			Name:      "inet_release_call",
 			Address:   "inet_release",
 			Fetchargs: "sock=+{{.SOCKET_SOCK}}({{.P1}})",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(inetReleaseCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.InetReleaseCall) }),
 	},
 
 	/***************************************************************************
@@ -232,12 +229,12 @@ var sharedKProbes = []helper.ProbeDef{
 	//  " connect(sock=0xffff9f1ddd216040, 0.0.0.0:0 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:      "tcp4_connect_in",
+			Name:      "tcp4_connect_call",
 			Address:   "tcp_v4_connect",
 			Fetchargs: "sock={{.P1}} laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN_AF}}({{.P2}}):u16 addr=+{{.SOCKADDR_IN_ADDR}}({{.P2}}):u32 port=+{{.SOCKADDR_IN_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpIPv4ConnectCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPv4ConnectCall) }),
 	},
 
 	// Result of IPv4/TCP connect:
@@ -246,11 +243,11 @@ var sharedKProbes = []helper.ProbeDef{
 	{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
-			Name:      "tcp4_connect_out",
+			Name:      "tcp4_connect_ret",
 			Address:   "tcp_v4_connect",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpConnectResult) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPConnectReturn) }),
 	},
 
 	// IPv4 packet is sent. Acceptable as a packet counter,
@@ -266,7 +263,7 @@ var sharedKProbes = []helper.ProbeDef{
 			Fetchargs: "sock={{.IP_LOCAL_OUT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.IP_LOCAL_OUT_SK_BUFF}}):u32 af=+{{.INET_SOCK_AF}}({{.IP_LOCAL_OUT_SOCK}}):u16 laddr=+{{.INET_SOCK_LADDR}}({{.IP_LOCAL_OUT_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.IP_LOCAL_OUT_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.IP_LOCAL_OUT_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.IP_LOCAL_OUT_SOCK}}):u16",
 			Filter:    "(af=={{.AF_INET}} || af=={{.AF_INET6}})",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(ipLocalOutCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.IPLocalOutCall) }),
 	},
 
 	// Count received IPv4/TCP packets.
@@ -278,7 +275,7 @@ var sharedKProbes = []helper.ProbeDef{
 			Address:   "tcp_v4_do_rcv",
 			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.P1}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpV4DoRcv) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPv4DoRcvCall) }),
 	},
 
 	/***************************************************************************
@@ -291,20 +288,20 @@ var sharedKProbes = []helper.ProbeDef{
 	*/
 	{
 		Probe: tracing.Probe{
-			Name:      "udp_sendmsg_in",
+			Name:      "udp_sendmsg_call",
 			Address:   "udp_sendmsg",
 			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.SOCKADDR_IN_ADDR}}(+0({{.UDP_SENDMSG_MSG}})):u32 siptr=+0({{.UDP_SENDMSG_MSG}}) siaf=+{{.SOCKADDR_IN_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16 rport=+{{.SOCKADDR_IN_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddr=+{{.INET_SOCK_RADDR}}({{.UDP_SENDMSG_SOCK}}):u32 altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpSendMsgCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.UDPSendmsgCall) }),
 	},
 
 	{
 		Probe: tracing.Probe{
-			Name:      "udp_queue_rcv_skb",
+			Name:      "udp_queue_rcv_skb_call",
 			Address:   "udp_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, socket_common.SkBuffDataDumpBytes),
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.UDPQueueRcvSkbCall) }),
 	},
 
 	/***************************************************************************
@@ -315,12 +312,12 @@ var sharedKProbes = []helper.ProbeDef{
 	 */
 	{
 		Probe: tracing.Probe{
-			Name:      "clock_sync_probe",
+			Name:      "clock_sync_call",
 			Address:   "{{.SYS_UNAME}}",
 			Fetchargs: "magic=+0({{.SYS_P1}}):u64 timestamp=+8({{.SYS_P1}}):u64",
 			Filter:    fmt.Sprintf("magic==0x%x", clockSyncMagic),
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(clockSyncCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.ClockSyncCall) }),
 	},
 }
 
@@ -333,13 +330,13 @@ var ipv4OnlyKProbes = []helper.ProbeDef{
 	{
 		Probe: tracing.Probe{
 			Type:    tracing.TypeKRetProbe,
-			Name:    "inet_csk_accept_ret4",
+			Name:    "inet_csk_accept_v4_return",
 			Address: "inet_csk_accept",
 			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16",
 			Filter: "family=={{.AF_INET}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult4) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.InetCskAcceptV4Return) }),
 	},
 
 	// Data is sent via TCP.
@@ -349,12 +346,12 @@ var ipv4OnlyKProbes = []helper.ProbeDef{
 	//  " tcp_sendmsg(sock=0xffff9f1ddd216040, len=517, 10.0.2.15:55310 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:    "tcp_sendmsg_in4",
+			Name:    "tcp_sendmsg_v4_call",
 			Address: "tcp_sendmsg",
 			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall4) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPSendmsgV4Call) }),
 	},
 }
 
@@ -372,13 +369,13 @@ var ipv6KProbes = []helper.ProbeDef{
 	//  " inet_create(socket=0xffff9f1ddadb8080, proto=17) "
 	{
 		Probe: tracing.Probe{
-			Name:      "inet6_create",
+			Name:      "inet6_create_call",
 			Address:   "inet6_create",
 			Fetchargs: "proto={{.P3}}:s32",
 			// proto=0 will select the protocol by looking at socket type (STREAM|DGRAM)
 			Filter: "proto==0 || proto=={{.IPPROTO_TCP}} || proto=={{.IPPROTO_UDP}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(inetCreate) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.InetCreateCall) }),
 	},
 
 	/***************************************************************************
@@ -399,7 +396,7 @@ var ipv6KProbes = []helper.ProbeDef{
 			Address:   "inet6_csk_xmit",
 			Fetchargs: "sock={{.INET6_CSK_XMIT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.INET6_CSK_XMIT_SKBUFF}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(inet6CskXmitCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.Inet6CskXmitCall) }),
 	},
 
 	// Count received IPv6/TCP packets.
@@ -411,7 +408,7 @@ var ipv6KProbes = []helper.ProbeDef{
 			Address:   "tcp_v6_do_rcv",
 			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpV6DoRcv) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPv6DoRcvCall) }),
 	},
 
 	// An IPv6 / TCP socket connect attempt:
@@ -419,12 +416,12 @@ var ipv6KProbes = []helper.ProbeDef{
 	//  " connect6(sock=0xffff9f1ddd216040, 0.0.0.0:0 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:      "tcp6_connect_in",
+			Name:      "tcp_v6_connect_return",
 			Address:   "tcp_v6_connect",
 			Fetchargs: "sock={{.P1}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET6}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpIPv6ConnectCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPv6ConnectCall) }),
 	},
 
 	// Result of IPv6/TCP connect:
@@ -433,11 +430,11 @@ var ipv6KProbes = []helper.ProbeDef{
 	{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
-			Name:      "tcp6_connect_out",
+			Name:      "tcp_v6_connect_return",
 			Address:   "tcp_v6_connect",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpConnectResult) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPConnectReturn) }),
 	},
 
 	/***************************************************************************
@@ -453,21 +450,21 @@ var ipv6KProbes = []helper.ProbeDef{
 	*/
 	{
 		Probe: tracing.Probe{
-			Name:      "udpv6_sendmsg_in",
+			Name:      "udpv6_sendmsg_call",
 			Address:   "udpv6_sendmsg",
 			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddra=+{{.SOCKADDR_IN6_ADDRA}}(+0({{.UDP_SENDMSG_MSG}})):u64 raddrb=+{{.SOCKADDR_IN6_ADDRB}}(+0({{.UDP_SENDMSG_MSG}})):u64 rport=+{{.SOCKADDR_IN6_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddra={{.INET_SOCK_V6_RADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altraddrb={{.INET_SOCK_V6_RADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16 si6ptr=+0({{.UDP_SENDMSG_MSG}}) si6af=+{{.SOCKADDR_IN6_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpv6SendMsgCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.UDPv6SendmsgCall) }),
 	},
 
 	/* UDP/IPv6 receive datagram. Good for counting payload bytes and packets.*/
 	{
 		Probe: tracing.Probe{
-			Name:      "udpv6_queue_rcv_skb",
+			Name:      "udpv6_queue_rcv_skb_call",
 			Address:   "udpv6_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, socket_common.SkBuffDataDumpBytes),
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpv6QueueRcvSkb) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.UDPv6QueueRcvSkbCall) }),
 	},
 
 	/***************************************************************************
@@ -481,12 +478,12 @@ var ipv6KProbes = []helper.ProbeDef{
 	//  " tcp_sendmsg(sock=0xffff9f1ddd216040, len=517, 10.0.2.15:55310 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:    "tcp_sendmsg_in",
+			Name:    "tcp_sendmsg_call",
 			Address: "tcp_sendmsg",
 			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.TCPSendmsgCall) }),
 	},
 
 	// Return of accept(). Local side is usually zero so not fetched. Needs
@@ -496,13 +493,13 @@ var ipv6KProbes = []helper.ProbeDef{
 	{
 		Probe: tracing.Probe{
 			Type:    tracing.TypeKRetProbe,
-			Name:    "inet_csk_accept_ret",
+			Name:    "inet_csk_accept_return",
 			Address: "inet_csk_accept",
 			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}}",
 			Filter: "family=={{.AF_INET}} || family=={{.AF_INET6}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(events.InetCskAcceptReturn) }),
 	},
 }
 
