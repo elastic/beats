@@ -13,6 +13,8 @@ Web Service: Current Connections (through experience with their apps app, users 
 
 The `cache` object contains metrics from the user mode cache and output cache.
 
+The `asp_net` and `asp_net_application` contain asp.net related performance counter values.
+
 
 
 
