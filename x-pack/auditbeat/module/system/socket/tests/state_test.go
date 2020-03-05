@@ -219,12 +219,9 @@ func TestTCPConnWithProcessTimeouts(t *testing.T) {
 	}
 	assert.Len(t, flows, 1)
 	// we have a truncated flow with no directionality,
-	// so just report what we
+	// so just report what we have
 	flow = flows[0]
 	for field, expected := range map[string]interface{}{
-		// swap the source and destination since we have a truncated flow
-		// and don't know if the initial transaction was a dial out or dial in
-		// but the first thing we got was a Rcv
 		"source.ip":         localIP,
 		"source.port":       localPort,
 		"client.ip":         localIP,

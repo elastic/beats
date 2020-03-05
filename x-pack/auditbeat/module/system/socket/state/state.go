@@ -54,15 +54,8 @@ func MakeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTim
 		dns:      NewDNSTracker(processTimeout * 2),
 		done:     []*Flow{},
 	}
-	flowCache := NewFlowCache(inactiveTimeout, func(f *Flow) {
-		f.Terminate()
-		newState.FinalizeFlow(f)
-	})
-	socketCache := NewSocketCache(socketTimeout, closeTimeout, func(s *Socket) {
-		for _, flow := range s.Flows() {
-			flowCache.Evict(flow)
-		}
-	})
+	flowCache := NewFlowCache(inactiveTimeout, newState.finalizeFlow)
+	socketCache := NewSocketCache(socketTimeout, closeTimeout, newState.finalizeSocket)
 	processCache := NewProcessCache(processTimeout)
 
 	newState.flows = flowCache
@@ -84,6 +77,9 @@ func (s *State) UpdateFlow(f *Flow) {
 // existing flow. The optional condition must be met before an existing flow is
 // updated. Otherwise the update is ignored.
 func (s *State) UpdateFlowWithCondition(f *Flow, condition func(*Flow) bool) {
+	s.Lock()
+	defer s.Unlock()
+
 	f.createdTime = s.clock.KernelToTime(f.created)
 	f.lastSeenTime = s.clock.KernelToTime(f.lastSeen)
 
@@ -117,17 +113,14 @@ func (s *State) UpdateFlowWithCondition(f *Flow, condition func(*Flow) bool) {
 	socket.AddFlow(cached)
 }
 
-func (s *State) FinalizeFlow(f *Flow) {
-	s.Lock()
-	defer s.Unlock()
+func (s *State) finalizeFlow(f *Flow) {
+	f.Terminate()
 	if f.IsValid() {
 		s.done = append(s.done, f)
 	}
 }
 
 func (s *State) PopFlows() []*Flow {
-	s.Lock()
-	defer s.Unlock()
 	r := s.done
 	s.done = []*Flow{}
 	return r
@@ -147,6 +140,9 @@ func (s *State) getOrCreateSocket(socket uintptr, pid uint32) *Socket {
 }
 
 func (s *State) SocketEnd(socket uintptr, pid uint32) {
+	s.Lock()
+	defer s.Unlock()
+
 	if closed := s.sockets.Close(socket); closed != nil {
 		closed.pid = pid
 		if process := s.processes.Get(pid); process != nil {
@@ -155,9 +151,18 @@ func (s *State) SocketEnd(socket uintptr, pid uint32) {
 	}
 }
 
+func (s *State) finalizeSocket(socket *Socket) {
+	for _, flow := range socket.Flows() {
+		s.flows.Evict(flow)
+	}
+}
+
 // process stuff
 
 func (s *State) ProcessStart(p *Process) {
+	s.Lock()
+	defer s.Unlock()
+
 	if p.createdTime == (time.Time{}) {
 		p.createdTime = s.clock.KernelToTime(p.created)
 	}
@@ -166,6 +171,9 @@ func (s *State) ProcessStart(p *Process) {
 }
 
 func (s *State) ProcessEnd(pid uint32) {
+	s.Lock()
+	defer s.Unlock()
+
 	s.processes.Delete(pid)
 }
 
@@ -175,12 +183,12 @@ var lastTime time.Time
 func (s *State) logState() {
 	s.Lock()
 	done := len(s.done)
-	s.Unlock()
 	flows := s.flows.Size()
 	activeSockets := s.sockets.Size()
 	closingSockets := s.sockets.ClosingSize()
 	processes := s.processes.Size()
 	threads := s.threads.Size()
+	s.Unlock()
 
 	events := atomic.LoadUint64(&s.EventCount)
 
@@ -204,6 +212,7 @@ func (s *State) reapLoop() {
 		case <-s.reporter.Done():
 			return
 		case <-reportTicker.C:
+			s.Lock()
 			s.CleanUp()
 			for _, flow := range s.PopFlows() {
 				if int(flow.pid) == pid {
@@ -212,9 +221,11 @@ func (s *State) reapLoop() {
 					continue
 				}
 				if !s.reporter.Event(flow.ToEvent(true)) {
+					s.Unlock()
 					return
 				}
 			}
+			s.Unlock()
 		case <-logTicker.C:
 			s.logState()
 		}
@@ -230,10 +241,16 @@ func (s *State) CleanUp() {
 }
 
 func (s *State) PushThreadEvent(thread uint32, e interface{}) {
+	s.Lock()
+	defer s.Unlock()
+
 	s.threads.PutIfAbsent(thread, e)
 }
 
 func (s *State) PopThreadEvent(thread uint32) interface{} {
+	s.Lock()
+	defer s.Unlock()
+
 	value := s.threads.Delete(thread)
 	if value == nil {
 		return nil
@@ -242,12 +259,16 @@ func (s *State) PopThreadEvent(thread uint32) interface{} {
 }
 
 func (s *State) SyncClocks(kernelNanos, userNanos uint64) {
+	s.Lock()
+	defer s.Unlock()
+
 	s.clock.Sync(kernelNanos, userNanos)
 }
 
 func (s *State) OnDNSTransaction(tr dns.Transaction) error {
 	s.Lock()
 	defer s.Unlock()
+
 	s.dns.AddTransaction(tr)
 	return nil
 }
