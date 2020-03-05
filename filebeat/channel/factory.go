@@ -87,7 +87,7 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(p beat.Pipeline) Connector {
+func (f *OutletFactory) Create(p beat.PipelineConnector) Connector {
 	return &pipelineConnector{parent: f, pipeline: p}
 }
 

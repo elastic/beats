@@ -56,7 +56,7 @@ func MatchDefault(factory RunnerFactory) FactoryMatcher {
 }
 
 func (f multiplexedFactory) Create(
-	p beat.Pipeline,
+	p beat.PipelineConnector,
 	config *common.Config,
 	meta *common.MapStrPointer,
 ) (Runner, error) {

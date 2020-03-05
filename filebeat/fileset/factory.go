@@ -75,7 +75,7 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
 	if err != nil {

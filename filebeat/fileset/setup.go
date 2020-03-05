@@ -41,7 +41,7 @@ func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFac
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
-func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
+func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
 	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatInfo, false)
 	if err != nil {
 		return nil, err

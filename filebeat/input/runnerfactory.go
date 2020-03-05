@@ -43,7 +43,7 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 
 // Create creates a input based on a config
 func (r *RunnerFactory) Create(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	c *common.Config,
 	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {

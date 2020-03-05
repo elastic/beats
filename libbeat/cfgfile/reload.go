@@ -73,7 +73,7 @@ type Reload struct {
 // of new Runners
 type RunnerFactory interface {
 	ConfigChecker
-	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 }
 
 // ConfigChecker is usually combined with a RunnerFactory for implementations
