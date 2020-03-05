@@ -84,7 +84,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
-		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory)
 		if fb.config.ConfigModules.Enabled() {
 			modulesLoader := cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
@@ -245,13 +245,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	inputLoader := input.NewRunnerFactory(pipelineConnector, registrar, fb.done)
-	moduleLoader := fileset.NewFactory(pipelineConnector,
-		registrar,
-		b.Info.Version,
-		pipelineLoaderFactory,
-		config.OverwritePipelines,
-		fb.done,
-	)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 
 	crawler, err := newCrawler(inputLoader, moduleLoader, pipelineConnector, config.Inputs, fb.done, *once)
 	if err != nil {

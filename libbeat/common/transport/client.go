@@ -23,16 +23,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 type Client struct {
-	log     *logp.Logger
 	dialer  Dialer
 	network string
 	host    string
-	config  *Config
+	config  Config
 
 	conn  net.Conn
 	mutex sync.Mutex
@@ -40,29 +39,12 @@ type Client struct {
 
 type Config struct {
 	Proxy   *ProxyConfig
-	TLS     *TLSConfig
+	TLS     *tlscommon.TLSConfig
 	Timeout time.Duration
 	Stats   IOStatser
 }
 
-func MakeDialer(c *Config) (Dialer, error) {
-	var err error
-	dialer := NetDialer(c.Timeout)
-	dialer, err = ProxyDialer(logp.NewLogger(logSelector), c.Proxy, dialer)
-	if err != nil {
-		return nil, err
-	}
-	if c.Stats != nil {
-		dialer = StatsDialer(dialer, c.Stats)
-	}
-
-	if c.TLS != nil {
-		return TLSDialer(dialer, c.TLS, c.Timeout)
-	}
-	return dialer, nil
-}
-
-func NewClient(c *Config, network, host string, defaultPort int) (*Client, error) {
+func NewClient(c Config, network, host string, defaultPort int) (*Client, error) {
 	// do some sanity checks regarding network and Config matching +
 	// address being parseable
 	switch network {
@@ -84,7 +66,7 @@ func NewClient(c *Config, network, host string, defaultPort int) (*Client, error
 	return NewClientWithDialer(dialer, c, network, host, defaultPort)
 }
 
-func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort int) (*Client, error) {
+func NewClientWithDialer(d Dialer, c Config, network, host string, defaultPort int) (*Client, error) {
 	// check address being parseable
 	host = fullAddress(host, defaultPort)
 	_, _, err := net.SplitHostPort(host)
@@ -93,7 +75,6 @@ func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort 
 	}
 
 	client := &Client{
-		log:     logp.NewLogger(logSelector),
 		dialer:  d,
 		network: network,
 		host:    host,
@@ -131,7 +112,7 @@ func (c *Client) Close() error {
 	defer c.mutex.Unlock()
 
 	if c.conn != nil {
-		c.log.Debug("closing")
+		debugf("closing")
 		err := c.conn.Close()
 		c.conn = nil
 		return err
@@ -218,8 +199,7 @@ func (c *Client) SetWriteDeadline(t time.Time) error {
 
 func (c *Client) handleError(err error) error {
 	if err != nil {
-
-		c.log.Debugf("handle error: %+v", err)
+		debugf("handle error: %v", err)
 
 		if nerr, ok := err.(net.Error); !(ok && (nerr.Temporary() || nerr.Timeout())) {
 			_ = c.Close()

@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -330,7 +329,7 @@ func makeClient(
 	host string,
 	params map[string]string,
 	proxyURL *url.URL,
-	tlsConfig *transport.TLSConfig,
+	tlsConfig *tlscommon.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)

@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
+- Fix diskio issue for windows 32 bit on disk_performance struct alignment. {issue}16680[16680]
 - Fix detection and logging of some error cases with light modules. {pull}14706[14706]
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
@@ -161,6 +162,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
 - Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
 - Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
+- Add `o365audit` input type for consuming events from Office 365 Management Activity API. {issue}16196[16196] {pull}16244[16244]
 
 *Heartbeat*
 
@@ -204,8 +206,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add filtering option for prometheus collector. {pull}16420[16420]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
+- Add OpenMetrics Metricbeat module {pull}16596[16596]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
+- Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
+- Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
 
 *Packetbeat*
 

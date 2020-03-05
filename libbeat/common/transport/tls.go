@@ -29,20 +29,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
-// TLSConfig is the interface used to configure a tcp client or server from a `Config`
-type TLSConfig = tlscommon.TLSConfig
-
-// TLSVersion type for TLS version.
-type TLSVersion = tlscommon.TLSVersion
-
-func TLSDialer(forward Dialer, config *TLSConfig, timeout time.Duration) (Dialer, error) {
+func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (Dialer, error) {
 	return TestTLSDialer(testing.NullDriver, forward, config, timeout)
 }
 
 func TestTLSDialer(
 	d testing.Driver,
 	forward Dialer,
-	config *TLSConfig,
+	config *tlscommon.TLSConfig,
 	timeout time.Duration,
 ) (Dialer, error) {
 	var lastTLSConfig *tls.Config
@@ -85,7 +79,7 @@ func tlsDialWith(
 	network, address string,
 	timeout time.Duration,
 	tlsConfig *tls.Config,
-	config *TLSConfig,
+	config *tlscommon.TLSConfig,
 ) (net.Conn, error) {
 	socket, err := dialer.Dial(network, address)
 	if err != nil {
@@ -129,7 +123,7 @@ func tlsDialWith(
 	return conn, nil
 }
 
-func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *TLSConfig) error {
+func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *tlscommon.TLSConfig) error {
 	st := conn.ConnectionState()
 
 	if !st.HandshakeComplete {
@@ -138,7 +132,7 @@ func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *TLSConfig
 		return err
 	}
 
-	d.Info("TLS version", fmt.Sprintf("%v", TLSVersion(st.Version)))
+	d.Info("TLS version", fmt.Sprintf("%v", tlscommon.TLSVersion(st.Version)))
 
 	// no more checks if no extra configs available
 	if config == nil {
@@ -154,7 +148,7 @@ func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *TLSConfig
 		versionOK = versionOK || st.Version == uint16(version)
 	}
 	if !versionOK {
-		err := fmt.Errorf("tls version %v not configured", TLSVersion(st.Version))
+		err := fmt.Errorf("tls version %v not configured", tlscommon.TLSVersion(st.Version))
 		d.Fatal("TLS version", err)
 		return err
 	}

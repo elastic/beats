@@ -473,7 +473,10 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+    - pubsub
+    - loadbalancing
   zone: "us-central1-a"
+  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
@@ -920,6 +923,19 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
+
+#----------------------------- Openmetrics Module -----------------------------
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
 
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
