@@ -23,9 +23,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -275,20 +273,15 @@ func ElasticBeatsDir() (string, error) {
 // it will return the root directory of the module from within the module cache or vendor
 // directory.
 func findElasticBeatsDir() (string, error) {
-	// Find the import path for the package containing this file.
-	type foo struct{}
-	typ := reflect.TypeOf(foo{})
-	magepkgpath := typ.PkgPath()
-
-	// Walk up the import path until we find the elastic/beats module path.
-	pkgpath := magepkgpath
-	for extractCanonicalRootImportPath(pkgpath) != elasticBeatsImportPath {
-		pkgpath = path.Dir(pkgpath)
-		if pkgpath == "." {
-			return "", errors.Errorf("failed to find %q from %q", elasticBeatsImportPath, magepkgpath)
-		}
+	repo, err := GetProjectRepoInfo()
+	if err != nil {
+		return "", err
 	}
-	return gotool.ListModulePath(pkgpath)
+	if repo.IsElasticBeats() {
+		return repo.RootDir, nil
+	}
+
+	return gotool.ListModulePath("github.com/elastic/beats/v7")
 }
 
 var (

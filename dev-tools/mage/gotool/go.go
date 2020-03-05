@@ -105,7 +105,7 @@ func ListModulePath(pkg string) (string, error) {
 		return "", err
 	}
 	if n := len(lines); n != 1 {
-		return "", fmt.Errorf("expected 1 line, got %d", n)
+		return "", fmt.Errorf("expected 1 line, got %d while looking for %s", n, pkg)
 	}
 	return lines[0], nil
 }
