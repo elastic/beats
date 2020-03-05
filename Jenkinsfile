@@ -534,6 +534,7 @@ pipeline {
 def makeTarget(context, target, clean = true){
   whenTrue(${params.debug}){
     dumpFilteredEnvironment()
+    dumpMage()
   }
   withGithubNotify(context: "${context}") {
     withBeatsEnv(){
@@ -551,6 +552,9 @@ def makeTarget(context, target, clean = true){
 def mageTargetWin(context, target){
   whenTrue(${params.debug}){
     dumpFilteredEnvironment()
+    withBeatsEnvWin(){
+      dumpMage()
+    }
   }
   withGithubNotify(context: "${context}") {
     withBeatsEnvWin(){
@@ -613,7 +617,14 @@ def withBeatsEnvWin(Closure body){
   }
 }
 
+def dumpMage(){
+  echo "### MAGE DUMP ###"
+  sh(label: "Dump mage variables", script: "mage dumpVariables")
+  echo "### END MAGE DUMP ###"
+}
+
 def dumpFilteredEnvironment(){
+  echo "### ENV DUMP ###"
   echo "BUILD_DIR: ${env.BUILD_DIR}"
   echo "COVERAGE_DIR: ${env.COVERAGE_DIR}"
   echo "BEATS: ${env.BEATS}"
@@ -659,6 +670,7 @@ def dumpFilteredEnvironment(){
   echo "DOCKER_CACHE: ${env.DOCKER_CACHE}"
   echo "GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}"
   echo "PIP_INSTALL_PARAMS: ${env.PIP_INSTALL_PARAMS}"
+  echo "### END ENV DUMP ###"
 }
 
 def k8sTest(versions){
