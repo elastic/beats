@@ -231,7 +231,7 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.NoError(t, err)
 
 	// simple ping
-	client.Ping()
+	client.Connect()
 	assert.Equal(t, 1, requestCount)
 
 	// bulk request

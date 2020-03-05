@@ -203,7 +203,7 @@ func doClientPing(t *testing.T) {
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
 	// the client is pointed at the right server or proxy.
-	client.Ping()
+	client.Connect()
 }
 
 // serverState contains the state of the http listeners for proxy tests,
