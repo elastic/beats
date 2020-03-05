@@ -16,4 +16,8 @@ chmod +x "${GVM_CMD}"
 gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
 
 eval $(gvm ${GO_VERSION})
-go get -u github.com/kardianos/govendor
+GO111MODULE=off go get -u github.com/kardianos/govendor
+
+docker images
+cd metricbeat
+TESTING_ENVIRONMENT=snapshot ES_BEATS=.. docker-compose -p metricbeat21e89f892431fca6dc2c9c17fa89dd8a9b03e92a  -f docker-compose.yml build  --pull --force-rm
