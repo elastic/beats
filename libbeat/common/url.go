@@ -92,21 +92,17 @@ func ParseURL(raw string, hints ...ParseHint) (*url.URL, error) {
 		return nil, nil
 	}
 
-	u, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(u.Scheme, "http") {
-		return u, err
-	}
-
-	// Parsing failed. Try applying hints and parsing again.
 	if len(hints) == 0 {
 		hints = append(hints, WithDefaultScheme("http"))
 	}
 
-	for _, hint := range hints {
-		raw = hint(raw)
+	if parts := strings.SplitN(raw, "://", 2); len(parts) != 2 {
+		for _, hint := range hints {
+			raw = hint(raw)
+		}
 	}
 
-	return u.Parse(raw)
+	return url.Parse(raw)
 }
 
 func WithDefaultScheme(scheme string) ParseHint {
