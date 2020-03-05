@@ -76,27 +76,32 @@ func (c *crawler) Start(
 	for _, inputConfig := range c.inputConfigs {
 		err := c.startInput(pipeline, inputConfig, r.GetStates())
 		if err != nil {
-			return err
+			return fmt.Errorf("starting input failed: %+v", err)
 		}
 	}
 
 	if configInputs.Enabled() {
 		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
-			return err
+			return fmt.Errorf("creating input reloader failed: %+v", err)
 		}
 
-		go func() {
-			c.inputReloader.Run(c.inputsFactory)
-		}()
 	}
 
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
-			return err
+			return fmt.Errorf("creating module reloader failed: %+v", err)
 		}
 
+	}
+
+	if c.inputReloader != nil {
+		go func() {
+			c.inputReloader.Run(c.inputsFactory)
+		}()
+	}
+	if c.modulesReloader != nil {
 		go func() {
 			c.modulesReloader.Run(c.modulesFactory)
 		}()
