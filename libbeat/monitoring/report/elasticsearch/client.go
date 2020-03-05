@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -37,7 +36,7 @@ import (
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
-	es     *elasticsearch.Client
+	es     *eslegclient.Connection
 	params map[string]string
 	format report.Format
 
@@ -45,7 +44,7 @@ type publishClient struct {
 }
 
 func newPublishClient(
-	es *elasticsearch.Client,
+	es *eslegclient.Connection,
 	params map[string]string,
 	format report.Format,
 ) (*publishClient, error) {
@@ -70,8 +69,7 @@ func (c *publishClient) Connect() error {
 	params := map[string]string{
 		"filter_path": "features.monitoring.enabled",
 	}
-	conn := c.es.Connection()
-	status, body, err := conn.Request("GET", "/_xpack", "", params, nil)
+	status, body, err := c.es.Request("GET", "/_xpack", "", params, nil)
 	if err != nil {
 		return fmt.Errorf("X-Pack capabilities query failed with: %v", err)
 	}
@@ -161,12 +159,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 }
 
 func (c *publishClient) Test(d testing.Driver) {
-	conn := c.es.Connection()
-	conn.Test(d)
+	c.es.Test(d)
 }
 
 func (c *publishClient) String() string {
-	return "publish(" + c.es.String() + ")"
+	return "monitoring(" + c.es.URL + ")"
 }
 
 func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
@@ -185,8 +182,7 @@ func (c *publishClient) publishXPackBulk(params map[string]string, event publish
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	conn := c.es.Connection()
-	_, err := conn.SendMonitoringBulk(params, bulk[:])
+	_, err := c.es.SendMonitoringBulk(params, bulk[:])
 	return err
 }
 
@@ -196,8 +192,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		"_routing": nil,
 	}
 
-	conn := c.es.Connection()
-	esVersion := conn.GetVersion()
+	esVersion := c.es.GetVersion()
 	if esVersion.Major < 7 {
 		meta["_type"] = "doc"
 	}
@@ -238,7 +233,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	_, result, err := conn.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
+	_, result, err := c.es.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
 		return err
 	}

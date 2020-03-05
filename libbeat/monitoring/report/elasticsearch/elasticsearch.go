@@ -34,8 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -337,22 +335,18 @@ func makeClient(
 		return nil, err
 	}
 
-	esClient, err := esout.NewClient(esout.ClientSettings{
-		ConnectionSettings: eslegclient.ConnectionSettings{
-			URL:              url,
-			Proxy:            proxyURL,
-			TLS:              tlsConfig,
-			Username:         config.Username,
-			Password:         config.Password,
-			APIKey:           config.APIKey,
-			Parameters:       params,
-			Headers:          config.Headers,
-			Timeout:          config.Timeout,
-			CompressionLevel: config.CompressionLevel,
-		},
-		Index:    outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),
-		Pipeline: nil,
-	}, nil)
+	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:              url,
+		Proxy:            proxyURL,
+		TLS:              tlsConfig,
+		Username:         config.Username,
+		Password:         config.Password,
+		APIKey:           config.APIKey,
+		Parameters:       params,
+		Headers:          config.Headers,
+		Timeout:          config.Timeout,
+		CompressionLevel: config.CompressionLevel,
+	})
 	if err != nil {
 		return nil, err
 	}
