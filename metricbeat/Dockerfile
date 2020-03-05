@@ -1,5 +1,5 @@
 #FROM store/oracle/database-instantclient:12.2.0.1 as oracle
-FROM docker.elastic.co/observability-ci/database-enterprise:12.2.0.1 as oracle
+FROM docker.elastic.co/observability-ci/database-instantclient:12.2.0.1 as oracle
 FROM golang:1.13.8
 
 RUN \
