@@ -244,7 +244,7 @@ func TestClientWithHeaders(t *testing.T) {
 	batch := outest.NewBatch(event, event, event)
 	err = client.Publish(batch)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, requestCount)
+	assert.Equal(t, 2, requestCount)
 }
 
 func TestBulkEncodeEvents(t *testing.T) {
