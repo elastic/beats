@@ -26,6 +26,77 @@ The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
 
 [float]
+=== Kubernetes RBAC
+
+Metricbeat requires certain cluster level privileges in order to fetch the metrics. The following example creates a `ServiceAcount` named `metricbeat` with the necessary permissions to run all the metricsets from the module. A `ClusterRole` and a `ClusterRoleBinding` are created for this purpose:
+
+[source,yaml]
+----
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: metricbeat
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+----
+
+[source,yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: metricbeat
+  labels:
+    k8s-app: metricbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - events
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  - deployments
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+----
+
+[source,yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metricbeat
+subjects:
+- kind: ServiceAccount
+  name: metricbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: metricbeat
+  apiGroup: rbac.authorization.k8s.io
+[source,yaml]
+----
+
+[float]
 === Dashboard
 
 Kubernetes module is shipped including default dashboards for `apiserver`, `controllermanager`, `scheduler` and `proxy`.
@@ -124,7 +195,10 @@ metricbeat.modules:
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
-
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
 - module: kubernetes
