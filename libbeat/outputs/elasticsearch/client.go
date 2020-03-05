@@ -402,10 +402,6 @@ func (client *Client) Close() error {
 	return client.conn.Close()
 }
 
-func (client *Client) Connection() eslegclient.Connection {
-	return client.conn
-}
-
 func (client *Client) String() string {
 	return "elasticsearch(" + client.conn.URL + ")"
 }
