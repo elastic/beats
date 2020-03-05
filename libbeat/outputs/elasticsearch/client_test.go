@@ -335,6 +335,6 @@ func TestClientWithAPIKey(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
-	client.Ping()
+	client.Connect()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
