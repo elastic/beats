@@ -31,6 +31,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Python 3 is required now to run python tests and tools. {pull}14798[14798]
 - The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
 - `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
+- The `libbeat/outputs/transport` package has been moved to `libbeat/common/transport`. {pull}16734[16734]
+- The `libbeat/outputs/tls.go` file has been removed. All exported symbols in that file (`libbeat/outputs.*`) are now available as `libbeat/common/tlscommon.*`. {pull}16734[16734]
+- The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
 
 ==== Bugfixes
 
