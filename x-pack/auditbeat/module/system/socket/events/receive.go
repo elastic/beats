@@ -15,47 +15,16 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-type receiveCall struct {
-	Meta      tracing.Metadata `kprobe:"metadata"`
-	Socket    uintptr          `kprobe:"sock"`
-	Size      uintptr          `kprobe:"size"`
-	LAddr     uint32           `kprobe:"laddr"`
-	RAddr     uint32           `kprobe:"raddr"`
-	LAddrA    uint64           `kprobe:"laddra"`
-	LAddrB    uint64           `kprobe:"laddrb"`
-	LAddr6a   uint64           `kprobe:"laddr6a"`
-	LAddr6b   uint64           `kprobe:"laddr6b"`
-	RAddr6a   uint64           `kprobe:"raddr6a"`
-	RAddr6b   uint64           `kprobe:"raddr6b"`
-	AltRAddr  uint32           `kprobe:"altraddr"`
-	AltRAddrA uint64           `kprobe:"altraddra"`
-	AltRAddrB uint64           `kprobe:"altraddrb"`
-	LPort     uint16           `kprobe:"lport"`
-	RPort     uint16           `kprobe:"rport"`
-	AltRPort  uint16           `kprobe:"altrport"`
-
-	IPHdr  uint16                           `kprobe:"iphdr"`
-	UDPHdr uint16                           `kprobe:"udphdr"`
-	Base   uintptr                          `kprobe:"base"`
-	Packet [common.SkBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
+type TCPv4DoRcvCall struct {
+	Meta   tracing.Metadata `kprobe:"metadata"`
+	Socket uintptr          `kprobe:"sock"`
+	Size   uint32           `kprobe:"size"`
+	LAddr  uint32           `kprobe:"laddr"`
+	RAddr  uint32           `kprobe:"raddr"`
+	LPort  uint16           `kprobe:"lport"`
+	RPort  uint16           `kprobe:"rport"`
 
 	flow *state.Flow // for caching
-}
-
-func genericReceiveMessage(name string, s receiveCall, f *state.Flow) string {
-	return fmt.Sprintf(
-		"%s %s(sock=0x%x, size=%d, %s <- %s)",
-		header(s.Meta),
-		name,
-		s.Socket,
-		s.Size,
-		f.Local().String(),
-		f.Remote().String(),
-	)
-}
-
-type TCPv4DoRcvCall struct {
-	receiveCall
 }
 
 func (e *TCPv4DoRcvCall) Flow() *state.Flow {
@@ -78,7 +47,15 @@ func (e *TCPv4DoRcvCall) Flow() *state.Flow {
 
 // String returns a representation of the event.
 func (e *TCPv4DoRcvCall) String() string {
-	return genericReceiveMessage("tcp_v4_do_rcv", e.receiveCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s tcp_v4_do_rcv(sock=0x%x, size=%d, %s <- %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String(),
+	)
 }
 
 // Update the state with the contents of this event.
@@ -87,7 +64,17 @@ func (e *TCPv4DoRcvCall) Update(s *state.State) {
 }
 
 type TCPv6DoRcvCall struct {
-	receiveCall
+	Meta    tracing.Metadata `kprobe:"metadata"`
+	Socket  uintptr          `kprobe:"sock"`
+	LAddr6a uint64           `kprobe:"laddr6a"`
+	LAddr6b uint64           `kprobe:"laddr6b"`
+	RAddr6a uint64           `kprobe:"raddr6a"`
+	RAddr6b uint64           `kprobe:"raddr6b"`
+	LPort   uint16           `kprobe:"lport"`
+	RPort   uint16           `kprobe:"rport"`
+	Size    uint32           `kprobe:"size"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *TCPv6DoRcvCall) Flow() *state.Flow {
@@ -110,7 +97,15 @@ func (e *TCPv6DoRcvCall) Flow() *state.Flow {
 
 // String returns a representation of the event.
 func (e *TCPv6DoRcvCall) String() string {
-	return genericReceiveMessage("tcp_v6_do_rcv", e.receiveCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s tcp_v6_do_rcv(sock=0x%x, size=%d, %s <- %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String(),
+	)
 }
 
 // Update the state with the contents of this event.
@@ -127,7 +122,17 @@ func validIPv4Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
 }
 
 type UDPQueueRcvSkbCall struct {
-	receiveCall
+	Meta   tracing.Metadata                 `kprobe:"metadata"`
+	Socket uintptr                          `kprobe:"sock"`
+	Size   uint32                           `kprobe:"size"`
+	LAddr  uint32                           `kprobe:"laddr"`
+	LPort  uint16                           `kprobe:"lport"`
+	IPHdr  uint16                           `kprobe:"iphdr"`
+	UDPHdr uint16                           `kprobe:"udphdr"`
+	Base   uintptr                          `kprobe:"base"`
+	Packet [common.SkBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *UDPQueueRcvSkbCall) Flow() *state.Flow {
@@ -151,13 +156,15 @@ func (e *UDPQueueRcvSkbCall) Flow() *state.Flow {
 		if e.IPHdr > base && e.UDPHdr > base {
 			ipOff := e.IPHdr - base
 			udpOff := e.UDPHdr - base
-			if validIPv4Headers(ipOff, udpOff, e.Packet[:]) {
+			if valid = validIPv4Headers(ipOff, udpOff, e.Packet[:]); valid {
 				e.IPHdr = ipOff
 				e.UDPHdr = udpOff
-				raddr := tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
-				rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-				remote = state.NewEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize)
 			}
+		}
+		if valid {
+			raddr := tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
+			rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
+			remote = state.NewEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize)
 		}
 	}
 
@@ -176,7 +183,15 @@ func (e *UDPQueueRcvSkbCall) Flow() *state.Flow {
 
 // String returns a representation of the event.
 func (e *UDPQueueRcvSkbCall) String() string {
-	return genericReceiveMessage("udp_queue_rcv_skb", e.receiveCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s udp_queue_rcv_skb(sock=0x%x, size=%d, %s <- %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String(),
+	)
 }
 
 // Update the state with the contents of this event.
@@ -193,7 +208,18 @@ func validIPv6Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
 }
 
 type UDPv6QueueRcvSkbCall struct {
-	receiveCall
+	Meta   tracing.Metadata                 `kprobe:"metadata"`
+	Socket uintptr                          `kprobe:"sock"`
+	Size   uint32                           `kprobe:"size"`
+	LAddrA uint64                           `kprobe:"laddra"`
+	LAddrB uint64                           `kprobe:"laddrb"`
+	LPort  uint16                           `kprobe:"lport"`
+	IPHdr  uint16                           `kprobe:"iphdr"`
+	UDPHdr uint16                           `kprobe:"udphdr"`
+	Base   uintptr                          `kprobe:"base"`
+	Packet [common.SkBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *UDPv6QueueRcvSkbCall) Flow() *state.Flow {
@@ -209,14 +235,16 @@ func (e *UDPv6QueueRcvSkbCall) Flow() *state.Flow {
 		if e.IPHdr > base && e.UDPHdr > base {
 			ipOff := e.IPHdr - base
 			udpOff := e.UDPHdr - base
-			if validIPv6Headers(ipOff, udpOff, e.Packet[:]) {
+			if valid = validIPv6Headers(ipOff, udpOff, e.Packet[:]); valid {
 				e.IPHdr = ipOff
 				e.UDPHdr = udpOff
-				raddrA := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
-				raddrB := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
-				rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-				remote = state.NewEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize)
 			}
+		}
+		if valid {
+			raddrA := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
+			raddrB := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
+			rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
+			remote = state.NewEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize)
 		}
 	}
 
@@ -235,7 +263,15 @@ func (e *UDPv6QueueRcvSkbCall) Flow() *state.Flow {
 
 // String returns a representation of the event.
 func (e *UDPv6QueueRcvSkbCall) String() string {
-	return genericReceiveMessage("udpv6_queue_rcv_skb", e.receiveCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s udpv6_queue_rcv_skb(sock=0x%x, size=%d, %s <- %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String(),
+	)
 }
 
 // Update the state with the contents of this event.

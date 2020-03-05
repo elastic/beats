@@ -35,11 +35,12 @@ func (e *Endpoint) String() string {
 	return "(not bound)"
 }
 
-func NewEndpointIPv4(beIP uint32, bePort uint16, pkts uint64, bytes uint64) (e *Endpoint) {
+func NewEndpointIPv4(beIP uint32, bePort uint16, pkts uint64, bytes uint64) *Endpoint {
 	var buf [4]byte
-	e = &Endpoint{}
-	e.packets = pkts
-	e.bytes = bytes
+	e := &Endpoint{
+		packets: pkts,
+		bytes:   bytes,
+	}
 	if bePort != 0 && beIP != 0 {
 		tracing.MachineEndian.PutUint16(buf[:], bePort)
 		port := binary.BigEndian.Uint16(buf[:])
@@ -52,10 +53,11 @@ func NewEndpointIPv4(beIP uint32, bePort uint16, pkts uint64, bytes uint64) (e *
 	return e
 }
 
-func NewEndpointIPv6(beIPa uint64, beIPb uint64, bePort uint16, pkts uint64, bytes uint64) (e *Endpoint) {
-	e = &Endpoint{}
-	e.packets = pkts
-	e.bytes = bytes
+func NewEndpointIPv6(beIPa uint64, beIPb uint64, bePort uint16, pkts uint64, bytes uint64) *Endpoint {
+	e := &Endpoint{
+		packets: pkts,
+		bytes:   bytes,
+	}
 	if bePort != 0 && (beIPa != 0 || beIPb != 0) {
 		addr := make([]byte, 16)
 		tracing.MachineEndian.PutUint16(addr[:], bePort)

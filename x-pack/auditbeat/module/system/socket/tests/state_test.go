@@ -7,18 +7,22 @@
 package tests
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/sys/unix"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
 )
 
 type logWrapper testing.T
@@ -47,22 +51,46 @@ func TestTCPConnWithProcess(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []events.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
-		commitCredsCall(meta(1234, 1234, 2), 501, 20, 501, 20),
-		execveReturn(meta(1234, 1234, 2), 1234),
-		inetCreateCall(meta(1234, 1235, 5), 0),
-		sockInitDataCall(meta(1234, 1235, 5), sock),
-		tcpv4ConnectCall(meta(1234, 1235, 8), sock, rAddr, rPort),
-		ipLocalOutCall(meta(1234, 1235, 8), sock, 20, lAddr, rAddr, lPort, rPort),
-		tcpConnectReturn(meta(1234, 1235, 9), 0),
-		tcpv4DoRcvCall(meta(0, 0, 12), sock, 12, lAddr, rAddr, lPort, rPort),
-		inetReleaseCall(meta(0, 0, 15), sock),
-		tcpv4DoRcvCall(meta(0, 0, 17), sock, 7, lAddr, rAddr, lPort, rPort),
-		doExitCall(meta(1234, 1234, 18)),
+		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&events.InetCreateCall{Meta: meta(1234, 1235, 5), Proto: 0},
+		&events.SockInitDataCall{Meta: meta(1234, 1235, 5), Socket: sock},
+		&events.TCPv4ConnectCall{Meta: meta(1234, 1235, 8), Socket: sock, RAddr: rAddr, RPort: rPort},
+		&events.IPLocalOutCall{
+			Meta:   meta(1234, 1235, 8),
+			Socket: sock,
+			Size:   20,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
+		&events.TCPConnectReturn{Meta: meta(1234, 1235, 9), Retval: 0},
+		&events.TCPv4DoRcvCall{
+			Meta:   meta(0, 0, 12),
+			Socket: sock,
+			Size:   12,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
+		&events.InetReleaseCall{Meta: meta(0, 0, 15), Socket: sock},
+		&events.TCPv4DoRcvCall{
+			Meta:   meta(0, 0, 17),
+			Socket: sock,
+			Size:   7,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
+		&events.DoExitCall{Meta: meta(1234, 1234, 18)},
 	}
 	feedEvents(evs, st, t)
 	st.CleanUp()
@@ -99,7 +127,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 	}
 }
 
-func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
+func TestTCPConnWithProcessTimeouts(t *testing.T) {
 	const (
 		localIP            = "192.168.33.10"
 		remoteIP           = "172.19.12.13"
@@ -107,26 +135,35 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, 0, 0, time.Second)
+	st := state.MakeState(nil, (*logWrapper)(t), time.Second, 0, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []events.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
-		commitCredsCall(meta(1234, 1234, 2), 501, 20, 501, 20),
-		execveReturn(meta(1234, 1234, 2), 1234),
-		inetCreateCall(meta(1234, 1235, 5), 0),
-		sockInitDataCall(meta(1234, 1235, 5), sock),
-		tcpv4ConnectCall(meta(1234, 1235, 8), sock, rAddr, rPort),
-		ipLocalOutCall(meta(1234, 1235, 8), sock, 20, lAddr, rAddr, lPort, rPort),
-		tcpConnectReturn(meta(1234, 1235, 9), 0),
-		tcpv4DoRcvCall(meta(0, 0, 12), sock, 12, lAddr, rAddr, lPort, rPort),
-	}
-	feedEvents(evs, st, t)
-	st.CleanUp()
-	evs = []events.Event{
-		inetReleaseCall(meta(0, 0, 15), sock),
-		tcpv4DoRcvCall(meta(0, 0, 17), sock, 7, lAddr, rAddr, lPort, rPort),
-		doExitCall(meta(1234, 1234, 18)),
+		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&events.InetCreateCall{Meta: meta(1234, 1235, 5), Proto: 0},
+		&events.SockInitDataCall{Meta: meta(1234, 1235, 5), Socket: sock},
+		&events.TCPv4ConnectCall{Meta: meta(1234, 1235, 8), Socket: sock, RAddr: rAddr, RPort: rPort},
+		&events.IPLocalOutCall{
+			Meta:   meta(1234, 1235, 8),
+			Socket: sock,
+			Size:   20,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
+		&events.TCPConnectReturn{Meta: meta(1234, 1235, 9), Retval: 0},
+		&events.TCPv4DoRcvCall{
+			Meta:   meta(0, 0, 12),
+			Socket: sock,
+			Size:   12,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
 	}
 	feedEvents(evs, st, t)
 	st.CleanUp()
@@ -134,9 +171,8 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Len(t, flows, 2)
+	assert.Len(t, flows, 1)
 	flow := flows[0]
-	t.Log("read flow 0", flow)
 	for field, expected := range map[string]interface{}{
 		"source.ip":           localIP,
 		"source.port":         localPort,
@@ -162,10 +198,29 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		}
 	}
 
+	evs = []events.Event{
+		&events.InetReleaseCall{Meta: meta(0, 0, 15), Socket: sock},
+		&events.TCPv4DoRcvCall{
+			Meta:   meta(0, 0, 17),
+			Socket: sock,
+			Size:   7,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			RAddr:  rAddr,
+			RPort:  rPort,
+		},
+		&events.DoExitCall{Meta: meta(1234, 1234, 18)},
+	}
+	feedEvents(evs, st, t)
+	st.CleanUp()
+	flows, err = getFlows(st.PopFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
 	// we have a truncated flow with no directionality,
 	// so just report what we
-	flow = flows[1]
-	t.Log("read flow 1", flow)
+	flow = flows[0]
 	for field, expected := range map[string]interface{}{
 		// swap the source and destination since we have a truncated flow
 		// and don't know if the initial transaction was a dial out or dial in
@@ -196,18 +251,26 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []events.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
-		commitCredsCall(meta(1234, 1234, 2), 501, 20, 501, 20),
-		execveReturn(meta(1234, 1234, 2), 1234),
-		inetCreateCall(meta(1234, 1235, 5), 0),
-		sockInitDataCall(meta(1234, 1235, 5), sock),
-		udpSendmsgCall(meta(1234, 1235, 6), sock, 123, 0, lAddr, 0, rAddr, lPort, 0, rPort, 0),
-		inetReleaseCall(meta(1234, 12345, 15), sock),
-		doExitCall(meta(1234, 1234, 18)),
+		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&events.InetCreateCall{Meta: meta(1234, 1235, 5), Proto: 0},
+		&events.SockInitDataCall{Meta: meta(1234, 1235, 5), Socket: sock},
+		&events.UDPSendmsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Socket:   sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+		&events.InetReleaseCall{Meta: meta(1234, 1235, 17), Socket: sock},
+		&events.DoExitCall{Meta: meta(1234, 1234, 18)},
 	}
 	feedEvents(evs, st, t)
 	st.CleanUp()
@@ -250,7 +313,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	var packet [256]byte
@@ -260,13 +323,22 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 	tracing.MachineEndian.PutUint16(packet[udpHdr:], rPort)
 	evs := []events.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
-		commitCredsCall(meta(1234, 1234, 2), 501, 20, 501, 20),
-		execveReturn(meta(1234, 1234, 2), 1234),
-		inetCreateCall(meta(1234, 1235, 5), 0),
-		sockInitDataCall(meta(1234, 1235, 5), sock),
-		udpQueueRcvSkbCall(meta(1234, 1235, 5), sock, 123, lAddr, lPort, ipHdr, udpHdr, packet),
-		inetReleaseCall(meta(1234, 12345, 15), sock),
-		doExitCall(meta(1234, 1234, 18)),
+		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&events.InetCreateCall{Meta: meta(1234, 1235, 5), Proto: 0},
+		&events.SockInitDataCall{Meta: meta(1234, 1235, 5), Socket: sock},
+		&events.UDPQueueRcvSkbCall{
+			Meta:   meta(1234, 1235, 5),
+			Socket: sock,
+			Size:   123,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			IPHdr:  ipHdr,
+			UDPHdr: udpHdr,
+			Packet: packet,
+		},
+		&events.InetReleaseCall{Meta: meta(1234, 1235, 17), Socket: sock},
+		&events.DoExitCall{Meta: meta(1234, 1234, 18)},
 	}
 	feedEvents(evs, st, t)
 	st.CleanUp()
@@ -439,46 +511,40 @@ func TestUDPSendMsgAltLogic(t *testing.T) {
 	const expectedIPv4 = "6 probe=0 pid=1234 tid=1235 udp_sendmsg(sock=0x0, size=0, 10.11.12.13:1010 -> 10.20.30.40:1234)"
 	const expectedIPv6 = "6 probe=0 pid=1234 tid=1235 udpv6_sendmsg(sock=0x0, size=0, [fddd::bebe]:1010 -> [fddd::cafe]:1234)"
 	t.Run("ipv4 non-connected", func(t *testing.T) {
-		ev := udpSendmsgCall(
-			meta(1234, 1235, 6),
-			0,
-			0,
-			0x7fffffff,
-			ipv4("10.11.12.13"),
-			ipv4("10.20.30.40"),
-			ipv4("192.168.255.255"),
-			be16(1010),
-			be16(1234),
-			be16(555),
-			unix.AF_INET,
-		)
+		ev := &events.UDPSendmsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("10.20.30.40"),
+			RPort:    be16(1234),
+			AltRAddr: ipv4("192.168.255.255"),
+			AltRPort: be16(555),
+			SIPtr:    0x7fffffff,
+			SIAF:     unix.AF_INET,
+		}
 		assert.Equal(t, expectedIPv4, ev.String())
 	})
 	t.Run("ipv4 connected", func(t *testing.T) {
-		ev := udpSendmsgCall(
-			meta(1234, 1235, 6),
-			0,
-			0,
-			0,
-			ipv4("10.11.12.13"),
-			ipv4("192.168.255.255"),
-			ipv4("10.20.30.40"),
-			be16(1010),
-			be16(555),
-			be16(1234),
-			0,
-		)
+		ev := &events.UDPSendmsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("192.168.255.255"),
+			RPort:    be16(555),
+			AltRAddr: ipv4("10.20.30.40"),
+			AltRPort: be16(1234),
+		}
 		assert.Equal(t, expectedIPv4, ev.String())
 	})
 	t.Run("ipv6 non-connected", func(t *testing.T) {
-		ev := udpv6SendmsgCall(
-			meta(1234, 1235, 6),
-			0x7fffffff,
-			be16(1010),
-			be16(1234),
-			be16(555),
-			unix.AF_INET6,
-		)
+		ev := &events.UDPv6SendmsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(1234),
+			AltRPort: be16(555),
+			SI6Ptr:   0x7fffffff,
+			SI6AF:    unix.AF_INET6,
+		}
 		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
 		ev.RAddrA, ev.RAddrB = ipv6("fddd::cafe")
 		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::bad:bad")
@@ -486,18 +552,134 @@ func TestUDPSendMsgAltLogic(t *testing.T) {
 	})
 
 	t.Run("ipv6 connected", func(t *testing.T) {
-		ev := udpv6SendmsgCall(
-			meta(1234, 1235, 6),
-			0,
-			be16(1010),
-			be16(555),
-			be16(1234),
-			0,
-		)
+		ev := &events.UDPv6SendmsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(555),
+			AltRPort: be16(1234),
+		}
 		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
 		ev.RAddrA, ev.RAddrB = ipv6("fddd::bad:bad")
 		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
 		assert.Equal(t, expectedIPv6, ev.String())
 	})
+}
 
+func execveCall(meta tracing.Metadata, args []string) *events.ExecveCall {
+	event := &events.ExecveCall{
+		Meta: meta,
+	}
+	lim := len(args)
+	if lim > common.MaxProgArgs {
+		lim = common.MaxProgArgs
+	}
+	for i := 0; i < lim; i++ {
+		event.Ptrs[i] = 1
+	}
+	if lim < len(args) {
+		event.Ptrs[lim] = 1
+	}
+	switch lim {
+	case 5:
+		copyCString(event.Param4[:], []byte(args[4]))
+		fallthrough
+	case 4:
+		copyCString(event.Param3[:], []byte(args[3]))
+		fallthrough
+	case 3:
+		copyCString(event.Param2[:], []byte(args[2]))
+		fallthrough
+	case 2:
+		copyCString(event.Param1[:], []byte(args[1]))
+		fallthrough
+	case 1:
+		copyCString(event.Param0[:], []byte(args[0]))
+	case 0:
+		return nil
+	}
+	event.Path = event.Param0
+	return event
+}
+
+func meta(pid uint32, tid uint32, timestamp uint64) tracing.Metadata {
+	return tracing.Metadata{
+		Timestamp: timestamp,
+		TID:       tid,
+		PID:       pid,
+	}
+}
+
+func copyCString(dst []byte, src []byte) {
+	copy(dst, src)
+	if len(src) < len(dst) {
+		dst[len(src)] = 0
+	} else {
+		dst[len(dst)-1] = 0
+	}
+}
+
+func ipv4(ip string) uint32 {
+	netIP := net.ParseIP(ip).To4()
+	if netIP == nil {
+		panic("bad ip")
+	}
+	return tracing.MachineEndian.Uint32(netIP)
+}
+
+func ipv6(ip string) (hi uint64, lo uint64) {
+	netIP := net.ParseIP(ip).To16()
+	if netIP == nil {
+		panic("bad ip")
+	}
+	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
+}
+
+func feedEvents(evs []events.Event, st *state.State, t *testing.T) {
+	for idx, ev := range evs {
+		t.Logf("Delivering event %d: %s", idx, ev.String())
+		ev.Update(st)
+	}
+}
+
+func getFlows(flows []*state.Flow, filter func(*state.Flow) bool) (evs []beat.Event, err error) {
+	var errs multierror.Errors
+	for _, flow := range flows {
+		if !flow.IsValid() {
+			errs = append(errs, errors.New("invalid flow"))
+			continue
+		}
+		if !filter(flow) {
+			continue
+		}
+		ev := flow.ToEvent(true)
+		evs = append(evs, ev.BeatEvent("system", "socket"))
+	}
+	return evs, errs.Err()
+}
+
+func assertValue(t *testing.T, ev beat.Event, expected interface{}, field string) bool {
+	value, err := ev.GetValue(field)
+	return assert.Nil(t, err, field) && assert.Equal(t, expected, value, field)
+}
+
+func be16(val uint16) uint16 {
+	var buf [2]byte
+	binary.BigEndian.PutUint16(buf[:], val)
+	return tracing.MachineEndian.Uint16(buf[:])
+}
+
+func be32(val uint32) uint32 {
+	var buf [4]byte
+	binary.BigEndian.PutUint32(buf[:], val)
+	return tracing.MachineEndian.Uint32(buf[:])
+}
+
+func be64(val uint64) uint64 {
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], val)
+	return tracing.MachineEndian.Uint64(buf[:])
+}
+
+func all(*state.Flow) bool {
+	return true
 }

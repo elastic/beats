@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -33,28 +34,26 @@ type State struct {
 
 	clock *clock
 	dns   *DNSTracker
+
+	EventCount uint64
 }
 
-func NewState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
-	s := MakeState(r, log, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
+func NewState(r mb.PushReporterV2, log helper.Logger, processTimeout, inactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
+	s := MakeState(r, log, processTimeout, processTimeout, inactiveTimeout, closeTimeout, clockMaxDrift)
 	go s.reapLoop()
 	return s
 }
 
-func MakeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
+func MakeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTimeout, inactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
 	clock := newClock(log, clockMaxDrift)
 
 	newState := &State{
 		reporter: r,
 		log:      log,
 		clock:    clock,
-		dns:      NewDNSTracker(inactiveTimeout * 2),
+		dns:      NewDNSTracker(processTimeout * 2),
 		done:     []*Flow{},
 	}
-
-	processTimeout := inactiveTimeout
-	threadTimeout := inactiveTimeout
-
 	flowCache := NewFlowCache(inactiveTimeout, func(f *Flow) {
 		f.Terminate()
 		newState.FinalizeFlow(f)
@@ -69,7 +68,7 @@ func MakeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 	newState.flows = flowCache
 	newState.sockets = socketCache
 	newState.processes = processCache
-	newState.threads = common.NewCache(threadTimeout, 8)
+	newState.threads = common.NewCache(processTimeout, 8)
 
 	return newState
 }
@@ -95,7 +94,7 @@ func (s *State) UpdateFlowWithCondition(f *Flow, condition func(*Flow) bool) {
 		socket.Enrich(f)
 		// link up the process with the newly enriched socket
 		if process := s.processes.Get(socket.pid); process != nil {
-			socket.process = process
+			socket.Process = process
 		}
 	}
 
@@ -105,17 +104,17 @@ func (s *State) UpdateFlowWithCondition(f *Flow, condition func(*Flow) bool) {
 		return
 	}
 
-	if condition != nil && !condition(f) {
-		return
-	}
-
-	socket.AddFlow(cached)
-
 	if cached != f {
+		if condition != nil && !condition(cached) {
+			return
+		}
 		cached.updateWith(f)
+	} else {
+		cached.createdTime = cached.lastSeenTime
 	}
 
 	s.enrichDNS(cached)
+	socket.AddFlow(cached)
 }
 
 func (s *State) FlowEnd(f *Flow) {
@@ -143,7 +142,7 @@ func (s *State) PopFlows() []*Flow {
 func (s *State) getOrCreateSocket(socket uintptr, pid uint32) *Socket {
 	if cached := s.sockets.PutIfAbsent(CreateSocket(socket, pid)); cached != nil {
 		if process := s.processes.Get(pid); process != nil {
-			cached.process = process
+			cached.Process = process
 		}
 		return cached
 	}
@@ -155,7 +154,7 @@ func (s *State) SocketEnd(socket uintptr, pid uint32) {
 	if closed := s.sockets.Close(socket); closed != nil {
 		closed.pid = pid
 		if process := s.processes.Get(pid); process != nil {
-			closed.process = process
+			closed.Process = process
 		}
 	}
 }
@@ -187,8 +186,7 @@ func (s *State) logState() {
 	processes := s.processes.Size()
 	threads := s.threads.Size()
 
-	// events := atomic.LoadUint64(&eventCount)
-	events := uint64(0)
+	events := atomic.LoadUint64(&s.EventCount)
 
 	now := time.Now()
 	eventsPerSecond := float64(events-lastEvents) * float64(time.Second) / float64(now.Sub(lastTime))
@@ -259,10 +257,10 @@ func (s *State) OnDNSTransaction(tr dns.Transaction) error {
 }
 
 func (s *State) enrichDNS(f *Flow) {
-	if f.remote.addr.Port == 53 && f.proto == ProtoUDP && f.pid != 0 && f.process != nil {
+	if f.remote.addr.Port == 53 && f.proto == ProtoUDP && f.pid != 0 && f.Process != nil {
 		s.dns.RegisterEndpoint(net.UDPAddr{
 			IP:   f.local.addr.IP,
 			Port: f.local.addr.Port,
-		}, f.process)
+		}, f.Process)
 	}
 }

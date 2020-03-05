@@ -124,8 +124,8 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 
 	st := state.NewState(r,
 		m.log,
+		m.config.InactiveTimeout,
 		m.config.FlowInactiveTimeout,
-		m.config.SocketInactiveTimeout,
 		m.config.FlowTerminationTimeout,
 		m.config.ClockMaxDrift)
 
@@ -193,7 +193,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 				m.detailLog.Debug(v.String())
 			}
 			v.Update(st)
-			atomic.AddUint64(&eventCount, 1)
+			atomic.AddUint64(&st.EventCount, 1)
 
 		case err := <-m.perfChannel.ErrC():
 			m.log.Errorf("Error received from perf channel: %v", err)

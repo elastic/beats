@@ -416,7 +416,7 @@ var ipv6KProbes = []helper.ProbeDef{
 	//  " connect6(sock=0xffff9f1ddd216040, 0.0.0.0:0 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:      "tcp_v6_connect_return",
+			Name:      "tcp_v6_connect_call",
 			Address:   "tcp_v6_connect",
 			Fetchargs: "sock={{.P1}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET6}}",

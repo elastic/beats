@@ -14,52 +14,21 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-type sendCall struct {
-	Meta      tracing.Metadata `kprobe:"metadata"`
-	Socket    uintptr          `kprobe:"sock"`
-	Size      uintptr          `kprobe:"size"`
-	LAddr     uint32           `kprobe:"laddr"`
-	RAddr     uint32           `kprobe:"raddr"`
-	LAddrA    uint64           `kprobe:"laddra"`
-	LAddrB    uint64           `kprobe:"laddrb"`
-	RAddrA    uint64           `kprobe:"addra"`
-	RAddrB    uint64           `kprobe:"addrb"`
-	LAddr6a   uint64           `kprobe:"laddr6a"`
-	LAddr6b   uint64           `kprobe:"laddr6b"`
-	RAddr6a   uint64           `kprobe:"raddr6a"`
-	RAddr6b   uint64           `kprobe:"raddr6b"`
-	AltRAddr  uint32           `kprobe:"altraddr"`
-	AltRAddrA uint64           `kprobe:"altraddra"`
-	AltRAddrB uint64           `kprobe:"altraddrb"`
-	LPort     uint16           `kprobe:"lport"`
-	RPort     uint16           `kprobe:"rport"`
-	AltRPort  uint16           `kprobe:"altrport"`
-	AF        uint16           `kprobe:"family"`
-	// SIPtr is the struct sockaddr_in pointer.
-	SIPtr uintptr `kprobe:"siptr"`
-	// SIAF is the address family in (struct sockaddr_in*)->sin_family.
-	SIAF uint16 `kprobe:"siaf"`
-	// SI6Ptr is the struct sockaddr_in6 pointer.
-	SI6Ptr uintptr `kprobe:"si6ptr"`
-	// Si6AF is the address family field ((struct sockaddr_in6*)->sin6_family)
-	SI6AF uint16 `kprobe:"si6af"`
+type TCPSendmsgCall struct {
+	Meta    tracing.Metadata `kprobe:"metadata"`
+	Socket  uintptr          `kprobe:"sock"`
+	Size    uintptr          `kprobe:"size"`
+	LAddr   uint32           `kprobe:"laddr"`
+	RAddr   uint32           `kprobe:"raddr"`
+	LPort   uint16           `kprobe:"lport"`
+	RPort   uint16           `kprobe:"rport"`
+	LAddr6a uint64           `kprobe:"laddr6a"`
+	LAddr6b uint64           `kprobe:"laddr6b"`
+	RAddr6a uint64           `kprobe:"raddr6a"`
+	RAddr6b uint64           `kprobe:"raddr6b"`
+	AF      uint16           `kprobe:"family"`
 
 	flow *state.Flow // for caching
-}
-
-func genericSendMessage(name string, s sendCall, f *state.Flow) string {
-	return fmt.Sprintf(
-		"%s %s(sock=0x%x, size=%d, %s -> %s)",
-		header(s.Meta),
-		name,
-		s.Socket,
-		s.Size,
-		f.Local().String(),
-		f.Remote().String())
-}
-
-type TCPSendmsgCall struct {
-	sendCall
 }
 
 func (e *TCPSendmsgCall) Flow() *state.Flow {
@@ -108,7 +77,16 @@ func (e *TCPSendmsgCall) Update(s *state.State) {
 }
 
 type TCPSendmsgV4Call struct {
-	sendCall
+	Meta   tracing.Metadata `kprobe:"metadata"`
+	Socket uintptr          `kprobe:"sock"`
+	Size   uintptr          `kprobe:"size"`
+	LAddr  uint32           `kprobe:"laddr"`
+	RAddr  uint32           `kprobe:"raddr"`
+	LPort  uint16           `kprobe:"lport"`
+	RPort  uint16           `kprobe:"rport"`
+	AF     uint16           `kprobe:"family"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *TCPSendmsgV4Call) Flow() *state.Flow {
@@ -148,21 +126,31 @@ func (e *TCPSendmsgV4Call) Update(s *state.State) {
 }
 
 type UDPSendmsgCall struct {
-	sendCall
+	Meta     tracing.Metadata `kprobe:"metadata"`
+	Socket   uintptr          `kprobe:"sock"`
+	Size     uintptr          `kprobe:"size"`
+	LAddr    uint32           `kprobe:"laddr"`
+	RAddr    uint32           `kprobe:"raddr"`
+	AltRAddr uint32           `kprobe:"altraddr"`
+	LPort    uint16           `kprobe:"lport"`
+	RPort    uint16           `kprobe:"rport"`
+	AltRPort uint16           `kprobe:"altrport"`
+	// SIPtr is the struct sockaddr_in pointer.
+	SIPtr uintptr `kprobe:"siptr"`
+	// SIAF is the address family in (struct sockaddr_in*)->sin_family.
+	SIAF uint16 `kprobe:"siaf"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *UDPSendmsgCall) Flow() *state.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
 	raddr, rport := e.RAddr, e.RPort
 	if e.SIPtr == 0 || e.SIAF != unix.AF_INET {
 		raddr = e.AltRAddr
 		rport = e.AltRPort
 	}
 
-	e.flow = state.NewFlow(
+	return state.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
@@ -171,13 +159,18 @@ func (e *UDPSendmsgCall) Flow() *state.Flow {
 		state.NewEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minIPv4UdpPacketSize),
 		state.NewEndpointIPv4(raddr, rport, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
 func (e *UDPSendmsgCall) String() string {
-	return genericSendMessage("udp_sendmsg", e.sendCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s udp_sendmsg(sock=0x%x, size=%d, %s -> %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String())
 }
 
 // Update the state with the contents of this event.
@@ -186,7 +179,25 @@ func (e *UDPSendmsgCall) Update(s *state.State) {
 }
 
 type UDPv6SendmsgCall struct {
-	sendCall
+	Meta      tracing.Metadata `kprobe:"metadata"`
+	Socket    uintptr          `kprobe:"sock"`
+	Size      uintptr          `kprobe:"size"`
+	LAddrA    uint64           `kprobe:"laddra"`
+	LAddrB    uint64           `kprobe:"laddrb"`
+	RAddrA    uint64           `kprobe:"raddra"`
+	RAddrB    uint64           `kprobe:"raddrb"`
+	AltRAddrA uint64           `kprobe:"altraddra"`
+	AltRAddrB uint64           `kprobe:"altraddrb"`
+	LPort     uint16           `kprobe:"lport"`
+	RPort     uint16           `kprobe:"rport"`
+	AltRPort  uint16           `kprobe:"altrport"`
+	// SI6Ptr is the struct sockaddr_in6 pointer.
+	SI6Ptr uintptr `kprobe:"si6ptr"`
+	// Si6AF is the address family field ((struct sockaddr_in6*)->sin6_family)
+	SI6AF uint16 `kprobe:"si6af"`
+
+	flow *state.Flow // for caching
+
 }
 
 func (e *UDPv6SendmsgCall) Flow() *state.Flow {
@@ -216,7 +227,14 @@ func (e *UDPv6SendmsgCall) Flow() *state.Flow {
 
 // String returns a representation of the event.
 func (e *UDPv6SendmsgCall) String() string {
-	return genericSendMessage("udpv6_sendmsg", e.sendCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s udpv6_sendmsg(sock=0x%x, size=%d, %s -> %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String())
 }
 
 // Update the state with the contents of this event.
@@ -225,7 +243,15 @@ func (e *UDPv6SendmsgCall) Update(s *state.State) {
 }
 
 type IPLocalOutCall struct {
-	sendCall
+	Meta   tracing.Metadata `kprobe:"metadata"`
+	Socket uintptr          `kprobe:"sock"`
+	Size   uint32           `kprobe:"size"`
+	LAddr  uint32           `kprobe:"laddr"`
+	RAddr  uint32           `kprobe:"raddr"`
+	LPort  uint16           `kprobe:"lport"`
+	RPort  uint16           `kprobe:"rport"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *IPLocalOutCall) Flow() *state.Flow {
@@ -247,7 +273,14 @@ func (e *IPLocalOutCall) Flow() *state.Flow {
 }
 
 func (e *IPLocalOutCall) String() string {
-	return genericSendMessage("ip_local_out", e.sendCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s ip_local_out(sock=0x%x, size=%d, %s -> %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String())
 }
 
 // Update the state with the contents of this event.
@@ -266,7 +299,17 @@ func (e *IPLocalOutCall) Update(s *state.State) {
 }
 
 type Inet6CskXmitCall struct {
-	sendCall
+	Meta    tracing.Metadata `kprobe:"metadata"`
+	Socket  uintptr          `kprobe:"sock"`
+	LAddr6a uint64           `kprobe:"laddr6a"`
+	LAddr6b uint64           `kprobe:"laddr6b"`
+	RAddr6a uint64           `kprobe:"raddr6a"`
+	RAddr6b uint64           `kprobe:"raddr6b"`
+	LPort   uint16           `kprobe:"lport"`
+	RPort   uint16           `kprobe:"rport"`
+	Size    uint32           `kprobe:"size"`
+
+	flow *state.Flow // for caching
 }
 
 func (e *Inet6CskXmitCall) Flow() *state.Flow {
@@ -288,7 +331,14 @@ func (e *Inet6CskXmitCall) Flow() *state.Flow {
 }
 
 func (e *Inet6CskXmitCall) String() string {
-	return genericSendMessage("inet6_csk_xmit", e.sendCall, e.Flow())
+	flow := e.Flow()
+	return fmt.Sprintf(
+		"%s inet6_csk_xmit(sock=0x%x, size=%d, %s -> %s)",
+		header(e.Meta),
+		e.Socket,
+		e.Size,
+		flow.Local().String(),
+		flow.Remote().String())
 }
 
 func (e *Inet6CskXmitCall) Update(s *state.State) {

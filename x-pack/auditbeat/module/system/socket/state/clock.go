@@ -24,6 +24,7 @@ type clock struct {
 func newClock(log helper.Logger, maxDrift time.Duration) *clock {
 	return &clock{
 		maxDrift: maxDrift,
+		log:      log,
 	}
 }
 

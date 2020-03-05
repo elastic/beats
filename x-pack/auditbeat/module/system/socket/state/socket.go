@@ -11,7 +11,7 @@ import (
 )
 
 type Socket struct {
-	process *Process
+	Process *Process
 
 	socket uintptr
 
@@ -41,7 +41,7 @@ func (s *Socket) AddFlow(f *Flow) {
 
 func (s *Socket) Enrich(f *Flow) {
 	// if the sock is not bound to a local address yet, update if possible
-	if !s.bound && f.LocalIP() != nil {
+	if !s.bound && f.Local() != nil {
 		s.bound = true
 		s.mutex.Lock()
 		for _, flow := range s.flows {
@@ -98,6 +98,6 @@ func (s *Socket) ProcessKey() uint32 {
 
 func (s *Socket) SetProcess(p *Process) {
 	if p != nil {
-		s.process = p
+		s.Process = p
 	}
 }

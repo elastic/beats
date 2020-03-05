@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -108,11 +109,11 @@ func (f *Flow) IsUDP() bool {
 }
 
 func (f *Flow) hasKey() bool {
-	return f.Remote() != nil
+	return f.Remote() != nil && f.Local() != nil
 }
 
 func (f *Flow) key() string {
-	return f.remote.addr.String()
+	return f.remote.addr.String() + "|" + f.local.addr.String()
 }
 
 func (f *Flow) updateWith(ref *Flow) {
@@ -127,20 +128,16 @@ func (f *Flow) updateWith(ref *Flow) {
 
 	if f.pid == 0 {
 		f.pid = ref.pid
-		f.process = ref.process
-	}
-
-	if f.process == nil {
-		if ref.process != nil && f.pid == ref.pid {
-			f.process = ref.process
-		}
 	}
 
 	if f.direction == DirectionUnknown {
 		f.direction = ref.direction
 	}
 
-	f.complete = ref.complete
+	if ref.complete {
+		f.complete = ref.complete
+	}
+
 	f.local.updateWith(ref.local)
 	f.remote.updateWith(ref.remote)
 }
@@ -219,17 +216,17 @@ func (f *Flow) ToEvent(final bool) (ev mb.Event) {
 		process := common.MapStr{
 			"pid": int(f.pid),
 		}
-		if f.process != nil {
-			process["name"] = f.process.name
-			process["args"] = f.process.args
-			process["executable"] = f.process.path
-			if f.process.createdTime != (time.Time{}) {
-				process["created"] = f.process.createdTime
+		if f.Process != nil {
+			process["name"] = f.Process.name
+			process["args"] = f.Process.args
+			process["executable"] = f.Process.path
+			if f.Process.createdTime != (time.Time{}) {
+				process["created"] = f.Process.createdTime
 			}
 
-			if f.process.hasCreds {
-				uid := strconv.Itoa(int(f.process.uid))
-				gid := strconv.Itoa(int(f.process.gid))
+			if f.Process.hasCreds {
+				uid := strconv.Itoa(int(f.Process.uid))
+				gid := strconv.Itoa(int(f.Process.gid))
 				root.Put("user.id", uid)
 				root.Put("group.id", gid)
 				if name := userCache.LookupUID(uid); name != "" {
@@ -238,16 +235,16 @@ func (f *Flow) ToEvent(final bool) (ev mb.Event) {
 				if name := groupCache.LookupGID(gid); name != "" {
 					root.Put("group.name", name)
 				}
-				metricset["uid"] = f.process.uid
-				metricset["gid"] = f.process.gid
-				metricset["euid"] = f.process.euid
-				metricset["egid"] = f.process.egid
+				metricset["uid"] = f.Process.uid
+				metricset["gid"] = f.Process.gid
+				metricset["euid"] = f.Process.euid
+				metricset["egid"] = f.Process.egid
 			}
 
-			if domain, found := f.process.ResolveIP(f.local.addr.IP); found {
+			if domain, found := f.Process.ResolveIP(f.local.addr.IP); found {
 				local["domain"] = domain
 			}
-			if domain, found := f.process.ResolveIP(f.remote.addr.IP); found {
+			if domain, found := f.Process.ResolveIP(f.remote.addr.IP); found {
 				remote["domain"] = domain
 			}
 		}

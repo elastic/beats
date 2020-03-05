@@ -75,7 +75,7 @@ var defaultConfig = Config{
 	ErrQueueSize:           1,
 	RingSizeExp:            7,
 	FlowInactiveTimeout:    30 * time.Second,
-	SocketInactiveTimeout:  60 * time.Second,
+	InactiveTimeout:        60 * time.Second,
 	FlowTerminationTimeout: 5 * time.Second,
 	ClockMaxDrift:          100 * time.Millisecond,
 	ClockSyncPeriod:        10 * time.Second,
