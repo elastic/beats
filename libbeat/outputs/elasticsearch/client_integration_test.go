@@ -48,7 +48,7 @@ func TestClientPublishEvent(t *testing.T) {
 	})
 
 	// drop old index preparing test
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -63,12 +63,12 @@ func TestClientPublishEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, resp, err := client.CountSearchURI(index, "", nil)
+	_, resp, err := client.conn.CountSearchURI(index, "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	// Check version
 	if client.conn.GetVersion().Major < 5 {
@@ -103,7 +103,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -124,8 +124,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,7 +149,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 			"testfield": 0,
 		}})
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +170,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
@@ -184,7 +184,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -205,8 +205,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,7 +232,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 			}},
 	)
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
