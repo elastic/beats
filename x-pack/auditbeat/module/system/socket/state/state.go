@@ -117,10 +117,6 @@ func (s *State) UpdateFlowWithCondition(f *Flow, condition func(*Flow) bool) {
 	socket.AddFlow(cached)
 }
 
-func (s *State) FlowEnd(f *Flow) {
-	s.flows.Evict(f)
-}
-
 func (s *State) FinalizeFlow(f *Flow) {
 	s.Lock()
 	defer s.Unlock()
