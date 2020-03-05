@@ -282,7 +282,6 @@ func createEventBulkMeta(
 	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
 	event *beat.Event,
-	logger *logp.Logger,
 ) (interface{}, error) {
 	eventType := ""
 	if version.Major < 7 {
