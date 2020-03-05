@@ -266,9 +266,9 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 				"labels": common.MapStr{
 					"foo": "bar",
 				},
-				"namespace":   common.MapStr{
+				"namespace": common.MapStr{
 					"name": "default",
-					"uid": uid,
+					"uid":  uid,
 					"labels": common.MapStr{
 						"nskey": "nsvalue",
 					},

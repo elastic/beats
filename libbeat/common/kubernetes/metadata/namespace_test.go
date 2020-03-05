@@ -60,7 +60,7 @@ func TestNamespace_Generate(t *testing.T) {
 			output: common.MapStr{
 				"namespace": common.MapStr{
 					"name": "obj",
-					"uid": uid,
+					"uid":  uid,
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
