@@ -60,6 +60,10 @@ var (
 	TestCoverage = false
 	UseVendor    = true
 
+	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only.
+	CrossBuildMountModcache = false
+
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
 	BeatIndexPrefix = EnvOr("BEAT_INDEX_PREFIX", BeatName)

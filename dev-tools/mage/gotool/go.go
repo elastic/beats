@@ -93,14 +93,19 @@ func ListTestFiles(pkg string) ([]string, error) {
 	return getLines(callGo(nil, "list", "-f", tmpl, pkg))
 }
 
-// ListModulePath returns the path to the module in the cache.
-func ListModulePath(pkg string) (string, error) {
-	const tmpl = `{{.Dir}}`
+// ListModulePath returns the path to the specified module.
+//
+// Additional parameters like "-mod=vendor" may be passed
+// to control behaviour.
+func ListModulePath(pkg string, args ...string) (string, error) {
 	env := map[string]string{
-		// make sure to look in the module cache
+		// make sure to look in the module cache,
+		// unless otherwise configured in args.
 		"GOFLAGS": "",
 	}
-	lines, err := getLines(callGo(env, "list", "-m", "-f", tmpl, pkg))
+	args = append([]string{"-m", "-f", "{{.Dir}}"}, args...)
+	args = append(args, pkg)
+	lines, err := getLines(callGo(env, "list", args...))
 	if err != nil {
 		return "", err
 	}
