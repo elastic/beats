@@ -3656,7 +3656,52 @@ type: double
 
 --
 
+*`cef.extensions.deviceCustomIPv6Address1`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
 *`cef.extensions.deviceCustomIPv6Address1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3Label`*::
 +
 --
 All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
@@ -3683,33 +3728,6 @@ type: keyword
 
 --
 
-*`cef.extensions.deviceCustomIPv6Address1`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3Label`*::
-+
---
-All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
-
-type: keyword
-
---
-
 *`cef.extensions.deviceCustomNumber1`*::
 +
 --
@@ -3728,7 +3746,7 @@ type: keyword
 
 --
 
-*`cef.extensions.DeviceCustomNumber2`*::
+*`cef.extensions.deviceCustomNumber2`*::
 +
 --
 One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
@@ -3912,6 +3930,42 @@ type: keyword
 +
 --
 The facility generating this event. For example, Syslog has an explicit facility associated with every event.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber1`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber2`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
 type: keyword
 
