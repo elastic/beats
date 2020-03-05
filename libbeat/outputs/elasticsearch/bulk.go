@@ -70,7 +70,7 @@ func bulkReadToItems(reader *JSONReader) error {
 }
 
 // bulkReadItemStatus reads the status and error fields from the bulk item
-func bulkReadItemStatus(reader *JSONReader, logger *logp.Logger) (int, []byte, error) {
+func bulkReadItemStatus(logger *logp.Logger, reader *JSONReader) (int, []byte, error) {
 	// skip outer dictionary
 	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject

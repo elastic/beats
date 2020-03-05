@@ -224,7 +224,7 @@ func (client *Client) publishEvents(
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		failedEvents, stats = bulkCollectPublishFails(result, data, client.log)
+		failedEvents, stats = bulkCollectPublishFails(client.log, result, data)
 	}
 
 	failed := len(failedEvents)
