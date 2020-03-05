@@ -182,7 +182,7 @@ func newTestConnection(url string) *Connection {
 func (r QueryResult) String() string {
 	out, err := json.Marshal(r)
 	if err != nil {
-		logp.NewLogger(logSelector).Warnf("failed to marshal QueryResult (%+v): %#v", err, r)
+		logp.L().Warnf("failed to marshal QueryResult (%+v): %#v", err, r)
 		return "ERROR"
 	}
 	return string(out)

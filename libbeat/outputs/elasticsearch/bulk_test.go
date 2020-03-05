@@ -22,6 +22,8 @@ package elasticsearch
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,7 +74,7 @@ func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 
 	reader := NewJSONReader(response)
-	code, _, err := bulkReadItemStatus(reader, testLogger())
+	code, _, err := bulkReadItemStatus(logp.L(), reader)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
@@ -124,6 +126,6 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
 
 func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
-	code, msg, err := bulkReadItemStatus(reader, testLogger())
+	code, msg, err := bulkReadItemStatus(logp.L(), reader)
 	return code, string(msg), err
 }
