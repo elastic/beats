@@ -36,7 +36,7 @@ func TestBulkReadToItems(t *testing.T) {
 			{"create": {"status": 400}}
     ]}`)
 
-	reader := NewJSONReader(response)
+	reader := newJSONReader(response)
 
 	err := bulkReadToItems(reader)
 	assert.NoError(t, err)
@@ -73,7 +73,7 @@ func TestBulkReadToItems(t *testing.T) {
 func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 
-	reader := NewJSONReader(response)
+	reader := newJSONReader(response)
 	code, _, err := bulkReadItemStatus(logp.L(), reader)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
@@ -125,7 +125,7 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
 }
 
 func readStatusItem(in []byte) (int, string, error) {
-	reader := NewJSONReader(in)
+	reader := newJSONReader(in)
 	code, msg, err := bulkReadItemStatus(logp.L(), reader)
 	return code, string(msg), err
 }

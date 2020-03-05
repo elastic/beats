@@ -347,7 +347,7 @@ func bulkCollectPublishFails(
 	result eslegclient.BulkResult,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
-	reader := NewJSONReader(result)
+	reader := newJSONReader(result)
 	if err := bulkReadToItems(reader); err != nil {
 		log.Errorf("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
