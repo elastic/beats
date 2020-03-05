@@ -37,6 +37,7 @@ import (
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G2 parser.rl -o parser.go
+//go:generate go fmt parser.go
 
 // Severity and Facility are derived from the priority, theses are the human readable terms
 // defined in https://tools.ietf.org/html/rfc3164#section-4.1.1.
@@ -250,6 +251,10 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	f["syslog"] = syslog
 	f["event"] = event
 	f["process"] = process
+
+	if ev.Sequence() != -1 {
+		f["event.sequence"] = ev.Sequence()
+	}
 
 	return &beat.Event{
 		Timestamp: ev.Timestamp(timezone),

@@ -176,6 +176,32 @@ func TestProgram(t *testing.T) {
 	})
 }
 
+func TestSequence(t *testing.T) {
+	t.Run("is set", func(t *testing.T) {
+		e := newEvent()
+		e.SetMessage([]byte("hello world"))
+		e.SetProgram([]byte("sudo"))
+		e.SetSequence([]byte("123"))
+		m := dummyMetadata()
+		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		v, err := event.GetValue("event.sequence")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, v, 123)
+	})
+
+	t.Run("is not set", func(t *testing.T) {
+		e := newEvent()
+		e.SetMessage([]byte("hello world"))
+		m := dummyMetadata()
+		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+
+		_, err := event.GetValue("event.sequence")
+		assert.Error(t, err)
+	})
+}
+
 func dummyMetadata() inputsource.NetworkMetadata {
 	ip := "127.0.0.1"
 	parsedIP := net.ParseIP(ip)

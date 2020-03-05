@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
+- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
 
 *Heartbeat*
 
