@@ -38,10 +38,6 @@ func init() {
 }
 
 var (
-	debugf = logp.MakeDebug("elasticsearch")
-)
-
-var (
 	// ErrNotConnected indicates failure due to client having no valid connection
 	ErrNotConnected = errors.New("not connected")
 
@@ -51,6 +47,8 @@ var (
 	// ErrResponseRead indicates error parsing Elasticsearch response
 	ErrResponseRead = errors.New("bulk item status parse failed")
 )
+
+const logSelector = "elasticsearch"
 
 // Callbacks must not depend on the result of a previous one,
 // because the ordering is not fixed.
@@ -140,6 +138,7 @@ func makeES(
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
+	log := logp.NewLogger(logSelector)
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
@@ -171,7 +170,7 @@ func makeES(
 			return outputs.Fail(err)
 		}
 		if proxyURL != nil {
-			logp.Info("Using proxy URL: %s", proxyURL)
+			log.Infof("Using proxy URL: %s", proxyURL)
 		}
 	}
 
@@ -184,7 +183,7 @@ func makeES(
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("Invalid host param set: %s, Error: %+v", host, err)
 			return outputs.Fail(err)
 		}
 
@@ -258,7 +257,7 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
-			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
+			client.Connection.log.Errorf("Error connecting to Elasticsearch at %v: %+v", client.Connection.URL, err)
 			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
 			errors = append(errors, err.Error())
 			continue
@@ -289,6 +288,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
+	log := logp.NewLogger(logSelector)
 	var proxyURL *url.URL
 	if !config.ProxyDisable {
 		proxyURL, err = parseProxyURL(config.ProxyURL)
@@ -296,7 +296,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 			return nil, err
 		}
 		if proxyURL != nil {
-			logp.Info("Using proxy URL: %s", proxyURL)
+			log.Infof("Using proxy URL: %s", proxyURL)
 		}
 	}
 
@@ -309,7 +309,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 	for _, host := range hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("Invalid host param set: %s, Error: %+v", host, err)
 			return nil, err
 		}
 

@@ -21,14 +21,15 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	v2 "github.com/elastic/go-lumber/client/v2"
 )
 
 type syncClient struct {
+	log *logp.Logger
 	*transport.Client
 	client   *v2.SyncClient
 	observer outputs.Observer
@@ -43,7 +44,9 @@ func newSyncClient(
 	observer outputs.Observer,
 	config *Config,
 ) (*syncClient, error) {
+	log := logp.NewLogger("logstash")
 	c := &syncClient{
+		log:      log,
 		Client:   conn,
 		observer: observer,
 		ttl:      config.TTL,
@@ -57,7 +60,7 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(beat, config.EscapeHTML, config.Index)
+	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
 		v2.Timeout(config.Timeout),
@@ -71,7 +74,7 @@ func newSyncClient(
 }
 
 func (c *syncClient) Connect() error {
-	logp.Debug("logstash", "connect")
+	c.log.Debug("connect")
 	err := c.Client.Connect()
 	if err != nil {
 		return err
@@ -87,13 +90,13 @@ func (c *syncClient) Close() error {
 	if c.ticker != nil {
 		c.ticker.Stop()
 	}
-	logp.Debug("logstash", "close connection")
+	c.log.Debug("close connection")
 	return c.Client.Close()
 }
 
 func (c *syncClient) reconnect() error {
 	if err := c.Client.Close(); err != nil {
-		logp.Err("error closing connection to logstash host %s: %s, reconnecting...", c.Host(), err)
+		c.log.Errorf("error closing connection to logstash host %s: %+v, reconnecting...", c.Host(), err)
 	}
 	return c.Client.Connect()
 }
@@ -138,7 +141,7 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 			n, err = c.publishWindowed(events)
 		}
 
-		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
 		events = events[n:]
@@ -152,7 +155,7 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 			}
 			_ = c.Close()
 
-			logp.Err("Failed to publish events caused by: %v", err)
+			c.log.Errorf("Failed to publish events caused by: %+v", err)
 
 			rest := len(events)
 			st.Failed(rest)
@@ -168,7 +171,7 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 	batchSize := len(events)
 	windowSize := c.win.get()
-	debugf("Try to publish %v events to logstash host %s with window size %v",
+	c.log.Debugf("Try to publish %v events to logstash host %s with window size %v",
 		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
