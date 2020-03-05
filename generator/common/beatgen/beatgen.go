@@ -29,8 +29,9 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/generator/common/beatgen/setup"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/generator/common/beatgen/setup"
 )
 
 // ConfigItem represents a value that must be configured for the custom beat
@@ -80,17 +81,29 @@ var configList = []ConfigItem{
 			return "beat"
 		},
 	},
+	{
+		Key:  "beats_revision",
+		Help: "Enter the github.com/elastic/beats revision",
+		Default: func(cfg map[string]string) string {
+			return "master"
+		},
+	},
 }
 
 // Generate generates a new custom beat
 func Generate() error {
 	cfg, err := getConfig()
 	if err != nil {
-		return errors.Wrap(err, "Error getting config")
+		return errors.Wrap(err, "error getting config")
 	}
+	beatsModuleName, err := gotool.GetModuleName()
+	if err != nil {
+		return err
+	}
+
 	err = setup.GenNewBeat(cfg)
 	if err != nil {
-		return errors.Wrap(err, "Error generating new beat")
+		return errors.Wrap(err, "error generating new beat")
 	}
 
 	absBeatPath := filepath.Join(build.Default.GOPATH, "src", cfg["beat_path"])
@@ -100,8 +113,14 @@ func Generate() error {
 		return errors.Wrap(err, "error changing directory")
 	}
 
+	mg.Deps(setup.InitModule)
+
+	err = getConfiguredBeatsRevision(beatsModuleName, cfg["beats_revision"])
+	if err != nil {
+		return errors.Wrap(err, "error while getting required beats version")
+	}
+
 	mg.Deps(setup.CopyVendor)
-	mg.Deps(setup.RunSetup)
 	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {
@@ -122,7 +141,16 @@ func Generate() error {
 	return nil
 }
 
-// VendorUpdate updates the beat vendor directory
+func getConfiguredBeatsRevision(beatsModule, revision string) error {
+	beatsPkg := beatsModule + "@" + revision
+	return gotool.Get(
+		gotool.Get.Download(),
+		gotool.Get.Update(),
+		gotool.Get.Package(beatsPkg),
+	)
+}
+
+// VendorUpdate updates the vendor directory
 func VendorUpdate() error {
 	err := sh.Rm("./vendor/github.com/elastic/beats")
 	if err != nil {

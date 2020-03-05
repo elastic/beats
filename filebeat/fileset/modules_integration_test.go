@@ -26,9 +26,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
 )
+
+func makeTestInfo(version string) beat.Info {
+	return beat.Info{
+		IndexPrefix: "filebeat",
+		Version:     version,
+	}
+}
 
 func TestLoadPipeline(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
@@ -97,7 +105,7 @@ func TestSetupNginx(t *testing.T) {
 		&ModuleConfig{Module: "nginx"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +184,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -221,7 +229,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -25,11 +25,11 @@ import (
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/harvester"
 )
 
 // Harvester contains all redis harvester data
