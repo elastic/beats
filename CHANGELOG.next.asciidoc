@@ -64,9 +64,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
 - Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
 - Fix diskio issue for windows 32 bit on disk_performance struct alignment. {issue}16680[16680]
-- Fix detection and logging of some error cases with light modules. {pull}14706[14706]
-- Fix imports after PR was merged before rebase. {pull}16756[16756]
-- Add dashboard for `redisenterprise` module. {pull}16752[16752]
 
 *Packetbeat*
 
