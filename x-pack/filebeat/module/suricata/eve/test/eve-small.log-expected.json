@@ -4,16 +4,21 @@
         "destination.address": "192.168.253.112",
         "destination.ip": "192.168.253.112",
         "destination.port": 22,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:01:09.820360-0400\",\"flow_id\":298824096901438,\"in_iface\":\"en0\",\"event_type\":\"ssh\",\"src_ip\":\"192.168.86.85\",\"src_port\":55406,\"dest_ip\":\"192.168.253.112\",\"dest_port\":22,\"proto\":\"TCP\",\"ssh\":{\"client\":{\"proto_version\":\"2.0\",\"software_version\":\"OpenSSH_7.6\"},\"server\":{\"proto_version\":\"2.0\",\"software_version\":\"libssh_0.7.0\"}}}",
+        "event.type": "protocol",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:NLm1MbaBR6humQxEQI2Ai7h/XiI=",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.86.85",
+            "192.168.253.112"
+        ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",
         "source.ip": "192.168.86.85",
@@ -36,14 +41,19 @@
         "destination.ip": "192.168.156.70",
         "destination.packets": 3,
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "intrusion_detection"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:07:20.910626-0400\",\"flow_id\":904992230150281,\"in_iface\":\"en0\",\"event_type\":\"alert\",\"src_ip\":\"192.168.86.85\",\"src_port\":55641,\"dest_ip\":\"192.168.156.70\",\"dest_port\":443,\"proto\":\"TCP\",\"tx_id\":0,\"alert\":{\"action\":\"allowed\",\"gid\":1,\"signature_id\":2024833,\"rev\":3,\"signature\":\"ET POLICY Observed IP Lookup Domain (l2 .io in TLS SNI)\",\"category\":\"Potential Corporate Privacy Violation\",\"severity\":1},\"tls\":{\"session_resumed\":true,\"sni\":\"l2.io\",\"version\":\"TLS 1.2\"},\"app_proto\":\"tls\",\"flow\":{\"pkts_toserver\":4,\"pkts_toclient\":3,\"bytes_toserver\":793,\"bytes_toclient\":343,\"start\":\"2018-07-05T15:07:19.659593-0400\"}}",
-        "event.outcome": "allowed",
         "event.severity": 1,
         "event.start": "2018-07-05T19:07:19.659Z",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 350,
@@ -53,6 +63,13 @@
         "network.packets": 7,
         "network.protocol": "tls",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.86.85",
+            "192.168.156.70"
+        ],
+        "rule.category": "Potential Corporate Privacy Violation",
+        "rule.id": "2024833",
+        "rule.name": "ET POLICY Observed IP Lookup Domain (l2 .io in TLS SNI)",
         "service.type": "suricata",
         "source.address": "192.168.86.85",
         "source.bytes": 793,
@@ -73,7 +90,9 @@
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
-        ]
+        ],
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2018-07-05T19:43:47.690Z",
@@ -81,11 +100,19 @@
         "destination.domain": "192.168.86.28",
         "destination.ip": "192.168.86.28",
         "destination.port": 63963,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "web"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:43:47.690014-0400\",\"flow_id\":2115002772430095,\"in_iface\":\"en0\",\"event_type\":\"http\",\"src_ip\":\"192.168.86.85\",\"src_port\":56119,\"dest_ip\":\"192.168.86.28\",\"dest_port\":63963,\"proto\":\"TCP\",\"tx_id\":0,\"http\":{\"hostname\":\"192.168.86.28\",\"url\":\"\\/dd.xml\",\"http_user_agent\":\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit\\/537.36 (KHTML, like Gecko) Chrome\\/67.0.3396.99 Safari\\/537.36\",\"http_content_type\":\"text\\/xml\",\"http_method\":\"GET\",\"protocol\":\"HTTP\\/1.1\",\"status\":200,\"length\":1155}}",
+        "event.outcome": "success",
+        "event.type": [
+            "access",
+            "protocol"
+        ],
         "fileset.name": "eve",
         "http.request.method": "get",
         "http.response.body.bytes": 1155,
@@ -94,6 +121,10 @@
         "log.offset": 985,
         "network.community_id": "1:gjMiDGtS5SVvdwzjjQdAKGBrDA4=",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.86.85",
+            "192.168.86.28"
+        ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",
         "source.ip": "192.168.86.85",
@@ -124,7 +155,7 @@
         "destination.domain": "192.168.86.28",
         "destination.ip": "192.168.86.85",
         "destination.port": 56118,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
@@ -140,6 +171,10 @@
         "network.community_id": "1:XhhAO/Twj86+bD+1fV8FnpLIEDs=",
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.86.28",
+            "192.168.86.85"
+        ],
         "service.type": "suricata",
         "source.address": "192.168.86.28",
         "source.ip": "192.168.86.28",
@@ -186,16 +221,21 @@
         "dns.id": "12308",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:51:20.213418-0400\",\"flow_id\":1684780223079543,\"in_iface\":\"en0\",\"event_type\":\"dns\",\"src_ip\":\"192.168.86.1\",\"src_port\":53,\"dest_ip\":\"192.168.86.85\",\"dest_port\":39464,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":12308,\"rcode\":\"NOERROR\",\"rrname\":\"clients.l.google.com\",\"rrtype\":\"A\",\"ttl\":299,\"rdata\":\"172.217.13.110\"}}",
+        "event.type": "protocol",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 2347,
         "network.community_id": "1:pC3b0nBNCU4LxSue53drHp4b4cs=",
         "network.transport": "udp",
+        "related.ip": [
+            "192.168.86.1",
+            "192.168.86.85"
+        ],
         "service.type": "suricata",
         "source.address": "192.168.86.1",
         "source.ip": "192.168.86.1",
@@ -350,22 +390,31 @@
         "destination.address": "17.142.164.13",
         "destination.as.number": 714,
         "destination.as.organization.name": "Apple Inc.",
+        "destination.domain": "p33-btmmdns.icloud.com.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.142.164.13",
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:51:50.666597-0400\",\"flow_id\":89751777876473,\"in_iface\":\"en0\",\"event_type\":\"tls\",\"src_ip\":\"192.168.86.85\",\"src_port\":56187,\"dest_ip\":\"17.142.164.13\",\"dest_port\":443,\"proto\":\"TCP\",\"tls\":{\"subject\":\"CN=*.icloud.com\\/OU=management:idms.group.506364\\/O=Apple Inc.\\/ST=California\\/C=US\",\"issuerdn\":\"CN=Apple IST CA 2 - G1\\/OU=Certification Authority\\/O=Apple Inc.\\/C=US\",\"serial\":\"5C:9C:E1:09:78:87:F8:07\",\"fingerprint\":\"6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47\",\"sni\":\"p33-btmmdns.icloud.com.\",\"version\":\"TLS 1.2\",\"notbefore\":\"2017-02-27T17:54:31\",\"notafter\":\"2019-03-29T17:54:31\"}}",
+        "event.type": "protocol",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4683,
         "network.community_id": "1:u67AuA4ybOaspT7mp9OZ3jWvnKw=",
         "network.transport": "tcp",
+        "related.hash": [
+            "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47"
+        ],
+        "related.ip": [
+            "192.168.86.85",
+            "17.142.164.13"
+        ],
         "service.type": "suricata",
         "source.address": "192.168.86.85",
         "source.ip": "192.168.86.85",
@@ -383,7 +432,16 @@
         "suricata.eve.tls.version": "TLS 1.2",
         "tags": [
             "suricata"
-        ]
+        ],
+        "tls.client.server_name": "p33-btmmdns.icloud.com.",
+        "tls.server.hash.sha1": "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47",
+        "tls.server.issuer": "CN=Apple IST CA 2 - G1/OU=Certification Authority/O=Apple Inc./C=US",
+        "tls.server.not_after": "2019-03-29T17:54:31",
+        "tls.server.not_before": "2017-02-27T17:54:31",
+        "tls.server.subject": "CN=*.icloud.com/OU=management:idms.group.506364/O=Apple Inc./ST=California/C=US",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
+        "url.domain": "p33-btmmdns.icloud.com."
     },
     {
         "@timestamp": "2018-07-05T19:51:54.001Z",
@@ -392,7 +450,7 @@
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0001:0002",
         "destination.packets": 0,
         "destination.port": 547,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "suricata.eve",
         "event.duration": 0,
         "event.end": "2018-07-05T19:51:23.453Z",
@@ -400,14 +458,21 @@
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:51:54.001329-0400\",\"flow_id\":1828507008887644,\"event_type\":\"flow\",\"src_ip\":\"fe80:0000:0000:0000:fada:0cff:fedc:87f1\",\"src_port\":546,\"dest_ip\":\"ff02:0000:0000:0000:0000:0000:0001:0002\",\"dest_port\":547,\"proto\":\"UDP\",\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":1,\"pkts_toclient\":0,\"bytes_toserver\":110,\"bytes_toclient\":0,\"start\":\"2018-07-05T15:51:23.453468-0400\",\"end\":\"2018-07-05T15:51:23.453468-0400\",\"age\":0,\"state\":\"new\",\"reason\":\"timeout\",\"alerted\":false}}",
         "event.start": "2018-07-05T19:51:23.453Z",
+        "event.type": [
+            "connection",
+            "start"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 5308,
         "network.bytes": 110,
         "network.community_id": "1:fNUIKjMfx/xaM1gOO3eaVAeWLZA=",
         "network.packets": 1,
-        "network.protocol": "failed",
         "network.transport": "udp",
+        "related.ip": [
+            "fe80:0000:0000:0000:fada:0cff:fedc:87f1",
+            "ff02:0000:0000:0000:0000:0000:0001:0002"
+        ],
         "service.type": "suricata",
         "source.address": "fe80:0000:0000:0000:fada:0cff:fedc:87f1",
         "source.bytes": 110,

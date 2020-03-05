@@ -42,7 +42,8 @@ processors:
   - community_id:
 {{ end }}
   - if:
-      equals.suricata.eve.event_type: dns
+      equals:
+        suricata.eve.event_type: dns
     then:
       - convert:
           ignore_missing: true
@@ -60,41 +61,6 @@ processors:
           fields:
             - {from: suricata.eve.dns.rrname, to: dns.question.name}
             - {from: suricata.eve.dns.rrtype, to: dns.question.type}
-      # Handle the version=1 EVE DNS answer format. Each JSON event contains
-      # a single resource record from the DNS response.
-      - script:
-          when.and:
-            - equals.dns.type: answer
-            - not.has_fields: [suricata.eve.dns.version]
-          id: suricata_dns_answers_v1
-          lang: javascript
-          source: >
-            function process(evt) {
-                var name = evt.Get("suricata.eve.dns.rrname");
-                var data = evt.Get("suricata.eve.dns.rdata");
-                var type = evt.Get("suricata.eve.dns.rrtype");
-                var ttl = evt.Get("suricata.eve.dns.ttl");
-
-                var answer = {};
-                if (name) {
-                    answer.name = name;
-                }
-                if (data) {
-                    answer.data = data;
-                }
-                if (type) {
-                    answer.type = type;
-                }
-                if (ttl) {
-                    answer.ttl = ttl;
-                }
-
-                if (Object.keys(answer).length === 0) {
-                    return;
-                }
-                evt.Put("dns.answers", [answer]);
-            }
-      # Handle the version=2 EVE DNS answer format.
       - if:
           and:
             - equals.dns.type: answer
@@ -107,83 +73,306 @@ processors:
               fields:
                 - {from: suricata.eve.dns.rrname, to: dns.question.name}
                 - {from: suricata.eve.dns.rrtype, to: dns.question.type}
-          - script:
-              id: suricata_dns_answers_v2
-              lang: javascript
-              source: >
-                function transformDetailedAnswers(evt) {
-                    var answers = evt.Get("suricata.eve.dns.answers");
-                    if (!answers) {
-                        return;
-                    }
-                    evt.Delete("suricata.eve.dns.answers");
-
-                    var resolvedIps = [];
-                    for (var i = 0; i < answers.length; i++) {
-                        var answer = answers[i];
-
-                        // Rename properties.
-                        var name = answer["rrname"];
-                        delete answer["rrname"];
-                        var type = answer["rrtype"];
-                        delete answer["rrtype"];
-                        var data = answer["rdata"];
-                        delete answer["rdata"];
-
-                        answer["name"] = name;
-                        answer["type"] = type;
-                        answer["data"] = data;
-
-                        // Append IP addresses to dns.resolved_ip.
-                        if (type === "A" || type === "AAAA") {
-                            resolvedIps.push(data);
-                        }
-                    }
-                    evt.Put("dns.answers", answers);
-                    if (resolvedIps.length > 0) {
-                        evt.Put("dns.resolved_ip", resolvedIps);
-                    }
-                }
-
-                function addDnsHeaderFlags(evt) {
-                    var flag = evt.Get("suricata.eve.dns.aa");
-                    if (flag === true) {
-                        evt.AppendTo("dns.header_flags", "AA");
-                    }
-
-                    flag = evt.Get("suricata.eve.dns.tc");
-                    if (flag === true) {
-                        evt.AppendTo("dns.header_flags", "TC");
-                    }
-
-                    flag = evt.Get("suricata.eve.dns.rd");
-                    if (flag === true) {
-                        evt.AppendTo("dns.header_flags", "RD");
-                    }
-
-                    flag = evt.Get("suricata.eve.dns.ra");
-                    if (flag === true) {
-                        evt.AppendTo("dns.header_flags", "RA");
-                    }
-                }
-
-                function process(evt) {
-                    transformDetailedAnswers(evt);
-                    addDnsHeaderFlags(evt);
-                }
       - registered_domain:
           ignore_missing: true
           ignore_failure: true
           field: dns.question.name
           target_field: dns.question.registered_domain
-      - drop_fields:
+  - script:
+      id: eve_process
+      lang: javascript
+      source: >-
+        function addEcsCategorization(evt) {
+          var event_type = evt.Get("suricata.eve.event_type");
+          if (event_type == null) {
+            return;
+          }
+          evt.Put("suricata.eve.event_type", event_type.toLowerCase());
+          switch (event_type.toLowerCase()) {
+            case "alert":
+              evt.Put("event.kind", "alert");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.category", "intrusion_detection");
+              break;
+            case "anomally":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              break;
+            case "http":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.category", "web");
+              evt.AppendTo("event.type", "access");
+              evt.AppendTo("event.type", "protocol");
+              var status = evt.Get("suricata.eve.http.status");
+              if (status == null) {
+                break;
+              }
+              if (status < 400) {
+                evt.Put("event.outcome", "success");
+              }
+              if (status >= 400 ) {
+                evt.Put("event.outcome", "failure");
+              }
+              break;
+            case "dns":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "ftp":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "ftp_data":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "tls":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "tftp":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "smb":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "ssh":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "flow":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "connection");
+              var state = evt.Get("suricata.eve.flow.state");
+              if (state == null) {
+                break;
+              }
+              switch (state) {
+                case "new":
+                  evt.AppendTo("event.type", "start");
+                  break;
+                case "closed":
+                  evt.AppendTo("event.type", "end");
+                  break;
+              }
+              break;
+            case "rdp":
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+              evt.AppendTo("event.type", "protocol");
+              break;
+            case "stats":
+              evt.Put("event.kind", "metric");
+              break;
+            default:
+              evt.Put("event.kind", "event");
+              evt.AppendTo("event.category", "network");
+          }
+        }
+        function setDnsV1Answers(evt) {
+          var dns_type = evt.Get("dns.type")
+          if (dns_type != "answer") {
+            return;
+          }
+          var version = evt.Get("suricata.eve.dns.version")
+          if (version == "2") {
+            return;
+          }
+          var name = evt.Get("suricata.eve.dns.rrname");
+          var data = evt.Get("suricata.eve.dns.rdata");
+          var type = evt.Get("suricata.eve.dns.rrtype");
+          var ttl = evt.Get("suricata.eve.dns.ttl");
+          var answer = {};
+          if (name) {
+            answer.name = name;
+          }
+          if (data) {
+            answer.data = data;
+          }
+          if (type) {
+            answer.type = type;
+          }
+          if (ttl) {
+            answer.ttl = ttl;
+          }
+          if (Object.keys(answer).length === 0) {
+            return;
+          }
+          evt.Put("dns.answers", [answer]);
+        }
+        function addDnsV2Answers(evt) {
+          var type = evt.Get("dns.type")
+          if (type != "answer") {
+            return;
+          }
+          var version = evt.Get("suricata.eve.dns.version")
+          if (version != 2) {
+            return;
+          }
+          var answers = evt.Get("suricata.eve.dns.answers");
+          if (!answers) {
+            return;
+          }
+          evt.Delete("suricata.eve.dns.answers");
+          var resolvedIps = [];
+          for (var i = 0; i < answers.length; i++) {
+            var answer = answers[i];
+
+            // Rename properties.
+            var name = answer["rrname"];
+            delete answer["rrname"];
+            var type = answer["rrtype"];
+            delete answer["rrtype"];
+            var data = answer["rdata"];
+            delete answer["rdata"];
+
+            answer["name"] = name;
+            answer["type"] = type;
+            answer["data"] = data;
+
+            // Append IP addresses to dns.resolved_ip.
+            if (type === "A" || type === "AAAA") {
+              resolvedIps.push(data);
+            }
+          }
+          evt.Put("dns.answers", answers);
+          if (resolvedIps.length > 0) {
+            evt.Put("dns.resolved_ip", resolvedIps);
+          }
+        }
+        function addDnsV2HeaderFlags(evt) {
+          var type = evt.Get("dns.type")
+          if (type != "answer") {
+            return;
+          }
+          var version = evt.Get("suricata.eve.dns.version")
+          if (version != 2) {
+            return;
+          }
+          var flag = evt.Get("suricata.eve.dns.aa");
+          if (flag === true) {
+            evt.AppendTo("dns.header_flags", "AA");
+          }
+
+          flag = evt.Get("suricata.eve.dns.tc");
+          if (flag === true) {
+            evt.AppendTo("dns.header_flags", "TC");
+          }
+
+          flag = evt.Get("suricata.eve.dns.rd");
+          if (flag === true) {
+            evt.AppendTo("dns.header_flags", "RD");
+          }
+
+          flag = evt.Get("suricata.eve.dns.ra");
+          if (flag === true) {
+            evt.AppendTo("dns.header_flags", "RA");
+          }
+        }
+        function addTopLevelDomain(evt) {
+          var rd = evt.Get("dns.question.registered_domain");
+          if (rd == null) {
+            return;
+          }
+          var firstPeriod = rd.indexOf(".");
+          if (firstPeriod == -1) {
+            return;
+          }
+          evt.Put("dns.question.top_level_domain", rd.substr(firstPeriod + 1));
+        }
+        function cleanupAppProto(evt) {
+          var proto = evt.Get("suricata.eve.app_proto");
+          if (proto == null){
+            return;
+          }
+          switch (proto.toLowerCase()) {
+            case "failed":
+            case "template":
+            case "template-rust":
+              break;
+            case "ftp-data":
+              evt.Put("network.protocol", "ftp");
+              break;
+            default:
+              evt.Put("network.protocol", proto.toLowerCase());
+          }
+          evt.Delete("suricata.eve.app_proto");
+        }
+        function addRelatedIps(evt) {
+          var src_ip = evt.Get("source.ip");
+          if (src_ip != null) {
+            evt.AppendTo("related.ip", src_ip);
+          }
+          var dst_ip = evt.Get("destination.ip");
+          if (dst_ip != null) {
+            evt.AppendTo("related.ip", dst_ip);
+          }
+        }
+        function addTlsVersion(evt) {
+          var tls_version = evt.Get("suricata.eve.tls.version")
+          if (tls_version == null) {
+            return;
+          }
+          var parts = tls_version.split(" ");
+          if (parts.length <  2) {
+            return;
+          }
+          evt.Put("tls.version_protocol", parts[0].toLowerCase());
+          evt.Put("tls.version", parts[1]);
+        }
+        function process(evt) {
+          var event_type = evt.Get("suricata.eve.event_type")
+
+          addEcsCategorization(evt);
+          if (event_type == "dns") {
+            setDnsV1Answers(evt);
+            addDnsV2Answers(evt);
+            addDnsV2HeaderFlags(evt);
+            addTopLevelDomain(evt);
+          }
+          cleanupAppProto(evt);
+          addRelatedIps(evt);
+          addTlsVersion(evt);
+        }
+  - if:
+      equals:
+        suricata.eve.event_type: tls
+    then:
+      - convert:
           ignore_missing: true
+          ignore_failure: true
+          mode: copy
           fields:
-            - suricata.eve.dns.aa
-            - suricata.eve.dns.tc
-            - suricata.eve.dns.rd
-            - suricata.eve.dns.ra
-            - suricata.eve.dns.qr
-            - suricata.eve.dns.version
-            - suricata.eve.dns.flags
-            - suricata.eve.dns.grouped
+            - {from: suricata.eve.tls.subject, to: tls.server.subject}
+            - {from: suricata.eve.tls.issuerdn, to: tls.server.issuer}
+            - {from: suricata.eve.tls.session_resumed, to: tls.resumed, type: boolean}
+            - {from: suricata.eve.tls.fingerprint, to: tls.server.hash.sha1}
+            - {from: suricata.eve.tls.sni, to: tls.client.server_name}
+            - {from: suricata.eve.tls.sni, to: destination.domain}
+            - {from: suricata.eve.tls.notbefore, to: tls.server.not_before}
+            - {from: suricata.eve.tls.notafter, to: tls.server.not_after}
+            - {from: suricata.eve.tls.ja3s, to: tls.server.ja3s}
+            - {from: suricata.eve.tls.certificate, to: tls.server.certificate}
+            - {from: suricata.eve.tls.chain, to: tls.server.certificate_chain}
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - suricata.eve.dns.aa
+        - suricata.eve.dns.tc
+        - suricata.eve.dns.rd
+        - suricata.eve.dns.ra
+        - suricata.eve.dns.qr
+        - suricata.eve.dns.version
+        - suricata.eve.dns.flags
+        - suricata.eve.dns.grouped

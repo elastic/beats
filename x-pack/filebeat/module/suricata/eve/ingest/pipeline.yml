@@ -65,18 +65,34 @@ processors:
   - lowercase:
       field: network.transport
       ignore_missing: true
-  - lowercase:
-      field: suricata.eve.event_type
-      ignore_missing: true
   - convert:
       field: suricata.eve.alert.category
       target_field: message
       type: string
       ignore_missing: true
-  - rename:
+  - set:
+      field: rule.category
+      value: "{{suricata.eve.alert.category}}"
+      if: "ctx?.suricata?.eve?.alert?.category != null"
+  - set:
+      field: rule.id
+      value: "{{suricata.eve.alert.signature_id}}"
+      if: "ctx?.suricata?.eve?.alert?.signature_id != null"
+  - set:
+      field: rule.name
+      value: "{{suricata.eve.alert.signature}}"
+      if: "ctx?.suricata?.eve?.alert?.signature != null"
+  - set:
       field: suricata.eve.alert.action
-      target_field: event.outcome
-      ignore_missing: true
+      value: denied
+      if:  "ctx?.suricata?.eve?.alert?.action == 'blocked'"
+  - append:
+      field: event.type
+      value: "{{suricata.eve.alert.action}}"
+      if: "ctx?.suricata?.eve?.alert?.action != null"
+  - remove:
+      field: suricata.eve.alert.action
+      ignore_failure: true
   - rename:
       field: suricata.eve.alert.severity
       target_field: event.severity
@@ -154,10 +170,6 @@ processors:
       field: suricata.eve.proto
       target_field: network.transport
       ignore_missing: true
-  - lowercase:
-      field: suricata.eve.app_proto
-      target_field: network.protocol
-      ignore_missing: true
   - user_agent:
       field: suricata.eve.http.http_user_agent
       ignore_missing: true
@@ -203,6 +215,10 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
+  - append:
+      field: related.hash
+      value: "{{tls.server.hash.sha1}}"
+      if: "ctx?.tls?.server?.hash?.sha1 != null"
   - remove:
       field:
         - suricata.eve.app_proto
@@ -211,20 +227,6 @@ processors:
         - suricata.eve.http.http_method
         - suricata.eve.http.http_user_agent
       ignore_missing: true
-  - script:
-      lang: painless
-      source: >
-        def t = ctx.suricata?.eve?.event_type;
-        if (t == "stats") {
-          ctx['event']['kind'] = "metric";
-        } else if (t == "alert") {
-          ctx['event']['kind'] = "alert";
-          ctx['event']['category'] = "network_traffic";
-        } else {
-          ctx['event']['kind'] = "event";
-          ctx['event']['category'] = "network_traffic";
-        }
-
 on_failure:
   - set:
       field: error.message
