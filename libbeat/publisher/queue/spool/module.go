@@ -64,7 +64,7 @@ func create(
 		log = defaultLogger()
 	}
 
-	return NewSpool(log, path, Settings{
+	return newDiskSpool(log, path, settings{
 		ACKListener:       ackListener,
 		Mode:              config.File.Permissions,
 		WriteBuffer:       uint(config.Write.BufferSize),
