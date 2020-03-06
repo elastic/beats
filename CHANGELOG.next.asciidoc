@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
+- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 
 *Auditbeat*
 
@@ -231,6 +233,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
+- Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
 - Improve ECS categorization field mappings in logstash module. {issue}16169[16169] {pull}16668[16668]
 
 *Heartbeat*
