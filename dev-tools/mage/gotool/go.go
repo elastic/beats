@@ -112,10 +112,11 @@ func listModuleDir(pkg string, vendor bool) (string, error) {
 		// Make sure GOFLAGS does not influence behaviour.
 		"GOFLAGS": "",
 	}
-	args := []string{"-m", "-f", "{{.Dir}}", pkg}
+	args := []string{"-m", "-f", "{{.Dir}}"}
 	if vendor {
 		args = append(args, "-mod=vendor")
 	}
+	args = append(args, pkg)
 	lines, err := getLines(callGo(env, "list", args...))
 	if err != nil {
 		return "", err
