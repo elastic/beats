@@ -93,18 +93,29 @@ func ListTestFiles(pkg string) ([]string, error) {
 	return getLines(callGo(nil, "list", "-f", tmpl, pkg))
 }
 
-// ListModulePath returns the path to the specified module.
-//
-// Additional parameters like "-mod=vendor" may be passed
-// to control behaviour.
-func ListModulePath(pkg string, args ...string) (string, error) {
+// ListModuleCacheDir returns the module cache directory containing
+// the specified module. If the module does not exist in the cache,
+// an error will be returned.
+func ListModuleCacheDir(pkg string) (string, error) {
+	return listModuleDir(pkg, false)
+}
+
+// ListModuleVendorDir returns the vendor directory containing the
+// specified module. If the module has not been vendored, an error
+// will be returned.
+func ListModuleVendorDir(pkg string) (string, error) {
+	return listModuleDir(pkg, true)
+}
+
+func listModuleDir(pkg string, vendor bool) (string, error) {
 	env := map[string]string{
-		// make sure to look in the module cache,
-		// unless otherwise configured in args.
+		// Make sure GOFLAGS does not influence behaviour.
 		"GOFLAGS": "",
 	}
-	args = append([]string{"-m", "-f", "{{.Dir}}"}, args...)
-	args = append(args, pkg)
+	args := []string{"-m", "-f", "{{.Dir}}", pkg}
+	if vendor {
+		args = append(args, "-mod=vendor")
+	}
 	lines, err := getLines(callGo(env, "list", args...))
 	if err != nil {
 		return "", err

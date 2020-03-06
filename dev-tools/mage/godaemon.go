@@ -22,8 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
@@ -44,19 +42,13 @@ func BuildGoDaemon() error {
 			"only be executed within the golang-crossbuild docker environment.")
 	}
 
-	// Locate tsg/go-daemon.
-	var args []string
-	if UseVendor {
-		args = append(args, "-mod=vendor")
-	}
-	godaemonDir, err := gotool.ListModulePath("github.com/tsg/go-daemon", args...)
+	// Test if binaries are up-to-date.
+	godaemonDir, err := listModuleDir("github.com/tsg/go-daemon")
 	if err != nil {
 		return err
 	}
-
-	// Test if binaries are up-to-date.
-	output := MustExpand("build/golang-crossbuild/god-{{.Platform.GOOS}}-{{.Platform.Arch}}")
 	input := filepath.Join(godaemonDir, "src", "god.c")
+	output := MustExpand("build/golang-crossbuild/god-{{.Platform.GOOS}}-{{.Platform.Arch}}")
 	if IsUpToDate(output, input) {
 		log.Println(">>> buildGoDaemon is up-to-date for", Platform.Name)
 		return nil
