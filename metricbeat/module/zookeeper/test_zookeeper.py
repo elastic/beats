@@ -21,7 +21,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['zookeeper']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         ZooKeeper mntr module outputs an event.
@@ -55,7 +55,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         ZooKeeper server module outputs an event.
@@ -83,7 +83,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_connection(self):
         """
         ZooKeeper server module outputs an event.

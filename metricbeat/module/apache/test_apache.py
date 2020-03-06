@@ -39,7 +39,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['apache']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Apache module outputs an event.

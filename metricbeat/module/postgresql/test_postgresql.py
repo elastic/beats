@@ -32,7 +32,7 @@ class Test(metricbeat.BaseTest):
         )
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_activity(self):
         """
         PostgreSQL module outputs an event.
@@ -59,7 +59,7 @@ class Test(metricbeat.BaseTest):
             assert "state" in evt["postgresql"]["activity"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_database(self):
         """
         PostgreSQL module outputs an event.
@@ -89,7 +89,7 @@ class Test(metricbeat.BaseTest):
             assert "deadlocks" in evt["postgresql"]["database"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_bgwriter(self):
         """
         PostgreSQL module outputs an event.

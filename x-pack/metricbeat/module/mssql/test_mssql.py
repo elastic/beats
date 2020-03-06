@@ -17,7 +17,7 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['mssql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MSSQL module outputs an event.
@@ -46,7 +46,7 @@ class Test(XPackTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_performance(self):
         """
         MSSQL module outputs an event.

@@ -15,7 +15,7 @@ class TestCAPinning(BaseTest):
     """
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_sending_events_with_a_good_sha256(self):
         """
         Test Sending events while using ca pinning with a good sha256
@@ -47,7 +47,7 @@ class TestCAPinning(BaseTest):
         proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_sending_events_with_a_bad_sha256(self):
         """
         Test Sending events while using ca pinning with a bad sha256

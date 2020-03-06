@@ -56,7 +56,7 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand(["http", "tcp"])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_status(self, proto):
         """
         uWSGI module outputs an event.

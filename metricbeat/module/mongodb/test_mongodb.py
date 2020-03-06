@@ -15,7 +15,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['mongodb']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MongoDB module outputs an event.

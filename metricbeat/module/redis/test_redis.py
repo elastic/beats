@@ -29,7 +29,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['redis']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_info(self):
         """
         Test redis info metricset
@@ -59,7 +59,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_keyspace(self):
         """
         Test redis keyspace metricset
@@ -95,7 +95,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_key(self):
         """
         Test redis key metricset
@@ -133,7 +133,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_module_processors(self):
         """
         Test local processors for Redis info event.

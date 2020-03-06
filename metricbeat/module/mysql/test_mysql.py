@@ -18,7 +18,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['mysql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MySQL module outputs an event.

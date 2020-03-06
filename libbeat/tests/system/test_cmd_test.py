@@ -41,7 +41,7 @@ class TestCommandTest(BaseTest):
         assert self.log_contains("Config OK") is False
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Test test output works

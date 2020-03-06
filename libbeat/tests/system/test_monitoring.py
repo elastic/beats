@@ -20,7 +20,7 @@ class Test(BaseTest):
         self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_via_output_cluster(self):
         """
         Test shipping monitoring data via the elasticsearch output cluster.
@@ -57,7 +57,7 @@ class Test(BaseTest):
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_direct_to_monitoring_cluster(self):
         """
         Test shipping monitoring data directly to the monitoring cluster.
@@ -91,7 +91,7 @@ class Test(BaseTest):
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_compare(self):
         """
         Test that monitoring docs are the same, regardless of how they are shipped.
@@ -154,7 +154,7 @@ class Test(BaseTest):
         self.assert_same_structure(indirect_beats_stats_doc['beats_stats'], direct_beats_stats_doc['beats_stats'])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_cluster_uuid_setting(self):
         """
         Test that monitoring.cluster_uuid setting may be set without any other monitoring.* settings

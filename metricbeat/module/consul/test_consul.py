@@ -27,7 +27,7 @@ class ConsulAgentTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['consul']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @pytest.mark.integration
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Consul agent module outputs an event.
