@@ -12,5 +12,5 @@ IF ERRORLEVEL 1 (
  curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-windows-amd64.exe
 )
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
-ste GO111MODULE=off
+set GO111MODULE=off
 go install github.com/elastic/beats/vendor/github.com/magefile/mage
