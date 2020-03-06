@@ -42,9 +42,6 @@ type broker struct {
 	logger logger
 
 	bufSize int
-	// buf         brokerBuffer
-	// minEvents   int
-	// idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
