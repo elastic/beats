@@ -298,7 +298,7 @@ module such as the `apache` module. To do this, you can:
 . Run `cd tests/system` to change to the folder that contains the integration
 tests.
 
-. Run `INTEGRATION_TESTS=true nosetests test_apache.py`,
+. Run `INTEGRATION_TESTS=true pytest test_apache.py`,
 remembering to replace `test_apache.py` with your own test file.
 
 [float]

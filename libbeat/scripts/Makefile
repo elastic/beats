@@ -82,7 +82,7 @@ REVIEWDOG_REPO?=github.com/reviewdog/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
-NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
+PYTEST_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling pytest
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
@@ -238,7 +238,7 @@ integration-tests-environment: prepare-tests build-image
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} pytest ${PYTHON_TEST_FILES} ${PYTEST_OPTIONS}
 	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
 
 # Runs the system tests
@@ -256,7 +256,7 @@ system-tests-environment: prepare-tests build-image
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
 fast-system-tests: ${BEAT_NAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; pytest ${PYTHON_TEST_FILES} ${PYTEST_OPTIONS}
 
 # Runs the go based stress tests
 .PHONY: stress-tests
@@ -275,7 +275,7 @@ benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
 # Run load tests
 .PHONY: load-tests
 load-tests: ## @testing Runs load tests
-	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1  nosetests ${PYTHON_TEST_FILES} --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
+	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1 pytest ${PYTHON_TEST_FILES} --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env

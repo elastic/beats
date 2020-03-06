@@ -172,7 +172,7 @@ func GoIntegTest(ctx context.Context) error {
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
@@ -187,6 +187,6 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		return devtools.PythonNoseTest(args)
+		return devtools.PythonTest(args)
 	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
 }

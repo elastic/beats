@@ -61,5 +61,5 @@ func GoUnitTest(ctx context.Context) error {
 func PythonUnitTest() error {
 	mg.SerialDeps(pythonTestDeps...)
 	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
 }

@@ -207,7 +207,7 @@ func GoUnitTest(ctx context.Context) error {
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------

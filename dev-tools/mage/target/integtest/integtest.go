@@ -72,6 +72,6 @@ func PythonIntegTest(ctx context.Context) error {
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+		return devtools.PythonTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, whitelistedEnvVars...)
 }

@@ -139,7 +139,7 @@ func GoUnitTest(ctx context.Context) error {
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
@@ -163,6 +163,6 @@ func PythonIntegTest(ctx context.Context) error {
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+		return devtools.PythonTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
 }
