@@ -70,7 +70,7 @@ func MustBundle(bundle ...bundleable) *Bundle {
 func HasStabilityPred(stabilities ...Stability) FilterFunc {
 	return func(f Featurable) bool {
 		for _, s := range stabilities {
-			if s == f.Description().Stability() {
+			if s == f.Description().Stability {
 				return true
 			}
 		}

@@ -12,14 +12,14 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 type message struct {
@@ -40,8 +40,8 @@ func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (prov
 }
 
 // APIGatewayProxyDetails returns the details of the feature.
-func APIGatewayProxyDetails() *feature.Details {
-	return feature.NewDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
+func APIGatewayProxyDetails() feature.Details {
+	return feature.MakeDetails("API Gateway proxy trigger", "receive events from the api gateway proxy", feature.Experimental)
 }
 
 // Run starts the lambda function and wait for web triggers.
