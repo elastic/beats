@@ -87,8 +87,11 @@ type Producer interface {
 	// true on success.
 	Publish(event publisher.Event) bool
 
-	// TryPublish adds an event to the queue, returning immediately if the queue
-	// is full, and returns true on success.
+	// TryPublish adds an event to the queue if doing so will not block the
+	// caller, otherwise it immediately returns. The reasons a publish attempt
+	// might block are defined by the specific queue implementation and its
+	// configuration. Returns true if the event was successfully added, false
+	// otherwise.
 	TryPublish(event publisher.Event) bool
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
