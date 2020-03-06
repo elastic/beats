@@ -7,23 +7,7 @@
 package common
 
 import (
-	"time"
-
 	"golang.org/x/sys/unix"
-
-	"github.com/elastic/go-libaudit/aucoalesce"
-)
-
-const (
-	// how often to collect and report expired and terminated flows.
-	reapInterval = time.Second
-	// how often the state log generated (only in debug mode).
-	logInterval = time.Second * 30
-)
-
-var (
-	userCache  = aucoalesce.NewUserCache(5 * time.Minute)
-	groupCache = aucoalesce.NewGroupCache(5 * time.Minute)
 )
 
 type FlowProto uint8

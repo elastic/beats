@@ -17,7 +17,6 @@ import (
 	socket_common "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/go-libaudit/aucoalesce"
 )
 
 const (
@@ -25,11 +24,6 @@ const (
 	reapInterval = time.Second
 	// how often the state log generated (only in debug mode).
 	logInterval = time.Second * 30
-)
-
-var (
-	userCache  = aucoalesce.NewUserCache(5 * time.Minute)
-	groupCache = aucoalesce.NewGroupCache(5 * time.Minute)
 )
 
 type State struct {

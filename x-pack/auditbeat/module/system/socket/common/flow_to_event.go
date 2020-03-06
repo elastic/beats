@@ -14,6 +14,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/go-libaudit/aucoalesce"
+)
+
+var (
+	userCache  = aucoalesce.NewUserCache(5 * time.Minute)
+	groupCache = aucoalesce.NewGroupCache(5 * time.Minute)
 )
 
 func (f *Flow) ToEvent(final bool) mb.Event {
