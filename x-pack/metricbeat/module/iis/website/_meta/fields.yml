@@ -1,0 +1,10 @@
+- name: website
+  type: group
+  release: beta
+  description: >
+    website
+  fields:
+  - name: name
+    type: keyword
+    description: >
+      website name

@@ -14,8 +14,8 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Centralize anything related to ECS into a common file.

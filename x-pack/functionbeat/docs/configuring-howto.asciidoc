@@ -44,20 +44,7 @@ include::{libbeat-dir}/queueconfig.asciidoc[]
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/outputconfig.asciidoc[tag=shared-outputconfig]
-
-* <<elasticsearch-output>>
-* <<logstash-output>>
-* <<configure-cloud-id>>
-
-[role="xpack"]
-include::{libbeat-outputs-dir}/elasticsearch/docs/elasticsearch.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/output-cloud.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/shared-ilm.asciidoc[]

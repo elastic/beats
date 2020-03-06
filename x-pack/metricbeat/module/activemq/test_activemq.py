@@ -66,8 +66,6 @@ class ActiveMqTest(XPackTest):
         for evt in output:
             if self.all_messages_enqueued(evt, destination_type, destination_name):
                 assert 0 < evt['activemq'][destination_type]['messages']['size']['avg']
-                if 'queue' == destination_type:
-                    assert 2 == evt['activemq'][destination_type]['size']
                 self.assert_fields_are_documented(evt)
                 passed = True
 

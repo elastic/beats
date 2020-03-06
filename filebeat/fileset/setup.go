@@ -18,23 +18,23 @@
 package fileset
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
 type SetupFactory struct {
-	beatVersion           string
+	beatInfo              beat.Info
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
 }
 
 // NewSetupFactory creates a SetupFactory
-func NewSetupFactory(beatVersion string, pipelineLoaderFactory PipelineLoaderFactory) *SetupFactory {
+func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory) *SetupFactory {
 	return &SetupFactory{
-		beatVersion:           beatVersion,
+		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		overwritePipelines:    true,
 	}
@@ -42,7 +42,7 @@ func NewSetupFactory(beatVersion string, pipelineLoaderFactory PipelineLoaderFac
 
 // Create creates a new SetupCfgRunner to setup module configuration.
 func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
-	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatVersion, false)
+	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatInfo, false)
 	if err != nil {
 		return nil, err
 	}

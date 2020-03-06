@@ -251,7 +251,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "azure.resource.name",
+                "fieldName": "cloud.instance.name",
                 "id": "1570774891724",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "VM Name",

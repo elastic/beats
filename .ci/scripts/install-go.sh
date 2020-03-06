@@ -16,4 +16,3 @@ chmod +x "${GVM_CMD}"
 gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
 
 eval $(gvm ${GO_VERSION})
-GO111MODULE=off go get -u github.com/kardianos/govendor

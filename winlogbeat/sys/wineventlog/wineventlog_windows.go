@@ -29,7 +29,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // Errors
