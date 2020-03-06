@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // directEventLoop implements the broker main event loop. It buffers events,
@@ -578,7 +580,7 @@ func (l *flushList) add(b *batchBuffer) {
 	}
 }
 
-func reportCancelledState(log logger, req *pushRequest) {
+func reportCancelledState(log *logp.Logger, req *pushRequest) {
 	log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.seq, req.state)
 
 	// do not add waiting events if producer did send cancel signal

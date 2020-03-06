@@ -19,7 +19,6 @@ package spool
 
 import (
 	"flag"
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -33,22 +32,14 @@ import (
 )
 
 var seed int64
-var debug bool
 
 type testQueue struct {
 	*diskSpool
 	teardown func()
 }
 
-type testLogger struct {
-	t *testing.T
-}
-
-type silentLogger struct{}
-
 func init() {
 	flag.Int64Var(&seed, "seed", time.Now().UnixNano(), "test random seed")
-	flag.BoolVar(&debug, "noisy", false, "print test logs to console")
 }
 
 func TestProduceConsumer(t *testing.T) {
@@ -84,11 +75,8 @@ func makeTestQueue(
 	maxSize, pageSize, writeBuffer uint,
 	flushTimeout time.Duration,
 ) func(*testing.T) queue.Queue {
+	logger := defaultLogger()
 	return func(t *testing.T) queue.Queue {
-		if debug {
-			fmt.Println("Test:", t.Name())
-		}
-
 		ok := false
 		path, cleanPath := txfiletest.SetupPath(t, "")
 		defer func() {
@@ -96,13 +84,6 @@ func makeTestQueue(
 				cleanPath()
 			}
 		}()
-
-		var logger logger
-		if debug {
-			logger = &testLogger{t}
-		} else {
-			logger = new(silentLogger)
-		}
 
 		spool, err := newDiskSpool(logger, path, settings{
 			WriteBuffer:       writeBuffer,
@@ -129,31 +110,3 @@ func (t *testQueue) Close() error {
 	t.teardown()
 	return err
 }
-
-func (l *testLogger) Debug(vs ...interface{})              { l.report("Debug", vs) }
-func (l *testLogger) Debugf(fmt string, vs ...interface{}) { l.reportf("Debug: ", fmt, vs) }
-
-func (l *testLogger) Info(vs ...interface{})              { l.report("Info", vs) }
-func (l *testLogger) Infof(fmt string, vs ...interface{}) { l.reportf("Info", fmt, vs) }
-
-func (l *testLogger) Error(vs ...interface{})              { l.report("Error", vs) }
-func (l *testLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("Error", fmt, vs) }
-
-func (l *testLogger) report(level string, vs []interface{}) {
-	args := append([]interface{}{level, ":"}, vs...)
-	l.t.Log(args...)
-	fmt.Println(args...)
-}
-
-func (l *testLogger) reportf(level string, str string, vs []interface{}) {
-	str = level + ": " + str
-	l.t.Logf(str, vs...)
-	fmt.Printf(str, vs...)
-}
-
-func (*silentLogger) Debug(vs ...interface{})              {}
-func (*silentLogger) Debugf(fmt string, vs ...interface{}) {}
-func (*silentLogger) Info(vs ...interface{})               {}
-func (*silentLogger) Infof(fmt string, vs ...interface{})  {}
-func (*silentLogger) Error(vs ...interface{})              {}
-func (*silentLogger) Errorf(fmt string, vs ...interface{}) {}

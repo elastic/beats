@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/pq"
@@ -47,7 +48,7 @@ type diskSpool struct {
 }
 
 type spoolCtx struct {
-	logger logger
+	logger *logp.Logger
 	wg     sync.WaitGroup
 	active atomic.Bool
 	done   chan struct{}
@@ -77,7 +78,7 @@ const minInFlushTimeout = 100 * time.Millisecond
 const minOutFlushTimeout = 0 * time.Millisecond
 
 // newDiskSpool creates and initializes a new file based queue.
-func newDiskSpool(logger logger, path string, settings settings) (*diskSpool, error) {
+func newDiskSpool(logger *logp.Logger, path string, settings settings) (*diskSpool, error) {
 	mode := settings.Mode
 	if mode == 0 {
 		mode = os.ModePerm
@@ -204,7 +205,7 @@ func (s *diskSpool) onACK(events, pages uint) {
 	s.inBroker.onACK(events, pages)
 }
 
-func newSpoolCtx(logger logger) *spoolCtx {
+func newSpoolCtx(logger *logp.Logger) *spoolCtx {
 	return &spoolCtx{
 		logger: logger,
 		active: atomic.MakeBool(true),

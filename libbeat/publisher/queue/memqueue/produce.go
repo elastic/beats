@@ -20,6 +20,7 @@ package memqueue
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -38,7 +39,7 @@ type ackProducer struct {
 }
 
 type openState struct {
-	log    logger
+	log    *logp.Logger
 	isOpen atomic.Bool
 	done   chan struct{}
 	events chan pushRequest
