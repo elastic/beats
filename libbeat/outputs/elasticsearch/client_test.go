@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -40,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
+<<<<<<< HEAD
 func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
 	code, msg, err := BulkReadItemStatus(logp.L(), reader)
@@ -91,6 +93,8 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
 	assert.Equal(t, 400, code)
 }
 
+=======
+>>>>>>> Separate ES client code from ES output code (#16150)
 func TestCollectPublishFailsNone(t *testing.T) {
 	N := 100
 	item := `{"create": {"status": 200}},`
@@ -102,8 +106,12 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
+<<<<<<< HEAD
 	reader := NewJSONReader(response)
 	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+	res, _ := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -120,8 +128,12 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
+<<<<<<< HEAD
 	reader := NewJSONReader(response)
 	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+	res, stats := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
@@ -141,8 +153,12 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
+<<<<<<< HEAD
 	reader := NewJSONReader(response)
 	res, stats := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+	res, stats := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
@@ -183,8 +199,12 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event}
 
+<<<<<<< HEAD
 	reader := NewJSONReader(response)
 	res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+	res, _ := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
@@ -201,10 +221,13 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
+<<<<<<< HEAD
 		reader.init(response)
 		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -224,10 +247,13 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
+<<<<<<< HEAD
 		reader.init(response)
 		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -246,10 +272,13 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
+<<<<<<< HEAD
 		reader.init(response)
 		res, _ := bulkCollectPublishFails(logp.L(), reader, events)
+=======
+		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 		if len(res) != 3 {
 			b.Fail()
 		}
@@ -266,24 +295,32 @@ func TestClientWithHeaders(t *testing.T) {
 		// Request.Host field and removed from the Header map.
 		assert.Equal(t, "myhost.local", r.Host)
 
-		bulkResponse := `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
-		fmt.Fprintln(w, bulkResponse)
+		var response string
+		if r.URL.Path == "/" {
+			response = `{ "version": { "number": "7.6.0" } }`
+		} else {
+			response = `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+
+		}
+		fmt.Fprintln(w, response)
 		requestCount++
 	}))
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
-		URL:   ts.URL,
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers: map[string]string{
-			"host":   "myhost.local",
-			"X-Test": "testing value",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL: ts.URL,
+			Headers: map[string]string{
+				"host":   "myhost.local",
+				"X-Test": "testing value",
+			},
 		},
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
 	}, nil)
 	assert.NoError(t, err)
 
 	// simple ping
-	client.Ping()
+	client.Connect()
 	assert.Equal(t, 1, requestCount)
 
 	// bulk request
@@ -299,65 +336,22 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.Equal(t, 2, requestCount)
 }
 
-func TestAddToURL(t *testing.T) {
-	type Test struct {
-		url      string
-		path     string
-		pipeline string
-		params   map[string]string
-		expected string
-	}
-	tests := []Test{
-		{
-			url:      "localhost:9200",
-			path:     "/path",
-			pipeline: "",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path",
-		},
-		{
-			url:      "localhost:9200/",
-			path:     "/path",
-			pipeline: "",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path",
-		},
-		{
-			url:      "localhost:9200",
-			path:     "/path",
-			pipeline: "pipeline_1",
-			params:   make(map[string]string),
-			expected: "localhost:9200/path?pipeline=pipeline_1",
-		},
-		{
-			url:      "localhost:9200/",
-			path:     "/path",
-			pipeline: "",
-			params: map[string]string{
-				"param": "value",
-			},
-			expected: "localhost:9200/path?param=value",
-		},
-	}
-	for _, test := range tests {
-		url := addToURL(test.url, test.path, test.pipeline, test.params)
-		assert.Equal(t, url, test.expected)
-	}
-}
-
-type testBulkRecorder struct {
-	data     []interface{}
-	inAction bool
-}
-
 func TestBulkEncodeEvents(t *testing.T) {
 	cases := map[string]struct {
+		version string
 		docType string
 		config  common.MapStr
 		events  []common.MapStr
 	}{
-		"Beats 7.x event": {
+		"6.x": {
+			version: "6.8.0",
 			docType: "doc",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
+		},
+		"latest": {
+			version: version.GetDefaultVersion(),
+			docType: "",
 			config:  common.MapStr{},
 			events:  []common.MapStr{{"message": "test"}},
 		},
@@ -369,7 +363,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 			cfg := common.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
-				Version:     version.GetDefaultVersion(),
+				Version:     test.version,
 			}
 
 			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
@@ -388,19 +382,23 @@ func TestBulkEncodeEvents(t *testing.T) {
 				}
 			}
 
+<<<<<<< HEAD
 			recorder := &testBulkRecorder{}
 
 			encoded := bulkEncodePublishRequest(logp.L(), common.Version{Major: 7, Minor: 5}, recorder, index, pipeline, test.docType, events)
+=======
+			encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(test.version), index, pipeline, events)
+>>>>>>> Separate ES client code from ES output code (#16150)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
-			assert.False(t, recorder.inAction, "incomplete bulk")
+			assert.Equal(t, 2*len(events), len(bulkItems), "incomplete bulk")
 
 			// check meta-data for each event
-			for i := 0; i < len(recorder.data); i += 2 {
-				var meta bulkEventMeta
-				switch v := recorder.data[i].(type) {
-				case bulkCreateAction:
+			for i := 0; i < len(bulkItems); i += 2 {
+				var meta eslegclient.BulkMeta
+				switch v := bulkItems[i].(type) {
+				case eslegclient.BulkCreateAction:
 					meta = v.Create
-				case bulkIndexAction:
+				case eslegclient.BulkIndexAction:
 					meta = v.Index
 				default:
 					panic("unknown type")
@@ -415,21 +413,6 @@ func TestBulkEncodeEvents(t *testing.T) {
 	}
 }
 
-func (r *testBulkRecorder) Add(meta, obj interface{}) error {
-	if r.inAction {
-		panic("can not add a new action if other action is active")
-	}
-
-	r.data = append(r.data, meta, obj)
-	return nil
-}
-
-func (r *testBulkRecorder) AddRaw(raw interface{}) error {
-	r.data = append(r.data)
-	r.inAction = !r.inAction
-	return nil
-}
-
 func TestClientWithAPIKey(t *testing.T) {
 	var headers http.Header
 
@@ -440,14 +423,17 @@ func TestClientWithAPIKey(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
-		URL:    ts.URL,
-		APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL:    ts.URL,
+			APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+		},
 	}, nil)
 	assert.NoError(t, err)
 
-	client.Ping()
+	client.Connect()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
+<<<<<<< HEAD
 
 func TestBulkReadToItems(t *testing.T) {
 	response := []byte(`{
@@ -500,3 +486,5 @@ func TestBulkReadItemStatus(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
+=======
+>>>>>>> Separate ES client code from ES output code (#16150)

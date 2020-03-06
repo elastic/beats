@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package eslegclient
 
 import (
 	"testing"
@@ -29,7 +29,7 @@ import (
 )
 
 func TestJSONEncoderMarshalBeatEvent(t *testing.T) {
-	encoder := newJSONEncoder(nil, true)
+	encoder := NewJSONEncoder(nil, true)
 	event := beat.Event{
 		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
 		Fields: common.MapStr{
@@ -46,7 +46,7 @@ func TestJSONEncoderMarshalBeatEvent(t *testing.T) {
 }
 
 func TestJSONEncoderMarshalMonitoringEvent(t *testing.T) {
-	encoder := newJSONEncoder(nil, true)
+	encoder := NewJSONEncoder(nil, true)
 	event := report.Event{
 		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
 		Fields: common.MapStr{

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package eslegclient
 
 import (
 	"fmt"
@@ -25,37 +25,29 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-type elasticsearchConfig struct {
-	Protocol         string            `config:"protocol"`
-	Path             string            `config:"path"`
-	Params           map[string]string `config:"parameters"`
-	Headers          map[string]string `config:"headers"`
-	Username         string            `config:"username"`
-	Password         string            `config:"password"`
-	APIKey           string            `config:"api_key"`
-	ProxyURL         string            `config:"proxy_url"`
-	ProxyDisable     bool              `config:"proxy_disable"`
-	LoadBalance      bool              `config:"loadbalance"`
-	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
-	EscapeHTML       bool              `config:"escape_html"`
-	TLS              *tlscommon.Config `config:"ssl"`
-	BulkMaxSize      int               `config:"bulk_max_size"`
-	MaxRetries       int               `config:"max_retries"`
-	Timeout          time.Duration     `config:"timeout"`
-	Backoff          Backoff           `config:"backoff"`
+type config struct {
+	Hosts    []string          `config:"hosts" validate:"required"`
+	Protocol string            `config:"protocol"`
+	Path     string            `config:"path"`
+	Params   map[string]string `config:"parameters"`
+	Headers  map[string]string `config:"headers"`
+
+	TLS *tlscommon.Config `config:"ssl"`
+
+	ProxyURL     string `config:"proxy_url"`
+	ProxyDisable bool   `config:"proxy_disable"`
+
+	Username string `config:"username"`
+	Password string `config:"password"`
+	APIKey   string `config:"api_key"`
+
+	CompressionLevel int           `config:"compression_level" validate:"min=0, max=9"`
+	EscapeHTML       bool          `config:"escape_html"`
+	Timeout          time.Duration `config:"timeout"`
 }
 
-type Backoff struct {
-	Init time.Duration
-	Max  time.Duration
-}
-
-const (
-	defaultBulkSize = 50
-)
-
-var (
-	defaultConfig = elasticsearchConfig{
+func defaultConfig() config {
+	return config{
 		Protocol:         "",
 		Path:             "",
 		ProxyURL:         "",
@@ -65,19 +57,13 @@ var (
 		Password:         "",
 		APIKey:           "",
 		Timeout:          90 * time.Second,
-		MaxRetries:       3,
 		CompressionLevel: 0,
 		EscapeHTML:       false,
 		TLS:              nil,
-		LoadBalance:      true,
-		Backoff: Backoff{
-			Init: 1 * time.Second,
-			Max:  60 * time.Second,
-		},
 	}
-)
+}
 
-func (c *elasticsearchConfig) Validate() error {
+func (c *config) Validate() error {
 	if c.ProxyURL != "" && !c.ProxyDisable {
 		if _, err := common.ParseURL(c.ProxyURL); err != nil {
 			return err
