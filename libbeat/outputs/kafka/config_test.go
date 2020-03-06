@@ -71,3 +71,28 @@ func TestConfigAcceptValid(t *testing.T) {
 		})
 	}
 }
+
+func TestConfigInvalid(t *testing.T) {
+	tests := map[string]common.MapStr{
+		"Kerberos with invalid auth_type": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "invalid_auth_type",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			_, err := readConfig(c)
+			if err == nil {
+				t.Fatalf("Can create test configuration from invalid input")
+			}
+		})
+	}
+}
