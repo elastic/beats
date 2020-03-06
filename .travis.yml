@@ -18,6 +18,12 @@ env:
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
 
+# Only run CI jobs on specific branches.
+# To keep the number of Travis CI jobs in check, we decided to configure Travis to only kick off CI jobs for the master branch.
+branches:
+  only:
+  - master
+
 jobs:
   include:
     # General checks
