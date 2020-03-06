@@ -46,7 +46,7 @@ type Config struct {
 	Realm       string   `config:"realm"`
 }
 
-// Unpack validates and unpack "seek" config option
+// Unpack validates and unpack "auth_type" config option
 func (t *AuthType) Unpack(value string) error {
 	authT, ok := authTypes[value]
 	if !ok {
