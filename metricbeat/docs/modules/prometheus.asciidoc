@@ -28,6 +28,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
+# Metrics collected from a Prometheus endpoint
 - module: prometheus
   period: 10s
   metricsets: ["collector"]
@@ -44,6 +45,7 @@ metricbeat.modules:
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+# Metrics sent by a Prometheus server using remote_write option
 - module: prometheus
   metricsets: ["remote_write"]
   host: "localhost"

@@ -19,11 +19,12 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper/server"
 	"io/ioutil"
+	"net/http"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper/server"
 
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
@@ -46,6 +47,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
+	events    chan *mb.Event
+	errors    chan error
 }
 
 // New create a new instance of the MetricSet
@@ -57,17 +60,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	svc, err := httpserver.NewHttpServer(base, getHandleFunc)
+	m := &MetricSet{
+		BaseMetricSet: base,
+	}
+	svc, err := httpserver.NewHttpServer(base, m.handleFunc)
 	if err != nil {
 		return nil, err
 	}
-
-	processor := NewMetricProcessor(config.Paths, config.DefaultPath)
-	return &MetricSet{
-		BaseMetricSet: base,
-		server:        svc,
-		processor:     processor,
-	}, nil
+	m.server = svc
+	m.processor = NewMetricProcessor(config.Paths, config.DefaultPath)
+	return m, nil
 }
 
 // Run method provides the module with a reporter with which events can be reported.
@@ -79,66 +81,63 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		select {
 		case <-reporter.Done():
 			m.server.Stop()
+			close(m.events)
 			return
-		case msg := <-m.server.GetEvents():
-			fields, err := m.processor.Process(msg)
-			if err != nil {
-				reporter.Error(err)
-			} else {
-				event := mb.Event{}
-				ns, ok := fields[mb.NamespaceKey].(string)
-				if ok {
-					ns = fmt.Sprintf("http.%s", ns)
-					delete(fields, mb.NamespaceKey)
-				}
-				event.MetricSetFields = fields
-				event.Namespace = ns
-				reporter.Event(event)
-			}
-
+		case e := <-m.events:
+			reporter.Event(*e)
+		case err := <-m.errors:
+			reporter.Error(err)
 		}
 	}
 }
 
-func getHandleFunc(h *httpserver.HttpServer) func(writer http.ResponseWriter, req *http.Request) {
-	return func(writer http.ResponseWriter, req *http.Request) {
-		switch req.Method {
-		case "POST":
-			meta := server.Meta{
-				"path": req.URL.String(),
-			}
-
-			contentType := req.Header.Get("Content-Type")
-			if contentType != "" {
-				meta["Content-Type"] = contentType
-			}
-
-			body, err := ioutil.ReadAll(req.Body)
-			if err != nil {
-				logp.Err("Error reading body: %v", err)
-				http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
-				return
-			}
-
-			payload := common.MapStr{
-				server.EventDataKey: body,
-			}
-
-			event := &httpserver.HttpEvent{}
-			event.SetEvent(payload)
-			event.SetMeta(meta)
-			h.WriteEvents(event)
-			writer.WriteHeader(http.StatusAccepted)
-
-		case "GET":
-			writer.WriteHeader(http.StatusOK)
-			if req.TLS != nil {
-				writer.Write([]byte("HTTPS Server accepts data via POST"))
-			} else {
-				writer.Write([]byte("HTTP Server accepts data via POST"))
-			}
-
+func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "POST":
+		meta := common.MapStr{
+			"path": req.URL.String(),
 		}
+
+		contentType := req.Header.Get("Content-Type")
+		if contentType != "" {
+			meta["Content-Type"] = contentType
+		}
+
+		body, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			logp.Err("Error reading body: %v", err)
+			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
+			return
+		}
+
+		payload := common.MapStr{
+			server.EventDataKey: body,
+		}
+
+		fields, err := m.processor.Process(payload, meta)
+		if err != nil {
+			m.errors <- err
+		} else {
+			event := mb.Event{}
+			ns, ok := fields[mb.NamespaceKey].(string)
+			if ok {
+				ns = fmt.Sprintf("http.%s", ns)
+				delete(fields, mb.NamespaceKey)
+			}
+			event.MetricSetFields = fields
+			event.Namespace = ns
+			m.events <- &event
+		}
+
+		writer.WriteHeader(http.StatusAccepted)
+
+	case "GET":
+		writer.WriteHeader(http.StatusOK)
+		if req.TLS != nil {
+			writer.Write([]byte("HTTPS Server accepts data via POST"))
+		} else {
+			writer.Write([]byte("HTTP Server accepts data via POST"))
+		}
+
 	}
 }
-

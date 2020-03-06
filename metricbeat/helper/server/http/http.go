@@ -19,12 +19,10 @@ package http
 
 import (
 	"context"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
@@ -32,41 +30,13 @@ import (
 )
 
 type HttpServer struct {
-	server     *http.Server
-	ctx        context.Context
-	stop       context.CancelFunc
-	done       chan struct{}
-	eventQueue chan server.Event
+	server *http.Server
+	ctx    context.Context
+	stop   context.CancelFunc
+	done   chan struct{}
 }
 
-type HttpEvent struct {
-	event common.MapStr
-	meta  server.Meta
-}
-
-// MetricSetFactory accepts a BaseMetricSet and returns a MetricSet. If there
-// was an error creating the MetricSet then an error will be returned. The
-// returned MetricSet must also implement either EventFetcher or EventsFetcher
-// (but not both).
-type HandlerFactory func(h *HttpServer) func(writer http.ResponseWriter, req *http.Request)
-
-func (h *HttpEvent) GetEvent() common.MapStr {
-	return h.event
-}
-
-func (h *HttpEvent) GetMeta() server.Meta {
-	return h.meta
-}
-
-func (h *HttpEvent) SetEvent(event common.MapStr) {
-	h.event = event
-}
-
-func (h *HttpEvent) SetMeta(meta server.Meta) {
-	h.meta = meta
-}
-
-func NewHttpServer(mb mb.BaseMetricSet, factory HandlerFactory) (server.Server, error) {
+func NewHttpServer(mb mb.BaseMetricSet, handlerFunc func(writer http.ResponseWriter, req *http.Request)) (server.Server, error) {
 	config := defaultHttpConfig()
 	err := mb.Module().UnpackConfig(&config)
 	if err != nil {
@@ -80,14 +50,13 @@ func NewHttpServer(mb mb.BaseMetricSet, factory HandlerFactory) (server.Server, 
 
 	ctx, cancel := context.WithCancel(context.Background())
 	h := &HttpServer{
-		done:       make(chan struct{}),
-		eventQueue: make(chan server.Event),
-		ctx:        ctx,
-		stop:       cancel,
+		done: make(chan struct{}),
+		ctx:  ctx,
+		stop: cancel,
 	}
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
-		Handler: http.HandlerFunc(factory(h)),
+		Handler: http.HandlerFunc(handlerFunc),
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
@@ -122,54 +91,8 @@ func (h *HttpServer) Stop() {
 	close(h.done)
 	h.stop()
 	h.server.Shutdown(h.ctx)
-	close(h.eventQueue)
 }
 
 func (h *HttpServer) GetEvents() chan server.Event {
-	return h.eventQueue
-}
-
-func (h *HttpServer) WriteEvents(event server.Event) {
-	h.eventQueue <- event
-}
-
-func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case "POST":
-		meta := server.Meta{
-			"path": req.URL.String(),
-		}
-
-		contentType := req.Header.Get("Content-Type")
-		if contentType != "" {
-			meta["Content-Type"] = contentType
-		}
-
-		body, err := ioutil.ReadAll(req.Body)
-		if err != nil {
-			logp.Err("Error reading body: %v", err)
-			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
-			return
-		}
-
-		payload := common.MapStr{
-			server.EventDataKey: body,
-		}
-
-		event := &HttpEvent{
-			event: payload,
-			meta:  meta,
-		}
-		h.eventQueue <- event
-		writer.WriteHeader(http.StatusAccepted)
-
-	case "GET":
-		writer.WriteHeader(http.StatusOK)
-		if req.TLS != nil {
-			writer.Write([]byte("HTTPS Server accepts data via POST"))
-		} else {
-			writer.Write([]byte("HTTP Server accepts data via POST"))
-		}
-
-	}
+	return make(chan server.Event)
 }
