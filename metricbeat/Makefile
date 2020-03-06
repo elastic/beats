@@ -83,3 +83,8 @@ integration-tests: ## @testing Run golang integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
 	mage goIntegTest
+
+# Builds the environment to test beat
+.PHONY: build-image
+build-image: write-environment
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} --force-rm
