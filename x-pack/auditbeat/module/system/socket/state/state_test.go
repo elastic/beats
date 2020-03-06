@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package tests
+package state
 
 import (
 	"encoding/binary"
@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -51,10 +50,10 @@ func TestTCPConnWithProcess(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
-	evs := []events.Event{
+	evs := []common.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
 		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -135,10 +134,10 @@ func TestTCPConnWithProcessTimeouts(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, 0, time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
-	evs := []events.Event{
+	evs := []common.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
 		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -198,7 +197,7 @@ func TestTCPConnWithProcessTimeouts(t *testing.T) {
 		}
 	}
 
-	evs = []events.Event{
+	evs = []common.Event{
 		&events.InetReleaseCall{Meta: meta(0, 0, 15), Socket: sock},
 		&events.TCPv4DoRcvCall{
 			Meta:   meta(0, 0, 17),
@@ -248,10 +247,10 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
-	evs := []events.Event{
+	evs := []common.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
 		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -310,7 +309,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := state.MakeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	var packet [256]byte
@@ -318,7 +317,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 	packet[ipHdr] = 0x45
 	tracing.MachineEndian.PutUint32(packet[ipHdr+12:], rAddr)
 	tracing.MachineEndian.PutUint16(packet[udpHdr:], rPort)
-	evs := []events.Event{
+	evs := []common.Event{
 		execveCall(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
 		&events.CommitCredsCall{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&events.ExecveReturn{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -378,7 +377,7 @@ func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bo
 
 type dnsTestCase struct {
 	found      bool
-	proc       *state.Process
+	proc       *common.Process
 	ip, domain string
 }
 
@@ -412,13 +411,13 @@ func TestDNSTracker(t *testing.T) {
 		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
 	}
 	t.Run("transaction before register", func(t *testing.T) {
-		proc1 := (&state.Process{}).SetPID(123)
-		proc2 := (&state.Process{}).SetPID(124)
-		tracker := state.NewDNSTracker(infiniteExpiration)
-		tracker.AddTransaction(trV4)
-		tracker.AddTransaction(trV6)
-		tracker.RegisterEndpoint(local1, proc1)
-		tracker.RegisterEndpoint(local2, proc1)
+		proc1 := (&common.Process{}).SetPID(123)
+		proc2 := (&common.Process{}).SetPID(124)
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.addTransaction(trV4)
+		tracker.addTransaction(trV6)
+		tracker.registerEndpoint(local1, proc1)
+		tracker.registerEndpoint(local2, proc1)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc1, "192.0.2.13", "example.net"},
@@ -431,13 +430,13 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("transaction after register", func(t *testing.T) {
-		proc1 := (&state.Process{}).SetPID(123)
-		proc2 := (&state.Process{}).SetPID(124)
-		tracker := state.NewDNSTracker(infiniteExpiration)
-		tracker.RegisterEndpoint(local1, proc1)
-		tracker.RegisterEndpoint(local2, proc1)
-		tracker.AddTransaction(trV4)
-		tracker.AddTransaction(trV6)
+		proc1 := (&common.Process{}).SetPID(123)
+		proc2 := (&common.Process{}).SetPID(124)
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.registerEndpoint(local1, proc1)
+		tracker.registerEndpoint(local2, proc1)
+		tracker.addTransaction(trV4)
+		tracker.addTransaction(trV6)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc1, "192.0.2.13", "example.net"},
@@ -450,12 +449,12 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("unknown local endpoint", func(t *testing.T) {
-		proc1 := (&state.Process{}).SetPID(123)
-		proc2 := (&state.Process{}).SetPID(124)
-		tracker := state.NewDNSTracker(infiniteExpiration)
-		tracker.RegisterEndpoint(local1, proc1)
-		tracker.AddTransaction(trV4)
-		tracker.AddTransaction(trV6)
+		proc1 := (&common.Process{}).SetPID(123)
+		proc2 := (&common.Process{}).SetPID(124)
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.registerEndpoint(local1, proc1)
+		tracker.addTransaction(trV4)
+		tracker.addTransaction(trV6)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc1, "192.0.2.13", "example.net"},
@@ -468,13 +467,13 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("expiration", func(t *testing.T) {
-		proc1 := (&state.Process{}).SetPID(123)
-		tracker := state.NewDNSTracker(10 * time.Millisecond)
-		tracker.AddTransaction(trV4)
-		tracker.AddTransaction(trV6)
+		proc1 := (&common.Process{}).SetPID(123)
+		tracker := newDNSTracker(10 * time.Millisecond)
+		tracker.addTransaction(trV4)
+		tracker.addTransaction(trV6)
 		time.Sleep(time.Millisecond * 50)
-		tracker.RegisterEndpoint(local1, proc1)
-		tracker.RegisterEndpoint(local2, proc1)
+		tracker.registerEndpoint(local1, proc1)
+		tracker.registerEndpoint(local2, proc1)
 		dnsTestCases{
 			{false, proc1, "192.0.2.12", ""},
 			{false, proc1, "192.0.2.13", ""},
@@ -483,8 +482,8 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("same IP different domains", func(t *testing.T) {
-		proc1 := (&state.Process{}).SetPID(123)
-		proc2 := (&state.Process{}).SetPID(124)
+		proc1 := (&common.Process{}).SetPID(123)
+		proc2 := (&common.Process{}).SetPID(124)
 		trV4alt := dns.Transaction{
 			TXID:      1234,
 			Client:    local2,
@@ -492,11 +491,11 @@ func TestDNSTracker(t *testing.T) {
 			Domain:    "example.com",
 			Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
 		}
-		tracker := state.NewDNSTracker(infiniteExpiration)
-		tracker.AddTransaction(trV4)
-		tracker.AddTransaction(trV4alt)
-		tracker.RegisterEndpoint(local1, proc1)
-		tracker.RegisterEndpoint(local2, proc2)
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.addTransaction(trV4)
+		tracker.addTransaction(trV4alt)
+		tracker.registerEndpoint(local1, proc1)
+		tracker.registerEndpoint(local2, proc2)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc2, "192.0.2.12", "example.com"},
@@ -631,14 +630,14 @@ func ipv6(ip string) (hi uint64, lo uint64) {
 	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
 }
 
-func feedEvents(evs []events.Event, st *state.State, t *testing.T) {
+func feedEvents(evs []common.Event, st *State, t *testing.T) {
 	for idx, ev := range evs {
 		t.Logf("Delivering event %d: %s", idx, ev.String())
 		ev.Update(st)
 	}
 }
 
-func getFlows(flows []*state.Flow, filter func(*state.Flow) bool) (evs []beat.Event, err error) {
+func getFlows(flows []*common.Flow, filter func(*common.Flow) bool) (evs []beat.Event, err error) {
 	var errs multierror.Errors
 	for _, flow := range flows {
 		if !flow.IsValid() {
@@ -677,6 +676,6 @@ func be64(val uint64) uint64 {
 	return tracing.MachineEndian.Uint64(buf[:])
 }
 
-func all(*state.Flow) bool {
+func all(*common.Flow) bool {
 	return true
 }

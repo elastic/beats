@@ -10,39 +10,40 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	socket_common "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 )
 
-type FlowRemovalListener func(v *Flow)
-type FlowCache struct {
+type flowRemovalListener func(v *socket_common.Flow)
+type flowCache struct {
 	*common.Cache
 }
 
-func NewFlowCache(d time.Duration, l FlowRemovalListener) *FlowCache {
-	return &FlowCache{common.NewCacheWithRemovalListener(d, 8, func(_ common.Key, value common.Value) {
+func newFlowCache(d time.Duration, l flowRemovalListener) *flowCache {
+	return &flowCache{common.NewCacheWithRemovalListener(d, 8, func(_ common.Key, value common.Value) {
 		if l != nil {
-			l(value.(*Flow))
+			l(value.(*socket_common.Flow))
 		}
 	})}
 }
 
-func (f *FlowCache) PutIfAbsent(value *Flow) *Flow {
-	if value.hasKey() {
-		v := f.Cache.PutIfAbsent(value.key(), value)
+func (f *flowCache) PutIfAbsent(value *socket_common.Flow) *socket_common.Flow {
+	if value.HasKey() {
+		v := f.Cache.PutIfAbsent(value.Key(), value)
 		if v == nil {
 			return value
 		}
-		return v.(*Flow)
+		return v.(*socket_common.Flow)
 	}
 	return nil
 }
 
-func (f *FlowCache) Evict(value *Flow) *Flow {
-	if value.hasKey() {
-		v := f.Cache.Evict(value.key())
+func (f *flowCache) Evict(value *socket_common.Flow) *socket_common.Flow {
+	if value.HasKey() {
+		v := f.Cache.Evict(value.Key())
 		if v == nil {
 			return nil
 		}
-		return v.(*Flow)
+		return v.(*socket_common.Flow)
 	}
 	return nil
 }

@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package state
+package common
 
 import (
 	"sync"
@@ -32,10 +32,10 @@ func CreateSocket(s uintptr, pid uint32) *Socket {
 }
 
 func (s *Socket) AddFlow(f *Flow) {
-	if f.hasKey() {
+	if f.HasKey() {
 		s.mutex.Lock()
 		defer s.mutex.Unlock()
-		s.flows[f.key()] = f
+		s.flows[f.Key()] = f
 	}
 }
 
@@ -88,16 +88,20 @@ func (s *Socket) Flows() []*Flow {
 	return flows
 }
 
-func (s *Socket) Key() uintptr {
-	return s.socket
+func (s *Socket) SetPID(pid uint32) *Socket {
+	if pid != 0 {
+		s.pid = pid
+	}
+	return s
 }
 
-func (s *Socket) ProcessKey() uint32 {
-	return s.pid
-}
-
-func (s *Socket) SetProcess(p *Process) {
+func (s *Socket) SetProcess(p *Process) *Socket {
 	if p != nil {
 		s.Process = p
 	}
+	return s
+}
+
+func (s *Socket) Key() uintptr {
+	return s.socket
 }

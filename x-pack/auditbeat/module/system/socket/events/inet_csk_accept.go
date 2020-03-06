@@ -9,7 +9,7 @@ package events
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"golang.org/x/sys/unix"
 )
@@ -27,24 +27,24 @@ type InetCskAcceptReturn struct {
 	RAddr6b uint64           `kprobe:"raddr6b"`
 	AF      uint16           `kprobe:"family"`
 
-	flow *state.Flow // for caching
+	flow *common.Flow // for caching
 }
 
-func (e *InetCskAcceptReturn) Flow() *state.Flow {
+func (e *InetCskAcceptReturn) Flow() *common.Flow {
 	if e.flow != nil {
 		return e.flow
 	}
 
-	var local, remote *state.Endpoint
+	var local, remote *common.Endpoint
 	if e.AF == unix.AF_INET {
-		local = state.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0)
-		remote = state.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0)
+		local = common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0)
+		remote = common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0)
 	} else {
-		local = state.NewEndpointIPv6(e.LAddr6a, e.LAddr6b, e.LPort, 0, 0)
-		remote = state.NewEndpointIPv6(e.RAddr6a, e.RAddr6b, e.RPort, 0, 0)
+		local = common.NewEndpointIPv6(e.LAddr6a, e.LAddr6b, e.LPort, 0, 0)
+		remote = common.NewEndpointIPv6(e.RAddr6a, e.RAddr6b, e.RPort, 0, 0)
 	}
 
-	e.flow = state.NewFlow(
+	e.flow = common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
@@ -64,7 +64,7 @@ func (e *InetCskAcceptReturn) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *InetCskAcceptReturn) Update(s *state.State) {
+func (e *InetCskAcceptReturn) Update(s common.EventTracker) {
 	if e.Socket != 0 {
 		s.UpdateFlow(e.Flow())
 	}
@@ -79,22 +79,22 @@ type InetCskAcceptV4Return struct {
 	RPort  uint16           `kprobe:"rport"`
 	AF     uint16           `kprobe:"family"`
 
-	flow *state.Flow // for caching
+	flow *common.Flow // for caching
 }
 
-func (e *InetCskAcceptV4Return) Flow() *state.Flow {
+func (e *InetCskAcceptV4Return) Flow() *common.Flow {
 	if e.flow != nil {
 		return e.flow
 	}
 
-	e.flow = state.NewFlow(
+	e.flow = common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
 		unix.IPPROTO_TCP,
 		e.Meta.Timestamp,
-		state.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		state.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
+		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
+		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkInbound().MarkComplete()
 
 	return e.flow
@@ -107,7 +107,7 @@ func (e *InetCskAcceptV4Return) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *InetCskAcceptV4Return) Update(s *state.State) {
+func (e *InetCskAcceptV4Return) Update(s common.EventTracker) {
 	if e.Socket != 0 {
 		s.UpdateFlow(e.Flow())
 	}

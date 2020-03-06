@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package state
+package common
 
 import (
 	"net"
@@ -43,6 +43,10 @@ var kernelProcess = &Process{
 	name: "[kernel_task]",
 }
 
+func (p *Process) PID() uint32 {
+	return p.pid
+}
+
 func (p *Process) SetPID(pid uint32) *Process {
 	p.pid = pid
 	return p
@@ -74,13 +78,20 @@ func (p *Process) Name() string {
 	return p.name
 }
 
+func (p *Process) FormatCreatedIfZero(formatter func(uint64) time.Time) *Process {
+	if p.createdTime == (time.Time{}) {
+		p.createdTime = formatter(p.created)
+	}
+	return p
+}
+
 // ResolveIP returns the domain associated with the given IP.
 func (p *Process) ResolveIP(ip net.IP) (domain string, found bool) {
 	domain, found = p.resolvedDomains[ip.String()]
 	return
 }
 
-func (p *Process) addTransaction(tr dns.Transaction) {
+func (p *Process) AddTransaction(tr dns.Transaction) {
 	if p.resolvedDomains == nil {
 		p.resolvedDomains = make(map[string]string)
 	}

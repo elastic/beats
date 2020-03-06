@@ -28,7 +28,7 @@ func newClock(log helper.Logger, maxDrift time.Duration) *clock {
 	}
 }
 
-func (c *clock) Sync(kernelNanos, userNanos uint64) {
+func (c *clock) sync(kernelNanos, userNanos uint64) {
 	userTime := time.Unix(int64(time.Duration(userNanos)/time.Second), int64(time.Duration(userNanos)%time.Second))
 	bootTime := userTime.Add(-time.Duration(kernelNanos))
 
@@ -45,7 +45,7 @@ func (c *clock) Sync(kernelNanos, userNanos uint64) {
 	}
 }
 
-func (c *clock) KernelToTime(ts uint64) time.Time {
+func (c *clock) kernelToTime(ts uint64) time.Time {
 	if ts == 0 {
 		return time.Time{}
 	}

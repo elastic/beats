@@ -4,11 +4,12 @@
 
 // +build linux,386 linux,amd64
 
-package state
+package common
 
 import (
 	"fmt"
 	"net"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,6 +17,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+var currentProcesPID int
+
+func init() {
+	currentProcesPID = os.Getpid()
+}
 
 type Flow struct {
 	*Socket
@@ -67,14 +74,41 @@ func (f *Flow) SetCreated(ts uint64) *Flow {
 }
 
 func (f *Flow) Terminate() {
-	if f.Socket != nil && f.hasKey() {
-		f.Socket.RemoveFlow(f.key())
+	if f.Socket != nil && f.HasKey() {
+		f.Socket.RemoveFlow(f.Key())
 	}
 }
 
 // If this flow should be reported or only captured partial data
 func (f *Flow) IsValid() bool {
 	return f.inetType != InetTypeUnknown && f.proto != ProtoUnknown && f.local.addr.IP != nil && f.remote.addr.IP != nil
+}
+
+func (f *Flow) SocketPtr() uintptr {
+	return f.socket
+}
+
+func (f *Flow) FormatLastSeen(formatter func(uint64) time.Time) *Flow {
+	f.lastSeenTime = formatter(f.lastSeen)
+	return f
+}
+
+func (f *Flow) FormatCreated(formatter func(uint64) time.Time) *Flow {
+	f.createdTime = formatter(f.created)
+	return f
+}
+
+func (f *Flow) FirstSeen() *Flow {
+	f.createdTime = f.lastSeenTime
+	return f
+}
+
+func (f *Flow) PID() uint32 {
+	return f.pid
+}
+
+func (f *Flow) Proto() FlowProto {
+	return f.proto
 }
 
 func (f *Flow) Local() *Endpoint {
@@ -96,6 +130,13 @@ func (f *Flow) LocalIP() net.IP {
 	return nil
 }
 
+func (f *Flow) LocalPort() int {
+	if f.local != nil {
+		return f.local.addr.Port
+	}
+	return 0
+}
+
 func (f *Flow) RemoteIP() net.IP {
 	if f.remote != nil {
 		return f.remote.addr.IP
@@ -103,19 +144,34 @@ func (f *Flow) RemoteIP() net.IP {
 	return nil
 }
 
+func (f *Flow) RemotePort() int {
+	if f.remote != nil {
+		return f.remote.addr.Port
+	}
+	return 0
+}
+
 func (f *Flow) IsUDP() bool {
 	return f.proto == ProtoUDP
 }
 
-func (f *Flow) hasKey() bool {
+func (f *Flow) IsCurrentProcess() bool {
+	return int(f.pid) == currentProcesPID
+}
+
+func (f *Flow) IsDNS() bool {
+	return f.RemotePort() == 53 && f.Proto() == ProtoUDP && f.PID() != 0 && f.Process != nil
+}
+
+func (f *Flow) HasKey() bool {
 	return f.Remote() != nil && f.Local() != nil
 }
 
-func (f *Flow) key() string {
+func (f *Flow) Key() string {
 	return f.remote.addr.String() + "|" + f.local.addr.String()
 }
 
-func (f *Flow) updateWith(ref *Flow) {
+func (f *Flow) Merge(ref *Flow) {
 	f.lastSeenTime = ref.lastSeenTime
 	if f.inetType == InetTypeUnknown {
 		f.inetType = ref.inetType

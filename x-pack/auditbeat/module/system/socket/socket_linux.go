@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -23,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
+	socket_common "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
@@ -156,7 +155,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	} else {
 		for _, p := range procs {
 			if i, err := p.Info(); err == nil {
-				process := state.CreateProcess(uint32(i.PID), i.Exe, i.Name, 0, i.Args).SetCreated(i.StartTime)
+				process := socket_common.CreateProcess(uint32(i.PID), i.Exe, i.Name, 0, i.Args).SetCreated(i.StartTime)
 
 				if user, err := p.User(); err == nil {
 					toUint32 := func(id string) uint32 {
@@ -184,7 +183,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 				running = false
 				break
 			}
-			v, ok := iface.(events.Event)
+			v, ok := iface.(socket_common.Event)
 			if !ok {
 				m.log.Errorf("Received an event of wrong type: %T", iface)
 				continue
@@ -192,8 +191,8 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			if m.isDetailed {
 				m.detailLog.Debug(v.String())
 			}
+			st.Increment()
 			v.Update(st)
-			atomic.AddUint64(&st.EventCount, 1)
 
 		case err := <-m.perfChannel.ErrC():
 			m.log.Errorf("Error received from perf channel: %v", err)

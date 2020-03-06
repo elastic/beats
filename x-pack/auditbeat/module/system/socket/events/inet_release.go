@@ -9,7 +9,7 @@ package events
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
@@ -24,29 +24,6 @@ func (e *InetReleaseCall) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *InetReleaseCall) Update(s *state.State) {
+func (e *InetReleaseCall) Update(s common.EventTracker) {
 	s.SocketEnd(e.Socket, e.Meta.PID)
-}
-
-type DoExitCall struct {
-	Meta tracing.Metadata `kprobe:"metadata"`
-}
-
-// String returns a representation of the event.
-func (e *DoExitCall) String() string {
-	whatExited := "process"
-	if e.Meta.PID != e.Meta.TID {
-		whatExited = "thread"
-	}
-	return fmt.Sprintf("%s do_exit(%s)", header(e.Meta), whatExited)
-}
-
-// Update the state with the contents of this event.
-func (e *DoExitCall) Update(s *state.State) {
-	// Only report exits of the main thread, a.k.a process exit
-	if e.Meta.PID == e.Meta.TID {
-		s.ProcessEnd(e.Meta.PID)
-	}
-	// Cleanup any saved thread state
-	s.PopThreadEvent(e.Meta.TID)
 }

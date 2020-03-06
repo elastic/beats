@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"golang.org/x/sys/unix"
 )
@@ -24,7 +24,7 @@ type TCPv4ConnectCall struct {
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"port"`
 
-	flow *state.Flow // for caching
+	flow *common.Flow // for caching
 }
 
 // String returns a representation of the event.
@@ -48,26 +48,26 @@ func (e *TCPv4ConnectCall) String() string {
 		rport)
 }
 
-func (e *TCPv4ConnectCall) Flow() *state.Flow {
+func (e *TCPv4ConnectCall) Flow() *common.Flow {
 	if e.flow != nil {
 		return e.flow
 	}
 
-	e.flow = state.NewFlow(
+	e.flow = common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
 		unix.IPPROTO_TCP,
 		e.Meta.Timestamp,
-		state.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		state.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
+		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
+		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkOutbound()
 
 	return e.flow
 }
 
 // Update the state with the contents of this event.
-func (e *TCPv4ConnectCall) Update(s *state.State) {
+func (e *TCPv4ConnectCall) Update(s common.EventTracker) {
 	s.PushThreadEvent(e.Meta.TID, e)
 }
 
@@ -81,7 +81,7 @@ type TCPv6ConnectCall struct {
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"port"`
 
-	flow *state.Flow // for caching
+	flow *common.Flow // for caching
 }
 
 // String returns a representation of the event.
@@ -107,26 +107,26 @@ func (e *TCPv6ConnectCall) String() string {
 		rport)
 }
 
-func (e *TCPv6ConnectCall) Flow() *state.Flow {
+func (e *TCPv6ConnectCall) Flow() *common.Flow {
 	if e.flow != nil {
 		return e.flow
 	}
 
-	e.flow = state.NewFlow(
+	e.flow = common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET6,
 		unix.IPPROTO_TCP,
 		e.Meta.Timestamp,
-		state.NewEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
-		state.NewEndpointIPv6(e.RAddrA, e.RAddrB, e.RPort, 0, 0),
+		common.NewEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
+		common.NewEndpointIPv6(e.RAddrA, e.RAddrB, e.RPort, 0, 0),
 	).MarkOutbound()
 
 	return e.flow
 }
 
 // Update the state with the contents of this event.
-func (e *TCPv6ConnectCall) Update(s *state.State) {
+func (e *TCPv6ConnectCall) Update(s common.EventTracker) {
 	s.PushThreadEvent(e.Meta.TID, e)
 }
 
@@ -141,7 +141,7 @@ func (e *TCPConnectReturn) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *TCPConnectReturn) Update(s *state.State) {
+func (e *TCPConnectReturn) Update(s common.EventTracker) {
 	if e.Retval == 0 {
 		if event := s.PopThreadEvent(e.Meta.TID); event != nil {
 			switch call := event.(type) {

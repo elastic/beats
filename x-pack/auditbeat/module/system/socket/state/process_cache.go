@@ -10,33 +10,34 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	socket_common "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 )
 
-type ProcessCache struct {
+type processCache struct {
 	*common.Cache
 }
 
-func NewProcessCache(d time.Duration) *ProcessCache {
-	return &ProcessCache{common.NewCache(d, 8)}
+func newProcessCache(d time.Duration) *processCache {
+	return &processCache{common.NewCache(d, 8)}
 }
 
-func (p *ProcessCache) Put(value *Process) {
-	if value.pid == 0 {
+func (p *processCache) Put(value *socket_common.Process) {
+	if value.PID() == 0 {
 		// no-op for uninitialized processes
 		return
 	}
 
-	p.Cache.Put(value.pid, value)
+	p.Cache.Put(value.PID(), value)
 }
 
-func (p *ProcessCache) Get(pid uint32) *Process {
+func (p *processCache) Get(pid uint32) *socket_common.Process {
 	if pid == 0 {
 		// no-op for uninitialized processes
 		return nil
 	}
 
 	if value := p.Cache.Get(pid); value != nil {
-		return value.(*Process)
+		return value.(*socket_common.Process)
 	}
 	return nil
 }

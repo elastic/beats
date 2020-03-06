@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package state
+package common
 
 import (
 	"time"

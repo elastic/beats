@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/state"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
@@ -25,7 +25,7 @@ func (e *ClockSyncCall) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *ClockSyncCall) Update(s *state.State) {
+func (e *ClockSyncCall) Update(s common.EventTracker) {
 	if int(e.Meta.PID) == os.Getpid() {
 		s.SyncClocks(e.Meta.Timestamp, e.Timestamp)
 	}
