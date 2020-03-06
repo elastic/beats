@@ -234,6 +234,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
 - Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
+- Improve ECS categorization field mappings in logstash module. {issue}16169[16169] {pull}16668[16668]
 
 *Heartbeat*
 
