@@ -3,12 +3,13 @@
 // you may not use this file except in compliance with the Elastic License.
 package main
 
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
+// This file is mandatory as otherwise the agent.test binary is not generated correctly.
 import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/x-pack/filebeat/cmd"
+	// Just using this a place holder.
+	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
 )
 
 var systemTest *bool

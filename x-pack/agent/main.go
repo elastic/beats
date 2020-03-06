@@ -5,18 +5,20 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
-	"github.com/elastic/beats/v7/x-pack/packetbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/cmd"
 )
 
 // Setups and Runs agent.
 func main() {
-	rand.seed(time.now().unixnano())
-
-	command := cmd.newcommand()
-	if err := command.execute(); err != nil {
-		fmt.fprintf(os.stderr, "%v\n", err)
-		os.exit(1)
+	rand.Seed(time.Now().UnixNano())
+	command := cmd.NewCommand()
+	if err := command.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
 	}
 }
