@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
@@ -78,7 +79,7 @@ var (
 
 func (c *elasticsearchConfig) Validate() error {
 	if c.ProxyURL != "" && !c.ProxyDisable {
-		if _, err := parseProxyURL(c.ProxyURL); err != nil {
+		if _, err := common.ParseURL(c.ProxyURL); err != nil {
 			return err
 		}
 	}
