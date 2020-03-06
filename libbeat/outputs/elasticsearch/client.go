@@ -24,6 +24,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/testing"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -404,4 +406,8 @@ func (client *Client) Close() error {
 
 func (client *Client) String() string {
 	return "elasticsearch(" + client.conn.URL + ")"
+}
+
+func (client *Client) Test(d testing.Driver) {
+	client.conn.Test(d)
 }
