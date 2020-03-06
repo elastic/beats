@@ -284,7 +284,10 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-
+	var args []string
+	if UseVendor {
+		args = append(args, "-mod=vendor")
+	}
 	return gotool.ListModulePath("github.com/elastic/beats/v7")
 }
 
