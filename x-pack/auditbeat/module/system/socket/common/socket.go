@@ -16,7 +16,7 @@ type Socket struct {
 	// Sockets have direction if they have been connect()ed or accept()ed.
 	direction FlowDirection
 	bound     bool
-	pid       uint32
+	PID       uint32
 }
 
 func CreateSocket(s uintptr, pid uint32) *Socket {
@@ -34,31 +34,27 @@ func (s *Socket) AddFlow(f *Flow) {
 
 func (s *Socket) Enrich(f *Flow) {
 	// if the sock is not bound to a local address yet, update if possible
-	if !s.bound && f.Local() != nil {
+	if !s.bound && f.Local != nil && f.Local.addr != nil {
 		s.bound = true
 		for _, flow := range s.flows {
-			flow.local.addr = f.local.addr
+			flow.Local.addr = f.Local.addr
 		}
 	}
 
 	if s.direction == DirectionUnknown {
-		s.direction = f.direction
+		s.direction = f.Direction
 	}
-	f.direction = s.direction
+	f.Direction = s.direction
 
-	if s.pid == 0 {
-		s.pid = f.pid
+	if s.PID == 0 {
+		s.PID = f.PID
 	}
-	f.pid = s.pid
+	f.PID = s.PID
 
 	f.Socket = s
 }
 
-func (s *Socket) GetFlow(key string) *Flow {
-	return s.flows[key]
-}
-
-func (s *Socket) RemoveFlow(key string) {
+func (s *Socket) removeFlow(key string) {
 	delete(s.flows, key)
 }
 
@@ -75,7 +71,7 @@ func (s *Socket) Flows() []*Flow {
 
 func (s *Socket) SetPID(pid uint32) *Socket {
 	if pid != 0 {
-		s.pid = pid
+		s.PID = pid
 	}
 	return s
 }

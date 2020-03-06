@@ -28,8 +28,6 @@ type UDPSendmsgCall struct {
 	SIPtr uintptr `kprobe:"siptr"`
 	// SIAF is the address family in (struct sockaddr_in*)->sin_family.
 	SIAF uint16 `kprobe:"siaf"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *UDPSendmsgCall) Flow() *common.Flow {
@@ -58,8 +56,8 @@ func (e *UDPSendmsgCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Local,
+		flow.Remote)
 }
 
 // Update the state with the contents of this event.

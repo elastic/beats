@@ -22,16 +22,10 @@ type TCPv4DoRcvCall struct {
 	RAddr  uint32           `kprobe:"raddr"`
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"rport"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *TCPv4DoRcvCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
@@ -40,8 +34,6 @@ func (e *TCPv4DoRcvCall) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 		common.NewEndpointIPv4(e.RAddr, e.RPort, 1, uint64(e.Size)),
 	)
-
-	return e.flow
 }
 
 // String returns a representation of the event.
@@ -52,8 +44,8 @@ func (e *TCPv4DoRcvCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String(),
+		flow.Local,
+		flow.Remote,
 	)
 }
 

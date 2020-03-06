@@ -22,16 +22,10 @@ type IPLocalOutCall struct {
 	RAddr  uint32           `kprobe:"raddr"`
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"rport"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *IPLocalOutCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
@@ -40,8 +34,6 @@ func (e *IPLocalOutCall) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)),
 		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 func (e *IPLocalOutCall) String() string {
@@ -51,14 +43,14 @@ func (e *IPLocalOutCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Local,
+		flow.Remote)
 }
 
 // Update the state with the contents of this event.
 func (e *IPLocalOutCall) Update(s common.EventTracker) {
 	flow := e.Flow()
-	if !flow.HasRemote() {
+	if flow.Remote == nil {
 		// Unconnected-UDP flows have nil destination in here.
 		return
 	}
@@ -66,6 +58,6 @@ func (e *IPLocalOutCall) Update(s common.EventTracker) {
 	// Those are already counted by udp_sendmsg, but there is no way
 	// to discriminate UDP in ip_local_out at kprobe level.
 	s.UpdateFlowWithCondition(flow, func(f *common.Flow) bool {
-		return !f.IsUDP()
+		return f.Proto != common.ProtoUDP
 	})
 }

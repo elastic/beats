@@ -23,36 +23,40 @@ var (
 )
 
 func (f *Flow) ToEvent(final bool) mb.Event {
-	localAddr := f.local.addr
-	remoteAddr := f.remote.addr
+	localAddr := f.Local.addr
+	localBytes := f.Local.bytes
+	localPackets := f.Local.packets
+	remoteAddr := f.Remote.addr
+	remoteBytes := f.Remote.bytes
+	remotePackets := f.Remote.packets
 
 	local := common.MapStr{
 		"ip":      localAddr.IP.String(),
 		"port":    localAddr.Port,
-		"packets": f.local.packets,
-		"bytes":   f.local.bytes,
+		"packets": localPackets,
+		"bytes":   localBytes,
 	}
 
 	remote := common.MapStr{
 		"ip":      remoteAddr.IP.String(),
 		"port":    remoteAddr.Port,
-		"packets": f.remote.packets,
-		"bytes":   f.remote.bytes,
+		"packets": remotePackets,
+		"bytes":   remoteBytes,
 	}
 
 	src, dst := local, remote
-	if f.direction == DirectionInbound {
+	if f.Direction == DirectionInbound {
 		src, dst = dst, src
 	}
 
-	inetType := f.inetType
+	inetType := f.Type
 	// Under Linux, a socket created as AF_INET6 can receive IPv4 connections
 	// and it will use the IPv4 stack.
 	// This results in src and dst address using IPv4 mapped addresses (which
 	// Golang converts to IPv4 automatically). It will be misleading to report
 	// network.type: ipv6 and have v4 addresses, so it's better to report
 	// a network.type of ipv4 (which also matches the actual stack used).
-	if inetType == InetTypeIPv6 && f.local.addr.IP.To4() != nil && f.remote.addr.IP.To4() != nil {
+	if inetType == InetTypeIPv6 && localAddr.IP.To4() != nil && remoteAddr.IP.To4() != nil {
 		inetType = InetTypeIPv4
 	}
 	root := common.MapStr{
@@ -61,17 +65,17 @@ func (f *Flow) ToEvent(final bool) mb.Event {
 		"destination": dst,
 		"server":      dst,
 		"network": common.MapStr{
-			"direction": f.direction.String(),
+			"direction": f.Direction.String(),
 			"type":      inetType.String(),
-			"transport": f.proto.String(),
-			"packets":   f.local.packets + f.remote.packets,
-			"bytes":     f.local.bytes + f.remote.bytes,
+			"transport": f.Proto.String(),
+			"packets":   localPackets + remotePackets,
+			"bytes":     localBytes + remoteBytes,
 			"community_id": flowhash.CommunityID.Hash(flowhash.Flow{
 				SourceIP:        localAddr.IP,
 				SourcePort:      uint16(localAddr.Port),
 				DestinationIP:   remoteAddr.IP,
 				DestinationPort: uint16(remoteAddr.Port),
-				Protocol:        uint8(f.proto),
+				Protocol:        uint8(f.Proto),
 			}),
 		},
 		"event": common.MapStr{
@@ -92,14 +96,14 @@ func (f *Flow) ToEvent(final bool) mb.Event {
 		"kernel_sock_address": fmt.Sprintf("0x%x", f.socket),
 	}
 
-	if f.pid != 0 {
+	if f.PID != 0 {
 		process := common.MapStr{
-			"pid": int(f.pid),
+			"pid": int(f.PID),
 		}
 		if f.Process != nil {
-			process["name"] = f.Process.name
-			process["args"] = f.Process.args
-			process["executable"] = f.Process.path
+			process["name"] = f.Process.Name
+			process["args"] = f.Process.Args
+			process["executable"] = f.Process.Path
 			if f.Process.createdTime != (time.Time{}) {
 				process["created"] = f.Process.createdTime
 			}
@@ -121,10 +125,10 @@ func (f *Flow) ToEvent(final bool) mb.Event {
 				metricset["egid"] = f.Process.egid
 			}
 
-			if domain, found := f.Process.ResolveIP(f.local.addr.IP); found {
+			if domain, found := f.Process.ResolveIP(localAddr.IP); found {
 				local["domain"] = domain
 			}
-			if domain, found := f.Process.ResolveIP(f.remote.addr.IP); found {
+			if domain, found := f.Process.ResolveIP(remoteAddr.IP); found {
 				remote["domain"] = domain
 			}
 		}

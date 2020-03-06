@@ -60,7 +60,7 @@ func (dt *dnsTracker) cleanUp() {
 
 // RegisterEndpoint registers a new local endpoint used for DNS queries
 // to correlate captured DNS packets with their originator process.
-func (dt *dnsTracker) registerEndpoint(addr net.UDPAddr, proc *socket_common.Process) {
+func (dt *dnsTracker) registerEndpoint(addr *net.UDPAddr, proc *socket_common.Process) {
 	key := addr.String()
 	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {

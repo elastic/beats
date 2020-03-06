@@ -24,16 +24,10 @@ type Inet6CskXmitCall struct {
 	LPort   uint16           `kprobe:"lport"`
 	RPort   uint16           `kprobe:"rport"`
 	Size    uint32           `kprobe:"size"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *Inet6CskXmitCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET6,
@@ -42,8 +36,6 @@ func (e *Inet6CskXmitCall) Flow() *common.Flow {
 		common.NewEndpointIPv6(e.LAddr6a, e.LAddr6b, e.LPort, 1, uint64(e.Size)),
 		common.NewEndpointIPv6(e.RAddr6a, e.RAddr6b, e.RPort, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 func (e *Inet6CskXmitCall) String() string {
@@ -53,8 +45,8 @@ func (e *Inet6CskXmitCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Local,
+		flow.Remote)
 }
 
 func (e *Inet6CskXmitCall) Update(s common.EventTracker) {

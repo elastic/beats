@@ -14,9 +14,9 @@ import (
 )
 
 type Process struct {
-	pid                  uint32
-	name, path           string
-	args                 []string
+	PID                  uint32
+	Name, Path           string
+	Args                 []string
 	created              uint64
 	uid, gid, euid, egid uint32
 	hasCreds             bool
@@ -30,26 +30,12 @@ type Process struct {
 
 func CreateProcess(pid uint32, path, name string, created uint64, args []string) *Process {
 	return &Process{
-		pid:     pid,
-		path:    path,
+		PID:     pid,
+		Path:    path,
+		Args:    args,
+		Name:    name,
 		created: created,
-		args:    args,
-		name:    name,
 	}
-}
-
-var kernelProcess = &Process{
-	pid:  0,
-	name: "[kernel_task]",
-}
-
-func (p *Process) PID() uint32 {
-	return p.pid
-}
-
-func (p *Process) SetPID(pid uint32) *Process {
-	p.pid = pid
-	return p
 }
 
 func (p *Process) SetCreds(uid, gid, euid, egid uint32) *Process {
@@ -64,18 +50,6 @@ func (p *Process) SetCreds(uid, gid, euid, egid uint32) *Process {
 func (p *Process) SetCreated(ts time.Time) *Process {
 	p.createdTime = ts
 	return p
-}
-
-func (p *Process) Args() []string {
-	return p.args
-}
-
-func (p *Process) Path() string {
-	return p.path
-}
-
-func (p *Process) Name() string {
-	return p.name
 }
 
 func (p *Process) FormatCreatedIfZero(formatter func(uint64) time.Time) *Process {

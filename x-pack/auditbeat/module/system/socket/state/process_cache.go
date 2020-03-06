@@ -22,12 +22,12 @@ func newProcessCache(d time.Duration) *processCache {
 }
 
 func (p *processCache) Put(value *socket_common.Process) {
-	if value.PID() == 0 {
+	if value.PID == 0 {
 		// no-op for uninitialized processes
 		return
 	}
 
-	p.Cache.Put(value.PID(), value)
+	p.Cache.Put(value.PID, value)
 }
 
 func (p *processCache) Get(pid uint32) *socket_common.Process {

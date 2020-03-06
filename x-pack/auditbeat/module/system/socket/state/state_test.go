@@ -411,13 +411,13 @@ func TestDNSTracker(t *testing.T) {
 		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
 	}
 	t.Run("transaction before register", func(t *testing.T) {
-		proc1 := (&common.Process{}).SetPID(123)
-		proc2 := (&common.Process{}).SetPID(124)
+		proc1 := &common.Process{PID: 123}
+		proc2 := &common.Process{PID: 124}
 		tracker := newDNSTracker(infiniteExpiration)
 		tracker.addTransaction(trV4)
 		tracker.addTransaction(trV6)
-		tracker.registerEndpoint(local1, proc1)
-		tracker.registerEndpoint(local2, proc1)
+		tracker.registerEndpoint(&local1, proc1)
+		tracker.registerEndpoint(&local2, proc1)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc1, "192.0.2.13", "example.net"},
@@ -430,11 +430,11 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("transaction after register", func(t *testing.T) {
-		proc1 := (&common.Process{}).SetPID(123)
-		proc2 := (&common.Process{}).SetPID(124)
+		proc1 := &common.Process{PID: 123}
+		proc2 := &common.Process{PID: 124}
 		tracker := newDNSTracker(infiniteExpiration)
-		tracker.registerEndpoint(local1, proc1)
-		tracker.registerEndpoint(local2, proc1)
+		tracker.registerEndpoint(&local1, proc1)
+		tracker.registerEndpoint(&local2, proc1)
 		tracker.addTransaction(trV4)
 		tracker.addTransaction(trV6)
 		dnsTestCases{
@@ -449,10 +449,10 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("unknown local endpoint", func(t *testing.T) {
-		proc1 := (&common.Process{}).SetPID(123)
-		proc2 := (&common.Process{}).SetPID(124)
+		proc1 := &common.Process{PID: 123}
+		proc2 := &common.Process{PID: 124}
 		tracker := newDNSTracker(infiniteExpiration)
-		tracker.registerEndpoint(local1, proc1)
+		tracker.registerEndpoint(&local1, proc1)
 		tracker.addTransaction(trV4)
 		tracker.addTransaction(trV6)
 		dnsTestCases{
@@ -467,13 +467,13 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("expiration", func(t *testing.T) {
-		proc1 := (&common.Process{}).SetPID(123)
+		proc1 := &common.Process{PID: 123}
 		tracker := newDNSTracker(10 * time.Millisecond)
 		tracker.addTransaction(trV4)
 		tracker.addTransaction(trV6)
 		time.Sleep(time.Millisecond * 50)
-		tracker.registerEndpoint(local1, proc1)
-		tracker.registerEndpoint(local2, proc1)
+		tracker.registerEndpoint(&local1, proc1)
+		tracker.registerEndpoint(&local2, proc1)
 		dnsTestCases{
 			{false, proc1, "192.0.2.12", ""},
 			{false, proc1, "192.0.2.13", ""},
@@ -482,8 +482,8 @@ func TestDNSTracker(t *testing.T) {
 		}.Run(t)
 	})
 	t.Run("same IP different domains", func(t *testing.T) {
-		proc1 := (&common.Process{}).SetPID(123)
-		proc2 := (&common.Process{}).SetPID(124)
+		proc1 := &common.Process{PID: 123}
+		proc2 := &common.Process{PID: 124}
 		trV4alt := dns.Transaction{
 			TXID:      1234,
 			Client:    local2,
@@ -494,8 +494,8 @@ func TestDNSTracker(t *testing.T) {
 		tracker := newDNSTracker(infiniteExpiration)
 		tracker.addTransaction(trV4)
 		tracker.addTransaction(trV4alt)
-		tracker.registerEndpoint(local1, proc1)
-		tracker.registerEndpoint(local2, proc2)
+		tracker.registerEndpoint(&local1, proc1)
+		tracker.registerEndpoint(&local2, proc2)
 		dnsTestCases{
 			{true, proc1, "192.0.2.12", "example.net"},
 			{true, proc2, "192.0.2.12", "example.com"},

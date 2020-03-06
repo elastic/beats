@@ -23,8 +23,6 @@ type TCPv4ConnectCall struct {
 	RAddr  uint32           `kprobe:"addr"`
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"port"`
-
-	flow *common.Flow // for caching
 }
 
 // String returns a representation of the event.
@@ -49,11 +47,7 @@ func (e *TCPv4ConnectCall) String() string {
 }
 
 func (e *TCPv4ConnectCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
@@ -62,8 +56,6 @@ func (e *TCPv4ConnectCall) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // Update the state with the contents of this event.
@@ -80,8 +72,6 @@ type TCPv6ConnectCall struct {
 	RAddrB uint64           `kprobe:"addrb"`
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"port"`
-
-	flow *common.Flow // for caching
 }
 
 // String returns a representation of the event.
@@ -108,11 +98,7 @@ func (e *TCPv6ConnectCall) String() string {
 }
 
 func (e *TCPv6ConnectCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET6,
@@ -121,8 +107,6 @@ func (e *TCPv6ConnectCall) Flow() *common.Flow {
 		common.NewEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
 		common.NewEndpointIPv6(e.RAddrA, e.RAddrB, e.RPort, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // Update the state with the contents of this event.

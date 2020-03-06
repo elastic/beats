@@ -32,15 +32,9 @@ type UDPQueueRcvSkbCall struct {
 	UDPHdr uint16                           `kprobe:"udphdr"`
 	Base   uintptr                          `kprobe:"base"`
 	Packet [common.SkBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *UDPQueueRcvSkbCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
 	var remote *common.Endpoint
 	if valid := validIPv4Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); valid {
 		// Check if we're dealing with pointers
@@ -69,7 +63,7 @@ func (e *UDPQueueRcvSkbCall) Flow() *common.Flow {
 		}
 	}
 
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET,
@@ -78,8 +72,6 @@ func (e *UDPQueueRcvSkbCall) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 		remote,
 	).MarkInbound()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
@@ -90,8 +82,8 @@ func (e *UDPQueueRcvSkbCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String(),
+		flow.Local,
+		flow.Remote,
 	)
 }
 

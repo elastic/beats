@@ -7,7 +7,6 @@
 package state
 
 import (
-	"net"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -92,12 +91,12 @@ func (s *State) UpdateFlowWithCondition(f *socket_common.Flow, condition func(*s
 	f.FormatCreated(s.clock.kernelToTime).FormatLastSeen(s.clock.kernelToTime)
 
 	// Get or create a socket for this flow
-	socket := s.getOrCreateSocket(f.SocketPtr(), f.PID())
+	socket := s.getOrCreateSocket(f.Ptr(), f.PID)
 	if socket != nil {
 		// enrich the socket with information from the flow and link up the relationships
 		socket.Enrich(f)
 		// link up the process with the newly enriched socket
-		socket.SetProcess(s.processes.Get(f.PID()))
+		socket.SetProcess(s.processes.Get(f.PID))
 	}
 
 	cached := s.flows.PutIfAbsent(f)
@@ -112,7 +111,7 @@ func (s *State) UpdateFlowWithCondition(f *socket_common.Flow, condition func(*s
 		}
 		cached.Merge(f)
 	} else {
-		cached.FirstSeen()
+		cached.MarkNew()
 	}
 
 	s.enrichDNS(cached)
@@ -270,10 +269,7 @@ func (s *State) Increment() {
 }
 
 func (s *State) enrichDNS(f *socket_common.Flow) {
-	if f.IsDNS() {
-		s.dns.registerEndpoint(net.UDPAddr{
-			IP:   f.LocalIP(),
-			Port: f.LocalPort(),
-		}, f.Process)
+	if address := f.DNSAddress(); address != nil {
+		s.dns.registerEndpoint(address, f.Process)
 	}
 }

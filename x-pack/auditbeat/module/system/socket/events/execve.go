@@ -73,14 +73,14 @@ func (e *ExecveCall) AddProcess() {
 // String returns a representation of the event.
 func (e *ExecveCall) String() string {
 	e.AddProcess()
-	args := e.process.Args()
+	args := e.process.Args
 
 	messages := make([]string, len(args))
 	for idx, val := range args {
 		messages[idx] = fmt.Sprintf("arg%d='%s'", idx, val)
 	}
 
-	return fmt.Sprintf("%s execve(name='%s', path='%s', %s)", header(e.Meta), e.process.Name(), e.process.Path(), strings.Join(messages, " "))
+	return fmt.Sprintf("%s execve(name='%s', path='%s', %s)", header(e.Meta), e.process.Name, e.process.Path, strings.Join(messages, " "))
 }
 
 // Update the state with the contents of this event.
@@ -99,9 +99,7 @@ type CommitCredsCall struct {
 
 // String returns a representation of the event.
 func (e *CommitCredsCall) String() string {
-	return fmt.Sprintf("%s commit_creds(uid=%d, gid=%d, euid=%d, egid=%d)",
-		header(e.Meta),
-		e.UID, e.GID, e.EUID, e.EGID)
+	return fmt.Sprintf("%s commit_creds(uid=%d, gid=%d, euid=%d, egid=%d)", header(e.Meta), e.UID, e.GID, e.EUID, e.EGID)
 }
 
 // Update the state with the contents of this event.

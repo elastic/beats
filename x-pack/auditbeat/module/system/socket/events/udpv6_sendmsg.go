@@ -31,22 +31,15 @@ type UDPv6SendmsgCall struct {
 	SI6Ptr uintptr `kprobe:"si6ptr"`
 	// Si6AF is the address family field ((struct sockaddr_in6*)->sin6_family)
 	SI6AF uint16 `kprobe:"si6af"`
-
-	flow *common.Flow // for caching
-
 }
 
 func (e *UDPv6SendmsgCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
 	raddra, raddrb, rport := e.RAddrA, e.RAddrB, e.RPort
 	if e.SI6Ptr == 0 || e.SI6AF != unix.AF_INET6 {
 		raddra, raddrb = e.AltRAddrA, e.AltRAddrB
 		rport = e.AltRPort
 	}
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		unix.AF_INET6,
@@ -57,8 +50,6 @@ func (e *UDPv6SendmsgCall) Flow() *common.Flow {
 		common.NewEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 1, uint64(e.Size)+minIPv6UdpPacketSize),
 		common.NewEndpointIPv6(raddra, raddrb, rport, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
@@ -69,8 +60,8 @@ func (e *UDPv6SendmsgCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Local,
+		flow.Remote)
 }
 
 // Update the state with the contents of this event.

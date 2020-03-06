@@ -26,15 +26,9 @@ type InetCskAcceptReturn struct {
 	RAddr6a uint64           `kprobe:"raddr6a"`
 	RAddr6b uint64           `kprobe:"raddr6b"`
 	AF      uint16           `kprobe:"family"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *InetCskAcceptReturn) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
 	var local, remote *common.Endpoint
 	if e.AF == unix.AF_INET {
 		local = common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0)
@@ -44,7 +38,7 @@ func (e *InetCskAcceptReturn) Flow() *common.Flow {
 		remote = common.NewEndpointIPv6(e.RAddr6a, e.RAddr6b, e.RPort, 0, 0)
 	}
 
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
@@ -53,14 +47,12 @@ func (e *InetCskAcceptReturn) Flow() *common.Flow {
 		local,
 		remote,
 	).MarkInbound().MarkComplete()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
 func (e *InetCskAcceptReturn) String() string {
 	f := e.Flow()
-	return fmt.Sprintf("%s <- accept(sock=0x%x, af=%s, %s <- %s)", header(e.Meta), e.Socket, f.Type(), f.Local(), f.Remote())
+	return fmt.Sprintf("%s <- accept(sock=0x%x, af=%s, %s <- %s)", header(e.Meta), e.Socket, f.Type, f.Local, f.Remote)
 }
 
 // Update the state with the contents of this event.
@@ -78,16 +70,10 @@ type InetCskAcceptV4Return struct {
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"rport"`
 	AF     uint16           `kprobe:"family"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *InetCskAcceptV4Return) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
@@ -96,14 +82,12 @@ func (e *InetCskAcceptV4Return) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkInbound().MarkComplete()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
 func (e *InetCskAcceptV4Return) String() string {
 	f := e.Flow()
-	return fmt.Sprintf("%s <- accept(sock=0x%x, af=%s, %s <- %s)", header(e.Meta), e.Socket, f.Type(), f.Local().String(), f.Remote().String())
+	return fmt.Sprintf("%s <- accept(sock=0x%x, af=%s, %s <- %s)", header(e.Meta), e.Socket, f.Type, f.Local, f.Remote)
 }
 
 // Update the state with the contents of this event.

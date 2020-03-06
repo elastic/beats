@@ -27,15 +27,9 @@ type TCPSendmsgCall struct {
 	RAddr6a uint64           `kprobe:"raddr6a"`
 	RAddr6b uint64           `kprobe:"raddr6b"`
 	AF      uint16           `kprobe:"family"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *TCPSendmsgCall) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
 	var local, remote *common.Endpoint
 	if e.AF == unix.AF_INET {
 		local = common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0)
@@ -45,7 +39,7 @@ func (e *TCPSendmsgCall) Flow() *common.Flow {
 		remote = common.NewEndpointIPv6(e.RAddr6a, e.RAddr6b, e.RPort, 0, 0)
 	}
 
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
@@ -54,8 +48,6 @@ func (e *TCPSendmsgCall) Flow() *common.Flow {
 		local,
 		remote,
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
@@ -66,9 +58,9 @@ func (e *TCPSendmsgCall) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Type(),
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Type,
+		flow.Local,
+		flow.Remote)
 }
 
 // Update the state with the contents of this event.
@@ -85,16 +77,10 @@ type TCPSendmsgV4Call struct {
 	LPort  uint16           `kprobe:"lport"`
 	RPort  uint16           `kprobe:"rport"`
 	AF     uint16           `kprobe:"family"`
-
-	flow *common.Flow // for caching
 }
 
 func (e *TCPSendmsgV4Call) Flow() *common.Flow {
-	if e.flow != nil {
-		return e.flow
-	}
-
-	e.flow = common.NewFlow(
+	return common.NewFlow(
 		e.Socket,
 		e.Meta.PID,
 		e.AF,
@@ -103,8 +89,6 @@ func (e *TCPSendmsgV4Call) Flow() *common.Flow {
 		common.NewEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 		common.NewEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	).MarkOutbound()
-
-	return e.flow
 }
 
 // String returns a representation of the event.
@@ -115,9 +99,9 @@ func (e *TCPSendmsgV4Call) String() string {
 		header(e.Meta),
 		e.Socket,
 		e.Size,
-		flow.Type(),
-		flow.Local().String(),
-		flow.Remote().String())
+		flow.Type,
+		flow.Local,
+		flow.Remote)
 }
 
 // Update the state with the contents of this event.
