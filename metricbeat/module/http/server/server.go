@@ -47,7 +47,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
-	events    chan *mb.Event
+	events    chan mb.Event
 	errors    chan error
 }
 
@@ -62,6 +62,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
+		events:        make(chan mb.Event),
+		errors:        make(chan error),
 	}
 	svc, err := httpserver.NewHttpServer(base, m.handleFunc)
 	if err != nil {
@@ -84,7 +86,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			close(m.events)
 			return
 		case e := <-m.events:
-			reporter.Event(*e)
+			reporter.Event(e)
 		case err := <-m.errors:
 			reporter.Error(err)
 		}
@@ -126,7 +128,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			}
 			event.MetricSetFields = fields
 			event.Namespace = ns
-			m.events <- &event
+			m.events <- event
 		}
 
 		writer.WriteHeader(http.StatusAccepted)

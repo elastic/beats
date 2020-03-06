@@ -17,11 +17,8 @@
 
 package remote_write
 
-// TODO this file is entirely copied from collector/data.go, refactor this
-
 import (
 	"math"
-	"time"
 
 	"github.com/prometheus/common/model"
 
@@ -29,20 +26,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-// PromEvent stores a set of one or more metrics with the same labels
-type PromEvent struct {
-	data      common.MapStr
-	labels    common.MapStr
-	timestamp time.Time
-}
-
-// LabelsHash returns a repeatable string that is unique for the set of labels in this event
-func (p *PromEvent) LabelsHash() string {
-	return p.labels.String()
-}
-
 func samplesToEvents(metrics model.Samples) map[string]mb.Event {
-	var events []PromEvent
+	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
 		labels := common.MapStr{}
@@ -50,48 +35,39 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 		if metric == nil {
 			continue
 		}
-		// TODO this may be nil?
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 
+		metric.Metric.Fingerprint()
 		for k, v := range metric.Metric {
 			labels[string(k)] = v
 		}
 
 		val := float64(metric.Value)
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name: val,
-				},
-				labels:    labels,
-				timestamp: metric.Timestamp.Time(),
-			})
-		}
-	}
+			// join metrics with same labels in a single event
+			labelsHash := labels.String()
+			if _, ok := eventList[labelsHash]; !ok {
+				eventList[labelsHash] = mb.Event{
+					ModuleFields: common.MapStr{
+						"metrics": common.MapStr{},
+					},
+				}
 
-	// join metrics with same labels in a single event
-	eventList := map[string]mb.Event{}
-
-	for _, promEvent := range events {
-		labelsHash := promEvent.LabelsHash()
-		if _, ok := eventList[labelsHash]; !ok {
-			eventList[labelsHash] = mb.Event{
-				ModuleFields: common.MapStr{
-					"metrics": common.MapStr{},
-				},
+				// Add labels
+				if len(labels) > 0 {
+					eventList[labelsHash].ModuleFields["labels"] = labels
+				}
 			}
 
-			// Add labels
-			if len(promEvent.labels) > 0 {
-				eventList[labelsHash].ModuleFields["labels"] = promEvent.labels
+			// Not checking anything here because we create these maps some lines before
+			e := eventList[labelsHash]
+			e.Timestamp = metric.Timestamp.Time()
+			data := common.MapStr{
+				name: val,
 			}
+			e.ModuleFields["metrics"].(common.MapStr).Update(data)
 		}
-
-		// Not checking anything here because we create these maps some lines before
-		e := eventList[labelsHash]
-		e.Timestamp = promEvent.timestamp
-		e.ModuleFields["metrics"].(common.MapStr).Update(promEvent.data)
 	}
 
 	return eventList

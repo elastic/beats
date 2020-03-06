@@ -38,7 +38,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	server serverhelper.Server
-	events chan *mb.Event
+	events chan mb.Event
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -50,6 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
+		events:        make(chan mb.Event),
 	}
 	svc, err := httpserver.NewHttpServer(base, m.handleFunc)
 	if err != nil {
@@ -70,7 +71,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			close(m.events)
 			return
 		case e := <-m.events:
-			reporter.Event(*e)
+			reporter.Event(e)
 		}
 	}
 }
@@ -96,14 +97,14 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	// refactor, optimize
 	samples := protoToSamples(&protoReq)
 	events := samplesToEvents(samples)
 
 	for _, e := range events {
-		m.events <- &e
+		m.events <- e
 	}
+	writer.WriteHeader(http.StatusAccepted)
 }
 
 func protoToSamples(req *prompb.WriteRequest) model.Samples {
