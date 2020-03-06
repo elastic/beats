@@ -1,11 +1,10 @@
-from base import BaseTest
-from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
 import logging
-from nose.tools import raises
+import os
+import pytest
+import unittest
+from base import BaseTest
 from elasticsearch import RequestError
+from idxmgmt import IdxMgmt
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -16,7 +15,7 @@ class TestCAPinning(BaseTest):
     """
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_sending_events_with_a_good_sha256(self):
         """
         Test Sending events while using ca pinning with a good sha256
@@ -48,7 +47,7 @@ class TestCAPinning(BaseTest):
         proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_sending_events_with_a_bad_sha256(self):
         """
         Test Sending events while using ca pinning with a bad sha256

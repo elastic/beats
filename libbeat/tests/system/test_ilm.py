@@ -1,12 +1,11 @@
-from base import BaseTest
-from idxmgmt import IdxMgmt
 import os
-from nose.plugins.attrib import attr
 import unittest
 import shutil
 import datetime
 import logging
 import json
+from base import BaseTest
+from idxmgmt import IdxMgmt
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -37,7 +36,7 @@ class TestRunILM(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_ilm_default(self):
         """
         Test ilm default settings to load ilm policy, write alias and ilm template
@@ -55,7 +54,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_ilm_disabled(self):
         """
         Test ilm disabled to not load ilm related components
@@ -72,7 +71,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_policy_name(self):
         """
         Test setting ilm policy name
@@ -92,7 +91,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_rollover_alias(self):
         """
         Test settings ilm rollover alias
@@ -111,7 +110,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_pattern(self):
         """
         Test setting ilm pattern
@@ -131,7 +130,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_pattern_date(self):
         """
         Test setting ilm pattern with date
@@ -187,7 +186,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_setup_ilm_policy_and_template(self):
         """
         Test combination of ilm policy and template setup
@@ -204,7 +203,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_setup_ilm_default(self):
         """
         Test ilm policy setup with default config
@@ -221,7 +220,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_setup_ilm_disabled(self):
         """
         Test ilm policy setup when ilm disabled
@@ -238,7 +237,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_policy_name(self):
         """
         Test ilm policy setup when policy_name is configured
@@ -254,7 +253,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_rollover_alias(self):
         """
         Test ilm policy setup when rollover_alias is configured

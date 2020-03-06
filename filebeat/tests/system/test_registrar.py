@@ -7,9 +7,7 @@ import shutil
 import stat
 import time
 import unittest
-
 from filebeat import BaseTest
-from nose.plugins.skip import SkipTest
 
 
 # Additional tests: to be implemented
@@ -163,7 +161,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry"
         registry_file = os.path.join(registry_home, "filebeat/data.json")
@@ -197,7 +195,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry"
         registry_file = os.path.join(registry_home, "filebeat/data.json")
@@ -232,7 +230,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry_x"
         registry_file = os.path.join(registry_home, "filebeat/data.json")
@@ -363,7 +361,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"
@@ -453,7 +451,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"
@@ -527,7 +525,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"

@@ -1,9 +1,9 @@
-from filebeat import BaseTest
 import socket
 import ssl
 import unittest
+import pytest
 from os import path
-from nose.tools import raises, assert_raises
+from filebeat import BaseTest
 
 NUMBER_OF_EVENTS = 2
 
@@ -86,7 +86,7 @@ class Test(BaseTest):
 
         sock.close()
 
-    @raises(ssl.SSLError)
+    @pytest.raises(ssl.SSLError)
     def test_tcp_over_tls_and_verify_invalid_server_without_mutual_auth(self):
         """
         Test filebeat TCP with TLS with an invalid cacert and not requiring mutual auth.
@@ -125,7 +125,7 @@ class Test(BaseTest):
                               ca_certs=CERTIFICATE2, do_handshake_on_connect=True)
         tls.connect((config.get('host'), config.get('port')))
 
-    @raises(ssl.SSLError)
+    @pytest.raises(ssl.SSLError)
     def test_tcp_over_tls_mutual_auth_fails(self):
         """
         Test filebeat TCP with TLS with default setting to enforce client auth, with bad client certificates
@@ -265,7 +265,7 @@ class Test(BaseTest):
 
         # The TLS handshake will close the connection, resulting in a broken pipe.
         # no events should be written on disk.
-        with assert_raises(IOError):
+        with pytest.raises(IOError):
             for n in range(0, 100000):
                 sock.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 

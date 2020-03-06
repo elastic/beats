@@ -1,8 +1,8 @@
-from base import BaseTest
 import os
 import logging
 import unittest
-from nose.plugins.attrib import attr
+import pytest
+from base import BaseTest
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -41,7 +41,7 @@ class TestCommandTest(BaseTest):
         assert self.log_contains("Config OK") is False
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_output(self):
         """
         Test test output works

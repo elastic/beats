@@ -2,11 +2,10 @@ from base import BaseTest
 import os
 import os.path
 import subprocess
-from nose.plugins.attrib import attr
 import unittest
-from unittest import SkipTest
 import requests
 import semver
+from unittest import SkipTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -14,7 +13,7 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_load_without_dashboard(self):
         """
         Test loading without dashboards
@@ -39,7 +38,7 @@ class Test(BaseTest):
         assert self.log_contains("Skipping loading dashboards")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_load_dashboard(self):
         """
         Test loading dashboards
@@ -64,7 +63,7 @@ class Test(BaseTest):
         assert self.log_contains("Kibana dashboards successfully loaded") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_load_dashboard_into_space(self, create_space=True):
         """
         Test loading dashboards into Kibana space
@@ -98,7 +97,7 @@ class Test(BaseTest):
         assert self.log_contains("Kibana dashboards successfully loaded") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_load_only_index_patterns(self):
         """
         Test loading dashboards
@@ -124,7 +123,7 @@ class Test(BaseTest):
         assert self.log_contains("Kibana dashboards successfully loaded") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_export_dashboard_cmd_export_dashboard_by_id_and_decoding(self):
         """
         Test testbeat export dashboard can export dashboards
@@ -148,7 +147,7 @@ class Test(BaseTest):
         assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_export_dashboard_cmd_export_dashboard_by_id(self):
         """
         Test testbeat export dashboard can export dashboards
@@ -170,7 +169,7 @@ class Test(BaseTest):
         assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_export_dashboard_cmd_export_dashboard_by_id_unknown_id(self):
         """
         Test testbeat export dashboard fails gracefully when dashboard with unknown ID is requested
@@ -191,7 +190,7 @@ class Test(BaseTest):
         assert self.log_contains("error exporting dashboard: Not found") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_export_dashboard_cmd_export_dashboard_from_yml(self):
         """
         Test testbeat export dashboard can export dashboards from dashboards YAML file
@@ -224,7 +223,7 @@ class Test(BaseTest):
         os.remove(exported_dashboard_path)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_export_dashboard_cmd_export_dashboard_from_not_existent_yml(self):
         """
         Test testbeat export dashboard fails gracefully when cannot find YAML file
@@ -246,7 +245,7 @@ class Test(BaseTest):
         assert self.log_contains("error opening the list of dashboards")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_dev_tool_export_dashboard_by_id(self):
         """
         Test dev-tools/cmd/dashboards exports dashboard and removes unsupported characters
@@ -272,7 +271,7 @@ class Test(BaseTest):
         os.remove("output.json")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_dev_tool_export_dashboard_by_id_unknown_id(self):
         """
         Test dev-tools/cmd/dashboards fails gracefully when dashboard with unknown ID is requested
@@ -288,7 +287,7 @@ class Test(BaseTest):
         assert p.returncode != 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_dev_tool_export_dashboard_by_id_from_space(self):
         """
         Test dev-tools/cmd/dashboards exports dashboard from Kibana space
@@ -319,7 +318,7 @@ class Test(BaseTest):
         os.remove("output.json")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_dev_tool_export_dashboard_from_yml(self):
         """
         Test dev-tools/cmd/dashboards exports dashboard from dashboards YAML file

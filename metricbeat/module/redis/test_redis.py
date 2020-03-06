@@ -1,8 +1,8 @@
 import os
+import pytest
 import redis
 import sys
 import unittest
-from nose.plugins.attrib import attr
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -29,7 +29,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['redis']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_info(self):
         """
         Test redis info metricset
@@ -59,7 +59,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_keyspace(self):
         """
         Test redis keyspace metricset
@@ -95,7 +95,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_key(self):
         """
         Test redis key metricset
@@ -133,7 +133,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_module_processors(self):
         """
         Test local processors for Redis info event.

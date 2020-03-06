@@ -1,11 +1,10 @@
-from heartbeat import BaseTest
+import unittest
 import urllib.request
 import urllib.error
 import urllib.parse
 import json
-import nose.tools
 import os
-from nose.plugins.skip import SkipTest
+from heartbeat import BaseTest
 
 
 class Test(BaseTest):
@@ -18,12 +17,12 @@ class Test(BaseTest):
         Test that telemetry metrics are correctly registered and increment / decrement
         """
         # This test is flaky https://github.com/elastic/beats/issues/8966
-        raise SkipTest
+        raise unittest.SkipTest
 
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         server = self.start_server("hello world", 200)
         try:
@@ -90,8 +89,7 @@ class Test(BaseTest):
             self.proc.check_kill_and_wait()
             server.shutdown()
 
-    @staticmethod
-    def assert_state(expected={}):
+    def assert_state(self, expected={}):
         stats = json.loads(urllib.request.urlopen(
             "http://localhost:5066/state").read())
 
@@ -104,23 +102,22 @@ class Test(BaseTest):
             endpoints = proto_expected.get("endpoints", 0)
             total_monitors += monitors
             total_endpoints += endpoints
-            nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
+            self.assertDictEqual(stats['heartbeat'][proto], {
                 'monitors': monitors,
                 'endpoints': endpoints,
             })
 
-        nose.tools.assert_equal(stats['heartbeat']['monitors'], total_monitors)
-        nose.tools.assert_equal(
+        self.assertEqual(stats['heartbeat']['monitors'], total_monitors)
+        self.assertEqual(
             stats['heartbeat']['endpoints'], total_endpoints)
 
-    @staticmethod
-    def assert_stats(expected={}):
+    def assert_stats(self, expected={}):
         stats = json.loads(urllib.request.urlopen(
             "http://localhost:5066/stats").read())
 
         for proto in ("http", "tcp", "icmp"):
             proto_expected = expected.get(proto, {})
-            nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
+            self.assertDictEqual(stats['heartbeat'][proto], {
                 'monitor_starts': proto_expected.get("monitor_starts", 0),
                 'monitor_stops': proto_expected.get("monitor_stops", 0),
                 'endpoint_starts': proto_expected.get("endpoint_starts", 0),

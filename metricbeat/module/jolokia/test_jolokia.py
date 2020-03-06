@@ -1,7 +1,6 @@
 import os
 import sys
 import unittest
-from nose.plugins.attrib import attr
 from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))

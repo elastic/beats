@@ -1,12 +1,10 @@
-from filebeat import BaseTest
 import os
 import logging
 import logging.handlers
 import json
 import time
 import unittest
-from nose.plugins.skip import Skip, SkipTest
-from nose.plugins.attrib import attr
+import pytest
 
 """
 Test filebeat under different load scenarios
@@ -25,7 +23,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because very fast file
             # rotation cannot happen when harvester has file handler still open.
-            raise SkipTest
+            raise unittest.SkipTest
 
         log_file = self.working_dir + "/log/test.log"
         os.mkdir(self.working_dir + "/log/")
@@ -106,7 +104,7 @@ class Test(BaseTest):
         assert len(entry_list) == total_lines
 
     @unittest.skipUnless(LOAD_TESTS, "load test")
-    @attr('load')
+    @pytest.mark.load
     def test_large_number_of_files(self):
         """
         Tests the number of files filebeat can open on startup
@@ -148,7 +146,7 @@ class Test(BaseTest):
         assert len(data) == number_of_files
 
     @unittest.skipUnless(LOAD_TESTS, "load test")
-    @attr('load')
+    @pytest.mark.load
     def test_concurrent_harvesters(self):
         """
         Test large number of files on startup if harvester overlap happens and would create too many events

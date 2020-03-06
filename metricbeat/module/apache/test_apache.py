@@ -1,9 +1,9 @@
 import os
 import unittest
-from nose.plugins.attrib import attr
 import urllib.request
 import urllib.error
 import urllib.parse
+import pytest
 import time
 import semver
 import sys
@@ -39,7 +39,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['apache']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_output(self):
         """
         Apache module outputs an event.

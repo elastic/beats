@@ -1,7 +1,7 @@
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -15,7 +15,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['mongodb']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_status(self):
         """
         MongoDB module outputs an event.

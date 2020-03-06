@@ -1,8 +1,8 @@
 import logging
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
 from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
@@ -56,7 +56,7 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand(["http", "tcp"])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.integration
     def test_status(self, proto):
         """
         uWSGI module outputs an event.

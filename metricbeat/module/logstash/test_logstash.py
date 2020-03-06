@@ -7,7 +7,6 @@ import unittest
 import urllib.error
 import urllib.parse
 import urllib.request
-from nose.plugins.skip import SkipTest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -41,7 +40,7 @@ class Test(metricbeat.BaseTest):
         version = self.get_version()
         if semver.compare(version, "7.3.0") == -1:
             # Skip for Logstash versions < 7.3.0 as necessary APIs not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template(modules=[{
             "name": "logstash",
