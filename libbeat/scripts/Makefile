@@ -82,7 +82,7 @@ REVIEWDOG_REPO?=github.com/reviewdog/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
-PYTEST_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling pytest
+PYTEST_OPTIONS?=--timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling pytest
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
@@ -275,7 +275,7 @@ benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
 # Run load tests
 .PHONY: load-tests
 load-tests: ## @testing Runs load tests
-	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1 pytest ${PYTHON_TEST_FILES} --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
+	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1 pytest ${PYTHON_TEST_FILES} --processes=$(PROCESSES) --timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env

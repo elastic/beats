@@ -129,16 +129,14 @@ func PythonTest(params PythonTestArgs) error {
 	}
 
 	pytestOptions := []string{
-		"--process-timeout=90",
-		"--with-timer",
+		"--timeout=90",
 	}
 	if mg.Verbose() {
 		pytestOptions = append(pytestOptions, "-v")
 	}
 	if params.XUnitReportFile != "" {
 		pytestOptions = append(pytestOptions,
-			"--with-xunit",
-			"--xunit-file="+createDir(params.XUnitReportFile),
+			"--junit-xml="+createDir(params.XUnitReportFile),
 		)
 	}
 
