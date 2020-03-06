@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
+// BlkioStats contains all formatted blkio stats
 type BlkioStats struct {
 	Time      time.Time
 	Container *docker.Container
@@ -34,6 +35,9 @@ type BlkioStats struct {
 
 	serviced      BlkioRaw
 	servicedBytes BlkioRaw
+	servicedTime  BlkioRaw
+	waitTime      BlkioRaw
+	queued        BlkioRaw
 }
 
 // Add adds blkio stats
@@ -46,6 +50,7 @@ func (s *BlkioStats) Add(o *BlkioStats) {
 	s.servicedBytes.Add(&o.servicedBytes)
 }
 
+// BlkioRaw sums raw Blkio stats
 type BlkioRaw struct {
 	Time   time.Time
 	reads  uint64
@@ -130,6 +135,15 @@ func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioS
 		servicedBytes: io.getNewStats(
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoServiceBytesRecursive),
+		servicedTime: io.getNewStats(
+			myRawStat.Stats.Read,
+			myRawStat.Stats.BlkioStats.IoServiceTimeRecursive),
+		waitTime: io.getNewStats(
+			myRawStat.Stats.Read,
+			myRawStat.Stats.BlkioStats.IoWaitTimeRecursive),
+		queued: io.getNewStats(
+			myRawStat.Stats.Read,
+			myRawStat.Stats.BlkioStats.IoQueuedRecursive),
 	}
 }
 

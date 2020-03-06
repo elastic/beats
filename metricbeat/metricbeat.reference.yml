@@ -315,6 +315,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -345,18 +347,6 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
-
-#--------------------------------- Iis Module ---------------------------------
-- module: iis
-  metricsets:
-    - webserver
-    - website
-    - application_pool
-  enabled: true
-  period: 10s
-
- # filter on application pool names
- # application_pool.name: []
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
@@ -1487,6 +1477,27 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/path/config
+
+  # The service principal name.
+  #kerberos.service_name: HTTP/my-service@realm
+
+  # Name of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
 #------------------------------- Redis output ----------------------------------
 #output.redis:
