@@ -112,7 +112,7 @@ func CopyVendor() error {
 		return err
 	}
 
-	path, err := gotool.ListModulePath("github.com/elastic/beats/v7")
+	path, err := gotool.ListModuleCacheDir("github.com/elastic/beats/v7")
 	if err != nil {
 		return err
 	}
