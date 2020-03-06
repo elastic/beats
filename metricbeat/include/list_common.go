@@ -152,6 +152,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/socket"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/socket_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/uptime"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system/users"
 	_ "github.com/elastic/beats/v7/metricbeat/module/traefik"
 	_ "github.com/elastic/beats/v7/metricbeat/module/traefik/health"
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi"

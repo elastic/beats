@@ -502,6 +502,8 @@ github.com/go-sourcemap/sourcemap/internal/base64vlq
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
+# github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
+github.com/godbus/dbus
 # github.com/godbus/dbus/v5 v5.0.3
 github.com/godbus/dbus/v5
 # github.com/godror/godror v0.10.4
