@@ -39,24 +39,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
-- TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
-- Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
-- Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
-- Fix missing output in dockerlogbeat {pull}15719[15719]
-- Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
-- Do not load dashboards where not available. {pull}15802[15802]
-- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
-- Update replicaset group to apps/v1 {pull}15854[15802]
-- Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
-- Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
-- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
-- Fix loading processors from annotation hints. {pull}16348[16348]
-- Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
-- Fix k8s pods labels broken schema. {pull}16480[16480]
-- Fix k8s pods annotations broken schema. {pull}16554[16554]
-- Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 
 *Auditbeat*
