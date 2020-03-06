@@ -6,10 +6,6 @@
 
 package common
 
-import (
-	"sync"
-)
-
 type Socket struct {
 	Process *Process
 
