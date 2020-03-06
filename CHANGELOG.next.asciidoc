@@ -286,6 +286,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add OpenMetrics Metricbeat module {pull}16596[16596]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
+- Add system/users metricset as beta {pull}16569[16569]
 - Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
 
