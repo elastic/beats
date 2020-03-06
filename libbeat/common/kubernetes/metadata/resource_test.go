@@ -25,6 +25,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
@@ -109,7 +111,8 @@ func TestResource_Generate(t *testing.T) {
 		},
 	}
 
-	cfg := defaultConfig()
+	var cfg Config
+	ucfg.New().Unpack(&cfg)
 	metagen := &Resource{
 		config: &cfg,
 	}
