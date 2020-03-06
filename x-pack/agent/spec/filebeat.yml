@@ -1,0 +1,42 @@
+name: Filebeat
+cmd: filebeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
+configurable: grpc
+rules:
+- map:
+    path: streams
+    rules:
+    - translate:
+        path: type
+        mapper:
+          event/file: log
+          event/stdin: stdin
+          event/tcp: tcp
+          event/udp: udp
+          log/docker: docker
+          log/redis_slowlog: redis
+          log/syslog: syslog
+- filter_values:
+    selector: streams
+    key: type
+    values:
+    - log
+    - stdin
+    - udp
+    - tcp
+    - docker
+    - redis
+    - syslog
+- copy:
+    from: streams
+    to: filebeat
+- rename:
+    from: filebeat.streams
+    to: inputs
+- filter:
+    selectors:
+    - filebeat
+    - output
+    - keystore
+when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+  'kafka', 'logstash')
