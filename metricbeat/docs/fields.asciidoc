@@ -6513,6 +6513,36 @@ type: long
 
 --
 
+*`docker.diskio.read.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
 *`docker.diskio.reads`*::
 +
 --
@@ -6565,6 +6595,36 @@ type: long
 
 --
 
+*`docker.diskio.write.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
 *`docker.diskio.writes`*::
 +
 --
@@ -6611,6 +6671,36 @@ format: bytes
 +
 --
 Number of current operations per second
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.queued`*::
++
+--
+Total number of queued requests
 
 
 type: long
