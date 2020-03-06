@@ -450,7 +450,7 @@ processors:
   - kv:
       if: '["430001", "430002", "430003", "430004", "430005", ""].contains(ctx._temp_.cisco.message_id)'
       field: "message"
-      field_split: ",(?=\\s[A-za-z1-9\\s]+:)"
+      field_split: ",(?=[A-za-z1-9\\s]+:)"
       value_split: ":"
       target_field: "_temp_.orig_security"
       trim_key: " "
