@@ -130,6 +130,7 @@ func PythonTest(params PythonTestArgs) error {
 
 	pytestOptions := []string{
 		"--timeout=90",
+		"--durations=20",
 	}
 	if mg.Verbose() {
 		pytestOptions = append(pytestOptions, "-v")
