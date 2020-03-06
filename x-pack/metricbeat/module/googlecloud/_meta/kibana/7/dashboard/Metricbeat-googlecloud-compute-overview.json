@@ -301,17 +301,17 @@
       },
       "references": [
         {
-          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
+          "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
+          "id": "metricbeat-*",
           "name": "control_2_index_pattern",
           "type": "index-pattern"
         }
