@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Query Latency",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "Database Transactions",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Fileblock IO",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Rows Fetched/Returned",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Rows Inserted/Deleted/Updated",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_5",
             "title": "Conflict/Deadlock Rates",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -128,7 +128,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_6",
             "title": "Database Filter",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -144,7 +144,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_7",
             "title": "Top Queries",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -160,7 +160,7 @@
             "panelIndex": "9",
             "panelRefName": "panel_8",
             "title": "Local block cache stats",
-            "version": "7.3.1"
+            "version": "7.5.0"
           },
           {
             "embeddableConfig": {
@@ -176,7 +176,7 @@
             "panelIndex": "10",
             "panelRefName": "panel_9",
             "title": "Shared block cache stats",
-            "version": "7.3.1"
+            "version": "7.5.0"
           }
         ],
         "timeRestore": false,
@@ -921,7 +921,7 @@
                   {
                     "field": "postgresql.database.conflicts",
                     "id": "6c90db32-b79a-11e9-a8f0-d7983cd3d871",
-                    "type": "avg"
+                    "type": "max"
                   },
                   {
                     "field": "6c90db32-b79a-11e9-a8f0-d7983cd3d871",
@@ -992,8 +992,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-05T15:46:52.411Z",
-      "version": "WzQzMDgsMV0="
+      "updated_at": "2020-03-06T15:47:05.627Z",
+      "version": "WzQ0MzYsMV0="
     },
     {
       "attributes": {
@@ -1152,8 +1152,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-06T12:04:42.628Z",
-      "version": "WzQzNTUsMV0="
+      "updated_at": "2020-03-06T15:53:18.342Z",
+      "version": "WzQ0NDEsMV0="
     },
     {
       "attributes": {
@@ -1390,5 +1390,5 @@
       "version": "WzQwMzEsMV0="
     }
   ],
-  "version": "7.3.1"
+  "version": "7.5.0"
 }
