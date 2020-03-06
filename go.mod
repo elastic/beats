@@ -150,7 +150,7 @@ require (
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	gopkg.in/inf.v0 v0.9.0
-	gopkg.in/jcmturner/gokrb5.v7 v7.3.0
+	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.2.7
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
