@@ -20,18 +20,34 @@
         "panelsJSON": [
           {
             "embeddableConfig": {
-              "title": "Availability Zone"
+              "title": "Filters"
             },
             "gridData": {
-              "h": 6,
-              "i": "28ca933f-e10d-4766-9266-21bc5b9c300c",
-              "w": 9,
+              "h": 5,
+              "i": "28706ab2-1142-401d-9143-f4176a034c10",
+              "w": 48,
               "x": 0,
               "y": 0
             },
-            "panelIndex": "28ca933f-e10d-4766-9266-21bc5b9c300c",
+            "panelIndex": "28706ab2-1142-401d-9143-f4176a034c10",
             "panelRefName": "panel_0",
-            "title": "Availability Zone",
+            "title": "Filters",
+            "version": "7.6.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Delta Uptime"
+            },
+            "gridData": {
+              "h": 17,
+              "i": "42031fdb-8548-48ec-86f8-195017c81e30",
+              "w": 24,
+              "x": 0,
+              "y": 5
+            },
+            "panelIndex": "42031fdb-8548-48ec-86f8-195017c81e30",
+            "panelRefName": "panel_1",
+            "title": "Delta Uptime",
             "version": "7.6.0"
           },
           {
@@ -39,47 +55,15 @@
               "title": "CPU Utilization"
             },
             "gridData": {
-              "h": 18,
+              "h": 17,
               "i": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
-              "w": 39,
-              "x": 9,
-              "y": 0
+              "w": 24,
+              "x": 24,
+              "y": 5
             },
             "panelIndex": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
-            "panelRefName": "panel_1",
-            "title": "CPU Utilization",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Instance Name"
-            },
-            "gridData": {
-              "h": 6,
-              "i": "88b48ea4-20d2-4623-9d82-888dd679aaa8",
-              "w": 9,
-              "x": 0,
-              "y": 6
-            },
-            "panelIndex": "88b48ea4-20d2-4623-9d82-888dd679aaa8",
             "panelRefName": "panel_2",
-            "title": "Instance Name",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Account ID"
-            },
-            "gridData": {
-              "h": 6,
-              "i": "4afe245e-674e-4d77-9239-e376db43fd64",
-              "w": 9,
-              "x": 0,
-              "y": 12
-            },
-            "panelIndex": "4afe245e-674e-4d77-9239-e376db43fd64",
-            "panelRefName": "panel_3",
-            "title": "Account ID",
+            "title": "CPU Utilization",
             "version": "7.6.0"
           },
           {
@@ -91,10 +75,10 @@
               "i": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
               "w": 24,
               "x": 0,
-              "y": 18
+              "y": 22
             },
             "panelIndex": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_3",
             "title": "Read I/O",
             "version": "7.6.0"
           },
@@ -107,10 +91,10 @@
               "i": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
               "w": 24,
               "x": 24,
-              "y": 18
+              "y": 22
             },
             "panelIndex": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
-            "panelRefName": "panel_5",
+            "panelRefName": "panel_4",
             "title": "Write I/O",
             "version": "7.6.0"
           },
@@ -123,10 +107,10 @@
               "i": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
               "w": 24,
               "x": 0,
-              "y": 33
+              "y": 37
             },
             "panelIndex": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_5",
             "title": "Network Sent Bytes",
             "version": "7.6.0"
           },
@@ -139,10 +123,10 @@
               "i": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
               "w": 24,
               "x": 24,
-              "y": 33
+              "y": 37
             },
             "panelIndex": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_6",
             "title": "Network Received Bytes",
             "version": "7.6.0"
           },
@@ -155,10 +139,10 @@
               "i": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
               "w": 24,
               "x": 0,
-              "y": 48
+              "y": 52
             },
             "panelIndex": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_7",
             "title": "Firewall Dropped Bytes",
             "version": "7.6.0"
           },
@@ -171,10 +155,10 @@
               "i": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
               "w": 24,
               "x": 24,
-              "y": 48
+              "y": 52
             },
             "panelIndex": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_8",
             "title": "Firewall Dropped Packets",
             "version": "7.6.0"
           }
@@ -189,59 +173,54 @@
       },
       "references": [
         {
-          "id": "6c3e45c0-5e4b-11ea-a4f6-717338406083",
+          "id": "3aa96470-5fc4-11ea-a4f6-717338406083",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
+          "id": "8186bda0-5e4f-11ea-a4f6-717338406083",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "9fdeac30-5e4b-11ea-a4f6-717338406083",
+          "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "fa01ad70-5e50-11ea-a4f6-717338406083",
+          "id": "89513bc0-5e48-11ea-a4f6-717338406083",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "89513bc0-5e48-11ea-a4f6-717338406083",
+          "id": "95e1f050-5e48-11ea-a4f6-717338406083",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "95e1f050-5e48-11ea-a4f6-717338406083",
+          "id": "6f795e70-5e49-11ea-a4f6-717338406083",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "6f795e70-5e49-11ea-a4f6-717338406083",
+          "id": "43f45ba0-5e4a-11ea-a4f6-717338406083",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "43f45ba0-5e4a-11ea-a4f6-717338406083",
+          "id": "9d919d00-5e4d-11ea-a4f6-717338406083",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "9d919d00-5e4d-11ea-a4f6-717338406083",
-          "name": "panel_8",
-          "type": "visualization"
-        },
-        {
           "id": "ef1508c0-5e4c-11ea-a4f6-717338406083",
-          "name": "panel_9",
+          "name": "panel_8",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-03-04T21:47:45.006Z",
-      "version": "Wzg0MywzXQ=="
+      "updated_at": "2020-03-06T17:23:58.990Z",
+      "version": "WzE3MDksM10="
     },
     {
       "attributes": {
@@ -255,7 +234,7 @@
             }
           }
         },
-        "title": "Availability Zone Filter [Metricbeat Googlecloud]",
+        "title": "az-instance-account Filter [Metricbeat Googlecloud]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -276,30 +255,167 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "cloud.instance.name",
+                "id": "1583510592540",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "instance name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "cloud.account.id",
+                "id": "1583510650472",
+                "indexPatternRefName": "control_2_index_pattern",
+                "label": "account id",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
               }
             ],
             "pinFilters": false,
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Availability Zone Filter [Metricbeat Googlecloud]",
+          "title": "az-instance-account Filter [Metricbeat Googlecloud]",
           "type": "input_control_vis"
         }
       },
-      "id": "6c3e45c0-5e4b-11ea-a4f6-717338406083",
+      "id": "3aa96470-5fc4-11ea-a4f6-717338406083",
       "migrationVersion": {
         "visualization": "7.4.2"
       },
       "references": [
         {
-          "id": "metricbeat-*",
+          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
           "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "59ce8050-5fbb-11ea-a4f6-717338406083",
+          "name": "control_2_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:46:31.516Z",
-      "version": "WzgzNCwzXQ=="
+      "updated_at": "2020-03-06T16:04:59.063Z",
+      "version": "WzE2NzYsM10="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "Compute Instance Uptime in Seconds [Metricbeat Googlecloud]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "3ece14c0-5e4c-11ea-9061-37f24ca5b01f"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "bar_color": "rgba(252,220,0,1)",
+                "id": "3b9c35c0-5e4c-11ea-9061-37f24ca5b01f",
+                "value": 60
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "drilldown_url": "",
+            "drop_last_bucket": 0,
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "gauge_color_rules": [
+              {
+                "id": "3b27a200-5e4c-11ea-9061-37f24ca5b01f"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "filter": {
+                  "language": "kuery",
+                  "query": ""
+                },
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": "3",
+                "metrics": [
+                  {
+                    "field": "googlecloud.compute.instance.uptime",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "cloud.instance.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "time_range_mode": "entire_time_range",
+            "type": "top_n"
+          },
+          "title": "Compute Instance Uptime in Seconds [Metricbeat Googlecloud]",
+          "type": "metrics"
+        }
+      },
+      "id": "8186bda0-5e4f-11ea-a4f6-717338406083",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-03-06T17:20:14.805Z",
+      "version": "WzE3MDgsM10="
     },
     {
       "attributes": {
@@ -365,124 +481,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:45:39.030Z",
-      "version": "WzgzMCwzXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Compute Instance Filter [Metricbeat Googlecloud]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "cloud.instance.name",
-                "id": "1549397251041",
-                "indexPatternRefName": "control_0_index_pattern",
-                "label": "compute instance",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "Compute Instance Filter [Metricbeat Googlecloud]",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "9fdeac30-5e4b-11ea-a4f6-717338406083",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-04T21:46:02.862Z",
-      "version": "WzgzMywzXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Compute Account ID Filter [Metricbeat Googlecloud]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "cloud.account.id",
-                "id": "1549397251041",
-                "indexPatternRefName": "control_0_index_pattern",
-                "label": "account id",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "Compute Account ID Filter [Metricbeat Googlecloud]",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "fa01ad70-5e50-11ea-a4f6-717338406083",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-04T21:47:16.151Z",
-      "version": "Wzg0MiwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzMzgsM10="
     },
     {
       "attributes": {
@@ -547,8 +547,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:45:54.891Z",
-      "version": "WzgzMiwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDEsM10="
     },
     {
       "attributes": {
@@ -613,8 +613,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:45:47.779Z",
-      "version": "WzgzMSwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDIsM10="
     },
     {
       "attributes": {
@@ -679,8 +679,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:46:56.383Z",
-      "version": "WzgzOSwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDMsM10="
     },
     {
       "attributes": {
@@ -745,8 +745,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:46:44.172Z",
-      "version": "WzgzNywzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDQsM10="
     },
     {
       "attributes": {
@@ -830,8 +830,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:46:50.144Z",
-      "version": "WzgzOCwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDUsM10="
     },
     {
       "attributes": {
@@ -916,8 +916,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-03-04T21:47:10.017Z",
-      "version": "Wzg0MSwzXQ=="
+      "updated_at": "2020-03-06T14:55:35.878Z",
+      "version": "WzEzNDYsM10="
     }
   ],
   "version": "7.6.0"

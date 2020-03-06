@@ -68,12 +68,12 @@ Currently, we have `compute`, `loadbalancing`, and `pubsub` metricset in
 [float]
 === `compute`
 Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine]
-Virtual Machines in Google Cloud Platform. The `compute` Metricset contains some of the
+Virtual Machines in Google Cloud Platform. The `compute` metricset contains some of the
 metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API].
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
 This is enough to get most of the info associated with a metric like compute
 labels and metadata and metric specific Labels.
 
-The compute metricset comes with a predefined dashboard:
+The `compute` metricset comes with a predefined dashboard:
 
 image::./images/metricbeat-googlecloud-compute-overview.png[]
