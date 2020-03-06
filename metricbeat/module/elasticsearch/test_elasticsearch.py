@@ -316,10 +316,12 @@ class Test(metricbeat.BaseTest):
 
     def check_skip(self, metricset):
         if metricset == 'ccr' and not self.is_ccr_available():
-            raise unittest.SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
         if metricset == 'enrich' and not self.is_enrich_available():
-            raise unittest.SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
 
     def is_ccr_available(self):
         es_version = self.get_version()
