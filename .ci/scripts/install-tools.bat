@@ -13,4 +13,4 @@ IF ERRORLEVEL 1 (
 )
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
-go install github.com/elastic/beats/vendor/github.com/magefile/mage
+go install -mod=vendor github.com/magefile/mage
