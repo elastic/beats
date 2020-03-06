@@ -42,6 +42,7 @@ def enable_ipv6_loopback():
     f.close()
 
 
+@unittest.skip("flaky: https://github.com/elastic/beats/issues/16878")
 @unittest.skipUnless(is_platform_supported(), "Requires Linux 2.6.32+ and 386/amd64 arch")
 @unittest.skipUnless(is_root(), "Requires root")
 class Test(AuditbeatXPackTest):
