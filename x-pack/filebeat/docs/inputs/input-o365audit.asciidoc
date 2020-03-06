@@ -1,0 +1,134 @@
+[role="xpack"]
+
+:type: o365audit
+
+[id="{beatname_lc}-input-{type}"]
+=== Office 365 Management Activity API input
+
+++++
+<titleabbrev>Office 365 Management Activity API</titleabbrev>
+++++
+
+beta[]
+
+Use the `o365audit` input to retrieve audit messages from Office 365
+and Azure AD activity logs. These are the same logs that are available under
+_Audit_ _log_ _search_ in the _Security_ _and_ _Compliance_ center.
+
+A single input instance can be used to fetch events for multiple tenants as long
+as a single application is configured to access all tenants. Certificate-based
+authentication is recommended in this scenario.
+
+This input doesn't perform any transformation on the incoming messages, notably
+no {ecs-ref}/ecs-reference.html[Elastic Common Schema fields] are populated, and
+some data is encoded as arrays of objects, which are difficult to query in
+Elasticsearch. You probably want to use the
+{filebeat-ref}/filebeat-module-o365.html[o365 module] instead.
+// TODO: link to O365 module docs.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: o365audit
+  application_id: my-application-id
+  tenant_id: my-tenant-id
+  client_secret: my-client-secret
+----
+
+Multi-tenancy and certificate-based authentication is also supported:
+
+----
+{beatname_lc}.inputs:
+- type: o365audit
+  application_id: my-application-id
+  tenant_id:
+    - tenant-id-A
+    - tenant-id-B
+    - tenant-id-C
+  certificate: /path/to/cert.pem
+  key: /path/to/private.pem
+  # key_passphrase: "my key's password"
+----
+
+==== Configuration options
+
+The `o365audit` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+===== `application_id`
+
+The Application ID (also known as Client ID) of the Azure application to
+authenticate as.
+
+[float]
+===== `tenant_id`
+
+The tenant ID (also known as Directory ID) whose data is to be fetched. It's
+also possible to specify a list of tenants IDs to fetch data from more than
+one tenant.
+
+[float]
+===== `content_type`
+
+List of content types to fetch. The default is to fetch all known content types:
+
+- Audit.AzureActiveDirectory
+- Audit.Exchange
+- Audit.SharePoint
+- Audit.General
+- DLP.All
+
+[float]
+===== `client_secret`
+
+The client secret used for authentication.
+
+[float]
+===== `certificate`
+
+Path to the public certificate file used for certificate-based authentication.
+
+[float]
+===== `key`
+
+Path to the certificate's private key file for certificate-based authentication.
+
+[float]
+===== `key_passphrase`
+
+Passphrase used to decrypt the private key.
+
+[float]
+===== `api.authentication_endpoint`
+
+The authentication endpoint used to authorize the Azure app. This is
+`https://login.microsoftonline.com/` by default, and can be changed to access
+alternative endpoints.
+
+===== `api.resource`
+
+The API resource to retrieve information from. This is
+`https://manage.office.com` by default, and can be changed to access alternative
+endpoints.
+
+===== `api.max_retention`
+
+The maximum data retention period to support. `178h` by default. {beatname_uc}
+will fetch all retained data for a tenant when run for the first time.
+
+===== `api.poll_interval`
+
+The interval to wait before polling the API server for new events. Default `3m`.
+
+===== `api.max_requests_per_minute`
+
+The maximum number of requests to perform per minute, for each tenant. The
+default is `2000`, as this is the server-side limit per tenant.
+
+===== `api.max_query_size`
+
+The maximum time window that API allows in a single query. Defaults to `24h`
+to match Microsoft's documented limit.

@@ -30,7 +30,7 @@ import (
 //
 // Due to parser simply stepping through the input buffer, almost no additional
 // allocations are required.
-type JSONReader struct {
+type jsonReader struct {
 	streambuf.Buffer
 
 	// parser state machine
@@ -133,14 +133,13 @@ func (s state) String() string {
 	return "unknown"
 }
 
-// NewJSONReader returns a new JSONReader initialized with in
-func NewJSONReader(in []byte) *JSONReader {
-	r := &JSONReader{}
+func newJSONReader(in []byte) *jsonReader {
+	r := &jsonReader{}
 	r.init(in)
 	return r
 }
 
-func (r *JSONReader) init(in []byte) {
+func (r *jsonReader) init(in []byte) {
 	r.Buffer.Init(in, true)
 	r.currentState = startState
 	r.states = r.statesBuf[:0]
@@ -148,18 +147,18 @@ func (r *JSONReader) init(in []byte) {
 
 var whitespace = []byte(" \t\r\n")
 
-func (r *JSONReader) skipWS() {
+func (r *jsonReader) skipWS() {
 	r.IgnoreSymbols(whitespace)
 }
 
-func (r *JSONReader) pushState(next state) {
+func (r *jsonReader) pushState(next state) {
 	if r.currentState != failedState {
 		r.states = append(r.states, r.currentState)
 	}
 	r.currentState = next
 }
 
-func (r *JSONReader) popState() {
+func (r *jsonReader) popState() {
 	if len(r.states) == 0 {
 		r.currentState = failedState
 	} else {
@@ -170,7 +169,7 @@ func (r *JSONReader) popState() {
 }
 
 // ExpectDict checks if the next entity is a json object
-func (r *JSONReader) ExpectDict() error {
+func (r *jsonReader) ExpectDict() error {
 	e, _, err := r.step()
 
 	if err != nil {
@@ -185,7 +184,7 @@ func (r *JSONReader) ExpectDict() error {
 }
 
 // ExpectArray checks if the next entity is a json array
-func (r *JSONReader) ExpectArray() error {
+func (r *jsonReader) ExpectArray() error {
 	e, _, err := r.step()
 	if err != nil {
 		return err
@@ -198,7 +197,7 @@ func (r *JSONReader) ExpectArray() error {
 	return nil
 }
 
-func (r *JSONReader) nextFieldName() (entity, []byte, error) {
+func (r *jsonReader) nextFieldName() (entity, []byte, error) {
 	e, raw, err := r.step()
 	if err != nil {
 		return e, raw, err
@@ -211,7 +210,7 @@ func (r *JSONReader) nextFieldName() (entity, []byte, error) {
 	return e, raw, err
 }
 
-func (r *JSONReader) nextInt() (int, error) {
+func (r *jsonReader) nextInt() (int, error) {
 	e, raw, err := r.step()
 	if err != nil {
 		return 0, err
@@ -227,7 +226,7 @@ func (r *JSONReader) nextInt() (int, error) {
 }
 
 // ignore type of next element and return raw content.
-func (r *JSONReader) ignoreNext() (raw []byte, err error) {
+func (r *jsonReader) ignoreNext() (raw []byte, err error) {
 	r.skipWS()
 
 	snapshot := r.Snapshot()
@@ -256,7 +255,7 @@ func (r *JSONReader) ignoreNext() (raw []byte, err error) {
 	return bytes, nil
 }
 
-func ignoreKind(r *JSONReader, kind entity) error {
+func ignoreKind(r *jsonReader, kind entity) error {
 	for {
 		e, _, err := r.step()
 		if err != nil {
@@ -279,7 +278,7 @@ func ignoreKind(r *JSONReader, kind entity) error {
 }
 
 // step continues the JSON parser state machine until next entity has been parsed.
-func (r *JSONReader) step() (entity, []byte, error) {
+func (r *jsonReader) step() (entity, []byte, error) {
 	r.skipWS()
 	switch r.currentState {
 	case failedState:
@@ -301,11 +300,11 @@ func (r *JSONReader) step() (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) stepFailing() (entity, []byte, error) {
+func (r *jsonReader) stepFailing() (entity, []byte, error) {
 	return failEntity, nil, r.Err()
 }
 
-func (r *JSONReader) stepStart() (entity, []byte, error) {
+func (r *jsonReader) stepStart() (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(err)
@@ -314,11 +313,11 @@ func (r *JSONReader) stepStart() (entity, []byte, error) {
 	return r.tryStepPrimitive(c)
 }
 
-func (r *JSONReader) stepArray() (entity, []byte, error) {
+func (r *jsonReader) stepArray() (entity, []byte, error) {
 	return r.doStepArray(true)
 }
 
-func (r *JSONReader) stepArrayNext() (entity, []byte, error) {
+func (r *jsonReader) stepArrayNext() (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(errFailing)
@@ -337,7 +336,7 @@ func (r *JSONReader) stepArrayNext() (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) doStepArray(allowArrayEnd bool) (entity, []byte, error) {
+func (r *jsonReader) doStepArray(allowArrayEnd bool) (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(err)
@@ -354,11 +353,11 @@ func (r *JSONReader) doStepArray(allowArrayEnd bool) (entity, []byte, error) {
 	return r.tryStepPrimitive(c)
 }
 
-func (r *JSONReader) stepDict() (entity, []byte, error) {
+func (r *jsonReader) stepDict() (entity, []byte, error) {
 	return r.doStepDict(true)
 }
 
-func (r *JSONReader) doStepDict(allowEnd bool) (entity, []byte, error) {
+func (r *jsonReader) doStepDict(allowEnd bool) (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(err)
@@ -378,7 +377,7 @@ func (r *JSONReader) doStepDict(allowEnd bool) (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) stepDictValue() (entity, []byte, error) {
+func (r *jsonReader) stepDictValue() (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(err)
@@ -388,7 +387,7 @@ func (r *JSONReader) stepDictValue() (entity, []byte, error) {
 	return r.tryStepPrimitive(c)
 }
 
-func (r *JSONReader) stepDictValueEnd() (entity, []byte, error) {
+func (r *jsonReader) stepDictValueEnd() (entity, []byte, error) {
 	c, err := r.PeekByte()
 	if err != nil {
 		return r.failWith(err)
@@ -407,7 +406,7 @@ func (r *JSONReader) stepDictValueEnd() (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) tryStepPrimitive(c byte) (entity, []byte, error) {
+func (r *jsonReader) tryStepPrimitive(c byte) (entity, []byte, error) {
 	switch c {
 	case '{': // start dictionary
 		return r.startDict()
@@ -435,19 +434,19 @@ func (r *JSONReader) tryStepPrimitive(c byte) (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) stepNull() (entity, []byte, error) {
+func (r *jsonReader) stepNull() (entity, []byte, error) {
 	return stepSymbol(r, nullValue, nullSymbol, errExpectedNull)
 }
 
-func (r *JSONReader) stepTrue() (entity, []byte, error) {
+func (r *jsonReader) stepTrue() (entity, []byte, error) {
 	return stepSymbol(r, trueValue, trueSymbol, errExpectedTrue)
 }
 
-func (r *JSONReader) stepFalse() (entity, []byte, error) {
+func (r *jsonReader) stepFalse() (entity, []byte, error) {
 	return stepSymbol(r, falseValue, falseSymbol, errExpectedFalse)
 }
 
-func stepSymbol(r *JSONReader, e entity, symb []byte, fail error) (entity, []byte, error) {
+func stepSymbol(r *jsonReader, e entity, symb []byte, fail error) (entity, []byte, error) {
 	ok, err := r.MatchASCII(symb)
 	if err != nil {
 		return failEntity, nil, err
@@ -460,7 +459,7 @@ func stepSymbol(r *JSONReader, e entity, symb []byte, fail error) (entity, []byt
 	return e, nil, nil
 }
 
-func (r *JSONReader) stepMapKey() (entity, []byte, error) {
+func (r *jsonReader) stepMapKey() (entity, []byte, error) {
 	e, key, err := r.stepString()
 	if err != nil {
 		return e, key, err
@@ -482,7 +481,7 @@ func (r *JSONReader) stepMapKey() (entity, []byte, error) {
 	return mapKeyEntity, key, nil
 }
 
-func (r *JSONReader) stepString() (entity, []byte, error) {
+func (r *jsonReader) stepString() (entity, []byte, error) {
 	start := 1
 	for {
 		idxQuote := r.IndexByteFrom(start, '"')
@@ -502,36 +501,36 @@ func (r *JSONReader) stepString() (entity, []byte, error) {
 	}
 }
 
-func (r *JSONReader) startDict() (entity, []byte, error) {
+func (r *jsonReader) startDict() (entity, []byte, error) {
 	r.Advance(1)
 	r.pushState(dictState)
 	return dictStart, nil, nil
 }
 
-func (r *JSONReader) endDict() (entity, []byte, error) {
+func (r *jsonReader) endDict() (entity, []byte, error) {
 	r.Advance(1)
 	r.popState()
 	return dictEnd, nil, nil
 }
 
-func (r *JSONReader) startArray() (entity, []byte, error) {
+func (r *jsonReader) startArray() (entity, []byte, error) {
 	r.Advance(1)
 	r.pushState(arrState)
 	return arrStart, nil, nil
 }
 
-func (r *JSONReader) endArray() (entity, []byte, error) {
+func (r *jsonReader) endArray() (entity, []byte, error) {
 	r.Advance(1)
 	r.popState()
 	return arrEnd, nil, nil
 }
 
-func (r *JSONReader) failWith(err error) (entity, []byte, error) {
+func (r *jsonReader) failWith(err error) (entity, []byte, error) {
 	r.currentState = failedState
 	return failEntity, nil, r.SetError(err)
 }
 
-func (r *JSONReader) stepNumber() (entity, []byte, error) {
+func (r *jsonReader) stepNumber() (entity, []byte, error) {
 	snapshot := r.Snapshot()
 	lenBefore := r.Len()
 	isDouble := false

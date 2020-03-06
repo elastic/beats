@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
 
@@ -186,8 +185,8 @@ func (c *kafkaConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
-	partitioner, err := makePartitioner(config.Partition)
+func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
+	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +202,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +282,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
+		log.Errorf("Invalid kafka configuration: %+v", err)
 		return nil, err
 	}
 	return k, nil

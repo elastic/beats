@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -45,7 +46,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(cfg); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
 		})
