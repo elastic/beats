@@ -22,5 +22,5 @@ import "flag"
 var (
 	// DataFlag enables file updates (e.g. it dumps events to data.json file).
 	// Use `go test -data` to update files.
-	DataFlag = flag.Bool("data", false, "Write updated files")
+	DataFlag = flag.Bool("data", true, "Write updated files")
 )

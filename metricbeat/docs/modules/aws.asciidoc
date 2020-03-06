@@ -324,6 +324,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-lambda,lambda>>
 
+* <<metricbeat-metricset-aws-natgateway,natgateway>>
+
 * <<metricbeat-metricset-aws-rds,rds>>
 
 * <<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>
@@ -334,9 +336,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-sqs,sqs>>
 
+* <<metricbeat-metricset-aws-transitgateway,transitgateway>>
+
 * <<metricbeat-metricset-aws-usage,usage>>
 
-* <<metricbeat-metricset-aws-vpc,vpc>>
+* <<metricbeat-metricset-aws-vpn,vpn>>
 
 include::aws/billing.asciidoc[]
 
@@ -352,6 +356,8 @@ include::aws/elb.asciidoc[]
 
 include::aws/lambda.asciidoc[]
 
+include::aws/natgateway.asciidoc[]
+
 include::aws/rds.asciidoc[]
 
 include::aws/s3_daily_storage.asciidoc[]
@@ -362,7 +368,9 @@ include::aws/sns.asciidoc[]
 
 include::aws/sqs.asciidoc[]
 
+include::aws/transitgateway.asciidoc[]
+
 include::aws/usage.asciidoc[]
 
-include::aws/vpc.asciidoc[]
+include::aws/vpn.asciidoc[]
 

@@ -1,0 +1,6 @@
+- name: vpn
+  type: group
+  description: >
+    `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
+  release: beta
+  fields:
