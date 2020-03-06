@@ -41,7 +41,7 @@ type Config struct {
 	KeyTabPath  string   `config:"keytab"`
 	ConfigPath  string   `config:"config_path"`
 	ServiceName string   `config:"service_name"`
-	Username    string   `config:"user"`
+	Username    string   `config:"username"`
 	Password    string   `config:"password"`
 	Realm       string   `config:"realm"`
 }
