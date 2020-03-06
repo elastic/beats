@@ -17,7 +17,7 @@
 
 // +build integration
 
-package elasticsearch
+package eslegclient
 
 import (
 	"encoding/json"
@@ -36,7 +36,7 @@ func TestIndex(t *testing.T) {
 
 	index := fmt.Sprintf("beats-test-index-%d", os.Getpid())
 
-	client := getTestingElasticsearch(t)
+	conn := getTestingElasticsearch(t)
 
 	body := map[string]interface{}{
 		"user":      "test",
@@ -46,7 +46,7 @@ func TestIndex(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Index(index, "_doc", "1", params, body)
+	_, resp, err := conn.Index(index, "_doc", "1", params, body)
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
@@ -59,7 +59,7 @@ func TestIndex(t *testing.T) {
 			"match_all": map[string]interface{}{},
 		},
 	}
-	_, result, err := client.SearchURIWithBody(index, "", nil, map[string]interface{}{})
+	_, result, err := conn.SearchURIWithBody(index, "", nil, map[string]interface{}{})
 	if err != nil {
 		t.Fatalf("SearchUriWithBody() returns an error: %s", err)
 	}
@@ -70,7 +70,7 @@ func TestIndex(t *testing.T) {
 	params = map[string]string{
 		"q": "user:test",
 	}
-	_, result, err = client.SearchURI(index, "test", params)
+	_, result, err = conn.SearchURI(index, "test", params)
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
@@ -78,7 +78,7 @@ func TestIndex(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
-	_, resp, err = client.Delete(index, "_doc", "1", nil)
+	_, resp, err = conn.Delete(index, "_doc", "1", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}
@@ -103,17 +103,17 @@ func TestIngest(t *testing.T) {
 		},
 	}
 
-	client := getTestingElasticsearch(t)
-	if client.Connection.version.Major < 5 {
+	conn := getTestingElasticsearch(t)
+	if conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
-	status, _, err := client.DeletePipeline(pipeline, nil)
+	status, _, err := conn.DeletePipeline(pipeline, nil)
 	if err != nil && status != http.StatusNotFound {
 		t.Fatal(err)
 	}
 
-	exists, err := client.PipelineExists(pipeline)
+	exists, err := conn.PipelineExists(pipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestIngest(t *testing.T) {
 		t.Fatalf("Test expected PipelineExists to return false for %v", pipeline)
 	}
 
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	_, resp, err := conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +129,7 @@ func TestIngest(t *testing.T) {
 		t.Fatalf("Test pipeline %v not created", pipeline)
 	}
 
-	exists, err = client.PipelineExists(pipeline)
+	exists, err = conn.PipelineExists(pipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	params := map[string]string{"refresh": "true"}
-	_, resp, err = client.Ingest(index, "_doc", pipeline, "1", params, obj{
+	_, resp, err = conn.Ingest(index, "_doc", pipeline, "1", params, obj{
 		"testfield": "TEST",
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	// get _source field from indexed document
-	_, docBody, err := client.apiCall("GET", index, "", "_source/1", "", nil, nil)
+	_, docBody, err := conn.apiCall("GET", index, "", "_source/1", "", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

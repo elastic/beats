@@ -15,26 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package estest
+package eslegclient
 
-import (
-	"time"
+import "errors"
 
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/internal"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+var (
+	// ErrNotConnected indicates failure due to client having no valid connection
+	ErrNotConnected = errors.New("not connected")
+
+	// ErrJSONEncodeFailed indicates encoding failures
+	ErrJSONEncodeFailed = errors.New("json encode failed")
+
+	// ErrResponseRead indicates error parsing Elasticsearch response
+	ErrResponseRead = errors.New("bulk item status parse failed")
 )
-
-// GetTestingElasticsearch creates a test client.
-func GetTestingElasticsearch(t internal.TestLogger) *elasticsearch.Client {
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-		URL:              internal.GetURL(),
-		Index:            outil.MakeSelector(),
-		Username:         internal.GetUser(),
-		Password:         internal.GetPass(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	internal.InitClient(t, client, err)
-	return client
-}

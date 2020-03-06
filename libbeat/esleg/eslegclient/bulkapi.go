@@ -15,11 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package eslegclient
 
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,8 +30,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// MetaBuilder creates meta data for bulk requests
-type MetaBuilder func(interface{}) interface{}
+var (
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
+)
+
+type BulkIndexAction struct {
+	Index BulkMeta `json:"index" struct:"index"`
+}
+
+type BulkCreateAction struct {
+	Create BulkMeta `json:"create" struct:"create"`
+}
+
+type BulkMeta struct {
+	Index    string `json:"_index" struct:"_index"`
+	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
+	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
+	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
+}
 
 type bulkRequest struct {
 	requ *http.Request
@@ -44,40 +61,23 @@ type BulkResult json.RawMessage
 func (conn *Connection) Bulk(
 	index, docType string,
 	params map[string]string, body []interface{},
-) (BulkResult, error) {
-	return conn.BulkWith(index, docType, params, nil, body)
-}
-
-// BulkWith creates a HTTP request containing a bunch of operations and send
-// them to Elasticsearch. The request is retransmitted up to max_retries before
-// returning an error.
-func (conn *Connection) BulkWith(
-	index string,
-	docType string,
-	params map[string]string,
-	metaBuilder MetaBuilder,
-	body []interface{},
-) (BulkResult, error) {
+) (int, BulkResult, error) {
 	if len(body) == 0 {
-		return nil, nil
+		return 0, nil, nil
 	}
 
-	enc := conn.encoder
+	enc := conn.Encoder
 	enc.Reset()
-	if err := bulkEncode(conn.log, enc, metaBuilder, body); err != nil {
-		return nil, err
+	if err := bulkEncode(conn.log, enc, body); err != nil {
+		return 0, nil, err
 	}
 
 	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	_, result, err := conn.sendBulkRequest(requ)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return conn.sendBulkRequest(requ)
 }
 
 // SendMonitoringBulk creates a HTTP request to the X-Pack Monitoring API containing a bunch of
@@ -91,9 +91,9 @@ func (conn *Connection) SendMonitoringBulk(
 		return nil, nil
 	}
 
-	enc := conn.encoder
+	enc := conn.Encoder
 	enc.Reset()
-	if err := bulkEncode(conn.log, enc, nil, body); err != nil {
+	if err := bulkEncode(conn.log, enc, body); err != nil {
 		return nil, err
 	}
 
@@ -103,7 +103,7 @@ func (conn *Connection) SendMonitoringBulk(
 		}
 	}
 
-	requ, err := newMonitoringBulkRequest(conn.version, conn.URL, params, enc)
+	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, params, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func newBulkRequest(
 	urlStr string,
 	index, docType string,
 	params map[string]string,
-	body bodyEncoder,
+	body BodyEncoder,
 ) (*bulkRequest, error) {
 	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
@@ -133,7 +133,7 @@ func newMonitoringBulkRequest(
 	esVersion common.Version,
 	urlStr string,
 	params map[string]string,
-	body bodyEncoder,
+	body BodyEncoder,
 ) (*bulkRequest, error) {
 	var path string
 	var err error
@@ -154,7 +154,7 @@ func newBulkRequestWithPath(
 	urlStr string,
 	path string,
 	params map[string]string,
-	body bodyEncoder,
+	body BodyEncoder,
 ) (*bulkRequest, error) {
 	url := addToURL(urlStr, path, "", params)
 
@@ -172,12 +172,15 @@ func newBulkRequestWithPath(
 		body.AddHeader(&requ.Header)
 	}
 
-	return &bulkRequest{
+	r := bulkRequest{
 		requ: requ,
-	}, nil
+	}
+	r.reset(body)
+
+	return &r, nil
 }
 
-func (r *bulkRequest) Reset(body bodyEncoder) {
+func (r *bulkRequest) reset(body BodyEncoder) {
 	bdy := body.Reader()
 
 	rc, ok := bdy.(io.ReadCloser)
@@ -205,20 +208,11 @@ func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, err
 	return status, BulkResult(resp), err
 }
 
-func bulkEncode(log *logp.Logger, out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
-	if metaBuilder == nil {
-		for _, obj := range body {
-			if err := out.AddRaw(obj); err != nil {
-				log.Debugf("Failed to encode message: %+v", err)
-				return err
-			}
-		}
-	} else {
-		for _, obj := range body {
-			meta := metaBuilder(obj)
-			if err := out.Add(meta, obj); err != nil {
-				log.Debugf("Failed to encode event (dropping event): %+v", err)
-			}
+func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
+	for _, obj := range body {
+		if err := out.AddRaw(obj); err != nil {
+			log.Debugf("Failed to encode message: %s", err)
+			return err
 		}
 	}
 	return nil
