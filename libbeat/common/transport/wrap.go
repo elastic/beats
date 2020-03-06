@@ -17,7 +17,9 @@
 
 package transport
 
-import "net"
+import (
+	"net"
+)
 
 func ConnWrapper(d Dialer, w func(net.Conn) net.Conn) Dialer {
 	return DialerFunc(func(network, addr string) (net.Conn, error) {
