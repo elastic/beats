@@ -48,7 +48,7 @@ type State struct {
 }
 
 func NewState(r mb.PushReporterV2, log helper.Logger, processTimeout, inactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
-	s := makeState(r, log, processTimeout, processTimeout, inactiveTimeout, closeTimeout, clockMaxDrift)
+	s := makeState(r, log, processTimeout, inactiveTimeout*2, inactiveTimeout, closeTimeout, clockMaxDrift)
 	go s.reapLoop()
 	return s
 }
@@ -60,7 +60,7 @@ func makeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTim
 		reporter: r,
 		log:      log,
 		clock:    clock,
-		dns:      newDNSTracker(processTimeout * 2),
+		dns:      newDNSTracker(socketTimeout),
 		done:     []*socket_common.Flow{},
 	}
 	flowCache := newFlowCache(inactiveTimeout, newState.finalizeFlow)
