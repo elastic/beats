@@ -37,7 +37,7 @@ var (
 )
 
 type Config struct {
-	AuthType    AuthType `config:"auth_type"`
+	AuthType    AuthType `config:"auth_type" validate:"required"`
 	KeyTabPath  string   `config:"keytab"`
 	ConfigPath  string   `config:"config_path"`
 	ServiceName string   `config:"service_name"`
@@ -54,6 +54,25 @@ func (t *AuthType) Unpack(value string) error {
 	}
 
 	*t = authT
+
+	return nil
+}
+
+func (c *Config) Validate() error {
+	if c.AuthType == AUTH_PASSWORD {
+		if c.Username == "" {
+			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
+		}
+		if c.Password == "" {
+			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
+		}
+	}
+
+	if c.AuthType == AUTH_KEYTAB {
+		if c.KeyTabPath == "" {
+			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
+		}
+	}
 
 	return nil
 }
