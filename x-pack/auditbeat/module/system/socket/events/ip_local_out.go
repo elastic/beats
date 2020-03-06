@@ -58,7 +58,7 @@ func (e *IPLocalOutCall) String() string {
 // Update the state with the contents of this event.
 func (e *IPLocalOutCall) Update(s common.EventTracker) {
 	flow := e.Flow()
-	if flow.RemoteIP() == nil {
+	if !flow.HasRemote() {
 		// Unconnected-UDP flows have nil destination in here.
 		return
 	}
