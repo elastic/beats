@@ -40,7 +40,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logp *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
 ) (queue.Queue, error) {
 	cfgwarn.Beta("Spooling to disk is beta")
 
@@ -59,8 +59,8 @@ func create(
 		flushEvents = uint(count)
 	}
 
-	var log logger = logp
-	if logp == nil {
+	var log *logp.Logger = logger
+	if logger == nil {
 		log = defaultLogger()
 	}
 

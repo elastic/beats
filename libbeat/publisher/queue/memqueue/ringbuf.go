@@ -20,6 +20,7 @@ package memqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
@@ -43,7 +44,7 @@ type region struct {
 }
 
 type eventBuffer struct {
-	logger logger
+	logger *logp.Logger
 
 	events  []publisher.Event
 	clients []clientState
@@ -70,13 +71,13 @@ func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
 	b.clients[idx] = st
 }
 
-func newRingBuffer(log logger, size int) *ringBuffer {
+func newRingBuffer(log *logp.Logger, size int) *ringBuffer {
 	b := &ringBuffer{}
 	b.init(log, size)
 	return b
 }
 
-func (b *ringBuffer) init(log logger, size int) {
+func (b *ringBuffer) init(log *logp.Logger, size int) {
 	*b = ringBuffer{}
 	b.buf.init(size)
 	b.buf.logger = log
