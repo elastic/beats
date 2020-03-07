@@ -1,9 +1,13 @@
 [id="securing-{beatname_lc}"]
-= Securing {beatname_uc}
+= Secure {beatname_uc}
 
 [partintro]
 
 --
+++++
+<titleabbrev>Secure</titleabbrev>
+++++
+
 The following topics provide information about securing the {beatname_uc}
 process and securing communication between {beatname_uc} and other products in
 the Elastic stack:

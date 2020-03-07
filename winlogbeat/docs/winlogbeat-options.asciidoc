@@ -2,9 +2,13 @@
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).
 
 [[configuration-winlogbeat-options]]
-== Set up Winlogbeat
+== Configure {beatname_uc}
 
-The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to Winlogbeat.
+++++
+<titleabbrev>{beatname_uc}</titleabbrev>
+++++
+
+The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to {beatname_uc}.
 Most importantly, it contains the list of event logs to monitor.
 
 Here is a sample configuration:
@@ -26,7 +30,7 @@ You can specify the following options in the `winlogbeat` section of the +{beatn
 [float]
 ==== `registry_file`
 
-The name of the file where Winlogbeat stores information that it uses to resume
+The name of the file where {beatname_uc} stores information that it uses to resume
 monitoring after a restart. By default the file is stored as `.winlogbeat.yml`
 in the directory where the Beat was started. When you run the process as a
 Windows service, it's recommended that you set the value to
@@ -46,7 +50,7 @@ need to escape them.
 ==== `shutdown_timeout`
 
 The amount of time to wait for all events to be published when shutting down.
-By default there is no shutdown timeout so Winlogbeat will stop without waiting.
+By default there is no shutdown timeout so {beatname_uc} will stop without waiting.
 When you restart it will resume from the last successfully published event in
 each event log.
 
@@ -83,7 +87,7 @@ The maximum number of event log records to read from the Windows API in a single
 batch. The default batch size is 100. Most Windows versions return an error if
 the value is larger than 1024. *{vista_and_newer}*
 
-Winlogbeat starts a goroutine (a lightweight thread) to read from each
+{beatname_uc} starts a goroutine (a lightweight thread) to read from each
 individual event log. The goroutine reads a batch of event log records using the
 Windows API, applies any processors to the events, publishes them to the
 configured outputs, and waits for an acknowledgement from the outputs before
@@ -157,7 +161,7 @@ winlogbeat.event_logs:
 [float]
 ==== `event_logs.ignore_older`
 
-If this option is specified, Winlogbeat filters events that are older than the
+If this option is specified, {beatname_uc} filters events that are older than the
 specified amount of time. Valid time units are "ns", "us" (or "µs"), "ms", "s",
 "m", "h". This option is useful when you are beginning to monitor an event log
 that contains older records that you would like to ignore. This field is
@@ -177,8 +181,8 @@ A boolean flag to indicate that the log contains only events collected from
 remote hosts using the Windows Event Collector. The value defaults to true for
 the ForwardedEvents log and false for any other log. *{vista_and_newer}*
 
-This settings allows Winlogbeat to optimize reads for forwarded events that are
-already rendered. When the value is true Winlogbeat does not attempt to render
+This settings allows {beatname_uc} to optimize reads for forwarded events that are
+already rendered. When the value is true {beatname_uc} does not attempt to render
 the event using message files from the host computer. The Windows Event
 Collector subscription should be configured to use the "RenderedText" format
 (this is the default) to ensure that the events are distributed with messages
@@ -202,9 +206,9 @@ winlogbeat.event_logs:
 [WARNING]
 =======================================
 If you specify more that 22 event IDs to include or 22 event IDs to exclude,
-Windows will prevent Winlogbeat from reading the event log because it limits the
+Windows will prevent {beatname_uc} from reading the event log because it limits the
 number of conditions that can be used in an event log query. If this occurs a similar
-warning as shown below will be logged by Winlogbeat, and it will continue
+warning as shown below will be logged by {beatname_uc}, and it will continue
 processing data from other event logs. For more information, see
 https://support.microsoft.com/en-us/kb/970453.
 
@@ -213,7 +217,7 @@ source. The specified query is invalid.`
 
 If you have more than 22 event IDs, you can workaround this Windows limitation
 by using a drop_event[drop-event] processor to do the filtering after
-Winlogbeat has received the events from Windows. The filter shown below is
+{beatname_uc} has received the events from Windows. The filter shown below is
 equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22
 event IDs.
 
@@ -305,11 +309,11 @@ Microsoft-Windows-Eventlog
 ==== `event_logs.include_xml`
 
 Boolean option that controls if the raw XML representation of an event is
-included in the data sent by Winlogbeat. The default is false.
+included in the data sent by {beatname_uc}. The default is false.
 *{vista_and_newer}*
 
 The XML representation of the event is useful for troubleshooting purposes. The
-data in the fields reported by Winlogbeat can be compared to the data in the XML
+data in the fields reported by {beatname_uc} can be compared to the data in the XML
 to diagnose problems.
 
 Example:
@@ -365,7 +369,7 @@ winlogbeat.event_logs:
 If this option is set to true, the custom <<winlogbeat-configuration-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
-field names added by Winlogbeat, then the custom fields overwrite the other
+field names added by {beatname_uc}, then the custom fields overwrite the other
 fields.
 
 [float]
@@ -400,7 +404,7 @@ the output document. By default, `keep_null` is set to `false`.
 The action that the event log reader should take when it receives a signal from
 Windows that there are no more events to read. It can either `wait` for more
 events to be written (the default behavior) or it can `stop`. The overall
-Winlogbeat process will stop when all of the individual event log readers have
+{beatname_uc} process will stop when all of the individual event log readers have
 stopped. *{vista_and_newer}*
 
 Setting `no_more_events` to `stop` is useful when reading from archived event

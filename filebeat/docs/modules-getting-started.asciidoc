@@ -22,7 +22,7 @@ Can't find a module for your log file type? Follow the numbered steps under
 Before running {beatname_uc} modules:
 
 * Install and configure the Elastic stack. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+{stack-gs}/get-started-elastic-stack.html[Get started with the {stack}].
 
 * Complete the {beatname_uc} installation instructions described in
 <<filebeat-installation>>. After installing {beatname_uc}, return to this

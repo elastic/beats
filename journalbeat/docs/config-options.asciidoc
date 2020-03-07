@@ -2,7 +2,7 @@
 == Configure inputs
 
 ++++
-<titleabbrev>Configure inputs</titleabbrev>
+<titleabbrev>Inputs</titleabbrev>
 ++++
 
 By default, {beatname_uc} reads log events from the default systemd journals. To

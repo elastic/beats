@@ -5,7 +5,11 @@
 /////
 
 [[setting-up-and-running]]
-== Setting up and running {beatname_uc}
+== Set up and run {beatname_uc}
+
+++++
+<titleabbrev>Set up and run</titleabbrev>
+++++
 
 Before reading this section, see the
 <<{beatname_lc}-getting-started,getting started documentation>> for basic

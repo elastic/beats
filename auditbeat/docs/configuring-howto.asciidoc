@@ -3,6 +3,10 @@
 
 [partintro]
 --
+++++
+<titleabbrev>Configuration</titleabbrev>
+++++
+
 Before modifying configuration settings, make sure you've completed the
 <<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
@@ -21,21 +25,16 @@ The following topics describe how to configure {beatname_uc}:
 
 * <<configuration-{beatname_lc}>>
 * <<configuration-general-options>>
-* <<{beatname_lc}-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
-* <<configuring-ingest-node>>
-* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
-* <<using-environ-vars>>
-* <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
@@ -49,8 +48,6 @@ include::./auditbeat-modules-config.asciidoc[]
 
 include::./auditbeat-general-options.asciidoc[]
 
-include::./reload-configuration.asciidoc[]
-
 include::{libbeat-dir}/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/outputconfig.asciidoc[]
@@ -61,10 +58,6 @@ include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::./auditbeat-filtering.asciidoc[]
 
-include::{libbeat-dir}/shared-config-ingest.asciidoc[]
-
-include::{libbeat-dir}/shared-geoip.asciidoc[]
-
 include::{libbeat-dir}/shared-path-config.asciidoc[]
 
 include::{libbeat-dir}/shared-kibana-config.asciidoc[]
@@ -72,14 +65,6 @@ include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 include::{libbeat-dir}/setup-config.asciidoc[]
 
 include::{libbeat-dir}/loggingconfig.asciidoc[]
-
-:standalone:
-include::{libbeat-dir}/shared-env-vars.asciidoc[]
-:standalone!:
-
-:standalone:
-include::{libbeat-dir}/yaml.asciidoc[]
-:standalone!:
 
 include::{libbeat-dir}/regexp.asciidoc[]
 

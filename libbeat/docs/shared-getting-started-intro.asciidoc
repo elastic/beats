@@ -8,7 +8,7 @@ ifndef::no-output-logstash[]
 * {ls} (optional) for parsing and enhancing the data.
 endif::[]
 
-See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}]
+See {stack-gs}/get-started-elastic-stack.html[Get started with the {stack}]
 for more information about installing these products.
 
 [TIP]

@@ -3,7 +3,7 @@
 == Use {metricbeat} to send monitoring data
 [subs="attributes"]
 ++++
-<titleabbrev>{metricbeat} collection</titleabbrev>
+<titleabbrev>Use {metricbeat} collection</titleabbrev>
 ++++
 
 In 7.3 and later, you can use {metricbeat} to collect data about {beatname_uc} 

@@ -1,5 +1,5 @@
 [[heartbeat-getting-started]]
-== Getting Started With Heartbeat
+== Get started With Heartbeat
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 

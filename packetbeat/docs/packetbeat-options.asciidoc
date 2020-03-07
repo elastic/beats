@@ -1,6 +1,12 @@
 [[configuration-interfaces]]
 == Set traffic capturing options
 
+//TODO: Break this file down into multiple source files (one for each html page)
+
+++++
+<titleabbrev>Network traffic</titleabbrev>
+++++
+
 There are two main ways of deploying Packetbeat:
 
 * On dedicated servers, getting the traffic from mirror ports or tap devices.
@@ -268,6 +274,10 @@ see the following published transactions (when `ignore_outgoing` is true):
 [[configuration-flows]]
 == Set up flows to monitor network traffic
 
+++++
+<titleabbrev>Network flows</titleabbrev>
+++++
+
 You can configure Packetbeat to collect and report statistics on network flows.
 A _flow_ is a group of packets sent over the same time period that share
 common properties, such as the same source and destination address and protocol.
@@ -423,6 +433,10 @@ the output document. By default, `keep_null` is set to `false`.
 
 [[configuration-protocols]]
 == Specify which transaction protocols to monitor
+
+++++
+<titleabbrev>Protocols</titleabbrev>
+++++
 
 The `packetbeat.protocols` section of the +{beatname_lc}.yml+ config file
 contains configuration options for each supported protocol, including common
@@ -1481,6 +1495,10 @@ of memory consumed by replication sessions.
 
 [[configuration-processes]]
 == Specify which processes to monitor
+
+++++
+<titleabbrev>Processes</titleabbrev>
+++++
 
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the
