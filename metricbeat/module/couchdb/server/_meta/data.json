@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "couchdb": {
         "server": {
             "couchdb": {
@@ -12,26 +8,26 @@
                 "database_reads": 0,
                 "database_writes": 0,
                 "open_databases": 0,
-                "open_os_files": 0,
-                "request_time": 96
+                "open_os_files": 1,
+                "request_time": 0
             },
             "httpd": {
                 "bulk_requests": 0,
                 "clients_requesting_changes": 0,
-                "requests": 159,
+                "requests": 80,
                 "temporary_view_reads": 0,
                 "view_reads": 0
             },
             "httpd_request_methods": {
                 "COPY": 0,
                 "DELETE": 0,
-                "GET": 159,
+                "GET": 80,
                 "HEAD": 0,
                 "POST": 0,
                 "PUT": 0
             },
             "httpd_status_codes": {
-                "200": 159,
+                "200": 80,
                 "201": 0,
                 "202": 0,
                 "301": 0,
@@ -47,16 +43,23 @@
             }
         }
     },
+    "ecs": {
+        "service": {
+            "id": "0ae996d03cd96d22851f3df77d553a25",
+            "version": "2.3.1"
+        }
+    },
     "event": {
         "dataset": "couchdb.server",
         "duration": 115000,
         "module": "couchdb"
     },
     "metricset": {
-        "name": "server"
+        "name": "server",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:5984",
+        "address": "172.17.0.2:5986",
         "type": "couchdb"
     }
 }

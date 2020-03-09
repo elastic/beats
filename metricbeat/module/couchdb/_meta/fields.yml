@@ -7,4 +7,3 @@
     - name: couchdb
       type: group
       description: >
-      fields:
