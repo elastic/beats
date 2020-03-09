@@ -133,8 +133,10 @@ metricbeat.modules:
   #diskio.include_devices: []
 
   # Filter systemd services by status or sub-status
-  #service.state_filter: []
+  #service.state_filter: ["active"]
 
+  # Filter systemd services based on a name pattern
+  #service.pattern_filter: ["ssh*", "nfs*"]
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
