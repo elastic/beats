@@ -1,5 +1,9 @@
 [[upgrading-filebeat]]
-== Upgrade Filebeat
+== Upgrade {beatname_uc}
+
+++++
+<titleabbrev>Upgrade</titleabbrev>
+++++
 
 For information about upgrading to a new version, see the following topics in the _Beats Platform Reference_:
 
