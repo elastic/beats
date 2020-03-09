@@ -26,6 +26,10 @@ The following topics describe how to build a new Beat:
 * <<newbeat-sharing>>
 * <<event-conventions>>
 
+The following topic provide information about moving generated Beats to go modules:
+
+* <<newbeat-migrate-gomodules>>
+
 [[newbeat-getting-ready]]
 === Getting Ready
 
@@ -128,7 +132,7 @@ mage GenerateCustomBeat
 --------------------
 
 The mage script will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
-For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
+For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname. Finally, pick the revision of elastic/beats you would like to depend on.
 
 [source,shell]
 ---------
@@ -136,9 +140,12 @@ Enter a project name [examplebeat]:  Countbeat
 Enter a github name [your-github-name]: {username}
 Enter a beat path [github.com/{username}/countbeat]: 
 Enter a full name [Firstname Lastname]: {Full Name}
+Enter the github.com/elastic/beats revision [master]:
 ---------
 
 The Beat generator creates a directory called `countbeat` inside of your project folder (e.g. {project folder}/github.com/{github id}/countbeat).
+
+Please note that it is not possible to use revisions of Beats which does not support go modules.
 
 You now have a raw template of the Beat, but you still need to <<setting-up-beat,fetch dependencies and set up the Beat>>.
 
@@ -480,3 +487,35 @@ func main() {
 
 When you're done with your new Beat, how about letting everyone know? Open
 a pull request to add your link to the {beats-ref}/community-beats.html[Community Beats] list.
+
+[[newbeat-migrate-gomodules]]
+=== Migrate existing Beat to go modules
+
+Get started by making sure the contents of the vendored beats folder is
+pushed to a remote repository. Otherwise, go will overwrite the folder
+with the selected revision of `github.com/elastic/beats`.
+
+The following command will initialize a new module in your repo.
+
+[source,shell]
+----------------------------------------------------------------------
+go mod init
+----------------------------------------------------------------------
+
+Make sure to add the approprite `replace` directives from the `go.mod` file
+of Beats: https://github.com/elastic/beats/tree/master/go.mod
+Unfortunately, this workaround is needed to make sure your Beat can be compiled.
+
+To depend on the latest `master` of `github.com/elastic/beats` run the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+go get github.com/elastic/beats@master
+----------------------------------------------------------------------
+
+To move the dependencies to vendor, you need to manually fetch the new
+`magefile.go` for newly generated Beats from the dev-tools of `elastic/beats`.
+
+We suggest you read the following section to learn about maintaining dependencies
+using go modules:
+* https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies[How to upgrade and downgrade dependencies]

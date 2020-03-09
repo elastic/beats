@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 var (
@@ -109,12 +109,12 @@ func TestMapMetric(t *testing.T) {
 		client.AzureMonitorService = m
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "Microsoft.Storage/storageAccounts")
-		assert.Equal(t, metrics[1].Resource.ID, "123")
+		assert.Equal(t, metrics[1].Resource.Id, "123")
 		assert.Equal(t, metrics[1].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[1].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[1].Resource.Location, "resourceLocation")

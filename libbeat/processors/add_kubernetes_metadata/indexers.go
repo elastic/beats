@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (

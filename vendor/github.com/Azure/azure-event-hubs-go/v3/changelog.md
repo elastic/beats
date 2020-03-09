@@ -2,6 +2,8 @@
 
 ## `head`
 
+- add support for websocket connections with eph with `eph.WithWebSocketConnection()`
+
 ## `v2.0.4`
 - add comment on the `PartitionID` field in `SystemProperties` to clarify that it will always return a nil value [#131](https://github.com/Azure/azure-event-hubs-go/issues/131)
 
