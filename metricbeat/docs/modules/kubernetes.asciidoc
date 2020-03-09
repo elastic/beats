@@ -21,11 +21,6 @@ example configuration on how to do it.
 The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 
 [float]
-=== Compatibility
-
-The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
-
-[float]
 === Kubernetes RBAC
 
 Metricbeat requires certain cluster level privileges in order to fetch the metrics. The following example creates a `ServiceAcount` named `metricbeat` with the necessary permissions to run all the metricsets from the module. A `ClusterRole` and a `ClusterRoleBinding` are created for this purpose:
@@ -95,6 +90,12 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 [source,yaml]
 ----
+
+
+[float]
+=== Compatibility
+
+The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
 
 [float]
 === Dashboard
@@ -195,10 +196,7 @@ metricbeat.modules:
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
-  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  ssl.certificate_authorities:
-    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-  
+
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
 - module: kubernetes
