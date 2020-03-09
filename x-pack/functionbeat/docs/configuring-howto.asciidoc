@@ -1,6 +1,6 @@
 [id="configuring-howto-{beatname_lc}"]
 [role="xpack"]
-= {beatname_uc} configuration
+= Configure {beatname_uc}
 
 [partintro]
 --
@@ -16,13 +16,12 @@ include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 The following topics describe how to configure {beatname_uc}:
 
-* <<configuration-general-options>>
 * <<configuration-{beatname_lc}-options>>
 * <<configuration-{beatname_lc}-gcp-options>>
+* <<configuration-general-options>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<ilm>>
-* <<setup-kibana-endpoint>>
 * <<configuration-template>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-internal-queue>>
@@ -32,11 +31,11 @@ The following topics describe how to configure {beatname_uc}:
 
 --
 
-include::./general-options.asciidoc[]
-
 include::./config-options-aws.asciidoc[]
 
 include::./config-options-gcp.asciidoc[]
+
+include::./general-options.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/outputconfig.asciidoc[]
@@ -46,9 +45,6 @@ include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/shared-ilm.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/setup-config.asciidoc[]

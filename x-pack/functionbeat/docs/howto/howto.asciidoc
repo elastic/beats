@@ -1,4 +1,5 @@
 [[howto-guides]]
+[role="xpack"]
 = How to
 
 [partintro]
@@ -14,17 +15,22 @@ Learn how to perform common {beatname_uc} configuration tasks.
 
 --
 
+[role="xpack"]
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
 :standalone:
+[role="xpack"]
 include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
 
+[role="xpack"]
 include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
 :standalone:
+[role="xpack"]
 include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
 

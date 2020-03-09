@@ -1,10 +1,10 @@
 [[configuration-interfaces]]
-== Set traffic capturing options
+== Configure traffic capturing options
 
 //TODO: Break this file down into multiple source files (one for each html page)
 
 ++++
-<titleabbrev>Network traffic</titleabbrev>
+<titleabbrev>Traffic sniffing</titleabbrev>
 ++++
 
 There are two main ways of deploying Packetbeat:
@@ -272,7 +272,7 @@ see the following published transactions (when `ignore_outgoing` is true):
 
 
 [[configuration-flows]]
-== Set up flows to monitor network traffic
+== Configure flows to monitor network traffic
 
 ++++
 <titleabbrev>Network flows</titleabbrev>
@@ -432,7 +432,7 @@ If this option is set to true, fields with `null` values will be published in
 the output document. By default, `keep_null` is set to `false`.
 
 [[configuration-protocols]]
-== Specify which transaction protocols to monitor
+== Configure which transaction protocols to monitor
 
 ++++
 <titleabbrev>Protocols</titleabbrev>
@@ -1494,7 +1494,7 @@ allows to use request pipelining while at the same time limiting the amount
 of memory consumed by replication sessions.
 
 [[configuration-processes]]
-== Specify which processes to monitor
+== Configure which processes to monitor
 
 ++++
 <titleabbrev>Processes</titleabbrev>

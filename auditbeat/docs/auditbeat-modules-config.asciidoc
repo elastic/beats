@@ -1,5 +1,5 @@
 [id="configuration-{beatname_lc}"]
-== Specify which modules to run
+== Configure modules
 
 ++++
 <titleabbrev>Modules</titleabbrev>

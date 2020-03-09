@@ -15,7 +15,7 @@
 === General configuration options
 
 ++++
-<titleabbrev>General</titleabbrev>
+<titleabbrev>General settings</titleabbrev>
 ++++
 
 These options are supported by all Elastic Beats. Because they are common

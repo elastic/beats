@@ -131,7 +131,7 @@ appropriate for your environment. To change the default configurations, you need
 to <<specify-variable-settings,specify variable settings>>.
 
 [[specify-variable-settings]]
-=== Specify variable settings
+=== Configure variable settings
 
 include::./include/set-paths.asciidoc[]
 

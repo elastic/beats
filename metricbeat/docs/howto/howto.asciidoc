@@ -6,7 +6,6 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<{beatname_lc}-geoip>>
-* <<{beatname_lc}-deduplication>>
 * <<metricbeat-configuration-reloading>>
 * <<using-environ-vars>>
 * <<configuring-ingest-node>>
@@ -16,8 +15,6 @@ Learn how to perform common {beatname_uc} configuration tasks.
 --
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
-
-include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
 include::{docdir}/../docs/reload-configuration.asciidoc[]
 

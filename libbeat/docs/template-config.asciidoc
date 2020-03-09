@@ -1,6 +1,6 @@
 [[configuration-template]]
 
-== Set up the Elasticsearch index template
+== Configure Elasticsearch index template loading
 
 ++++
 <titleabbrev>Elasticsearch index template</titleabbrev>

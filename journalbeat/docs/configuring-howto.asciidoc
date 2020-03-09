@@ -1,10 +1,10 @@
 [id="configuring-howto-{beatname_lc}"]
-= {beatname_uc} configuration
+= Configure {beatname_uc}
 
 [partintro]
 --
 ++++
-<titleabbrev>Configuration</titleabbrev>
+<titleabbrev>Configure</titleabbrev>
 ++++
 
 Before modifying configuration settings, make sure you've completed the
@@ -15,14 +15,13 @@ include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 The following topics describe how to configure {beatname_uc}:
 
+* <<configuration-{beatname_lc}-options>>
 * <<configuration-general-options>>
 * <<configuration-path>>
-* <<configuration-{beatname_lc}-options>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<ilm>>
 * <<configuration-template>>
-* <<setup-kibana-endpoint>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
@@ -32,11 +31,11 @@ The following topics describe how to configure {beatname_uc}:
 
 --
 
+include::./config-options.asciidoc[]
+
 include::./general-options.asciidoc[]
 
 include::{libbeat-dir}/shared-path-config.asciidoc[]
-
-include::./config-options.asciidoc[]
 
 include::{libbeat-dir}/outputconfig.asciidoc[]
 
@@ -45,8 +44,6 @@ include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 include::{libbeat-dir}/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/setup-config.asciidoc[]
-
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
 include::./filtering.asciidoc[]
 

@@ -1,10 +1,10 @@
 [[configuring-howto-filebeat]]
-= {beatname_uc} configuration
+= Configure {beatname_uc}
 
 [partintro]
 --
 ++++
-<titleabbrev>Configuration</titleabbrev>
+<titleabbrev>Configure</titleabbrev>
 ++++
 
 Before modifying configuration settings, make sure you've completed the
@@ -23,15 +23,16 @@ _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Filebeat:
 
+* <<configuration-filebeat-options>>
 * <<configuration-general-options>>
 * <<configuration-path>>
-* <<configuration-filebeat-options>>
+* <<filebeat-configuration-reloading>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<ilm>>
+* <<configuration-template>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
-* <<configuration-template>>
 * <<filtering-and-enhancing-data>>
 * <<configuration-autodiscover>>
 * <<configuring-internal-queue>>
@@ -43,11 +44,13 @@ The following topics describe how to configure Filebeat:
 
 --
 
+include::./filebeat-options.asciidoc[]
+
 include::./filebeat-general-options.asciidoc[]
 
 include::{libbeat-dir}/shared-path-config.asciidoc[]
 
-include::./filebeat-options.asciidoc[]
+include::./reload-configuration.asciidoc[]
 
 include::{libbeat-dir}/outputconfig.asciidoc[]
 
@@ -56,8 +59,6 @@ include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 include::../../libbeat/docs/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/setup-config.asciidoc[]
-
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
 

@@ -1,6 +1,6 @@
 [[configuration-ssl]]
 ifndef::apm-server[]
-== Specify SSL settings
+== Configure SSL
 
 ++++
 <titleabbrev>SSL</titleabbrev>
@@ -16,7 +16,9 @@ ifndef::apm-server[]
 You can specify SSL options when you configure:
 
 * <<configuring-output,outputs>> that support SSL
+ifndef::no_dashboards[]
 * the <<setup-kibana-endpoint,Kibana endpoint>>
+endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
 * <<configuration-heartbeat-options,{beatname_uc} monitors>> that support SSL
 endif::[]

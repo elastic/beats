@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-dashboards]]
-== Set up Kibana dashboards
+== Configure Kibana dashboard loading
 
 ++++
 <titleabbrev>Kibana dashboards</titleabbrev>

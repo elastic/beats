@@ -1,10 +1,10 @@
 [[configuring-howto-packetbeat]]
-= {beatname_uc} configuration
+= Configure {beatname_uc}
 
 [partintro]
 --
 ++++
-<titleabbrev>Configuration</titleabbrev>
+<titleabbrev>Configure</titleabbrev>
 ++++
 
 Before modifying configuration settings, make sure you've completed the
@@ -23,18 +23,18 @@ _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Packetbeat:
 
-* <<configuration-path>>
-* <<configuration-general-options>>
-* <<configuration-interfaces>>
 * <<configuration-flows>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
+* <<configuration-general-options>>
+* <<configuration-path>>
+* <<configuration-interfaces>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<ilm>>
+* <<configuration-template>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
-* <<configuration-template>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
@@ -43,19 +43,17 @@ The following topics describe how to configure Packetbeat:
 
 --
 
-include::{libbeat-dir}/shared-path-config.asciidoc[]
+include::./packetbeat-options.asciidoc[]
 
 include::./packetbeat-general-options.asciidoc[]
 
-include::./packetbeat-options.asciidoc[]
+include::{libbeat-dir}/shared-path-config.asciidoc[]
 
 include::{libbeat-dir}/outputconfig.asciidoc[]
 
 include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::{libbeat-dir}/shared-ilm.asciidoc[]
-
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
 include::{libbeat-dir}/setup-config.asciidoc[]
 

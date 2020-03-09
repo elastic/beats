@@ -1,10 +1,10 @@
 [[configuring-howto-heartbeat]]
-= {beatname_uc} configuration
+= Configure {beatname_uc}
 
 [partintro]
 --
 ++++
-<titleabbrev>Configuration</titleabbrev>
+<titleabbrev>Configure</titleabbrev>
 ++++
 
 Before modifying configuration settings, make sure you've completed the
@@ -32,13 +32,12 @@ The following topics describe how to configure Heartbeat:
 * <<configuration-ssl>>
 * <<ilm>>
 * <<configuration-template>>
-* <<setup-kibana-endpoint>>
 * <<filtering-and-enhancing-data>>
+* <<configuration-autodiscover>>
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
-* <<configuration-autodiscover>>
-* <<regexp-support>>
 * <<http-endpoint>>
+* <<regexp-support>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -57,13 +56,7 @@ include::{libbeat-dir}/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/setup-config.asciidoc[]
 
-include::{libbeat-dir}/shared-kibana-config.asciidoc[]
-
 include::./heartbeat-filtering.asciidoc[]
-
-include::{libbeat-dir}/queueconfig.asciidoc[]
-
-include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 :autodiscoverAWSELB:
 :autodiscoverHints:
@@ -71,8 +64,12 @@ include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 :autodiscoverHints!:
 :autodiscoverAWSELB!:
 
-include::{libbeat-dir}/regexp.asciidoc[]
+include::{libbeat-dir}/queueconfig.asciidoc[]
+
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/regexp.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]

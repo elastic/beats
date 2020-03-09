@@ -123,7 +123,7 @@ metricbeat modules enable beat-xpack
 ----------------------------------------------------------------------
 
 For more information, see 
-{metricbeat-ref}/configuration-metricbeat.html[Specify which modules to run] and 
+{metricbeat-ref}/configuration-metricbeat.html[Configure modules] and 
 {metricbeat-ref}/metricbeat-module-beat.html[beat module]. 
 // end::enable-beat-module[]
 --
