@@ -571,17 +571,14 @@ github.com/googleapis/gnostic/extensions
 github.com/gorhill/cronexpr
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
-<<<<<<< HEAD
 # github.com/grpc-ecosystem/grpc-gateway v1.13.0
 github.com/grpc-ecosystem/grpc-gateway/internal
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
-=======
 # github.com/hashicorp/errwrap v0.0.0-20141028054710-7554cd9344ce
 github.com/hashicorp/errwrap
 # github.com/hashicorp/go-multierror v0.0.0-20161216184304-ed905158d874
 github.com/hashicorp/go-multierror
->>>>>>> upstream/master
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
 # github.com/hashicorp/go-version v1.0.0
