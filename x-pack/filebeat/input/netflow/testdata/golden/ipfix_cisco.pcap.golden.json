@@ -17,7 +17,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -102,7 +105,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -187,7 +193,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -272,7 +281,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -357,7 +369,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -442,7 +457,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -527,7 +545,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -612,7 +633,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -697,7 +721,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -782,7 +809,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -867,7 +897,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -952,7 +985,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1037,7 +1073,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1122,7 +1161,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1207,7 +1249,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1292,7 +1337,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1377,7 +1425,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1462,7 +1513,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1547,7 +1601,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1632,7 +1689,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1717,7 +1777,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1802,7 +1865,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1887,7 +1953,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1972,7 +2041,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -2057,7 +2129,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -2142,7 +2217,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -2227,7 +2305,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -2312,7 +2393,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -2397,7 +2481,10 @@
           "action": "netflow_flow",
           "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Vhs9T5k296w",
