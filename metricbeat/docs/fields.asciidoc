@@ -30601,6 +30601,12 @@ type: object
 
 --
 
+[float]
+=== remote_write
+
+remote write metrics from Prometheus server
+
+
 [[exported-fields-rabbitmq]]
 == RabbitMQ fields
 
