@@ -32,10 +32,10 @@ package ecs
 // and ETL components used in processing events or metrics are not considered
 // observers in ECS.
 type Observer struct {
-	// MAC address of the observer
+	// MAC addresses of the observer
 	MAC string `ecs:"mac"`
 
-	// IP address of the observer.
+	// IP addresses of the observer.
 	IP string `ecs:"ip"`
 
 	// Hostname of the observer.
@@ -65,4 +65,26 @@ type Observer struct {
 	// `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM
 	// server`.
 	Type string `ecs:"type"`
+
+	// Observer.ingress holds information like interface number and name, vlan,
+	// and zone information to  classify ingress traffic.  Single armed
+	// monitoring such as a network sensor on a span port should  only use
+	// observer.ingress to categorize traffic.
+	Ingress map[string]interface{} `ecs:"ingress"`
+
+	// Network zone of incoming traffic as reported by the observer to
+	// categorize the source area of ingress  traffic. e.g. internal, External,
+	// DMZ, HR, Legal, etc.
+	IngressZone string `ecs:"ingress.zone"`
+
+	// Observer.egress holds information like interface number and name, vlan,
+	// and zone information to  classify egress traffic.  Single armed
+	// monitoring such as a network sensor on a span port should  only use
+	// observer.ingress to categorize traffic.
+	Egress map[string]interface{} `ecs:"egress"`
+
+	// Network zone of outbound traffic as reported by the observer to
+	// categorize the destination area of egress  traffic, e.g. Internal,
+	// External, DMZ, HR, Legal, etc.
+	EgressZone string `ecs:"egress.zone"`
 }
