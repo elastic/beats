@@ -190,6 +190,8 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					// If tag filter doesn't exist in tagKeys/tagValues,
 					// then do not report this event/instance.
 					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+						// if tag filter doesn't exist, remove this event initial
+						// entry to avoid report an empty event.
 						delete(events, instanceID)
 						continue
 					}
