@@ -16,6 +16,7 @@ type Go struct {
 
 	Build GoBuild
 	List  GoList
+	Run   GoRun
 	Test  GoTest
 }
 
@@ -27,6 +28,7 @@ func New(exec clitool.Executor, path string) *Go {
 	g.Build = makeBuild(g)
 	g.List = makeList(g)
 	g.Test = makeTest(g)
+	g.Run = makeRun(g)
 	return g
 }
 

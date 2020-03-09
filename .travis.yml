@@ -18,6 +18,12 @@ env:
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
 
+# Only run CI jobs on specific branches.
+# To keep the number of Travis CI jobs in check, we decided to configure Travis to only kick off CI jobs for the master branch.
+branches:
+  only:
+  - master
+
 jobs:
   include:
     # General checks
@@ -147,25 +153,34 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
-    # Generators
-    # Temporarily disable generator jobs
-    #- os: linux
-    #  env: TARGETS="-C generator/_templates/metricbeat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
-    #- os: linux
-    #  env: TARGETS="-C generator/_templates/beat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
+    # Agent
+    - os: linux
+      env: TARGETS="-C x-pack/agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
 
-    #- os: osx
-    #  env: TARGETS="-C generator/_templates/metricbeat test"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
-    #- os: osx
-    #  env: TARGETS="-C generator/_templates/beat test"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
+    # Generators
+    - os: linux
+      env: TARGETS="-C generator/_templates/metricbeat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C generator/_templates/beat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
+    - os: osx
+      env: TARGETS="-C generator/_templates/metricbeat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="-C generator/_templates/beat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
 
     # Kubernetes
     - os: linux

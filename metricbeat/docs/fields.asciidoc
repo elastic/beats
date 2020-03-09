@@ -3124,16 +3124,6 @@ The resource specified
 
 
 
-*`azure.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
 *`azure.resource.type`*::
 +
 --
@@ -6523,6 +6513,36 @@ type: long
 
 --
 
+*`docker.diskio.read.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.read.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
 *`docker.diskio.reads`*::
 +
 --
@@ -6575,6 +6595,36 @@ type: long
 
 --
 
+*`docker.diskio.write.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.write.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
 *`docker.diskio.writes`*::
 +
 --
@@ -6621,6 +6671,36 @@ format: bytes
 +
 --
 Number of current operations per second
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`docker.diskio.summary.queued`*::
++
+--
+Total number of queued requests
 
 
 type: long
@@ -36364,6 +36444,113 @@ The OS uptime in milliseconds.
 type: long
 
 format: duration
+
+--
+
+[float]
+=== users
+
+Logged-in user session data
+
+
+
+*`system.users.id`*::
++
+--
+The ID of the session
+
+
+type: keyword
+
+--
+
+*`system.users.seat`*::
++
+--
+An associated logind seat
+
+
+type: keyword
+
+--
+
+*`system.users.path`*::
++
+--
+The DBus object path of the session
+
+
+type: keyword
+
+--
+
+*`system.users.type`*::
++
+--
+The type of the user session
+
+
+type: keyword
+
+--
+
+*`system.users.service`*::
++
+--
+A session associated with the service
+
+
+type: keyword
+
+--
+
+*`system.users.remote`*::
++
+--
+A bool indicating a remote session
+
+
+type: boolean
+
+--
+
+*`system.users.state`*::
++
+--
+The current state of the session
+
+
+type: keyword
+
+--
+
+*`system.users.scope`*::
++
+--
+The associated systemd scope
+
+
+type: keyword
+
+--
+
+*`system.users.leader`*::
++
+--
+The root PID of the session
+
+
+type: long
+
+--
+
+*`system.users.remote_host`*::
++
+--
+A remote host address for the session
+
+
+type: keyword
 
 --
 
