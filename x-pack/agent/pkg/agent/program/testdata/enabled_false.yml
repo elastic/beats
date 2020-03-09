@@ -1,9 +1,12 @@
-streams:
-  - type: event/file
-    enabled: false
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
+datasources:
+  - use_output: default
+    inputs:
+      - type: event/file
+        streams:
+          - enabled: false
+            paths:
+              - var/log/hello1.log
+              - var/log/hello2.log
 management:
   host: "localhost"
 config:

@@ -47,6 +47,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 		switch rule.(type) {
 		case *CopyRule:
 			name = "copy"
+		case *CopyToListRule:
+			name = "copy_to_list"
 		case *RenameRule:
 			name = "rename"
 		case *TranslateRule:
@@ -63,6 +65,12 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "filter_values_with_regexp"
 		case *ExtractListItemRule:
 			name = "extract_list_items"
+		case *InjectIndexRule:
+			name = "inject_index"
+		case *MakeArrayRule:
+			name = "make_array"
+		case *RemoveKeyRule:
+			name = "remove_key"
 
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
@@ -113,6 +121,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		switch name {
 		case "copy":
 			r = &CopyRule{}
+		case "copy_to_list":
+			r = &CopyToListRule{}
 		case "rename":
 			r = &RenameRule{}
 		case "translate":
@@ -129,6 +139,12 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &FilterValuesWithRegexpRule{}
 		case "extract_list_items":
 			r = &ExtractListItemRule{}
+		case "inject_index":
+			r = &InjectIndexRule{}
+		case "make_array":
+			r = &MakeArrayRule{}
+		case "remove_key":
+			r = &RemoveKeyRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -141,6 +157,214 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	r.Rules = rules
 	return nil
+}
+
+// RemoveKeyRule removes key from a dict.
+type RemoveKeyRule struct {
+	Key string
+}
+
+// Apply applies remove key rule.
+func (r *RemoveKeyRule) Apply(ast *AST) error {
+	sourceMap, ok := ast.root.(*Dict)
+	if !ok {
+		return nil
+	}
+
+	for i, item := range sourceMap.value {
+		itemKey, ok := item.(*Key)
+		if !ok {
+			continue
+		}
+
+		if itemKey.name != r.Key {
+			continue
+		}
+
+		sourceMap.value = append(sourceMap.value[:i], sourceMap.value[i+1:]...)
+		return nil
+	}
+	return nil
+}
+
+// RemoveKey creates a RemoveKeyRule
+func RemoveKey(key string) *RemoveKeyRule {
+	return &RemoveKeyRule{
+		Key: key,
+	}
+}
+
+// MakeArrayRule transforms a single value into an array of length 1.
+type MakeArrayRule struct {
+	Item Selector
+	To   string
+}
+
+// Apply applies make array rule.
+func (r *MakeArrayRule) Apply(ast *AST) error {
+	sourceNode, found := Lookup(ast, r.Item)
+	if !found {
+		return nil
+	}
+
+	newList := &List{
+		value: make([]Node, 0, 1),
+	}
+
+	sourceKey, ok := sourceNode.(*Key)
+	if !ok {
+		return nil
+	}
+
+	newList.value = append(newList.value, sourceKey.value.Clone())
+	return Insert(ast, newList, r.To)
+}
+
+// MakeArray creates a MakeArrayRule
+func MakeArray(item Selector, to string) *MakeArrayRule {
+	return &MakeArrayRule{
+		Item: item,
+		To:   to,
+	}
+}
+
+// CopyToListRule is a rule which copies a specified
+// node into every item in a provided list.
+type CopyToListRule struct {
+	Item Selector
+	To   string
+}
+
+// Apply copies specified node into every item of the list.
+func (r *CopyToListRule) Apply(ast *AST) error {
+	sourceNode, found := Lookup(ast, r.Item)
+	if !found {
+		// nothing to copy
+		return nil
+	}
+
+	targetListNode, found := Lookup(ast, r.To)
+	if !found {
+		// nowhere to copy
+		return nil
+	}
+
+	targetList, ok := targetListNode.Value().(*List)
+	if !ok {
+		return errors.New("target node is not a list")
+	}
+
+	for _, listItem := range targetList.value {
+		listItemMap, ok := listItem.(*Dict)
+		if !ok {
+			continue
+		}
+
+		listItemMap.value = append(listItemMap.value, sourceNode.Clone())
+	}
+
+	return nil
+}
+
+// CopyToList creates a CopyToListRule
+func CopyToList(item Selector, to string) *CopyToListRule {
+	return &CopyToListRule{
+		Item: item,
+		To:   to,
+	}
+}
+
+// InjectIndexRule injects index to each input.
+// Index is in form {type}-{namespace}-{dataset-type}
+// type: is provided to the rule.
+// namespace: is collected from streams[n].namespace. If not found used 'default'.
+// dataset-type: is collected from streams[n].dataset.type. If not found used 'generic'.
+type InjectIndexRule struct {
+	Type string
+}
+
+// Apply injects index into input.
+func (r *InjectIndexRule) Apply(ast *AST) error {
+	const defaultNamespace = "default"
+	const defaultDataset = "generic"
+
+	datasourcesNode, found := Lookup(ast, "datasources")
+	if !found {
+		return nil
+	}
+
+	datasourcesList, ok := datasourcesNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, datasourceNode := range datasourcesList.value {
+		namespace := defaultNamespace
+		nsNode, found := datasourceNode.Find("namespace")
+		if found {
+			nsKey, ok := nsNode.(*Key)
+			if ok {
+				namespace = nsKey.value.String()
+			}
+		}
+
+		// get input
+		inputNode, found := datasourceNode.Find("inputs")
+		if !found {
+			continue
+		}
+
+		inputsList, ok := inputNode.Value().(*List)
+		if !ok {
+			continue
+		}
+
+		for _, inputNode := range inputsList.value {
+			streamsNode, ok := inputNode.Find("streams")
+			if !ok {
+				continue
+			}
+
+			streamsList, ok := streamsNode.Value().(*List)
+			if !ok {
+				continue
+			}
+
+			for _, streamNode := range streamsList.value {
+				streamMap, ok := streamNode.(*Dict)
+				if !ok {
+					continue
+				}
+
+				dataset := defaultDataset
+
+				dsNode, found := streamNode.Find("dataset")
+				if found {
+					dsKey, ok := dsNode.(*Key)
+					if ok {
+						dataset = dsKey.value.String()
+					}
+
+				}
+
+				streamMap.value = append(streamMap.value, &Key{
+					name:  "index",
+					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
+				})
+			}
+
+		}
+
+	}
+
+	return nil
+}
+
+// InjectIndex creates a InjectIndexRule
+func InjectIndex(indexType string) *InjectIndexRule {
+	return &InjectIndexRule{
+		Type: indexType,
+	}
 }
 
 // ExtractListItemRule extract items with specified name from a list of maps.
@@ -185,6 +409,13 @@ func (r *ExtractListItemRule) Apply(ast *AST) error {
 
 		vn, ok := in.Value().(Node)
 		if !ok {
+			continue
+		}
+
+		if ln, ok := vn.(*List); ok {
+			for _, lnItem := range ln.value {
+				newList.value = append(newList.value, lnItem.Clone())
+			}
 			continue
 		}
 

@@ -5,19 +5,24 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
 )
 
 const (
-	monitoringName      = "FLEET_MONITORING"
-	programsKey         = "programs"
-	monitoringKey       = "monitoring"
-	monitoringOutputKey = "monitoring.elasticsearch"
-	enabledKey          = "monitoring.enabled"
-	outputKey           = "output"
-	outputsKey          = "outputs"
-	typeKey             = "type"
+	monitoringName            = "FLEET_MONITORING"
+	programsKey               = "programs"
+	monitoringKey             = "settings.monitoring"
+	monitoringUseOutputKey    = "settings.monitoring.use_output"
+	monitoringOutputFormatKey = "outputs.%s"
+	outputKey                 = "output"
+
+	enabledKey       = "settings.monitoring.enabled"
+	outputsKey       = "outputs"
+	elasticsearchKey = "elasticsearch"
+	typeKey          = "type"
 )
 
 func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
@@ -35,8 +40,21 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 		config = make(map[string]interface{})
 		config[enabledKey] = false
 	} else {
+		// get monitoring output name to be used
+		useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
+		if !found {
+			return programsToRun, nil
+		}
+
+		monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
+		if !ok {
+			return programsToRun, nil
+		}
+
+		monitoringOutputName := monitoringOutputNameKey.String()
+
 		ast := rootAst.Clone()
-		if err := getMonitoringRule(outputGroup).Apply(ast); err != nil {
+		if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
 			return programsToRun, err
 		}
 
@@ -63,8 +81,10 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 }
 
 func getMonitoringRule(outputName string) *transpiler.RuleList {
+	monitoringOutputSelector := fmt.Sprintf(monitoringOutputFormatKey, outputName)
 	return transpiler.NewRuleList(
-		transpiler.Copy(monitoringOutputKey, outputKey),
+		transpiler.Copy(monitoringOutputSelector, outputKey),
+		transpiler.Rename(fmt.Sprintf("%s.%s", outputsKey, outputName), elasticsearchKey),
 		transpiler.Filter(monitoringKey, programsKey, outputKey),
 	)
 }

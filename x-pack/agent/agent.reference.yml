@@ -13,12 +13,21 @@ outputs:
     username: elastic
     password: changeme
 
-streams:
-  - type: event/file
-    enabled: true
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
+datasources:
+  - namespace: sample
+    use_output: default
+    inputs:
+      - type: logs
+        processors:
+        streams:
+          - dataset: sample.acccess
+            paths: /var/log/sample/access.log
+          - enabled: false
+            dataset: sample.error
+            paths: /var/log/sample/error.log
+      - type: system/metrics
+        streams:
+          - metricset: cpu
 
 management:
   # Mode of management, the agent currently only support the following mode:

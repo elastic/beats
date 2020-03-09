@@ -144,8 +144,8 @@ func newManaged(
 	}
 
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{
+		&fleetapi.ActionConfigChange{},
+		&handlerConfigChange{
 			log:     log,
 			emitter: emit,
 		},

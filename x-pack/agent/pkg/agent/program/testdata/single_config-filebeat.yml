@@ -4,6 +4,7 @@ filebeat:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
+    index: logs-generic-default
 output:
   elasticsearch:
     hosts:
@@ -11,3 +12,5 @@ output:
       - 127.0.0.1:9300
     username: elastic
     password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=

@@ -1,19 +1,49 @@
-streams:
-  - type: metric/docker
-    setting: one
-  - type: metric/apache
-    setting: two
-  - type: event/file
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
-management:
-  host: "localhost"
-config:
-  reload: 123
+name:	Production Website DB Servers
+fleet:
+    kibana_url: https://kibana.mydomain.com:5601
+    ca_hash: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+    checkin_interval: 5m
+
 outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
     username: elastic
     password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+
+  monitoring:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["monitoring:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+
+datasources:
+  - use_output: default
+    inputs:
+    - type: docker/metrics
+      streams:
+        - metricset: status
+          dataset: docker.status
+    - type: logs
+      streams:
+        - paths:
+          - /var/log/hello1.log
+          - /var/log/hello2.log
+  - namespace: testing
+    use_output: default
+    inputs:
+      - type: apache/metrics
+        streams:
+          - enabled: true
+            metricset: info
+
+settings.monitoring:
+  use_output: monitoring
+
+management:
+  host: "localhost"
+
+config:
+  reload: 123
